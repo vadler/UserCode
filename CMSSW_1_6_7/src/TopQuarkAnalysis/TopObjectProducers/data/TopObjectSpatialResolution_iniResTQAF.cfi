@@ -1,0 +1,125 @@
+//
+// Modules for smearing 4-vector's angles of TopObjects
+//
+// Parameters:
+// - InputTag movedTopObject:
+//   Specify object to smear. 
+//   Object type should correspond to module (e.g. TopElectron in module TopElectronSpatialResolution) 
+// - bool useDefaultInitialResolutions :
+//   TopObjects contain individual 4-vector resolutions (in terms of Et, theta/eta, phi).
+//   Set this to "true" if these should be used to compute initial resolutions for the smearing.
+// - bool usePolarTheta:
+//   Switch top specify, if eta or rather theta is used for the polar angle smearing.
+//   Set this to "true" to smear theta or to "false" to smear eta.
+// - double initialResolutionPolar:
+//   Initial resolution (in radiants for theta) to be used for the eta/theta smearing.
+//   Is given as absolute value only, since factors make no sense for angles.
+//   Overwritten, if 'useDefaultInitialResolution' is "true".
+// - double worsenResolutionPolar:
+//   Used to calculate the final resolution (after smearing) from the initial resolution.
+//   The angle is smeared with a Gaussion of
+//   mu    = angle and
+//   sigma = sqrt(finalRes^2-iniRes^2).
+// - bool worsenResolutionPolarByFactor:
+//   Flags the usage mode of 'worsenResolutionPolar' (how the final resolution is calculated from the initial one)
+// - double initialResolutionPhi, double worsenResolutionPhi and bool worsenResolutionPhiByFactor:
+//   Accordingly...
+//
+// Examples:
+//
+// Remarks:
+// - To switch off angular smearing, use (worsenResolutionPolar=0.) resp. (worsenResolutionPhi=0.)
+// - All numeric values are protected from "meaninglessness" by the usage of absolute values only.
+// - In the standard sequence at the bottom of this file, TopTaus are commented.
+// - Keep polar smearing switched of for MET objects!!! ;-)
+//
+// Contact: volker.adler@cern.ch
+//
+
+
+// initialize random number generator
+service = RandomNumberGeneratorService {
+  untracked uint32 sourceSeed = 7893456
+  // need one initializer for each module defined below
+  PSet moduleSeeds = {
+    untracked uint32 movedTopElectrons = 897867
+    untracked uint32 movedTopMuons     = 17987
+    untracked uint32 movedTopTaus      = 38476
+    untracked uint32 movedTopJets      = 61587
+    untracked uint32 movedTopMETs      = 3489766
+  }
+}
+
+// Top electrons
+module movedTopElectrons = TopElectronSpatialResolution {
+  InputTag movedTopObject                = selectedLayer1TopElectrons
+  bool     useDefaultInitialResolutions  = true
+  bool     usePolarTheta                 = true
+  double   initialResolutionPolar        = 0.
+  double   worsenResolutionPolar         = 2.
+  bool     worsenResolutionPolarByFactor = true
+  double   initialResolutionPhi          = 0.
+  double   worsenResolutionPhi           = 1.
+  bool     worsenResolutionPhiByFactor   = true
+}
+
+// Top muons
+module movedTopMuons = TopMuonSpatialResolution {
+  InputTag movedTopObject                = selectedLayer1TopMuons
+  bool     useDefaultInitialResolutions  = true
+  bool     usePolarTheta                 = false
+  double   initialResolutionPolar        = 0.
+  double   worsenResolutionPolar         = 2.
+  bool     worsenResolutionPolarByFactor = true
+  double   initialResolutionPhi          = 0.
+  double   worsenResolutionPhi           = 1.
+  bool     worsenResolutionPhiByFactor   = true
+}
+
+// Top taus
+module movedTopTaus = TopTauSpatialResolution {
+  InputTag movedTopObject                = selectedLayer1TopTaus
+  bool     useDefaultInitialResolutions  = true
+  bool     usePolarTheta                 = true
+  double   initialResolutionPolar        = 0.
+  double   worsenResolutionPolar         = 1.
+  bool     worsenResolutionPolarByFactor = true
+  double   initialResolutionPhi          = 0.
+  double   worsenResolutionPhi           = 1.
+  bool     worsenResolutionPhiByFactor   = true
+}
+
+// Top light jets
+module movedTopJets = TopJetSpatialResolution {
+  InputTag movedTopObject                = selectedLayer1TopJets
+  bool     useDefaultInitialResolutions  = true
+  bool     usePolarTheta                 = true
+  double   initialResolutionPolar        = 0.
+  double   worsenResolutionPolar         = 0.25
+  bool     worsenResolutionPolarByFactor = false
+  double   initialResolutionPhi          = 0.
+  double   worsenResolutionPhi           = 1.
+  bool     worsenResolutionPhiByFactor   = true
+}
+
+// Top METs
+module movedTopMETs = TopMETSpatialResolution {
+  InputTag movedTopObject                = selectedLayer1TopMETs
+  bool     useDefaultInitialResolutions  = true
+  bool     usePolarTheta                 = true
+  double   initialResolutionPolar        = 0.
+  double   worsenResolutionPolar         = 1.
+  bool     worsenResolutionPolarByFactor = true
+  double   initialResolutionPhi          = 0.
+  double   worsenResolutionPhi           = 0.8
+  bool     worsenResolutionPhiByFactor   = false
+}
+
+// Standard sequence for all objects
+sequence movedTopObjects = {
+  movedTopElectrons &
+  movedTopMuons &
+//  movedTopTaus &
+  movedTopJets &
+  movedTopMETs
+}
