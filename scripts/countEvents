@@ -1,0 +1,38 @@
+set oldDir="$PWD"
+foreach dataSet (tt0j_135 tt1j_135 tt2j_135 tt3j_135 tt4j_135)
+  cd /tmp/vadler/test/${dataSet}
+  rm -f countedEvents_${dataSet}.txt
+  touch countedEvents_${dataSet}.txt
+  if -d res then
+    grep "<EventsRead>"  res/crab_fjr_*.xml >> countedEvents_${dataSet}.txt
+    grep "<TotalEvents>" res/crab_fjr_*.xml >> countedEvents_${dataSet}.txt
+    if -f countedEvents_${dataSet}.txt then
+      awk 'BEGIN { \
+             FS = "<EventsRead>" \
+             events = 0 \
+           } \
+           /<EventsRead>/ { \
+             events += $NF \
+           } \
+           END { \
+             print "" \
+             print "total events read:", events \
+           }' countedEvents_${dataSet}.txt >> countedEvents_${dataSet}.txt
+      awk 'BEGIN { \
+             FS = "<TotalEvents>" \
+             events = 0 \
+           } \
+           /<TotalEvents>/ { \
+             events += $NF \
+           } \
+           END { \
+             print "" \
+             print "total events written:", events \
+           }' countedEvents_${dataSet}.txt >> countedEvents_${dataSet}.txt
+      echo "data set: ${dataSet}"
+      echo -n "--> "; grep "total events read:" countedEvents_${dataSet}.txt
+      echo -n "--> "; grep "total events written:" countedEvents_${dataSet}.txt
+    endif
+  endif
+end
+cd $oldDir
