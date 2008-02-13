@@ -1,0 +1,30 @@
+module analyzeGenEvent = AnalyzeGenEvent {
+
+  // output file
+  string outputFilePath = "/msa3/vadler/TtSpinCorrelations/tt0j_2231-test/analyzeGenEvent-test.root"
+
+  // input TtGenEvent that contains the top decay chains and the initial partons
+  InputTag srcGenEvent = genEvt
+
+  // choose reference bases
+  bool useHelicityBasis       = true
+  bool useInitialPartonsBasis = false // not implemented yet (not IR-safe anyway)
+  bool useBeamBasis           = true
+  bool useOffDiagonalBasis    = true
+  bool useOptimalBasis        = false // not implemented yet
+
+  // split sample into analysis/reference sample
+  double splitTtValue        =  40. // split value at:
+                                    // - splitTtMassAbsolute = true
+                                    //   sample split for tt mass at this value
+                                    // - splitTtMassAbsolute = false
+                                    //   sample split such, that this value gives percentage of events in analysis sample
+  bool   splitTtMassAbsolute = false // false splits by percentag of number of events
+
+  // tree & histogram settings
+  int32  binsTtMass     =   66
+  double xMinTtMass     =  350.
+  double xMaxTtMass     = 2000.
+  int32  binsCosAngle1D =    6
+  int32  binsCosAngle2D =   25
+}
