@@ -14,17 +14,17 @@ module analyzeGenEvent = AnalyzeGenEvent {
   bool useOptimalBasis        = false // not implemented yet
 
   // split sample into analysis/reference sample
-  double splitTtValue        =  40. // split value at:
-                                    // - splitTtMassAbsolute = true
-                                    //   sample split for tt mass at this value
-                                    // - splitTtMassAbsolute = false
-                                    //   sample split such, that this value gives percentage of events in analysis sample
+  double splitTtValue        =  50.  // split value at:
+                                     // - splitTtMassAbsolute = true
+                                     //   sample split for tt mass at this value
+                                     // - splitTtMassAbsolute = false
+                                     //   sample split such, that this value gives percentage of events in analysis sample
   bool   splitTtMassAbsolute = false // false splits by percentag of number of events
 
   // tree & histogram settings
   int32  binsTtMass     =   66
   double xMinTtMass     =  350.
   double xMaxTtMass     = 2000.
-  int32  binsCosAngle1D =    6
-  int32  binsCosAngle2D =   25
+  int32  binsCosAngle1D =   25
+  int32  binsCosAngle2D =    6
 }
