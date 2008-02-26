@@ -19,7 +19,7 @@ sequence patHLTProducer_withoutTau = {
 sequence patHLTProducer = {
 //     patHLTMProducerwithoutTau,
 //     tauHLTProducer
-    patHLT_withoutTau
+    patHLTProducer_withoutTau
 }
 
 include "PhysicsTools/PatAlgos/data/electronHLTMatch.cfi"
