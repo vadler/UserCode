@@ -8,12 +8,12 @@ include "PhysicsTools/PatAlgos/data/photonHLTProducer.cfi"
 
 sequence patHLTProducer_withoutTau = {
 //     electronHLTProducer,
-//     muonHLTProducer,
-//     photonHLTProducer,
+    muonHLTProducer,
+    photonHLTProducer,
 //     jetHLTProducer,
 //     metHLTProducer,
 //     btagHLTProducer
-    muonHLTProducer
+    electronHLTProducer
 }
 
 sequence patHLTProducer = {
@@ -32,18 +32,18 @@ include "PhysicsTools/PatAlgos/data/photonHLTMatch.cfi"
 
 sequence patHLTMatch_withoutTau = {
 //     electronHLTMatch,
-//     muonHLTMatch,
-//     photonHLTMatch,
+    muonHLTMatch,
+    photonHLTMatch,
 //     jetHLTMatch,
 //     metHLTMatch,
 //     btagHLTMatch
-    muonHLTMatch
+    electronHLTMatch
 }
 
 sequence patHLTMatch = {
 //     patHLTMatch_withoutTau,
 //     tauHLTMatch
-    patHLT_withoutTau
+    patHLTMatch_withoutTau
 }
 
 sequence patHLT_withoutTau = {

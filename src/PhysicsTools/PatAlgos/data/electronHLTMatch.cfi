@@ -39,12 +39,9 @@ module electronHLTMatchHLT2ElectronRelaxed = PATHLTMatcher {
    bool resolveByMatchQuality = false
 }
 
-// sequence electronHLTMatch = {
-//     electronHLTMatchHLT1Electron,
-//     electronHLTMatchHLT1ElectronRelaxed,
-//     electronHLTMatchHLT2Electron,
-//     electronHLTMatchHLT2ElectronRelaxed
-// }
 sequence electronHLTMatch = {
-    electronHLTMatchHLT1ElectronRelaxed
+    electronHLTMatchHLT1Electron,
+    electronHLTMatchHLT1ElectronRelaxed,
+    electronHLTMatchHLT2Electron,
+    electronHLTMatchHLT2ElectronRelaxed
 }

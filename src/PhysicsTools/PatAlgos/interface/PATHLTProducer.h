@@ -9,45 +9,49 @@
 //
 /**
   \class    PATHLTProducer PATHLTProducer.h "PhysicsTools/PatAlgos/interface/PATHLTProducer.h"
-  \brief    A CandidateCollection of "firing" trigger objects from a given trigger/filter is produced from trigger information available in AOD.
+  \brief    A CandidateCollection of "firing" trigger objects from a given filter in a given trigger path is produced from trigger information available in AOD.
 
    No documentation yet.
 
   \author   Volker Adler
-  \version  $Id:$
+  \version  $Id: PATHLTProducer.h,v 1.1 2008/02/22 11:27:45 vadler Exp $
 */
 //
-// $Id:$
+// $Id: PATHLTProducer.h,v 1.1 2008/02/22 11:27:45 vadler Exp $
 // based on the HLTCandProducer by florian.bechtel@cern.ch
 //
 
 
-#include <vector>
 #include <string>
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDProducer.h"
+
+#include "FWCore/Framework/interface/Run.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
 
+using namespace std;
+using namespace edm;
+
 namespace pat {
 
-  class PATHLTProducer : public edm::EDProducer {
+  class PATHLTProducer : public EDProducer {
 
     public:
 
-      explicit PATHLTProducer( const edm::ParameterSet& iConfig );
+      explicit PATHLTProducer( const ParameterSet& iConfig );
       ~PATHLTProducer();
 
     private:
 
-      virtual void produce( edm::Event& iEvent, const edm::EventSetup& iSetup );
+      virtual void produce( Event& iEvent, const EventSetup& iSetup );
       
-      edm::InputTag triggerResults_;
-      std::string   triggerName_;
-      edm::InputTag filterName_;
+      InputTag triggerResults_;
+      string   triggerName_;
+      InputTag filterName_;
 
   };
 

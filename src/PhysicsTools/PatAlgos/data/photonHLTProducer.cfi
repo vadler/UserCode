@@ -22,12 +22,9 @@ module HLT2PhotonRelaxed = PATHLTProducer {
     InputTag filterName      = hltL1NonIsoDoublePhotonDoubleEtFilter::HLT
 }
 
-// sequence photonHLTProducer = {
-//     HLT1Photon,
-//     HLT1PhotonRelaxed,
-//     HLT2Photon,
-//     HLT2PhotonRelaxed
-// }
 sequence photonHLTProducer = {
-    HLT1PhotonRelaxed
+    HLT1Photon,
+    HLT1PhotonRelaxed,
+    HLT2Photon,
+    HLT2PhotonRelaxed
 }

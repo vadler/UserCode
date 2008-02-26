@@ -22,12 +22,9 @@ module HLT2ElectronRelaxed = PATHLTProducer {
     InputTag filterName      = hltL1NonIsoDoubleElectronTrackIsolFilter::HLT
 }
 
-// sequence electronHLTProducer = {
-//     HLT1Electron,
-//     HLT1ElectronRelaxed,
-//     HLT2Electron,
-//     HLT2ElectronRelaxed
-// }
 sequence electronHLTProducer = {
-    HLT1ElectronRelaxed
+    HLT1Electron,
+    HLT1ElectronRelaxed,
+    HLT2Electron,
+    HLT2ElectronRelaxed
 }

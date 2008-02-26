@@ -30,11 +30,8 @@ module muonHLTMatchHLT2MuonNonIso = PATHLTMatcher {
    bool resolveByMatchQuality = false
 }
 
-// sequence muonHLTMatch = {
-//     muonHLTMatchHLT1MuonIso,
-//     muonHLTMatchHLT1MuonNonIso,
-//     muonHLTMatchHLT2MuonNonIso
-// }
 sequence muonHLTMatch = {
-    muonHLTMatchHLT1MuonNonIso
+    muonHLTMatchHLT1MuonIso,
+    muonHLTMatchHLT1MuonNonIso,
+    muonHLTMatchHLT2MuonNonIso
 }
