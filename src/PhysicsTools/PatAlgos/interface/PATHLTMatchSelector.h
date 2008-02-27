@@ -1,5 +1,5 @@
-#ifndef PATHLTMatchSelector_h
-#define PATHLTMatchSelector_h
+#ifndef PhysicsTools_PatAlgos_PATHLTMatchSelector_h
+#define PhysicsTools_PatAlgos_PATHLTMatchSelector_h
 
 
 // -*- C++ -*-
@@ -15,10 +15,10 @@
    This might be replaced later by checks if the particular PATObject cold have been fired the requested trigger/filter at all.
 
   \author   Volker Adler
-  \version  $Id:$
+  \version  $Id: PATHLTMatchSelector.h,v 1.1 2008/02/22 11:27:45 vadler Exp $
 */
 //
-// $Id:$
+// $Id: PATHLTMatchSelector.h,v 1.1 2008/02/22 11:27:45 vadler Exp $
 //
 
 

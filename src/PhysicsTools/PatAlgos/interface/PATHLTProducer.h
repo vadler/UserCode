@@ -13,12 +13,11 @@
 
    No documentation yet.
 
-  \author   Volker Adler
-  \version  $Id: PATHLTProducer.h,v 1.1 2008/02/22 11:27:45 vadler Exp $
+  \author   Volker Adler (based on the HLTCandProducer by Florian Bechtel)
+  \version  $Id: PATHLTProducer.h,v 1.2 2008/02/26 12:38:10 vadler Exp $
 */
 //
-// $Id: PATHLTProducer.h,v 1.1 2008/02/22 11:27:45 vadler Exp $
-// based on the HLTCandProducer by florian.bechtel@cern.ch
+// $Id: PATHLTProducer.h,v 1.2 2008/02/26 12:38:10 vadler Exp $
 //
 
 
