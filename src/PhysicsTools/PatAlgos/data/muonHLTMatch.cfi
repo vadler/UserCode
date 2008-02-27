@@ -5,7 +5,7 @@
 
 module muonHLTMatchHLT1MuonIso = PATHLTMatcher {
    InputTag src               = allLayer0Muons
-   InputTag matched           = HLT1MuonNonIso
+   InputTag matched           = HLT1MuonIso
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true
