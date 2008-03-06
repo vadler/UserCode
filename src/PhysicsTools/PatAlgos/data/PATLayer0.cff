@@ -97,11 +97,15 @@ include "PhysicsTools/PatAlgos/data/PATHighLevelReco.cff"
 
 # perform MC matching
 include "PhysicsTools/PatAlgos/data/MCTruth.cff"
+# perform L1 matching
+include "PhysicsTools/PatAlgos/data/L1.cff"
 # perform HLT matching
 include "PhysicsTools/PatAlgos/data/HLT.cff"
 
-// sequence patLayer0_withoutPFTau = { patBeforeLevel0Reco, patLayer0Cleaners_withoutPFTau, patHighLevelReco, patMCTruth_withoutTau }
+// sequence patLayer0_withoutPFTau = { patBeforeLevel0Reco, patLayer0Cleaners_withoutPFTau, patHighLevelReco, patMCTruth_withoutTau, patL1_withoutTau }
+// sequence patLayer0              = { patBeforeLevel0Reco, patLayer0Cleaners, patHighLevelReco, patMCTruth, patL1 }
+// sequence patLayer0_withoutPFTau = { patBeforeLevel0Reco, patLayer0Cleaners_withoutPFTau, patHighLevelReco, patMCTruth_withoutTau, patHLT_withoutTau }
 // sequence patLayer0              = { patBeforeLevel0Reco, patLayer0Cleaners, patHighLevelReco, patMCTruth, patHLT }
-sequence patLayer0_withoutPFTau = { patBeforeLevel0Reco, patLayer0Cleaners_withoutPFTau, patHighLevelReco, patMCTruth_withoutTau, patHLT_withoutTau }
-sequence patLayer0              = { patBeforeLevel0Reco, patLayer0Cleaners, patHighLevelReco, patMCTruth, patHLT }
+sequence patLayer0_withoutPFTau = { patBeforeLevel0Reco, patLayer0Cleaners_withoutPFTau, patHighLevelReco, patMCTruth_withoutTau, patL1_withoutTau, patHLT_withoutTau }
+sequence patLayer0              = { patBeforeLevel0Reco, patLayer0Cleaners, patHighLevelReco, patMCTruth, patL1, patHLT }
 

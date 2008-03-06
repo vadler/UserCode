@@ -8,6 +8,15 @@ block patLayer0EventContent = {
     "keep recoTracks_gsWithMaterialTracks_*_*",
     "keep *_offlinePrimaryVerticesFromCTFTracks_*_*",
     
+    "keep *_L1SingleEG5_*_*",
+    "keep *_L1SingleMu3_*_*",
+    "keep *_L1ETM20_*_*",
+    
+    "keep *_electronL1MatchL1SingleEG5_*_*",
+    "keep *_photonL1MatchL1SingleEG5_*_*",
+    "keep *_muonL1MatchL1SingleMu3_*_*",
+    "keep *_metL1MatchL1ETM20_*_*",
+    
     "keep *_HLT1Photon_*_*",
     "keep *_HLT1PhotonRelaxed_*_*",
     "keep *_HLT2Photon_*_*",
