@@ -1,9 +1,9 @@
 //
-// $Id$
+// $Id: PATL1Producer.cc,v 1.1 2008/03/06 16:28:38 vadler Exp $
 //
 
 
-#include "PhysicsTools/PatAlgos/interface/PATL1Producer.h"
+#include "PhysicsTools/PatAlgos/plugins/PATL1Producer.h"
 
 #include "DataFormats/L1Trigger/interface/L1ParticleMap.h"
 

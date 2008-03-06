@@ -1,9 +1,9 @@
 //
-// $Id: PATHLTProducer.cc,v 1.2 2008/02/26 12:38:11 vadler Exp $
+// $Id: PATHLTProducer.cc,v 1.3 2008/02/27 09:10:15 vadler Exp $
 //
 
 
-#include "PhysicsTools/PatAlgos/interface/PATHLTProducer.h"
+#include "PhysicsTools/PatAlgos/plugins/PATHLTProducer.h"
 
 #include <vector>
 
@@ -40,19 +40,19 @@ void PATHLTProducer::produce( Event& iEvent, const EventSetup& iSetup )
   TriggerNames triggerNames( *triggerResults );
   unsigned int triggerIndex = triggerNames.triggerIndex( triggerName_ );
   if ( triggerIndex == triggerNames.size() ) {
-    LogInfo( "wrongTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " is not known in this event!";
+    LogWarning( "wrongTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " is not known in this event!";
   } else if ( ! triggerResults->wasrun( triggerIndex ) ) {
-    LogInfo( "notrunTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " was not run in this event!";
+    LogWarning( "notrunTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " was not run in this event!";
   } else if ( ! triggerResults->accept( triggerIndex ) ) {
-    LogInfo( "notacceptTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " did not accept this event!";
+    LogWarning( "notacceptTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " did not accept this event!";
   } else if (   triggerResults->error ( triggerIndex ) ) {
-    LogInfo( "errorTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " had an error in this event!";
+    LogWarning( "errorTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " had an error in this event!";
   } else {
     Handle<reco::HLTFilterObjectWithRefs> hltFilter;
     try { // In this case, we want to act differently compared to the usual behaviour on "ProductNotFound" exception thrown by Event::getByLabel.
       iEvent.getByLabel( filterName_, hltFilter );
       if ( triggerIndex != hltFilter->path() ) {
-        LogInfo( "wrongTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " does not belong to the trigger path " << triggerName_ << "!";
+        LogWarning( "wrongTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " does not belong to the trigger path " << triggerName_ << "!";
       } else {
         // loop over trigger objects and store trigger candidates
         for ( unsigned int iTriggerObject = 0; iTriggerObject < hltFilter->size(); ++iTriggerObject ) {
@@ -63,7 +63,7 @@ void PATHLTProducer::produce( Event& iEvent, const EventSetup& iSetup )
       }
     } catch( Exception exc ) {
       if ( exc.codeToString( exc.categoryCode() ) == "ProductNotFound" ) {
-        LogInfo( "notpresentTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " is not present here!";
+        LogWarning( "notpresentTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " is not present here!";
       } else {
         throw exc;
       }

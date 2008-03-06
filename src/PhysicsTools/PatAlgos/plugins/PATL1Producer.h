@@ -8,16 +8,16 @@
 // Class:      PATL1Producer
 //
 /**
-  \class    PATL1Producer PATL1Producer.h "PhysicsTools/PatAlgos/interface/PATL1Producer.h"
+  \class    pat::PATL1Producer PATL1Producer.h "PhysicsTools/PatAlgos/interface/PATL1Producer.h"
   \brief    Produces a CandidateCollection of L1 trigger objects.
 
    A CandidateCollection of "firing" L1 trigger objects from a given L1 trigger is produced from L1 information available in AOD.
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: PATL1Producer.h,v 1.1 2008/03/06 16:28:37 vadler Exp $
 */
 //
-// $Id$
+// $Id: PATL1Producer.h,v 1.1 2008/03/06 16:28:37 vadler Exp $
 //
 
 

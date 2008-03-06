@@ -8,16 +8,16 @@
 // Class:      PATHLTProducer
 //
 /**
-  \class    PATHLTProducer PATHLTProducer.h "PhysicsTools/PatAlgos/interface/PATHLTProducer.h"
-  \brief    A CandidateCollection of "firing" trigger objects from a given filter in a given trigger path is produced from trigger information available in AOD.
+  \class    pat::PATHLTProducer PATHLTProducer.h "PhysicsTools/PatAlgos/interface/PATHLTProducer.h"
+  \brief    Produces a CandidateCollection of trigger objects.
 
-   No documentation yet.
+   A CandidateCollection of "firing" trigger objects from a given filter in a given trigger path is produced from trigger information available in AOD.
 
-  \author   Volker Adler (based on the HLTCandProducer by Florian Bechtel)
-  \version  $Id: PATHLTProducer.h,v 1.2 2008/02/26 12:38:10 vadler Exp $
+  \author   Volker Adler
+  \version  $Id: PATHLTProducer.h,v 1.3 2008/02/27 09:10:12 vadler Exp $
 */
 //
-// $Id: PATHLTProducer.h,v 1.2 2008/02/26 12:38:10 vadler Exp $
+// $Id: PATHLTProducer.h,v 1.3 2008/02/27 09:10:12 vadler Exp $
 //
 
 
