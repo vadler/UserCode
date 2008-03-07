@@ -1,5 +1,5 @@
 //
-// $Id: PATL1Producer.cc,v 1.1 2008/03/06 16:28:38 vadler Exp $
+// $Id: PATL1Producer.cc,v 1.1 2008/03/06 17:50:39 vadler Exp $
 //
 
 
@@ -44,7 +44,6 @@ void PATL1Producer::produce( Event& iEvent, const EventSetup& iSetup )
     } else {
       if ( objectType_ == "em" ) { // isolated or non-isolated (for electrons and photons)
         const L1EmParticleVectorRef& triggeredObjects = particleMap.emParticles();
-        // loop over L1 trigger objects and store L1 trigger candidates
         for ( unsigned int iTriggeredObjects = 0; iTriggeredObjects < triggeredObjects.size(); ++iTriggeredObjects ) {
           const reco::Candidate * patL1Candidate( triggeredObjects[ iTriggeredObjects ]->clone() );
           auto_ptr<reco::Candidate> ptr( patL1Candidate->clone() );
@@ -52,7 +51,6 @@ void PATL1Producer::produce( Event& iEvent, const EventSetup& iSetup )
         }
       } else if ( objectType_ == "muon" ) {
         const L1MuonParticleVectorRef& triggeredObjects = particleMap.muonParticles();
-        // loop over L1 trigger objects and store L1 trigger candidates
         for ( unsigned int iTriggeredObjects = 0; iTriggeredObjects < triggeredObjects.size(); ++iTriggeredObjects ) {
           const reco::Candidate * patL1Candidate( triggeredObjects[ iTriggeredObjects ]->clone() );
           auto_ptr<reco::Candidate> ptr( patL1Candidate->clone() );
@@ -60,7 +58,6 @@ void PATL1Producer::produce( Event& iEvent, const EventSetup& iSetup )
         }
       } else if ( objectType_ == "jet" ) { // central or forward (for jets) or tau
         const L1JetParticleVectorRef& triggeredObjects = particleMap.jetParticles();
-        // loop over L1 trigger objects and store L1 trigger candidates
         for ( unsigned int iTriggeredObjects = 0; iTriggeredObjects < triggeredObjects.size(); ++iTriggeredObjects ) {
           const reco::Candidate * patL1Candidate( triggeredObjects[ iTriggeredObjects ]->clone() );
           auto_ptr<reco::Candidate> ptr( patL1Candidate->clone() );
@@ -68,7 +65,6 @@ void PATL1Producer::produce( Event& iEvent, const EventSetup& iSetup )
         }
       } else if ( objectType_ == "met" ) {
         const L1EtMissParticleRefProd& triggeredObject = particleMap.etMissParticle();
-        // store L1 trigger candidates
         const reco::Candidate * patL1Candidate( triggeredObject->clone() );
         auto_ptr<reco::Candidate> ptr( patL1Candidate->clone() );
         patL1Candidates->push_back( ptr );        

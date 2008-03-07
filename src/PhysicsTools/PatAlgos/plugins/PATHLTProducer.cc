@@ -1,5 +1,5 @@
 //
-// $Id: PATHLTProducer.cc,v 1.3 2008/02/27 09:10:15 vadler Exp $
+// $Id: PATHLTProducer.cc,v 1.1 2008/03/06 17:50:39 vadler Exp $
 //
 
 
@@ -54,7 +54,6 @@ void PATHLTProducer::produce( Event& iEvent, const EventSetup& iSetup )
       if ( triggerIndex != hltFilter->path() ) {
         LogWarning( "wrongTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " does not belong to the trigger path " << triggerName_ << "!";
       } else {
-        // loop over trigger objects and store trigger candidates
         for ( unsigned int iTriggerObject = 0; iTriggerObject < hltFilter->size(); ++iTriggerObject ) {
           const reco::Candidate * patHltCandidate( &(hltFilter->at(iTriggerObject)) );
           auto_ptr<reco::Candidate> ptr( patHltCandidate->clone() );
