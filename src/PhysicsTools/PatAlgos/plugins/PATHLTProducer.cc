@@ -1,5 +1,5 @@
 //
-// $Id: PATHLTProducer.cc,v 1.3 2008/02/27 09:10:15 vadler Exp $
+// $Id: PATHLTProducer.cc,v 1.1 2008/03/06 17:50:39 vadler Exp $
 //
 
 
@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/HLTReco/interface/HLTFilterObject.h"
+// #include "DataFormats/HLTReco/interface/HLTFilterObject.h"
 
 #include "FWCore/Framework/interface/TriggerNames.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
@@ -48,26 +48,26 @@ void PATHLTProducer::produce( Event& iEvent, const EventSetup& iSetup )
   } else if (   triggerResults->error ( triggerIndex ) ) {
     LogWarning( "errorTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " had an error in this event!";
   } else {
-    Handle<reco::HLTFilterObjectWithRefs> hltFilter;
-    try { // In this case, we want to act differently compared to the usual behaviour on "ProductNotFound" exception thrown by Event::getByLabel.
-      iEvent.getByLabel( filterName_, hltFilter );
-      if ( triggerIndex != hltFilter->path() ) {
-        LogWarning( "wrongTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " does not belong to the trigger path " << triggerName_ << "!";
-      } else {
-        // loop over trigger objects and store trigger candidates
-        for ( unsigned int iTriggerObject = 0; iTriggerObject < hltFilter->size(); ++iTriggerObject ) {
-          const reco::Candidate * patHltCandidate( &(hltFilter->at(iTriggerObject)) );
-          auto_ptr<reco::Candidate> ptr( patHltCandidate->clone() );
-          patHltCandidates->push_back( ptr );        
-        }  
-      }
-    } catch( Exception exc ) {
-      if ( exc.codeToString( exc.categoryCode() ) == "ProductNotFound" ) {
-        LogWarning( "notpresentTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " is not present here!";
-      } else {
-        throw exc;
-      }
-    }
+//     Handle<reco::HLTFilterObjectWithRefs> hltFilter;
+//     try { // In this case, we want to act differently compared to the usual behaviour on "ProductNotFound" exception thrown by Event::getByLabel.
+//       iEvent.getByLabel( filterName_, hltFilter );
+//       if ( triggerIndex != hltFilter->path() ) {
+//         LogWarning( "wrongTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " does not belong to the trigger path " << triggerName_ << "!";
+//       } else {
+//         // loop over trigger objects and store trigger candidates
+//         for ( unsigned int iTriggerObject = 0; iTriggerObject < hltFilter->size(); ++iTriggerObject ) {
+//           const reco::Candidate * patHltCandidate( &(hltFilter->at(iTriggerObject)) );
+//           auto_ptr<reco::Candidate> ptr( patHltCandidate->clone() );
+//           patHltCandidates->push_back( ptr );        
+//         }  
+//       }
+//     } catch( Exception exc ) {
+//       if ( exc.codeToString( exc.categoryCode() ) == "ProductNotFound" ) {
+//         LogWarning( "notpresentTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " is not present here!";
+//       } else {
+//         throw exc;
+//       }
+//     }
   }
   iEvent.put( patHltCandidates );
 }
