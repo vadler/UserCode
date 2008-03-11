@@ -2,6 +2,7 @@ module HLT1MET = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1MET"
     InputTag filterName      = hlt1MET65::HLT
+    bool     reportVerbose   = false
 }
 
 sequence metHLTProducer = {

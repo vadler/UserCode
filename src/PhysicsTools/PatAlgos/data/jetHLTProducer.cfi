@@ -2,24 +2,28 @@ module HLT1Jet = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1Jet"
     InputTag filterName      = hlt1jet200::HLT
+    bool     reportVerbose   = false
 }
 
 module HLT2Jet = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT2Jet"
     InputTag filterName      = hlt2jet150::HLT
+    bool     reportVerbose   = false
 }
 
 module HLT3Jet = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT3Jet"
     InputTag filterName      = hlt3jet85::HLT
+    bool     reportVerbose   = false
 }
 
 module HLT4Jet = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT4Jet"
     InputTag filterName      = hlt4jet60::HLT
+    bool     reportVerbose   = false
 }
 
 sequence jetHLTProducer = {

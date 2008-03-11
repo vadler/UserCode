@@ -2,24 +2,28 @@ module HLT1Electron = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1Electron"
     InputTag filterName      = hltL1IsoSingleElectronTrackIsolFilter::HLT
+    bool     reportVerbose   = false
 }
 
 module HLT1ElectronRelaxed = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1ElectronRelaxed"
     InputTag filterName      = hltL1NonIsoSingleElectronTrackIsolFilter::HLT
+    bool     reportVerbose   = false
 }
 
 module HLT2Electron = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT2Electron"
     InputTag filterName      = hltL1IsoDoubleElectronTrackIsolFilter::HLT
+    bool     reportVerbose   = false
 }
 
 module HLT2ElectronRelaxed = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT2ElectronRelaxed"
     InputTag filterName      = hltL1NonIsoDoubleElectronTrackIsolFilter::HLT
+    bool     reportVerbose   = false
 }
 
 sequence electronHLTProducer = {

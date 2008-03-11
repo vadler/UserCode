@@ -2,12 +2,14 @@ module HLT1Tau = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1Tau"
     InputTag filterName      = filterL3SingleTau::HLT
+    bool     reportVerbose   = false
 }
 
 module HLT2TauPixel = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT2TauPixel"
     InputTag filterName      = filterL25PixelTau::HLT
+    bool     reportVerbose   = false
 }
 
 sequence tauHLTProducer = {
