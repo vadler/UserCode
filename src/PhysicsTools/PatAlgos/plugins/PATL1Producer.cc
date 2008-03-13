@@ -1,5 +1,5 @@
 //
-// $Id: PATL1Producer.cc,v 1.1.2.1 2008/03/07 18:18:35 vadler Exp $
+// $Id: PATL1Producer.cc,v 1.1.2.2 2008/03/11 13:52:31 vadler Exp $
 //
 
 
@@ -12,6 +12,8 @@
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
+using namespace std;
+using namespace edm;
 using namespace pat;
 using namespace l1extra;
 

@@ -1,5 +1,5 @@
 //
-// $Id: PATHLTProducer.cc,v 1.1.2.1 2008/03/07 18:18:35 vadler Exp $
+// $Id: PATHLTProducer.cc,v 1.1.2.2 2008/03/11 13:52:29 vadler Exp $
 //
 
 
@@ -16,6 +16,9 @@
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
+
+using namespace std;
+using namespace edm;
 using namespace pat;
 
 PATHLTProducer::PATHLTProducer( const ParameterSet& iConfig ) :
@@ -26,7 +29,8 @@ PATHLTProducer::PATHLTProducer( const ParameterSet& iConfig ) :
   report_         (iConfig.getParameter<bool>    ( "reportVerbose" ) )
 {
   produces<reco::CandidateCollection>();
-  produces<StringMap>();
+  produces<StringMap>( "hltTriggerNames" );
+  produces<StringMap>( "hltFilterNames" );
 }
 
 
@@ -39,6 +43,7 @@ void PATHLTProducer::produce( Event& iEvent, const EventSetup& iSetup )
 {
   auto_ptr<reco::CandidateCollection> patHltCandidates( new reco::CandidateCollection );
   auto_ptr<StringMap> patHltTriggerNames( new StringMap );
+  auto_ptr<StringMap> patHltFilterNames( new StringMap );
   
   Handle<TriggerResults> triggerResults;
   iEvent.getByLabel( triggerResults_, triggerResults );
@@ -66,7 +71,7 @@ void PATHLTProducer::produce( Event& iEvent, const EventSetup& iSetup )
           auto_ptr<reco::Candidate> ptr( patHltCandidate->clone() );
           patHltCandidates->push_back( ptr );
           patHltTriggerNames->add( triggerName_, iTriggerObject );        
-          patHltTriggerNames->add( filterName_.label(), -iTriggerObject );        
+          patHltFilterNames->add( filterName_.label(), iTriggerObject );        
         }  
       }
     } catch( Exception exc ) {
@@ -80,7 +85,8 @@ void PATHLTProducer::produce( Event& iEvent, const EventSetup& iSetup )
   }
   
   iEvent.put( patHltCandidates );
-  iEvent.put( patHltTriggerNames );
+  iEvent.put( patHltTriggerNames, "hltTriggerNames" );
+  iEvent.put( patHltFilterNames, "hltFilterNames" );
 }
 
 
