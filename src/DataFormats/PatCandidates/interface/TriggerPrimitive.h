@@ -1,16 +1,10 @@
-//
-// $Id$
-//
-
-
 #ifndef DataFormats_PatCandidates_TriggerPrimitive_h
 #define DataFormats_PatCandidates_TriggerPrimitive_h
 
 
-#include <string>
-#include "DataFormats/Candidate/interface/Particle.h"
-
-#include <vector>
+//
+// $Id$
+//
 
 
 /**
@@ -18,38 +12,40 @@
   \brief    Analysis-level trigger primitive class
 
    TriggerPrimitive implements a container for trigger primitives' information within the 'pat' namespace.
+   It inherits from LeafCandidate and adds trigger and filter names.
 
   \author   Volker Adler
   \version  $Id$
 */
 
 
+#include <string>
+#include "DataFormats/Candidate/interface/LeafCandidate.h"
+
+#include <vector>
+
+
 namespace pat {
 
-  class TriggerPrimitive {
+  class TriggerPrimitive : public reco::LeafCandidate {
 
     public:
 
       TriggerPrimitive();
       TriggerPrimitive( const reco::Particle::LorentzVector & aVec, const std::string aTrig = "", const std::string aFilt = "" );
-//       TriggerPrimitive( const reco::Particle::PolarLorentzVector & aVec, const std::string aTrig = "", const std::string aFilt = "" );
-      TriggerPrimitive( const TriggerPrimitive & aPrim );
+      TriggerPrimitive( const reco::Particle::PolarLorentzVector & aVec, const std::string aTrig = "", const std::string aFilt = "" );
       virtual ~TriggerPrimitive();
       
-      const reco::Particle::LorentzVector & lorentzVector() const;
-      const std::string                   & triggerName() const;
-      const std::string                   & filterName() const;
+      const std::string & triggerName() const;
+      const std::string & filterName() const;
       
-      void setLorentzVector( const reco::Particle::LorentzVector & aVec );
-//       void setLorentzVector( const reco::Particle::PolarLorentzVector & aVec );
       void setTriggerName( const std::string aTrig = "" );
       void setFilterName( const std::string aFilt = "" );
       
     protected:
     
-      reco::Particle::LorentzVector lorentzVector_;
-      std::string                   triggerName_;
-      std::string                   filterName_;      
+      std::string triggerName_;
+      std::string filterName_;      
 
   };
   
