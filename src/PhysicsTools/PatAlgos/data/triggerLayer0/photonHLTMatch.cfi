@@ -1,0 +1,47 @@
+///
+/// Example for a configuration of the HLT match for photons
+/// (cuts are NOT tuned, using old values from TQAF MC match, january 2008)
+///
+
+module photonHLTMatchHLT1Photon = PATHLTMatcher {
+ InputTag src               = allLayer0Photons
+ InputTag matched           = HLT1Photon
+ double maxDeltaR           = 0.2
+ double maxDPtRel           = 1.0
+ bool resolveAmbiguities    = true
+ bool resolveByMatchQuality = false
+}
+
+module photonHLTMatchHLT1PhotonRelaxed = PATHLTMatcher {
+ InputTag src               = allLayer0Photons
+ InputTag matched           = HLT1PhotonRelaxed
+ double maxDeltaR           = 0.2
+ double maxDPtRel           = 1.0
+ bool resolveAmbiguities    = true
+ bool resolveByMatchQuality = false
+}
+
+module photonHLTMatchHLT2Photon = PATHLTMatcher {
+ InputTag src               = allLayer0Photons
+ InputTag matched           = HLT2Photon
+ double maxDeltaR           = 0.2
+ double maxDPtRel           = 1.0
+ bool resolveAmbiguities    = true
+ bool resolveByMatchQuality = false
+}
+
+module photonHLTMatchHLT2PhotonRelaxed = PATHLTMatcher {
+ InputTag src               = allLayer0Photons
+ InputTag matched           = HLT2PhotonRelaxed
+ double maxDeltaR           = 0.2
+ double maxDPtRel           = 1.0
+ bool resolveAmbiguities    = true
+ bool resolveByMatchQuality = false
+}
+
+sequence photonHLTMatch = {
+    photonHLTMatchHLT1Photon,
+    photonHLTMatchHLT1PhotonRelaxed,
+    photonHLTMatchHLT2Photon,
+    photonHLTMatchHLT2PhotonRelaxed
+}
