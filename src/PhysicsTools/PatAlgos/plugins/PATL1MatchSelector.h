@@ -15,10 +15,10 @@
    This might be replaced later by checks if the particular PATObject could have been fired the requested trigger/filter at all.
 
   \author   Volker Adler
-  \version  $Id: PATL1MatchSelector.h,v 1.1 2008/03/06 16:28:37 vadler Exp $
+  \version  $Id$
 */
 //
-// $Id: PATL1MatchSelector.h,v 1.1 2008/03/06 16:28:37 vadler Exp $
+// $Id$
 //
 
 
@@ -32,9 +32,9 @@ namespace pat {
   
     public:
     
-      PATL1MatchSelector(const edm::ParameterSet& cfg) {  }
+      PATL1MatchSelector( const edm::ParameterSet& cfg ) {  }
       
-      bool operator()( const T1 & c, const T2 & hlt ) const { return true; }
+      bool operator()( const T1 & c, const T2 & l1 ) const { return true; }
       
     private:
       
