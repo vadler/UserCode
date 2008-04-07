@@ -15,7 +15,7 @@
    It inherits from LeafCandidate and adds trigger and filter names.
 
   \author   Volker Adler
-  \version  $Id: TriggerPrimitive.h,v 1.2 2008/04/02 16:51:39 vadler Exp $
+  \version  $Id$
 */
 
 
@@ -23,6 +23,10 @@
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
 
 #include "DataFormats/Common/interface/OwnVector.h"
+#include "DataFormats/Common/interface/Ref.h"
+#include "DataFormats/Common/interface/RefProd.h"
+#include "DataFormats/Common/interface/RefVector.h"
+#include "DataFormats/Common/interface/Association.h"
 
 
 namespace pat {
@@ -48,11 +52,21 @@ namespace pat {
     protected:
     
       std::string triggerName_;
-      std::string filterName_;      
+      std::string filterName_;
 
   };
   
+
+  /// collection of TriggerPrimitive
   typedef edm::OwnVector<TriggerPrimitive> TriggerPrimitiveCollection;
+  /// persistent reference to a TriggerPrimitive
+  typedef edm::Ref<TriggerPrimitiveCollection> TriggerPrimitiveRef;
+  /// persistent reference to a TriggerPrimitiveCollection
+  typedef edm::RefProd<TriggerPrimitiveCollection> TriggerPrimitiveRefProd;
+  /// vector of reference to TriggerPrimitive in the same collection
+  typedef edm::RefVector<TriggerPrimitiveCollection> TriggerPrimitiveRefVector;
+  /// vector of reference to TriggerPrimitive in the same collection
+  typedef edm::Association<TriggerPrimitiveCollection> TriggerPrimitiveMatch;
 
 }
 
