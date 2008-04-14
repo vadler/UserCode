@@ -68,8 +68,9 @@ namespace {
     
     std::string tp_st;
     pat::TriggerPrimitive tp;
-    std::vector<pat::TriggerPrimitive> tps;
-    edm::Wrapper<std::vector<pat::TriggerPrimitive> > tps_w;
+    std::vector<pat::TriggerPrimitive *> tpv;
+    pat::TriggerPrimitiveCollection tpc;
+    edm::Wrapper<pat::TriggerPrimitiveCollection> tpc_w;
 
 
     // To check:
