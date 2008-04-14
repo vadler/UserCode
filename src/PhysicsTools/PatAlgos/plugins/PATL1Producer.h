@@ -31,26 +31,23 @@
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
 
-using namespace std;
-using namespace edm;
-
 namespace pat {
 
-  class PATL1Producer : public EDProducer {
+  class PATL1Producer : public edm::EDProducer {
 
     public:
 
-      explicit PATL1Producer( const ParameterSet& iConfig );
+      explicit PATL1Producer( const edm::ParameterSet& iConfig );
       ~PATL1Producer();
 
     private:
 
-      virtual void produce( Event& iEvent, const EventSetup& iSetup );
+      virtual void produce( edm::Event& iEvent, const edm::EventSetup& iSetup );
       
-      InputTag particleMaps_;
-      string   triggerName_;
-      string   objectType_;
-      bool     report_;
+      edm::InputTag particleMaps_;
+      std::string   triggerName_;
+      std::string   objectType_;
+      bool          report_;
 
   };
 
