@@ -14,9 +14,9 @@
  */
 
 #include "DataFormats/Common/interface/RefToBase.h"
-#include "DataFormats/Candidate/interface/Particle.h"
-#include "DataFormats/PatCandidates/interface/StringMap.h"
 #include <vector>
+
+#include "DataFormats/PatCandidates/interface/TriggerPrimitive.h"
 
 
 namespace pat {
@@ -56,6 +56,11 @@ namespace pat {
       float resolutionTheta() const;
       /// covariance matrix elements
       const std::vector<float> & covMatrix() const;
+      /// trigger matches
+      const std::vector<TriggerPrimitive> & triggerMatches() const;
+      const std::vector<TriggerPrimitive> & triggerMatchesByTrigger(const std::string & aTrig) const;
+      const std::vector<TriggerPrimitive> & triggerMatchesByHltFilter(const std::string & aFilt) const;
+      const std::vector<TriggerPrimitive> & triggerMatchesByL1Object(const std::string & aObj) const;
       /// set standard deviation on A (see CMS Note 2006/023)
       void setResolutionA(float a);
       /// set standard deviation on B (see CMS Note 2006/023)
@@ -74,29 +79,8 @@ namespace pat {
       void setResolutionTheta(float theta);
       /// set covariance matrix elements
       void setCovMatrix(const std::vector<float> & c);
-
-      /// return the matches to the L1 trigger primitives
-      const reco::Particle * l1Primitives() const;
-      /// return match to a particular L1 trigger primitive
-      const reco::Particle * l1Primitive( size_t idx ) const;
-      /// return match to a particular L1 trigger primitive given the L1 trigger name
-      const reco::Particle * l1PrimitiveByTrigger( const std::string & ltn ) const;
-      /// return the matches to the HLT trigger primitives
-      const reco::Particle * hltPrimitives() const;
-      /// return match to a particular HLT trigger primitive
-      const reco::Particle * hltPrimitive( size_t idx) const;
-      /// return match to a particular HLT trigger primitive given the HLT trigger and filter name
-      const reco::Particle * hltPrimitiveByTrigger( const std::string & htn, const std::string & hfn ) const;
-      /// add an L1 trigger primitive
-      void addL1Primitive( const reco::Particle & lp, const std::string & ltn );
-      /// add an HLT trigger primitive
-      void addHLTPrimitive( const reco::Particle & hp, const std::string & htn, const std::string & hfn );
-      /// sort L1 map
-      /// should be done before using the trigger names' map after every adding new items
-      void sortL1Map();
-      /// sort HLT maps
-      /// should be done before using the trigger/filter names' maps after every adding new items
-      void sortHLTMaps();
+      /// add a trigger match
+      void addTriggerMatch(const pat::TriggerPrimitive & aTrigPrim);
       
     protected:
       /// reference back to the original object
@@ -119,12 +103,8 @@ namespace pat {
       float resTheta_;
       /// covariance matrix elements
       std::vector<float> covM_;
-      /// trigger info
-      std::vector<reco::Particle> l1Primitives_;
-      StringMap l1TriggerNames_;
-      std::vector<reco::Particle> hltPrimitives_;
-      StringMap hltTriggerNames_;
-      StringMap hltFilterNames_;
+      /// vector of trigger matches
+      std::vector<pat::TriggerPrimitive> triggerMatches_;
 
   };
 
@@ -192,6 +172,36 @@ namespace pat {
   const std::vector<float> & PATObject<ObjectType>::covMatrix() const { return covM_; }
 
   template <class ObjectType> 
+  const std::vector<TriggerPrimitive> & PATObject<ObjectType>::triggerMatches() const { return triggerMatches_; }
+
+  template <class ObjectType> 
+  const std::vector<TriggerPrimitive> & PATObject<ObjectType>::triggerMatchesByTrigger(const std::string & aTrig) const {
+    std::vector<TriggerPrimitive> selectedMatches;
+    for ( size_t i = 0; i < triggerMatches_.size(); i++ ) {
+      if ( triggerMatches_.at(i).triggerName == aTrig ) selectedMatches.push_back(triggerMatches_.at(i));
+    }
+    return selectedMatches;
+  }
+
+  template <class ObjectType> 
+  const std::vector<TriggerPrimitive> & PATObject<ObjectType>::triggerMatchesByHltFilter(const std::string & aFilt) const {
+    std::vector<TriggerPrimitive> selectedMatches;
+    for ( size_t i = 0; i < triggerMatches_.size(); i++ ) {
+      if ( triggerMatches_.at(i).filterName == aFilt ) selectedMatches.push_back(triggerMatches_.at(i));
+    }
+    return selectedMatches;
+  }
+
+  template <class ObjectType> 
+  const std::vector<TriggerPrimitive> & PATObject<ObjectType>::triggerMatchesByL1Object(const std::string & aObj) const {
+    std::vector<TriggerPrimitive> selectedMatches;
+    for ( size_t i = 0; i < triggerMatches_.size(); i++ ) {
+      if ( triggerMatches_.at(i).filterName == aObj ) selectedMatches.push_back(triggerMatches_.at(i));
+    }
+    return selectedMatches;
+  }
+
+  template <class ObjectType> 
   void PATObject<ObjectType>::setResolutionEt(float et) { resEt_ = et; }
 
   template <class ObjectType> 
@@ -221,68 +231,10 @@ namespace pat {
     //    for (size_t i = 0; i < c.size(); i++) covM_.push_back(c[i]); 
     covM_ = c;
   }
-
-  template <class ObjectType> 
-  const reco::Particle * PATObject<ObjectType>::l1Primitives() const {
-    return ( l1Primitives_.size() > 0 ? &l1Primitives_.front() : 0 );
-  }
-
-  template <class ObjectType> 
-  const reco::Particle * PATObject<ObjectType>::l1Primitive( size_t idx ) const {
-    return ( l1Primitives_.size() > idx ? &l1Primitives_[ idx ] : 0 );
-  }
-                  
-  template <class ObjectType> 
-  const reco::Particle * PATObject<ObjectType>::l1PrimitiveByTrigger( const std::string & ltn ) const {
-    return ( l1TriggerNames_[ ltn ] == -1 ? 0 : l1Primitive( l1TriggerNames_[ ltn ] ) );
-  }
-
-  template <class ObjectType> 
-  const reco::Particle * PATObject<ObjectType>::hltPrimitives() const {
-    return ( hltPrimitives_.size() > 0 ? &hltPrimitives_.front() : 0 );
-  }
-
-  template <class ObjectType> 
-  const reco::Particle * PATObject<ObjectType>::hltPrimitive( size_t idx ) const {
-    return ( hltPrimitives_.size() > idx ? &hltPrimitives_[ idx ] : 0 );
-  }
-                  
-  template <class ObjectType> 
-  const reco::Particle * PATObject<ObjectType>::hltPrimitiveByTrigger( const std::string & htn, const std::string & hfn ) const {
-    for ( size_t itn = 0; itn < hltTriggerNames_.size(); ++itn ) {
-      if ( hltTriggerNames_.get( itn ).first == htn ) {
-	for ( size_t ifn = 0; ifn < hltFilterNames_.size(); ++ifn ) {
-	  if ( hltFilterNames_.get( ifn ).second == hltTriggerNames_.get( itn ).second && hltTriggerNames_.get( ifn ).first == hfn ) {
-	    return &hltPrimitives_[ hltTriggerNames_.get( itn ).second ];
-	  }
-	}
-      }
-    }
-    return 0;
-  }
-
-  template <class ObjectType> 
-  void PATObject<ObjectType>::addL1Primitive( const reco::Particle & lp, const std::string & ltn ) {
-    l1Primitives_.push_back( lp );
-    l1TriggerNames_.add( ltn, l1Primitives_.size()-1 );
-  }
-
-  template <class ObjectType> 
-  void PATObject<ObjectType>::addHLTPrimitive( const reco::Particle & hp, const std::string & htn, const std::string & hfn ) {
-    hltPrimitives_.push_back( hp );
-    hltTriggerNames_.add( htn, l1Primitives_.size()-1 );
-    hltFilterNames_.add( hfn, l1Primitives_.size()-1 );
-  }
   
   template <class ObjectType>
-  void PATObject<ObjectType>::sortL1Map() {
-    l1TriggerNames_.sort();
-  }
-  
-  template <class ObjectType>
-  void PATObject<ObjectType>::sortHLTMaps() {
-    hltTriggerNames_.sort();
-    hltFilterNames_.sort();
+  void PATObject<ObjectType>::addTriggerMatch(const pat::TriggerPrimitive & aTrigPrim) {
+    triggerMatches_.push_back(aTrigPrim);
   }
 
 }
