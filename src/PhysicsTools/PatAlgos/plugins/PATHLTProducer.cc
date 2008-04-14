@@ -1,5 +1,5 @@
 //
-// $Id: PATHLTProducer.cc,v 1.1.2.2 2008/03/11 13:52:29 vadler Exp $
+// $Id$
 //
 
 
@@ -9,28 +9,26 @@
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/HLTFilterObject.h"
-
 #include "FWCore/Framework/interface/TriggerNames.h"
-#include "DataFormats/Candidate/interface/Candidate.h"
-#include "DataFormats/PatCandidates/interface/StringMap.h"
+
+#include "DataFormats/PatCandidates/interface/TriggerPrimitive.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 
-using namespace std;
-using namespace edm;
 using namespace pat;
+using namespace edm;
+using namespace std;
+
 
 PATHLTProducer::PATHLTProducer( const ParameterSet& iConfig ) :
   // initialize
   triggerResults_ (iConfig.getParameter<InputTag>( "triggerResults" ) ),
   triggerName_    (iConfig.getParameter<string>  ( "triggerName" ) ),
   filterName_     (iConfig.getParameter<InputTag>( "filterName" ) ),
-  report_         (iConfig.getParameter<bool>    ( "reportVerbose" ) )
+  verbose_        (iConfig.getParameter<bool>    ( "reportVerbose" ) )
 {
-  produces<reco::CandidateCollection>();
-  produces<StringMap>( "hltTriggerNames" );
-  produces<StringMap>( "hltFilterNames" );
+  produces<TriggerPrimitiveCollection>();
 }
 
 
@@ -41,52 +39,41 @@ PATHLTProducer::~PATHLTProducer()
 
 void PATHLTProducer::produce( Event& iEvent, const EventSetup& iSetup )
 {
-  auto_ptr<reco::CandidateCollection> patHltCandidates( new reco::CandidateCollection );
-  auto_ptr<StringMap> patHltTriggerNames( new StringMap );
-  auto_ptr<StringMap> patHltFilterNames( new StringMap );
-  
-  Handle<TriggerResults> triggerResults;
+  auto_ptr<TriggerPrimitiveCollection> patHltCandidates( new TriggerPrimitiveCollection );
+  edm::Handle<TriggerResults> triggerResults;
   iEvent.getByLabel( triggerResults_, triggerResults );
   TriggerNames triggerNames( *triggerResults );
-  
   unsigned int triggerIndex = triggerNames.triggerIndex( triggerName_ );
   if ( triggerIndex == triggerNames.size() ) {
-    if ( report_ ) LogWarning( "wrongTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " is not known in this event!";
+    if ( verbose_ ) LogWarning( "wrongTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " is not known in this event!";
   } else if ( ! triggerResults->wasrun( triggerIndex ) ) {
-    if ( report_ ) LogWarning( "notrunTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " was not run in this event!";
+    if ( verbose_ ) LogWarning( "notrunTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " was not run in this event!";
   } else if ( ! triggerResults->accept( triggerIndex ) ) {
-    if ( report_ ) LogWarning( "notacceptTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " did not accept this event!";
+    if ( verbose_ ) LogWarning( "notacceptTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " did not accept this event!";
   } else if (   triggerResults->error ( triggerIndex ) ) {
-    if ( report_ ) LogWarning( "errorTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " had an error in this event!";
+    if ( verbose_ ) LogWarning( "errorTriggerPath" ) << "PATHLTProducer: The trigger path " << triggerName_ << " had an error in this event!";
   } else {
     Handle<reco::HLTFilterObjectWithRefs> hltFilter;
     try { // In this case, we want to act differently compared to the usual behaviour on "ProductNotFound" exception thrown by Event::getByLabel.
       iEvent.getByLabel( filterName_, hltFilter );
       if ( triggerIndex != hltFilter->path() ) {
-        if ( report_ ) LogWarning( "wrongTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " does not belong to the trigger path " << triggerName_ << "!";
+        if ( verbose_ ) LogWarning( "wrongTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " does not belong to the trigger path " << triggerName_ << "!";
       } else {
         // loop over trigger objects and store trigger candidates
-        for ( unsigned int iTriggerObject = 0; iTriggerObject < hltFilter->size(); ++iTriggerObject ) {
-          const reco::Candidate * patHltCandidate( &(hltFilter->at(iTriggerObject)) );
-          auto_ptr<reco::Candidate> ptr( patHltCandidate->clone() );
-          patHltCandidates->push_back( ptr );
-          patHltTriggerNames->add( triggerName_, iTriggerObject );        
-          patHltFilterNames->add( filterName_.label(), iTriggerObject );        
+        for ( unsigned int iTriggeredObject = 0; iTriggeredObject < hltFilter->size(); ++iTriggeredObject ) {
+          auto_ptr<TriggerPrimitive> ptr( new TriggerPrimitive( (hltFilter->at(iTriggeredObject)).p4(), triggerName_, filterName_.label() ) );
+          patHltCandidates->push_back( ptr );        
         }  
       }
     } catch( Exception exc ) {
       if ( exc.codeToString( exc.categoryCode() ) == "ProductNotFound" ) {
-//         if ( report_ ) LogWarning( "notpresentTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " is not present here!";
-        LogWarning( "notpresentTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " is not present here!"; // This should be reported in  a n y  case.
+        if ( verbose_ ) LogWarning( "notpresentTriggerModule" ) << "PATHLTProducer: The filter module " << filterName_.label() << " is not present here!";
       } else {
         throw exc;
       }
     }
   }
-  
   iEvent.put( patHltCandidates );
-  iEvent.put( patHltTriggerNames, "hltTriggerNames" );
-  iEvent.put( patHltFilterNames, "hltFilterNames" );
 }
 
 
