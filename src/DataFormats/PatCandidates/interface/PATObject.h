@@ -58,9 +58,9 @@ namespace pat {
       const std::vector<float> & covMatrix() const;
       /// trigger matches
       const std::vector<TriggerPrimitive> & triggerMatches() const;
-      const std::vector<TriggerPrimitive> & triggerMatchesByTrigger(const std::string & aTrig) const;
-      const std::vector<TriggerPrimitive> & triggerMatchesByHltFilter(const std::string & aFilt) const;
-      const std::vector<TriggerPrimitive> & triggerMatchesByL1Object(const std::string & aObj) const;
+      const std::vector<TriggerPrimitive> triggerMatchesByTrigger(const std::string & aTrig) const;
+      const std::vector<TriggerPrimitive> triggerMatchesByHltFilter(const std::string & aFilt) const;
+      const std::vector<TriggerPrimitive> triggerMatchesByL1Object(const std::string & aObj) const;
       /// set standard deviation on A (see CMS Note 2006/023)
       void setResolutionA(float a);
       /// set standard deviation on B (see CMS Note 2006/023)
@@ -175,28 +175,28 @@ namespace pat {
   const std::vector<TriggerPrimitive> & PATObject<ObjectType>::triggerMatches() const { return triggerMatches_; }
 
   template <class ObjectType> 
-  const std::vector<TriggerPrimitive> & PATObject<ObjectType>::triggerMatchesByTrigger(const std::string & aTrig) const {
+  const std::vector<TriggerPrimitive> PATObject<ObjectType>::triggerMatchesByTrigger(const std::string & aTrig) const {
     std::vector<TriggerPrimitive> selectedMatches;
     for ( size_t i = 0; i < triggerMatches_.size(); i++ ) {
-      if ( triggerMatches_.at(i).triggerName == aTrig ) selectedMatches.push_back(triggerMatches_.at(i));
+      if ( triggerMatches_.at(i).triggerName() == aTrig ) selectedMatches.push_back(triggerMatches_.at(i));
     }
     return selectedMatches;
   }
 
   template <class ObjectType> 
-  const std::vector<TriggerPrimitive> & PATObject<ObjectType>::triggerMatchesByHltFilter(const std::string & aFilt) const {
+  const std::vector<TriggerPrimitive> PATObject<ObjectType>::triggerMatchesByHltFilter(const std::string & aFilt) const {
     std::vector<TriggerPrimitive> selectedMatches;
     for ( size_t i = 0; i < triggerMatches_.size(); i++ ) {
-      if ( triggerMatches_.at(i).filterName == aFilt ) selectedMatches.push_back(triggerMatches_.at(i));
+      if ( triggerMatches_.at(i).filterName() == aFilt ) selectedMatches.push_back(triggerMatches_.at(i));
     }
     return selectedMatches;
   }
 
   template <class ObjectType> 
-  const std::vector<TriggerPrimitive> & PATObject<ObjectType>::triggerMatchesByL1Object(const std::string & aObj) const {
+  const std::vector<TriggerPrimitive> PATObject<ObjectType>::triggerMatchesByL1Object(const std::string & aObj) const {
     std::vector<TriggerPrimitive> selectedMatches;
     for ( size_t i = 0; i < triggerMatches_.size(); i++ ) {
-      if ( triggerMatches_.at(i).filterName == aObj ) selectedMatches.push_back(triggerMatches_.at(i));
+      if ( triggerMatches_.at(i).filterName() == aObj ) selectedMatches.push_back(triggerMatches_.at(i));
     }
     return selectedMatches;
   }
