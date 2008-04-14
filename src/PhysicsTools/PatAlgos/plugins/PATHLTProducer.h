@@ -32,26 +32,23 @@
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
 
-using namespace std;
-using namespace edm;
-
 namespace pat {
 
-  class PATHLTProducer : public EDProducer {
+  class PATHLTProducer : public edm::EDProducer {
 
     public:
 
-      explicit PATHLTProducer( const ParameterSet& iConfig );
+      explicit PATHLTProducer( const edm::ParameterSet& iConfig );
       ~PATHLTProducer();
 
     private:
 
-      virtual void produce( Event& iEvent, const EventSetup& iSetup );
+      virtual void produce( edm::Event& iEvent, const edm::EventSetup& iSetup );
       
-      InputTag triggerResults_;
-      string   triggerName_;
-      InputTag filterName_;
-      bool     report_;
+      edm::InputTag triggerResults_;
+      std::string   triggerName_;
+      edm::InputTag filterName_;
+      bool          report_;
 
   };
 
