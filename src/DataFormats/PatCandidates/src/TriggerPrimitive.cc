@@ -14,6 +14,13 @@ TriggerPrimitive::TriggerPrimitive() :
   filterName_( "" ) {
 }
 
+/// copy constructor
+TriggerPrimitive::TriggerPrimitive( const TriggerPrimitive & aTrigPrim ) :
+  reco::LeafCandidate( 0, aTrigPrim.p4() ),
+  triggerName_( aTrigPrim.triggerName() ),
+  filterName_( aTrigPrim.filterName() ) {
+}
+
 /// constructor from values
 TriggerPrimitive::TriggerPrimitive( const reco::Particle::LorentzVector & aVec, const std::string aTrig, const std::string aFilt ) :
   reco::LeafCandidate( 0, aVec ),
@@ -28,6 +35,11 @@ TriggerPrimitive::TriggerPrimitive( const reco::Particle::PolarLorentzVector & a
 
 /// destructor
 TriggerPrimitive::~TriggerPrimitive() {
+}
+
+/// clone method
+TriggerPrimitive * TriggerPrimitive::clone() const {
+  return new TriggerPrimitive( * this );
 }
 
 /// return trigger name
