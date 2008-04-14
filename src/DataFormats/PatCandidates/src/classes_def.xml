@@ -85,6 +85,7 @@
   
   <class name="std::string" />
   <class name="pat::TriggerPrimitive" />
+  <class name="std::vector<pat::TriggerPrimitive>" />
   <class name="std::vector<pat::TriggerPrimitive *>" />
   <class name="pat::TriggerPrimitiveCollection" />
   <class name="edm::Wrapper<pat::TriggerPrimitiveCollection>" />
@@ -158,3 +159,5 @@
   </class>
  </exclusion>
 </lcgdict>
+
+

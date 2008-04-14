@@ -1,0 +1,35 @@
+
+module allLayer1Photons = PATPhotonProducer {
+
+  ### General configurables
+  InputTag photonSource      = allLayer0Photons   # cleaned photons from AOD
+  bool     embedSuperCluster = false              # whether to embed in AOD externally stored supercluster
+
+  ### Trigger matching configurables
+  bool      addTrigMatch     = true               # switch on/off matching to trigger primitives
+  VInputTag trigPrimMatch    = { photonL1MatchL1SingleEG5,
+                                 photonHLTMatchHLT1PhotonRelaxed } # trigger primitive sources to be used for the matching
+
+  ### Isolation configurables
+  PSet isolation = {
+     PSet tracker = {
+        InputTag src    = layer0PhotonIsolations:egammaPhotonTkDeposits
+        double   deltaR    = 0.3
+        double   threshold = 1.5
+     }
+     PSet hcal = {
+        InputTag src    = layer0PhotonIsolations:egammaPhotonTowersDeposits
+        double   deltaR = 0.3
+     }
+     PSet ecal = {
+        InputTag src    = layer0PhotonIsolations:egammaPhotonEcalDeposits
+        double   deltaR = 0.3
+     }
+  }
+  PSet isoDeposits = {
+    InputTag tracker =  layer0PhotonIsolations:egammaPhotonTkDeposits
+    InputTag ecal    =  layer0PhotonIsolations:egammaPhotonEcalDeposits
+    InputTag hcal    =  layer0PhotonIsolations:egammaPhotonTowersDeposits
+  }
+
+}

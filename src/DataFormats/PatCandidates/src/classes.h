@@ -70,7 +70,8 @@ namespace {
     
     std::string tp_st;
     pat::TriggerPrimitive tp;
-    std::vector<pat::TriggerPrimitive *> tpv;
+    std::vector<pat::TriggerPrimitive> tpv;
+    std::vector<pat::TriggerPrimitive *> tppv;
     pat::TriggerPrimitiveCollection tpc;
     edm::Wrapper<pat::TriggerPrimitiveCollection> tpc_w;
     pat::TriggerPrimitiveMatch tpm;
