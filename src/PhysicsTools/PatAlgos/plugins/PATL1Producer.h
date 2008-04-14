@@ -14,10 +14,10 @@
    A CandidateCollection of "firing" L1 trigger objects from a given L1 trigger is produced from L1 information available in AOD.
 
   \author   Volker Adler
-  \version  $Id: PATL1Producer.h,v 1.1 2008/03/06 16:28:37 vadler Exp $
+  \version  $Id$
 */
 //
-// $Id: PATL1Producer.h,v 1.1 2008/03/06 16:28:37 vadler Exp $
+// $Id$
 //
 
 
@@ -50,6 +50,7 @@ namespace pat {
       InputTag particleMaps_;
       string   triggerName_;
       string   objectType_;
+      bool     report_;
 
   };
 
