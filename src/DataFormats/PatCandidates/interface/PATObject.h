@@ -34,6 +34,8 @@ namespace pat {
       PATObject(const edm::RefToBase<ObjectType> & ref);
       /// destructor
       virtual ~PATObject() {}
+      /// Clone      
+      virtual PATObject<ObjectType> * clone() const;
       /// access to the original object; returns zero for null Ref and throws for unavailable collection
       const ObjectType * originalObject() const;
       /// reference to original object. Returns a null reference if not available
@@ -124,7 +126,11 @@ namespace pat {
     refToOrig_(ref),
     resEt_(0), resEta_(0), resPhi_(0), resA_(0), resB_(0), resC_(0), resD_(0),  resTheta_(0) {
   }
-
+  
+  template <class ObjectType> PATObject<ObjectType> * PATObject<ObjectType>::clone() const {
+    return new PATObject<ObjectType>(*this);
+  }
+  
   template <class ObjectType> const ObjectType * PATObject<ObjectType>::originalObject() const {
     if (refToOrig_.isNull()) {
       // this object was not produced from a reference, so no link to the
