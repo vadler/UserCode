@@ -34,21 +34,22 @@
 
 namespace pat {
 
+
   class PATHLTProducer : public edm::EDProducer {
 
     public:
 
-      explicit PATHLTProducer( const edm::ParameterSet& iConfig );
+      explicit PATHLTProducer( const edm::ParameterSet & iConfig );
       ~PATHLTProducer();
 
     private:
 
-      virtual void produce( edm::Event& iEvent, const edm::EventSetup& iSetup );
+      virtual void produce( edm::Event & iEvent, const edm::EventSetup & iSetup );
       
       edm::InputTag triggerResults_;
       std::string   triggerName_;
       edm::InputTag filterName_;
-      bool          report_;
+      bool          verbose_;
 
   };
 
