@@ -12,7 +12,7 @@ block patLayer0EventContent = {
     "keep recoPixelMatchGsfElectrons_pixelMatchGsfElectrons_*_*",  # by layer 1
 
     "keep *_layer0MuonIsolations_*_*",
-    "keep *_layer0ElectronIsolation_*_*",
+    "keep *_layer0ElectronIsolations_*_*",
     "keep *_layer0TauIsolations_*_*",
     "keep *_layer0PhotonIsolations_*_*",
     "keep patJetCorrFactorsedmValueMap_*_*_*",
