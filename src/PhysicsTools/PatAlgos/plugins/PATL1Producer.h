@@ -33,21 +33,22 @@
 
 namespace pat {
 
+
   class PATL1Producer : public edm::EDProducer {
 
     public:
 
-      explicit PATL1Producer( const edm::ParameterSet& iConfig );
+      explicit PATL1Producer( const edm::ParameterSet & iConfig );
       ~PATL1Producer();
 
     private:
 
-      virtual void produce( edm::Event& iEvent, const edm::EventSetup& iSetup );
+      virtual void produce( edm::Event & iEvent, const edm::EventSetup & iSetup );
       
       edm::InputTag particleMaps_;
       std::string   triggerName_;
       std::string   objectType_;
-      bool          report_;
+      bool          verbose_;
 
   };
 

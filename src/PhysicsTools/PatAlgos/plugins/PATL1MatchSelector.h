@@ -15,10 +15,10 @@
    This might be replaced later by checks if the particular PATObject could have been fired the requested trigger/filter at all.
 
   \author   Volker Adler
-  \version  $Id: PATL1MatchSelector.h,v 1.1 2008/03/06 16:28:37 vadler Exp $
+  \version  $Id$
 */
 //
-// $Id: PATL1MatchSelector.h,v 1.1 2008/03/06 16:28:37 vadler Exp $
+// $Id$
 //
 
 
