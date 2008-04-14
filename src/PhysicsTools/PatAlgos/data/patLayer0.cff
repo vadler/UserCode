@@ -14,9 +14,8 @@ include "PhysicsTools/PatAlgos/data/recoLayer0/beforeLevel0Reco.cff"
 include "PhysicsTools/PatAlgos/data/recoLayer0/highLevelReco.cff"
 # MC matching
 include "PhysicsTools/PatAlgos/data/mcMatchLayer0/mcMatchSequences.cff"
-# perform L1 matching
+# Trigger matching
 include "PhysicsTools/PatAlgos/data/triggerLayer0/l1Sequences.cff"
-# perform HLT matching
 include "PhysicsTools/PatAlgos/data/triggerLayer0/hltSequences.cff"
 
 sequence patLayer0Cleaners_withoutPFTau = { 

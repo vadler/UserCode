@@ -40,8 +40,8 @@ module electronHLTMatchHLT2ElectronRelaxed = PATHLTMatcher {
 }
 
 sequence electronHLTMatch = {
-    electronHLTMatchHLT1Electron,
-    electronHLTMatchHLT1ElectronRelaxed,
-    electronHLTMatchHLT2Electron,
-    electronHLTMatchHLT2ElectronRelaxed
+//     electronHLTMatchHLT2Electron,
+//     electronHLTMatchHLT2ElectronRelaxed,
+//     electronHLTMatchHLT1Electron,
+    electronHLTMatchHLT1ElectronRelaxed
 }

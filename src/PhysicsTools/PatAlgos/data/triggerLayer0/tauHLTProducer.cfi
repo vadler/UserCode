@@ -13,6 +13,6 @@ module HLT2TauPixel = PATHLTProducer {
 }
 
 sequence tauHLTProducer = {
-    HLT1Tau,
-    HLT2TauPixel
+//     HLT2TauPixel,
+    HLT1Tau
 }

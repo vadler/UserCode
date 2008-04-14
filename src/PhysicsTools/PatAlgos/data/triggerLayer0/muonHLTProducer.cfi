@@ -20,7 +20,7 @@ module HLT2MuonNonIso = PATHLTProducer {
 }
 
 sequence muonHLTProducer = {
-    HLT1MuonIso,
-    HLT1MuonNonIso,
-    HLT2MuonNonIso
+//     HLT2MuonNonIso,
+//     HLT1MuonIso,
+    HLT1MuonNonIso
 }

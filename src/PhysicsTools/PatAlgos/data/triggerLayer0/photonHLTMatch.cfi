@@ -40,8 +40,8 @@ module photonHLTMatchHLT2PhotonRelaxed = PATHLTMatcher {
 }
 
 sequence photonHLTMatch = {
-    photonHLTMatchHLT1Photon,
-    photonHLTMatchHLT1PhotonRelaxed,
-    photonHLTMatchHLT2Photon,
-    photonHLTMatchHLT2PhotonRelaxed
+//     photonHLTMatchHLT2Photon,
+//     photonHLTMatchHLT2PhotonRelaxed,
+//     photonHLTMatchHLT1Photon,
+    photonHLTMatchHLT1PhotonRelaxed
 }

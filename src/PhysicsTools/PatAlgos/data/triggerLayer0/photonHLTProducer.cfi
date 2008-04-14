@@ -27,8 +27,8 @@ module HLT2PhotonRelaxed = PATHLTProducer {
 }
 
 sequence photonHLTProducer = {
-    HLT1Photon,
-    HLT1PhotonRelaxed,
-    HLT2Photon,
-    HLT2PhotonRelaxed
+//     HLT2Photon,
+//     HLT2PhotonRelaxed,
+//     HLT1Photon,
+    HLT1PhotonRelaxed
 }

@@ -31,7 +31,7 @@ module muonHLTMatchHLT2MuonNonIso = PATHLTMatcher {
 }
 
 sequence muonHLTMatch = {
-    muonHLTMatchHLT1MuonIso,
-    muonHLTMatchHLT1MuonNonIso,
-    muonHLTMatchHLT2MuonNonIso
+//     muonHLTMatchHLT2MuonNonIso,
+//     muonHLTMatchHLT1MuonIso,
+    muonHLTMatchHLT1MuonNonIso
 }

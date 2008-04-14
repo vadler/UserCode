@@ -27,8 +27,8 @@ module HLT2ElectronRelaxed = PATHLTProducer {
 }
 
 sequence electronHLTProducer = {
-    HLT1Electron,
-    HLT1ElectronRelaxed,
-    HLT2Electron,
-    HLT2ElectronRelaxed
+//     HLT2Electron,
+//     HLT2ElectronRelaxed,
+//     HLT1Electron,
+    HLT1ElectronRelaxed
 }
