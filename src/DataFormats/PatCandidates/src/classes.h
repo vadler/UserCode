@@ -71,6 +71,15 @@ namespace {
     std::vector<pat::TriggerPrimitive *> tpv;
     pat::TriggerPrimitiveCollection tpc;
     edm::Wrapper<pat::TriggerPrimitiveCollection> tpc_w;
+    pat::TriggerPrimitiveMatch tpm;
+    edm::Wrapper<pat::TriggerPrimitiveMatch> tpm_w;
+    pat::TriggerPrimitiveRef tpr;
+    pat::TriggerPrimitiveRefProd tprp;
+    pat::TriggerPrimitiveRefVector tprv;
+    edm::reftobase::Holder<reco::Candidate, pat::TriggerPrimitiveRef> tpr_h;
+    edm::reftobase::RefHolder<pat::TriggerPrimitiveRef> tpr_rh;
+    edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerPrimitiveRefVector> tprv_h;
+    edm::reftobase::RefVectorHolder<pat::TriggerPrimitiveRefVector> tprv_rh;
 
 
     // To check:
