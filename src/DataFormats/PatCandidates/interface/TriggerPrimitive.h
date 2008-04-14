@@ -22,7 +22,7 @@
 #include <string>
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
 
-#include <vector>
+#include "DataFormats/Common/interface/OwnVector.h"
 
 
 namespace pat {
@@ -32,9 +32,12 @@ namespace pat {
     public:
 
       TriggerPrimitive();
+      TriggerPrimitive( const pat::TriggerPrimitive & aTrigPrim );
       TriggerPrimitive( const reco::Particle::LorentzVector & aVec, const std::string aTrig = "", const std::string aFilt = "" );
       TriggerPrimitive( const reco::Particle::PolarLorentzVector & aVec, const std::string aTrig = "", const std::string aFilt = "" );
       virtual ~TriggerPrimitive();
+      
+      virtual TriggerPrimitive * clone() const;
       
       const std::string & triggerName() const;
       const std::string & filterName() const;
@@ -49,7 +52,7 @@ namespace pat {
 
   };
   
-  typedef std::vector<TriggerPrimitive> TriggerPrimitiveCollection;
+  typedef edm::OwnVector<TriggerPrimitive> TriggerPrimitiveCollection;
 
 }
 
