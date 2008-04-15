@@ -1,0 +1,56 @@
+
+module allLayer1Jets = PATJetProducer {
+
+  ### General configurables
+  InputTag jetSource               = allLayer0Jets               # uncalibrated reco jet input source
+  bool     embedCaloTowers         = true                        # switch on/off embedding of supercluster (externally stored in AOD)
+
+  ### Jet flavour idetification configurables
+  bool     getJetMCFlavour         = true                        # switch on/off MC flavour identification of all jets
+  InputTag JetPartonMapSource      = jetPartonAssociation        # the match-collection, produced by default from PATHighLevelReco.cff
+
+  ### MC matching configurables
+  bool     addGenPartonMatch       = true                        # switch on/off matching to partons
+  InputTag genPartonMatch          = jetPartonMatch              # particles source to be used for the matching
+  bool     addGenJetMatch          = true                        # switch on/off matching to GenJet's
+  InputTag genJetMatch             = jetGenJetMatch              # GenJet source to be used for the matching
+  bool     addPartonJetMatch       = false                       # switch on/off matching to PartonJet's (not implemented yet)
+  InputTag partonJetSource         = nonsenseName                # ParticleJet source to be used for the matching
+
+  ### Jet energy scale correction configurables
+  InputTag jetCorrFactorsSource    = jetCorrFactors              # source of the valuemap containing the jet correction factors
+
+  ### Resolution configurables
+  bool     addResolutions          = true                        # switch on/off the resolution calculation
+  bool     useNNResolutions        = false                       # use the neural network approach?
+  string   caliJetResoFile         = "PhysicsTools/PatUtils/data/Resolutions_lJets_MCJetCorJetIcone5.root"
+                                                                 # input root file for the resolution functions
+  string   caliBJetResoFile        = "PhysicsTools/PatUtils/data/Resolutions_bJets_MCJetCorJetIcone5.root"
+                                                                 # input root file for the resolution functions
+
+  ### b-Tag info configurables
+  bool     addBTagInfo             = true                        # switch on/off the addition of b-tag information
+  string   tagModuleLabelPostfix   = "Layer0"                    # strip this string from the end of the tag module labels
+  bool     addDiscriminators       = true                        # switch on/off the addition of the btag discriminators
+  bool     addTagInfoRefs          = true                        # switch on/off the addition of references to the b-tag JetTag's
+  vstring  tagModuleLabelsToKeep = {                             # the JetTag labels that should be considered and kept (excluding tagModuleLabelPostfix)
+    "combinedSVJetTags", "combinedSVMVAJetTags", "impactParameterMVAJetTags", "jetProbabilityJetTags", "softElectronJetTags", "softMuonJetTags", "softMuonNoIPJetTags", "trackCountingHighEffJetTags", "trackCountingHighPurJetTags"
+  }
+
+  ### track association configurables
+  bool     addAssociatedTracks     = true                        # switch on/off track association
+  PSet     trackAssociation        = {                           # the track association parameter set
+    InputTag tracksSource = generalTracks
+    double   deltaR       = 0.5
+    int32    minHits      = 8
+    double   maxNormChi2  = 5.0
+  }
+
+  ### Jet charge configurables
+  bool     addJetCharge            = true                        # switch on/off jet charge calculation
+  PSet     jetCharge               = {                           # the jet charge parameter set
+    double exp = 1.0
+    string var = "Pt"
+  }
+
+}
