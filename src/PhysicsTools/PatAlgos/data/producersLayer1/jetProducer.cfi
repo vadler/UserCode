@@ -1,5 +1,12 @@
 
 module allLayer1Jets = PATJetProducer {
+  
+  bool addTagInfoRefs = false
+  VInputTag ipTagInfoLabelName = {  "impactParameterMVAJetTags", "jetProbabilityJetTags",   "trackCountingHighEffJetTags", "trackCountingHighPurJetTags"}
+  VInputTag softETagInfoLabelName = {"softElectronJetTags"}
+  VInputTag softMTagInfoLabelName = { "softMuonJetTags","softMuonNoIPJetTags"}
+  VInputTag svTagInfoLabelName = {"combinedSVJetTags", "combinedSVMVAJetTags"}
+
 
   ### General configurables
   InputTag jetSource               = allLayer0Jets               # uncalibrated reco jet input source
@@ -29,10 +36,10 @@ module allLayer1Jets = PATJetProducer {
                                                                  # input root file for the resolution functions
 
   ### b-Tag info configurables
-  bool     addBTagInfo             = true                        # switch on/off the addition of b-tag information
+  bool     addBTagInfo             = false                        # switch on/off the addition of b-tag information
   string   tagModuleLabelPostfix   = "Layer0"                    # strip this string from the end of the tag module labels
-  bool     addDiscriminators       = true                        # switch on/off the addition of the btag discriminators
-  bool     addTagInfoRefs          = true                        # switch on/off the addition of references to the b-tag JetTag's
+  bool     addDiscriminators       = false                        # switch on/off the addition of the btag discriminators
+  bool     addJetTagRefs           = false                        # switch on/off the addition of references to the b-tag JetTag's
   vstring  tagModuleLabelsToKeep = {                             # the JetTag labels that should be considered and kept (excluding tagModuleLabelPostfix)
     "combinedSVJetTags", "combinedSVMVAJetTags", "impactParameterMVAJetTags", "jetProbabilityJetTags", "softElectronJetTags", "softMuonJetTags", "softMuonNoIPJetTags", "trackCountingHighEffJetTags", "trackCountingHighPurJetTags"
   }
