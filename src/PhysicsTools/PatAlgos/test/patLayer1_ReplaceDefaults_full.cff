@@ -85,7 +85,7 @@ replace allLayer1Jets.caliBJetResoFile = "PhysicsTools/PatUtils/data/Resolutions
 replace allLayer1Jets.addBTagInfo = true
 replace allLayer1Jets.tagModuleLabelPostfix = "Layer0"
 replace allLayer1Jets.addDiscriminators = true
-replace allLayer1Jets.addTagInfoRefs = true
+replace allLayer1Jets.addJetTagRefs = true
 replace allLayer1Jets.tagModuleLabelsToKeep = {
     "combinedSVJetTags", "combinedSVMVAJetTags", "impactParameterMVAJetTags", "jetProbabilityJetTags", "softElectronJetTags", "softMuonJetTags", "softMuonNoIPJetTags", "trackCountingHighEffJetTags", "trackCountingHighPurJetTags"
   }
