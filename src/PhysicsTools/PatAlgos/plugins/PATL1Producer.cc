@@ -22,8 +22,7 @@ PATL1Producer::PATL1Producer( const ParameterSet& iConfig ) :
   // initialize
   particleMaps_ (iConfig.getParameter<InputTag>( "particleMaps" ) ),
   triggerName_  (iConfig.getParameter<string>  ( "triggerName" ) ),
-  objectType_   (iConfig.getParameter<string>  ( "objectType" ) ),
-  verbose_      (iConfig.getParameter<bool>    ( "reportVerbose" ) )
+  objectType_   (iConfig.getParameter<string>  ( "objectType" ) )
 {
   produces<TriggerPrimitiveCollection>();
 }
@@ -41,11 +40,11 @@ void PATL1Producer::produce( Event& iEvent, const EventSetup& iSetup )
   iEvent.getByLabel( particleMaps_, particleMaps );
   const L1ParticleMap::L1TriggerType triggerType = L1ParticleMap::triggerType( triggerName_ );
   if ( triggerType == L1ParticleMap::kNumOfL1TriggerTypes ) {
-    if ( verbose_ ) LogWarning( "wrongL1TriggerName" ) << "PATL1Producer: The L1 trigger name " << triggerName_ << " is not known in this event!";
+    LogDebug( "wrongL1TriggerName" ) << "PATL1Producer: The L1 trigger name " << triggerName_ << " is not known in this event!";
   } else {
     const L1ParticleMap& particleMap = particleMaps->at( triggerType );
     if ( ! particleMap.triggerDecision() ) {
-      if ( verbose_ ) LogWarning( "notacceptL1Trigger" ) << "PATL1Producer: The L1 trigger " << triggerName_ << " did not accept this event!";
+      LogDebug( "notacceptL1Trigger" ) << "PATL1Producer: The L1 trigger " << triggerName_ << " did not accept this event!";
     } else {
       if ( objectType_ == "em" ) { // isolated or non-isolated (for electrons and photons)
         const L1EmParticleVectorRef& triggeredObjects = particleMap.emParticles();
@@ -74,7 +73,7 @@ void PATL1Producer::produce( Event& iEvent, const EventSetup& iSetup )
         auto_ptr<TriggerPrimitive> ptr( new TriggerPrimitive( triggeredObject->p4(), triggerName_, objectType_ ) );
         patL1Candidates->push_back( ptr );        
       } else { // wrong input to configurable
-        if ( verbose_ ) LogWarning( "wrongL1Object" ) << "PATL1Producer: The L1 object type " << objectType_ << "does not exist!";
+        LogDebug( "wrongL1Object" ) << "PATL1Producer: The L1 object type " << objectType_ << "does not exist!";
       }
     }
   }

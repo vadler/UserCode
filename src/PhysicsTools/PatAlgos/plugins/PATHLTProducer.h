@@ -49,7 +49,6 @@ namespace pat {
       edm::InputTag triggerResults_;
       std::string   triggerName_;
       edm::InputTag filterName_;
-      bool          verbose_;
 
   };
 

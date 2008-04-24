@@ -24,8 +24,6 @@
 #include "DataFormats/Common/interface/View.h"
 
 #include "PhysicsTools/Utilities/interface/EtComparator.h"
-#include "PhysicsTools/JetCharge/interface/JetCharge.h"
-#include "PhysicsTools/PatUtils/interface/SimpleJetTrackAssociator.h"
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -77,14 +75,12 @@ namespace pat {
       bool                     addJetTagRefs_;
       std::vector<std::string> tagModuleLabelsToKeep_;
       bool                     addAssociatedTracks_;
-      edm::ParameterSet        trackAssociationPSet_;
+      edm::InputTag            trackAssociation_;
       bool                     addJetCharge_;
-      edm::ParameterSet        jetChargePSet_;
+      edm::InputTag            jetCharge_;
       // tools
       ObjectResolutionCalc             * theResoCalc_;
       ObjectResolutionCalc             * theBResoCalc_;
-      ::helper::SimpleJetTrackAssociator   simpleJetTrackAssociator_;
-      JetCharge                        * jetCharge_;
       GreaterByEt<Jet>                   eTComparator_;
 
   };

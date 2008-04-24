@@ -22,7 +22,4 @@ module allLayer1Taus = PATTauProducer {
   PSet isolation   = { } 
   PSet isoDeposits = { } 
 
-  ### likelihood ratio configurables
-  bool     addLRValues       = false                    # switch on/off the lepton likelihood ratio calculation
-  string   tauLRFile         = "PhysicsTools/PatUtils/data/TauLRDistros.root"
 }

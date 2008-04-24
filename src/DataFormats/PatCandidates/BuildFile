@@ -8,6 +8,7 @@
 <use name=DataFormats/EgammaCandidates>
 <use name=DataFormats/TrackReco>
 <use name=DataFormats/HepMCCandidate>
+<use name=RecoMuon/MuonIdentification>
 <use name=rootrflx>
 <use name=root>
 <export>
@@ -20,6 +21,7 @@
   <use name=DataFormats/EgammaCandidates>
   <use name=DataFormats/TrackReco>
   <use name=DataFormats/HepMCCandidate>
+  <use name=RecoMuon/MuonIdentification>
   <use name=root>
   <lib name=DataFormatsPatCandidates>
 </export>

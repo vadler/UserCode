@@ -23,19 +23,19 @@ sequence patLayer0Cleaners_withoutPFTau = {
     allLayer0Jets, allLayer0METs
 }
 
-sequence patLayer0Cleaners              = { 
+sequence patLayer0Cleaners = { 
     allLayer0Muons, allLayer0Electrons, allLayer0Photons, allLayer0Taus, 
     allLayer0Jets, allLayer0METs 
 }
 
-sequence patLayer0_withoutPFTau = { 
+sequence patLayer0_withoutTrigMatch_withoutPFTau = { 
     patBeforeLevel0Reco_withoutPFTau, 
     patLayer0Cleaners_withoutPFTau, 
     patHighLevelReco_withoutPFTau, 
     patMCTruth_withoutTau
 }
 
-sequence patLayer0              = { 
+sequence patLayer0_withoutTrigMatch = { 
     patBeforeLevel0Reco, 
     patLayer0Cleaners, 
     patHighLevelReco, 
@@ -43,14 +43,14 @@ sequence patLayer0              = {
 }
 
 # Trigger matching included, but only usable for full simulation a.t.m.
-sequence patLayer0_TriggerMatch_withoutPFTau = { 
-    patLayer0_withoutPFTau, // From above
+sequence patLayer0_withoutPFTau = { 
+    patLayer0_withoutTrigMatch_withoutPFTau,
     patL1_withoutTau,
     patHLT_withoutTau 
 }
 
-sequence patLayer0_TriggerMatch              = { 
-    patLayer0,              // From above
+sequence patLayer0 = { 
+    patLayer0_withoutTrigMatch,
     patL1,
     patHLT 
 }

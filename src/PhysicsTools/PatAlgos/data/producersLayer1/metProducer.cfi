@@ -18,9 +18,4 @@ module allLayer1METs = PATMETProducer {
   bool     useNNResolutions   = false                   # use the neural network approach?
   string   metResoFile        = "PhysicsTools/PatUtils/data/Resolutions_met.root"
                                                         # input root file for the resolution functions
-
-  ### Muon correction configurables
-  bool     addMuonCorrections = true                    # switch on/off basic muon corrections
-  InputTag muonSource         = muons                   # muon input source for corrections
-
 }

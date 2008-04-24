@@ -2,25 +2,35 @@ block patLayer0EventContent = {
   untracked vstring outputCommands = {
     "keep edmTriggerResults_TriggerResults_*_*",
     "keep *_genParticles_*_*",
+    "keep *_genParticleCandidates_*_*",                            # obsolete but needed for JetPartonAssociation
     "keep recoJetTags_*_*_*",
     "drop recoJetTags_coneIsolationTauJetTags_*_*",
     "keep recoTracks_ctfWithMaterialTracks_*_*",
     "keep recoTracks_gsWithMaterialTracks_*_*",
     "keep *_offlinePrimaryVerticesFromCTFTracks_*_*",
 
-    "keep recoJets_iterativeCone5CaloJets_*_*",                    # temporarly needed
-    "keep recoPixelMatchGsfElectrons_pixelMatchGsfElectrons_*_*",  # by layer 1
+    "keep *_caloTowers_*_*","keep CaloTowersSorted_towerMaker_*_*",  # to allow embedding
 
     "keep *_layer0MuonIsolations_*_*",
     "keep *_layer0ElectronIsolations_*_*",
     "keep *_layer0TauIsolations_*_*",
     "keep *_layer0PhotonIsolations_*_*",
-    "keep patJetCorrFactorsedmValueMap_*_*_*",
+
+    "keep *_layer0JetCorrFactors_*_*",
+
     "keep recoGenJetsedmAssociation_*_*_*",
+    "keep *_iterativeCone5GenJetsPt10_*_*",
+    "keep *_genMet_*_*",
+
     "keep recoGenParticlesedmAssociation_*_*_*",
     "keep recoJetTagsrecoJetTagrecoJetTagsrecoJetTagedmrefhelperFindUsingAdvanceedmRefedmValueMap_*_*_*",
-    "keep recoPixelMatchGsfElectronsrecoElectronIDsuintedmOneToOneedmAssociationMap_electronId_*_*",
-    "keep recoPixelMatchGsfElectronsrecoElectronIDsuintedmOneToOneedmAssociationMap_electronIdRobust_*_*",
+    "keep *_electronId_*_*",
+    "keep *_electronIdRobust_*_*",
+    "keep *_jetPartonAssociation_*_*",
+    "keep *_caloJetCollectionClone_*_*",
+
+    "keep *_layer0JetTracksAssociator_*_*",
+    "keep *_layer0JetCharge_*_*",
  
     "keep patTriggerPrimitivesOwned_*_*_*",    
     "keep patTriggerPrimitivesOwnededmAssociation_*_*_*",    

@@ -25,7 +25,7 @@ module allLayer1Jets = PATJetProducer {
                                  jetHLTMatchHLT4Jet }            # trigger primitive sources to be used for the matching
 
   ### Jet energy scale correction configurables
-  InputTag jetCorrFactorsSource    = jetCorrFactors              # source of the valuemap containing the jet correction factors
+  InputTag jetCorrFactorsSource    = layer0JetCorrFactors        # source of the valuemap containing the jet correction factors
 
   ### Resolution configurables
   bool     addResolutions          = true                        # switch on/off the resolution calculation
@@ -46,18 +46,9 @@ module allLayer1Jets = PATJetProducer {
 
   ### track association configurables
   bool     addAssociatedTracks     = true                        # switch on/off track association
-  PSet     trackAssociation        = {                           # the track association parameter set
-    InputTag tracksSource = ctfWithMaterialTracks
-    double   deltaR       = 0.5
-    int32    minHits      = 8
-    double   maxNormChi2  = 5.0
-  }
-
+  InputTag trackAssociationSource  = layer0JetTracksAssociator   # association from jets to tracks
   ### Jet charge configurables
   bool     addJetCharge            = true                        # switch on/off jet charge calculation
-  PSet     jetCharge               = {                           # the jet charge parameter set
-    double exp = 1.0
-    string var = "Pt"
-  }
+  InputTag jetChargeSource         = layer0JetCharge             # the jet charge input value map
 
 }

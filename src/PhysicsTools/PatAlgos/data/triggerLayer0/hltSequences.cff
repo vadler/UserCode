@@ -1,10 +1,10 @@
-include "PhysicsTools/PatAlgos/data/electronHLTProducer.cfi"
-include "PhysicsTools/PatAlgos/data/muonHLTProducer.cfi"
-include "PhysicsTools/PatAlgos/data/tauHLTProducer.cfi"
-include "PhysicsTools/PatAlgos/data/photonHLTProducer.cfi"
-include "PhysicsTools/PatAlgos/data/jetHLTProducer.cfi"
-include "PhysicsTools/PatAlgos/data/metHLTProducer.cfi"
-// include "PhysicsTools/PatAlgos/data/btagHLTProducer.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/electronHLTProducer.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/muonHLTProducer.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/tauHLTProducer.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/photonHLTProducer.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/jetHLTProducer.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/metHLTProducer.cfi"
+// include "PhysicsTools/PatAlgos/data/triggerLayer0/btagHLTProducer.cfi"
 
 sequence patHLTProducer_withoutTau = {
 //     btagHLTProducer
@@ -20,13 +20,13 @@ sequence patHLTProducer = {
     tauHLTProducer
 }
 
-include "PhysicsTools/PatAlgos/data/electronHLTMatch.cfi"
-include "PhysicsTools/PatAlgos/data/muonHLTMatch.cfi"
-include "PhysicsTools/PatAlgos/data/tauHLTMatch.cfi"
-include "PhysicsTools/PatAlgos/data/photonHLTMatch.cfi"
-include "PhysicsTools/PatAlgos/data/jetHLTMatch.cfi"
-include "PhysicsTools/PatAlgos/data/metHLTMatch.cfi"
-// include "PhysicsTools/PatAlgos/data/btagHLTMatch.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/electronHLTMatch.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/muonHLTMatch.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/tauHLTMatch.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/photonHLTMatch.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/jetHLTMatch.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/metHLTMatch.cfi"
+// include "PhysicsTools/PatAlgos/data/triggerLayer0/btagHLTMatch.cfi"
 
 sequence patHLTMatch_withoutTau = {
 //     btagHLTMatch

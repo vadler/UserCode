@@ -1,7 +1,7 @@
-include "PhysicsTools/PatAlgos/data/emL1Producer.cfi"
-include "PhysicsTools/PatAlgos/data/muonL1Producer.cfi"
-// include "PhysicsTools/PatAlgos/data/jetL1Producer.cfi"
-include "PhysicsTools/PatAlgos/data/metL1Producer.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/emL1Producer.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/muonL1Producer.cfi"
+// include "PhysicsTools/PatAlgos/data/triggerLayer0/jetL1Producer.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/metL1Producer.cfi"
 
 sequence patL1Producer_withoutTau = {
     emL1Producer,
@@ -14,10 +14,10 @@ sequence patL1Producer = {
     patL1Producer_withoutTau
 }
 
-include "PhysicsTools/PatAlgos/data/emL1Match.cfi"
-include "PhysicsTools/PatAlgos/data/muonL1Match.cfi"
-// include "PhysicsTools/PatAlgos/data/jetL1Match.cfi"
-include "PhysicsTools/PatAlgos/data/metL1Match.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/emL1Match.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/muonL1Match.cfi"
+// include "PhysicsTools/PatAlgos/data/triggerLayer0/jetL1Match.cfi"
+include "PhysicsTools/PatAlgos/data/triggerLayer0/metL1Match.cfi"
 
 sequence patL1Match_withoutTau = {
     emL1Match,

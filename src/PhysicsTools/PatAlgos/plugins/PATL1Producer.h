@@ -48,7 +48,6 @@ namespace pat {
       edm::InputTag particleMaps_;
       std::string   triggerName_;
       std::string   objectType_;
-      bool          verbose_;
 
   };
 

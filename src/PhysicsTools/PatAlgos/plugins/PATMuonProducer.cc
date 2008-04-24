@@ -44,6 +44,7 @@ PATMuonProducer::PATMuonProducer(const edm::ParameterSet & iConfig) :
   useNNReso_     = iConfig.getParameter<bool>         ( "useNNResolutions" );
   muonResoFile_  = iConfig.getParameter<std::string>  ( "muonResoFile" );
   // muon ID configurables
+  // FIXME: still needed?
   addMuonID_     = iConfig.getParameter<bool>         ( "addMuonID" );
 
   // construct resolution calculator
@@ -129,9 +130,7 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
 
     // add muon ID info
     if (addMuonID_) {
-//      aMuon.setLeptonID((float) TMath::Prob((Float_t) itMuon->combinedMuon()->chi2(), (Int_t) itMuon->combinedMuon()->ndof()));
-// no combinedMuon in fastsim
-      aMuon.setLeptonID((float) TMath::Prob((Float_t) itMuon->track()->chi2(), (Int_t) itMuon->track()->ndof()));
+// FIXME: something left to do here?
     }
 
      // Isolation
