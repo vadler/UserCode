@@ -16,7 +16,7 @@ include "PhysicsTools/PatAlgos/data/selectionLayer1/leptonCountFilter.cfi"
 sequence allObjects = {
   ( (layer1Muons , layer1Electrons , layer1Taus) , countLayer1Leptons ) ,
   layer1Photons ,
-//   layer1Jets ,
+  layer1Jets ,
   layer1METs,
   layer1Hemispheres
 }

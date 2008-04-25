@@ -14,10 +14,10 @@
    A CandidateCollection of "firing" trigger objects from a given filter in a given trigger path is produced from trigger information available in AOD.
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: PATHLTProducer.h,v 1.4 2008/04/07 15:05:49 vadler Exp $
 */
 //
-// $Id$
+// $Id: PATHLTProducer.h,v 1.4 2008/04/07 15:05:49 vadler Exp $
 //
 
 
@@ -49,7 +49,6 @@ namespace pat {
       edm::InputTag triggerResults_;
       std::string   triggerName_;
       edm::InputTag filterName_;
-      bool          verbose_;
 
   };
 

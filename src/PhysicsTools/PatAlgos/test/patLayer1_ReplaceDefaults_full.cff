@@ -27,10 +27,7 @@ replace allLayer1Muons.isoDeposits.ecal    = layer0MuonIsolations:muIsoDepositCa
 replace allLayer1Muons.isoDeposits.hcal    = layer0MuonIsolations:muIsoDepositCalByAssociatorTowershcal
 replace allLayer1Muons.isoDeposits.user  = { layer0MuonIsolations:muIsoDepositCalByAssociatorTowersho,
                                              layer0MuonIsolations:muIsoDepositJets }
-replace allLayer1Muons.addMuonID = true
-replace allLayer1Muons.addLRValues = true
-replace allLayer1Muons.tracksSource = generalTracks
-replace allLayer1Muons.muonLRFile = "PhysicsTools/PatUtils/data/MuonLRDistros.root"
+replace allLayer1Muons.addMuonID = false 
 # Generated from /afs/cern.ch/user/l/lowette/scratch.0/CMSSW_1_6_9_pre2_pat/src/PhysicsTools/PatAlgos/data/PATElectronProducer.cfi
 replace allLayer1Electrons.electronSource = allLayer0Electrons
 replace allLayer1Electrons.addGenMatch = true
@@ -50,8 +47,6 @@ replace allLayer1Electrons.addElectronID = true
 replace allLayer1Electrons.electronIDSource = electronId
 replace allLayer1Electrons.addElectronIDRobust = true
 replace allLayer1Electrons.electronIDRobustSource = electronIdRobust
-replace allLayer1Electrons.addLRValues = true
-replace allLayer1Electrons.electronLRFile = "PhysicsTools/PatUtils/data/ElectronLRDistros.root"
 # Generated from /afs/cern.ch/user/l/lowette/scratch.0/CMSSW_1_6_9_pre2_pat/src/PhysicsTools/PatAlgos/data/PATPhotonProducer.cfi
 
 # Generated from /afs/cern.ch/user/l/lowette/scratch.0/CMSSW_1_6_9_pre2_pat/src/PhysicsTools/PatAlgos/data/PATTauProducer.cfi
@@ -61,17 +56,10 @@ replace allLayer1Taus.genParticleMatch = tauMatch
 replace allLayer1Taus.addResolutions = true
 replace allLayer1Taus.useNNResolutions = true
 replace allLayer1Taus.tauResoFile = "PhysicsTools/PatUtils/data/Resolutions_tau.root"
-replace allLayer1Taus.addLRValues = false
-replace allLayer1Taus.tauLRFile = "PhysicsTools/PatUtils/data/TauLRDistros.root"
 # Generated from /afs/cern.ch/user/l/lowette/scratch.0/CMSSW_1_6_9_pre2_pat/src/PhysicsTools/PatAlgos/data/PATJetProducer.cfi
-replace allLayer1Jets.addTagInfoRefs = false
-replace allLayer1Jets.ipTagInfoLabelName = {  "impactParameterMVAJetTags", "jetProbabilityJetTags",   "trackCountingHighEffJetTags", "trackCountingHighPurJetTags"}
-replace allLayer1Jets.softETagInfoLabelName = {"softElectronJetTags"}
-replace allLayer1Jets.softMTagInfoLabelName = { "softMuonJetTags","softMuonNoIPJetTags"}
-replace allLayer1Jets.svTagInfoLabelName = {"combinedSVJetTags", "combinedSVMVAJetTags"}
 replace allLayer1Jets.jetSource = allLayer0Jets
 replace allLayer1Jets.getJetMCFlavour = true
-replace allLayer1Jets.JetPartonMapSource = jetPartonAssociation
+replace allLayer1Jets.JetPartonMapSource = jetFlavourAssociation
 replace allLayer1Jets.addGenPartonMatch = true
 replace allLayer1Jets.genPartonMatch = jetPartonMatch
 replace allLayer1Jets.addGenJetMatch = true
@@ -83,24 +71,17 @@ replace allLayer1Jets.useNNResolutions = false
 replace allLayer1Jets.caliJetResoFile = "PhysicsTools/PatUtils/data/Resolutions_lJets_MCJetCorJetIcone5.root"
 replace allLayer1Jets.caliBJetResoFile = "PhysicsTools/PatUtils/data/Resolutions_bJets_MCJetCorJetIcone5.root"
 replace allLayer1Jets.addBTagInfo = true
-replace allLayer1Jets.tagModuleLabelPostfix = "Layer0"
 replace allLayer1Jets.addDiscriminators = true
-replace allLayer1Jets.addJetTagRefs = true
-replace allLayer1Jets.tagModuleLabelsToKeep = {
-    "combinedSVJetTags", "combinedSVMVAJetTags", "impactParameterMVAJetTags", "jetProbabilityJetTags", "softElectronJetTags", "softMuonJetTags", "softMuonNoIPJetTags", "trackCountingHighEffJetTags", "trackCountingHighPurJetTags"
-  }
-replace allLayer1Jets.addAssociatedTracks = true
-replace allLayer1Jets.trackAssociation = {
-    InputTag tracksSource = generalTracks
-    double   deltaR       = 0.5
-    int32    minHits      = 8
-    double   maxNormChi2  = 5.0
-  }
-replace allLayer1Jets.addJetCharge = true
-replace allLayer1Jets.jetCharge = {
-    double exp = 1.0
-    string var = "Pt"
-  }
+replace allLayer1Jets.discriminatorModule = layer0BTags
+replace allLayer1Jets.discriminatorNames  = { "*" }
+replace allLayer1Jets.addTagInfoRefs      = true
+replace allLayer1Jets.tagInfoModule       = layer0TagInfos
+replace allLayer1Jets.tagInfoNames        = { "secondaryVertexTagInfos", "softElectronTagInfos", "softMuonTagInfos", "impactParameterTagInfos" }
+replace allLayer1Jets.addAssociatedTracks    = true
+replace allLayer1Jets.trackAssociationSource = layer0JetTracksAssociator
+replace allLayer1Jets.addJetCharge           = true
+replace allLayer1Jets.jetChargeSource        = layer0JetCharge
+
 # Generated from /afs/cern.ch/user/l/lowette/scratch.0/CMSSW_1_6_9_pre2_pat/src/PhysicsTools/PatAlgos/data/PATMETProducer.cfi
 replace allLayer1METs.metSource = allLayer0METs
 replace allLayer1METs.addGenMET = true
