@@ -1,70 +1,62 @@
-#--------------------------
-#### DQM services
-#--------------------------
+  #-------------------------------------------------
+  # DQM Services
+  #-------------------------------------------------
 
-include "DQMServices/Core/data/DQM.cfg"
+  # core
+  include "DQMServices/Core/data/DQM.cfg"
+  
+  # DQM environment and saver
+  include "DQMServices/Components/data/DQMEnvironment.cfi"
+  replace dqmEnv.subSystemFolder     = "SiStrip"
+  replace dqmSaver.convention        = "Online" // "Online", "Offline" (default) or "RelVal"
+  replace dqmSaver.workflow          = ""
+  replace dqmSaver.dirName           = "."
+//   replace dqmSaver.forceRunNumber    = -1
+//   replace dqmSaver.saveByLumiSection = 1
+//   replace dqmSaver.saveByMinute      = -1
+  replace dqmSaver.saveByRun         =  1
+  replace dqmSaver.saveAtJobEnd      = true
 
-    #########################################################
-    #### BEGIN DQM Online Environment #######################
-    #########################################################
-
-    #### PUT THE FOLLOWING INTO YOUR PATH FOR OPERATION AT P5
-    #### REPLACE YourSubsystemName by the name of your source ###
-
-    # use include file for dqmEnv dqmSaver
-       include "DQMServices/Components/data/DQMEnvironment.cfi"
-       # Possible conventions are "Online", "Offline" and "RelVal".
-       # Default is "Offline"
-       replace dqmSaver.convention    = "Online"
-       // replace dqmSaver.workflow      = ""
-       replace dqmSaver.dirName       = "."
-       # This is the filename prefix
-       replace dqmSaver.producer        = "DQM"
-       # (this goes into the foldername)
-       replace dqmEnv.subSystemFolder   = "SiStrip"
-       # Ignore run number for MC data
-       # replace dqmSaver.forceRunNumber  = -1
-
-       # optionally change fileSaving  conditions
-       # replace dqmSaver.saveByLumiSection =   1
-       # replace dqmSaver.saveByMinute = -1
-       replace dqmSaver.saveByRun =     1
-       replace dqmSaver.saveAtJobEnd = true
-       # will add switch to select histograms to be saved soon
-
-    #########################################################
-    #### END ################################################
-    #########################################################
-
-    ### FIX YOUR  PATH TO INCLUDE dqmEnv and dqmSaver
-
-
-#--------------------------
-#### STRIP DQM Source and Client
-#--------------------------
-include "DQM/SiStripMonitorClient/data/SiStripSourceConfigTier0.cff"
-
-
-sequence SiStripDQMTest_cosmicTk = {
+  #-------------------------------------------------
+  # SiStrip DQM Source and Client
+  #-------------------------------------------------
+  
+  # source
+  include "DQM/SiStripMonitorClient/data/SiStripSourceConfigTier0.cff"
+  
+  #-------------------------------------------------
+  # Scheduling
+  #-------------------------------------------------
+  
+  sequence SiStripDQMTest_cosmicTk = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
     SiStripDQMTier0_cosmicTk,
-    dqmEnv , 
+    # from "DQMServices/Components/data/DQMEnvironment.cfi"
+    dqmEnv, 
     dqmSaver 
-}
-
-sequence SiStripDQMTest_ckf = {
+  }
+  
+  sequence SiStripDQMTest_ckf = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
     SiStripDQMTier0_ckf,
-    dqmEnv , 
+    # from "DQMServices/Components/data/DQMEnvironment.cfi"
+    dqmEnv, 
     dqmSaver 
-}
-
-sequence SiStripDQMTest_rs = {
+  }
+  
+  sequence SiStripDQMTest_rs = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
     SiStripDQMTier0_rs,
-    dqmEnv , 
+    # from "DQMServices/Components/data/DQMEnvironment.cfi"
+    dqmEnv, 
     dqmSaver 
-}
-
-sequence SiStripDQMTest = {
+  }
+  
+  sequence SiStripDQMTest = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
     SiStripDQMTier0,
-    dqmEnv , 
+    # from "DQMServices/Components/data/DQMEnvironment.cfi"
+    dqmEnv, 
     dqmSaver 
-}
+  }
+  
