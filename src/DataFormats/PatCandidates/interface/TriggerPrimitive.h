@@ -44,10 +44,14 @@ namespace pat {
       virtual TriggerPrimitive * clone() const;
       
       const std::string & triggerName() const;
+      const std::string & pathName() const;
       const std::string & filterName() const;
+      const std::string & objectType() const;
       
       void setTriggerName( const std::string aTrig = "" );
+      void setPathName( const std::string aPath = "" );
       void setFilterName( const std::string aFilt = "" );
+      void setObjectType( const std::string anObj = "" );
       
     protected:
     
