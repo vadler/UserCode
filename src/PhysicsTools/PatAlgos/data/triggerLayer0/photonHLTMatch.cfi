@@ -3,7 +3,7 @@
 /// (cuts are NOT tuned, using old values from TQAF MC match, january 2008)
 ///
 
-module photonHLTMatchHLT1Photon = PATHLTMatcher {
+module photonTrigMatchHLT1Photon = PATTrigMatcher {
  InputTag src               = allLayer0Photons
  InputTag matched           = HLT1Photon
  double maxDeltaR           = 0.2
@@ -12,7 +12,7 @@ module photonHLTMatchHLT1Photon = PATHLTMatcher {
  bool resolveByMatchQuality = false
 }
 
-module photonHLTMatchHLT1PhotonRelaxed = PATHLTMatcher {
+module photonTrigMatchHLT1PhotonRelaxed = PATTrigMatcher {
  InputTag src               = allLayer0Photons
  InputTag matched           = HLT1PhotonRelaxed
  double maxDeltaR           = 0.2
@@ -21,7 +21,7 @@ module photonHLTMatchHLT1PhotonRelaxed = PATHLTMatcher {
  bool resolveByMatchQuality = false
 }
 
-module photonHLTMatchHLT2Photon = PATHLTMatcher {
+module photonTrigMatchHLT2Photon = PATTrigMatcher {
  InputTag src               = allLayer0Photons
  InputTag matched           = HLT2Photon
  double maxDeltaR           = 0.2
@@ -30,7 +30,7 @@ module photonHLTMatchHLT2Photon = PATHLTMatcher {
  bool resolveByMatchQuality = false
 }
 
-module photonHLTMatchHLT2PhotonRelaxed = PATHLTMatcher {
+module photonTrigMatchHLT2PhotonRelaxed = PATTrigMatcher {
  InputTag src               = allLayer0Photons
  InputTag matched           = HLT2PhotonRelaxed
  double maxDeltaR           = 0.2
@@ -40,8 +40,8 @@ module photonHLTMatchHLT2PhotonRelaxed = PATHLTMatcher {
 }
 
 sequence photonHLTMatch = {
-//     photonHLTMatchHLT2Photon,
-//     photonHLTMatchHLT2PhotonRelaxed,
-//     photonHLTMatchHLT1Photon,
-    photonHLTMatchHLT1PhotonRelaxed
+//     photonTrigMatchHLT2Photon,
+//     photonTrigMatchHLT2PhotonRelaxed,
+//     photonTrigMatchHLT1Photon,
+    photonTrigMatchHLT1PhotonRelaxed
 }

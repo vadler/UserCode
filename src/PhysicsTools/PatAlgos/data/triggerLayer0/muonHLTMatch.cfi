@@ -3,7 +3,7 @@
 /// (cuts are NOT tuned, using old values from TQAF MC match, january 2008)
 ///
 
-module muonHLTMatchHLT1MuonIso = PATHLTMatcher {
+module muonTrigMatchHLT1MuonIso = PATTrigMatcher {
    InputTag src               = allLayer0Muons
    InputTag matched           = HLT1MuonIso
    double maxDeltaR           = 0.5
@@ -12,7 +12,7 @@ module muonHLTMatchHLT1MuonIso = PATHLTMatcher {
    bool resolveByMatchQuality = false
 }
 
-module muonHLTMatchHLT1MuonNonIso = PATHLTMatcher {
+module muonTrigMatchHLT1MuonNonIso = PATTrigMatcher {
    InputTag src               = allLayer0Muons
    InputTag matched           = HLT1MuonNonIso
    double maxDeltaR           = 0.5
@@ -21,7 +21,7 @@ module muonHLTMatchHLT1MuonNonIso = PATHLTMatcher {
    bool resolveByMatchQuality = false
 }
 
-module muonHLTMatchHLT2MuonNonIso = PATHLTMatcher {
+module muonTrigMatchHLT2MuonNonIso = PATTrigMatcher {
    InputTag src               = allLayer0Muons
    InputTag matched           = HLT2MuonNonIso
    double maxDeltaR           = 0.5
@@ -31,7 +31,7 @@ module muonHLTMatchHLT2MuonNonIso = PATHLTMatcher {
 }
 
 sequence muonHLTMatch = {
-//     muonHLTMatchHLT2MuonNonIso,
-//     muonHLTMatchHLT1MuonIso,
-    muonHLTMatchHLT1MuonNonIso
+//     muonTrigMatchHLT2MuonNonIso,
+//     muonTrigMatchHLT1MuonIso,
+    muonTrigMatchHLT1MuonNonIso
 }

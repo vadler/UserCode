@@ -1,14 +1,14 @@
-#ifndef PhysicsTools_PatAlgos_PATHLTMatchSelector_h
-#define PhysicsTools_PatAlgos_PATHLTMatchSelector_h
+#ifndef PhysicsTools_PatAlgos_PATTrigMatchSelector_h
+#define PhysicsTools_PatAlgos_PATTrigMatchSelector_h
 
 
 // -*- C++ -*-
 //
 // Package:    PatAlgos
-// Class:      PATHLTMatchSelector
+// Class:      PATTrigMatchSelector
 //
 /**
-  \class    pat::PATHLTMatchSelector PATHLTMatchSelector.h "PhysicsTools/PatAlgos/interface/PATHLTMatchSelector.h"
+  \class    pat::PATTrigMatchSelector PATTrigMatchSelector.h "PhysicsTools/PatAlgos/interface/PATTrigMatchSelector.h"
   \brief    Dummy class as counterpart to PATMatchSelector in order to use PATCandMatcher
 
    Dummy class.
@@ -28,11 +28,11 @@
 namespace pat {
 
   template<typename T1, typename T2>
-  class PATHLTMatchSelector {
+  class PATTrigMatchSelector {
   
     public:
     
-      PATHLTMatchSelector( const edm::ParameterSet& cfg ) {  }
+      PATTrigMatchSelector( const edm::ParameterSet& cfg ) {  }
       
       bool operator()( const T1 & c, const T2 & hlt ) const { return true; }
       

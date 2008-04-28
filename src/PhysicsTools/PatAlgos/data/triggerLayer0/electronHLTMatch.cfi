@@ -3,7 +3,7 @@
 /// (cuts are NOT tuned, using old values from TQAF MC match, january 2008)
 ///
 
-module electronHLTMatchHLT1Electron = PATHLTMatcher {
+module electronTrigMatchHLT1Electron = PATTrigMatcher {
    InputTag src               = allLayer0Electrons
    InputTag matched           = HLT1Electron
    double maxDeltaR           = 0.5
@@ -12,7 +12,7 @@ module electronHLTMatchHLT1Electron = PATHLTMatcher {
    bool resolveByMatchQuality = false
 }
 
-module electronHLTMatchHLT1ElectronRelaxed = PATHLTMatcher {
+module electronTrigMatchHLT1ElectronRelaxed = PATTrigMatcher {
    InputTag src               = allLayer0Electrons
    InputTag matched           = HLT1ElectronRelaxed
    double maxDeltaR           = 0.5
@@ -21,7 +21,7 @@ module electronHLTMatchHLT1ElectronRelaxed = PATHLTMatcher {
    bool resolveByMatchQuality = false
 }
 
-module electronHLTMatchHLT2Electron = PATHLTMatcher {
+module electronTrigMatchHLT2Electron = PATTrigMatcher {
    InputTag src               = allLayer0Electrons
    InputTag matched           = HLT2Electron
    double maxDeltaR           = 0.5
@@ -30,7 +30,7 @@ module electronHLTMatchHLT2Electron = PATHLTMatcher {
    bool resolveByMatchQuality = false
 }
 
-module electronHLTMatchHLT2ElectronRelaxed = PATHLTMatcher {
+module electronTrigMatchHLT2ElectronRelaxed = PATTrigMatcher {
    InputTag src               = allLayer0Electrons
    InputTag matched           = HLT2ElectronRelaxed
    double maxDeltaR           = 0.5
@@ -40,8 +40,8 @@ module electronHLTMatchHLT2ElectronRelaxed = PATHLTMatcher {
 }
 
 sequence electronHLTMatch = {
-//     electronHLTMatchHLT2Electron,
-//     electronHLTMatchHLT2ElectronRelaxed,
-//     electronHLTMatchHLT1Electron,
-    electronHLTMatchHLT1ElectronRelaxed
+//     electronTrigMatchHLT2Electron,
+//     electronTrigMatchHLT2ElectronRelaxed,
+//     electronTrigMatchHLT1Electron,
+    electronTrigMatchHLT1ElectronRelaxed
 }

@@ -10,7 +10,7 @@ module allLayer1Taus = PATTauProducer {
 
   ### Trigger matching configurables
   bool      addTrigMatch     = true                     # switch on/off matching to trigger primitives
-  VInputTag trigPrimMatch    = { tauHLTMatchHLT1Tau }   # trigger primitive sources to be used for the matching
+  VInputTag trigPrimMatch    = { tauTrigMatchHLT1Tau }  # trigger primitive sources to be used for the matching
 
   ### resolution configurables
   bool     addResolutions    = true                     # switch on/off the resolution calculation

@@ -10,8 +10,9 @@ module allLayer1Electrons = PATElectronProducer {
 
   ### Trigger matching configurables
   bool      addTrigMatch     = true                     # switch on/off matching to trigger primitives
-  VInputTag trigPrimMatch    = { electronL1MatchL1SingleEG5,
-                                 electronHLTMatchHLT1ElectronRelaxed } # trigger primitive sources to be used for the matching
+  VInputTag trigPrimMatch    = { electronTrigMatchL1SingleEG5,
+                                 electronTrigMatchHLT1ElectronRelaxed }
+                                                        # trigger primitive sources to be used for the matching
 
   ### resolution configurables
   bool     addResolutions    = true                     # switch on/off the resolution calculation

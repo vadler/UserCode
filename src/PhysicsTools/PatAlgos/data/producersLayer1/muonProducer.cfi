@@ -10,8 +10,9 @@ module allLayer1Muons = PATMuonProducer {
 
   ### Trigger matching configurables
   bool      addTrigMatch     = true                    # switch on/off matching to trigger primitives
-  VInputTag trigPrimMatch    = { muonL1MatchL1SingleMu3,
-                                 muonHLTMatchHLT1MuonNonIso } # trigger primitive sources to be used for the matching
+  VInputTag trigPrimMatch    = { muonTrigMatchL1SingleMu3,
+                                 muonTrigMatchHLT1MuonNonIso }
+                                                       # trigger primitive sources to be used for the matching
 
   ### Resolution configurables
   bool     addResolutions    = true                    # switch on/off the resolution calculation

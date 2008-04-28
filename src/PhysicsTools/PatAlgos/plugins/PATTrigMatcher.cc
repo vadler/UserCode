@@ -4,7 +4,7 @@
 
 
 #include "PhysicsTools/PatAlgos/plugins/PATCandMatcher.h"
-#include "PhysicsTools/PatAlgos/plugins/PATHLTMatchSelector.h"
+#include "PhysicsTools/PatAlgos/plugins/PATTrigMatchSelector.h"
 #include "PhysicsTools/PatUtils/interface/PATMatchByDRDPt.h"
 #include "PhysicsTools/PatUtils/interface/PATMatchLessByDPt.h"
 
@@ -15,25 +15,26 @@
 typedef pat::PATCandMatcher<
   reco::CandidateView,
   pat::TriggerPrimitiveCollection,
-  pat::PATHLTMatchSelector<reco::CandidateView::value_type,
+  pat::PATTrigMatchSelector<reco::CandidateView::value_type,
                            pat::TriggerPrimitiveCollection::value_type>,
   pat::PATMatchByDRDPt<reco::CandidateView::value_type,
                        pat::TriggerPrimitiveCollection::value_type>
-> PATHLTMatcher;
+> PATTrigMatcher;
 
 // Alternative: match by deltaR and deltaPt, ranking by deltaPt
 typedef pat::PATCandMatcher<
   reco::CandidateView,
   pat::TriggerPrimitiveCollection,
-  pat::PATHLTMatchSelector<reco::CandidateView::value_type,
+  pat::PATTrigMatchSelector<reco::CandidateView::value_type,
                            pat::TriggerPrimitiveCollection::value_type>,
   pat::PATMatchByDRDPt<reco::CandidateView::value_type,
                        pat::TriggerPrimitiveCollection::value_type>,
   pat::PATMatchLessByDPt<reco::CandidateView,
                          pat::TriggerPrimitiveCollection >
-> PATHLTMatcherByPt;
+> PATTrigMatcherByPt;
 
 
 #include "FWCore/Framework/interface/MakerMacros.h"
-DEFINE_FWK_MODULE( PATHLTMatcher );
-DEFINE_FWK_MODULE( PATHLTMatcherByPt );
+DEFINE_FWK_MODULE( PATTrigMatcher );
+DEFINE_FWK_MODULE( PATTrigMatcherByPt );
+

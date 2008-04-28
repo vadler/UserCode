@@ -3,7 +3,7 @@
 /// (cuts are NOT tuned, using old values from TQAF MC match for jets, january 2008)
 ///
 
-module metL1MatchL1ETM20 = PATL1Matcher {
+module metTrigMatchL1ETM20 = PATTrigMatcher {
    InputTag src               = allLayer0METs
    InputTag matched           = L1ETM20
    double maxDeltaR           = 0.4
@@ -13,5 +13,5 @@ module metL1MatchL1ETM20 = PATL1Matcher {
 }
 
 sequence metL1Match = {
-    metL1MatchL1ETM20
+    metTrigMatchL1ETM20
 }

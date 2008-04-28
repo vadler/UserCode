@@ -19,10 +19,10 @@ module allLayer1Jets = PATJetProducer {
 
   ### Trigger matching configurables
   bool      addTrigMatch     = true                              # switch on/off matching to trigger primitives
-  VInputTag trigPrimMatch    = { jetHLTMatchHLT1Jet,
-                                 jetHLTMatchHLT2Jet,
-                                 jetHLTMatchHLT3Jet,
-                                 jetHLTMatchHLT4Jet }            # trigger primitive sources to be used for the matching
+  VInputTag trigPrimMatch    = { jetTrigMatchHLT1Jet,
+                                 jetTrigMatchHLT2Jet,
+                                 jetTrigMatchHLT3Jet,
+                                 jetTrigMatchHLT4Jet }           # trigger primitive sources to be used for the matching
 
   ### Jet energy scale correction configurables
   InputTag jetCorrFactorsSource    = layer0JetCorrFactors        # source of the valuemap containing the jet correction factors

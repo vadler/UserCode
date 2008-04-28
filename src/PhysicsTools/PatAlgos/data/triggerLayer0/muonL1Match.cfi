@@ -3,7 +3,7 @@
 /// (cuts are NOT tuned, using old values from TQAF MC match, january 2008)
 ///
 
-module muonL1MatchL1SingleMu3 = PATL1Matcher {
+module muonTrigMatchL1SingleMu3 = PATTrigMatcher {
    InputTag src               = allLayer0Muons
    InputTag matched           = L1SingleMu3
    double maxDeltaR           = 0.5
@@ -13,5 +13,5 @@ module muonL1MatchL1SingleMu3 = PATL1Matcher {
 }
 
 sequence muonL1Match = {
-    muonL1MatchL1SingleMu3
+    muonTrigMatchL1SingleMu3
 }

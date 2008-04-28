@@ -7,8 +7,9 @@ module allLayer1Photons = PATPhotonProducer {
 
   ### Trigger matching configurables
   bool      addTrigMatch     = true               # switch on/off matching to trigger primitives
-  VInputTag trigPrimMatch    = { photonL1MatchL1SingleEG5,
-                                 photonHLTMatchHLT1PhotonRelaxed } # trigger primitive sources to be used for the matching
+  VInputTag trigPrimMatch    = { photonTrigMatchL1SingleEG5,
+                                 photonTrigMatchHLT1PhotonRelaxed }
+                                                  # trigger primitive sources to be used for the matching
 
   ### Isolation configurables
   PSet isolation = {

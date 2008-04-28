@@ -3,7 +3,7 @@
 /// (cuts are NOT tuned, using old values from TQAF MC match, january 2008)
 ///
 
-module jetHLTMatchHLT1Jet = PATHLTMatcher {
+module jetTrigMatchHLT1Jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
    InputTag matched           = HLT1Jet
    double maxDeltaR           = 0.4
@@ -12,7 +12,7 @@ module jetHLTMatchHLT1Jet = PATHLTMatcher {
    bool resolveByMatchQuality = false
 }
 
-module jetHLTMatchHLT2Jet = PATHLTMatcher {
+module jetTrigMatchHLT2Jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
    InputTag matched           = HLT2Jet
    double maxDeltaR           = 0.4
@@ -21,7 +21,7 @@ module jetHLTMatchHLT2Jet = PATHLTMatcher {
    bool resolveByMatchQuality = false
 }
 
-module jetHLTMatchHLT3Jet = PATHLTMatcher {
+module jetTrigMatchHLT3Jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
    InputTag matched           = HLT3Jet
    double maxDeltaR           = 0.4
@@ -30,7 +30,7 @@ module jetHLTMatchHLT3Jet = PATHLTMatcher {
    bool resolveByMatchQuality = false
 }
 
-module jetHLTMatchHLT4Jet = PATHLTMatcher {
+module jetTrigMatchHLT4Jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
    InputTag matched           = HLT4Jet
    double maxDeltaR           = 0.4
@@ -40,8 +40,8 @@ module jetHLTMatchHLT4Jet = PATHLTMatcher {
 }
 
 sequence jetHLTMatch = {
-    jetHLTMatchHLT1Jet,
-    jetHLTMatchHLT2Jet,
-    jetHLTMatchHLT3Jet,
-    jetHLTMatchHLT4Jet
+    jetTrigMatchHLT1Jet,
+    jetTrigMatchHLT2Jet,
+    jetTrigMatchHLT3Jet,
+    jetTrigMatchHLT4Jet
 }

@@ -3,7 +3,7 @@
 /// (cuts are NOT tuned, using old values from TQAF MC match for electrons, january 2008)
 ///
 
-module electronL1MatchL1SingleEG5 = PATL1Matcher {
+module electronTrigMatchL1SingleEG5 = PATTrigMatcher {
    InputTag src               = allLayer0Electrons
    InputTag matched           = L1SingleEG5
    double maxDeltaR           = 0.5
@@ -12,7 +12,7 @@ module electronL1MatchL1SingleEG5 = PATL1Matcher {
    bool resolveByMatchQuality = false
 }
 
-module photonL1MatchL1SingleEG5 = PATL1Matcher {
+module photonTrigMatchL1SingleEG5 = PATTrigMatcher {
    InputTag src               = allLayer0Photons
    InputTag matched           = L1SingleEG5
    double maxDeltaR           = 0.2
@@ -22,11 +22,11 @@ module photonL1MatchL1SingleEG5 = PATL1Matcher {
 }
 
 sequence electronL1Match = {
-    electronL1MatchL1SingleEG5
+    electronTrigMatchL1SingleEG5
 }
 
 sequence photonL1Match = {
-    photonL1MatchL1SingleEG5
+    photonTrigMatchL1SingleEG5
 }
 
 sequence emL1Match = {

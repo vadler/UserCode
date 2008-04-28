@@ -10,8 +10,8 @@ module allLayer1METs = PATMETProducer {
 
   ### Trigger matching configurables
   bool      addTrigMatch      = true                    # switch on/off matching to trigger primitives
-  VInputTag trigPrimMatch     = { metL1MatchL1ETM20,
-                                  metHLTMatchHLT1MET }  # trigger primitive sources to be used for the matching
+  VInputTag trigPrimMatch     = { metTrigMatchL1ETM20,
+                                  metTrigMatchHLT1MET } # trigger primitive sources to be used for the matching
 
   ### Resolution configurables
   bool     addResolutions     = true                    # switch on/off the resolution calculation
