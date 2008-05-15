@@ -14,7 +14,7 @@
 //
 // Original Author:  Volker Adler
 //         Created:  Fri Feb  8 14:48:21 CET 2008
-// $Id: AnalyzeGenEvent.cc,v 1.1 2008/02/13 15:04:28 vadler Exp $
+// $Id: AnalyzeGenEvent.cc,v 1.2 2008/02/16 19:11:58 vadler Exp $
 //
 
 
@@ -28,6 +28,7 @@ AnalyzeGenEvent::AnalyzeGenEvent(const edm::ParameterSet& iConfig) :
   useOffDiagBasis_(iConfig.getParameter<bool>         ("useOffDiagonalBasis")),
   useOptBasis_    (iConfig.getParameter<bool>         ("useOptimalBasis")),
   splitTtAbsolute_(iConfig.getParameter<bool>         ("splitTtMassAbsolute")),
+  fitHistos_      (iConfig.getParameter<bool>         ("fitHistos")),
   srcGenEvt_      (iConfig.getParameter<edm::InputTag>("srcGenEvent")),
   filePath_       (iConfig.getParameter<std::string>  ("outputFilePath")),
   splitTtValue_   (iConfig.getParameter<double>       ("splitTtValue")),
@@ -35,20 +36,38 @@ AnalyzeGenEvent::AnalyzeGenEvent(const edm::ParameterSet& iConfig) :
   xMinTtMass_     (iConfig.getParameter<double>       ("xMinTtMass")),
   xMaxTtMass_     (iConfig.getParameter<double>       ("xMaxTtMass")),
   binsCosAngle1D_ (iConfig.getParameter<int>          ("binsCosAngle1D")),
-  binsCosAngle2D_ (iConfig.getParameter<int>          ("binsCosAngle2D"))
+  binsCosAngle2D_ (iConfig.getParameter<int>          ("binsCosAngle2D")),
+  kappaLplus_     (iConfig.getParameter<double>       ("kappaLplus")),
+  kappaDbar_      (iConfig.getParameter<double>       ("kappaDbar")),
+  kappaSbar_      (iConfig.getParameter<double>       ("kappaSbar")),
+  kappaNu_        (iConfig.getParameter<double>       ("kappaNu")),
+  kappaU_         (iConfig.getParameter<double>       ("kappaU")),
+  kappaC_         (iConfig.getParameter<double>       ("kappaC")),
+  kappaB_         (iConfig.getParameter<double>       ("kappaB")),
+  kappaW_         (iConfig.getParameter<double>       ("kappaW")),
+  kappaQ_         (iConfig.getParameter<double>       ("kappaQ"))
 {
   // create output file
   file_ = new TFile(filePath_.data(), "RECREATE");
 
   // define trees & histograms
   tree_ = new TTree("tree", "Spin basis independent observables (tt ZMF)");
-  tree_->Branch("splitTtAbsolute_", &splitTtAbsolute_, "splitTtAbsolute_/b");
-  tree_->Branch("splitTtValue_",    &splitTtValue_,    "splitTtValue_/D");
   tree_->Branch("topsZMFMass_",     &topsZMFMass_,     "topsZMFMass_/D");
   tree_->Branch("cosPhiLB_",        &cosPhiLB_,        "cosPhiLB_/D");
   tree_->Branch("cosPhiLQ_",        &cosPhiLQ_,        "cosPhiLQ_/D");
   treeMeta_ = new TTree("treeMeta", "Event and spin independent observables");
-  treeMeta_->Branch("splitTtMass_", &splitTtMass_, "splitTtMass_/D");
+  treeMeta_->Branch("splitTtAbsolute_", &splitTtAbsolute_, "splitTtAbsolute_/b");
+  treeMeta_->Branch("splitTtValue_",    &splitTtValue_,    "splitTtValue_/D");
+  treeMeta_->Branch("splitTtMass_",     &splitTtMass_,     "splitTtMass_/D");
+  treeMeta_->Branch("kappaLplus_",      &kappaLplus_,      "kappaLplus_/D");
+  treeMeta_->Branch("kappaDbar_",       &kappaDbar_,       "kappaDbar_/D");
+  treeMeta_->Branch("kappaSbar_",       &kappaSbar_,       "kappaSbar_/D");
+  treeMeta_->Branch("kappaNu_",         &kappaNu_,         "kappaNu_/D");
+  treeMeta_->Branch("kappaU_",          &kappaU_,          "kappaU_/D");
+  treeMeta_->Branch("kappaC_",          &kappaC_,          "kappaC_/D");
+  treeMeta_->Branch("kappaB_",          &kappaB_,          "kappaB_/D");
+  treeMeta_->Branch("kappaW_",          &kappaW_,          "kappaW_/D");
+  treeMeta_->Branch("kappaQ_",          &kappaQ_,          "kappaQ_/D");
   hTtMass_ = new TH1D("hTtMass", "t#bar{t} invariant mass", binsTtMass_, xMinTtMass_, xMaxTtMass_);
   hTtMass_->SetXTitle("m_{t#bar{t}} (GeV)");
   hTtMass_->SetYTitle("events");
@@ -127,12 +146,6 @@ AnalyzeGenEvent::AnalyzeGenEvent(const edm::ParameterSet& iConfig) :
     hRefCosTQCosTLHel_->SetXTitle("cos #theta_{t,l}");
     hRefCosTQCosTLHel_->SetYTitle("cos #theta_{t,q}");
     hRefCosTQCosTLHel_->SetZTitle("events");
-    hcCosTBCosTLHel_    = new TH2D();
-    hcCosTQCosTLHel_    = new TH2D();
-    hcAnaCosTBCosTLHel_ = new TH2D();
-    hcAnaCosTQCosTLHel_ = new TH2D();
-    hcRefCosTBCosTLHel_ = new TH2D();
-    hcRefCosTQCosTLHel_ = new TH2D();
     file_->cd();
   }
   if ( useBeamBasis_ ) {
@@ -192,12 +205,6 @@ AnalyzeGenEvent::AnalyzeGenEvent(const edm::ParameterSet& iConfig) :
     hRefCosBeamQCosBeamLBeam_->SetXTitle("cos #theta_{ini,l}");
     hRefCosBeamQCosBeamLBeam_->SetYTitle("cos #theta_{ini,q}");
     hRefCosBeamQCosBeamLBeam_->SetZTitle("events");
-    hcCosBeamBCosBeamLBeam_    = new TH2D();
-    hcCosBeamQCosBeamLBeam_    = new TH2D();
-    hcAnaCosBeamBCosBeamLBeam_ = new TH2D();
-    hcAnaCosBeamQCosBeamLBeam_ = new TH2D();
-    hcRefCosBeamBCosBeamLBeam_ = new TH2D();
-    hcRefCosBeamQCosBeamLBeam_ = new TH2D();
     file_->cd();
   }
   if ( useOffDiagBasis_ ) {
@@ -257,13 +264,28 @@ AnalyzeGenEvent::AnalyzeGenEvent(const edm::ParameterSet& iConfig) :
     hRefCosOffDiagQCosOffDiagLOffDiag_->SetXTitle("cos #theta_{off,l}");
     hRefCosOffDiagQCosOffDiagLOffDiag_->SetYTitle("cos #theta_{off,q}");
     hRefCosOffDiagQCosOffDiagLOffDiag_->SetZTitle("events");
-    hcCosOffDiagBCosOffDiagLOffDiag_    = new TH2D();
-    hcCosOffDiagQCosOffDiagLOffDiag_    = new TH2D();
-    hcAnaCosOffDiagBCosOffDiagLOffDiag_ = new TH2D();
-    hcAnaCosOffDiagQCosOffDiagLOffDiag_ = new TH2D();
-    hcRefCosOffDiagBCosOffDiagLOffDiag_ = new TH2D();
-    hcRefCosOffDiagQCosOffDiagLOffDiag_ = new TH2D();
     file_->cd();
+  }
+  if ( fitHistos_ ) {
+    fit1L_ = TF1("fit1L_", "[0]*(1.+[1]*[2]*x)");
+    fit1L_.SetParameter(2,kappaLplus_);
+    fit1L_.FixParameter(2,kappaLplus_);
+    fit1B_ = TF1("fit1B_", "[0]*(1.+[1]*[2]*x)");
+    fit1B_.SetParameter(2,kappaB_);
+    fit1B_.FixParameter(2,kappaB_);
+    fit1Q_ = TF1("fit1Q_", "[0]*(1.+[1]*[2]*x)");
+    fit1Q_.SetParameter(2,kappaQ_);
+    fit1Q_.FixParameter(2,kappaQ_);
+    fit2LB_ = TF2("fit2LB_", "[0]*(1.-[1]*[2]*[3]*x*y)");
+    fit2LB_.SetParameter(2,kappaLplus_);
+    fit2LB_.FixParameter(2,kappaLplus_);
+    fit2LB_.SetParameter(3,kappaB_);
+    fit2LB_.FixParameter(3,kappaB_);
+    fit2LQ_ = TF2("fit2LQ_", "[0]*(1.-[1]*[2]*[3]*x*y)");
+    fit2LQ_.SetParameter(2,kappaLplus_);
+    fit2LQ_.FixParameter(2,kappaLplus_);
+    fit2LQ_.SetParameter(3,kappaQ_);
+    fit2LQ_.FixParameter(3,kappaQ_);
   }
 }
 
@@ -298,12 +320,6 @@ AnalyzeGenEvent::~AnalyzeGenEvent()
     delete hAnaCosTQCosTLHel_;
     delete hRefCosTBCosTLHel_;
     delete hRefCosTQCosTLHel_;
-    delete hcCosTBCosTLHel_;
-    delete hcCosTQCosTLHel_;
-    delete hcAnaCosTBCosTLHel_;
-    delete hcAnaCosTQCosTLHel_;
-    delete hcRefCosTBCosTLHel_;
-    delete hcRefCosTQCosTLHel_;
     file_->cd();
   }
   if ( useBeamBasis_ ) {
@@ -324,12 +340,6 @@ AnalyzeGenEvent::~AnalyzeGenEvent()
     delete hAnaCosBeamQCosBeamLBeam_;
     delete hRefCosBeamBCosBeamLBeam_;
     delete hRefCosBeamQCosBeamLBeam_;
-    delete hcCosBeamBCosBeamLBeam_;
-    delete hcCosBeamQCosBeamLBeam_;
-    delete hcAnaCosBeamBCosBeamLBeam_;
-    delete hcAnaCosBeamQCosBeamLBeam_;
-    delete hcRefCosBeamBCosBeamLBeam_;
-    delete hcRefCosBeamQCosBeamLBeam_;
     file_->cd();
   }
   if ( useOffDiagBasis_ ) {
@@ -350,12 +360,6 @@ AnalyzeGenEvent::~AnalyzeGenEvent()
     delete hAnaCosOffDiagQCosOffDiagLOffDiag_;
     delete hRefCosOffDiagBCosOffDiagLOffDiag_;
     delete hRefCosOffDiagQCosOffDiagLOffDiag_;
-    delete hcCosOffDiagBCosOffDiagLOffDiag_;
-    delete hcCosOffDiagQCosOffDiagLOffDiag_;
-    delete hcAnaCosOffDiagBCosOffDiagLOffDiag_;
-    delete hcAnaCosOffDiagQCosOffDiagLOffDiag_;
-    delete hcRefCosOffDiagBCosOffDiagLOffDiag_;
-    delete hcRefCosOffDiagQCosOffDiagLOffDiag_;
     file_->cd();
   }
 
@@ -561,12 +565,6 @@ void AnalyzeGenEvent::endJob()
         hRefCosTBCosTLHel_->Fill(cosThetaTBHel_, cosThetaTLHel_);
         hRefCosTQCosTLHel_->Fill(cosThetaTQHel_, cosThetaTLHel_);
       }
-      hcCosTBCosTLHel_    = (TH2D*)(hCosTBCosTLHel_   ->Clone("hcCosTBCosTLHel_"));
-      hcCosTQCosTLHel_    = (TH2D*)(hCosTQCosTLHel_   ->Clone("hcCosTQCosTLHel_"));
-      hcAnaCosTBCosTLHel_ = (TH2D*)(hAnaCosTBCosTLHel_->Clone("hcAnaCosTBCosTLHel_"));
-      hcAnaCosTQCosTLHel_ = (TH2D*)(hAnaCosTQCosTLHel_->Clone("hcAnaCosTQCosTLHel_"));
-      hcRefCosTBCosTLHel_ = (TH2D*)(hRefCosTBCosTLHel_->Clone("hcRefCosTBCosTLHel_"));
-      hcRefCosTQCosTLHel_ = (TH2D*)(hRefCosTQCosTLHel_->Clone("hcRefCosTQCosTLHel_"));
       file_->cd();
     }
     if ( useBeamBasis_ ) {
@@ -585,12 +583,6 @@ void AnalyzeGenEvent::endJob()
         hRefCosBeamBCosBeamLBeam_->Fill(cosThetaBeamBBeam_, cosThetaBeamLBeam_);
         hRefCosBeamQCosBeamLBeam_->Fill(cosThetaBeamQBeam_, cosThetaBeamLBeam_);
       }
-      hcCosBeamBCosBeamLBeam_    = (TH2D*)(hCosBeamBCosBeamLBeam_   ->Clone("hcCosBeamBCosBeamLBeam_"));
-      hcCosBeamQCosBeamLBeam_    = (TH2D*)(hCosBeamQCosBeamLBeam_   ->Clone("hcCosBeamQCosBeamLBeam_"));
-      hcAnaCosBeamBCosBeamLBeam_ = (TH2D*)(hAnaCosBeamBCosBeamLBeam_->Clone("hcAnaCosBeamBCosBeamLBeam_"));
-      hcAnaCosBeamQCosBeamLBeam_ = (TH2D*)(hAnaCosBeamQCosBeamLBeam_->Clone("hcAnaCosBeamQCosBeamLBeam_"));
-      hcRefCosBeamBCosBeamLBeam_ = (TH2D*)(hRefCosBeamBCosBeamLBeam_->Clone("hcRefCosBeamBCosBeamLBeam_"));
-      hcRefCosBeamQCosBeamLBeam_ = (TH2D*)(hRefCosBeamQCosBeamLBeam_->Clone("hcRefCosBeamQCosBeamLBeam_"));
       file_->cd();
     }
     if ( useOffDiagBasis_ ) {
@@ -609,103 +601,69 @@ void AnalyzeGenEvent::endJob()
         hRefCosOffDiagBCosOffDiagLOffDiag_->Fill(cosThetaOffDiagBOffDiag_, cosThetaOffDiagLOffDiag_);
         hRefCosOffDiagQCosOffDiagLOffDiag_->Fill(cosThetaOffDiagQOffDiag_, cosThetaOffDiagLOffDiag_);
       }
-      hcCosOffDiagBCosOffDiagLOffDiag_    = (TH2D*)(hCosOffDiagBCosOffDiagLOffDiag_   ->Clone("hcCosOffDiagBCosOffDiagLOffDiag_"));
-      hcCosOffDiagQCosOffDiagLOffDiag_    = (TH2D*)(hCosOffDiagQCosOffDiagLOffDiag_   ->Clone("hcCosOffDiagQCosOffDiagLOffDiag_"));
-      hcAnaCosOffDiagBCosOffDiagLOffDiag_ = (TH2D*)(hAnaCosOffDiagBCosOffDiagLOffDiag_->Clone("hcAnaCosOffDiagBCosOffDiagLOffDiag_"));
-      hcAnaCosOffDiagQCosOffDiagLOffDiag_ = (TH2D*)(hAnaCosOffDiagQCosOffDiagLOffDiag_->Clone("hcAnaCosOffDiagQCosOffDiagLOffDiag_"));
-      hcRefCosOffDiagBCosOffDiagLOffDiag_ = (TH2D*)(hRefCosOffDiagBCosOffDiagLOffDiag_->Clone("hcRefCosOffDiagBCosOffDiagLOffDiag_"));
-      hcRefCosOffDiagQCosOffDiagLOffDiag_ = (TH2D*)(hRefCosOffDiagQCosOffDiagLOffDiag_->Clone("hcRefCosOffDiagQCosOffDiagLOffDiag_"));
       file_->cd();
     }
   }
 
-  // initialize analyzer qualities (CMS NOTE 2006/111)
-  const double  kappaLplus =  1.;
-//   const double& kappaDbar  = kappaLplus;
-//   const double& kappaSbar  = kappaLplus;
-//   const double  kappaNu    = -0.31;
-//   const double& kappaU     = kappaNu;
-//   const double& kappaC     = kappaNu;
-  const double  kappaB     = -0.41;
-//   const double  kappaW     =  0.41;
-  const double  kappaQ     =  0.51;
-
   // fit histos
-  TF1* fit1L = new TF1("fit1L", "[0]*(1.+[1]*[2]*x)");
-  fit1L->SetParameter(2,kappaLplus);
-  fit1L->FixParameter(2,kappaLplus);
-  TF1* fit1B = new TF1("fit1B", "[0]*(1.+[1]*[2]*x)");
-  fit1B->SetParameter(2,kappaB);
-  fit1B->FixParameter(2,kappaB);
-  TF1* fit1Q = new TF1("fit1Q", "[0]*(1.+[1]*[2]*x)");
-  fit1Q->SetParameter(2,kappaQ);
-  fit1Q->FixParameter(2,kappaQ);
-  TF2* fit2LB = new TF2("fit2LB", "[0]*(1.-[1]*[2]*[3]*x*y)");
-  fit2LB->SetParameter(2,kappaLplus);
-  fit2LB->FixParameter(2,kappaLplus);
-  fit2LB->SetParameter(3,kappaB);
-  fit2LB->FixParameter(3,kappaB);
-  TF2* fit2LQ = new TF2("fit2LQ", "[0]*(1.-[1]*[2]*[3]*x*y)");
-  fit2LQ->SetParameter(2,kappaLplus);
-  fit2LQ->FixParameter(2,kappaLplus);
-  fit2LQ->SetParameter(3,kappaQ);
-  fit2LQ->FixParameter(3,kappaQ);
-  if ( useHelBasis_ ) {
-    file_->cd("basisHelicity");
-    hCosTLHel_        ->Fit("fit1L");
-    hCosTBHel_        ->Fit("fit1B");
-    hCosTQHel_        ->Fit("fit1Q");
-    hAnaCosTLHel_     ->Fit("fit1L");
-    hAnaCosTBHel_     ->Fit("fit1B");
-    hAnaCosTQHel_     ->Fit("fit1Q");
-    hRefCosTLHel_     ->Fit("fit1L");
-    hRefCosTBHel_     ->Fit("fit1B");
-    hRefCosTQHel_     ->Fit("fit1Q");
-    hCosTBCosTLHel_   ->Fit("fit2LB");
-    hCosTQCosTLHel_   ->Fit("fit2LQ");
-    hAnaCosTBCosTLHel_->Fit("fit2LB");
-    hAnaCosTQCosTLHel_->Fit("fit2LQ");
-    hRefCosTBCosTLHel_->Fit("fit2LB");
-    hRefCosTQCosTLHel_->Fit("fit2LQ");
-    file_->cd();
-  }
-  if ( useBeamBasis_ ) {
-    file_->cd("basisBeam");
-    hCosBeamLBeam_           ->Fit("fit1L");
-    hCosBeamBBeam_           ->Fit("fit1B");
-    hCosBeamQBeam_           ->Fit("fit1Q");
-    hAnaCosBeamLBeam_        ->Fit("fit1L");
-    hAnaCosBeamBBeam_        ->Fit("fit1B");
-    hAnaCosBeamQBeam_        ->Fit("fit1Q");
-    hRefCosBeamLBeam_        ->Fit("fit1L");
-    hRefCosBeamBBeam_        ->Fit("fit1B");
-    hRefCosBeamQBeam_        ->Fit("fit1Q");
-    hCosBeamBCosBeamLBeam_   ->Fit("fit2LB");
-    hCosBeamQCosBeamLBeam_   ->Fit("fit2LQ");
-    hAnaCosBeamBCosBeamLBeam_->Fit("fit2LB");
-    hAnaCosBeamQCosBeamLBeam_->Fit("fit2LQ");
-    hRefCosBeamBCosBeamLBeam_->Fit("fit2LB");
-    hRefCosBeamQCosBeamLBeam_->Fit("fit2LQ");
-    file_->cd();
-  }
-  if ( useOffDiagBasis_ ) {
-    file_->cd("basisOffDiag");
-    hCosOffDiagLOffDiag_              ->Fit("fit1L");
-    hCosOffDiagBOffDiag_              ->Fit("fit1B");
-    hCosOffDiagQOffDiag_              ->Fit("fit1Q");
-    hAnaCosOffDiagLOffDiag_           ->Fit("fit1L");
-    hAnaCosOffDiagBOffDiag_           ->Fit("fit1B");
-    hAnaCosOffDiagQOffDiag_           ->Fit("fit1Q");
-    hRefCosOffDiagLOffDiag_           ->Fit("fit1L");
-    hRefCosOffDiagBOffDiag_           ->Fit("fit1B");
-    hRefCosOffDiagQOffDiag_           ->Fit("fit1Q");
-    hCosOffDiagBCosOffDiagLOffDiag_   ->Fit("fit2LB");
-    hCosOffDiagQCosOffDiagLOffDiag_   ->Fit("fit2LQ");
-    hAnaCosOffDiagBCosOffDiagLOffDiag_->Fit("fit2LB");
-    hAnaCosOffDiagQCosOffDiagLOffDiag_->Fit("fit2LQ");
-    hRefCosOffDiagBCosOffDiagLOffDiag_->Fit("fit2LB");
-    hRefCosOffDiagQCosOffDiagLOffDiag_->Fit("fit2LQ");
-    file_->cd();
+  if ( fitHistos_ ) {
+    if ( useHelBasis_ ) {
+      file_->cd("basisHelicity");
+      hCosTLHel_        ->Fit(&fit1L_);
+      hCosTBHel_        ->Fit(&fit1B_);
+      hCosTQHel_        ->Fit(&fit1Q_);
+      hAnaCosTLHel_     ->Fit(&fit1L_);
+      hAnaCosTBHel_     ->Fit(&fit1B_);
+      hAnaCosTQHel_     ->Fit(&fit1Q_);
+      hRefCosTLHel_     ->Fit(&fit1L_);
+      hRefCosTBHel_     ->Fit(&fit1B_);
+      hRefCosTQHel_     ->Fit(&fit1Q_);
+      hCosTBCosTLHel_   ->Fit(&fit2LB_);
+      hCosTQCosTLHel_   ->Fit(&fit2LQ_);
+      hAnaCosTBCosTLHel_->Fit(&fit2LB_);
+      hAnaCosTQCosTLHel_->Fit(&fit2LQ_);
+      hRefCosTBCosTLHel_->Fit(&fit2LB_);
+      hRefCosTQCosTLHel_->Fit(&fit2LQ_);
+      file_->cd();
+    }
+    if ( useBeamBasis_ ) {
+      file_->cd("basisBeam");
+      hCosBeamLBeam_           ->Fit(&fit1L_);
+      hCosBeamBBeam_           ->Fit(&fit1B_);
+      hCosBeamQBeam_           ->Fit(&fit1Q_);
+      hAnaCosBeamLBeam_        ->Fit(&fit1L_);
+      hAnaCosBeamBBeam_        ->Fit(&fit1B_);
+      hAnaCosBeamQBeam_        ->Fit(&fit1Q_);
+      hRefCosBeamLBeam_        ->Fit(&fit1L_);
+      hRefCosBeamBBeam_        ->Fit(&fit1B_);
+      hRefCosBeamQBeam_        ->Fit(&fit1Q_);
+      hCosBeamBCosBeamLBeam_   ->Fit(&fit2LB_);
+      hCosBeamQCosBeamLBeam_   ->Fit(&fit2LQ_);
+      hAnaCosBeamBCosBeamLBeam_->Fit(&fit2LB_);
+      hAnaCosBeamQCosBeamLBeam_->Fit(&fit2LQ_);
+      hRefCosBeamBCosBeamLBeam_->Fit(&fit2LB_);
+      hRefCosBeamQCosBeamLBeam_->Fit(&fit2LQ_);
+      file_->cd();
+    }
+    if ( useOffDiagBasis_ ) {
+      file_->cd("basisOffDiag");
+      hCosOffDiagLOffDiag_              ->Fit(&fit1L_);
+      hCosOffDiagBOffDiag_              ->Fit(&fit1B_);
+      hCosOffDiagQOffDiag_              ->Fit(&fit1Q_);
+      hAnaCosOffDiagLOffDiag_           ->Fit(&fit1L_);
+      hAnaCosOffDiagBOffDiag_           ->Fit(&fit1B_);
+      hAnaCosOffDiagQOffDiag_           ->Fit(&fit1Q_);
+      hRefCosOffDiagLOffDiag_           ->Fit(&fit1L_);
+      hRefCosOffDiagBOffDiag_           ->Fit(&fit1B_);
+      hRefCosOffDiagQOffDiag_           ->Fit(&fit1Q_);
+      hCosOffDiagBCosOffDiagLOffDiag_   ->Fit(&fit2LB_);
+      hCosOffDiagQCosOffDiagLOffDiag_   ->Fit(&fit2LQ_);
+      hAnaCosOffDiagBCosOffDiagLOffDiag_->Fit(&fit2LB_);
+      hAnaCosOffDiagQCosOffDiagLOffDiag_->Fit(&fit2LQ_);
+      hRefCosOffDiagBCosOffDiagLOffDiag_->Fit(&fit2LB_);
+      hRefCosOffDiagQCosOffDiagLOffDiag_->Fit(&fit2LQ_);
+      file_->cd();
+    }
   }
 
   // write trees & histograms to file
@@ -737,12 +695,6 @@ void AnalyzeGenEvent::endJob()
     hAnaCosTQCosTLHel_->Write();
     hRefCosTBCosTLHel_->Write();
     hRefCosTQCosTLHel_->Write();
-    hcCosTBCosTLHel_   ->Write();
-    hcCosTQCosTLHel_   ->Write();
-    hcAnaCosTBCosTLHel_->Write();
-    hcAnaCosTQCosTLHel_->Write();
-    hcRefCosTBCosTLHel_->Write();
-    hcRefCosTQCosTLHel_->Write();
     file_->cd();
   }
   if ( useBeamBasis_ ) {
@@ -763,12 +715,6 @@ void AnalyzeGenEvent::endJob()
     hAnaCosBeamQCosBeamLBeam_->Write();
     hRefCosBeamBCosBeamLBeam_->Write();
     hRefCosBeamQCosBeamLBeam_->Write();
-    hcCosBeamBCosBeamLBeam_   ->Write();
-    hcCosBeamQCosBeamLBeam_   ->Write();
-    hcAnaCosBeamBCosBeamLBeam_->Write();
-    hcAnaCosBeamQCosBeamLBeam_->Write();
-    hcRefCosBeamBCosBeamLBeam_->Write();
-    hcRefCosBeamQCosBeamLBeam_->Write();
     file_->cd();
   }
   if ( useOffDiagBasis_ ) {
@@ -789,12 +735,6 @@ void AnalyzeGenEvent::endJob()
     hAnaCosOffDiagQCosOffDiagLOffDiag_->Write();
     hRefCosOffDiagBCosOffDiagLOffDiag_->Write();
     hRefCosOffDiagQCosOffDiagLOffDiag_->Write();
-    hcCosOffDiagBCosOffDiagLOffDiag_   ->Write();
-    hcCosOffDiagQCosOffDiagLOffDiag_   ->Write();
-    hcAnaCosOffDiagBCosOffDiagLOffDiag_->Write();
-    hcAnaCosOffDiagQCosOffDiagLOffDiag_->Write();
-    hcRefCosOffDiagBCosOffDiagLOffDiag_->Write();
-    hcRefCosOffDiagQCosOffDiagLOffDiag_->Write();
     file_->cd();
   }
 }

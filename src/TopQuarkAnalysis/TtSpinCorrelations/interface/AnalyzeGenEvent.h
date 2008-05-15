@@ -5,7 +5,7 @@
 //
 // Original Author:  Volker Adler
 //         Created:  Fri Feb  8 14:48:21 CET 2008
-// $Id: AnalyzeGenEvent.h,v 1.1 2008/02/13 15:04:27 vadler Exp $
+// $Id: AnalyzeGenEvent.h,v 1.2 2008/02/16 19:10:26 vadler Exp $
 //
 
 
@@ -54,7 +54,8 @@ class AnalyzeGenEvent : public edm::EDAnalyzer {
          useBeamBasis_,
          useOffDiagBasis_,
          useOptBasis_,
-         splitTtAbsolute_;
+         splitTtAbsolute_,
+         fitHistos_;
     edm::InputTag srcGenEvt_;
     std::string filePath_;
 
@@ -135,31 +136,13 @@ class AnalyzeGenEvent : public edm::EDAnalyzer {
     TH2D* hRefCosOffDiagQCosOffDiagLOffDiag_; // pseudo-angles l/t vs. q/t in off-diag. basis ref. sample
     TH2D* hRefCosTBCosTLOpt_;                 // pseudo-angles l/t vs. b/t in opt. basis ref. sample
     TH2D* hRefCosTQCosTLOpt_;                 // pseudo-angles l/t vs. q/t in opt. basis ref. sample
-    // Clones of TH2 (display problems)
-    TH2D* hcCosTBCosTLHel_;
-    TH2D* hcCosTQCosTLHel_;                   
-    TH2D* hcCosBeamBCosBeamLBeam_;            
-    TH2D* hcCosBeamQCosBeamLBeam_;            
-    TH2D* hcCosOffDiagBCosOffDiagLOffDiag_;   
-    TH2D* hcCosOffDiagQCosOffDiagLOffDiag_;   
-    TH2D* hcCosTBCosTLOpt_;                   
-    TH2D* hcCosTQCosTLOpt_;                   
-    TH2D* hcAnaCosTBCosTLHel_;                
-    TH2D* hcAnaCosTQCosTLHel_;                
-    TH2D* hcAnaCosBeamBCosBeamLBeam_;         
-    TH2D* hcAnaCosBeamQCosBeamLBeam_;         
-    TH2D* hcAnaCosOffDiagBCosOffDiagLOffDiag_;
-    TH2D* hcAnaCosOffDiagQCosOffDiagLOffDiag_;
-    TH2D* hcAnaCosTBCosTLOpt_;                
-    TH2D* hcAnaCosTQCosTLOpt_;                
-    TH2D* hcRefCosTBCosTLHel_;                
-    TH2D* hcRefCosTQCosTLHel_;                
-    TH2D* hcRefCosBeamBCosBeamLBeam_;         
-    TH2D* hcRefCosBeamQCosBeamLBeam_;         
-    TH2D* hcRefCosOffDiagBCosOffDiagLOffDiag_;
-    TH2D* hcRefCosOffDiagQCosOffDiagLOffDiag_;
-    TH2D* hcRefCosTBCosTLOpt_;                
-    TH2D* hcRefCosTQCosTLOpt_;
+    
+    // fit functions
+    TF1 fit1L_,  // angular distribution of lepton
+        fit1B_,  // angular distribution of b-quark
+        fit1Q_;  // angular distribution of lower energy quark
+    TF2 fit2LB_, // double differential angular distribution of lepton and b-quark
+        fit2LQ_; // double differential angular distribution of lepton and lower energy quark
 
     // generic observables
     double topsZMFMass_;
@@ -180,6 +163,17 @@ class AnalyzeGenEvent : public edm::EDAnalyzer {
     double cosThetaTLOpt_,
            cosThetaTBOpt_,
            cosThetaTQOpt_;
+           
+    // spin analyzer qualities
+    double kappaLplus_,
+           kappaDbar_,
+           kappaSbar_,
+           kappaNu_,
+           kappaU_,
+           kappaC_,
+           kappaB_,
+           kappaW_,
+           kappaQ_;
 
 };
 

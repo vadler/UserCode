@@ -1,22 +1,18 @@
+  module ttFilter = TtDecaySelection {
+  
+    # source
+    InputTag src = genEvt
 
-module ttFilter = TtDecaySelection {
-  InputTag src = genEvt
+    # allowed families for first (channel_1) and/or second (channel_2) lepton
+    # order: { elec, muon, tau }
+    vint32 channel_1 = { 1, 1, 0 }
+    vint32 channel_2 = { 0, 0, 0 }
 
- #---------------------------------------
- # allowed families for first (channel_1)
- # and/or second (channel_2) lepton. In
- # order: (elec,muon,tau)
- #---------------------------------------
-  vint32 channel_1 = {1,1,0}
-  vint32 channel_2 = {0,0,0}
+    # allowed decay channels for taus
+    # order: { leptonic, one prong, three prong }
+    vint32 tauDecays = { 0, 0, 0 }
 
- #---------------------------------------
- # allowed decay channels for taus.
- # In order: (leptonic, one prong, three prong)
- #---------------------------------------
-  vint32 tauDecays = {0,0,0}
-
- #invert selection?
-  bool   invert = false
+    # invert selection?
+    bool invert = false
 
 }
