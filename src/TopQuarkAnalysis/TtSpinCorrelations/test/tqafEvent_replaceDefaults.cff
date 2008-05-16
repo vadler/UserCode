@@ -3,7 +3,7 @@
 
 ## cleaners ##
 
-// # caloJetCleaner #
+# caloJetCleaner #
 // replace allLayer0Jets.jetSource = iterativeCone5CaloJets
 // replace allLayer0Jets.removeOverlaps.jets.collection = allLayer0Electrons
 // replace allLayer0Jets.removeOverlaps.jets.deltaR     = 0.3
@@ -16,7 +16,7 @@
 // replace allLayer0Jets.bitsToIgnore = {  }
 // replace allLayer0Jets.wantSummary  = true
 
-// # caloMETCleaner #
+# caloMETCleaner #
 // replace allLayer0METs.metSource    = corMetType1Icone5
 // replace allLayer0METs.markItems    = true
 // replace allLayer0METs.saveRejected = ""
@@ -24,7 +24,7 @@
 // replace allLayer0METs.bitsToIgnore = {  }
 // replace allLayer0METs.wantSummary  = true
 
-// # electronCleaner #
+# electronCleaner #
 // replace allLayer0Electrons.electronSource   = pixelMatchGsfElectrons
 // replace allLayer0Electrons.removeDuplicates = true
 // replace allLayer0Electrons.selection.type = "none"
@@ -40,7 +40,7 @@
 // replace allLayer0Electrons.bitsToIgnore = { "Isolation/All" }
 // replace allLayer0Electrons.wantSummary = true
 
-// # muonCleaner #
+# muonCleaner #
 // replace allLayer0Muons.muonSource = muons
 // replace allLayer0Muons.selection.type = "muonPOG"
 // replace allLayer0Muons.selection.flag = "TMLastStationLoose"
@@ -71,7 +71,7 @@
 // replace allLayer0Muons.bitsToIgnore = { "Isolation/All" }
 // replace allLayer0Muons.wantSummary  = true
 
-// # pfTauCleaner #
+# pfTauCleaner #
 // replace allLayer0Taus.tauSource              = pfRecoTauProducer 
 // replace allLayer0Taus.tauDiscriminatorSource = pfRecoTauDiscriminationByIsolation 
 // replace allLayer0Taus.removeOverlaps         = {  } 
@@ -81,7 +81,7 @@
 // replace allLayer0Taus.bitsToIgnore           = {  } 
 // replace allLayer0Taus.wantSummary            = true 
 
-// # photonCleaner #
+# photonCleaner #
 // replace allLayer0Photons.photonSource     = photons
 // replace allLayer0Photons.removeDuplicates = "bySeed"
 // replace allLayer0Photons.removeElectrons  = "bySeed"
@@ -104,7 +104,7 @@
 
 ## corrections ##
 
-// # jetCorrFactors #
+# jetCorrFactors #
 // replace jetCorrFactors.jetSource           = iterativeCone5CaloJets
 // replace jetCorrFactors.defaultJetCorrector = "MCJetCorrectorIcone5"
 // replace jetCorrFactors.udsJetCorrector     = "L5FlavorJetCorrectorUds"
@@ -114,7 +114,7 @@
 
 ## MC matching ##
 
-// # electronMatch #
+# electronMatch #
 // replace electronMatch.src                   = allLayer0Electrons
 // replace electronMatch.matched               = genParticles
 // replace electronMatch.maxDeltaR             = 0.5
@@ -125,7 +125,7 @@
 // replace electronMatch.mcPdgId               = { 11 }
 // replace electronMatch.mcStatus              = { 1 }
 
-// # tauMatch #
+# tauMatch #
 // replace tauMatch.src                   = allLayer0Taus
 // replace tauMatch.matched               = genParticles
 // replace tauMatch.maxDeltaR             = 5
@@ -136,7 +136,7 @@
 // replace tauMatch.mcPdgId               = { 15 }
 // replace tauMatch.mcStatus              = { 2 }
 
-// # photonMatch #
+# photonMatch #
 // replace photonMatch.src                   = allLayer0Photons
 // replace photonMatch.matched               = genParticles
 // replace photonMatch.maxDeltaR             = 0.2
@@ -147,7 +147,7 @@
 // replace photonMatch.mcPdgId               = { 22 }
 // replace photonMatch.mcStatus              = { 1 }
 
-// # muonMatch #
+# muonMatch #
 // replace muonMatch.src                   = allLayer0Muons
 // replace muonMatch.matched               = genParticles
 // replace muonMatch.maxDeltaR             = 0.5
@@ -158,7 +158,7 @@
 // replace muonMatch.mcPdgId               = { 13 }
 // replace muonMatch.mcStatus              = { 1 }
 
-// # jetPartonMatch #
+# jetPartonMatch #
 // replace jetPartonMatch.src                   = allLayer0Jets
 // replace jetPartonMatch.matched               = genParticles
 // replace jetPartonMatch.maxDeltaR             = 0.4
@@ -169,7 +169,7 @@
 // replace jetPartonMatch.mcPdgId               = { 1, 2, 3, 4, 5, 21 }
 // replace jetPartonMatch.mcStatus              = { 3 }
 
-// # jetGenJetMatch #
+# jetGenJetMatch #
 // replace jetGenJetMatch.src                   = allLayer0Jets
 // replace jetGenJetMatch.matched               = iterativeCone5GenJetsPt10
 // replace jetGenJetMatch.maxDeltaR             = 0.4
@@ -182,12 +182,12 @@
 
 ## trigger matching ##
 
-// # muonHLTProducer #
+# muonHLTProducer #
 // replace HLT1MuonIso.triggerResults  = TriggerResults::HLT
 // replace HLT1MuonIso.triggerName     = "HLT1MuonIso"
 // replace HLT1MuonIso.filterName      = SingleMuIsoL3IsoFiltered::HLT
 // replace HLT1MuonIso.reportVerbose   = false
-// # muonHLTMatch #
+# muonHLTMatch #
 // replace muonHLTMatchHLT1MuonNonIso.src               = allLayer0Muons
 // replace muonHLTMatchHLT1MuonNonIso.matched           = HLT1MuonNonIso
 // replace muonHLTMatchHLT1MuonNonIso.maxDeltaR           = 0.5
@@ -195,7 +195,7 @@
 // replace muonHLTMatchHLT1MuonNonIso.resolveAmbiguities    = true
 // replace muonHLTMatchHLT1MuonNonIso.resolveByMatchQuality = false
 
-// # jetHLTProducer
+# jetHLTProducer
 // replace HLT1Jet.triggerResults  = TriggerResults::HLT
 // replace HLT1Jet.triggerName     = "HLT1Jet"
 // replace HLT1Jet.filterName      = hlt1jet200::HLT
@@ -212,7 +212,7 @@
 // replace HLT4Jet.triggerName     = "HLT4Jet"
 // replace HLT4Jet.filterName      = hlt4jet60::HLT
 // replace HLT4Jet.reportVerbose   = false
-// # jetHLTMatch #
+# jetHLTMatch #
 // replace jetHLTMatchHLT1Jet.src                   = allLayer0Jets
 // replace jetHLTMatchHLT1Jet.matched               = HLT1Jet
 // replace jetHLTMatchHLT1Jet.maxDeltaR             = 0.4
@@ -247,11 +247,11 @@
 // replace allLayer1Electrons.electronSource   = allLayer0Electrons
 // replace allLayer1Electrons.addGenMatch      = true
 // replace allLayer1Electrons.genParticleMatch = electronMatch
-replace allLayer1Electrons.addTrigMatch     = false              // changed
-replace allLayer1Electrons.trigPrimMatch    = {  }               // changed
+replace allLayer1Electrons.addTrigMatch     = false
+replace allLayer1Electrons.trigPrimMatch    = {  }
 // replace allLayer1Electrons.addResolutions   = true
 // replace allLayer1Electrons.useNNResolutions = false
-replace allLayer1Electrons.electronResoFile = "PhysicsTools/PatUtils/data/Resolutions_electron.root"
+// replace allLayer1Electrons.electronResoFile = "PhysicsTools/PatUtils/data/Resolutions_electron.root"
 // replace allLayer1Electrons.isolation.tracker.src = layer0ElectronIsolations:egammaElectronTkIsolation
 // replace allLayer1Electrons.isolation.ecal.src = layer0ElectronIsolations:egammaEcalIsolation
 // replace allLayer1Electrons.isolation.hcal.src = layer0ElectronIsolations:egammaTowerIsolation
@@ -266,11 +266,11 @@ replace allLayer1Electrons.electronResoFile = "PhysicsTools/PatUtils/data/Resolu
 // replace allLayer1Electrons.addElectronIDRobust     = true
 // replace allLayer1Electrons.electronIDRobustSource  = electronIdRobust
 
-// # electronSelector #
+# electronSelector #
 // replace selectedLayer1Electrons.src = allLayer1Electrons
 // replace selectedLayer1Electrons.cut = "pt > 10. & abs(eta) < 2.4"
 
-// # electronCountFilter #
+# electronCountFilter #
 // replace minLayer1Electrons.src       = selectedLayer1Electrons
 // replace minLayer1Electrons.minNumber = 0
 // replace maxLayer1Electrons.src       = selectedLayer1Electrons
@@ -283,7 +283,7 @@ replace allLayer1Electrons.electronResoFile = "PhysicsTools/PatUtils/data/Resolu
 // replace allLayer1Muons.addGenMatch       = true
 // replace allLayer1Muons.genParticleMatch  = muonMatch
 // replace allLayer1Muons.addTrigMatch      = true
-replace allLayer1Muons.trigPrimMatch     = { muonHLTMatchHLT1MuonNonIso } // changed
+replace allLayer1Muons.trigPrimMatch     = { muonHLTMatchHLT1MuonNonIso }
 // replace allLayer1Muons.addResolutions    = true
 // replace allLayer1Muons.useNNResolutions  = false
 // replace allLayer1Muons.muonResoFile      = "PhysicsTools/PatUtils/data/Resolutions_muon.root"
@@ -311,14 +311,14 @@ replace allLayer1Muons.trigPrimMatch     = { muonHLTMatchHLT1MuonNonIso } // cha
 // replace allLayer1Muons.addMuonID = true
 
 # muonSelector #
-replace selectedLayer1Muons.src = allLayer1Muons
-replace selectedLayer1Muons.cut = "pt > 10. & abs(eta) < 2.4"
+// replace selectedLayer1Muons.src = allLayer1Muons
+// replace selectedLayer1Muons.cut = "pt > 10. & abs(eta) < 2.4"
 
 # muonCountFilter #
-replace minLayer1Muons.src       = selectedLayer1Muons
-replace minLayer1Muons.minNumber = 1                   // changed
-replace maxLayer1Muons.src       = selectedLayer1Muons
-replace maxLayer1Muons.maxNumber = 999999
+// replace minLayer1Muons.src       = selectedLayer1Muons
+replace minLayer1Muons.minNumber = 1
+// replace maxLayer1Muons.src       = selectedLayer1Muons
+// replace maxLayer1Muons.maxNumber = 999999
 
 ## taus ##
 
@@ -326,19 +326,19 @@ replace maxLayer1Muons.maxNumber = 999999
 // replace allLayer1Taus.tauSource        = allLayer0Taus
 // replace allLayer1Taus.addGenMatch      = true
 // replace allLayer1Taus.genParticleMatch = tauMatch  
-replace allLayer1Taus.addTrigMatch     = false         // changed
-replace allLayer1Taus.trigPrimMatch    = {  }          // changed
+replace allLayer1Taus.addTrigMatch     = false
+replace allLayer1Taus.trigPrimMatch    = {  }
 // replace allLayer1Taus.addResolutions   = true
 // replace allLayer1Taus.useNNResolutions = true
 // replace allLayer1Taus.tauResoFile      = "PhysicsTools/PatUtils/data/Resolutions_tau.root"
 // replace allLayer1Taus.isolation        = {  } 
 // replace allLayer1Taus.isoDeposits      = {  } 
 
-// # tauSelector #
+# tauSelector #
 // replace selectedLayer1Taus.src = allLayer1Taus
 // replace selectedLayer1Taus.cut = "pt > 15. & abs(eta) < 2.4 & emEnergyFraction<0.9 & eOverP>0.5"
 
-// # tauCountFilter #
+# tauCountFilter #
 // replace minLayer1Taus.src       = selectedLayer1Taus
 // replace minLayer1Taus.minNumber = 0
 // replace maxLayer1Taus.src       = selectedLayer1Taus
@@ -349,8 +349,8 @@ replace allLayer1Taus.trigPrimMatch    = {  }          // changed
 # photonProducer #
 // replace allLayer1Photons.photonSource      = allLayer0Photons 
 // replace allLayer1Photons.embedSuperCluster = false
-replace allLayer1Photons.addTrigMatch      = false            // changed
-replace allLayer1Photons.trigPrimMatch     = {  }             // changed
+replace allLayer1Photons.addTrigMatch      = false
+replace allLayer1Photons.trigPrimMatch     = {  }
 // replace allLayer1Photons.isolation.tracker.src       = layer0PhotonIsolations:egammaPhotonTkDeposits
 // replace allLayer1Photons.isolation.tracker.deltaR    = 0.3
 // replace allLayer1Photons.isolation.tracker.threshold = 1.5
@@ -362,11 +362,11 @@ replace allLayer1Photons.trigPrimMatch     = {  }             // changed
 // replace allLayer1Photons.isoDeposits.ecal    =  layer0PhotonIsolations:egammaPhotonEcalDeposits
 // replace allLayer1Photons.isoDeposits.hcal    =  layer0PhotonIsolations:egammaPhotonTowersDeposits
 
-// # photonSelector #
+# photonSelector #
 // replace selectedLayer1Photons.src = allLayer1Photons
 // replace selectedLayer1Photons.cut = "pt > 10. & abs(eta) < 2.4"
 
-// # photonCountFilter #
+# photonCountFilter #
 // replace minLayer1Photons.src       = selectedLayer1Photons
 // replace minLayer1Photons.minNumber = 0
 // replace maxLayer1Photons.src       = selectedLayer1Photons
@@ -374,7 +374,7 @@ replace allLayer1Photons.trigPrimMatch     = {  }             // changed
 
 ## jets ##
 
-// # jetProducer #
+# jetProducer #
 // replace allLayer1Jets.jetSource               = allLayer0Jets
 // replace allLayer1Jets.embedCaloTowers         = true
 // replace allLayer1Jets.getJetMCFlavour         = true
@@ -422,14 +422,14 @@ replace allLayer1Photons.trigPrimMatch     = {  }             // changed
 // replace allLayer1Jets.jetCharge.var = "Pt"
 
 # jetSelector #
-replace selectedLayer1Jets.src = allLayer1Jets
-replace selectedLayer1Jets.cut = "et > 15. & abs(eta) < 2.4 & nConstituents > 0"
+// replace selectedLayer1Jets.src = allLayer1Jets
+// replace selectedLayer1Jets.cut = "et > 15. & abs(eta) < 2.4 & nConstituents > 0"
 
 # jetCountFilter #
-replace minLayer1Jets.src       = selectedLayer1Jets
-replace minLayer1Jets.minNumber = 4                  // changed
-replace maxLayer1Jets.src       = selectedLayer1Jets
-replace maxLayer1Jets.maxNumber = 999999
+// replace minLayer1Jets.src       = selectedLayer1Jets
+replace minLayer1Jets.minNumber = 4
+// replace maxLayer1Jets.src       = selectedLayer1Jets
+// replace maxLayer1Jets.maxNumber = 999999
 
 ## MET ##
 
@@ -437,19 +437,19 @@ replace maxLayer1Jets.maxNumber = 999999
 // replace allLayer1METs.metSource        = allLayer0METs
 // replace allLayer1METs.addGenMET        = true
 // replace allLayer1METs.genMETSource     = genMet
-replace allLayer1METs.addTrigMatch     = false // changed
-replace allLayer1METs.trigPrimMatch    = {  }  // changed
+replace allLayer1METs.addTrigMatch     = false
+replace allLayer1METs.trigPrimMatch    = {  }
 // replace allLayer1METs.addResolutions   = true
 // replace allLayer1METs.useNNResolutions = false
 // replace allLayer1METs.metResoFile      = "PhysicsTools/PatUtils/data/Resolutions_met.root"
 
-// # metSelector #
+# metSelector #
 // replace selectedLayer1METs.src = allLayer1METs
 // replace selectedLayer1METs.cut = "et > 0."
 
 ## leptons ##
 
-// # leptonCountFilter #
+# leptonCountFilter #
 // replace countLayer1Leptons.electronSource = selectedLayer1Electrons
 // replace countLayer1Leptons.muonSource     = selectedLayer1Muons
 // replace countLayer1Leptons.tauSource      = selectedLayer1Taus
@@ -461,7 +461,7 @@ replace allLayer1METs.trigPrimMatch    = {  }  // changed
 
 ## eventSolution ##
 
-// # ttSemi #
+# ttSemi #
 // replace solutions.electronSource      = selectedLayer1Electrons
 // replace solutions.muonSource          = selectedLayer1Muons
 // replace solutions.metSource           = selectedLayer1METs
