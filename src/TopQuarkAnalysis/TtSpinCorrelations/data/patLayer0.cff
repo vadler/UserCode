@@ -39,20 +39,26 @@ sequence patLayer0_withoutPFTau = {
     patBeforeLevel0Reco_withoutPFTau, 
     patLayer0Cleaners_withoutPFTau, 
     patHighLevelReco_withoutPFTau, 
-    patMCTruth_withoutTau
+    patMCTruth_withoutTau,
 //     patL1_withoutTau,
 //     patHLT_withoutTau
-    HLT1MuonNonIso,
-    muonHLTMatchHLT1MuonNonIso
+    HLT1MuonNonIso, muonHLTMatchHLT1MuonNonIso,
+    MatchHLT1Jet, jetHLTMatchHLT1Jet,
+    MatchHLT2Jet, jetHLTMatchHLT2Jet,
+    MatchHLT3Jet, jetHLTMatchHLT3Jet,
+    MatchHLT4Jet, jetHLTMatchHLT4Jet
 }
 
 sequence patLayer0 = { 
     patBeforeLevel0Reco, 
     patLayer0Cleaners, 
     patHighLevelReco, 
-    patMCTruth
+    patMCTruth,
 //     patL1,
 //     patHLT
-    HLT1MuonNonIso,
-    muonHLTMatchHLT1MuonNonIso 
+    HLT1MuonNonIso, muonHLTMatchHLT1MuonNonIso,
+    MatchHLT1Jet, jetHLTMatchHLT1Jet,
+    MatchHLT2Jet, jetHLTMatchHLT2Jet,
+    MatchHLT3Jet, jetHLTMatchHLT3Jet,
+    MatchHLT4Jet, jetHLTMatchHLT4Jet
 }
