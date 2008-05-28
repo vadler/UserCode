@@ -1,23 +1,23 @@
-#ifndef PhysicsTools_PatAlgos_PATHLTProducer_h
-#define PhysicsTools_PatAlgos_PATHLTProducer_h
+#ifndef PhysicsTools_PatAlgos_PATTrigProducer_h
+#define PhysicsTools_PatAlgos_PATTrigProducer_h
 
 
 // -*- C++ -*-
 //
 // Package:    PatAlgos
-// Class:      PATHLTProducer
+// Class:      PATTrigProducer
 //
 /**
-  \class    pat::PATHLTProducer PATHLTProducer.h "PhysicsTools/PatAlgos/interface/PATHLTProducer.h"
+  \class    pat::PATTrigProducer PATTrigProducer.h "PhysicsTools/PatAlgos/plugins/PATTrigProducer.h"
   \brief    Produces a CandidateCollection of trigger objects.
 
    A CandidateCollection of "firing" trigger objects from a given filter in a given trigger path is produced from trigger information available in AOD.
 
   \author   Volker Adler
-  \version  $Id: PATHLTProducer.h,v 1.4 2008/04/07 15:05:49 vadler Exp $
+  \version  $Id$
 */
 //
-// $Id: PATHLTProducer.h,v 1.4 2008/04/07 15:05:49 vadler Exp $
+// $Id$
 //
 
 
@@ -35,20 +35,19 @@
 namespace pat {
 
 
-  class PATHLTProducer : public edm::EDProducer {
+  class PATTrigProducer : public edm::EDProducer {
 
     public:
 
-      explicit PATHLTProducer( const edm::ParameterSet & iConfig );
-      ~PATHLTProducer();
+      explicit PATTrigProducer( const edm::ParameterSet & iConfig );
+      ~PATTrigProducer();
 
     private:
 
       virtual void produce( edm::Event & iEvent, const edm::EventSetup & iSetup );
       
-      edm::InputTag triggerResults_;
-      std::string   triggerName_;
-      edm::InputTag filterName_;
+      edm::InputTag triggerEvent_;
+      std::string   filterName_;
 
   };
 
