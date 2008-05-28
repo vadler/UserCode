@@ -12,7 +12,9 @@
   \brief    Analysis-level trigger primitive class
 
    TriggerPrimitive implements a container for trigger primitives' information within the 'pat' namespace.
-   It inherits from LeafCandidate and adds trigger and filter names.
+   It inherits from LeafCandidate and adds the following data members:
+   - std::string filterName_        (name of the trigger filter the TriggerPrimitive was used in)
+   - int         triggerObjectType_ (trigger object type as defined in DataFormats/HLTReco/interface/TriggerTypeDefs.h)
 
   \author   Volker Adler
   \version  $Id$
@@ -37,17 +39,19 @@ namespace pat {
 
       TriggerPrimitive();
       TriggerPrimitive( const pat::TriggerPrimitive & aTrigPrim );
-      TriggerPrimitive( const reco::Particle::LorentzVector & aVec, const std::string aFilt = "", const int aType = 0 );
-      TriggerPrimitive( const reco::Particle::PolarLorentzVector & aVec, const std::string aFilt = "", const int aType = 0 );
+      TriggerPrimitive( const reco::Particle::LorentzVector & aVec, const std::string aFilt = "", const int aType = 0, const int id = 0 );
+      TriggerPrimitive( const reco::Particle::PolarLorentzVector & aVec, const std::string aFilt = "", const int aType = 0, const int id = 0 );
       virtual ~TriggerPrimitive();
       
       virtual TriggerPrimitive * clone() const;
       
       const std::string & filterName() const;
-      const int & triggerObjectType() const;
+      const int           triggerObjectType() const;
+      const int           triggerObjectId() const;
       
-      void setFilterName( const std::string aFilt = "" );
-      void setTriggerObjectType( const int aType = 0 );
+      void setFilterName( const std::string aFilt );
+      void setTriggerObjectType( const int aType );
+      void setTriggerObjectId( const int id );
       
     protected:
     

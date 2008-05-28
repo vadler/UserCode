@@ -18,8 +18,8 @@ using namespace std;
 
 PATTrigProducer::PATTrigProducer( const ParameterSet & iConfig ) :
   // initialize
-  triggerEvent_ (iConfig.getParameter<InputTag>   ( "triggerEvent" ) ),
-  filterName_   (iConfig.getParameter<std::string>( "filterName" ) )
+  triggerEvent_ (iConfig.getParameter<InputTag>( "triggerEvent" ) ),
+  filterName_   (iConfig.getParameter<InputTag>( "filterName" ) )
 {
   produces<TriggerPrimitiveCollection>();
 }
@@ -32,18 +32,20 @@ PATTrigProducer::~PATTrigProducer()
 
 void PATTrigProducer::produce( Event& iEvent, const EventSetup& iSetup )
 {
-  auto_ptr<TriggerPrimitiveCollection> patHltCandidates( new TriggerPrimitiveCollection );
+  auto_ptr<TriggerPrimitiveCollection> patTrigCandidates( new TriggerPrimitiveCollection );
   Handle<TriggerEvent> triggerEvent;
   iEvent.getByLabel( triggerEvent_, triggerEvent );
-  size_type iFilter = triggerEvent->filterIndex( filterName_ );
-  const Vids & triggerIds     = triggerEvent->filterIds( iFilter );
-  const Keys & triggerObjects = triggerEvent->filterKeys( iFilter );
-  assert( triggerIds.size() == triggerObjects.size() );
-//   for (  ) {
-//     auto_ptr<TriggerPrimitive> ptr( new TriggerPrimitive( (hltFilter->at(iTriggeredObject)).p4(), triggerName_, filterName_.label() ) );
-//     patHltCandidates->push_back( ptr );
-//   }
-  iEvent.put( patHltCandidates );
+  size_type                       iFilter        = triggerEvent->filterIndex( filterName_.label() );
+  const Vids &                    triggerIds     = triggerEvent->filterIds( iFilter );
+  const Keys &                    triggerKeys    = triggerEvent->filterKeys( iFilter );
+  const TriggerObjectCollection & triggerObjects = triggerEvent->getObjects();
+  assert( triggerIds.size() == triggerKeys.size() );
+  for ( size_type idx = 0; idx < triggerKeys.size(); ++idx ) {
+    const TriggerObject triggerObject = triggerObjects.at( triggerKeys.at( idx ) );
+    auto_ptr<TriggerPrimitive> ptr( new TriggerPrimitive( triggerObject.particle().p4(), filterName_.label(), triggerIds.at( idx ), triggerObject.id() ) );
+    patTrigCandidates->push_back( ptr );
+  }
+  iEvent.put( patTrigCandidates );
 }
 
 
