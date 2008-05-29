@@ -1,4 +1,5 @@
 <lcgdict>
+ <selection>
 
   <!-- To check: -->
   <!-- These dont belong here, and maybe they already exist in the meantime -->
@@ -143,6 +144,8 @@
   <class name="edm::reftobase::Holder<pat::TauType, pat::TauRef>" />
   <class name="edm::reftobase::RefHolder<pat::TauRef>" />
   <class name="edm::reftobase::Holder<reco::Candidate, pat::TauRef>" />
+  <class name="edm::reftobase::RefHolder<reco::PFTauRef>" />
+  <class name="edm::reftobase::Holder<reco::Candidate, reco::PFTauRef>" /> 
 
   <class name="edm::RefToBase<pat::PhotonType>" />
   <class name="edm::reftobase::BaseHolder<pat::PhotonType>" />
@@ -184,5 +187,11 @@
   <class name="std::vector<edm::Ptr<reco::BaseTagInfo> >" />
   <class name="edm::ValueMap<edm::Ptr<reco::BaseTagInfo> >" />
   <class name="edm::Wrapper<edm::ValueMap<edm::Ptr<reco::BaseTagInfo> > >" />
+ </selection>
+ <exclusion>
+  <class name="edm::OwnVector<pat::TriggerPrimitive, edm::ClonePolicy<pat::TriggerPrimitive> >">
+   <method name="sort" />
+  </class>
+ </exclusion>
 </lcgdict>
 
