@@ -1,0 +1,62 @@
+include "PhysicsTools/PatAlgos/data/triggerLayer0/patTrigMatcher.cfi"
+
+// sequence patTrigMatchEgamma = {
+//     patTrigMatchHLT1Photon &
+//     patTrigMatchHLT1PhotonRelaxed &
+//     patTrigMatchHLT2Photon &
+//     patTrigMatchHLT2PhotonRelaxed &
+//     patTrigMatchHLT1Electron &
+//     patTrigMatchHLT1ElectronRelaxed &
+//     patTrigMatchHLT2Electron &
+//     patTrigMatchHLT2ElectronRelaxed
+// }
+// 
+// sequence patTrigMatchMuon = {
+//     patTrigMatchHLT1MuonIso &
+//     patTrigMatchHLT1MuonNonIso &
+//     patTrigMatchHLT2MuonNonIso
+// }
+// 
+// sequence patTrigMatchBTau = {
+//     patTrigMatchHLT1Tau &
+//     patTrigMatchHLT2TauPixel
+// }
+// 
+// sequences patTrigMatchJetMET = {
+//     patTrigMatchHLT1Jet &
+//     patTrigMatchHLT2Jet &
+//     patTrigMatchHLT3Jet &
+//     patTrigMatchHLT4Jet &
+//     patTrigMatchHLT1MET
+// }
+// 
+// // sequence patTrigMatch_withoutBTau = {
+// //     patTrigMatchEgamma &
+// //     patTrigMatchMuon &
+// //     patTrigMatchJetMET
+// // }
+// // 
+// // sequence patTrigMatch = {
+// //     patTrigMatch_withoutTau &
+// //     patTrigMatchBTau
+// // }
+// 
+// sequence patTrigMatch_withoutBTau = {
+//     patTrigMatchHLT1PhotonRelaxed &
+//     patTrigMatchHLT1ElectronRelaxed &
+//     patTrigMatchHLT1MuonNonIso &
+//     patTrigMatchHLT2Jet &
+//     patTrigMatchHLT1MET
+// }
+// 
+// sequence patTrigMatch = {
+//     patTrigMatch_withoutBTau &
+//     patTrigMatchHLT1Tau
+// }
+
+sequence patTrigMatch_withoutBTau = {
+    patTrigMatchHLT1PhotonRelaxed
+}
+sequence patTrigMatch = {
+    patTrigMatch_withoutBTau
+}

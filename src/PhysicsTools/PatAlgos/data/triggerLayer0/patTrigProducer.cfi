@@ -1,0 +1,104 @@
+# modules to produce pat::TriggerPrimitiveCollections,
+# grouped by POG (corresponding to trigger config files)
+
+// # Egamma triggers
+// 
+// module patHLT1Photon = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT1Photon
+// }
+
+module patHLT1PhotonRelaxed = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = HLT1PhotonRelaxed
+}
+
+// module patHLT2Photon = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT2Photon
+// }
+// 
+// module patHLT2PhotonRelaxed = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT2PhotonRelaxed
+// }
+// 
+// module patHLT1Electron = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT1Electron
+// }
+// 
+// module patHLT1ElectronRelaxed = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT1ElectronRelaxed
+// }
+// 
+// module patHLT2Electron = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT2Electron
+// }
+// 
+// module patHLT2ElectronRelaxed = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT2ElectronRelaxed
+// }
+// 
+// # Muon triggers
+// 
+// module patHLT1MuonIso = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT1MuonIso
+// }
+// 
+// module patHLT1MuonNonIso = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT1MuonNonIso
+// }
+// 
+// module patHLT2MuonNonIso = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT2MuonNonIso
+// }
+// 
+// # BTau triggers
+// 
+// module patHLT1Tau = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT1Tau
+// }
+// 
+// module patHLT2TauPixel = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT2TauPixel
+// }
+// 
+// # JetMET triggers
+// 
+// module patHLT1Jet = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT1Jet
+// }
+// 
+// module patHLT2Jet = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT2Jet
+// }
+// 
+// module patHLT3Jet = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT3Jet
+// }
+// 
+// module patHLT4Jet = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT4Jet
+// }
+// 
+// module patHLT1MET = PATTrigProducer {
+//     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+//     InputTag filterName   = HLT1MET
+// }
+// 
+// # Xchannel triggers
+// 
+// # Special triggers

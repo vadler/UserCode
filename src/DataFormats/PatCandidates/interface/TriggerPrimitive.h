@@ -15,6 +15,8 @@
    It inherits from LeafCandidate and adds the following data members:
    - std::string filterName_        (name of the trigger filter the TriggerPrimitive was used in)
    - int         triggerObjectType_ (trigger object type as defined in DataFormats/HLTReco/interface/TriggerTypeDefs.h)
+   In addition, the data member reco::Particle::pdgId_ (inherited via reco::LeafCandidate) is used
+   to store the trigger object id from trigger::TriggerObject::id_.
 
   \author   Volker Adler
   \version  $Id$
