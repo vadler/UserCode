@@ -23,11 +23,10 @@ include "PhysicsTools/PatAlgos/data/triggerLayer0/patTrigMatcher.cfi"
 // }
 // 
 // sequences patTrigMatchJetMET = {
-//     patTrigMatchHLT1Jet &
 //     patTrigMatchHLT2Jet &
 //     patTrigMatchHLT3Jet &
 //     patTrigMatchHLT4Jet &
-//     patTrigMatchHLT1MET
+//     patTrigMatchHLT1MET65
 // }
 // 
 // // sequence patTrigMatch_withoutBTau = {
@@ -40,23 +39,26 @@ include "PhysicsTools/PatAlgos/data/triggerLayer0/patTrigMatcher.cfi"
 // //     patTrigMatch_withoutTau &
 // //     patTrigMatchBTau
 // // }
-// 
-// sequence patTrigMatch_withoutBTau = {
-//     patTrigMatchHLT1PhotonRelaxed &
-//     patTrigMatchHLT1ElectronRelaxed &
-//     patTrigMatchHLT1MuonNonIso &
-//     patTrigMatchHLT2Jet &
-//     patTrigMatchHLT1MET
-// }
-// 
-// sequence patTrigMatch = {
-//     patTrigMatch_withoutBTau &
-//     patTrigMatchHLT1Tau
-// }
+
+// demo sequences to have a few trigger match examples in the
+// default PAT configuration
 
 sequence patTrigMatch_withoutBTau = {
-    patTrigMatchHLT1PhotonRelaxed
+    patTrigMatchHLT1PhotonRelaxed &
+    patTrigMatchHLT1ElectronRelaxed &
+    patTrigMatchHLT1MuonNonIso &
+    patTrigMatchHLT2Jet &
+    patTrigMatchHLT1MET65
 }
+
 sequence patTrigMatch = {
-    patTrigMatch_withoutBTau
+    patTrigMatch_withoutBTau &
+    patTrigMatchHLT1Tau
 }
+
+// sequence patTrigMatch_withoutBTau = {
+//     patTrigMatchHLT1PhotonRelaxed
+// }
+// sequence patTrigMatch = {
+//     patTrigMatch_withoutBTau
+// }

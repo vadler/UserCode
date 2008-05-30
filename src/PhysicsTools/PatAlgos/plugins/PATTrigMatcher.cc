@@ -9,32 +9,33 @@
 #include "PhysicsTools/PatUtils/interface/PATMatchLessByDPt.h"
 
 #include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/PatCandidates/interface/TriggerPrimitive.h"
 
 
 using namespace pat;
 using namespace reco;
 
 
-// Match by deltaR and deltaPt, ranking by deltaR (default)
+/// Match by deltaR and deltaPt, ranking by deltaR (default)
 typedef PATCandMatcher<
   CandidateView,
-  CandidateCollection,
+  TriggerPrimitiveCollection,
   PATTrigMatchSelector<CandidateView::value_type,
-                       CandidateCollection::value_type>,
+                       TriggerPrimitiveCollection::value_type>,
   PATMatchByDRDPt<CandidateView::value_type,
-                  CandidateCollection::value_type>
+                  TriggerPrimitiveCollection::value_type>
 > PATTrigMatcher;
 
-// Alternative: match by deltaR and deltaPt, ranking by deltaPt
+/// Alternative: match by deltaR and deltaPt, ranking by deltaPt
 typedef PATCandMatcher<
   CandidateView,
-  CandidateCollection,
+  TriggerPrimitiveCollection,
   PATTrigMatchSelector<CandidateView::value_type,
-                       CandidateCollection::value_type>,
+                       TriggerPrimitiveCollection::value_type>,
   PATMatchByDRDPt<CandidateView::value_type,
-                  CandidateCollection::value_type>,
+                  TriggerPrimitiveCollection::value_type>,
   PATMatchLessByDPt<CandidateView,
-                    CandidateCollection >
+                    TriggerPrimitiveCollection >
 > PATTrigMatcherByPt;
 
 
