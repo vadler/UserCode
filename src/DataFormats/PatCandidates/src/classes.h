@@ -75,7 +75,6 @@ namespace {
     edm::Wrapper<std::vector<pat::EventHypothesis> > hypots_w;
     
     std::string tp_st;
-//     int tp_int;
     pat::TriggerPrimitive tp;
     std::vector<pat::TriggerPrimitive> tpv;
     std::vector<pat::TriggerPrimitive *> tppv;

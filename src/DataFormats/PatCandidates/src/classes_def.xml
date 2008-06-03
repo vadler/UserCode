@@ -79,7 +79,6 @@
   <class name="edm::Wrapper<std::vector<pat::EventHypothesis> >" />
   
   <class name="std::string" />
-<!--   <class name="int" /> -->
   <class name="pat::TriggerPrimitive" />
   <class name="std::vector<pat::TriggerPrimitive>" />
   <class name="std::vector<pat::TriggerPrimitive *>" />
