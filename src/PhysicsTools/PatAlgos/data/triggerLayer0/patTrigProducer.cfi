@@ -1,104 +1,108 @@
 /// Examples for configurations of the trigger primitive producers.
-/// A list of valid filter names is found in: 
+///
+/// A list of valid HLT path names for CMSSW releases is found in: 
 /// https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideGlobalHLT
+/// Choose the path 'myPath' of your interest. Then you can find the filter modules by doing
+/// > grep -n "path [myPath]" /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/[CMSSW version]/src/HLTrigger/Configuration/data/HLT_{2E30,1E32}.cff
 /// 
 /// BEWARE: Use the list of the CMSSW version the data has been  p r o d u c e d  with,
 ///         not of that you are running with!
-/// BEWARE: The InputTags to be used in this configuration start with  l o w e r  case letters
-///         compared to the HLT paths given in the TWiki!
-///         E.g., use
-///         InputTag filterName = hlt1Photon
-///         to access "HLT1Photon" from the TWiki.
+///         Use this version also in the 'grep' command -- not $CMSSW_VERSION!
+/// BEWARE: Only those parts of the paths starting with  l o w e r  case letters are modules!
+///         Capital letters indicate sequences, which you also can 'grep' for then.
+/// BEWARE: Make sure to choose filter modules only, not e.g. prescaler modules!
 
 # modules to produce pat::TriggerPrimitiveCollections,
 # grouped by POG (corresponding to trigger config files)
+
+# The module names without "pat" indicate the HLT path name.
 
 # Egamma triggers
 
 module patHLT1Photon = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt1Photon
+    InputTag filterName   = hltL1IsoSinglePhotonTrackIsolFilter
 }
 
 module patHLT1PhotonRelaxed = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt1PhotonRelaxed
+    InputTag filterName   = hltL1NonIsoSinglePhotonTrackIsolFilter
 }
 
 module patHLT2Photon = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt2Photon
+    InputTag filterName   = hltL1IsoDoublePhotonDoubleEtFilter
 }
 
 module patHLT2PhotonRelaxed = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt2PhotonRelaxed
+    InputTag filterName   = hltL1NonIsoDoublePhotonDoubleEtFilter
 }
 
 module patHLT1Electron = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt1Electron
+    InputTag filterName   = hltL1IsoSingleElectronTrackIsolFilter
 }
 
 module patHLT1ElectronRelaxed = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt1ElectronRelaxed
+    InputTag filterName   = hltL1NonIsoSingleElectronTrackIsolFilter
 }
 
 module patHLT2Electron = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt2Electron
+    InputTag filterName   = hltL1IsoDoubleElectronTrackIsolFilter
 }
 
 module patHLT2ElectronRelaxed = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt2ElectronRelaxed
+    InputTag filterName   = hltL1NonIsoDoubleElectronTrackIsolFilter
 }
 
 # Muon triggers
 
 module patHLT1MuonIso = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt1MuonIso
+    InputTag filterName   = hltSingleMuIsoL3IsoFiltered
 }
 
 module patHLT1MuonNonIso = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt1MuonNonIso
+    InputTag filterName   = hltSingleMuNoIsoL3PreFiltered
 }
 
 module patHLT2MuonNonIso = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt2MuonNonIso
+    InputTag filterName   = hltDiMuonNoIsoL3PreFiltered
 }
 
 # BTau triggers
 
 module patHLT1Tau = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt1Tau
+    InputTag filterName   = hltFilterL3SingleTau
 }
 
 module patHLT2TauPixel = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt2TauPixel
+    InputTag filterName   = hltFilterL25PixelTau
 }
 
 # JetMET triggers
 
-module patHLT2Jet = PATTrigProducer {
+module patHLT2jet = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt2Jet
+    InputTag filterName   = hlt2jet150
 }
 
-module patHLT3Jet = PATTrigProducer {
+module patHLT3jet = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt3Jet
+    InputTag filterName   = hlt3jet85
 }
 
-module patHLT4Jet = PATTrigProducer {
+module patHLT4jet = PATTrigProducer {
     InputTag triggerEvent = hltTriggerSummaryAOD::HLT
-    InputTag filterName   = hlt4Jet
+    InputTag filterName   = hlt4jet60
 }
 
 module patHLT1MET65 = PATTrigProducer {

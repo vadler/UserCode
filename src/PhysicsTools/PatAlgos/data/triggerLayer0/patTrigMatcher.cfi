@@ -236,52 +236,52 @@ sequence patTrigMatchHLT2TauPixel = {
 
 ## matches to JetMET triggers
 
-# matches to HLT2Jet
+# matches to HLT2jet
 
-module jetTrigMatchHLT2Jet = PATTrigMatcher {
+module jetTrigMatchHLT2jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
-   InputTag matched           = patHLT2Jet
+   InputTag matched           = patHLT2jet
    double maxDeltaR           = 0.4
    double maxDPtRel           = 3.0
    bool resolveAmbiguities    = true
    bool resolveByMatchQuality = false
 }
 
-sequence patTrigMatchHLT2Jet = {
-    patHLT2Jet,
-    jetTrigMatchHLT2Jet
+sequence patTrigMatchHLT2jet = {
+    patHLT2jet,
+    jetTrigMatchHLT2jet
 }
 
-# matches to HLT3Jet
+# matches to HLT3jet
 
-module jetTrigMatchHLT3Jet = PATTrigMatcher {
+module jetTrigMatchHLT3jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
-   InputTag matched           = patHLT3Jet
+   InputTag matched           = patHLT3jet
    double maxDeltaR           = 0.4
    double maxDPtRel           = 3.0
    bool resolveAmbiguities    = true
    bool resolveByMatchQuality = false
 }
 
-sequence patTrigMatchHLT3Jet = {
-    patHLT3Jet,
-    jetTrigMatchHLT3Jet
+sequence patTrigMatchHLT3jet = {
+    patHLT3jet,
+    jetTrigMatchHLT3jet
 }
 
-# matches to HLT4Jet
+# matches to HLT4jet
 
-module jetTrigMatchHLT4Jet = PATTrigMatcher {
+module jetTrigMatchHLT4jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
-   InputTag matched           = patHLT4Jet
+   InputTag matched           = patHLT4jet
    double maxDeltaR           = 0.4
    double maxDPtRel           = 3.0
    bool resolveAmbiguities    = true
    bool resolveByMatchQuality = false
 }
 
-sequence patTrigMatchHLT4Jet = {
-    patHLT4Jet,
-    jetTrigMatchHLT4Jet
+sequence patTrigMatchHLT4jet = {
+    patHLT4jet,
+    jetTrigMatchHLT4jet
 }
 
 # matches to HLT1MET65
