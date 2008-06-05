@@ -17,7 +17,7 @@ block patLayer0EventContent = {
     "keep *_layer0JetCorrFactors_*_*",
 
     "keep recoGenJetsedmAssociation_*_*_*",
-    #"keep *_iterativeCone5GenJetsPt10_*_*",
+//     "keep *_iterativeCone5GenJetsPt10_*_*",
     "keep *_iterativeCone5GenJets_*_*",
     "keep *_genMet_*_*",
 
