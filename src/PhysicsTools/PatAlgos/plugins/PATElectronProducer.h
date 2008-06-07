@@ -62,6 +62,9 @@ namespace pat {
 
       // configurables
       edm::InputTag electronSrc_;
+      bool          embedGsfTrack_;
+      bool          embedSuperCluster_;
+      bool          embedTrack_;
       bool          addGenMatch_;
       edm::InputTag genMatchSrc_;
       bool          addTrigMatch_;

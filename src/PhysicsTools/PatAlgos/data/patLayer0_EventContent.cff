@@ -40,6 +40,7 @@ block patLayer0EventContent = {
     "keep *_allLayer0Muons_*_*",
     "keep *_allLayer0Taus_*_*",
     "keep *_allLayer0Jets_*_*",
+    "keep *_allLayer0PFJets_*_*",
     "keep *_allLayer0METs_*_*",
     "drop recoCandidateedmRefToBaseedmValueMap_allLayer0Photons_*_*",
     "drop recoCandidateedmRefToBaseedmValueMap_allLayer0Electrons_*_*",

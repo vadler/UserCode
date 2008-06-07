@@ -49,8 +49,11 @@ namespace pat {
 
       // configurables
       edm::InputTag tauSrc_;
+      bool embedIsolationTracks_;
+      bool embedLeadTrack_;
+      bool embedSignalTracks_;
       bool          addGenMatch_;
-      edm::InputTag genPartSrc_;
+      edm::InputTag genMatchSrc_;
       bool          addTrigMatch_;
       std::vector<edm::InputTag> trigPrimSrc_;
       bool          addResolutions_;

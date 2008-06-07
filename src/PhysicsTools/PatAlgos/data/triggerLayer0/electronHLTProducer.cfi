@@ -1,30 +1,30 @@
-module HLT2Electron = PATHLTProducer {
+module patHLT2Electron = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT2Electron"
     InputTag filterName      = hltL1IsoDoubleElectronTrackIsolFilter::HLT
 }
 
-module HLT2ElectronRelaxed = PATHLTProducer {
+module patHLT2ElectronRelaxed = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT2ElectronRelaxed"
     InputTag filterName      = hltL1NonIsoDoubleElectronTrackIsolFilter::HLT
 }
 
-module HLT1Electron = PATHLTProducer {
+module patHLT1Electron = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1Electron"
     InputTag filterName      = hltL1IsoSingleElectronTrackIsolFilter::HLT
 }
 
-module HLT1ElectronRelaxed = PATHLTProducer {
+module patHLT1ElectronRelaxed = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1ElectronRelaxed"
     InputTag filterName      = hltL1NonIsoSingleElectronTrackIsolFilter::HLT
 }
 
 sequence electronHLTProducer = {
-//     HLT2Electron,
-//     HLT2ElectronRelaxed,
-//     HLT1Electron,
-    HLT1ElectronRelaxed
+//     patHLT2Electron,
+//     patHLT2ElectronRelaxed,
+//     patHLT1Electron,
+    patHLT1ElectronRelaxed
 }

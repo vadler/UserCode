@@ -5,6 +5,10 @@ module allLayer1Photons = PATPhotonProducer {
   InputTag photonSource      = allLayer0Photons   # cleaned photons from AOD
   bool     embedSuperCluster = false              # whether to embed in AOD externally stored supercluster
 
+  ### MC matching configurables
+  bool     addGenMatch       = true               # switch on/off matching to generator level
+  InputTag genParticleMatch  = photonMatch        # particles source to be used for the matching
+
   ### Trigger matching configurables
   bool      addTrigMatch     = true               # switch on/off matching to trigger primitives
   VInputTag trigPrimMatch    = { photonTrigMatchL1SingleEG5,

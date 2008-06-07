@@ -5,7 +5,7 @@
 
 module muonTrigMatchHLT1MuonIso = PATTrigMatcher {
    InputTag src               = allLayer0Muons
-   InputTag matched           = HLT1MuonIso
+   InputTag matched           = patHLT1MuonIso
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true
@@ -14,7 +14,7 @@ module muonTrigMatchHLT1MuonIso = PATTrigMatcher {
 
 module muonTrigMatchHLT1MuonNonIso = PATTrigMatcher {
    InputTag src               = allLayer0Muons
-   InputTag matched           = HLT1MuonNonIso
+   InputTag matched           = patHLT1MuonNonIso
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true
@@ -23,7 +23,7 @@ module muonTrigMatchHLT1MuonNonIso = PATTrigMatcher {
 
 module muonTrigMatchHLT2MuonNonIso = PATTrigMatcher {
    InputTag src               = allLayer0Muons
-   InputTag matched           = HLT2MuonNonIso
+   InputTag matched           = patHLT2MuonNonIso
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true

@@ -5,7 +5,7 @@
 
 module tauTrigMatchHLT1Tau = PATTrigMatcher {
    InputTag src               = allLayer0Taus
-   InputTag matched           = HLT1Tau
+   InputTag matched           = patHLT1Tau
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true
@@ -14,7 +14,7 @@ module tauTrigMatchHLT1Tau = PATTrigMatcher {
 
 module tauTrigMatchHLT2TauPixel = PATTrigMatcher {
    InputTag src               = allLayer0Taus
-   InputTag matched           = HLT2TauPixel
+   InputTag matched           = patHLT2TauPixel
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true

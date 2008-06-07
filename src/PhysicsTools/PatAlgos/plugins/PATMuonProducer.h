@@ -50,13 +50,13 @@ namespace pat {
 
       // configurables
       edm::InputTag muonSrc_;
+      bool          embedTrack_;
+      bool          embedStandAloneMuon_;
+      bool          embedCombinedMuon_;
       bool          addGenMatch_;
-      edm::InputTag genPartSrc_;
+      edm::InputTag genMatchSrc_;
       bool          addTrigMatch_;
       std::vector<edm::InputTag> trigPrimSrc_;
-      float         maxDeltaR_;
-      float         minRecoOnGenEt_;
-      float         maxRecoOnGenEt_;
       bool          addResolutions_;
       bool          useNNReso_;
       std::string   muonResoFile_;

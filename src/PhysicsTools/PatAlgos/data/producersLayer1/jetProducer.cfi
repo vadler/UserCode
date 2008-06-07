@@ -25,6 +25,7 @@ module allLayer1Jets = PATJetProducer {
                                  jetTrigMatchHLT4Jet }           # trigger primitive sources to be used for the matching
 
   ### Jet energy scale correction configurables
+  bool     addJetCorrFactors       = true
   InputTag jetCorrFactorsSource    = layer0JetCorrFactors        # source of the valuemap containing the jet correction factors
 
   ### Resolution configurables

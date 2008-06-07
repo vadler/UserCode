@@ -5,7 +5,7 @@
 
 module electronTrigMatchL1SingleEG5 = PATTrigMatcher {
    InputTag src               = allLayer0Electrons
-   InputTag matched           = L1SingleEG5
+   InputTag matched           = patL1SingleEG5
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true
@@ -14,7 +14,7 @@ module electronTrigMatchL1SingleEG5 = PATTrigMatcher {
 
 module photonTrigMatchL1SingleEG5 = PATTrigMatcher {
    InputTag src               = allLayer0Photons
-   InputTag matched           = L1SingleEG5
+   InputTag matched           = patL1SingleEG5
    double maxDeltaR           = 0.2
    double maxDPtRel           = 1.0
    bool resolveAmbiguities    = true

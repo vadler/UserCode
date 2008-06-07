@@ -1,15 +1,21 @@
+############################
+# Fast simulation replaces #
+############################
 
 ####################################
 ### PAT Layer-1 object producers ###
 ####################################
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/producersLayer1/muonProducer.cfi
-replace allLayer1Muons.muonSource = allLayer0Muons          # cleaned muons from AOD
-replace allLayer1Muons.addGenMatch = true                    # switch on/off matching to generator level
-replace allLayer1Muons.genParticleMatch = muonMatch               # particles source to be used for the matching
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/producersLayer1/muonProducer.cfi
+replace allLayer1Muons.muonSource = allLayer0Muons                    # cleaned muons from AOD
+replace allLayer1Muons.embedTrack = false                             # whether to embed in AOD externally stored tracker track
+replace allLayer1Muons.embedStandAloneMuon = false                    # whether to embed in AOD externally stored standalone muon track
+replace allLayer1Muons.embedCombinedMuon = false                      # whether to embed in AOD externally stored combined muon track
+replace allLayer1Muons.addGenMatch = true                             # switch on/off matching to generator level
+replace allLayer1Muons.genParticleMatch = muonMatch                   # particles source to be used for the matching
 replace allLayer1Muons.addTrigMatch = false
 replace allLayer1Muons.trigPrimMatch = { muonTrigMatchL1SingleMu3,muonTrigMatchHLT1MuonNonIso }
-replace allLayer1Muons.addResolutions = true                    # switch on/off the resolution calculation
-replace allLayer1Muons.useNNResolutions = false                   # use the neural network approach?
+replace allLayer1Muons.addResolutions = true                          # switch on/off the resolution calculation
+replace allLayer1Muons.useNNResolutions = false                       # use the neural network approach?
 replace allLayer1Muons.muonResoFile = "PhysicsTools/PatUtils/data/Resolutions_muon.root"
 replace allLayer1Muons.isolation.tracker.src = layer0MuonIsolations:muParamGlobalIsoDepositGsTk
 replace allLayer1Muons.isolation.tracker.deltaR = 0.3 
@@ -21,26 +27,31 @@ replace allLayer1Muons.isoDeposits.tracker = layer0MuonIsolations:muParamGlobalI
 replace allLayer1Muons.isoDeposits.ecal    = layer0MuonIsolations:muParamGlobalIsoDepositCalEcal
 replace allLayer1Muons.isoDeposits.hcal    = layer0MuonIsolations:muParamGlobalIsoDepositCalHcal
 replace allLayer1Muons.isoDeposits.user    = {}
-replace allLayer1Muons.addMuonID = true                    # switch on/off the electron ID info addition
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/producersLayer1/electronProducer.cfi
-replace allLayer1Electrons.electronSource = allLayer0Electrons       # clean layer 0 electrons
-replace allLayer1Electrons.addGenMatch = true                     # switch on/off matching to generator level
-replace allLayer1Electrons.genParticleMatch = electronMatch            # Association between electrons and generator particles
+replace allLayer1Muons.addMuonID = true                               # switch on/off the electron ID info addition
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/producersLayer1/electronProducer.cfi
+replace allLayer1Electrons.electronSource = allLayer0Electrons        # clean layer 0 electrons
+replace allLayer1Electrons.embedGsfTrack = false                      # whether to embed in AOD externally stored gsf track
+replace allLayer1Electrons.embedSuperCluster = false                  # whether to embed in AOD externally stored supercluster
+replace allLayer1Electrons.embedTrack = false                         # whether to embed in AOD externally stored track
+replace allLayer1Electrons.addGenMatch = true                         # switch on/off matching to generator level
+replace allLayer1Electrons.genParticleMatch = electronMatch           # Association between electrons and generator particles
 replace allLayer1Electrons.addTrigMatch = false
 replace allLayer1Electrons.trigPrimMatch = { electronTrigMatchL1SingleEG5,electronTrigMatchHLT1ElectronRelaxed }
-replace allLayer1Electrons.addResolutions = true                     # switch on/off the resolution calculation
-replace allLayer1Electrons.useNNResolutions = false                    # use the neural network approach?
+replace allLayer1Electrons.addResolutions = true                      # switch on/off the resolution calculation
+replace allLayer1Electrons.useNNResolutions = false                   # use the neural network approach?
 replace allLayer1Electrons.electronResoFile = "PhysicsTools/PatUtils/data/Resolutions_electron.root"
 replace allLayer1Electrons.isolation.tracker.src = layer0ElectronIsolations:egammaElectronTkIsolation 
 replace allLayer1Electrons.isolation.ecal.src = layer0ElectronIsolations:egammaEcalIsolation    
 replace allLayer1Electrons.isolation.hcal.src = layer0ElectronIsolations:egammaTowerIsolation      
-replace allLayer1Electrons.addElectronID = true                     # switch on/off the electron ID info addition
-replace allLayer1Electrons.electronIDSource = electronId               # label of the electron ID info source
-replace allLayer1Electrons.addElectronIDRobust = true               # switch on/off the adding of additional electron id info, from the "robust cuts-based" producer            
-replace allLayer1Electrons.electronIDRobustSource = electronIdRobust   # label for the robust cuts-based producer (should be just a clone of previous)
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/producersLayer1/photonProducer.cfi
-replace allLayer1Photons.photonSource = allLayer0Photons   # cleaned photons from AOD
-replace allLayer1Photons.embedSuperCluster = false              # whether to embed in AOD externally stored supercluster
+replace allLayer1Electrons.addElectronID = true                       # switch on/off the electron ID info addition
+replace allLayer1Electrons.electronIDSource = electronId              # label of the electron ID info source
+replace allLayer1Electrons.addElectronIDRobust = true                 # switch on/off the adding of additional electron id info, from the "robust cuts-based" producer            
+replace allLayer1Electrons.electronIDRobustSource = electronIdRobust  # label for the robust cuts-based producer (should be just a clone of previous)
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/producersLayer1/photonProducer.cfi
+replace allLayer1Photons.photonSource = allLayer0Photons              # cleaned photons from AOD
+replace allLayer1Photons.embedSuperCluster = false                    # whether to embed in AOD externally stored supercluster
+replace allLayer1Photons.addGenMatch = true                           # switch on/off matching to generator level
+replace allLayer1Photons.genParticleMatch = photonMatch               # particles source to be used for the matching
 replace allLayer1Photons.addTrigMatch = false
 replace allLayer1Photons.trigPrimMatch = { photonTrigMatchL1SingleEG5,photonTrigMatchHLT1PhotonRelaxed }
 replace allLayer1Photons.isolation.tracker.src = layer0PhotonIsolations:egammaPhotonTkDeposits
@@ -53,108 +64,112 @@ replace allLayer1Photons.isolation.ecal.deltaR = 0.3
 replace allLayer1Photons.isoDeposits.tracker = layer0PhotonIsolations:egammaPhotonTkDeposits
 replace allLayer1Photons.isoDeposits.ecal = layer0PhotonIsolations:egammaPhotonEcalDeposits
 replace allLayer1Photons.isoDeposits.hcal = layer0PhotonIsolations:egammaPhotonTowersDeposits
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/producersLayer1/tauProducer.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/producersLayer1/tauProducer.cfi
 replace allLayer1Taus.tauSource = allLayer0Taus
-replace allLayer1Taus.addGenMatch = true                     # switch on/off matching to generator level
-replace allLayer1Taus.genParticleMatch = tauMatch                 # particles source to be used for the matching
+replace allLayer1Taus.embedIsolationTracks = false                    # whether to embed in AOD externally stored isolation tracks
+replace allLayer1Taus.embedLeadTrack = false                          # whether to embed in AOD externally stored leading track
+replace allLayer1Taus.embedSignalTracks = false                       # whether to embed in AOD externally stored signal tracks
+replace allLayer1Taus.addGenMatch = true                              # switch on/off matching to generator level
+replace allLayer1Taus.genParticleMatch = tauMatch                     # particles source to be used for the matching
 replace allLayer1Taus.addTrigMatch = false
-replace allLayer1Taus.trigPrimMatch = { tauTrigMatchHLT1Tau }   # trigger primitive sources to be used for the matching
-replace allLayer1Taus.addResolutions = true                     # switch on/off the resolution calculation
-replace allLayer1Taus.useNNResolutions = true                     # use the neural network approach?
+replace allLayer1Taus.trigPrimMatch = { tauTrigMatchHLT1Tau }         # trigger primitive sources to be used for the matching
+replace allLayer1Taus.addResolutions = true                           # switch on/off the resolution calculation
+replace allLayer1Taus.useNNResolutions = true                         # use the neural network approach?
 replace allLayer1Taus.tauResoFile = "PhysicsTools/PatUtils/data/Resolutions_tau.root"
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/producersLayer1/jetProducer.cfi
-replace allLayer1Jets.jetSource = allLayer0Jets               # uncalibrated reco jet input source
-replace allLayer1Jets.embedCaloTowers = true                        # switch on/off embedding of supercluster (externally stored in AOD)
-replace allLayer1Jets.getJetMCFlavour = true                        # switch on/off MC flavour identification of all jets
-replace allLayer1Jets.JetPartonMapSource = jetPartonAssociation        # the match-collection, produced by default from PATHighLevelReco.cff
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/producersLayer1/jetProducer.cfi
+replace allLayer1Jets.jetSource = allLayer0Jets                       # uncalibrated reco jet input source
+replace allLayer1Jets.embedCaloTowers = true                          # switch on/off embedding of supercluster (externally stored in AOD)
+replace allLayer1Jets.getJetMCFlavour = true                          # switch on/off MC flavour identification of all jets
+replace allLayer1Jets.JetPartonMapSource = jetPartonAssociation       # the match-collection, produced by default from PATHighLevelReco.cff
 replace allLayer1Jets.addGenPartonMatch = true                        # switch on/off matching to partons
-replace allLayer1Jets.genPartonMatch = jetPartonMatch              # particles source to be used for the matching
-replace allLayer1Jets.addGenJetMatch = true                        # switch on/off matching to GenJet's
-replace allLayer1Jets.genJetMatch = jetGenJetMatch              # GenJet source to be used for the matching
+replace allLayer1Jets.genPartonMatch = jetPartonMatch                 # particles source to be used for the matching
+replace allLayer1Jets.addGenJetMatch = true                           # switch on/off matching to GenJet's
+replace allLayer1Jets.genJetMatch = jetGenJetMatch                    # GenJet source to be used for the matching
 replace allLayer1Jets.addPartonJetMatch = false                       # switch on/off matching to PartonJet's (not implemented yet)
-replace allLayer1Jets.partonJetSource = nonsenseName                # ParticleJet source to be used for the matching
+replace allLayer1Jets.partonJetSource = nonsenseName                  # ParticleJet source to be used for the matching
 replace allLayer1Jets.addTrigMatch = false
 replace allLayer1Jets.trigPrimMatch = { jetTrigMatchHLT1Jet,jetTrigMatchHLT2Jet,jetTrigMatchHLT3Jet,jetTrigMatchHLT4Jet }
-replace allLayer1Jets.jetCorrFactorsSource = layer0JetCorrFactors              # source of the valuemap containing the jet correction factors
-replace allLayer1Jets.addResolutions = true                        # switch on/off the resolution calculation
-replace allLayer1Jets.useNNResolutions = false                       # use the neural network approach?
+replace allLayer1Jets.addJetCorrFactors = true
+replace allLayer1Jets.jetCorrFactorsSource = layer0JetCorrFactors     # source of the valuemap containing the jet correction factors
+replace allLayer1Jets.addResolutions = true                           # switch on/off the resolution calculation
+replace allLayer1Jets.useNNResolutions = false                        # use the neural network approach?
 replace allLayer1Jets.caliJetResoFile = "PhysicsTools/PatUtils/data/Resolutions_lJets_MCJetCorJetIcone5.root"
 replace allLayer1Jets.caliBJetResoFile = "PhysicsTools/PatUtils/data/Resolutions_bJets_MCJetCorJetIcone5.root"
-replace allLayer1Jets.addBTagInfo = true                        # switch on/off the addition of b-tag information
-replace allLayer1Jets.tagModuleLabelPostfix = "Layer0"                    # strip this string from the end of the tag module labels
+replace allLayer1Jets.addBTagInfo = true                              # switch on/off the addition of b-tag information
+replace allLayer1Jets.tagModuleLabelPostfix = "Layer0"                # strip this string from the end of the tag module labels
 replace allLayer1Jets.addDiscriminators = true                        # switch on/off the addition of the btag discriminators
-replace allLayer1Jets.addJetTagRefs = true                        # switch on/off the addition of references to the b-tag JetTag's
+replace allLayer1Jets.addJetTagRefs = true                            # switch on/off the addition of references to the b-tag JetTag's
 replace allLayer1Jets.tagModuleLabelsToKeep = {"combinedSVJetTags", "combinedSVMVAJetTags", "impactParameterMVAJetTags", "jetProbabilityJetTags", "softElectronJetTags", "softMuonJetTags", "softMuonNoIPJetTags", "trackCountingHighEffJetTags", "trackCountingHighPurJetTags"}
-replace allLayer1Jets.addAssociatedTracks = true                        # switch on/off track association
-replace allLayer1Jets.trackAssociationSource = layer0JetTracksAssociator
-replace allLayer1Jets.addJetCharge = true                        # switch on/off jet charge calculation
-replace allLayer1Jets.jetChargeSource = layer0JetCharge
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/producersLayer1/metProducer.cfi
-replace allLayer1METs.metSource = allLayer0METs           # reco MET input source
-replace allLayer1METs.addGenMET = true                    # switch on/off matching to generator level
-replace allLayer1METs.genMETSource = genMet                  # GenMET source to be used for the matching
+replace allLayer1Jets.addAssociatedTracks = true                      # switch on/off track association
+replace allLayer1Jets.trackAssociationSource = layer0JetTracksAssociator # association from jets to tracks
+replace allLayer1Jets.addJetCharge = true                             # switch on/off jet charge calculation
+replace allLayer1Jets.jetChargeSource = layer0JetCharge               # the jet charge input value map
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/producersLayer1/metProducer.cfi
+replace allLayer1METs.metSource = allLayer0METs                       # reco MET input source
+replace allLayer1METs.addGenMET = true                                # switch on/off matching to generator level
+replace allLayer1METs.genMETSource = genMet                           # GenMET source to be used for the matching
 replace allLayer1METs.addTrigMatch = false
 replace allLayer1METs.trigPrimMatch = { metTrigMatchL1ETM20,metTrigMatchHLT1MET }
-replace allLayer1METs.addResolutions = true                    # switch on/off the resolution calculation
-replace allLayer1METs.useNNResolutions = false                   # use the neural network approach?
+replace allLayer1METs.addResolutions = true                           # switch on/off the resolution calculation
+replace allLayer1METs.useNNResolutions = false                        # use the neural network approach?
 replace allLayer1METs.metResoFile = "PhysicsTools/PatUtils/data/Resolutions_met.root"
 
 ####################################
 ### PAT Layer-1 Object Selectors ###
 ####################################
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/muonSelector.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/muonSelector.cfi
 replace selectedLayer1Muons.src = allLayer1Muons
-replace selectedLayer1Muons.cut = "pt > 10. & abs(eta) < 2.4"
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/electronSelector.cfi
+replace selectedLayer1Muons.cut = "pt > 0. & abs(eta) < 12."
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/electronSelector.cfi
 replace selectedLayer1Electrons.src = allLayer1Electrons
-replace selectedLayer1Electrons.cut = "pt > 10. & abs(eta) < 2.4"
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/photonSelector.cfi
+replace selectedLayer1Electrons.cut = "pt > 0. & abs(eta) < 12."
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/photonSelector.cfi
 replace selectedLayer1Photons.src = allLayer1Photons
-replace selectedLayer1Photons.cut = "pt > 10. & abs(eta) < 2.4"
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/tauSelector.cfi
+replace selectedLayer1Photons.cut = "pt > 0. & abs(eta) < 12."
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/tauSelector.cfi
 replace selectedLayer1Taus.src = allLayer1Taus
-replace selectedLayer1Taus.cut = "pt > 15. & abs(eta) < 2.4 & emEnergyFraction<0.9 & eOverP>0.5"
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/jetSelector.cfi
+replace selectedLayer1Taus.cut = "pt > 0. & abs(eta) < 12. & emEnergyFraction<2. & eOverP>0."
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/jetSelector.cfi
 replace selectedLayer1Jets.src = allLayer1Jets
-replace selectedLayer1Jets.cut = "et > 15. & abs(eta) < 2.4 & nConstituents > 0"
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/metSelector.cfi
+replace selectedLayer1Jets.cut = "et > 0. & abs(eta) < 12. & nConstituents > 0"
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/metSelector.cfi
 replace selectedLayer1METs.src = allLayer1METs
 replace selectedLayer1METs.cut = "et > 0."
 
 #################################
 ### PAT Layer-1 Count Filters ###
 #################################
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/muonMinFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/muonMinFilter.cfi
 replace minLayer1Muons.src = selectedLayer1Muons
 replace minLayer1Muons.minNumber = 0
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/muonMaxFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/muonMaxFilter.cfi
 replace maxLayer1Muons.src = selectedLayer1Muons
 replace maxLayer1Muons.maxNumber = 999999
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/electronMinFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/electronMinFilter.cfi
 replace minLayer1Electrons.src = selectedLayer1Electrons
 replace minLayer1Electrons.minNumber = 0
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/electronMaxFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/electronMaxFilter.cfi
 replace maxLayer1Electrons.src = selectedLayer1Electrons
 replace maxLayer1Electrons.maxNumber = 999999
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/photonMinFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/photonMinFilter.cfi
 replace minLayer1Photons.src = selectedLayer1Photons
 replace minLayer1Photons.minNumber = 0
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/photonMaxFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/photonMaxFilter.cfi
 replace maxLayer1Photons.src = selectedLayer1Photons
 replace maxLayer1Photons.maxNumber = 999999
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/tauMinFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/tauMinFilter.cfi
 replace minLayer1Taus.src = selectedLayer1Taus
 replace minLayer1Taus.minNumber = 0
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/tauMaxFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/tauMaxFilter.cfi
 replace maxLayer1Taus.src = selectedLayer1Taus
 replace maxLayer1Taus.maxNumber = 999999
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/jetMinFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/jetMinFilter.cfi
 replace minLayer1Jets.src = selectedLayer1Jets
 replace minLayer1Jets.minNumber = 0
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/jetMaxFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/jetMaxFilter.cfi
 replace maxLayer1Jets.src = selectedLayer1Jets
 replace maxLayer1Jets.maxNumber = 999999
-# Generated from CMSSW_1_6_11/src/PhysicsTools/PatAlgos/data/selectionLayer1/leptonCountFilter.cfi
+# Generated from CMSSW_1_6_12_pre2/src/PhysicsTools/PatAlgos/data/selectionLayer1/leptonCountFilter.cfi
 replace countLayer1Leptons.electronSource = selectedLayer1Electrons
 replace countLayer1Leptons.muonSource = selectedLayer1Muons
 replace countLayer1Leptons.tauSource = selectedLayer1Taus

@@ -50,6 +50,7 @@ PATJetProducer::PATJetProducer(const edm::ParameterSet& iConfig) {
   // Trigger matching configurables
   addTrigMatch_            = iConfig.getParameter<bool>                     ( "addTrigMatch" );
   trigPrimSrc_             = iConfig.getParameter<std::vector<edm::InputTag> >( "trigPrimMatch" );
+  addJetCorrFactors_       = iConfig.getParameter<bool>                     ( "addJetCorrFactors" );
   jetCorrFactorsSrc_       = iConfig.getParameter<edm::InputTag>            ( "jetCorrFactorsSource" );
   addResolutions_          = iConfig.getParameter<bool>                     ( "addResolutions" );
   useNNReso_               = iConfig.getParameter<bool>                     ( "useNNResolutions" );
@@ -109,7 +110,7 @@ void PATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
 
   // read in the jet correction factors ValueMap
   edm::Handle<edm::ValueMap<JetCorrFactors> > jetCorrs;
-  iEvent.getByLabel(jetCorrFactorsSrc_, jetCorrs);
+  if (addJetCorrFactors_) iEvent.getByLabel(jetCorrFactorsSrc_, jetCorrs);
 
   // Get the vector of jet tags with b-tagging info
   //std::vector<edm::Handle<std::vector<reco::JetTag> > > jetTags_testManyByType ;
@@ -135,14 +136,20 @@ void PATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
     unsigned int idx = itJet - jets->begin();
     edm::RefToBase<JetType> jetRef = jets->refAt(idx); 
     Jet ajet(jetRef);
-    // ensure the internal storage of the jet constituents
-    if (embedCaloTowers_) ajet.setCaloTowers(jetRef->getConstituents());
 
-    // calculate the energy correction factors
-    const JetCorrFactors & jcf = (*jetCorrs)[jetRef];
-    ajet.setP4(jcf.scaleDefault() * itJet->p4());
-    ajet.setNoCorrFactor(1./jcf.scaleDefault());
-    ajet.setJetCorrFactors(jcf);
+    // ensure the internal storage of the jet constituents
+    if (ajet.isCaloJet() && embedCaloTowers_) {
+        const reco::CaloJet *cj = dynamic_cast<const reco::CaloJet *>(jetRef.get());
+        ajet.setCaloTowers( cj->getConstituents() );
+    }
+
+    if (addJetCorrFactors_) {
+        // calculate the energy correction factors
+        const JetCorrFactors & jcf = (*jetCorrs)[jetRef];
+        ajet.setP4(jcf.scaleDefault() * itJet->p4());
+        ajet.setNoCorrFactor(1./jcf.scaleDefault());
+        ajet.setJetCorrFactors(jcf);
+    }
 
     // get the MC flavour information for this jet
     if (getJetMCFlavour_) {
@@ -156,24 +163,20 @@ void PATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
         }
       }
     }
-    // do the parton matching
+
+    // store the match to the generated partons
     if (addGenPartonMatch_) {
       reco::GenParticleRef parton = (*partonMatch)[jetRef];
       if (parton.isNonnull() && parton.isAvailable()) {
           ajet.setGenParton(*parton);
-      } else {
-          reco::Particle bestParton(0, reco::Particle::LorentzVector(0, 0, 0, 0), reco::Particle::Point(0,0,0), 0, 0, true);
-          ajet.setGenParton(bestParton);
-      }
+      } // leave empty if no match found
     }
-    // do the GenJet matching
+    // store the match to the GenJets
     if (addGenJetMatch_) {
       reco::GenJetRef genjet = (*genJetMatch)[jetRef];
       if (genjet.isNonnull() && genjet.isAvailable()) {
           ajet.setGenJet(*genjet);
-      } else {
-          ajet.setGenJet(reco::GenJet());
-      }
+      } // leave empty if no match found
     }
 
     // TO BE IMPLEMENTED FOR >=1_5_X: do the PartonJet matching

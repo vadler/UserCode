@@ -9,6 +9,7 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
 #include "DataFormats/PatCandidates/interface/Particle.h"
+#include "DataFormats/PatCandidates/interface/GenericParticle.h"
 #include "DataFormats/PatCandidates/interface/Hemisphere.h"
 
 #include "DataFormats/PatCandidates/interface/JetCorrFactors.h"
@@ -31,6 +32,12 @@
 
 #include "DataFormats/JetReco/interface/GenJetfwd.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
+
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+
+#include "DataFormats/TauReco/interface/PFTauFwd.h"
+#include "DataFormats/TauReco/interface/PFTau.h"
 // ^^^^^ End
 
 // we need these typedefs, it won't work directly - NO IDEA WHY!!!
@@ -41,6 +48,7 @@ namespace pat {
   typedef edm::Ref<std::vector<pat::Photon> >   PhotonRef;
   typedef edm::Ref<std::vector<pat::Jet> >      JetRef;
   typedef edm::Ref<std::vector<pat::MET> >      METRef;
+  typedef edm::Ref<std::vector<pat::GenericParticle> > GenericParticleRef;
   typedef edm::Ref<std::vector<pat::Particle> > ParticleRef;
   typedef edm::Ref<std::vector<pat::Hemisphere> > HemisphereRef;
 
@@ -50,7 +58,6 @@ namespace pat {
   typedef edm::Ref<std::vector<pat::PhotonType> >   PhotonTypeRef;
   typedef edm::Ref<std::vector<pat::JetType> >      JetTypeRef;
   typedef edm::Ref<std::vector<pat::METType> >      METTypeRef;
-  typedef edm::Ref<std::vector<pat::ParticleType> > ParticleTypeRef;
 }
 
 
@@ -117,6 +124,7 @@ namespace {
     pat::Jet                                    jet;
     pat::MET                                    met;
     pat::Particle                               part;
+    pat::GenericParticle                        recopart;
     pat::Hemisphere                             hemisphere;
     std::vector<pat::Electron>                  v_el;
     std::vector<pat::Muon>                      v_mu;
@@ -125,6 +133,7 @@ namespace {
     std::vector<pat::Jet>                       v_jet;
     std::vector<pat::MET>                       v_met;
     std::vector<pat::Particle>                  v_part;
+    std::vector<pat::GenericParticle>           v_recopart;
     std::vector<pat::Hemisphere>                v_hemi;
     edm::Wrapper<std::vector<pat::Electron> >   w_v_el;
     edm::Wrapper<std::vector<pat::Muon> >       w_v_mu;
@@ -133,6 +142,7 @@ namespace {
     edm::Wrapper<std::vector<pat::Jet> >        w_v_jet;
     edm::Wrapper<std::vector<pat::MET> >        w_v_met;
     edm::Wrapper<std::vector<pat::Particle> >   w_v_part;
+    edm::Wrapper<std::vector<pat::GenericParticle> > w_v_reco_part;
     edm::Wrapper<std::vector<pat::Hemisphere> >   w_v_hemi;
     edm::Ref<std::vector<pat::Electron> >       r_el;
     edm::Ref<std::vector<pat::Muon> >           r_mu;
@@ -165,35 +175,51 @@ namespace {
     edm::reftobase::Holder<pat::ElectronType, pat::ElectronTypeRef> rbh1Electron;
     edm::reftobase::Holder<pat::ElectronType, pat::ElectronRef>     rbh2Electron;
     edm::reftobase::RefHolder<pat::ElectronRef> rhElectron;
+    edm::reftobase::Holder<reco::Candidate, pat::ElectronRef> rbh3Electron;
+
     edm::RefToBase<pat::MuonType>  rbMuon;
     edm::reftobase::IndirectHolder<pat::MuonType> rbihMuon;
     edm::reftobase::Holder<pat::MuonType, pat::MuonTypeRef> rbh1Muon;
     edm::reftobase::Holder<pat::MuonType, pat::MuonRef>     rbh2Muon;
     edm::reftobase::RefHolder<pat::MuonRef> rhMuon;
+    edm::reftobase::Holder<reco::Candidate, pat::MuonRef> rbh3Muon;
+
     edm::RefToBase<pat::TauType>  rbTau;
     edm::reftobase::IndirectHolder<pat::TauType> rbihTau;
     edm::reftobase::Holder<pat::TauType, pat::TauTypeRef> rbh1Tau;
     edm::reftobase::Holder<pat::TauType, pat::TauRef>     rbh2Tau;
     edm::reftobase::RefHolder<pat::TauRef> rhTau;
+    edm::reftobase::RefHolder<reco::PFTauRef> rhPFTau;
+    edm::reftobase::Holder<reco::Candidate, pat::TauRef> rbh3Tau;
+    edm::reftobase::Holder<reco::Candidate, reco::PFTauRef> rbh4Tau;
+
     edm::RefToBase<pat::PhotonType>  rbPhoton;
     edm::reftobase::IndirectHolder<pat::PhotonType> rbihPhoton;
     edm::reftobase::Holder<pat::PhotonType, pat::PhotonTypeRef> rbh1Photon;
     edm::reftobase::Holder<pat::PhotonType, pat::PhotonRef>     rbh2Photon;
     edm::reftobase::RefHolder<pat::PhotonRef> rhPhoton;
+    edm::reftobase::Holder<reco::Candidate, pat::PhotonRef> rbh3Photon;
+
     edm::RefToBase<pat::JetType>  rbJet;
     edm::reftobase::IndirectHolder<pat::JetType> rbihJet;
     edm::reftobase::Holder<pat::JetType, pat::JetTypeRef> rbh1Jet;
     edm::reftobase::Holder<pat::JetType, pat::JetRef>     rbh2Jet;
+    edm::reftobase::Holder<reco::Candidate, pat::JetRef> rbh3Jet;
+
     edm::reftobase::RefHolder<pat::JetRef> rhJet;
     edm::RefToBase<pat::METType>  rbMET;
     edm::reftobase::IndirectHolder<pat::METType> rbihMET;
     edm::reftobase::Holder<pat::METType, pat::METTypeRef> rbh1MET;
     edm::reftobase::Holder<pat::METType, pat::METRef>     rbh2MET;
     edm::reftobase::RefHolder<pat::METRef> rhMET;
-    edm::RefToBase<pat::ParticleType>  rbParticle;
-    edm::reftobase::IndirectHolder<pat::ParticleType> rbihParticle;
-    edm::reftobase::Holder<pat::ParticleType, pat::ParticleTypeRef> rbh1Particle;
-    edm::reftobase::Holder<pat::ParticleType, pat::ParticleRef>     rbh2Particle;
+    edm::reftobase::Holder<reco::Candidate, pat::METRef> rbh3MET;
+
+    edm::reftobase::Holder<reco::Candidate, pat::ParticleRef>     rbh3Particle;
     edm::reftobase::RefHolder<pat::ParticleRef> rhParticle;
+
+    edm::reftobase::Holder<reco::Candidate, pat::GenericParticleRef>     hGenericParticle;
+    edm::reftobase::RefHolder<pat::GenericParticleRef>                  rhGenericParticle;
+
+    edm::Wrapper<edm::ValueMap<reco::TrackRefVector> > patJTA;
   }
 }

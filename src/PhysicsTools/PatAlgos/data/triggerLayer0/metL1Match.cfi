@@ -5,7 +5,7 @@
 
 module metTrigMatchL1ETM20 = PATTrigMatcher {
    InputTag src               = allLayer0METs
-   InputTag matched           = L1ETM20
+   InputTag matched           = patL1ETM20
    double maxDeltaR           = 0.4
    double maxDPtRel           = 3.0
    bool resolveAmbiguities    = true

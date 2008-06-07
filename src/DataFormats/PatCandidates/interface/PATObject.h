@@ -14,6 +14,8 @@
  */
 
 #include "DataFormats/Common/interface/RefToBase.h"
+#include "DataFormats/Candidate/interface/CandidateFwd.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
 #include <vector>
 
 #include "DataFormats/PatCandidates/interface/TriggerPrimitive.h"
@@ -34,12 +36,13 @@ namespace pat {
       PATObject(const edm::RefToBase<ObjectType> & ref);
       /// destructor
       virtual ~PATObject() {}
-      /// Clone      
-      virtual PATObject<ObjectType> * clone() const;
+      // / Clone      
+      // // virtual PATObject<ObjectType> * clone() const; // NO,NO, ObjectType can be abstract
+
       /// access to the original object; returns zero for null Ref and throws for unavailable collection
-      const ObjectType * originalObject() const;
+      const reco::Candidate * originalObject() const;
       /// reference to original object. Returns a null reference if not available
-      const edm::RefToBase<ObjectType> & originalObjectRef() const;
+      const edm::RefToBase<reco::Candidate> & originalObjectRef() const;
       /// standard deviation on A (see CMS Note 2006/023)
       float resolutionA() const;
       /// standard deviation on B (see CMS Note 2006/023)
@@ -86,7 +89,7 @@ namespace pat {
       
     protected:
       /// reference back to the original object
-      edm::RefToBase<ObjectType> refToOrig_;
+      edm::RefToBase<reco::Candidate> refToOrig_;
       /// standard deviation on transverse energy
       float resEt_;
       /// standard deviation on pseudorapidity
@@ -123,15 +126,22 @@ namespace pat {
 
   template <class ObjectType> PATObject<ObjectType>::PATObject(const edm::RefToBase<ObjectType> & ref) :
     ObjectType(*ref),
-    refToOrig_(ref),
-    resEt_(0), resEta_(0), resPhi_(0), resA_(0), resB_(0), resC_(0), resD_(0),  resTheta_(0) {
+    refToOrig_(),
+    resEt_(0), resEta_(0), resPhi_(0), resA_(0), resB_(0), resC_(0), resD_(0),  resTheta_(0) 
+  {
+     // NOT as simple, in 1.6.X RefToBase from RefToBase constructor is broken :-(
+     // see https://hypernews.cern.ch/HyperNews/CMS/get/edmFramework/1308.html for details
+     // this workaround should be ok
+     boost::shared_ptr<edm::reftobase::RefHolderBase> holderBase(ref.holder().release());
+     refToOrig_ = edm::RefToBase<reco::Candidate>(holderBase);
   }
   
-  template <class ObjectType> PATObject<ObjectType> * PATObject<ObjectType>::clone() const {
-    return new PATObject<ObjectType>(*this);
-  }
+  //  NO NO NO: ObjectType can be abstract
+  //template <class ObjectType> PATObject<ObjectType> * PATObject<ObjectType>::clone() const {
+  //  return new PATObject<ObjectType>(*this);
+  //}
   
-  template <class ObjectType> const ObjectType * PATObject<ObjectType>::originalObject() const {
+  template <class ObjectType> const reco::Candidate * PATObject<ObjectType>::originalObject() const {
     if (refToOrig_.isNull()) {
       // this object was not produced from a reference, so no link to the
       // original object exists -> return a 0-pointer
@@ -148,7 +158,7 @@ namespace pat {
   }
 
   template <class ObjectType> 
-  const edm::RefToBase<ObjectType> & PATObject<ObjectType>::originalObjectRef() const { return refToOrig_; }
+  const edm::RefToBase<reco::Candidate> & PATObject<ObjectType>::originalObjectRef() const { return refToOrig_; }
 
   template <class ObjectType> 
   float PATObject<ObjectType>::resolutionEt() const { return resEt_; }

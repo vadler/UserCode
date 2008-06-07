@@ -2,6 +2,7 @@
 
 # full cleaning
 include "PhysicsTools/PatAlgos/data/cleaningLayer0/caloJetCleaner.cfi"
+include "PhysicsTools/PatAlgos/data/cleaningLayer0/pfJetCleaner.cfi"   // but not in the sequence by default
 include "PhysicsTools/PatAlgos/data/cleaningLayer0/caloMetCleaner.cfi"
 include "PhysicsTools/PatAlgos/data/cleaningLayer0/electronCleaner.cfi"
 include "PhysicsTools/PatAlgos/data/cleaningLayer0/muonCleaner.cfi"

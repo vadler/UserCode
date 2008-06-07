@@ -5,7 +5,7 @@
 
 module electronTrigMatchHLT1Electron = PATTrigMatcher {
    InputTag src               = allLayer0Electrons
-   InputTag matched           = HLT1Electron
+   InputTag matched           = patHLT1Electron
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true
@@ -14,7 +14,7 @@ module electronTrigMatchHLT1Electron = PATTrigMatcher {
 
 module electronTrigMatchHLT1ElectronRelaxed = PATTrigMatcher {
    InputTag src               = allLayer0Electrons
-   InputTag matched           = HLT1ElectronRelaxed
+   InputTag matched           = patHLT1ElectronRelaxed
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true
@@ -23,7 +23,7 @@ module electronTrigMatchHLT1ElectronRelaxed = PATTrigMatcher {
 
 module electronTrigMatchHLT2Electron = PATTrigMatcher {
    InputTag src               = allLayer0Electrons
-   InputTag matched           = HLT2Electron
+   InputTag matched           = patHLT2Electron
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true
@@ -32,7 +32,7 @@ module electronTrigMatchHLT2Electron = PATTrigMatcher {
 
 module electronTrigMatchHLT2ElectronRelaxed = PATTrigMatcher {
    InputTag src               = allLayer0Electrons
-   InputTag matched           = HLT2ElectronRelaxed
+   InputTag matched           = patHLT2ElectronRelaxed
    double maxDeltaR           = 0.5
    double maxDPtRel           = 0.5
    bool resolveAmbiguities    = true

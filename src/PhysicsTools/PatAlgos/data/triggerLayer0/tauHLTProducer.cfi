@@ -1,16 +1,16 @@
-module HLT2TauPixel = PATHLTProducer {
+module patHLT2TauPixel = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT2TauPixel"
     InputTag filterName      = filterL25PixelTau::HLT
 }
 
-module HLT1Tau = PATHLTProducer {
+module patHLT1Tau = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1Tau"
     InputTag filterName      = filterL3SingleTau::HLT
 }
 
 sequence tauHLTProducer = {
-//     HLT2TauPixel,
-    HLT1Tau
+//     patHLT2TauPixel,
+    patHLT1Tau
 }

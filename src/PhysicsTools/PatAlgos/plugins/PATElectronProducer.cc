@@ -31,6 +31,9 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
 
   // general configurables
   electronSrc_      = iConfig.getParameter<edm::InputTag>( "electronSource" );
+  embedGsfTrack_    = iConfig.getParameter<bool>         ( "embedGsfTrack" );
+  embedSuperCluster_= iConfig.getParameter<bool>         ( "embedSuperCluster" );
+  embedTrack_       = iConfig.getParameter<bool>         ( "embedTrack" );
   // MC matching configurables
   addGenMatch_      = iConfig.getParameter<bool>         ( "addGenMatch" );
   genMatchSrc_      = iConfig.getParameter<edm::InputTag>( "genParticleMatch" );
@@ -111,16 +114,18 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
     unsigned int idx = itElectron - electrons->begin();
     edm::RefToBase<ElectronType> elecsRef = electrons->refAt(idx);
     Electron anElectron(elecsRef);
-    // match to generated final state electrons
+    if (embedGsfTrack_) anElectron.embedGsfTrack();
+    if (embedSuperCluster_) anElectron.embedSuperCluster();
+    if (embedTrack_) anElectron.embedTrack();
+
+    // store the match to the generated final state electrons
     if (addGenMatch_) {
       reco::GenParticleRef genElectron = (*genMatch)[elecsRef];
       if (genElectron.isNonnull() && genElectron.isAvailable() ) {
         anElectron.setGenLepton(*genElectron);
-      } else {
-        // "MC ELE MATCH: Something wrong: null=" << !genElectron.isNonnull() <<", avail=" << genElectron.isAvailable() << std::endl;
-        anElectron.setGenLepton(reco::Particle(0, reco::Particle::LorentzVector(0,0,0,0))); // TQAF way of setting "null"
-      }
+      } // leave empty if no match found
     }
+
     // matches to fired trigger primitives
     if ( addTrigMatch_ ) {
       for ( size_t i = 0; i < trigPrimSrc_.size(); ++i ) {
@@ -132,6 +137,7 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
         }
       }
     }
+
     // add resolution info
     if(addResolutions_){
       (*theResoCalc_)(anElectron);

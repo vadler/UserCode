@@ -1,9 +1,9 @@
-module L1SingleEG5 = PATL1Producer {
+module patL1SingleEG5 = PATL1Producer {
     InputTag particleMaps  = l1extraParticleMap::Raw
     string   triggerName   = "L1_SingleEG5" // as in 'DataFormats/L1Trigger/src/L1ParticleMap.cc' (triggerNames_)
     string   objectType    = "em" // "em", "muon", "jet" or "etmiss"
 }
 
 sequence emL1Producer = {
-    L1SingleEG5
+    patL1SingleEG5
 }

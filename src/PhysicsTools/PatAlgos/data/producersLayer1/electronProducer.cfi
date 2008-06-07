@@ -3,6 +3,9 @@ module allLayer1Electrons = PATElectronProducer {
 
   ### General configurables
   InputTag electronSource    = allLayer0Electrons       # clean layer 0 electrons
+  bool     embedGsfTrack     = false                    # whether to embed in AOD externally stored gsf track
+  bool     embedSuperCluster = false                    # whether to embed in AOD externally stored supercluster
+  bool     embedTrack        = false                    # whether to embed in AOD externally stored track
 
   ### MC matching configurables
   bool     addGenMatch       = true                     # switch on/off matching to generator level

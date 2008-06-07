@@ -32,10 +32,13 @@ PATMuonProducer::PATMuonProducer(const edm::ParameterSet & iConfig) :
   isolator_(iConfig.exists("isolation") ? iConfig.getParameter<edm::ParameterSet>("isolation") : edm::ParameterSet(), false) 
 {
   // general configurables
-  muonSrc_       = iConfig.getParameter<edm::InputTag>( "muonSource" );
+  muonSrc_             = iConfig.getParameter<edm::InputTag>( "muonSource" );
+  embedTrack_          = iConfig.getParameter<bool>         ( "embedTrack" );
+  embedStandAloneMuon_ = iConfig.getParameter<bool>         ( "embedStandAloneMuon" );
+  embedCombinedMuon_   = iConfig.getParameter<bool>         ( "embedCombinedMuon" );
   // MC matching configurables
   addGenMatch_   = iConfig.getParameter<bool>         ( "addGenMatch" );
-  genPartSrc_    = iConfig.getParameter<edm::InputTag>( "genParticleMatch" );
+  genMatchSrc_   = iConfig.getParameter<edm::InputTag>( "genParticleMatch" );
   // Trigger matching configurables
   addTrigMatch_  = iConfig.getParameter<bool>         ( "addTrigMatch" );
   trigPrimSrc_   = iConfig.getParameter<std::vector<edm::InputTag> >( "trigPrimMatch" );
@@ -94,7 +97,7 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
 
   // prepare the MC matching
   edm::Handle<edm::Association<reco::GenParticleCollection> > genMatch;
-  if (addGenMatch_) iEvent.getByLabel(genPartSrc_, genMatch);
+  if (addGenMatch_) iEvent.getByLabel(genMatchSrc_, genMatch);
 
   // loop over muons
   std::vector<Muon> * patMuons = new std::vector<Muon>();
@@ -102,16 +105,20 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
     // construct the Muon from the ref -> save ref to original object
     unsigned int idx = itMuon - muons->begin();
     edm::RefToBase<MuonType> muonsRef = muons->refAt(idx);
+
     Muon aMuon(muonsRef);
-    // match to generated final state muons
+    if (embedTrack_) aMuon.embedTrack();
+    if (embedStandAloneMuon_) aMuon.embedStandAloneMuon();
+    if (embedCombinedMuon_) aMuon.embedCombinedMuon();
+
+    // store the match to the generated final state muons
     if (addGenMatch_) {
       reco::GenParticleRef genMuon = (*genMatch)[muonsRef];
       if (genMuon.isNonnull() && genMuon.isAvailable() ) {
         aMuon.setGenLepton(*genMuon);
-      } else {
-        aMuon.setGenLepton(reco::Particle(0, reco::Particle::LorentzVector(0,0,0,0))); // TQAF way of setting "null"
-      }
+      } // leave empty if no match found
     }
+
     // matches to fired trigger primitives
     if ( addTrigMatch_ ) {
       for ( size_t i = 0; i < trigPrimSrc_.size(); ++i ) {

@@ -63,6 +63,7 @@ namespace pat {
       edm::InputTag            partonJetSrc_;
       bool                     addTrigMatch_;
       std::vector<edm::InputTag> trigPrimSrc_;
+      bool                     addJetCorrFactors_;
       edm::InputTag            jetCorrFactorsSrc_;
       bool                     addResolutions_;
       bool                     useNNReso_;

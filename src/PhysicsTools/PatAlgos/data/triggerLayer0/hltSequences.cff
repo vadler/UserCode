@@ -4,10 +4,8 @@ include "PhysicsTools/PatAlgos/data/triggerLayer0/tauHLTProducer.cfi"
 include "PhysicsTools/PatAlgos/data/triggerLayer0/photonHLTProducer.cfi"
 include "PhysicsTools/PatAlgos/data/triggerLayer0/jetHLTProducer.cfi"
 include "PhysicsTools/PatAlgos/data/triggerLayer0/metHLTProducer.cfi"
-// include "PhysicsTools/PatAlgos/data/triggerLayer0/btagHLTProducer.cfi"
 
 sequence patHLTProducer_withoutTau = {
-//     btagHLTProducer
     electronHLTProducer,
     muonHLTProducer,
     photonHLTProducer,
@@ -26,10 +24,8 @@ include "PhysicsTools/PatAlgos/data/triggerLayer0/tauHLTMatch.cfi"
 include "PhysicsTools/PatAlgos/data/triggerLayer0/photonHLTMatch.cfi"
 include "PhysicsTools/PatAlgos/data/triggerLayer0/jetHLTMatch.cfi"
 include "PhysicsTools/PatAlgos/data/triggerLayer0/metHLTMatch.cfi"
-// include "PhysicsTools/PatAlgos/data/triggerLayer0/btagHLTMatch.cfi"
 
 sequence patHLTMatch_withoutTau = {
-//     btagHLTMatch
     electronHLTMatch,
     muonHLTMatch,
     photonHLTMatch,

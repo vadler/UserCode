@@ -1,30 +1,30 @@
-module HLT1Jet = PATHLTProducer {
+module patHLT1Jet = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1Jet"
     InputTag filterName      = hlt1jet200::HLT
 }
 
-module HLT2Jet = PATHLTProducer {
+module patHLT2Jet = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT2Jet"
     InputTag filterName      = hlt2jet150::HLT
 }
 
-module HLT3Jet = PATHLTProducer {
+module patHLT3Jet = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT3Jet"
     InputTag filterName      = hlt3jet85::HLT
 }
 
-module HLT4Jet = PATHLTProducer {
+module patHLT4Jet = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT4Jet"
     InputTag filterName      = hlt4jet60::HLT
 }
 
 sequence jetHLTProducer = {
-    HLT1Jet,
-    HLT2Jet,
-    HLT3Jet,
-    HLT4Jet
+    patHLT1Jet,
+    patHLT2Jet,
+    patHLT3Jet,
+    patHLT4Jet
 }

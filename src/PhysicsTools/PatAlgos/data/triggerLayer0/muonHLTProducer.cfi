@@ -1,23 +1,23 @@
-module HLT2MuonNonIso = PATHLTProducer {
+module patHLT2MuonNonIso = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT2MuonNonIso"
     InputTag filterName      = DiMuonNoIsoL3PreFiltered::HLT
 }
 
-module HLT1MuonIso = PATHLTProducer {
+module patHLT1MuonIso = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1MuonIso"
     InputTag filterName      = SingleMuIsoL3IsoFiltered::HLT
 }
 
-module HLT1MuonNonIso = PATHLTProducer {
+module patHLT1MuonNonIso = PATHLTProducer {
     InputTag triggerResults  = TriggerResults::HLT
     string   triggerName     = "HLT1MuonNonIso"
     InputTag filterName      = SingleMuNoIsoL3PreFiltered::HLT
 }
 
 sequence muonHLTProducer = {
-//     HLT2MuonNonIso,
-//     HLT1MuonIso,
-    HLT1MuonNonIso
+//     patHLT2MuonNonIso,
+//     patHLT1MuonIso,
+    patHLT1MuonNonIso
 }

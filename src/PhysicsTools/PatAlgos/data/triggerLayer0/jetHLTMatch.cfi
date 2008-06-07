@@ -5,7 +5,7 @@
 
 module jetTrigMatchHLT1Jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
-   InputTag matched           = HLT1Jet
+   InputTag matched           = patHLT1Jet
    double maxDeltaR           = 0.4
    double maxDPtRel           = 3.0
    bool resolveAmbiguities    = true
@@ -14,7 +14,7 @@ module jetTrigMatchHLT1Jet = PATTrigMatcher {
 
 module jetTrigMatchHLT2Jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
-   InputTag matched           = HLT2Jet
+   InputTag matched           = patHLT2Jet
    double maxDeltaR           = 0.4
    double maxDPtRel           = 3.0
    bool resolveAmbiguities    = true
@@ -23,7 +23,7 @@ module jetTrigMatchHLT2Jet = PATTrigMatcher {
 
 module jetTrigMatchHLT3Jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
-   InputTag matched           = HLT3Jet
+   InputTag matched           = patHLT3Jet
    double maxDeltaR           = 0.4
    double maxDPtRel           = 3.0
    bool resolveAmbiguities    = true
@@ -32,7 +32,7 @@ module jetTrigMatchHLT3Jet = PATTrigMatcher {
 
 module jetTrigMatchHLT4Jet = PATTrigMatcher {
    InputTag src               = allLayer0Jets
-   InputTag matched           = HLT4Jet
+   InputTag matched           = patHLT4Jet
    double maxDeltaR           = 0.4
    double maxDPtRel           = 3.0
    bool resolveAmbiguities    = true

@@ -2,7 +2,10 @@
 module allLayer1Muons = PATMuonProducer {
 
   ### General configurables
-  InputTag muonSource        = allLayer0Muons          # cleaned muons from AOD
+  InputTag muonSource          = allLayer0Muons        # cleaned muons from AOD
+  bool     embedTrack          = false                 # whether to embed in AOD externally stored tracker track
+  bool     embedStandAloneMuon = false                 # whether to embed in AOD externally stored standalone muon track
+  bool     embedCombinedMuon   = false                 # whether to embed in AOD externally stored combined muon track
 
   ### MC matching configurables
   bool     addGenMatch       = true                    # switch on/off matching to generator level

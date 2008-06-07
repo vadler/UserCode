@@ -13,7 +13,7 @@
    a collection of objects of PhotonType.
 
   \author   Steven Lowette
-  \version  $Id$
+  \version  $Id: PATPhotonProducer.h,v 1.3.2.4 2008/05/31 16:22:22 lowette Exp $
 */
 
 
@@ -30,14 +30,9 @@
 
 namespace pat {
 
-
-  class ObjectResolutionCalc;
-
-
   class PATPhotonProducer : public edm::EDProducer {
 
     public:
-
       explicit PATPhotonProducer(const edm::ParameterSet & iConfig);
       ~PATPhotonProducer();
 
@@ -48,8 +43,13 @@ namespace pat {
       // configurables
       edm::InputTag photonSrc_;
       bool embedSuperCluster_;
+
+      bool addGenMatch_;
+      edm::InputTag genMatchSrc_;
+
       bool addTrigMatch_;
       std::vector<edm::InputTag> trigPrimSrc_;
+
       // tools
       GreaterByEt<Photon> eTComparator_;
 
