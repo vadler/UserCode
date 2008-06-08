@@ -40,7 +40,7 @@ void PATTrigProducer::produce( Event& iEvent, const EventSetup& iSetup )
     if ( nFilters == 0 ) {
       LogDebug( "noTriggerFilters" ) << "PATTrigProducer: The TriggerEvent of this event contains no filter information at all!";
     } else {
-      size_type iFilter = triggerEvent->filterIndex( filterName_.label() );
+      size_type iFilter = triggerEvent->filterIndex( filterName_ );
       if ( iFilter == nFilters ) {
         LogDebug( "noTriggerFilter" ) << "PATTrigProducer: The TriggerEvent of this event contains no filter information on filter " << filterName_.label() << "!";
       } else {

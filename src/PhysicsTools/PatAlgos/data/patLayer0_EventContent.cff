@@ -10,8 +10,8 @@ block patLayer0EventContent = {
     "keep *_caloTowers_*_*","keep CaloTowersSorted_towerMaker_*_*",  # to allow embedding
 
     "keep *_layer0MuonIsolations_*_*",
-    "keep *_layer0ElectronIsolation_*_*",
-    "keep *_layer0TauIsolations_*_*",
+    "keep *_layer0ElectronIsolations_*_*",
+    "keep *_layer0TauIsolations_*_*", # actually they don't exist yet
     "keep *_layer0PhotonIsolations_*_*",
 
     "keep *_layer0JetCorrFactors_*_*",
@@ -54,6 +54,7 @@ block patLayer0EventContent = {
     "drop recoCandidateedmRefToBaseedmValueMap_allLayer0Jets_*_*",
     "drop recoCandidateedmRefToBaseedmValueMap_allLayer0METs_*_*",
     
+    "keep *_hltTriggerSummaryAOD_*_*",
     "keep patTriggerPrimitivesOwned_*_*_*",
     "keep patTriggerPrimitivesOwnededmAssociation_*_*_*"
   }

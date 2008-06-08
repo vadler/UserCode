@@ -1,0 +1,39 @@
+
+# electron id
+// include "PhysicsTools/PatAlgos/data/recoLayer0/electronId.cff"
+
+# Electron Isolation 
+include "PhysicsTools/PatAlgos/data/recoLayer0/electronIsolation.cff"
+# Muon Isolation 
+include "PhysicsTools/PatAlgos/data/recoLayer0/muonIsolation.cff"
+# Photon Isolation 
+include "PhysicsTools/PatAlgos/data/recoLayer0/photonIsolation.cff"
+# Tau Isolation 
+#include "PhysicsTools/PatAlgos/data/recoLayer0/tauIsolation.cff"
+
+# jet-parton matching
+include "PhysicsTools/PatAlgos/data/recoLayer0/jetFlavourId.cff"
+
+# additional b-tagging
+include "PhysicsTools/PatAlgos/data/recoLayer0/bTagging.cff"
+
+# Jet track association and jet charge
+include "PhysicsTools/PatAlgos/data/recoLayer0/jetTracksCharge.cff"
+
+# default  sequence for extra high-level reconstruction
+sequence patHighLevelReco_withoutPFTau = {
+//   patElectronId,
+  patJetFlavourId, 
+  patLayer0ElectronIsolation, // skim & re-key
+  patLayer0PhotonIsolation, // skim & re-key // FIXME 
+  patLayer0MuonIsolation,    // skim & re-key
+  patLayer0BTagging,  
+  patLayer0JetMETCorrections,
+  patLayer0JetTracksCharge
+}
+
+sequence patHighLevelReco = {
+  patHighLevelReco_withoutPFTau
+  #,patLayer0TauIsolation,         // skim & re-key
+}
+
