@@ -22,59 +22,59 @@ import FWCore.ParameterSet.Config as cms
 # Egamma triggers
 
 patHLT1Photon = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltL1IsoSinglePhotonTrackIsolFilter")
 )
 
 patHLT1PhotonRelaxed = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltL1NonIsoSinglePhotonTrackIsolFilter")
 )
 
 patHLT2Photon = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltL1IsoDoublePhotonDoubleEtFilter")
 )
 
 patHLT2PhotonRelaxed = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltL1NonIsoDoublePhotonDoubleEtFilter")
 )
 
 patHLT1Electron = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltL1IsoSingleElectronTrackIsolFilter")
 )
 
 patHLT1ElectronRelaxed = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltL1NonIsoSingleElectronTrackIsolFilter")
 )
 
 patHLT2Electron = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltL1IsoDoubleElectronTrackIsolFilter")
 )
 
 patHLT2ElectronRelaxed = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltL1NonIsoDoubleElectronTrackIsolFilter")
 )
 
 # Muon triggers
 
 patHLT1MuonIso = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltSingleMuIsoL3IsoFiltered")
 )
 
 patHLT1MuonNonIso = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltSingleMuNoIsoL3PreFiltered")
 )
 
 patHLT2MuonNonIso = cms.EDProducer("PATTrigProducer",
-    triggerEvent = cms.InputTag("hltTriggerSummaryAOD::HLT"),
+    triggerEvent = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     filterName   = cms.InputTag("hltDiMuonNoIsoL3PreFiltered")
 )
 
@@ -94,22 +94,22 @@ patHLT2TauPixel = cms.EDProducer("PATTrigProducer",
 
 patHLT2jet = cms.EDProducer("PATTrigProducer",
     triggerEvent = cms.InputTag("hltTriggerSummaryAOD"),
-    filterName   = cms.InputTag("hlt2jet150::HLT")
+    filterName   = cms.InputTag("hlt2jet150","","HLT")
 )
 
 patHLT3jet = cms.EDProducer("PATTrigProducer",
     triggerEvent = cms.InputTag("hltTriggerSummaryAOD"),
-    filterName   = cms.InputTag("hlt3jet85::HLT")
+    filterName   = cms.InputTag("hlt3jet85","","HLT")
 )
 
 patHLT4jet = cms.EDProducer("PATTrigProducer",
     triggerEvent = cms.InputTag("hltTriggerSummaryAOD"),
-    filterName   = cms.InputTag("hlt4jet60::HLT")
+    filterName   = cms.InputTag("hlt4jet60","","HLT")
 )
 
 patHLT1MET65 = cms.EDProducer("PATTrigProducer",
     triggerEvent = cms.InputTag("hltTriggerSummaryAOD"),
-    filterName   = cms.InputTag("hlt1MET65::HLT")
+    filterName   = cms.InputTag("hlt1MET65","","HLT")
 )
 
 # Xchannel triggers
