@@ -1,0 +1,55 @@
+  ## SiStrip DQM Source
+  
+  include "DQM/SiStripMonitorClient/data/SiStripSourceConfigP5.cff"
+  replace HardwareMonitor.preSwapOn = false
+  module SiStripMonitorTrackCAF_cosmicTk = SiStripMonitorTrack from "DQM/SiStripMonitorTrack/data/SiStripMonitorTrack.cfi"
+  replace SiStripMonitorTrackCAF_cosmicTk.TrackProducer = "cosmictrackfinderP5Refitter"
+  replace SiStripMonitorTrackCAF_cosmicTk.FolderName    = "SiStrip/Tracks"
+  module SiStripMonitorTrackCAF_ckf = SiStripMonitorTrack from "DQM/SiStripMonitorTrack/data/SiStripMonitorTrack.cfi"
+  replace SiStripMonitorTrackCAF_ckf.TrackProducer = "ctfWithMaterialTracksP5Refitter"
+  replace SiStripMonitorTrackCAF_ckf.FolderName    = "SiStrip/Tracks"
+  module SiStripMonitorTrackCAF_rs = SiStripMonitorTrack from "DQM/SiStripMonitorTrack/data/SiStripMonitorTrack.cfi"
+  replace SiStripMonitorTrackCAF_rs.TrackProducer = "rsWithMaterialTracksP5Refitter"
+  replace SiStripMonitorTrackCAF_rs.FolderName    = "SiStrip/Tracks"
+  module MonitorTrackResidualsCAF_cosmicTk = MonitorTrackResiduals from "DQM/TrackerMonitorTrack/data/MonitorTrackResiduals.cfi"
+  replace MonitorTrackResidualsCAF_cosmicTk.Tracks              = cosmictrackfinderP5
+  replace MonitorTrackResidualsCAF_cosmicTk.trajectoryInput     = "cosmictrackfinderP5Refitter"
+  module MonitorTrackResidualsCAF_ckf = MonitorTrackResiduals from "DQM/TrackerMonitorTrack/data/MonitorTrackResiduals.cfi"
+  replace MonitorTrackResidualsCAF_ckf.Tracks              = ctfWithMaterialTracksP5
+  replace MonitorTrackResidualsCAF_ckf.trajectoryInput     = "ctfWithMaterialTracksP5Refitter"
+  module MonitorTrackResidualsCAF_rs = MonitorTrackResiduals from "DQM/TrackerMonitorTrack/data/MonitorTrackResiduals.cfi"
+  replace MonitorTrackResidualsCAF_rs.Tracks              = rsWithMaterialTracksP5
+  replace MonitorTrackResidualsCAF_rs.trajectoryInput     = "rsWithMaterialTracksP5Refitter"
+  
+  ## Scheduling
+  
+  sequence SiStripDQMSourceGlobalRunCAF_common = {
+    SiStripMonitorDigiSim &
+    SiStripMonitorCluster &
+    QualityMonSim // 'QualityMonReal' not compatible
+  }
+  
+  sequence SiStripDQMSourceGlobalRunCAF_cosmikTk = {
+    SiStripMonitorTrackCAF_cosmicTk &
+    MonitorTrackResidualsCAF_cosmicTk &
+    TrackMon_cosmicTk
+  }
+  
+  sequence SiStripDQMSourceGlobalRunCAF_ckf = {
+    SiStripMonitorTrackCAF_ckf &
+    MonitorTrackResidualsCAF_ckf &
+    TrackMon_ckf
+  }
+  
+  sequence SiStripDQMSourceGlobalRunCAF_rs = {
+    SiStripMonitorTrackCAF_rs &
+    MonitorTrackResidualsCAF_rs &
+    TrackMon_rs
+  }
+  
+  sequence SiStripDQMSourceGlobalRunCAF = {
+    SiStripDQMSourceGlobalRunCAF_common &
+    SiStripDQMSourceGlobalRunCAF_cosmikTk &
+    SiStripDQMSourceGlobalRunCAF_ckf &
+    SiStripDQMSourceGlobalRunCAF_rs
+  }        
