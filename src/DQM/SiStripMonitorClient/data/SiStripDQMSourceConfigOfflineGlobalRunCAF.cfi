@@ -14,12 +14,15 @@
   module MonitorTrackResidualsCAF_cosmicTk = MonitorTrackResiduals from "DQM/TrackerMonitorTrack/data/MonitorTrackResiduals.cfi"
   replace MonitorTrackResidualsCAF_cosmicTk.Tracks              = cosmictrackfinderP5
   replace MonitorTrackResidualsCAF_cosmicTk.trajectoryInput     = "cosmictrackfinderP5Refitter"
+  replace MonitorTrackResidualsCAF_cosmicTk.OutputMEsInRootFile = false
   module MonitorTrackResidualsCAF_ckf = MonitorTrackResiduals from "DQM/TrackerMonitorTrack/data/MonitorTrackResiduals.cfi"
   replace MonitorTrackResidualsCAF_ckf.Tracks              = ctfWithMaterialTracksP5
   replace MonitorTrackResidualsCAF_ckf.trajectoryInput     = "ctfWithMaterialTracksP5Refitter"
+  replace MonitorTrackResidualsCAF_ckf.OutputMEsInRootFile = false
   module MonitorTrackResidualsCAF_rs = MonitorTrackResiduals from "DQM/TrackerMonitorTrack/data/MonitorTrackResiduals.cfi"
   replace MonitorTrackResidualsCAF_rs.Tracks              = rsWithMaterialTracksP5
   replace MonitorTrackResidualsCAF_rs.trajectoryInput     = "rsWithMaterialTracksP5Refitter"
+  replace MonitorTrackResidualsCAF_rs.OutputMEsInRootFile = false
   
   ## Scheduling
   
@@ -52,4 +55,10 @@
     SiStripDQMSourceGlobalRunCAF_cosmikTk &
     SiStripDQMSourceGlobalRunCAF_ckf &
     SiStripDQMSourceGlobalRunCAF_rs
+  }        
+  sequence SiStripDQMSourceGlobalRunCAF_reduced = {
+    SiStripDQMSourceGlobalRunCAF_common &
+    TrackMon_cosmicTk &
+    SiStripDQMSourceGlobalRunCAF_ckf &
+    TrackMon_rs
   }        
