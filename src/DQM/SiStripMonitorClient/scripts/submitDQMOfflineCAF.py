@@ -7,6 +7,7 @@ import shutil
 import string
 import math
 import urllib
+import time
 
 def WrongUsage():
   print '> submitDQMOfflineCAF.py > wrong usage'
@@ -108,4 +109,5 @@ for i in range(splitLevel):
   os.chdir(currentDir)
 
 if actionLevel == 'submit':
+  sleep(5)
   os.system('bjobs -q cmscaf')
