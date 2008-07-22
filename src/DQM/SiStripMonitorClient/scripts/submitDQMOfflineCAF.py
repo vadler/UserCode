@@ -8,7 +8,7 @@ import string
 import math
 import urllib
 
-if len(sys.argv) != 4:
+def WrongUsage():
   print '> submitDQMOfflineCAF.py > wrong usage'
   print '  requires arguments:'
   print '  - run number'
@@ -16,9 +16,15 @@ if len(sys.argv) != 4:
   print '  - action level (\'create\', \'submit\')'
   sys.exit(1)
 
-runNumber   =     sys.argv[1]
-splitLevel  = int(sys.argv[2])
-actionLevel =     sys.argv[3]
+if len(sys.argv) != 4:
+  WrongUsage()
+
+actionLevel =     sys.argv[1]
+runNumber   =     sys.argv[2]
+splitLevel  = int(sys.argv[3])
+
+if actionLevel != 'submit' and actionLevel != 'create':
+  WrongUsage()
 
 # shell = os.path.basename(os.getenv('SHELL'))
 # shellType = 'sh'
@@ -62,15 +68,6 @@ inputFilesJob = int(inputFiles/splitLevel) + 1
 if inputFiles == inputFilesJob * (splitLevel-1):
   splitLevel -= 1
 print '> submitDQMOfflineCAF.py > input files for run' + runNumber + ': ' + str(inputFiles)
-if actionLevel == 'create':
-  sys.exit(0)
-if actionLevel != 'submit':
-  print '> submitDQMOfflineCAF.py > wrong action level'
-  print '  requires arguments:'
-  print '  - run number'
-  print '  - split level'
-  print '  - action level (\'create\', \'submit\')'
-  sys.exit(1)
   
 readLines = 0
 inputCff = file(runName + '/' + runName + '.cff','r')
@@ -102,9 +99,13 @@ for i in range(splitLevel):
   inputCffJob.write('  }\n')
   inputCffJob.close()
   os.system('sed -e \"s#OUTPUT_DIRECTORY#/tmp/' + os.getenv('USER') + '/' + jobDir + '#g\" ' + cmsswBase + '/src/DQM/SiStripMonitorClient/data/SiStripDQMOfflineGlobalRunCAF_template.cff > SiStripDQMOfflineGlobalRunCAF.cff')
-  os.system('sed -e \"s#CMSSW_BASE#' + cmsswBase + '#g\" -e \"s#RUN_NAME#' + runName + '#g\" -e \"s#JOB_NAME#' + jobName + '#g\" ' + cmsswBase + '/src/DQM/SiStripMonitorClient/scripts/SiStripDQMOfflineCAF_template.job > SiStripDQMOfflineCAF.job')
+  os.system('sed -e \"s#CMSSW_BASE#' + cmsswBase + '#g\" -e \"s#RUN_NAME#' + runName + '#g\" -e \"s#JOB_NAME#' + jobName + '#g\" -e \"s#CURRENT_DIR#' + currentDir + '#g\" ' + cmsswBase + '/src/DQM/SiStripMonitorClient/scripts/SiStripDQMOfflineCAF_template.job > SiStripDQMOfflineCAF.job')
   os.chmod('SiStripDQMOfflineCAF.job',484)
-  print '> submitDQMOfflineCAF.py >'
-  print '  ' + os.getcwd() + ' : bsub -q cmscaf SiStripDQMOfflineCAF.job'
-  os.system('bsub -q cmscaf SiStripDQMOfflineCAF.job')
+  if actionLevel == 'submit':
+    print '> submitDQMOfflineCAF.py >'
+    print '  ' + os.getcwd() + ' : bsub -q cmscaf SiStripDQMOfflineCAF.job'
+    os.system('bsub -q cmscaf SiStripDQMOfflineCAF.job')
   os.chdir(currentDir)
+
+if actionLevel == 'submit':
+  os.system('bjobs -q cmscaf')
