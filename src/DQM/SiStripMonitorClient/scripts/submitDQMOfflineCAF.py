@@ -38,7 +38,7 @@ STR_textUsage = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.p
  
  This script submits batch jobs to the CAF in order to process the full
  granularity SiStrip offline DQM.
- Questions and comments to: volker.adler@crn.ch
+ Questions and comments to: volker.adler@cern.ch
  
  Usage(): submitDQMOfflineCAF.py (-s, --submit | -c, --create |
                                   -h, --help)
@@ -84,13 +84,13 @@ STR_textUsage = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.p
          path to copy job output *.root files to;
          currently (almost) no check performed;
          must be in AFS or CASTOR
-         default: $CASTOR_HOME
+         default: $CASTOR_HOME/DQM
          
      -m, --mergepath PATH
          path to merge the job output *.root files;
          currently (almost) no check performed;
          must be in AFS
-         default: $HOME/scratch0
+         default: $HOME/scratch0/DQM
 """                        
 LSTR_true  = ['1','TRUE' ,'True' ,'true' ]
 LSTR_false = ['0','FALSE','False','false']
