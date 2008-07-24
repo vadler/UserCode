@@ -28,8 +28,8 @@ LSTR_wordArgument = sys.argv[1:]
 INT_nJobs      = 10
 BOOL_filtersOn = False
 STR_dataset    = '/Cosmics/CRUZET3_CRUZET3_V2P_v3/RECO'
-STR_pathOut    = os.getenv('CASTOR_HOME')
-STR_pathMerge  = os.getenv('HOME') + '/scratch0'
+STR_pathOut    = os.getenv('CASTOR_HOME') + '/DQM'
+STR_pathMerge  = os.getenv('HOME') + '/scratch0/DQM'
 # numbers
 OCT_rwx_r_r = 0744
 # strings
@@ -381,6 +381,7 @@ for int_iJob in range(int_nJobs):
   # FIXME: This protection is currently needed. Review calculations again!
   if int_nLinesRead >= int_nInputFiles:
     print '> submitDQMOfflineCAF.py > number of created job: ' + str(int_iJob+1)
+    print
     break
 file_mergeScript.close()
 os.chmod(str_nameRun + '/' + str_nameMergeScript,OCT_rwx_r_r)
