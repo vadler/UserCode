@@ -41,13 +41,13 @@ STR_textUsage = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.p
  Questions and comments to: volker.adler@crn.ch
  
  Usage(): submitDQMOfflineCAF.py (-s, --submit | -c, --create |
-                                -h, --help)
-                               [-r, --run]
-                               [-j, --jobs]
-                               [-f, --filter]
-                               [-d, --dataset]
-                               [-o, --outpath]
-                               [-m, --mergepath]                               
+                                  -h, --help)
+                                 [-r, --run]
+                                 [-j, --jobs]
+                                 [-f, --filter]
+                                 [-d, --dataset]
+                                 [-o, --outpath]
+                                 [-m, --mergepath]                               
                                
    Function letters: One of the following options  m u s t  be used.
    
@@ -66,7 +66,7 @@ STR_textUsage = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.p
    
      -r, --run RUNNUMBER
          number of run to process;
-         required with funtion letters '-s' and '-c'
+         required by funtion letters '-s' and '-c'
          
      -j, --jobs NUMBER
          number of jobs to create;
@@ -76,17 +76,17 @@ STR_textUsage = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.p
          use or use not HLT filters to select events to process;
          default: False
       
-     -d, --dataset
+     -d, --dataset PRIMARY_DATASET
          specify dataset for DBS query;
          default: /Cosmics/CRUZET3_CRUZET3_V2P_v3/RECO
          
-     -o, --outpath
+     -o, --outpath PATH
          path to copy job output *.root files to;
          currently (almost) no check performed;
          must be in AFS or CASTOR
          default: $CASTOR_HOME
          
-     -m, --mergepath
+     -m, --mergepath PATH
          path to merge the job output *.root files;
          currently (almost) no check performed;
          must be in AFS
@@ -272,9 +272,10 @@ if string.split(str_pathMerge,'/')[1] != 'afs':
   
 # current environment
 
+# FIXME: This should be done in a more flexible way. See r1.4 for proposal...
 str_pathCurrentDir        = os.getcwd()
-str_pathCurrentDirStrings = string.split(str_pathCurrentDir, '/src/')       # assumes to be in _the_ release working area
-str_pathCmsswBase         = str_pathCurrentDirStrings[0]                    # assumes to be in _the_ release working area 
+str_pathCurrentDirStrings = string.split(str_pathCurrentDir, '/src/') # assumes to be in _the_ release working area
+str_pathCmsswBase         = str_pathCurrentDirStrings[0]              # assumes to be in _the_ release working area 
 
 # prepare work area
   
@@ -377,6 +378,10 @@ for int_iJob in range(int_nJobs):
     print
     os.system('bsub -q cmscaf SiStripDQMOfflineCAF.job')
   os.chdir(str_pathCurrentDir)
+  # FIXME: This protection is currently needed. Review calculations again!
+  if int_nLinesRead >= int_nInputFiles:
+    print '> submitDQMOfflineCAF.py > number of created job: ' + str(int_iJob+1)
+    break
 file_mergeScript.close()
 os.chmod(str_nameRun + '/' + str_nameMergeScript,OCT_rwx_r_r)
 
