@@ -1,21 +1,18 @@
   ## SiStrip DQM Source
   
-  # SiStripMonitoDigi
-  module SiStripMonitorDigiRealCAF = SiStripMonitorDigi from "DQM/SiStripMonitorDigi/data/SiStripMonitorDigi_RealData.cfi"
-  replace SiStripMonitorDigiRealCAF.SelectAllDetectors = true
-  module SiStripMonitorDigiSimCAF = SiStripMonitorDigi from "DQM/SiStripMonitorDigi/data/SiStripMonitorDigi_SimData.cfi"
-  replace SiStripMonitorDigiSimCAF.SelectAllDetectors = true
+  # SiStripMonitorDigi
+  module SiStripMonitorDigiCAF = SiStripMonitorDigi from "DQM/SiStripMonitorDigi/data/SiStripMonitorDigi.cfi"
+  replace SiStripMonitorDigiCAF.SelectAllDetectors = true
 
   # SiStripMonitorCluster
   module SiStripMonitorClusterCAF = SiStripMonitorCluster from "DQM/SiStripMonitorCluster/data/SiStripMonitorCluster.cfi"
   replace SiStripMonitorClusterCAF.OutputMEsInRootFile = false
   replace SiStripMonitorClusterCAF.SelectAllDetectors  = true
+  replace SiStripMonitorClusterCAF.StripQualityLabel   = ""
 
   # SiStripMonitorQuality
-  module QualityMonRealCAF = QualityMon from "DQM/SiStripMonitorPedestals/data/SiStripMonitorQuality.cfi"
-  replace QualityMonRealCAF.StripQualityLabel = "test1"
-  module QualityMonSimCAF = QualityMon from "DQM/SiStripMonitorPedestals/data/SiStripMonitorQuality.cfi"
-  replace QualityMonSimCAF.StripQualityLabel = ""
+  module QualityMonCAF = QualityMon from "DQM/SiStripMonitorPedestals/data/SiStripMonitorQuality.cfi"
+  replace QualityMonCAF.StripQualityLabel = ""
   
   # SiStripMonitorTrack
   module SiStripMonitorTrackCAF_cosmicTk = SiStripMonitorTrack from "DQM/SiStripMonitorTrack/data/SiStripMonitorTrack.cfi"
@@ -43,31 +40,25 @@
   replace MonitorTrackResidualsCAF_rs.OutputMEsInRootFile = false
   
   # TrackingMonitor
-  module TrackMonCAF_cosmicTk = TrackMon from "DQM/TrackingMonitor/data/TrackingMonitor.cfi"
+  module TrackMonCAF_cosmicTk = TrackerCosmicTrackMon from "DQM/TrackingMonitor/data/TrackerCosmicsTrackingMonitor.cfi"
   replace TrackMonCAF_cosmicTk.TrackProducer = cosmictrackfinderP5
   replace TrackMonCAF_cosmicTk.AlgoName      = "CosmicTk"
   replace TrackMonCAF_cosmicTk.FolderName    = "SiStrip/Tracks"
-  replace TrackMonCAF_cosmicTk.TkSizeMax     = 25
-  replace TrackMonCAF_cosmicTk.TkSizeBin     = 25
-  module TrackMonCAF_ckf = TrackMon from "DQM/TrackingMonitor/data/TrackingMonitor.cfi"
+  module TrackMonCAF_ckf = TrackerCosmicTrackMon from "DQM/TrackingMonitor/data/TrackerCosmicsTrackingMonitor.cfi"
   replace TrackMonCAF_ckf.TrackProducer = ctfWithMaterialTracksP5
   replace TrackMonCAF_ckf.AlgoName      = "CKFTk"
   replace TrackMonCAF_ckf.FolderName    = "SiStrip/Tracks"
-  replace TrackMonCAF_ckf.TkSizeMax     = 25
-  replace TrackMonCAF_ckf.TkSizeBin     = 25
-  module TrackMonCAF_rs = TrackMon from "DQM/TrackingMonitor/data/TrackingMonitor.cfi"
+  module TrackMonCAF_rs = TrackerCosmicTrackMon from "DQM/TrackingMonitor/data/TrackerCosmicsTrackingMonitor.cfi"
   replace TrackMonCAF_rs.TrackProducer = rsWithMaterialTracksP5
   replace TrackMonCAF_rs.AlgoName      = "RSTk"
   replace TrackMonCAF_rs.FolderName    = "SiStrip/Tracks"
-  replace TrackMonCAF_rs.TkSizeMax     = 25
-  replace TrackMonCAF_rs.TkSizeBin     = 25
   
   ## Scheduling
   
   sequence SiStripDQMSourceGlobalRunCAF_common = {
-    SiStripMonitorDigiSimCAF &
+    SiStripMonitorDigiCAF &
     SiStripMonitorClusterCAF &
-    QualityMonSimCAF // 'QualityMonRealCAF' not compatible
+    QualityMonCAF 
   }
   
   sequence SiStripDQMSourceGlobalRunCAF_cosmikTk = {
