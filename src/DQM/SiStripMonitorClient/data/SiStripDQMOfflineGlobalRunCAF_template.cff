@@ -13,6 +13,13 @@
   replace dqmSaver.saveAtJobEnd = true
   replace dqmEnv.subSystemFolder = "SiStrip"
   
+  ## Quality Tester
+  module qTester = QualityTester {
+    untracked FileInPath qtList = "DQM/SiStripMonitorClient/data/sistrip_qualitytest_config.xml"
+    untracked bool getQualityTestsFromFile = true
+    untracked int32 prescaleFactor = 1
+  }
+
   ### DQM MODULES
   
   include "DQM/SiStripMonitorClient/data/SiStripDQMRecoConfigOfflineGlobalRunCAF.cfi"  
