@@ -1,24 +1,9 @@
   ## SiStrip DQM Reco
   
-  # Digitizer
-  include "EventFilter/SiStripRawToDigi/data/SiStripDigis.cfi"
-  replace siStripDigis.ProductLabel = "source"
-  include "EventFilter/SiPixelRawToDigi/data/SiPixelRawToDigi.cfi"
-  replace siPixelDigis.InputLabel   = "source"
-
-  # Local reconstruction
-  include "RecoLocalTracker/Configuration/data/RecoLocalTracker_Cosmics.cff"
-  replace siStripClusters.SiStripQualityLabel = ""
-
-  # Track reconstruction
-  include "RecoTracker/Configuration/data/RecoTrackerP5.cff"
-  include "RecoVertex/BeamSpotProducer/data/BeamSpot.cff"
-  replace CTF_P5_MeasurementTracker.pixelClusterProducer = ""
-  replace RS_P5_MeasurementTracker.pixelClusterProducer  = ""
+  include "DQM/SiStripMonitorClient/data/RecoForDQM.cff"
 
   # Refitting needed due to missing trajectories in RECO
   include "RecoTracker/TrackProducer/data/RefitterWithMaterial.cfi"
-  replace RKFittingSmoother.ComponentName = "FittingSmootherRK"
   # clone for cosmic track finder
   module cosmictrackfinderP5Refitter = TrackRefitter from "RecoTracker/TrackProducer/data/RefitterWithMaterial.cfi"
   replace cosmictrackfinderP5Refitter.src               = cosmictrackfinderP5
@@ -34,9 +19,15 @@
    
   ## Scheduling
   
+  sequence SiStripDQMRecoFromRaw = {
+    siStripDigis         ,
+    offlineBeamSpot      ,
+    striptrackerlocalreco,
+    tracksP5
+  }
+  
   sequence SiStripDQMRecoGlobalRunCAF = {
-//     siStripDigis & // needed input not available in RECO
-    cosmictrackfinderP5Refitter &
+    cosmictrackfinderP5Refitter     &
     ctfWithMaterialTracksP5Refitter &
     rsWithMaterialTracksP5Refitter
   }
