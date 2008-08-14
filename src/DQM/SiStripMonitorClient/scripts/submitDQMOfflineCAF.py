@@ -8,7 +8,7 @@
 #
 #  This script submits batch jobs to the CAF in order to process the full
 #  granularity SiStrip offline DQM.
-#  Questions and comments to: volker.adler@crn.ch
+#  Questions and comments to: volker.adler@cern.ch
 
 
 import sys
@@ -22,14 +22,6 @@ import time
 
 # Constants
 
-# argument vector
-LSTR_wordArgument = sys.argv[1:]
-# default arguments
-INT_nJobs      = 10
-BOOL_filtersOn = False
-STR_dataset    = '/Cosmics/CRUZET3_CRUZET3_V2P_v3/RECO'
-STR_pathOut    = os.getenv('CASTOR_HOME') + '/DQM'
-STR_pathMerge  = os.getenv('HOME') + '/scratch0/DQM'
 # numbers
 OCT_rwx_r_r = 0744
 # strings
@@ -78,23 +70,33 @@ STR_textUsage = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.p
       
      -d, --dataset PRIMARY_DATASET
          specify dataset for DBS query;
-         default: /Cosmics/CRUZET3_CRUZET3_V2P_v3/RECO
+         available: (default)
          
      -o, --outpath PATH
          path to copy job output *.root files to;
          currently (almost) no check performed;
          must be in AFS or CASTOR
-         default: $CASTOR_HOME/DQM
+         default: /castor/cern.ch/user/c/cctrack/DQM
          
      -m, --mergepath PATH
          path to merge the job output *.root files;
          currently (almost) no check performed;
          must be in AFS
-         default: $HOME/scratch0/DQM
+         default: /afs/cern.ch/cms/CAF/CMSCOMM/COMM_TRACKER/DQM/SiStrip/jobs/merged
 """                        
 LSTR_true  = ['1','TRUE' ,'True' ,'true' ]
 LSTR_false = ['0','FALSE','False','false']
-DICT_datasets = {STR_dataset:'/store/data/CRUZET3/Cosmics/RECO/CRUZET3_V2P_v3'}
+# argument vector
+LSTR_wordArgument = sys.argv[1:]
+# default arguments
+INT_nJobs      = 10
+BOOL_filtersOn = False
+STR_dataset    = ''              # FIXME: dataset for CRUZET4
+DICT_datasets = {STR_dataset:''} # FIXME: LFN for CRUZET4
+# STR_pathOut    = os.getenv('CASTOR_HOME') + '/DQM'
+# STR_pathMerge  = os.getenv('HOME') + '/scratch0/DQM'
+STR_pathOut    = '/castor/cern.ch/user/c/cctrack/DQM'
+STR_pathMerge  = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_TRACKER/DQM/SiStrip/jobs/merged'
 # option lists
 LSTR_functionLetters = ['-s','-c','-h']
 DICT_functionLetters = {'--submit':LSTR_functionLetters[0],
@@ -355,14 +357,10 @@ for int_iJob in range(int_nJobs):
   file_inputFilesJobCff = file(str_nameInputFilesJobCff, 'w')
   file_inputFilesJobCff.write('  source = PoolSource {\n    untracked vstring fileNames = {\n')
   for n_iActualLine in range(int_nLinesRead, min(int_nLinesRead+nInputFilesJob, int_nInputFiles)):
+    str_actualLine  = lstr_linesInput[n_iActualLine]
     if (n_iActualLine+1)%nInputFilesJob == 0 or int_nLinesRead == int_nInputFiles-1:
-      lstr_actualLine1  = string.split('      \'/store/data/' + string.split(lstr_linesInput[n_iActualLine], '/store/data/')[1], '.root\'')[0] + '.root\',\n'
-    else:
-      lstr_actualLine1  = string.split('      \'/store/data/' + string.split(lstr_linesInput[n_iActualLine], '/store/data/')[1], '.root\',')[0] + '.root\',\n'
-    lstr_actualLine2  = lstr_actualLine1
-    if (n_iActualLine+1)%nInputFilesJob == 0 or int_nLinesRead == int_nInputFiles-1:
-      lstr_actualLine2 = string.split(lstr_actualLine1, ',')[0] + '\n'
-    file_inputFilesJobCff.write(lstr_actualLine2)
+      str_actualLine = string.split(lstr_linesInput[n_iActualLine], ',')[0] + '\n'
+    file_inputFilesJobCff.write(str_actualLine)
     int_nLinesRead += 1
   file_inputFilesJobCff.write('    }\n  }\n')
   file_inputFilesJobCff.close()

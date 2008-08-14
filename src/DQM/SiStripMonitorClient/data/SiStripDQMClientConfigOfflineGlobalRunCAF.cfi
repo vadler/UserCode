@@ -4,7 +4,7 @@
     untracked int32 StaticUpdateFrequency    = -1
     untracked int32 TkMapCreationFrequency   = -1
     untracked int32 SummaryCreationFrequency = -1
-    untracked bool  GlobalStatusFilling       = true
+    untracked bool  GlobalStatusFilling      = true
     PSet TkmapParameters = { 
       untracked string trackerdatPath    = "CommonTools/TrackerMap/data/"
       untracked string trackermaptxtPath = "DQM/Integration/test/TkMap/"
