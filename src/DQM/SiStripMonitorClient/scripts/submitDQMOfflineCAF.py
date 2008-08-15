@@ -70,7 +70,7 @@ STR_textUsage = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.p
       
      -d, --dataset PRIMARY_DATASET
          specify dataset for DBS query;
-         available: (default)
+         available: /Cosmics/Commissioning08-MW33_v1/RECO (default)
          
      -o, --outpath PATH
          path to copy job output *.root files to;
@@ -91,8 +91,8 @@ LSTR_wordArgument = sys.argv[1:]
 # default arguments
 INT_nJobs      = 10
 BOOL_filtersOn = False
-STR_dataset    = ''              # FIXME: dataset for CRUZET4
-DICT_datasets = {STR_dataset:''} # FIXME: LFN for CRUZET4
+STR_dataset    = '/Cosmics/Commissioning08-MW33_v1/RECO'
+DICT_datasets = {STR_dataset:'/store/data/Commissioning08/Cosmics/RECO/MW33_v1'}
 # STR_pathOut    = os.getenv('CASTOR_HOME') + '/DQM'
 # STR_pathMerge  = os.getenv('HOME') + '/scratch0/DQM'
 STR_pathOut    = '/castor/cern.ch/user/c/cctrack/DQM'

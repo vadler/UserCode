@@ -62,7 +62,7 @@ process.hltFilter = cms.EDFilter( "HLTHighLevel",
 
 # Scheduling
 process.p = cms.Path(
-    process.SiStripDQMRecoFromRaw                * # comment this out when running from RECO or with full reconstruction
+#     process.SiStripDQMRecoFromRaw                * # comment this out when running from RECO or with full reconstruction
 #     process.hltFilter                            * # comment this out to switch off the HLT pre-selection
     process.SiStripDQMRecoGlobalRunCAF           *
     process.SiStripDQMSourceGlobalRunCAF_reduced *
@@ -74,10 +74,10 @@ process.p = cms.Path(
 # Input
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-      # from CRUZET3 RAW run ???
-      '/store/data/CRUZET3/Cosmics/RAW/v4/000/051/490/0013FDDE-F054-DD11-B80D-001617DC1F70.root' # 38766 events
-#       # from CRUZET4 run ???
-#       ''
+#       # RAW from MW33 run 56493
+#       '/store/data/Commissioning08/Cosmics/RAW/MW33_v1/000/056/493/0053249A-456A-DD11-83FE-001D09F24448.root' # 25730 events
+      # RECO from MW33 run 56493
+      '/store/data/Commissioning08/Cosmics/RECO/MW33_v1/000/056/493/02DAAD57-616A-DD11-BBAB-001617E30E28.root' # 25773 events
     )
 )
 process.maxEvents = cms.untracked.PSet(
