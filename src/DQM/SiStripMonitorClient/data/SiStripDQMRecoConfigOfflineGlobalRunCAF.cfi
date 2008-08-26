@@ -20,9 +20,10 @@
   ## Scheduling
   
   sequence SiStripDQMRecoFromRaw = {
-    siStripDigis         ,
-    offlineBeamSpot      ,
-    striptrackerlocalreco,
+    siStripDigis    ,
+    siPixelDigis    ,
+    offlineBeamSpot ,
+    trackerlocalreco,
     tracksP5
   }
   
