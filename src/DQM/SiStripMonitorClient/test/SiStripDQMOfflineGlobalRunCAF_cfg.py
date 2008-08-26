@@ -12,11 +12,11 @@ process.MessageLogger = cms.Service( "MessageLogger",
 )
 
 # Magnetic Field
-# process.load( "Configuration.GlobalRuns.ForceZeroTeslaField_cff" )
-process.localUniform = cms.ESProducer( "UniformMagneticFieldESProducer",
-    ZFieldInTesla = cms.double( 0.0 )
-)
-process.prefer( "UniformMagneticFieldESProducer" )
+process.load( "Configuration.GlobalRuns.ForceZeroTeslaField_cff" )
+# process.localUniform = cms.ESProducer( "UniformMagneticFieldESProducer",
+#     ZFieldInTesla = cms.double( 0.0 )
+# )
+# process.prefer( "UniformMagneticFieldESProducer" )
 
 # Geometry
 process.load( "Configuration.StandardSequences.Geometry_cff" )

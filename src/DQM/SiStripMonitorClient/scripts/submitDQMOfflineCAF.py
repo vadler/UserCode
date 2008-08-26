@@ -417,12 +417,6 @@ for int_iJob in range(int_nJobs):
     os.system('sed -e \"s#CMSSW_BASE#' + str_pathCmsswBase + '#g\" -e \"s#RUN_NAME#' + str_nameRun + '#g\" -e \"s#JOB_NAME#' + str_nameJob + '#g\" -e \"s#CURRENT_DIR#' + str_pathCurrentDir + '#g\" -e \"s#COPY#rfcp#g\" -e \"s#OUTPUT_DIR#' + str_pathOut + '#g\" ' + str_pathCmsswBasePackage + '/scripts/SiStripDQMOfflineCAF_template.job > SiStripDQMOfflineCAF.job')
   else:
     os.system('sed -e \"s#CMSSW_BASE#' + str_pathCmsswBase + '#g\" -e \"s#RUN_NAME#' + str_nameRun + '#g\" -e \"s#JOB_NAME#' + str_nameJob + '#g\" -e \"s#CURRENT_DIR#' + str_pathCurrentDir + '#g\" -e \"s#COPY#cp#g\" -e \"s#OUTPUT_DIR#' + str_pathOut + '#g\" ' + str_pathCmsswBasePackage + 'scripts/SiStripDQMOfflineCAF_template.job > SiStripDQMOfflineCAF.job')
-  os.chmod('SiStripDQMOfflineCAF.job',OCT_rwx_r_r)
-  if dict_arguments.has_key(LSTR_functionLetters[0]):
-    print '> submitDQMOfflineCAF.py >'
-    print '  ' + os.getcwd() + ' : bsub -q cmscaf SiStripDQMOfflineCAF.job'
-    print
-    os.system('bsub -q cmscaf SiStripDQMOfflineCAF.job')
   os.chdir(str_pathCurrentDir)
   # FIXME: This protection is currently needed. Review calculations again!
   if int_nLinesRead >= int_nInputFiles:
@@ -430,13 +424,32 @@ for int_iJob in range(int_nJobs):
     print
     break
 file_mergeScript.close()
-os.chmod(str_nameRun + '/' + str_nameMergeScript,OCT_rwx_r_r)
 
 # compile
 
 os.chdir(str_pathCmsswBasePackage)
 os.system('scramv1 b python')
 os.chdir(str_pathCurrentDir)
+
+# submit jobs
+
+if dict_arguments.has_key(LSTR_functionLetters[0]):
+  for int_iJob in range(int_nJobs):
+    int_nDigits = 1
+    if int_iJob >= 10:
+      int_nDigits = int(math.log10(int_iJob)) + 1
+    str_nameJobDir = str_nameRun + "/" + str_nameRun + "_"
+    for int_iDigit in range(4-int_nDigits):
+      str_nameJobDir += '0'
+    str_nameJobDir += str(int_iJob)
+    os.chdir(str_nameJobDir)     
+    os.chmod('SiStripDQMOfflineCAF.job',OCT_rwx_r_r)
+    print '> submitDQMOfflineCAF.py >'
+    print '  ' + os.getcwd() + ' : bsub -q cmscaf SiStripDQMOfflineCAF.job'
+    os.system('bsub -q cmscaf SiStripDQMOfflineCAF.job')
+    print
+    os.chdir(str_pathCurrentDir)
+  os.chmod(str_nameRun + '/' + str_nameMergeScript,OCT_rwx_r_r)
 
 # check queue
 
