@@ -9,7 +9,7 @@
   replace dqmSaver.convention   = "Online"
   replace dqmSaver.dirName      = "OUTPUT_DIRECTORY"  
   replace dqmSaver.producer     = "DQM"
-  replace dqmSaver.saveByRun    =  1
+  replace dqmSaver.saveByRun    = 1
   replace dqmSaver.saveAtJobEnd = true
   replace dqmEnv.subSystemFolder = "SiStrip"
   
