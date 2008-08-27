@@ -72,7 +72,9 @@ STR_textUsage            = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMO
       
      -d, --dataset PRIMARY_DATASET
          specify dataset for DBS query;
-         available: /Cosmics/Commissioning08_CRUZET4_V2P_CRUZET4_InterimReco_v3/RECO
+         available: /Cosmics/CRUZET4_v1_CRZT210_V1_SuperPointing_v1/RECO
+                    /Cosmics/CRUZET4_v1_CRZT210_V1_TrackerPointing_v1/RECO
+                    /Cosmics/Commissioning08_CRUZET4_V2P_CRUZET4_InterimReco_v3/RECO
                     /Cosmics/Commissioning08-CRUZET4_v1/RECO                         (default)
                     /Cosmics/Commissioning08-CRUZET4_v1/RAW
                     /Cosmics/Commissioning08-MW33_v1/RECO
@@ -99,13 +101,13 @@ LSTR_wordArgument = sys.argv[1:]
 INT_nJobs      = 10
 BOOL_filtersOn = False
 STR_dataset    = '/Cosmics/Commissioning08-CRUZET4_v1/RECO'
-DICT_datasets = { '/Cosmics/Commissioning08_CRUZET4_V2P_CRUZET4_InterimReco_v3/RECO':'/store/data/Commissioning08/Cosmics/RECO/CRUZET4_V2P_CRUZET4_InterimReco_v3',
-                  STR_dataset                                                       :'/store/data/Commissioning08/Cosmics/RECO/CRUZET4_v1',
-                  '/Cosmics/Commissioning08-CRUZET4_v1/RAW'                         :'/store/data/Commissioning08/Cosmics/RAW/CRUZET4_v1' ,
-                  '/Cosmics/Commissioning08-MW33_v1/RECO'                           :'/store/data/Commissioning08/Cosmics/RECO/MW33_v1'   ,
-                  '/Cosmics/Commissioning08-MW33_v1/RAW'                            :'/store/data/Commissioning08/Cosmics/RAW/MW33_v1'    }
-# STR_pathOut    = os.getenv('CASTOR_HOME') + '/DQM'
-# STR_pathMerge  = os.getenv('HOME') + '/scratch0/DQM'
+DICT_datasets = { '/Cosmics/CRUZET4_v1_CRZT210_V1_SuperPointing_v1/RECO'            :'/store/data/CRUZET4_v1/Cosmics/RECO/CRZT210_V1_SuperPointing_v1'            ,
+                  '/Cosmics/CRUZET4_v1_CRZT210_V1_TrackerPointing_v1/RECO'          :'/store/data/CRUZET4_v1/Cosmics/RECO/CRZT210_V1_TrackerPointing_v1'          ,
+                  '/Cosmics/Commissioning08_CRUZET4_V2P_CRUZET4_InterimReco_v3/RECO':'/store/data/Commissioning08/Cosmics/RECO/CRUZET4_V2P_CRUZET4_InterimReco_v3',
+                  STR_dataset                                                       :'/store/data/Commissioning08/Cosmics/RECO/CRUZET4_v1'                        ,
+                  '/Cosmics/Commissioning08-CRUZET4_v1/RAW'                         :'/store/data/Commissioning08/Cosmics/RAW/CRUZET4_v1'                         ,
+                  '/Cosmics/Commissioning08-MW33_v1/RECO'                           :'/store/data/Commissioning08/Cosmics/RECO/MW33_v1'                           ,
+                  '/Cosmics/Commissioning08-MW33_v1/RAW'                            :'/store/data/Commissioning08/Cosmics/RAW/MW33_v1'                            }
 STR_pathOut    = '/castor/cern.ch/user/c/cctrack/DQM'
 STR_pathMerge  = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_TRACKER/DQM/SiStrip/jobs/merged'
 # option lists
