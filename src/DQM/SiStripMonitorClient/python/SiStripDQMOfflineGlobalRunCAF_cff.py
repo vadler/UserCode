@@ -9,7 +9,7 @@ DQM.collectorHost = ''
 #  DQM File Saving and Environment
 from DQMServices.Components.DQMEnvironment_cfi import *
 dqmSaver.convention   = 'Online'
-dqmSaver.dirName      = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_2/output'
+dqmSaver.dirName      = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_X_2008-08-27-0000/output'
 dqmSaver.producer     = 'DQM'
 dqmSaver.saveByRun    = 1
 dqmSaver.saveAtJobEnd = True

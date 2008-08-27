@@ -29,7 +29,6 @@ process.es_prefer_GlobalTag = cms.ESPrefer('PoolDBESSource','GlobalTag')
 
 # SiStrip DQM
 process.load( "INCLUDE_DIRECTORY.SiStripDQMOfflineGlobalRunCAF_cff" )
-# from INCLUDE_DIRECTORY.SiStripDQMOfflineGlobalRunCAF_cff import *
 
 # HLT Filter
 process.hltFilter = cms.EDFilter( "HLTHighLevel",
@@ -46,6 +45,7 @@ process.hltFilter = cms.EDFilter( "HLTHighLevel",
 process.p = cms.Path(
 RECO_FROM_RAW
 HLT_FILTER
+DQM_FROM_RAW
     process.SiStripDQMRecoGlobalRunCAF           *
     process.SiStripDQMSourceGlobalRunCAF_reduced *
     process.SiStripDQMClientGlobalRunCAF         *

@@ -1,5 +1,13 @@
   ## SiStrip DQM Source
   
+  # Hardware Monitoring
+  include "DQM/SiStripMonitorHardware/test/buffer-hack.cfi"
+  replace HardwareMonitor.rootFile           = ""
+  replace HardwareMonitor.buildAllHistograms = false
+
+  # Condition DB Monitoring
+  include "DQM/SiStripMonitorSummary/data/SiStripMonitorCondData.cfi"
+  
   # SiStripMonitorDigi
   module SiStripMonitorDigiCAF = SiStripMonitorDigi from "DQM/SiStripMonitorDigi/data/SiStripMonitorDigi.cfi"
   replace SiStripMonitorDigiCAF.SelectAllDetectors = true
@@ -68,8 +76,13 @@
   
   ## Scheduling
   
+  sequence SiStripDQMSourceGlobalRunCAF_fromRAW = {
+    HardwareMonitor
+  }
+  
   sequence SiStripDQMSourceGlobalRunCAF_common = {
-    SiStripMonitorDigiCAF &
+    CondDataMonitoring       &  
+    SiStripMonitorDigiCAF    &
     SiStripMonitorClusterCAF &
     QualityMonCAF 
   }
