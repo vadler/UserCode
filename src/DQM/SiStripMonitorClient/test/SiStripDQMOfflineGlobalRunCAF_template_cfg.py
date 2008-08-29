@@ -16,7 +16,7 @@ process.load( "Configuration.GlobalRuns.ForceZeroTeslaField_cff" )
 # process.localUniform = cms.ESProducer( "UniformMagneticFieldESProducer",
 #     ZFieldInTesla = cms.double( 0.0 )
 # )
-# process.prefer( "UniformMagneticFieldESProducer" )
+# es_prefer_uniform = cms.ESPrefer( "UniformMagneticFieldESProducer" )
 
 # Geometry
 process.load( "Configuration.StandardSequences.Geometry_cff" )
