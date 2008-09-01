@@ -2,7 +2,7 @@
 
 jobtype     = cmssw
 scheduler   = caf
-# server_name = caf
+# server_name = caf # FIXME Is it really that slow?
 
 [CMSSW]
 
@@ -17,7 +17,7 @@ pset = SiStripDQMOfflineGlobalRunCAF_cfg.py
 
 total_number_of_events = 10000
 events_per_job         =  1000
-# number_of_jobs         =     5
+# number_of_jobs         =    20
 
 output_file = DQM_SiStrip_R000058733.root
 
@@ -25,7 +25,7 @@ output_file = DQM_SiStrip_R000058733.root
 
 # eMail = volker.adler@cern.ch,volker.adler@gmx.net # FIXME Is a list allowed here? To be tested.
 
-# additional_input_files = file1, file2, /full/path/file3 # FIXME Is this needed for dynamically created files in CMSSW work area? 
+# additional_input_files = file1, file2, /full/path/file3 # FIXME Is this needed for dynamically created files in CMSSW work area? (Guess: no)
 # ui_working_dir         = /full/path/Name_of_Directory # FIXME Not used here, but in the template.
 
 return_data = 0

@@ -7,7 +7,7 @@ process.MessageLogger = cms.Service( "MessageLogger",
         'cout'
     ),
     cout = cms.untracked.PSet(
-        threshold = cms.untracked.string( 'WARNING' )
+        threshold = cms.untracked.string( 'ERROR' )
     )
 )
 
@@ -52,5 +52,5 @@ DQM_FROM_RAW
 # Input
 process.load( "INPUT_FILES" )
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( 1000 )
+    input = cms.untracked.int32( -1 )
 )
