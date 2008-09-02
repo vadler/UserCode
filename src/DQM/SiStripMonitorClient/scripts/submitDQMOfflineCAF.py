@@ -65,6 +65,18 @@ STR_textUsage            = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMO
      -C, --CRAB TRUE/FALSE
          submit or submit not using CRAB;
          default: TRUE
+   
+     -S, --server CRAB_SERVER
+         CRAB server to use;
+         available: None (default)
+                    caf
+                    bari (currently not usable for submission due to drain mode,
+                          s. https://twiki.cern.ch/twiki/bin/view/CMS/CrabServer#Server_available_for_users)
+                    lnl2
+         
+     -e, --email EMAIL_ADDRESS
+         where the CRAB server should send its messages;
+         default: volker.adler@cern.ch
          
      -j, --jobs NUMBER
          number of jobs to create;
@@ -76,7 +88,9 @@ STR_textUsage            = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMO
       
      -d, --dataset PRIMARY_DATASET
          specify dataset for DBS query;
-         available: /Cosmics/Commissioning08-EW35_3T_v1/RECO                         (default)
+         available: /Cosmics/EW35_3T_v1_CRUZET4_V3P_SuperPointing_v1/RECO
+                    /Cosmics/EW35_3T_v1_CRUZET4_V3P_TrackerPointing_v1/RECO
+                    /Cosmics/Commissioning08-EW35_3T_v1/RECO                         (default)
                     /Cosmics/Commissioning08-EW35_3T_v1/RAW
                     /Cosmics/CRUZET4_v1_CRZT210_V1_SuperPointing_v1/RECO
                     /Cosmics/CRUZET4_v1_CRZT210_V1_TrackerPointing_v1/RECO
@@ -104,10 +118,15 @@ LSTR_datatiers = ['RECO','RAW']
 # argument vector
 LSTR_wordArgument = sys.argv[1:]
 # default arguments
+STR_server     = 'None'
+LSTR_server    = [STR_server,'caf','bari','lnl2']
+STR_email      = 'volker.adler@cern.ch'
 INT_nJobs      = 10
 BOOL_filtersOn = False
 STR_dataset    = '/Cosmics/Commissioning08-EW35_3T_v1/RECO'
-DICT_datasets = { STR_dataset                                                       :'/store/data/Commissioning08/Cosmics/RECO/EW35_3T_v1'                        ,
+DICT_datasets = { '/Cosmics/EW35_3T_v1_CRUZET4_V3P_SuperPointing_v1/RECO'           :'/store/data/EW35_3T_v1/Cosmics/RECO/CRUZET4_V3P_SuperPointing_v1'           ,
+                  '/Cosmics/EW35_3T_v1_CRUZET4_V3P_TrackerPointing_v1/RECO'         :'/store/data/EW35_3T_v1/Cosmics/RECO/CRUZET4_V3P_TrackerPointing_v1'         ,
+                  STR_dataset                                                       :'/store/data/Commissioning08/Cosmics/RECO/EW35_3T_v1'                        ,
                   '/Cosmics/Commissioning08-EW35_3T_v1/RAW'                         :'/store/data/Commissioning08/Cosmics/RAW/EW35_3T_v1'                         ,
                   '/Cosmics/CRUZET4_v1_CRZT210_V1_SuperPointing_v1/RECO'            :'/store/data/CRUZET4_v1/Cosmics/RECO/CRZT210_V1_SuperPointing_v1'            ,
                   '/Cosmics/CRUZET4_v1_CRZT210_V1_TrackerPointing_v1/RECO'          :'/store/data/CRUZET4_v1/Cosmics/RECO/CRZT210_V1_TrackerPointing_v1'          ,
@@ -123,14 +142,16 @@ LSTR_functionLetters = ['-s','-c','-h']
 DICT_functionLetters = {'--submit':LSTR_functionLetters[0],
                         '--create':LSTR_functionLetters[1],
                         '--help'  :LSTR_functionLetters[2]}
-LSTR_optionLetters   = ['-r','-C','-j','-f','-d','-o','-m']
+LSTR_optionLetters   = ['-r','-C','-S','-e','-j','-f','-d','-o','-m']
 DICT_optionLetters   = {'--run'      :LSTR_optionLetters[0],  
                         '--CRAB'     :LSTR_optionLetters[1],  
-                        '--jobs'     :LSTR_optionLetters[2],
-                        '--filter'   :LSTR_optionLetters[3],
-                        '--dataset'  :LSTR_optionLetters[4],
-                        '--outpath'  :LSTR_optionLetters[5],
-                        '--mergepath':LSTR_optionLetters[6]}
+                        '--server'   :LSTR_optionLetters[2],  
+                        '--email'    :LSTR_optionLetters[3],  
+                        '--jobs'     :LSTR_optionLetters[4],
+                        '--filter'   :LSTR_optionLetters[5],
+                        '--dataset'  :LSTR_optionLetters[6],
+                        '--outpath'  :LSTR_optionLetters[7],
+                        '--mergepath':LSTR_optionLetters[8]}
                         
 # Globals
 
@@ -138,6 +159,8 @@ global dict_arguments
 dict_arguments = {}                                             
 global str_runNumber
 global bool_CRAB 
+global str_server
+global str_email
 global int_nJobs     
 global bool_filtersOn
 global str_dataset   
@@ -247,14 +270,35 @@ else:
   bool_CRAB = True
 if dict_arguments.has_key(LSTR_optionLetters[2])        and\
    dict_arguments[LSTR_optionLetters[2]] != STR_default    :
-  int_nJobs = int(dict_arguments[LSTR_optionLetters[2]])
+  str_server = dict_arguments[LSTR_optionLetters[2]]
+  if not str_server in LSTR_server:
+    print '> submitDQMOfflineCAF.py > CRAB server "%s" not available' %(str_server)
+    print '                           exit'
+    print
+    sys.exit(1)
+  elif str_server == LSTR_server[1]:                   
+    print '> submitDQMOfflineCAF.py > CRAB server "%s" currently in drain mode' %(str_server)
+    print '                           and not available for submission'
+    print '                           exit'
+    print
+    sys.exit(1)
 else:   
-  int_nJobs = INT_nJobs
+  str_server = STR_server
 if dict_arguments.has_key(LSTR_optionLetters[3])        and\
    dict_arguments[LSTR_optionLetters[3]] != STR_default    :
-  if dict_arguments[LSTR_optionLetters[3]] in LSTR_true:
+  str_email = dict_arguments[LSTR_optionLetters[3]]
+else:   
+  str_email = STR_email
+if dict_arguments.has_key(LSTR_optionLetters[4])        and\
+   dict_arguments[LSTR_optionLetters[4]] != STR_default    :
+  int_nJobs = int(dict_arguments[LSTR_optionLetters[4]])
+else:   
+  int_nJobs = INT_nJobs
+if dict_arguments.has_key(LSTR_optionLetters[5])        and\
+   dict_arguments[LSTR_optionLetters[5]] != STR_default    :
+  if dict_arguments[LSTR_optionLetters[5]] in LSTR_true:
     bool_filtersOn = True
-  elif dict_arguments[LSTR_optionLetters[3]] in LSTR_false:  
+  elif dict_arguments[LSTR_optionLetters[5]] in LSTR_false:  
     bool_filtersOn = False
   else:
     print '> submitDQMOfflineCAF.py > option \'-f\' expects 0/1, FALSE/TRUE, False/True or false/true'
@@ -263,9 +307,9 @@ if dict_arguments.has_key(LSTR_optionLetters[3])        and\
     sys.exit(1)
 else:   
   bool_filtersOn = BOOL_filtersOn
-if dict_arguments.has_key(LSTR_optionLetters[4])        and\
-   dict_arguments[LSTR_optionLetters[4]] != STR_default    :
-  str_dataset = dict_arguments[LSTR_optionLetters[4]]
+if dict_arguments.has_key(LSTR_optionLetters[6])        and\
+   dict_arguments[LSTR_optionLetters[6]] != STR_default    :
+  str_dataset = dict_arguments[LSTR_optionLetters[6]]
 else:   
   str_dataset = STR_dataset
 if not DICT_datasets.has_key(str_dataset):
@@ -279,9 +323,9 @@ if not str_datatier in LSTR_datatiers:
   print '                           exit'
   print
   sys.exit(1)
-if dict_arguments.has_key(LSTR_optionLetters[5])        and\
-   dict_arguments[LSTR_optionLetters[5]] != STR_default    :
-  str_pathOut = dict_arguments[LSTR_optionLetters[5]]
+if dict_arguments.has_key(LSTR_optionLetters[7])        and\
+   dict_arguments[LSTR_optionLetters[7]] != STR_default    :
+  str_pathOut = dict_arguments[LSTR_optionLetters[7]]
 else:   
   str_pathOut = STR_pathOut
 bool_useCastor = True
@@ -293,9 +337,9 @@ elif string.split(str_pathOut,'/')[1] != 'castor':
   print
   Usage()
   sys.exit(1)
-if dict_arguments.has_key(LSTR_optionLetters[6])        and\
-   dict_arguments[LSTR_optionLetters[6]] != STR_default    :
-  str_pathMerge = dict_arguments[LSTR_optionLetters[6]]
+if dict_arguments.has_key(LSTR_optionLetters[8])        and\
+   dict_arguments[LSTR_optionLetters[8]] != STR_default    :
+  str_pathMerge = dict_arguments[LSTR_optionLetters[8]]
 else:   
   str_pathMerge = STR_pathMerge
 if string.split(str_pathMerge,'/')[1] != 'afs':
@@ -389,7 +433,7 @@ file_mergeScript.write('cd ' + str_pathCmsswBaseSrc + '\n')
 file_mergeScript.write('cmsenv\n')
 file_mergeScript.write('setenv STAGE_SVCCLASS cmscaf\n')
 file_mergeScript.write('hadd -f ' + str_pathMerge + '/DQM_SiStrip_' + str_nameRun + '_CAF-' + str_nameCmsswRel +'-standAlone.root \\\n') # FIXME: make configurable
-# prepare harvesting config file
+# create harvesting config file
 str_sedCommand  = 'sed '
 str_sedCommand += '-e \"s#xRUN_NUMBERx#' + str_runNumber + '#g\" '
 str_sedCommand += '-e \"s#xMERGED_INPUT_FILEx#' + str_pathMerge + '/DQM_SiStrip_' + str_nameRun + '_CAF-' + str_nameCmsswRel +'-standAlone.root#g\" '
@@ -438,7 +482,8 @@ if bool_CRAB:
     for n_iActualLine in range(int_nLinesRead, min(int_nLinesRead+nInputFilesJob, int_nInputFiles)):
       int_nLinesRead += 1
     # extend merge script
-    str_lineMergeScript = str_pathOut + '/DQM_SiStrip_' + str(int_iJob) + '.root'
+    str_nJobs = str(int_iJob+1)
+    str_lineMergeScript = str_pathOut + '/DQM_SiStrip_' + str_nameRun + '_' + str_nJobs + '.root'
     if bool_useCastor:
       str_lineMergeScript = 'rfio:' + str_lineMergeScript
     if int_nLinesRead < int_nInputFiles:
@@ -447,11 +492,9 @@ if bool_CRAB:
     file_mergeScript.write(str_lineMergeScript)
     # FIXME: This protection is currently needed. Review calculations again!
     if int_nLinesRead >= int_nInputFiles:
-      str_nJobs = str(int_iJob+1)
       print '> submitDQMOfflineCAF.py > number of created job: ' + str_nJobs
       print
       break
-  # finalize job creation
   os.chdir(str_pathCurrentDir)
 else:
   for int_iJob in range(int_nJobs):
@@ -533,9 +576,15 @@ else:
     # FIXME: This protection is currently needed. Review calculations again!
     if int_nLinesRead >= int_nInputFiles:
       str_nJobs = str(int_iJob+1)
-      print '> submitDQMOfflineCAF.py > number of created job: ' + str_nJobs
+      print '> submitDQMOfflineCAF.py > number of created jobs: ' + str_nJobs
       print
       break
+
+# compile
+
+os.chdir(str_pathCmsswBasePackage)
+os.system('scramv1 b python')
+os.chdir(str_pathCurrentDir)
     
 # finish scripts
     
@@ -544,42 +593,42 @@ file_mergeScript.write('cd ' + str_pathCurrentDir + '/' + str_nameRun + '/\n')
 file_mergeScript.write('cmsRun SiStripCAFHarvest_cfg.py\n')
 file_mergeScript.close()
 # create CRAB configuration
-str_sedCommand  = 'sed '
-str_sedCommand += '-e \"s#xSERVER_NAMEx#None#g\" '
-str_sedCommand += '-e \"s#xDATASETPATHx#' + str_dataset + '#g\" '
-str_sedCommand += '-e \"s#xRUNSELECTIONx#' + str_runNumber + '#g\" '
-str_sedCommand += '-e \"s#xNUMBER_OF_JOBSx#' + str_nJobs + '#g\" '
-str_sedCommand += '-e \"s#xOUTPUT_FILEx#' + str_nameRun + '#g\" '
-str_sedCommand += '-e \"s#xUI_WORKING_DIRx#crab' + str_nameRun + '#g\" '
-# str_sedCommand += '-e \"s#xOUTPUTDIRx##g\" '
-# str_sedCommand += '-e \"s#xLOGDIRx##g\" '
-if bool_useCastor:
-  str_sedCommand += '-e \"s#xCOPY_DATAx#1#g\" '
-else:
-  str_sedCommand += '-e \"s#xCOPY_DATAx#0#g\" '
-str_sedCommand += '-e \"s#xSTORAGE_PATHx#' + str_pathOut + '#g\" '
-str_sedCommand += str_pathCmsswBasePackage + '/crab/SiStripDQMOfflineCAF_template.crab > ' + str_nameRun + '/crab.cfg'
-os.system(str_sedCommand)
-
-# compile
-
-os.chdir(str_pathCmsswBasePackage)
-os.system('scramv1 b python')
-os.chdir(str_pathCurrentDir)
+if bool_CRAB:
+  os.chdir(str_nameRun)     
+  str_sedCommand  = 'sed '
+  str_sedCommand += '-e \"s#xSERVER_NAMEx#'        + str_server    + '#g\" '
+  str_sedCommand += '-e \"s#xDATASETPATHx#'        + str_dataset   + '#g\" '
+  str_sedCommand += '-e \"s#xRUNSELECTIONx#'       + str_runNumber + '#g\" '
+  str_sedCommand += '-e \"s#xNUMBER_OF_JOBSx#'     + str_nJobs     + '#g\" '
+  str_sedCommand += '-e \"s#xEMAILx#'              + str_email     + '#g\" '
+  str_sedCommand += '-e \"s#xOUTPUT_FILEx#'        + str_nameRun   + '#g\" '
+  str_sedCommand += '-e \"s#xUI_WORKING_DIRx#crab' + str_nameRun   + '#g\" '
+  str_sedCommand += '-e \"s#xSTORAGE_PATHx#'       + str_pathOut   + '#g\" '
+#   str_sedCommand += '-e \"s#xOUTPUTDIRx##g\" '
+#   str_sedCommand += '-e \"s#xLOGDIRx##g\" '
+  if bool_useCastor:
+    str_sedCommand += '-e \"s#xCOPY_DATAx#1#g\" '
+  else:
+    str_sedCommand += '-e \"s#xCOPY_DATAx#0#g\" '
+  str_sedCommand += str_pathCmsswBasePackage + '/crab/SiStripDQMOfflineCAF_template.crab > crab.cfg'
+  os.system(str_sedCommand)
+#   os.system('source /afs/cern.ch/cms/ccs/wm/scripts/Crab/crab.' + str_shell) # FIXME: 'source' doesn't work
+  os.system('crab -create')
+  os.chdir(str_pathCurrentDir)
 
 # submit jobs
-if bool_CRAB:
-  os.chdir(str_nameRun)
-  os.system('source /afs/cern.ch/cms/ccs/wm/scripts/Crab/crab.' + str_shell) # FIXME: 'source' doesn't work
-  os.system('crab -create')
-  if dict_arguments.has_key(LSTR_functionLetters[0]):
+
+if dict_arguments.has_key(LSTR_functionLetters[0]):
+  if bool_CRAB:
+    os.chdir(str_nameRun)
     print '> submitDQMOfflineCAF.py >'
     print '  ' + os.getcwd() + ' : crab -submit -c crab' + str_nameRun
-#     os.system('crab -submit -c crab' + str_nameRun)
+    os.system('crab -submit -c crab' + str_nameRun)
     print
-  os.chdir(str_pathCurrentDir)
-else:
-  if dict_arguments.has_key(LSTR_functionLetters[0]):
+    os.chdir(str_pathCurrentDir)
+    time.sleep(5)
+    os.system('crab -status -c ' + str_nameRun + '/crab' + str_nameRun)
+  else:
     for int_iJob in range(int_nJobs):
       int_nDigits = 1
       if int_iJob >= 10:
@@ -595,13 +644,6 @@ else:
       os.system('bsub -q cmscaf SiStripDQMOfflineCAF.job')
       print
       os.chdir(str_pathCurrentDir)
-    os.chmod(str_nameRun + '/' + str_nameMergeScript,OCT_rwx_r_r)
-
-# check queue
-
-if dict_arguments.has_key(LSTR_functionLetters[0]):
-  time.sleep(5)
-  if bool_CRAB:
-    os.system('crab -status -c ' + str_nameRun + '/crab' + str_nameRun)
-  else:
+    time.sleep(5)
     os.system('bjobs -q cmscaf')
+  os.chmod(str_nameRun + '/' + str_nameMergeScript,OCT_rwx_r_r)
