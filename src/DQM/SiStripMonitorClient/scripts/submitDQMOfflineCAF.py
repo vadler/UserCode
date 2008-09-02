@@ -276,7 +276,7 @@ if dict_arguments.has_key(LSTR_optionLetters[2])        and\
     print '                           exit'
     print
     sys.exit(1)
-  elif str_server == LSTR_server[1]:                   
+  elif str_server == LSTR_server[2]:                   
     print '> submitDQMOfflineCAF.py > CRAB server "%s" currently in drain mode' %(str_server)
     print '                           and not available for submission'
     print '                           exit'
