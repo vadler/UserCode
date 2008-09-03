@@ -575,13 +575,20 @@ if Bool_CRAB:
   if Bool_Python:
     str_pathInputFilesJobCff += '.py'
   file_inputFilesJobCff = file(str_pathInputFilesJobCff, 'w')
-  file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
-  for str_linesInput in lstr_linesInput:
-    # protections vs. those annoying DBS output format changes come here:
-#     file_inputFilesJobCff.write(str_linesInput)
-    str_actualLine = str_linesInput.replace(') );',',')
-    file_inputFilesJobCff.write(str_actualLine)
-  file_inputFilesJobCff.write('    )\n)\n')
+  if Bool_Python:
+    file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
+    for str_linesInput in lstr_linesInput:
+      # protections vs. those annoying DBS output format changes come here:
+#       file_inputFilesJobCff.write(str_linesInput)
+      str_actualLine = str_linesInput.replace(') );',',')
+      file_inputFilesJobCff.write(str_actualLine)
+    file_inputFilesJobCff.write('    )\n)\n')
+  else:
+    file_inputFilesJobCff.write('  source = PoolSource {\n    untracked vstring fileNames = {\n')
+    for str_linesInput in lstr_linesInput:
+      file_inputFilesJobCff.write(str_linesInput)
+    file_inputFilesJobCff.write('    }\n  }\n')
+    file_inputFilesJobCff.close()
   file_inputFilesJobCff.close()
   # create included configuration file
   str_sedCommand = 'sed '
@@ -649,18 +656,30 @@ else:
     if Bool_Python:
       str_pathInputFilesJobCff += '.py'
     file_inputFilesJobCff = file(str_pathInputFilesJobCff, 'w')
-    file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
-    for n_iActualLine in range(int_nLinesRead, min(int_nLinesRead+nInputFilesJob, int_nInputFiles)):
-      # protections vs. those annoying DBS output format changes come here:
-#       str_linesInput = lstr_linesInput[n_iActualLine]
-      str_linesInput = lstr_linesInput[n_iActualLine].replace(') );',',')
-      # fix commata and end of line
-      str_actualLine = str_linesInput
-      if (n_iActualLine+1)%nInputFilesJob == 0 or int_nLinesRead == int_nInputFiles-1:
-        str_actualLine = string.split(str_linesInput, ',')[0] + '\n'
-      file_inputFilesJobCff.write(str_actualLine)
-      int_nLinesRead += 1
-    file_inputFilesJobCff.write('    )\n)\n')
+    if Bool_Python:
+      file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
+      for n_iActualLine in range(int_nLinesRead, min(int_nLinesRead+nInputFilesJob, int_nInputFiles)):
+        # protections vs. those annoying DBS output format changes come here:
+#         str_linesInput = lstr_linesInput[n_iActualLine]
+        str_linesInput = lstr_linesInput[n_iActualLine].replace(') );',',')
+        # fix commata and end of line
+        str_actualLine = str_linesInput
+        if (n_iActualLine+1)%nInputFilesJob == 0 or int_nLinesRead == int_nInputFiles-1:
+          str_actualLine = string.split(str_linesInput, ',')[0] + '\n'
+        file_inputFilesJobCff.write(str_actualLine)
+        int_nLinesRead += 1
+      file_inputFilesJobCff.write('    )\n)\n')
+    else:
+      file_inputFilesJobCff.write('  source = PoolSource {\n    untracked vstring fileNames = {\n')
+      for n_iActualLine in range(int_nLinesRead, min(int_nLinesRead+nInputFilesJob, int_nInputFiles)):
+        str_linesInput = lstr_linesInput[n_iActualLine]
+        # fix commata and end of line
+        str_actualLine = str_linesInput
+        if (n_iActualLine+1)%nInputFilesJob == 0 or int_nLinesRead == int_nInputFiles-1:
+          str_actualLine = string.split(str_linesInput, ',')[0] + '\n'
+        file_inputFilesJobCff.write(str_actualLine)
+        int_nLinesRead += 1
+      file_inputFilesJobCff.write('    }\n  }\n')
     file_inputFilesJobCff.close()
     # extend merge script
     str_lineMergeScript = Str_outpath + '/DQM_SiStrip_' + str_nameJob + '.root'
