@@ -12,6 +12,7 @@ runselection = 58733
 # runselection = 58733
 # datasetpath  = /Cosmics/CRUZET4_v1_CRZT210_V1_TrackerPointing_v1/RECO
 # runselection = 58614
+# dbs_url = http://cmsdoc.cern.ch/cms/test/aprom/DBS/CGIServer/prodquery
 
 pset = SiStripDQMOfflineGlobalRunCAF_cfg.py
 
