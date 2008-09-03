@@ -30,7 +30,6 @@ LSTR_true                = ['1','TRUE' ,'True' ,'true' ]
 LSTR_false               = ['0','FALSE','False','false']
 STR_default              = 'DEFAULT'
 STR_none                 = 'None'
-STR_nameInputFilesJobCff = 'inputFiles_cff' # FIXME: not here
 STR_nameCmsswPackage     = 'DQM/SiStripMonitorClient'
 STR_magField0            = '0T' # FIXME: not here and not this way
 STR_magField20           = '20T' # FIXME: not here and not this way
@@ -418,19 +417,21 @@ if Dict_arguments.has_key(LSTR_optionLetters[9])        and\
 # React on arguments
 
 # on use Python
-str_nameIncludePath = 'python'
-str_suffixCfg       = '_cfg.py'
-str_suffixCff       = '_cff.py'
-str_suffixDBS       = 'py'
-str_prefixProcess   = 'process.'
-str_delimiter       = ' *'
+str_nameIncludePath   = 'python'
+str_suffixCfg         = '_cfg.py'
+str_suffixCff         = '_cff.py'
+str_nameInputFilesCff = 'inputFiles_cff'
+str_suffixDBS         = 'py'
+str_prefixProcess     = 'process.'
+str_delimiter         = ' *'
 if not Bool_Python:
-  str_nameIncludePath = 'data'
-  str_suffixCfg       = '.cfg'
-  str_suffixCff       = '.cff'
-  str_suffixDBS       = 'cff'
-  str_prefixProcess   = ''
-  str_delimiter       = ','
+  str_nameIncludePath   = 'data'
+  str_suffixCfg         = '.cfg'
+  str_suffixCff         = '.cff'
+  str_nameInputFilesCff = 'inputFiles.cff'
+  str_suffixDBS         = 'cff'
+  str_prefixProcess     = ''
+  str_delimiter         = ','
 # on use CRAB
 if Bool_CRAB:
   str_buffer  = commands.getoutput('which crab')
@@ -566,11 +567,13 @@ if Bool_CRAB:
     str_sedCommand += '-e \"s#xDQM_FROM_RAWx#    ' + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
   str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField             + '#g\" '
   str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameRunIncludeDir    + '#g\" '
-  str_sedCommand += '-e \"s#xINPUT_FILESx#'       + STR_nameInputFilesJobCff + '#g\" '
+  str_sedCommand += '-e \"s#xINPUT_FILESx#'       + str_nameInputFilesCff + '#g\" '
   str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripDQMOfflineGlobalRunCAF_template' + str_suffixCfg + ' > SiStripDQMOfflineGlobalRunCAF' + str_suffixCfg
   os.system(str_sedCommand)
   # create included input files list
-  str_pathInputFilesJobCff = str_pathRunIncludeDir + '/' + STR_nameInputFilesJobCff + '.py'
+  str_pathInputFilesJobCff = str_pathRunIncludeDir + '/' + str_nameInputFilesCff
+  if Bool_Python:
+    str_pathInputFilesJobCff += '.py'
   file_inputFilesJobCff = file(str_pathInputFilesJobCff, 'w')
   file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
   for str_linesInput in lstr_linesInput:
@@ -636,13 +639,15 @@ else:
       str_sedCommand += '-e \"s#xDQM_FROM_RAWx#    ' + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
     str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField             + '#g\" '
     str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameJobIncludeDir    + '#g\" '
-    str_sedCommand += '-e \"s#xINPUT_FILESx#'       + STR_nameInputFilesJobCff + '#g\" '
+    str_sedCommand += '-e \"s#xINPUT_FILESx#'       + str_nameInputFilesCff + '#g\" '
     str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripDQMOfflineGlobalRunCAF_template' + str_suffixCfg + ' > SiStripDQMOfflineGlobalRunCAF' + str_suffixCfg
     os.system(str_sedCommand)
     # prepare job include dir
     os.mkdir(str_pathJobIncludeDir)
     # create included input files list
-    str_pathInputFilesJobCff = str_pathJobIncludeDir + '/' + STR_nameInputFilesJobCff + '.py'
+    str_pathInputFilesJobCff = str_pathJobIncludeDir + '/' + str_nameInputFilesCff
+    if Bool_Python:
+      str_pathInputFilesJobCff += '.py'
     file_inputFilesJobCff = file(str_pathInputFilesJobCff, 'w')
     file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
     for n_iActualLine in range(int_nLinesRead, min(int_nLinesRead+nInputFilesJob, int_nInputFiles)):
