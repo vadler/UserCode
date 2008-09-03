@@ -462,12 +462,12 @@ file_mergeScript.write('#!/bin/tcsh\n')
 file_mergeScript.write('cd ' + str_pathCmsswBaseSrc + '\n')
 file_mergeScript.write('cmsenv\n')
 file_mergeScript.write('setenv STAGE_SVCCLASS cmscaf\n')
-file_mergeScript.write('hadd -f ' + str_pathMerge + '/DQM_SiStrip_' + str_nameRun + '_CAF-' + str_nameCmsswRel +'-standAlone.root \\\n') # FIXME: make configurable
+file_mergeScript.write('hadd -f ' + str_pathMerge + '/DQM_SiStrip_' + str_nameRun + '-' + str_datatier + '-CAF_' + str_nameCmsswRel +'-standAlone.root \\\n') # FIXME: make configurable
 # create harvesting config file
 str_sedCommand  = 'sed '
 str_sedCommand += '-e \"s#xRUN_NUMBERx#'         + str_runNumber + '#g\" '
-str_sedCommand += '-e \"s#xMERGED_INPUT_FILEx#'  + str_pathMerge + '/DQM_SiStrip_' + str_nameRun + '_CAF-' + str_nameCmsswRel +'-standAlone.root#g\" '
-str_sedCommand += '-e \"s#xMERGED_OUTPUT_FILEx#' + str_pathMerge + '/DQM_SiStrip_' + str_nameRun + '_CAF-' + str_nameCmsswRel +'.root#g\" '
+str_sedCommand += '-e \"s#xMERGED_INPUT_FILEx#'  + str_pathMerge + '/DQM_SiStrip_' + str_nameRun + '-' + str_datatier + '-CAF_' + str_nameCmsswRel +'-standAlone.root#g\" '
+str_sedCommand += '-e \"s#xMERGED_OUTPUT_FILEx#' + str_pathMerge + '/DQM_SiStrip_' + str_nameRun + '-' + str_datatier + '-CAF_' + str_nameCmsswRel +'.root#g\" '
 str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripCAFHarvest_template_cfg.py > ' + str_nameRun + '/SiStripCAFHarvest_cfg.py'
 os.system(str_sedCommand)
 
