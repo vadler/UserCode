@@ -20,23 +20,20 @@ import string
 import math
 import urllib
 import time
+import datetime
 
 # Constants
 
 # numbers
-OCT_rwx_r_r = 0744
+OCT_rwx_r_r          = 0744
+LFLOAT_valueMagField = [0.0, 2.0, 3.0, 3.5, 3.8, 4.0]
+TD_shiftUTC          = datetime.timedelta(hours = 2) # positive for timezones with later time than UTC
 # strings
 LSTR_true                = ['1','TRUE' ,'True' ,'true' ]
 LSTR_false               = ['0','FALSE','False','false']
 STR_default              = 'DEFAULT'
 STR_none                 = 'None'
 STR_nameCmsswPackage     = 'DQM/SiStripMonitorClient'
-STR_magField0            = '0T' # FIXME: not here and not this way
-STR_magField20           = '20T' # FIXME: not here and not this way
-STR_magField30           = '30T' # FIXME: not here and not this way
-STR_magField35           = '35T' # FIXME: not here and not this way
-STR_magField38           = '38T' # FIXME: not here and not this way
-STR_magField40           = '40T' # FIXME: not here and not this way
 STR_textUsage            = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.py
  
  This script submits batch jobs to the CAF in order to process the full
@@ -77,6 +74,9 @@ STR_textUsage            = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMO
      -P, --Python TRUE/FALSE
          use or use not Python configuration of CMSSW jobs;
          default: TRUE
+         
+         NOTE: Not using Python configuration might end up in errors due to a lack of maintenance or even availablity
+               of involved configuration files somewhere in CMSSW.
    
      -C, --CRAB TRUE/FALSE
          submit or submit not using CRAB;
@@ -460,11 +460,6 @@ if not DICT_datasets.has_key(Str_dataset):
   print '> submitDQMOfflineCAF.py > dataset "%s" not registered' %(Str_dataset)
   Func_Exit()
 Str_datatier = string.split(Str_dataset, '/')[-1]
-# magnetic field
-# FIXME: more sophisticated magn. field determination for dataset
-str_magField = STR_magField0
-if Str_dataset.find('_3T_') >= 0:
-  str_magField = STR_magField30
 if not Str_datatier in LSTR_datatiers:
   print '> submitDQMOfflineCAF.py > datatier "%s" not processable' %(Str_datatier)
   Func_Exit()
@@ -496,11 +491,13 @@ str_pathRunIncludeDir = str_pathCmsswBasePackage + '/' + str_nameIncludePath + '
 Func_MkDir(str_pathRunIncludeDir)
 str_nameInputFilesFile = str_nameRun + '/' + str_nameRun + '.txt'
 
-# Dealing with input files
+# Retrieving information from the web
 
+# input files
 int_nInputFiles    = 0
 file_inputFilesCff = file(str_nameInputFilesFile, 'w')
-str_dbsParams    = urllib.urlencode({'dbsInst': 'cms_dbs_prod_global', 'blockName': '*', 'dataset': Str_dataset, 'userMode': 'user', 'run': Str_run, 'what': str_suffixDBS})
+# DBS query for list of input files
+str_dbsParams    = urllib.urlencode({'dbsInst':'cms_dbs_prod_global', 'blockName':'*', 'dataset':Str_dataset, 'userMode':'user', 'run':Str_run, 'what':str_suffixDBS})
 lstr_dbsOutput   = urllib.urlopen("https://cmsweb.cern.ch/dbs_discovery/getLFN_txt", str_dbsParams)
 str_pathDbsStore = DICT_datasets[Str_dataset]
 for str_iLine in lstr_dbsOutput.readlines():
@@ -523,6 +520,47 @@ if int_nInputFiles == nInputFilesJob*(Int_jobs-1) and Int_jobs > 1:
 str_nJobs = str(Int_jobs)
 print '> submitDQMOfflineCAF.py > input files for run ' + Str_run + ':   ' + str(int_nInputFiles)
 print
+
+# magnetic field
+# extract time stamps of the run
+str_cmsmonParams  = urllib.urlencode({'RUN':Str_run})
+lstr_cmsmonOutput = urllib.urlopen("http://cmsmon.cern.ch/cmsdb/servlet/RunSummary", str_cmsmonParams)
+str_timeBegin     = ''
+str_timeEnd       = ''
+for str_cmsmonOutput in lstr_cmsmonOutput.readlines():
+  if str_cmsmonOutput.find('HREF=Component?RUN=60302&NAME=TRACKER') >= 0:
+    lstr_timeQuery = str_cmsmonOutput.split('HREF=Component?RUN=60302&NAME=TRACKER&')[1].split('>TRACKER')[0].split('&')
+    for str_timeQuery in lstr_timeQuery:
+      str_nameStamp = str_timeQuery.split('=')[0]
+      lstr_timeDate = str_timeQuery.split('=')[1].split('_')[0].split('.')
+      lstr_timeTime = str_timeQuery.split('=')[1].split('_')[1].split(':')
+      dt_stampOld   = datetime.datetime(int(lstr_timeDate[0]),int(lstr_timeDate[1]),int(lstr_timeDate[2]),int(lstr_timeTime[0]),int(lstr_timeTime[1]),int(lstr_timeTime[2]))
+      dt_stampNew   = dt_stampOld - TD_shiftUTC
+      str_timeStamp = str(dt_stampNew).replace('-','.') 
+      if str_nameStamp == 'TIME_BEGIN':
+        str_timeBegin = str_timeStamp
+      elif str_nameStamp == 'TIME_END':
+        str_timeEnd = str_timeStamp
+# get magnetic field itself
+str_cmsmonParams  = urllib.urlencode({'TIME_BEGIN':str_timeBegin, 'TIME_END':str_timeEnd})
+lstr_cmsmonOutput = urllib.urlopen("http://cmsmon.cern.ch/cmsdb/servlet/MagnetHistory", str_cmsmonParams)
+float_avMagMeasure = -999.0
+for str_cmsmonOutput in lstr_cmsmonOutput.readlines():
+  if str_cmsmonOutput.find('BFIELD, Tesla') >= 0:
+    float_avMagMeasure = float(str_cmsmonOutput.split('</A>')[0].split('>')[-1])
+# determine corresponding configuration file to be included
+float_magField = 0.0
+str_magField   = '0'
+for float_valueMagField in LFLOAT_valueMagField:
+  if math.fabs(float_valueMagField-float_avMagMeasure) < math.fabs(float_magField-float_avMagMeasure):
+    float_magField = float_valueMagField
+    str_magField   = str(int(float_magField*10))
+print '> submitDQMOfflineCAF.py > (average) magnetic field in run ' + Str_run + ':   ' + str(float_avMagMeasure) + ' T'
+print '                           using ' + str(float_magField) + ' T for configuration'
+print
+str_magField += 'T'
+if not Bool_Python:
+  str_magField = str(float_magField)
 
 # Create scripts
 
@@ -565,8 +603,8 @@ if Bool_CRAB:
   else:
     str_sedCommand += '-e \"s#xRECO_FROM_RAWx#    ' + str_prefixProcess + 'SiStripDQMRecoFromRaw' + str_delimiter + '#g\" '
     str_sedCommand += '-e \"s#xDQM_FROM_RAWx#    ' + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
-  str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField             + '#g\" '
-  str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameRunIncludeDir    + '#g\" '
+  str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField          + '#g\" '
+  str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameRunIncludeDir + '#g\" '
   str_sedCommand += '-e \"s#xINPUT_FILESx#'       + str_nameInputFilesCff + '#g\" '
   str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripDQMOfflineGlobalRunCAF_template' + str_suffixCfg + ' > SiStripDQMOfflineGlobalRunCAF' + str_suffixCfg
   os.system(str_sedCommand)
