@@ -21,6 +21,7 @@ import math
 import urllib
 import time
 import datetime
+import smtplib
 
 # Constants
 
@@ -777,7 +778,7 @@ if Bool_CRAB:
   os.system('crab -create')
   os.chdir(str_pathCurrentDir)
 
-# submit jobs
+# Submit jobs
 
 if Dict_arguments.has_key(LSTR_functionLetters[0]):
   if Bool_CRAB:
@@ -808,3 +809,64 @@ if Dict_arguments.has_key(LSTR_functionLetters[0]):
     time.sleep(5)
     os.system('bjobs -q cmscaf')
   os.chmod(str_nameRun + '/' + str_nameMergeScript,OCT_rwx_r_r)
+
+# Send reminder email to submitter
+    
+if Dict_arguments.has_key(LSTR_functionLetters[0]):
+  str_mailSmtp    = 'localhost'
+  str_mailFrom    = os.getenv('USER') + '@mail.cern.ch'
+  str_mailTo      = [str_mailFrom, 'volker.adler@cern.ch']
+#   str_mailTo      = [str_mailFrom,
+#                      'volker.adler@cern.ch',
+#                      'suchandra.dutta@cern.ch',
+#                      'domenico.giordano@cern.ch',
+#                      'vitaliano.ciulli@cern.ch']
+  str_mailSubject = 'Your SiStrip offline DQM shift on ' + str(datetime.date.today()) + ', run ' + Str_run
+  str_mailText    = """\
+Dear """ + os.getenv('USER').capitalize() + """,
+
+on """ + str(time.ctime()) + """, you have submitted run """ + Str_run + """
+for SiStrip offline DQM at the CAF.
+Unfortunately, this needed to be done from your private account. So, only you
+are able to finalize this submission -- even after the end of your shift."""
+  if Bool_CRAB:
+    str_mailText += """
+To do so, please login on lxplus and then:
+
+$ cd """ + str_pathCurrentDir + '/' + str_nameRun + """
+$ cmsenv
+$ source /afs/cern.ch/cms/ccs/wm/scripts/Crab/crab.[SHELL]
+$ crab -status -c crab""" + str_nameRun + """
+
+As soon as all jobs are in 'Done' status, retrieve the output with
+
+$ crab -getoutput -c crab""" + str_nameRun + """
+"""
+  else:
+    str_mailText += """
+To do so, please forward all emails from the LSF batch system referring to the
+respective jobs to the list  t h i s  message was sent to."""
+str_mailText += """
+-- and then your shift is  r e a l l y  done :-)
+
+We are very sorry for the inconvenience.
+Thanks a lot!
+
+Best regards,
+your SiStrip DQM team
+
+P.S.:
+To reply to this email, simply use the "Reply to all" function of your email
+client.
+"""
+  str_mailMessage = """\
+From: %s
+To: %s
+Subject: %s
+
+%s
+"""  % (str_mailFrom, ", ".join(str_mailTo), str_mailSubject, str_mailText)   
+  server = smtplib.SMTP(str_mailSmtp)
+  server.sendmail(str_mailFrom, str_mailTo, str_mailMessage)
+  server.quit()
+
