@@ -152,6 +152,31 @@ DICT_optionLetters   = {'--run'      :LSTR_optionLetters[0],
                         '--dataset'  :LSTR_optionLetters[7],
                         '--outpath'  :LSTR_optionLetters[8],
                         '--mergepath':LSTR_optionLetters[9]}
+STR_mailSmtp        = 'localhost'
+STR_mailServer      = '@mail.cern.ch'
+STR_mailTextOpener  = """Dear """ + os.getenv('USER').capitalize() + """,
+
+on """ + str(time.ctime()) + """, you have submitted run """
+STR_mailTextExplain = """
+for SiStrip offline DQM at the CAF.
+Unfortunately, this needed to be done from your private account. So, only you
+are able to finalize this submission -- even after the end of your shift."""
+STR_mailTextCRABNo  = """
+To do so, please forward all emails from the LSF batch system referring to the
+respective jobs to the list  t h i s  message was sent to."""
+STR_mailTextFinish  = """
+-- and then your shift is  r e a l l y  done :-)
+
+We are very sorry for the inconvenience.
+Thanks a lot!
+
+Best regards,
+your SiStrip DQM team
+
+P.S.:
+To reply to this email, simply use the "Reply to all" function of your email
+client.
+"""
                         
 # Globals
 
@@ -813,22 +838,15 @@ if Dict_arguments.has_key(LSTR_functionLetters[0]):
 # Send reminder email to submitter
     
 if Dict_arguments.has_key(LSTR_functionLetters[0]):
-  str_mailSmtp    = 'localhost'
-  str_mailFrom    = os.getenv('USER') + '@mail.cern.ch'
-  str_mailTo      = [str_mailFrom, 'volker.adler@cern.ch']
-#   str_mailTo      = [str_mailFrom,
+  str_mailFrom    = os.getenv('USER') + STR_mailServer
+  str_mailTo      = [str_mailFrom,
 #                      'volker.adler@cern.ch',
 #                      'suchandra.dutta@cern.ch',
 #                      'domenico.giordano@cern.ch',
 #                      'vitaliano.ciulli@cern.ch']
+                     'volker.adler@cern.ch']
   str_mailSubject = 'Your SiStrip offline DQM shift on ' + str(datetime.date.today()) + ', run ' + Str_run
-  str_mailText    = """\
-Dear """ + os.getenv('USER').capitalize() + """,
-
-on """ + str(time.ctime()) + """, you have submitted run """ + Str_run + """
-for SiStrip offline DQM at the CAF.
-Unfortunately, this needed to be done from your private account. So, only you
-are able to finalize this submission -- even after the end of your shift."""
+  str_mailText    = STR_mailTextOpener + Str_run + STR_mailTextExplain
   if Bool_CRAB:
     str_mailText += """
 To do so, please login on lxplus and then:
@@ -843,30 +861,15 @@ As soon as all jobs are in 'Done' status, retrieve the output with
 $ crab -getoutput -c crab""" + str_nameRun + """
 """
   else:
-    str_mailText += """
-To do so, please forward all emails from the LSF batch system referring to the
-respective jobs to the list  t h i s  message was sent to."""
-str_mailText += """
--- and then your shift is  r e a l l y  done :-)
-
-We are very sorry for the inconvenience.
-Thanks a lot!
-
-Best regards,
-your SiStrip DQM team
-
-P.S.:
-To reply to this email, simply use the "Reply to all" function of your email
-client.
-"""
-  str_mailMessage = """\
-From: %s
+    str_mailText += STR_mailTextCRABNo
+  str_mailText += STR_mailTextFinish
+  str_mailMessage = """From: %s
 To: %s
 Subject: %s
 
 %s
 """  % (str_mailFrom, ", ".join(str_mailTo), str_mailSubject, str_mailText)   
-  server = smtplib.SMTP(str_mailSmtp)
+  server = smtplib.SMTP(STR_mailSmtp)
   server.sendmail(str_mailFrom, str_mailTo, str_mailMessage)
   server.quit()
 
