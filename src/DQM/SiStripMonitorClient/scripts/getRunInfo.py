@@ -28,6 +28,7 @@ STR_good                = 'SS_GOOD'
 STR_htmlL1Key           = '&lt;b>L1&amp;nbsp;Key:&lt;/b>'
 STR_htmlHLTKey          = '&lt;b>HLT&amp;nbsp;Key:&lt;/b>'
 STR_wwwDBSData          = 'https://cmsweb.cern.ch/dbs_discovery/getData'
+STR_headDatasets        = 'available data files'
 LSTR_summaryKeys        = ['BField', 'HLT Version', 'L1 Rate', 'HLT Rate', 'L1 Triggers', 'HLT Triggers', 'LHC Fill', 'LHC Energy', 'Initial Lumi', 'Ending Lumi', 'Run Lumi', 'Run Live Lumi']
 LSTR_summaryKeysTrigger = ['L1 Key', 'HLT Key']   
 # STR_summaryHLTKey = 'HLT Key'</TH><TD><A HREF=HLTConfiguration?KEY=1551>/cdaq/cosmic/CRUZET3/HLTstartup_DTDataIntegrity/V1</A></TD></TR>
@@ -155,12 +156,15 @@ for str_dbsRuns in file_dbsRuns.readlines():
       lstr_dbsDatasets.append(str_dbsRuns.split('&amp;proc=')[1].split('&amp;')[0])
     else:
       lstr_dbsDatasets.append(str_dbsRuns.split('&amp;proc=')[1])
+int_maxLenDbsDatasets = 0
 for str_dbsDatasets in lstr_dbsDatasets:
   str_dbsLFN  = urllib.urlencode({'dbsInst':'cms_dbs_prod_global', 'blockName':'*', 'dataset':str_dbsDatasets, 'userMode':'user', 'run':Str_run})
   file_dbsLFN = urllib.urlopen("https://cmsweb.cern.ch/dbs_discovery/getLFNlist", str_dbsLFN)
   for str_dbsLFN in file_dbsLFN.readlines():
     if str_dbsLFN.find('contians') >= 0 and str_dbsLFN.find('file(s)'):
       Dict_dbsDatasets[str_dbsDatasets] = str_dbsLFN.split()[1]
+  if len(str_dbsDatasets) > int_maxLenDbsDatasets:
+    int_maxLenDbsDatasets = len(str_dbsDatasets)
     
       
 # get run summary
@@ -240,9 +244,9 @@ if Dict_cmsmonRunRegistry.has_key('subsystems'):
 if Dict_cmsmonRunRegistry.has_key('RUN_EVENTS'):
   print '> getRunInfo.py > # of triggers           : ' + Dict_cmsmonRunRegistry['RUN_EVENTS']
 if Dict_cmsmonRunRegistry.has_key('RUN_START_TIME'):
-  print '> getRunInfo.py > start time              : ' + Dict_cmsmonRunRegistry['RUN_START_TIME']
+  print '> getRunInfo.py > start time (local)      : ' + Dict_cmsmonRunRegistry['RUN_START_TIME']
 if Dict_cmsmonRunRegistry.has_key('RUN_END_TIME'):
-  print '> getRunInfo.py > end time                : ' + Dict_cmsmonRunRegistry['RUN_END_TIME']
+  print '> getRunInfo.py > end time (local)        : ' + Dict_cmsmonRunRegistry['RUN_END_TIME']
 if len(str_htmlL1Key) > 0:
   print '> getRunInfo.py > L1 key                  : ' + str_htmlL1Key
 if len(str_htmlHLTKey) > 0:
@@ -261,9 +265,24 @@ print
 # from DBS
 print '> getRunInfo.py > * information from DBS *'
 print
-print '> getRunInfo.py > available data set                                                    available data files'
+str_print = '> getRunInfo.py > ' + STR_headDatasets
+for int_i in range(int_maxLenDbsDatasets-len(STR_headDatasets)):
+  str_print += ' '
+str_print += ' '
+print str_print + STR_headDatasets
+int_len = len(str_print+STR_headDatasets)
+str_print = '> '
+for int_i in range(int_len-2):
+  str_print += '-'
+print str_print
 for str_dbsDatasets in lstr_dbsDatasets:
-  print '                  ' + str_dbsDatasets + '\t ' + Dict_dbsDatasets[str_dbsDatasets]
+  str_print = '                  ' + str_dbsDatasets
+  for int_i in range(int_maxLenDbsDatasets-len(str_dbsDatasets)):
+    str_print += ' '
+  str_print += ' '
+  for int_i in range(len(STR_headDatasets)/2-len(Dict_dbsDatasets[str_dbsDatasets])):
+    str_print += ' '
+  print str_print + Dict_dbsDatasets[str_dbsDatasets]
 print  
 # from run summary
 print '> getRunInfo.py > * information from run summary *'
@@ -274,9 +293,12 @@ print
 # from HLT configuration
 print '> getRunInfo.py > * information from HLT configuration *'
 print
-print '> getRunInfo.py > HLT paths included'
+print '> getRunInfo.py > HLT paths included:'
+print '> -----------------------------------'
 for str_hltPaths in Lstr_hltPaths:
-  if str_hltPaths.find('Tracker') >= 0:
+  if str_hltPaths.find('CandHLTTrackerCosmics') >= 0: 
+    print '                  ' + str_hltPaths + ' \t<====== FOR SURE!'
+  elif str_hltPaths.find('Tracker') >= 0:
     print '                  ' + str_hltPaths + ' \t<====== maybe?'
   else:
     print '                  ' + str_hltPaths
