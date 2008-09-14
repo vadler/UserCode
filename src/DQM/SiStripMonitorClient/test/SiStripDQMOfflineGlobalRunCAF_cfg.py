@@ -16,19 +16,15 @@ process.options = cms.untracked.PSet(
 )
 
 # Magnetic Field
-process.load( "Configuration.GlobalRuns.ForceZeroTeslaField_cff" )
-# process.localUniform = cms.ESProducer( "UniformMagneticFieldESProducer",
-#     ZFieldInTesla = cms.double( 0.0 )
-# )
-# es_prefer_uniform = cms.ESPrefer( "UniformMagneticFieldESProducer" )
+process.load( "Configuration.StandardSequences.MagneticField_0T_cff" )
 
 # Geometry
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 
 # Calibration 
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.connect   = "frontier://FrontierProd/CMS_COND_21X_GLOBALTAG"
-process.GlobalTag.globaltag = "CRUZET4_V2P::All"
+process.GlobalTag.connect   = "frontier://PromptProd/CMS_COND_21X_GLOBALTAG"
+process.GlobalTag.globaltag = "CRUZET4_V5P::All"
 process.es_prefer_GlobalTag = cms.ESPrefer('PoolDBESSource','GlobalTag')
 
 # SiStrip DQM
