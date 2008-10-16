@@ -22,11 +22,6 @@ SiStripMonitorClusterCAF.OutputMEsInRootFile = False
 SiStripMonitorClusterCAF.SelectAllDetectors  = True
 SiStripMonitorClusterCAF.StripQualityLabel   = ''
 
-# SiStripMonitorQuality
-import DQM.SiStripMonitorPedestals.SiStripMonitorQuality_cfi
-QualityMonCAF = DQM.SiStripMonitorPedestals.SiStripMonitorQuality_cfi.QualityMon.clone()
-QualityMonCAF.StripQualityLabel = ''
-
 # SiStripMonitorTrack
 # clone for cosmic track finder
 import DQM.SiStripMonitorTrack.SiStripMonitorTrack_cfi
@@ -89,7 +84,7 @@ TrackMonCAF_rs.FolderName    = 'SiStrip/Tracks'
 
 # Scheduling
 SiStripDQMSourceGlobalRunCAF_fromRAW  = cms.Sequence( HardwareMonitor )
-SiStripDQMSourceGlobalRunCAF_common   = cms.Sequence( CondDataMonitoring + SiStripMonitorDigiCAF + SiStripMonitorClusterCAF + QualityMonCAF )
+SiStripDQMSourceGlobalRunCAF_common   = cms.Sequence( CondDataMonitoring + SiStripMonitorDigiCAF + SiStripMonitorClusterCAF )
 SiStripDQMSourceGlobalRunCAF_cosmikTk = cms.Sequence( SiStripMonitorTrackCAF_cosmicTk + MonitorTrackResidualsCAF_cosmicTk + TrackMonCAF_cosmicTk )
 SiStripDQMSourceGlobalRunCAF_ckf      = cms.Sequence( SiStripMonitorTrackCAF_ckf      + MonitorTrackResidualsCAF_ckf      + TrackMonCAF_ckf )
 SiStripDQMSourceGlobalRunCAF_rs       = cms.Sequence( SiStripMonitorTrackCAF_rs       + MonitorTrackResidualsCAF_rs       + TrackMonCAF_rs )
