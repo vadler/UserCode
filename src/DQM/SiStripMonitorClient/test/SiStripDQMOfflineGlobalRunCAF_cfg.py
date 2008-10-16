@@ -9,7 +9,7 @@ process.options = cms.untracked.PSet(
    wantSummary = cms.untracked.bool( True )
 )
 process.MessageLogger = cms.Service( "MessageLogger",
-    destination = cms.untracked.vstring(
+    destinations = cms.untracked.vstring(
         'cout'
     ),
     cout = cms.untracked.PSet(
