@@ -17,7 +17,7 @@ process.MessageLogger = cms.Service( "MessageLogger",
     )
 )
 
-# Profiling #
+# # Profiling #
 # process.ProfilerService = cms.Service( "ProfilerService",
 #     paths = cms.untracked.vstring(
 #         'FullEvent'
@@ -83,9 +83,9 @@ process.out = cms.OutputModule("PoolOutputModule",
 # HLT Filter #
 process.hltFilter = cms.EDFilter( "HLTHighLevel",
     HLTPaths          = cms.vstring(
-        'CandHLTTrackerCosmicsCoTF',
-        'CandHLTTrackerCosmicsRS'  ,
-        'CandHLTTrackerCosmicsCTF'
+        'HLT_TrackerCosmics_CoTF',
+        'HLT_TrackerCosmics_CTF' ,
+        'HLT_TrackerCosmics_RS'
     ),
     andOr             = cms.bool( True ),
     TriggerResultsTag = cms.InputTag( "TriggerResults", "", "FU" )

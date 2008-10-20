@@ -2,13 +2,11 @@ import FWCore.ParameterSet.Config as cms
 
 ### DQM Services ###
 
-## DQM store and related ##
+## DQM store ##
 from DQMServices.Core.DQM_cfg import *
 DQM.collectorHost = ''
-from DQMServices.Components.MEtoEDMConverter_cfi import *
-from DQMServices.Components.EDMtoMEConverter_cfi import *
 
-##  DQM file saving and environment ##
+## DQM file saving and environment ##
 from DQMServices.Components.DQMEnvironment_cfi import *
 # File saving #
 dqmSaver.convention        = 'Online'
@@ -20,8 +18,12 @@ dqmSaver.referenceHandling = 'qtests'
 # Environment #
 dqmEnv.subSystemFolder = 'SiStrip'
 
+## ME2EDM/EDM2ME ##
+from DQMServices.Components.MEtoEDMConverter_cfi import *
+from DQMServices.Components.EDMtoMEConverter_cfi import *
+
 ## Quality tester ##
-qTester = cms.EDAnalyzer("QualityTester",
+qTester = cms.EDAnalyzer( "QualityTester",
     qtList                  = cms.untracked.FileInPath( 'DQM/SiStripMonitorClient/data/sistrip_qualitytest_config.xml' ),
     getQualityTestsFromFile = cms.untracked.bool( True ),
     prescaleFactor          = cms.untracked.int32( 1 )
