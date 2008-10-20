@@ -20,18 +20,24 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 # Calibration 
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 process.GlobalTag.connect   = "frontier://PromptProd/CMS_COND_21X_GLOBALTAG"
-process.GlobalTag.globaltag = "CRUZET4_V5P::All"
+process.GlobalTag.globaltag = "CRUZET4_V6P::All"
 process.es_prefer_GlobalTag = cms.ESPrefer('PoolDBESSource','GlobalTag')
 
 # SiStrip DQM
 process.load( "xINCLUDE_DIRECTORYx.SiStripDQMOfflineGlobalRunCAF_cff" )
 
+# Input
+process.load( "xINCLUDE_DIRECTORYx.xINPUT_FILESx" )
+process.maxEvents = cms.untracked.PSet(
+    input = cms.untracked.int32( -1 )
+)
+
 # HLT Filter
 process.hltFilter = cms.EDFilter( "HLTHighLevel",
     HLTPaths          = cms.vstring(
-        'CandHLTTrackerCosmicsCoTF',
-        'CandHLTTrackerCosmicsRS'  ,
-        'CandHLTTrackerCosmicsCTF'
+        'HLT_TrackerCosmics_CoTF',
+        'HLT_TrackerCosmics_CTF' ,
+        'HLT_TrackerCosmics_RS'
     ),
     andOr             = cms.bool( True ),
     TriggerResultsTag = cms.InputTag( "TriggerResults", "", "FU" )
@@ -44,13 +50,5 @@ xHLT_FILTERx
 xDQM_FROM_RAWx
     process.SiStripDQMRecoGlobalRunCAF           *
     process.SiStripDQMSourceGlobalRunCAF_reduced *
-#     process.SiStripDQMClientGlobalRunCAF         *
-#     process.qTester                              *
     process.dqmSaver
-)
-
-# Input
-process.load( "xINCLUDE_DIRECTORYx.xINPUT_FILESx" )
-process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( -1 )
 )
