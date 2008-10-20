@@ -19,9 +19,9 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 
 # Calibration 
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.connect   = "frontier://PromptProd/CMS_COND_21X_GLOBALTAG"
-process.GlobalTag.globaltag = "CRUZET4_V6P::All"
-process.es_prefer_GlobalTag = cms.ESPrefer('PoolDBESSource','GlobalTag')
+process.GlobalTag.connect   = 'frontier://PromptProd/CMS_COND_21X_GLOBALTAG'
+process.GlobalTag.globaltag = 'CRUZET4_V6P::All'
+process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
 
 # SiStrip DQM
 process.load( "xINCLUDE_DIRECTORYx.SiStripDQMOfflineGlobalRunCAF_cff" )
@@ -40,7 +40,19 @@ process.hltFilter = cms.EDFilter( "HLTHighLevel",
         'HLT_TrackerCosmics_RS'
     ),
     andOr             = cms.bool( True ),
-    TriggerResultsTag = cms.InputTag( "TriggerResults", "", "FU" )
+    TriggerResultsTag = cms.InputTag( 'TriggerResults', '', 'FU' )
+)
+
+# DQM Saver path
+process.dqmSaver.dirName = 'xOUPTUT_DIRECTORYx'
+
+# PoolOutput #
+process.out = cms.OutputModule( "PoolOutputModule",
+    fileName       = cms.untracked.string( 'xOUPTUT_DIRECTORYx/SiStripDQMOfflineGlobalRunCAF.root' ),
+    outputCommands = cms.untracked.vstring(
+        'drop *',
+        'keep *_MEtoEDMConverter_*_SiStripDQMOfflineGlobalRunCAF'
+    )
 )
 
 # Scheduling
@@ -50,5 +62,7 @@ xHLT_FILTERx
 xDQM_FROM_RAWx
     process.SiStripDQMRecoGlobalRunCAF           *
     process.SiStripDQMSourceGlobalRunCAF_reduced *
-    process.dqmSaver
+xOUTPUT_MODULEx
 )
+
+xOUTPATHx

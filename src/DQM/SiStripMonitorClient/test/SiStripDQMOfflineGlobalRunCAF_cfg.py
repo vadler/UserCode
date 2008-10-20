@@ -30,6 +30,22 @@ process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck",
     ignoreTotal      = cms.untracked.int32( 0 )
 )
 
+### Import ###
+
+# Magnetic fiels #
+process.load( "Configuration.StandardSequences.MagneticField_0T_cff" )
+# Geometry #
+process.load( "Configuration.StandardSequences.Geometry_cff" )
+# Calibration 
+process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
+process.GlobalTag.connect   = 'frontier://PromptProd/CMS_COND_21X_GLOBALTAG'
+process.GlobalTag.globaltag = 'CRUZET4_V6P::All'
+process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
+
+### SiStrip DQM ###
+
+process.load( "DQM.SiStripMonitorClient.SiStripDQMOfflineGlobalRunCAF_cff" )
+
 ### Input ###
 
 # Source #
@@ -49,37 +65,6 @@ process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32( 1000 )
 )
 
-### Import ###
-
-# Magnetic fiels #
-process.load( "Configuration.StandardSequences.MagneticField_0T_cff" )
-# Geometry #
-process.load( "Configuration.StandardSequences.Geometry_cff" )
-# Calibration 
-process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.connect   = 'frontier://PromptProd/CMS_COND_21X_GLOBALTAG'
-process.GlobalTag.globaltag = 'CRUZET4_V6P::All'
-process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
-
-### SiStrip DQM ###
-
-process.load( "DQM.SiStripMonitorClient.SiStripDQMOfflineGlobalRunCAF_cff" )
-
-### Output ###
-
-# DQMStore path
-process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_10/output'
-
-# PoolOutput #
-process.out = cms.OutputModule("PoolOutputModule",
-#     fileName = cms.untracked.string( '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_10/output/SiStripDQMOfflineGlobalRunCAF-0.root' ),
-    fileName = cms.untracked.string( '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_10/output/SiStripDQMOfflineGlobalRunCAF-1.root' ),
-    outputCommands = cms.untracked.vstring(
-        'drop *',
-        'keep *_MEtoEDMConverter_*_TEST'
-    )
-)
-
 # HLT Filter #
 process.hltFilter = cms.EDFilter( "HLTHighLevel",
     HLTPaths          = cms.vstring(
@@ -88,7 +73,21 @@ process.hltFilter = cms.EDFilter( "HLTHighLevel",
         'HLT_TrackerCosmics_RS'
     ),
     andOr             = cms.bool( True ),
-    TriggerResultsTag = cms.InputTag( "TriggerResults", "", "FU" )
+    TriggerResultsTag = cms.InputTag( 'TriggerResults', '', 'FU' )
+)
+
+### Output ###
+
+# DQM Saver path
+process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_10/output'
+
+# PoolOutput #
+process.out = cms.OutputModule( "PoolOutputModule",
+    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_10/output/SiStripDQMOfflineGlobalRunCAF.root' ),
+    outputCommands = cms.untracked.vstring(
+        'drop *',
+        'keep *_MEtoEDMConverter_*_SiStripDQMOfflineGlobalRunCAF'
+    )
 )
 
 ### Scheduling ###
@@ -97,7 +96,7 @@ process.p = cms.Path(
 #     process.SiStripDQMRecoFromRaw                * # comment this out when running from RECO or with full reconstruction
 #     process.hltFilter                            * # comment this out to switch off the HLT pre-selection
 #     process.SiStripDQMSourceGlobalRunCAF_fromRAW * # comment this out when running from RECO or with full reconstruction
-#     process.SiStripDQMRecoGlobalRunCAF           *
+    process.SiStripDQMRecoGlobalRunCAF           *
 #     process.SiStripDQMSourceGlobalRunCAF_reduced *
     process.SiStripMonitorClusterCAF             *
 #     process.SiStripDQMClientGlobalRunCAF         *
