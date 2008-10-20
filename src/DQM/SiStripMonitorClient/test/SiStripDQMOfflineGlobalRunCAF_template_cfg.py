@@ -32,16 +32,6 @@ process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32( -1 )
 )
 
-# Output
-process.out = cms.OutputModule( "PoolOutputModule",
-    fileName = cms.untracked.string( xOUTPUT_DIRECTORYx/SiStripDQMOfflineGlobalRunCAF.root )
-    outputCommands = cms.untracked.vstring(
-        'drop *',
-        'keep *_MEtoEDMConverter_*_SiStripDQMOfflineGlobalRunCAF'
-    )
-)
-dqmSaver.dirName = 'xOUTPUT_DIRECTORYx'
-
 # HLT Filter
 process.hltFilter = cms.EDFilter( "HLTHighLevel",
     HLTPaths          = cms.vstring(
@@ -58,11 +48,7 @@ process.p = cms.Path(
 xRECO_FROM_RAWx
 xHLT_FILTERx
 xDQM_FROM_RAWx
-    process.SiStripDQMRecoGlobalRunCAF *
-    process.SiStripMonitorClusterCAF   *
-#     process.dqmSaver
-xOUTPUT_MODULEx
+    process.SiStripDQMRecoGlobalRunCAF           *
+    process.SiStripDQMSourceGlobalRunCAF_reduced *
+    process.dqmSaver
 )
-
-# process.outpath = cms.EndPath( process.out )
-xOUT_PATHx
