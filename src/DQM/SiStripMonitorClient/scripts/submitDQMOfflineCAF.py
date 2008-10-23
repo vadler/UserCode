@@ -82,18 +82,19 @@ STR_textUsage            = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMO
          
          NOTE: Not using Python configuration might end up in errors due to a lack of maintenance or even availablity
                of involved configuration files somewhere in CMSSW.
+         NOTE: Non-Python configurations will be phased out soon.
    
      -C, --CRAB TRUE/FALSE
          submit or submit not using CRAB;
          default: TRUE
+         
+         NOTE: This script runs only with CRAB 2.4.0 or higher.
    
      -S, --server CRAB_SERVER
          CRAB server to use;
          available: None (default)
                     caf  (works, but slow)
                     bari (CRAB version >= 2.3.2,
-                          s. https://twiki.cern.ch/twiki/bin/view/CMS/CrabServer#Server_available_for_users)
-                    lnl2 (CRAB version <= 2.3.1,
                           s. https://twiki.cern.ch/twiki/bin/view/CMS/CrabServer#Server_available_for_users)
                     
          NOTE: CRAB server submission is disabled at the moment.
@@ -128,7 +129,7 @@ LSTR_wordArgument = sys.argv[1:]
 # default arguments
 BOOL_Python    = True
 BOOL_CRAB      = True
-LSTR_server    = [STR_none,'caf','bari','lnl2'] # FIXME: add test of CRAB version
+LSTR_server    = [STR_none,'caf','bari']
 STR_server     = LSTR_server[0]
 STR_email      = 'volker.adler@cern.ch'
 INT_jobs       = 10
@@ -187,6 +188,7 @@ global Bool_CRAB
 global Str_server
 global Str_email
 global Int_jobs     
+global Int_nJobs     
 global Bool_filter
 global Str_dataset   
 global Str_datatier
@@ -201,6 +203,7 @@ Bool_CRAB      = BOOL_CRAB
 Str_server     = STR_server
 Str_email      = STR_email
 Int_jobs       = INT_jobs
+Int_nJobs      = INT_jobs
 Bool_filter    = BOOL_filter
 Str_outpath    = STR_outpath
 Bool_useCastor = BOOL_useCastor
@@ -297,7 +300,7 @@ for str_argument in LSTR_wordArgument:
      DICT_functionLetters.has_key(str_argument)   :
     int_nFunctionLetters += 1
 if int_nFunctionLetters == 0:
-  print '> submitDQMOfflineCAF.py > no or unknow function letter used'
+  print '> submitDQMOfflineCAF.py > no or unknown function letter used'
   Func_ExitUsage()
 elif int_nFunctionLetters > 1:
   print '> submitDQMOfflineCAF.py > too many function letter used'
@@ -395,7 +398,8 @@ if Dict_arguments.has_key(LSTR_optionLetters[4])        and\
 # number of jobs to create
 if Dict_arguments.has_key(LSTR_optionLetters[5])        and\
    Dict_arguments[LSTR_optionLetters[5]] != STR_default    :
-  Int_jobs = int(Dict_arguments[LSTR_optionLetters[5]])
+  Int_jobs  = int(Dict_arguments[LSTR_optionLetters[5]])
+  Int_nJobs = Int_jobs
 # use HLT to filter events
 if Dict_arguments.has_key(LSTR_optionLetters[6])        and\
    Dict_arguments[LSTR_optionLetters[6]] != STR_default    :
@@ -424,21 +428,23 @@ if Dict_arguments.has_key(LSTR_optionLetters[9])        and\
 # React on arguments
 
 # on use Python
-str_nameIncludePath   = 'python'
-str_suffixCfg         = '_cfg.py'
-str_suffixCff         = '_cff.py'
-str_nameInputFilesCff = 'inputFiles_cff'
-str_suffixDBS         = 'py'
-str_prefixProcess     = 'process.'
-str_delimiter         = ' *'
+str_nameIncludePath      = 'python'
+str_suffixCfg            = '_cfg.py'
+str_suffixCff            = '_cff.py'
+str_nameInputFilesCff    = 'inputFiles_cff'
+str_nameInputFilesCAFCff = 'inputFilesCAF_cff'
+str_suffixDBS            = 'py'
+str_prefixProcess        = 'process.'
+str_delimiter            = ' *'
 if not Bool_Python:
-  str_nameIncludePath   = 'data'
-  str_suffixCfg         = '.cfg'
-  str_suffixCff         = '.cff'
-  str_nameInputFilesCff = 'inputFiles.cff'
-  str_suffixDBS         = 'cff'
-  str_prefixProcess     = ''
-  str_delimiter         = ','
+  str_nameIncludePath      = 'data'
+  str_suffixCfg            = '.cfg'
+  str_suffixCff            = '.cff'
+  str_nameInputFilesCff    = 'inputFiles.cff'
+  str_nameInputFilesCAFCff = 'inputFilesCAF.cff'
+  str_suffixDBS            = 'cff'
+  str_prefixProcess        = ''
+  str_delimiter            = ','
 # on use CRAB
 if Bool_CRAB:
   str_buffer  = commands.getoutput('which crab')
@@ -491,6 +497,10 @@ Func_MkDir(str_nameRun)
 str_pathRunIncludeDir = str_pathCmsswBasePackage + '/' + str_nameIncludePath + '/' + str_nameRun
 Func_MkDir(str_pathRunIncludeDir)
 str_nameInputFilesFile = str_nameRun + '/' + str_nameRun + '.txt'
+str_nameRunIncludeDir = STR_nameCmsswPackage + '/' + str_nameIncludePath + '/' + str_nameRun
+if Bool_Python:
+  str_nameRunIncludeDir  = str_nameRunIncludeDir.replace('/','.')
+  str_nameRunIncludeDir  = str_nameRunIncludeDir.replace('.python.','.')
 
 # Retrieving information from the web
 
@@ -508,7 +518,6 @@ for str_iLine in file_dbsOutput.readlines():
        Str_dataset.find(lstr_wordsLine[3]) >= 0            and\
        Str_dataset.find(lstr_wordsLine[4]) >= 0            and\
                         lstr_wordsLine[5]  == Str_datatier and\
-       Str_dataset.find(lstr_wordsLine[6]) >= 0            and\
                     len(lstr_wordsLine[7]) == 3               :
       int_nInputFiles += 1
       file_inputFilesCff.write(str_iLine)
@@ -551,68 +560,69 @@ print
 # # get magnetic field itself
 # str_cmsmonParams  = urllib.urlencode({'TIME_BEGIN':str_timeBegin, 'TIME_END':str_timeEnd})
 # file_cmsmonOutput = urllib.urlopen("http://cmsmon.cern.ch/cmsdb/servlet/MagnetHistory", str_cmsmonParams)
-# float_avMagMeasure = -999.0
+float_avMagMeasure = 3.8
 # for str_cmsmonOutput in file_cmsmonOutput.readlines():
 #   if str_cmsmonOutput.find('BFIELD, Tesla') >= 0:
 #     float_avMagMeasure = float(str_cmsmonOutput.split('</A>')[0].split('>')[-1])
-# # determine corresponding configuration file to be included
+# determine corresponding configuration file to be included
 float_magField = 0.0
 str_magField   = '0'
-# for float_valueMagField in LFLOAT_valueMagField:
-#   if math.fabs(float_valueMagField-float_avMagMeasure) < math.fabs(float_magField-float_avMagMeasure):
-#     float_magField = float_valueMagField
-#     str_magField   = str(int(float_magField*10))
-# print '> submitDQMOfflineCAF.py > (average) magnetic field in run ' + Str_run + ':   ' + str(float_avMagMeasure) + ' T'
-# print '                           using ' + str(float_magField) + ' T for configuration'
-# print
+for float_valueMagField in LFLOAT_valueMagField:
+  if math.fabs(float_valueMagField-float_avMagMeasure) < math.fabs(float_magField-float_avMagMeasure):
+    float_magField = float_valueMagField
+    str_magField   = str(int(float_magField*10))
+print '> submitDQMOfflineCAF.py > (average) magnetic field in run ' + Str_run + ':   ' + str(float_avMagMeasure) + ' T'
+print '                           using ' + str(float_magField) + ' T for configuration'
+print
 str_magField += 'T'
 if not Bool_Python:
   str_magField = str(float_magField)
 
 # Create scripts
 
-# prepare merge script  
 int_nLinesRead      = 0
 file_inputFilesCff  = file(str_nameInputFilesFile, 'r')
 lstr_linesInput     = file_inputFilesCff.readlines()
-str_nameMergeScript = 'merge' + str_nameRun + '.job'
-file_mergeScript = file(str_nameRun + '/' + str_nameMergeScript, 'w')
-file_mergeScript.write('#!/bin/tcsh\n')
-file_mergeScript.write('cd ' + str_pathCmsswBaseSrc + '\n')
-file_mergeScript.write('cmsenv\n')
-file_mergeScript.write('setenv STAGE_SVCCLASS cmscaf\n')
-file_mergeScript.write('hadd -f ' + Str_mergepath + '/DQM_V0001_SiStrip_' + str_nameRun + '-' + Str_datatier + '-CAF_' + str_nameCmsswRel +'-standAlone.root \\\n') # FIXME: make configurable
+file_inputFilesCff.close()
+
 # create harvesting config file
 str_sedCommand  = 'sed '
-str_sedCommand += '-e \"s#xRUN_NUMBERx#'         + Str_run + '#g\" '
-str_sedCommand += '-e \"s#xMERGED_INPUT_FILEx#'  + Str_mergepath + '/DQM_V0001_SiStrip_' + str_nameRun + '-' + Str_datatier + '-CAF_' + str_nameCmsswRel +'-standAlone.root#g\" '
-str_sedCommand += '-e \"s#xMERGED_OUTPUT_FILEx#' + Str_mergepath + '/DQM_V0001_SiStrip_' + str_nameRun + '-' + Str_datatier + '-CAF_' + str_nameCmsswRel +'.root#g\" '
+str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField             + '#g\" '
+str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameRunIncludeDir    + '#g\" '
+str_sedCommand += '-e \"s#xINPUT_FILESx#'       + str_nameInputFilesCAFCff + '#g\" '
+str_sedCommand += '-e \"s#xMERGE_PATHx#'        + Str_mergepath            + '#g\" '
 str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripCAFHarvest_template' + str_suffixCfg + ' > ' + str_nameRun + '/SiStripCAFHarvest' + str_suffixCfg
 os.system(str_sedCommand)
+# prepare included CAF input files list
+str_pathInputFilesCAFCff = str_pathRunIncludeDir + '/' + str_nameInputFilesCAFCff
+if Bool_Python:
+  str_pathInputFilesCAFCff += '.py'
+file_inputFilesCAFCff = file(str_pathInputFilesCAFCff, 'w')
+if Bool_Python:
+  file_inputFilesCAFCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    processingMode = cms.untracked.string( \'Runs\' ),\n    fileNames      = cms.untracked.vstring(\n')
+else:
+  file_inputFilesJobCff.write('  source = PoolSource {\n    untracked string processingMode = \'Runs\'\n    untracked vstring fileNames      = {\n')
 
 # loop over single jobs
 if Bool_CRAB:
   os.chdir(str_nameRun)     
-  str_outputDir         = '.'
-  str_nameRunIncludeDir = STR_nameCmsswPackage + '/' + str_nameIncludePath + '/' + str_nameRun
-  if Bool_Python:
-    str_nameRunIncludeDir  = str_nameRunIncludeDir.replace('/','.')
-    str_nameRunIncludeDir  = str_nameRunIncludeDir.replace('.python.','.')
-  # create main configuration file
+  str_outputDir = '.'
   str_sedCommand = 'sed '
   if Bool_filter:
-    str_sedCommand += '-e \"s#xHLT_FILTERx#    ' + str_prefixProcess + 'hltFilter' + str_delimiter + '#g\" '
+    str_sedCommand += '-e \"s#xHLT_FILTERx#    '    + str_prefixProcess + 'hltFilter' + str_delimiter + '#g\" '
   else:
     str_sedCommand += '-e \"s#xHLT_FILTERx#\#     ' + str_prefixProcess + 'hltFilter' + str_delimiter + '#g\" '
   if Str_datatier == 'RECO':
-    str_sedCommand += '-e \"s#xRECO_FROM_RAWx#\#     ' + str_prefixProcess + 'SiStripDQMRecoFromRaw' + str_delimiter + '#g\" '
-    str_sedCommand += '-e \"s#xDQM_FROM_RAWx#\#     ' + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
+    str_sedCommand += '-e \"s#xRECO_FROM_RAWx#\#     ' + str_prefixProcess + 'SiStripDQMRecoFromRaw'                + str_delimiter + '#g\" '
+    str_sedCommand += '-e \"s#xDQM_FROM_RAWx#\#     '  + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
   else:
-    str_sedCommand += '-e \"s#xRECO_FROM_RAWx#    ' + str_prefixProcess + 'SiStripDQMRecoFromRaw' + str_delimiter + '#g\" '
-    str_sedCommand += '-e \"s#xDQM_FROM_RAWx#    ' + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
+    str_sedCommand += '-e \"s#xRECO_FROM_RAWx#    ' + str_prefixProcess + 'SiStripDQMRecoFromRaw'                + str_delimiter + '#g\" '
+    str_sedCommand += '-e \"s#xDQM_FROM_RAWx#    '  + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
   str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField          + '#g\" '
   str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameRunIncludeDir + '#g\" '
   str_sedCommand += '-e \"s#xINPUT_FILESx#'       + str_nameInputFilesCff + '#g\" '
+  str_sedCommand += '-e \"s#xOUTPUT_DIRECTORYx#'  + str_outputDir         + '#g\" '
+  str_sedCommand += '-e \"s#xRUN_NUMBERx#'        + str_nameRun           + '#g\" '
   str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripDQMOfflineGlobalRunCAF_template' + str_suffixCfg + ' > SiStripDQMOfflineGlobalRunCAF' + str_suffixCfg
   os.system(str_sedCommand)
   # create included input files list
@@ -633,30 +643,24 @@ if Bool_CRAB:
     for str_linesInput in lstr_linesInput:
       file_inputFilesJobCff.write(str_linesInput)
     file_inputFilesJobCff.write('    }\n  }\n')
-    file_inputFilesJobCff.close()
   file_inputFilesJobCff.close()
-  # create included configuration file
-  str_sedCommand = 'sed '
-  str_sedCommand += '-e \"s#xOUTPUT_DIRECTORYx#' + str_outputDir + '#g\" '
-  str_sedCommand += str_pathCmsswBasePackage + '/' + str_nameIncludePath + '/SiStripDQMOfflineGlobalRunCAF_template' + str_suffixCff + ' > ' + str_pathRunIncludeDir + '/SiStripDQMOfflineGlobalRunCAF' + str_suffixCff
-  os.system(str_sedCommand)
   for int_iJob in range(Int_jobs):
     for n_iActualLine in range(int_nLinesRead, min(int_nLinesRead+int_nInputFilesJob, int_nInputFiles)):
       int_nLinesRead += 1
-    # extend merge script
-    str_nJobs = str(int_iJob+1)
-    str_lineMergeScript = Str_outpath + '/DQM_V0001_SiStrip_' + str_nameRun + '_' + str_nJobs + '.root'
+    # extend included CAF input files list
+    str_lineInput = Str_outpath + '/SiStripDQMOfflineGlobalRunCAF-' + str_nameRun + '_' + str(int_iJob+1) + '.root'
     if Bool_useCastor:
-      str_lineMergeScript = 'rfio:' + str_lineMergeScript
-    if int_nLinesRead < int_nInputFiles:
-      str_lineMergeScript += ' \\'
-    str_lineMergeScript += '\n'  
-    file_mergeScript.write(str_lineMergeScript)
+      str_lineInput = 'rfio:' + str_lineInput
+    str_lineInput = '        \'' + str_lineInput + '\''
     # FIXME: This protection is currently needed. Review calculations again!
     if int_nLinesRead >= int_nInputFiles:
+      str_lineInput += '\n'
+      file_inputFilesCAFCff.write(str_lineInput)
       print '> submitDQMOfflineCAF.py > number of created job: ' + str_nJobs
       print
       break
+    str_lineInput += ',\n'
+    file_inputFilesCAFCff.write(str_lineInput)
   os.chdir(str_pathCurrentDir)
 else:
   for int_iJob in range(Int_jobs):
@@ -680,18 +684,20 @@ else:
     # create main configuration file
     str_sedCommand = 'sed '
     if Bool_filter:
-      str_sedCommand += '-e \"s#xHLT_FILTERx#    ' + str_prefixProcess + 'hltFilter' + str_delimiter + '#g\" '
+      str_sedCommand += '-e \"s#xHLT_FILTERx#    '    + str_prefixProcess + 'hltFilter' + str_delimiter + '#g\" '
     else:
       str_sedCommand += '-e \"s#xHLT_FILTERx#\#     ' + str_prefixProcess + 'hltFilter' + str_delimiter + '#g\" '
     if Str_datatier == 'RECO':
-      str_sedCommand += '-e \"s#xRECO_FROM_RAWx#\#     ' + str_prefixProcess + 'SiStripDQMRecoFromRaw' + str_delimiter + '#g\" '
-      str_sedCommand += '-e \"s#xDQM_FROM_RAWx#\#     ' + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
+      str_sedCommand += '-e \"s#xRECO_FROM_RAWx#\#     ' + str_prefixProcess + 'SiStripDQMRecoFromRaw'                + str_delimiter + '#g\" '
+      str_sedCommand += '-e \"s#xDQM_FROM_RAWx#\#     '  + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
     else:
-      str_sedCommand += '-e \"s#xRECO_FROM_RAWx#    ' + str_prefixProcess + 'SiStripDQMRecoFromRaw' + str_delimiter + '#g\" '
-      str_sedCommand += '-e \"s#xDQM_FROM_RAWx#    ' + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
-    str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField             + '#g\" '
-    str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameJobIncludeDir    + '#g\" '
+      str_sedCommand += '-e \"s#xRECO_FROM_RAWx#    ' + str_prefixProcess + 'SiStripDQMRecoFromRaw'                + str_delimiter + '#g\" '
+      str_sedCommand += '-e \"s#xDQM_FROM_RAWx#    '  + str_prefixProcess + 'SiStripDQMSourceGlobalRunCAF_fromRAW' + str_delimiter + '#g\" '
+    str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField          + '#g\" '
+    str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameJobIncludeDir + '#g\" '
     str_sedCommand += '-e \"s#xINPUT_FILESx#'       + str_nameInputFilesCff + '#g\" '
+    str_sedCommand += '-e \"s#xOUTPUT_DIRECTORYx#'  + str_outputDir         + '#g\" '
+    str_sedCommand += '-e \"s#xRUN_NUMBERx#'        + str_nameRun           + '#g\" '
     str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripDQMOfflineGlobalRunCAF_template' + str_suffixCfg + ' > SiStripDQMOfflineGlobalRunCAF' + str_suffixCfg
     os.system(str_sedCommand)
     # prepare job include dir
@@ -726,19 +732,6 @@ else:
         int_nLinesRead += 1
       file_inputFilesJobCff.write('    }\n  }\n')
     file_inputFilesJobCff.close()
-    # extend merge script
-    str_lineMergeScript = Str_outpath + '/DQM_V0001_SiStrip_' + str_nameJob + '.root'
-    if Bool_useCastor:
-      str_lineMergeScript = 'rfio:' + str_lineMergeScript
-    if int_nLinesRead < int_nInputFiles:
-      str_lineMergeScript += ' \\'
-    str_lineMergeScript += '\n'  
-    file_mergeScript.write(str_lineMergeScript)
-    # create included configuration file
-    str_sedCommand = 'sed '
-    str_sedCommand += '-e \"s#xOUTPUT_DIRECTORYx#' + str_outputDir + '#g\" '
-    str_sedCommand += str_pathCmsswBasePackage + '/' + str_nameIncludePath + '/SiStripDQMOfflineGlobalRunCAF_template' + str_suffixCff + ' > ' + str_pathJobIncludeDir + '/SiStripDQMOfflineGlobalRunCAF' + str_suffixCff
-    os.system(str_sedCommand)
     # create job script
     str_sedCommand = 'sed '
     str_sedCommand += '-e \"s#xCMSSW_BASEx#' + str_pathCmsswBase   + '#g\" '
@@ -755,12 +748,22 @@ else:
     os.system(str_sedCommand)
     # finalize job creation
     os.chdir(str_pathCurrentDir)
+    # extend included CAF input files list
+    str_lineInput = Str_outpath + '/SiStripDQMOfflineGlobalRunCAF-' + str_nameRun + '_' + str(int_iJob+1) + '.root'
+    if Bool_useCastor:
+      str_lineInput = 'rfio:' + str_lineInput
+    str_lineInput = '        \'' + str_lineInput + '\''
     # FIXME: This protection is currently needed. Review calculations again!
     if int_nLinesRead >= int_nInputFiles:
-      str_nJobs = str(int_iJob+1)
+      str_lineInput += '\n'
+      file_inputFilesCAFCff.write(str_lineInput)
+      Int_nJobs  = int_iJob + 1
+      str_nJobs = str(Int_nJobs)
       print '> submitDQMOfflineCAF.py > number of created jobs: ' + str_nJobs
       print
       break
+    str_lineInput += ',\n'
+    file_inputFilesCAFCff.write(str_lineInput)
 
 # Compile
 
@@ -770,26 +773,30 @@ if Bool_Python:
   os.chdir(str_pathCurrentDir)
   print
     
-# finish scripts
+# Finish scripts
     
-# finish merge script
-file_mergeScript.write('cd ' + str_pathCurrentDir + '/' + str_nameRun + '/\n')
-file_mergeScript.write('cmsRun SiStripCAFHarvest' + str_suffixCfg + '\n')
-file_mergeScript.write('rm ' + Str_mergepath + '/DQM_V0001_SiStrip_' + str_nameRun + '-' + Str_datatier + '-CAF_' + str_nameCmsswRel +'-standAlone.root' + '\n')
-file_mergeScript.close()
+# finish included CAF input files list
+if Bool_Python:
+  file_inputFilesCAFCff.write('    )\n)\n')
+else:
+  file_inputFilesCAFCff.write('    }\n  }\n')
+file_inputFilesCAFCff.close()
 # create CRAB configuration
 if Bool_CRAB:
-  os.chdir(str_nameRun)     
+  os.chdir(str_nameRun)
+  lstr_outpath = Str_outpath.split('/', 3)
+  str_outpath  = lstr_outpath[0] + '/' + lstr_outpath[1] + '/' + lstr_outpath[2] 
   str_sedCommand  = 'sed '
-  str_sedCommand += '-e \"s#xSERVER_NAMEx#'        + Str_server    + '#g\" '
-  str_sedCommand += '-e \"s#xDATASETPATHx#'        + Str_dataset   + '#g\" '
-  str_sedCommand += '-e \"s#xRUNSELECTIONx#'       + Str_run       + '#g\" '
-  str_sedCommand += '-e \"s#xNUMBER_OF_JOBSx#'     + str_nJobs     + '#g\" '
-  str_sedCommand += '-e \"s#xEMAILx#'              + Str_email     + '#g\" '
-  str_sedCommand += '-e \"s#xOUTPUT_FILEx#'        + str_nameRun   + '#g\" '
-  str_sedCommand += '-e \"s#xUI_WORKING_DIRx#crab' + str_nameRun   + '#g\" '
-  str_sedCommand += '-e \"s#xSTORAGE_PATHx#'       + Str_outpath   + '#g\" '
-  str_sedCommand += '-e \"s#xSUFFIXx#'             + str_suffixCfg + '#g\" '
+  str_sedCommand += '-e \"s#xSERVER_NAMEx#'        + Str_server      + '#g\" '
+  str_sedCommand += '-e \"s#xDATASETPATHx#'        + Str_dataset     + '#g\" '
+  str_sedCommand += '-e \"s#xRUNSELECTIONx#'       + Str_run         + '#g\" '
+  str_sedCommand += '-e \"s#xNUMBER_OF_JOBSx#'     + str_nJobs       + '#g\" '
+  str_sedCommand += '-e \"s#xEMAILx#'              + Str_email       + '#g\" '
+  str_sedCommand += '-e \"s#xRUN_NUMBERx#'         + str_nameRun     + '#g\" '
+  str_sedCommand += '-e \"s#xUI_WORKING_DIRx#crab' + str_nameRun     + '#g\" '
+  str_sedCommand += '-e \"s#xSTORAGE_PATHx#'       + str_outpath     + '#g\" '
+  str_sedCommand += '-e \"s#xLFNx#'                + lstr_outpath[3] + '#g\" '
+  str_sedCommand += '-e \"s#xSUFFIXx#'             + str_suffixCfg   + '#g\" '
   if Bool_useCastor:
     str_sedCommand += '-e \"s#xCOPY_DATAx#1#g\" '
   else:
@@ -829,7 +836,6 @@ if Dict_arguments.has_key(LSTR_functionLetters[0]):
       os.chdir(str_pathCurrentDir)
     time.sleep(5)
     os.system('bjobs -q cmscaf')
-  os.chmod(str_nameRun + '/' + str_nameMergeScript,OCT_rwx_r_r)
 
 # Send reminder email to submitter (not needed for CRAB)
     
