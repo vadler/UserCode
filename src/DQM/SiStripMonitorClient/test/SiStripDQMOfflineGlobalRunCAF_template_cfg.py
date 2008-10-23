@@ -31,7 +31,7 @@ process.es_prefer_GlobalTag = cms.ESPrefer('PoolDBESSource','GlobalTag')
 process.load( "DQM.SiStripMonitorClient.SiStripDQMOfflineGlobalRunCAF_cff" )
 
 # Input
-process.load( "xINCLUDE_DIRECTORYx.xINPUT_FILESx" )
+process.load( "xINCLUDE_DIRECTORYx.inputFiles_cff" )
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32( -1 )
 )
@@ -58,9 +58,9 @@ process.out = cms.OutputModule( "PoolOutputModule",
 
 # Scheduling
 process.p = cms.Path(
-xRECO_FROM_RAWx
-xHLT_FILTERx
-xDQM_FROM_RAWx
+xRECO_FROM_RAWxprocess.SiStripDQMRecoFromRaw                *
+xHLT_FILTERxprocess.hltFilter                            *
+xDQM_FROM_RAWxprocess.SiStripDQMSourceGlobalRunCAF_fromRAW *
     process.SiStripDQMRecoGlobalRunCAF           *
 #     process.SiStripDQMSourceGlobalRunCAF_reduced *
     process.SiStripMonitorClusterCAF             *

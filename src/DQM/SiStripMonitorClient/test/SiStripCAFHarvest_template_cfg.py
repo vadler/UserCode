@@ -34,7 +34,7 @@ process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
 ### Input ###
 
 # Source #
-process.load( "xINCLUDE_DIRECTORYx.xINPUT_FILESx" )
+process.load( "xINCLUDE_DIRECTORYx.inputFilesCAF_cff" )
 # Input steering #
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32( -1 )
