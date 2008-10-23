@@ -457,9 +457,7 @@ Func_MkDir(str_nameRun)
 str_pathRunIncludeDir = str_pathCmsswBasePackage + '/python/' + str_nameRun
 Func_MkDir(str_pathRunIncludeDir)
 str_nameInputFilesFile = str_nameRun + '/' + str_nameRun + '.txt'
-str_nameRunIncludeDir = STR_nameCmsswPackage + '/python/' + str_nameRun
-str_nameRunIncludeDir  = str_nameRunIncludeDir.replace('/','.')
-str_nameRunIncludeDir  = str_nameRunIncludeDir.replace('.python.','.')
+str_nameRunIncludeDir  = STR_nameCmsswPackage.replace('/','.') + '.' + str_nameRun
 
 # Retrieving information from the web
 
@@ -542,16 +540,22 @@ file_inputFilesCff  = file(str_nameInputFilesFile, 'r')
 lstr_linesInput     = file_inputFilesCff.readlines()
 file_inputFilesCff.close()
 
-# create harvesting config file
+# create harvesting config file and job script
 str_sedCommand  = 'sed '
 str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField             + '#g\" '
 str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameRunIncludeDir    + '#g\" '
 str_sedCommand += '-e \"s#xMERGE_PATHx#'        + Str_mergepath            + '#g\" '
 str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripCAFHarvest_template_cfg.py > ' + str_nameRun + '/SiStripCAFHarvest_cfg.py'
 os.system(str_sedCommand)
+str_sedCommand  = 'sed '
+str_sedCommand += '-e \"s#xCMSSW_BASEx#'  + str_pathCmsswBase  + '#g\" '
+str_sedCommand += '-e \"s#xRUN_NAMEx#'    + str_nameRun        + '#g\" '
+str_sedCommand += '-e \"s#xMERGE_PATHx#'  + Str_mergepath      + '#g\" '
+str_sedCommand += '-e \"s#xCURRENT_DIRx#' + str_pathCurrentDir + '#g\" '
+str_sedCommand += str_pathCmsswBasePackage + '/scripts/SiStripDQMCAFHarvest_template.job > ' + str_nameRun + '/SiStripCAFHarvest.job'
+os.system(str_sedCommand)
 # prepare included CAF input files list
-str_pathInputFilesCAFCff = str_pathRunIncludeDir + '/inputFilesCAF_cff'
-str_pathInputFilesCAFCff += '.py'
+str_pathInputFilesCAFCff = str_pathRunIncludeDir + '/inputFilesCAF_cff.py'
 file_inputFilesCAFCff = file(str_pathInputFilesCAFCff, 'w')
 file_inputFilesCAFCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    processingMode = cms.untracked.string( \'Runs\' ),\n    fileNames      = cms.untracked.vstring(\n')
 
@@ -577,8 +581,7 @@ if Bool_CRAB:
   str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripDQMOfflineGlobalRunCAF_template_cfg.py > SiStripDQMOfflineGlobalRunCAF_cfg.py'
   os.system(str_sedCommand)
   # create included input files list
-  str_pathInputFilesJobCff = str_pathRunIncludeDir + '/inputFiles_cff'
-  str_pathInputFilesJobCff += '.py'
+  str_pathInputFilesJobCff = str_pathRunIncludeDir + '/inputFiles_cff.py'
   file_inputFilesJobCff = file(str_pathInputFilesJobCff, 'w')
   file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
   for str_linesInput in lstr_linesInput:
@@ -616,9 +619,7 @@ else:
     str_nameJobDir        = str_nameRun + "/" + str_nameJob
     str_outputDir         = '/tmp/' + os.getenv('USER') + '/' + str_nameJobDir
     str_pathJobIncludeDir = str_pathRunIncludeDir + '/' + str_nameJob
-    str_nameJobIncludeDir = STR_nameCmsswPackage + '/python/' + str_nameJobDir
-    str_nameJobIncludeDir = str_nameJobIncludeDir.replace('/','.')
-    str_nameJobIncludeDir = str_nameJobIncludeDir.replace('.python.','.')
+    str_nameJobIncludeDir = STR_nameCmsswPackage.replace('/','.') + '.' + str_nameJobDir.replace('/','.')
     os.mkdir(str_nameJobDir)
     os.chdir(str_nameJobDir)     
     # create main configuration file
@@ -642,8 +643,7 @@ else:
     # prepare job include dir
     os.mkdir(str_pathJobIncludeDir)
     # create included input files list
-    str_pathInputFilesJobCff = str_pathJobIncludeDir + '/inputFiles_cff'
-    str_pathInputFilesJobCff += '.py'
+    str_pathInputFilesJobCff = str_pathJobIncludeDir + '/inputFiles_cff.py'
     file_inputFilesJobCff = file(str_pathInputFilesJobCff, 'w')
     file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
     for n_iActualLine in range(int_nLinesRead, min(int_nLinesRead+int_nInputFilesJob, int_nInputFiles)):
@@ -685,19 +685,22 @@ else:
       break
     str_lineInput += ',\n'
     file_inputFilesCAFCff.write(str_lineInput)
-
-# Compile
-
-os.chdir(str_pathCmsswBasePackage)
-os.system('scramv1 b python')
-os.chdir(str_pathCurrentDir)
-print
     
 # Finish scripts
     
 # finish included CAF input files list
 file_inputFilesCAFCff.write('    )\n)\n')
 file_inputFilesCAFCff.close()
+
+# Compile
+
+os.chdir(str_pathRunIncludeDir+'/..')
+os.system('scramv1 b python')
+os.chdir(str_pathCurrentDir)
+print
+
+# CRAB
+
 # create CRAB configuration
 if Bool_CRAB:
   os.chdir(str_nameRun)
@@ -722,21 +725,20 @@ if Bool_CRAB:
 # Submit jobs
 
 if Dict_arguments.has_key(LSTR_functionLetters[0]):
+  os.chdir(str_nameRun)
   if Bool_CRAB:
-    os.chdir(str_nameRun)
     print '> submitDQMOfflineCAF.py >'
     print '  ' + os.getcwd() + ' : crab -submit -c crab' + str_nameRun
     os.system('crab -submit -c crab' + str_nameRun)
     print
-    os.chdir(str_pathCurrentDir)
     time.sleep(5)
-    os.system('crab -status -c ' + str_nameRun + '/crab' + str_nameRun)
+    os.system('crab -status -c crab' + str_nameRun)
   else:
     for int_iJob in range(Int_jobs):
       int_nDigits = 1
       if int_iJob >= 10:
         int_nDigits = int(math.log10(int_iJob)) + 1
-      str_nameJobDir = str_nameRun + "/" + str_nameRun + "_"
+      str_nameJobDir = str_nameRun + "_"
       for int_iDigit in range(4-int_nDigits):
         str_nameJobDir += '0'
       str_nameJobDir += str(int_iJob)
@@ -746,9 +748,11 @@ if Dict_arguments.has_key(LSTR_functionLetters[0]):
       print '  ' + os.getcwd() + ' : bsub -q cmscaf SiStripDQMOfflineCAF.job'
       os.system('bsub -q cmscaf SiStripDQMOfflineCAF.job')
       print
-      os.chdir(str_pathCurrentDir)
+      os.chdir('../')
     time.sleep(5)
     os.system('bjobs -q cmscaf')
+  os.chmod('SiStripCAFHarvest_cfg.py',OCT_rwx_r_r)
+  os.chdir(str_pathCurrentDir)
 
 # Send reminder email to submitter (not needed for CRAB)
     
@@ -786,4 +790,3 @@ Subject: %s
   server = smtplib.SMTP(STR_mailSmtp)
   server.sendmail(str_mailFrom, str_mailTo, str_mailMessage)
   server.quit()
-
