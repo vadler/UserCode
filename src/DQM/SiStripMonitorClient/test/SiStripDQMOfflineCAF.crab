@@ -17,7 +17,7 @@ number_of_jobs         =    10
 # use this for output from DQM saver:
 # output_file = DQM_V0001_SiStrip_R000062815.root
 # use this for output from ME2EDM converter:
-output_file = SiStripDQMOfflineGlobalRunCAF.root
+output_file = ./SiStripDQMOfflineGlobalRunCAF_test.root
 
 [USER]
 

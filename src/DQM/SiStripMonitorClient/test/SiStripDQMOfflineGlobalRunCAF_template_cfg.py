@@ -7,8 +7,12 @@ process.MessageLogger = cms.Service( "MessageLogger",
         'cout'
     ),
     cout = cms.untracked.PSet(
-        threshold = cms.untracked.string( 'ERROR' )
+#         threshold = cms.untracked.string( 'ERROR' )
+        threshold = cms.untracked.string( 'WARNING' )
     )
+)
+process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck",
+    ignoreTotal = cms.untracked.int32( 0 )
 )
 
 # Magnetic Field
@@ -19,12 +23,12 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 
 # Calibration 
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.connect   = 'frontier://PromptProd/CMS_COND_21X_GLOBALTAG'
-process.GlobalTag.globaltag = 'CRUZET4_V6P::All'
-process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
+process.GlobalTag.connect   = "frontier://PromptProd/CMS_COND_21X_GLOBALTAG"
+process.GlobalTag.globaltag = "CRAFT_V2P::All"
+process.es_prefer_GlobalTag = cms.ESPrefer('PoolDBESSource','GlobalTag')
 
 # SiStrip DQM
-process.load( "xINCLUDE_DIRECTORYx.SiStripDQMOfflineGlobalRunCAF_cff" )
+process.load( "DQM.SiStripMonitorClient.SiStripDQMOfflineGlobalRunCAF_cff" )
 
 # Input
 process.load( "xINCLUDE_DIRECTORYx.xINPUT_FILESx" )
@@ -40,15 +44,12 @@ process.hltFilter = cms.EDFilter( "HLTHighLevel",
         'HLT_TrackerCosmics_RS'
     ),
     andOr             = cms.bool( True ),
-    TriggerResultsTag = cms.InputTag( 'TriggerResults', '', 'FU' )
+    TriggerResultsTag = cms.InputTag( "TriggerResults", "", "FU" )
 )
 
-# DQM Saver path
-process.dqmSaver.dirName = 'xOUPTUT_DIRECTORYx'
-
-# PoolOutput #
+# Output
 process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( 'xOUPTUT_DIRECTORYx/SiStripDQMOfflineGlobalRunCAF.root' ),
+    fileName       = cms.untracked.string( 'xOUTPUT_DIRECTORYx/SiStripDQMOfflineGlobalRunCAF-xRUN_NUMBERx.root' ),
     outputCommands = cms.untracked.vstring(
         'drop *',
         'keep *_MEtoEDMConverter_*_SiStripDQMOfflineGlobalRunCAF'
@@ -61,8 +62,11 @@ xRECO_FROM_RAWx
 xHLT_FILTERx
 xDQM_FROM_RAWx
     process.SiStripDQMRecoGlobalRunCAF           *
-    process.SiStripDQMSourceGlobalRunCAF_reduced *
-xOUTPUT_MODULEx
+#     process.SiStripDQMSourceGlobalRunCAF_reduced *
+    process.SiStripMonitorClusterCAF             *
+    process.MEtoEDMConverter
 )
 
-xOUTPATHx
+process.outpath = cms.EndPath(
+    process.out
+)

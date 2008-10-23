@@ -84,7 +84,7 @@ process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/C
 # PoolOutput #
 process.out = cms.OutputModule( "PoolOutputModule",
 #     fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_10/output/SiStripDQMOfflineGlobalRunCAF.root' ),
-    fileName       = cms.untracked.string( 'SiStripDQMOfflineGlobalRunCAF.root' ),
+    fileName       = cms.untracked.string( './SiStripDQMOfflineGlobalRunCAF_test.root' ),
     outputCommands = cms.untracked.vstring(
         'drop *',
         'keep *_MEtoEDMConverter_*_SiStripDQMOfflineGlobalRunCAF'
@@ -100,7 +100,7 @@ process.p = cms.Path(
     process.SiStripDQMRecoGlobalRunCAF           *
 #     process.SiStripDQMSourceGlobalRunCAF_reduced *
     process.SiStripMonitorClusterCAF             *
-#     process.SiStripDQMClientGlobalRunCAF         *
+#     process.SiStripOfflineDQMClient              *
 #     process.qTester                              *
 #     process.dqmSaver
     process.MEtoEDMConverter

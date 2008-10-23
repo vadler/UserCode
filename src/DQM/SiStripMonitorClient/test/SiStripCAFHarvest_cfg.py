@@ -1,15 +1,17 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("CAFHarvestingJob")
+process = cms.Process( "SiStripDQMConvertOfflineGlobalRun" )
 
 ### Miscellanous ###
 
-# Logging #
 process.options = cms.untracked.PSet(
+   fileMode    = cms.untracked.string( 'FULLMERGE' ),
    wantSummary = cms.untracked.bool( True )
 )
+
+# Logging #
 process.MessageLogger = cms.Service( "MessageLogger",
-    destinations = cms.untracked.vstring(
+    destination = cms.untracked.vstring(
         'cout'
     ),
     cout = cms.untracked.PSet(
@@ -17,7 +19,7 @@ process.MessageLogger = cms.Service( "MessageLogger",
     )
 )
 
-# Profiling #
+# # Profiling #
 # process.ProfilerService = cms.Service( "ProfilerService",
 #     paths = cms.untracked.vstring(
 #         'FullEvent'
@@ -30,48 +32,64 @@ process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck",
     ignoreTotal      = cms.untracked.int32( 0 )
 )
 
-#-------------------------------------------------
-## Empty Event Source
-#-------------------------------------------------
-process.source = cms.Source("EmptyIOVSource",
-    lastValue = cms.uint64(62815),
-    timetype = cms.string('runnumber'),
-    firstValue = cms.uint64(62815),
-    interval = cms.uint64(1)
-)
+### Import ###
 
+# Magnetic fiels #
+process.load( "Configuration.StandardSequences.MagneticField_0T_cff" )
+# Geometry #
+process.load( "Configuration.StandardSequences.Geometry_cff" )
+# Calibration 
+process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
+process.GlobalTag.connect   = 'frontier://PromptProd/CMS_COND_21X_GLOBALTAG'
+process.GlobalTag.globaltag = 'CRUZET4_V6P::All'
+process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
+
+### Input ###
+
+# Source #
+process.source = cms.Source( "PoolSource",
+    processingMode = cms.untracked.string( 'Runs' ),
+    fileNames      = cms.untracked.vstring(
+        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_1.root',
+        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_2.root',
+        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_3.root',
+        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_4.root',
+        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_5.root',
+        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_6.root',
+        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_7.root',
+        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_8.root',
+        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_9.root',
+        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_10.root'
+    )
+)
+# Input steering #
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1)
+    input = cms.untracked.int32( -1 )
 )
 
-#-------------------------------------------------
-# DQM Services
-#-------------------------------------------------
+### SiStrip DQM ###
 
-process.DQMStore = cms.Service("DQMStore",
-    referenceFileName = cms.untracked.string(''),
-    verbose = cms.untracked.int32(1)
+process.load( "DQM.SiStripMonitorClient.SiStripDQMOfflineGlobalRunCAF_cff" )
+
+### Output ###
+
+# DQM store #
+# process.DQMStore.referenceFileName = ''
+# process.DQMStore.collateHistograms = False
+# process.DQMStore.verbose = 1
+
+# EDM2ME #
+# process.EDMtoMEConverter.convertOnEndLumi = False
+# process.EDMtoMEConverter.convertOnEndRun  = True
+
+# DQM saver #
+process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_10/output'
+
+### Scheduling ###
+
+process.p = cms.Path(
+    process.EDMtoMEConverter        *
+    process.SiStripOfflineDQMClient *
+    process.qTester                 *
+    process.dqmSaver
 )
-
-process.qTester = cms.EDFilter("QualityTester",
-    qtestOnEndJob = cms.untracked.bool(True),
-    qtList = cms.untracked.FileInPath('DQM/SiStripMonitorClient/data/sistrip_qualitytest_config.xml'),
-    QualityTestPrescaler = cms.untracked.int32(1),
-    getQualityTestsFromFile = cms.untracked.bool(True)
-)
-
-#-------------------------------------------------
-## DQM Harvesting
-#-------------------------------------------------
-process.dqmHarvesing = cms.EDFilter("SiStripOfflineDQM",
-    CreateSummary = cms.untracked.bool(True),
-    InputFileName = cms.untracked.string('/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_10/output/DQM_V0001_SiStrip_R000062815-standAlone.root'),
-    OutputFileName = cms.untracked.string('/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_10/output/DQM_V0001_SiStrip_R000062815.root'),
-    GlobalStatusFilling = cms.untracked.int32(1)
-)
-
-#-------------------------------------------------
-## Scheduling
-#-------------------------------------------------
-process.p = cms.Path(process.qTester*process.dqmHarvesing)
-
