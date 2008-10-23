@@ -99,6 +99,10 @@ STR_textUsage            = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMO
          number of jobs to create;
          default: 10
          
+     -g, --global-tag GLOBAL_TAG
+         global tag to be used;
+         default: CRAFT_V2P::All
+         
      -f, --filter TRUE/FALSE
          use or use not HLT filters to select events to process;
          default: FALSE
@@ -124,6 +128,7 @@ LSTR_server    = [STR_none,'caf','bari']
 STR_server     = LSTR_server[0]
 STR_email      = 'volker.adler@cern.ch'
 INT_jobs       = 10
+STR_globalTag  = 'CRAFT_V2P::All'
 BOOL_filter    = False
 STR_outpath    = '/castor/cern.ch/user/c/cctrack/DQM'
 BOOL_useCastor = True
@@ -133,16 +138,17 @@ LSTR_functionLetters = ['-s','-c','-h']
 DICT_functionLetters = {'--submit':LSTR_functionLetters[0],
                         '--create':LSTR_functionLetters[1],
                         '--help'  :LSTR_functionLetters[2]}
-LSTR_optionLetters   = ['-r','-C','-S','-e','-j','-f','-d','-o','-m']
-DICT_optionLetters   = {'--run'      :LSTR_optionLetters[0],  
-                        '--CRAB'     :LSTR_optionLetters[1],  
-                        '--server'   :LSTR_optionLetters[2],  
-                        '--email'    :LSTR_optionLetters[3],  
-                        '--jobs'     :LSTR_optionLetters[4],
-                        '--filter'   :LSTR_optionLetters[5],
-                        '--dataset'  :LSTR_optionLetters[6],
-                        '--outpath'  :LSTR_optionLetters[7],
-                        '--mergepath':LSTR_optionLetters[8]}
+LSTR_optionLetters   = ['-r','-C','-S','-e','-j','-g','-f','-d','-o','-m']
+DICT_optionLetters   = {'--run'       :LSTR_optionLetters[0],  
+                        '--CRAB'      :LSTR_optionLetters[1],  
+                        '--server'    :LSTR_optionLetters[2],  
+                        '--email'     :LSTR_optionLetters[3],  
+                        '--jobs'      :LSTR_optionLetters[4],
+                        '--global-tag':LSTR_optionLetters[5],
+                        '--filter'    :LSTR_optionLetters[6],
+                        '--dataset'   :LSTR_optionLetters[7],
+                        '--outpath'   :LSTR_optionLetters[8],
+                        '--mergepath' :LSTR_optionLetters[9]}
 STR_mailSmtp        = 'localhost'
 STR_mailServer      = '@mail.cern.ch'
 STR_mailTextOpener  = """Dear """ + os.getenv('USER').capitalize() + """,
@@ -177,6 +183,7 @@ global Bool_CRAB
 global Str_server
 global Str_email
 global Int_jobs     
+global Str_globalTag
 global Bool_filter
 global Str_dataset   
 global Str_datatier
@@ -190,6 +197,7 @@ Bool_CRAB      = BOOL_CRAB
 Str_server     = STR_server
 Str_email      = STR_email
 Int_jobs       = INT_jobs
+Str_globalTag  = STR_globalTag
 Bool_filter    = BOOL_filter
 Str_outpath    = STR_outpath
 Bool_useCastor = BOOL_useCastor
@@ -375,30 +383,34 @@ if Dict_arguments.has_key(LSTR_optionLetters[3])        and\
 if Dict_arguments.has_key(LSTR_optionLetters[4])        and\
    Dict_arguments[LSTR_optionLetters[4]] != STR_default    :
   Int_jobs  = int(Dict_arguments[LSTR_optionLetters[4]])
-# use HLT to filter events
+# global tag
 if Dict_arguments.has_key(LSTR_optionLetters[5])        and\
    Dict_arguments[LSTR_optionLetters[5]] != STR_default    :
-  if Dict_arguments[LSTR_optionLetters[5]] in LSTR_true:
+  Str_globalTag  = Dict_arguments[LSTR_optionLetters[5]]
+# use HLT to filter events
+if Dict_arguments.has_key(LSTR_optionLetters[6])        and\
+   Dict_arguments[LSTR_optionLetters[6]] != STR_default    :
+  if Dict_arguments[LSTR_optionLetters[6]] in LSTR_true:
     Bool_filter = True
-  elif Dict_arguments[LSTR_optionLetters[5]] in LSTR_false:  
+  elif Dict_arguments[LSTR_optionLetters[6]] in LSTR_false:  
     Bool_filter = False
   else:
     Func_ExitBool(6)
 # primary dataset
-if Dict_arguments.has_key(LSTR_optionLetters[6])        and\
-   Dict_arguments[LSTR_optionLetters[6]] != STR_default    :
-  Str_dataset = Dict_arguments[LSTR_optionLetters[6]]
+if Dict_arguments.has_key(LSTR_optionLetters[7])        and\
+   Dict_arguments[LSTR_optionLetters[7]] != STR_default    :
+  Str_dataset = Dict_arguments[LSTR_optionLetters[7]]
 else:   
   print '> submitDQMOfflineCAF.py > no primary dataset given'
   Func_Exit()
 # path for job output
-if Dict_arguments.has_key(LSTR_optionLetters[7])        and\
-   Dict_arguments[LSTR_optionLetters[7]] != STR_default    :
-  Str_outpath = Dict_arguments[LSTR_optionLetters[7]]
-# path for merged output
 if Dict_arguments.has_key(LSTR_optionLetters[8])        and\
    Dict_arguments[LSTR_optionLetters[8]] != STR_default    :
-  Str_mergepath = Dict_arguments[LSTR_optionLetters[8]]
+  Str_outpath = Dict_arguments[LSTR_optionLetters[8]]
+# path for merged output
+if Dict_arguments.has_key(LSTR_optionLetters[9])        and\
+   Dict_arguments[LSTR_optionLetters[9]] != STR_default    :
+  Str_mergepath = Dict_arguments[LSTR_optionLetters[9]]
   
 # React on arguments
 
@@ -543,6 +555,7 @@ file_inputFilesCff.close()
 # create harvesting config file and job script
 str_sedCommand  = 'sed '
 str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField             + '#g\" '
+str_sedCommand += '-e \"s#xGLOBAL_TAGx#'        + Str_globalTag            + '#g\" '
 str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameRunIncludeDir    + '#g\" '
 str_sedCommand += '-e \"s#xMERGE_PATHx#'        + Str_mergepath            + '#g\" '
 str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripCAFHarvest_template_cfg.py > ' + str_nameRun + '/SiStripCAFHarvest_cfg.py'
@@ -575,6 +588,7 @@ if Bool_CRAB:
     str_sedCommand += '-e \"s#xRECO_FROM_RAWx#    #g\" '
     str_sedCommand += '-e \"s#xDQM_FROM_RAWx#    #g\" '
   str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField          + '#g\" '
+  str_sedCommand += '-e \"s#xGLOBAL_TAGx#'        + Str_globalTag         + '#g\" '
   str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameRunIncludeDir + '#g\" '
   str_sedCommand += '-e \"s#xOUTPUT_DIRECTORYx#'  + str_outputDir         + '#g\" '
   str_sedCommand += '-e \"s#xRUN_NUMBERx#'        + str_nameRun           + '#g\" '
@@ -635,6 +649,7 @@ else:
       str_sedCommand += '-e \"s#xRECO_FROM_RAWx#    #g\" '
       str_sedCommand += '-e \"s#xDQM_FROM_RAWx#    #g\" '
     str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField          + '#g\" '
+    str_sedCommand += '-e \"s#xGLOBAL_TAGx#'        + Str_globalTag         + '#g\" '
     str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameJobIncludeDir + '#g\" '
     str_sedCommand += '-e \"s#xOUTPUT_DIRECTORYx#'  + str_outputDir         + '#g\" '
     str_sedCommand += '-e \"s#xRUN_NUMBERx#'        + str_nameRun           + '#g\" '
