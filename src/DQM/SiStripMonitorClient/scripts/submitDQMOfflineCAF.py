@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# $Id: submitDQMOfflineCAF.py,v 1.20.2.1 2008/09/16 17:18:46 vadler Exp $
+# $Id$
 #
 
 ## CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.py
@@ -277,7 +277,7 @@ if not str_pathCmsswBase:
   print '                           $ cmsenv'
   print
   Func_Exit()
-str_nameCmsswRel         = os.path.basename(str_pathCmsswBase)
+str_nameCmsswRel         = os.getenv('CMSSW_VERSION')
 str_pathCmsswBaseSrc     = str_pathCmsswBase + '/src'
 str_pathCmsswBasePackage = str_pathCmsswBaseSrc + '/' + STR_nameCmsswPackage
 str_suffixShell          = 'csh'
@@ -561,10 +561,12 @@ str_sedCommand += '-e \"s#xMERGE_PATHx#'        + Str_mergepath            + '#g
 str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripCAFHarvest_template_cfg.py > ' + str_nameRun + '/SiStripCAFHarvest_cfg.py'
 os.system(str_sedCommand)
 str_sedCommand  = 'sed '
-str_sedCommand += '-e \"s#xCMSSW_BASEx#'  + str_pathCmsswBase  + '#g\" '
-str_sedCommand += '-e \"s#xRUN_NAMEx#'    + str_nameRun        + '#g\" '
-str_sedCommand += '-e \"s#xMERGE_PATHx#'  + Str_mergepath      + '#g\" '
-str_sedCommand += '-e \"s#xCURRENT_DIRx#' + str_pathCurrentDir + '#g\" '
+str_sedCommand += '-e \"s#xCMSSW_BASEx#'    + str_pathCmsswBase    + '#g\" '
+str_sedCommand += '-e \"s#xRUN_NAMEx#'      + str_nameRun          + '#g\" '
+str_sedCommand += '-e \"s#xMERGE_PATHx#'    + Str_mergepath        + '#g\" '
+str_sedCommand += '-e \"s#xCURRENT_DIRx#'   + str_pathCurrentDir   + '#g\" '
+str_sedCommand += '-e \"s#xDATA_TIERx#'     + Str_datatier         + '#g\" '
+str_sedCommand += '-e \"s#xCMSSW_VERSIONx#' + str_nameCmsswRel + '#g\" '
 str_sedCommand += str_pathCmsswBasePackage + '/scripts/SiStripDQMCAFHarvest_template.job > ' + str_nameRun + '/SiStripCAFHarvest.job'
 os.system(str_sedCommand)
 # prepare included CAF input files list
