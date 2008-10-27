@@ -101,7 +101,7 @@ STR_textUsage            = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMO
          
      -g, --global-tag GLOBAL_TAG
          global tag to be used;
-         default: CRAFT_V2P::All
+         default: CRAFT_V3P::All
          
      -f, --filter TRUE/FALSE
          use or use not HLT filters to select events to process;
@@ -128,7 +128,7 @@ LSTR_server    = [STR_none,'caf','bari']
 STR_server     = LSTR_server[0]
 STR_email      = 'volker.adler@cern.ch'
 INT_jobs       = 10
-STR_globalTag  = 'CRAFT_V2P::All'
+STR_globalTag  = 'CRAFT_V3P::All'
 BOOL_filter    = False
 STR_outpath    = '/castor/cern.ch/user/c/cctrack/DQM'
 BOOL_useCastor = True
@@ -600,12 +600,17 @@ if Bool_CRAB:
   str_pathInputFilesJobCff = str_pathRunIncludeDir + '/inputFiles_cff.py'
   file_inputFilesJobCff = file(str_pathInputFilesJobCff, 'w')
   file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
+  nLines = 0
   for str_linesInput in lstr_linesInput:
-    # protections vs. those annoying DBS output format changes come here:
-#     file_inputFilesJobCff.write(str_linesInput)
-    str_actualLine = str_linesInput.replace(') );',',')
+    nLines += 1
+    str_correctedLine = str_linesInput.replace(') );',',')
+    if nLines == len(lstr_linesInput):
+      str_actualLine = str_correctedLine.replace(',','\n    )\n)\n')
+    elif nLines%255 == 0:
+      str_actualLine = str_correctedLine.replace(',','\n    )\n)\nsource.fileNames.extend(\n    (')
+    else:
+      str_actualLine = str_correctedLine
     file_inputFilesJobCff.write(str_actualLine)
-  file_inputFilesJobCff.write('    )\n)\n')
   file_inputFilesJobCff.close()
   for int_iJob in range(Int_jobs):
     # extend included CAF input files list
@@ -768,7 +773,7 @@ if Dict_arguments.has_key(LSTR_functionLetters[0]):
       os.chdir('../')
     time.sleep(5)
     os.system('bjobs -q cmscaf')
-  os.chmod('SiStripCAFHarvest_cfg.py',OCT_rwx_r_r)
+  os.chmod('SiStripCAFHarvest.job',OCT_rwx_r_r)
   os.chdir(str_pathCurrentDir)
 
 # Send reminder email to submitter (not needed for CRAB)

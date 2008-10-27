@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# $Id: getRunInfo.py,v 1.3.2.3 2008/10/21 13:13:36 vadler Exp $
+# $Id$
 #
 
 ## CMSSW/DQM/SiStripMonitorClient/scripts/getRunInfo.py
@@ -221,8 +221,8 @@ for int_i in range(int_maxLenDbsDatasets-len(STR_headDatasets)):
 str_print += ' '
 int_length = len(str_print)
 print str_print + STR_headFiles
-str_print = '> '
-for int_i in range(int_length+len(STR_headFiles)/2+INT_offset+8):
+str_print = '                  '
+for int_i in range(int_length-16+len(STR_headFiles)/2+INT_offset+8):
   str_print += '-'
 print str_print
 for str_dbsDatasets in lstr_dbsDatasets:
