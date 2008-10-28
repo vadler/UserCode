@@ -19,26 +19,49 @@ import datetime
 
 # Constants
 
-LSTR_arguments = sys.argv[1:]
 # numbers
 INT_offset = 8
 # strings
 STR_SiStrip      = 'SIST'
 STR_wwwDBSData   = 'https://cmsweb.cern.ch/dbs_discovery/getData'
+LSTR_dbsInstances = ['cms_dbs_prod_global'    ,
+                     'cms_dbs_caf_analysis_01']
 STR_headDatasets = 'datasets'
 STR_headFiles    = 'available data files'
+DICT_htmlTags    = {}
+DICT_htmlTags['GLOBAL_NAME']     = 'global name                  '
+DICT_htmlTags['STATUS']          = 'status                       '
+DICT_htmlTags['IN_DBS']          = 'in DBS                       '
+DICT_htmlTags['SUBSYSTEMS']      = 'subsystems                   '
+DICT_htmlTags['EVENTS']          = '# of triggers                '
+DICT_htmlTags['START_TIME']      = 'start time (local)           '
+DICT_htmlTags['END_TIME']        = 'end time (local)             '
+DICT_htmlTags['L1KEY']           = 'L1 key                       '
+DICT_htmlTags['HLTKEY']          = 'HLT key                      '
+DICT_htmlTags['L1SOURCES']       = 'L1 sources                   '
+DICT_htmlTags['RUN_RATE']        = 'event rate (Hz)              '
+DICT_htmlTags['STOP_REASON']     = 'stop reason                  '
+DICT_htmlTags['SHIFTER']         = 'DQM shifter                  '
+DICT_htmlTags['CREATE_USER']     = 'entry created by             '
+DICT_htmlTags['CREATE_TIME']     = 'entry creation time          '
+DICT_htmlTags['ONLINE_COMMENT']  = 'DQM online shifter\'s comment '
+DICT_htmlTags['OFFLINE_COMMENT'] = 'DQM offline shifter\'s comment'
 
 # Globals
 
 global Str_run
 global Dict_cmsmonRunRegistry
+global DictDict_dbsDatasets
+global DictDict_dbsEvents
 global Dict_dbsDatasets
-global Dict_dbsEvents
+global Dict_maxLenDbsDatasets
 # initialise
 Str_run                = sys.argv[1]
 Dict_cmsmonRunRegistry = {}
+DictDict_dbsDatasets   = {}
+DictDict_dbsEvents     = {}
 Dict_dbsDatasets       = {}
-Dict_dbsEvents         = {}
+Dict_maxLenDbsDatasets = {}
 
 ## FUNCTIONS
 
@@ -129,11 +152,51 @@ def Func_FillInfoRunRegistry():
     print '> getRunInfo.py > SiStrip was not in this run'
     return False
   return True
+  
+## Func_FillInfoDBS(str_dbsInstance)
+#
+# Retrieves run info from DBS and fills it into containers
+def Func_FillInfoDBS(str_dbsInstance):
+  """ Func_FillInfoDBS(str_dbsInstance)
+  Retrieves run info from DBS and fills it into containers
+  """
+  str_dbsRuns      = urllib.urlencode({'ajax':'0', '_idx':'0', 'pagerStep':'0', 'userMode':'user', 'release':'Any', 'tier':'Any', 'dbsInst':str_dbsInstance, 'primType':'Any', 'primD':'Any', 'minRun':Str_run, 'maxRun':Str_run})
+  file_dbsRuns     = urllib.urlopen("https://cmsweb.cern.ch/dbs_discovery/getRunsFromRange", str_dbsRuns)
+  lstr_dbsRuns     = []
+  lstr_dbsDatasets = []
+  dict_dbsDatasets = {}
+  dict_dbsEvents   = {}
+  for str_dbsRuns in file_dbsRuns.readlines():
+    lstr_dbsRuns.append(str_dbsRuns)
+    if str_dbsRuns.find(STR_wwwDBSData) >= 0:
+      if str_dbsRuns.split('&amp;proc=')[1].find('&amp;') >= 0:
+        lstr_dbsDatasets.append(str_dbsRuns.split('&amp;proc=')[1].split('&amp;')[0])
+      else:
+        lstr_dbsDatasets.append(str_dbsRuns.split('&amp;proc=')[1])
+  int_maxLenDbsDatasets = 0
+  for str_dbsDataset in lstr_dbsDatasets:
+    str_dbsLFN  = urllib.urlencode({'dbsInst':str_dbsInstance, 'blockName':'*', 'dataset':str_dbsDataset, 'userMode':'user', 'run':Str_run})
+    file_dbsLFN = urllib.urlopen("https://cmsweb.cern.ch/dbs_discovery/getLFNlist", str_dbsLFN)
+    lstr_dbsLFN = []
+    int_events  = 0
+    for str_dbsLFN in file_dbsLFN.readlines():
+      lstr_dbsLFN.append(str_dbsLFN)
+      if str_dbsLFN.find('contians') >= 0 and str_dbsLFN.find('file(s)'): # FIXME: be careful, this typo might be corrected sometimes on the web page...
+        dict_dbsDatasets[str_dbsDataset] = str_dbsLFN.split()[1]
+      if str_dbsLFN.startswith('/store/data/'):
+        int_events += int(Func_GetHtmlTagValue('td' ,lstr_dbsLFN[len(lstr_dbsLFN)-4]))
+    dict_dbsEvents[str_dbsDataset] = str(int_events)
+    if len(str_dbsDataset) > int_maxLenDbsDatasets:
+      int_maxLenDbsDatasets = len(str_dbsDataset)
+  DictDict_dbsDatasets[str_dbsInstance]   = dict_dbsDatasets
+  DictDict_dbsEvents[str_dbsInstance]     = dict_dbsEvents
+  Dict_dbsDatasets[str_dbsInstance]       = lstr_dbsDatasets
+  Dict_maxLenDbsDatasets[str_dbsInstance] = int_maxLenDbsDatasets
  
 ## MAIN PROGRAM
 
 print
-print '> getRunInfo.py > information on run \t*** ' + Str_run + ' ***'
+print '> getRunInfo.py > information on run \t*** %s ***' %(Str_run)
 print
 
 # Get run information from the web
@@ -142,33 +205,9 @@ print
 bool_runRegistry = Func_FillInfoRunRegistry()
 
 # get run DBS entries
-str_dbsRuns      = urllib.urlencode({'ajax':'0', '_idx':'0', 'pagerStep':'0', 'userMode':'user', 'release':'Any', 'tier':'Any', 'dbsInst':'cms_dbs_caf_analysis_01', 'primType':'Any', 'primD':'Any', 'minRun':Str_run, 'maxRun':Str_run})
-file_dbsRuns     = urllib.urlopen("https://cmsweb.cern.ch/dbs_discovery/getRunsFromRange", str_dbsRuns)
-lstr_dbsRuns     = []
-lstr_dbsDatasets = []
-for str_dbsRuns in file_dbsRuns.readlines():
-  lstr_dbsRuns.append(str_dbsRuns) # store run DBS information
-  if str_dbsRuns.find(STR_wwwDBSData) >= 0:
-    if str_dbsRuns.split('&amp;proc=')[1].find('&amp;') >= 0:
-      lstr_dbsDatasets.append(str_dbsRuns.split('&amp;proc=')[1].split('&amp;')[0])
-    else:
-      lstr_dbsDatasets.append(str_dbsRuns.split('&amp;proc=')[1])
-int_maxLenDbsDatasets = 0
-for str_dbsDatasets in lstr_dbsDatasets:
-  str_dbsLFN  = urllib.urlencode({'dbsInst':'cms_dbs_prod_global', 'blockName':'*', 'dataset':str_dbsDatasets, 'userMode':'user', 'run':Str_run})
-  file_dbsLFN = urllib.urlopen("https://cmsweb.cern.ch/dbs_discovery/getLFNlist", str_dbsLFN)
-  lstr_dbsLFN = []
-  int_events  = 0
-  for str_dbsLFN in file_dbsLFN.readlines():
-    lstr_dbsLFN.append(str_dbsLFN)
-    if str_dbsLFN.find('contians') >= 0 and str_dbsLFN.find('file(s)'): # FIXME: be careful, this typo might be corrected sometimes on the web page...
-      Dict_dbsDatasets[str_dbsDatasets] = str_dbsLFN.split()[1]
-    if str_dbsLFN.startswith('/store/data/'):
-      int_events += int(Func_GetHtmlTagValue('td' ,lstr_dbsLFN[len(lstr_dbsLFN)-4]))
-  Dict_dbsEvents[str_dbsDatasets] = str(int_events)
-  if len(str_dbsDatasets) > int_maxLenDbsDatasets:
-    int_maxLenDbsDatasets = len(str_dbsDatasets)
-    
+for str_dbsInstance in LSTR_dbsInstances:
+  Func_FillInfoDBS(str_dbsInstance)
+
 # Print information
 
 # from run registry
@@ -176,64 +215,35 @@ if bool_runRegistry:
   print
   print '> getRunInfo.py > * information from run registry *'
   print
-  if 'GLOBAL_NAME' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > global name                  : ' + Dict_cmsmonRunRegistry['GLOBAL_NAME']
-  if 'STATUS' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > status                       : ' + Dict_cmsmonRunRegistry['STATUS']
-  if 'IN_DBS' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > in DBS                       : ' + Dict_cmsmonRunRegistry['IN_DBS']
-  if 'SUBSYSTEMS' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > subsystems                   : ' + Dict_cmsmonRunRegistry['SUBSYSTEMS']
-  if 'EVENTS' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > # of triggers                : ' + Dict_cmsmonRunRegistry['EVENTS']
-  if 'START_TIME' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > start time (local)           : ' + Dict_cmsmonRunRegistry['START_TIME']
-  if 'END_TIME' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > end time (local)             : ' + Dict_cmsmonRunRegistry['END_TIME']
-  if 'L1KEY' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > L1 key                       : ' + Dict_cmsmonRunRegistry['L1KEY']
-  if 'HLTKEY' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > HLT key                      : ' + Dict_cmsmonRunRegistry['HLTKEY']
-  if 'L1SOURCES' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > L1 sources                   : ' + Dict_cmsmonRunRegistry['L1SOURCES']
-#   if 'RUN_RATE' in Dict_cmsmonRunRegistry:
-#     print '> getRunInfo.py > event rate                   : ' + Dict_cmsmonRunRegistry['RUN_RATE'] + ' Hz'
-  if 'STOP_REASON' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > stop reason                  : ' + Dict_cmsmonRunRegistry['STOP_REASON']
-  if 'SHIFTER' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > DQM shifter                  : ' + Dict_cmsmonRunRegistry['SHIFTER']
-  if 'CREATE_USER' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > entry created by             : ' + Dict_cmsmonRunRegistry['CREATE_USER']
-  if 'CREATE_TIME' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > entry creation time          : ' + Dict_cmsmonRunRegistry['CREATE_TIME']
-  if 'ONLINE_COMMENT' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > DQM online shifter\'s comment : ' + Dict_cmsmonRunRegistry['ONLINE_COMMENT']
-  if 'OFFLINE_COMMENT' in Dict_cmsmonRunRegistry:
-    print '> getRunInfo.py > DQM offline shifter\'s comment: ' + Dict_cmsmonRunRegistry['OFFLINE_COMMENT']
+  for str_htmlTag in DICT_htmlTags.keys():
+    if str_htmlTag in Dict_cmsmonRunRegistry:
+      print '> getRunInfo.py > %s: %s'    %(DICT_htmlTags[str_htmlTag],Dict_cmsmonRunRegistry[str_htmlTag])
 
 # from DBS
 print
 print '> getRunInfo.py > * information from DBS *'
 print
-str_print = '> getRunInfo.py > ' + STR_headDatasets
-for int_i in range(int_maxLenDbsDatasets-len(STR_headDatasets)):
-  str_print += ' '
-str_print += ' '
-int_length = len(str_print)
-print str_print + STR_headFiles
-str_print = '                  '
-for int_i in range(int_length-16+len(STR_headFiles)/2+INT_offset+8):
-  str_print += '-'
-print str_print
-for str_dbsDatasets in lstr_dbsDatasets:
-  str_print = '                  ' + str_dbsDatasets
-  for int_i in range(int_maxLenDbsDatasets-len(str_dbsDatasets)):
+for str_dbsInstance in LSTR_dbsInstances:
+  print '> getRunInfo.py > DBS instance: %s' %(str_dbsInstance)
+  str_print = '> getRunInfo.py > ' + STR_headDatasets
+  for int_i in range(Dict_maxLenDbsDatasets[str_dbsInstance]-len(STR_headDatasets)):
     str_print += ' '
   str_print += ' '
-  for int_i in range(len(STR_headFiles)/2-len(Dict_dbsDatasets[str_dbsDatasets])):
+  int_length = len(str_print)
+  print '%s%s' %(str_print,STR_headFiles)
+  str_print = '                  '
+  for int_i in range(int_length-16+len(STR_headFiles)/2+INT_offset+8):
+    str_print += '-'
+  print str_print
+  for str_dbsDataset in Dict_dbsDatasets[str_dbsInstance]:
+    str_print = '                  ' + str_dbsDataset
+    for int_i in range(Dict_maxLenDbsDatasets[str_dbsInstance]-len(str_dbsDataset)):
+      str_print += ' '
     str_print += ' '
-  str_print += Dict_dbsDatasets[str_dbsDatasets] + ' ('
-  for int_i in range(INT_offset-len(Dict_dbsEvents[str_dbsDatasets])):
-    str_print += ' '
-  print str_print + Dict_dbsEvents[str_dbsDatasets] + ' events)'
-print  
+    for int_i in range(len(STR_headFiles)/2-len(DictDict_dbsDatasets[str_dbsInstance][str_dbsDataset])):
+      str_print += ' '
+    str_print += DictDict_dbsDatasets[str_dbsInstance][str_dbsDataset] + ' ('
+    for int_i in range(INT_offset-len(DictDict_dbsEvents[str_dbsInstance][str_dbsDataset])):
+      str_print += ' '
+    print '%s%s events)' %(str_print,DictDict_dbsEvents[str_dbsInstance][str_dbsDataset])
+  print  
