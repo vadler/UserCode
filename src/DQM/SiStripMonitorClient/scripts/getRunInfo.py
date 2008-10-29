@@ -24,8 +24,8 @@ INT_offset = 8
 # strings
 STR_SiStrip      = 'SIST'
 STR_wwwDBSData   = 'https://cmsweb.cern.ch/dbs_discovery/getData'
-LSTR_dbsInstances = ['cms_dbs_prod_global'    ,
-                     'cms_dbs_caf_analysis_01']
+LSTR_dbsInstances = ['cms_dbs_caf_analysis_01',
+                     'cms_dbs_prod_global'    ]
 STR_headDatasets = 'datasets'
 STR_headFiles    = 'available data files'
 DICT_htmlTags    = {}
@@ -225,6 +225,8 @@ print '> getRunInfo.py > * information from DBS *'
 print
 for str_dbsInstance in LSTR_dbsInstances:
   print '> getRunInfo.py > DBS instance: %s' %(str_dbsInstance)
+  if str_dbsInstance == LSTR_dbsInstances[0]:
+    print '                  (This is the instance used at CAF!)'
   str_print = '> getRunInfo.py > ' + STR_headDatasets
   for int_i in range(Dict_maxLenDbsDatasets[str_dbsInstance]-len(STR_headDatasets)):
     str_print += ' '
