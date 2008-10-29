@@ -212,6 +212,11 @@ global Str_pathCurrentDir
 global Str_pathCmsswBase
 global Str_nameCmsswRel
 global Str_pathCmsswBasePackage
+global Str_nameRun
+global Str_pathRunIncludeDir
+global Str_pathInputFilesCAFCff
+global Int_jobsNew
+global Str_magField
 # initialize arguments
 Dict_arguments    = {}
 Bool_CRAB         = BOOL_CRAB
@@ -226,7 +231,6 @@ Bool_magFieldAuto = BOOL_magFieldAuto
 Str_outpath       = STR_outpath
 Bool_useCastor    = BOOL_useCastor
 Str_mergepath     = STR_mergepath
-# initialize others
 
 ## Function Func_Usage()
 #
@@ -523,13 +527,13 @@ if Str_mergepath.split('/')[1] != 'afs':
 # Prepare work area
 
 # string identifying run (run name)  
-str_nameRun = 'R' + Str_run.zfill(9)
+Str_nameRun = 'R' + Str_run.zfill(9)
 #  directories
-Func_MkDir(str_nameRun)
-str_pathRunIncludeDir = Str_pathCmsswBasePackage + '/python/' + str_nameRun
-Func_MkDir(str_pathRunIncludeDir)
-str_nameInputFilesFile = str_nameRun + '/' + str_nameRun + '.txt'
-str_nameRunIncludeDir  = STR_nameCmsswPackage.replace('/','.') + '.' + str_nameRun
+Func_MkDir(Str_nameRun)
+Str_pathRunIncludeDir = Str_pathCmsswBasePackage + '/python/' + Str_nameRun
+Func_MkDir(Str_pathRunIncludeDir)
+str_nameInputFilesFile = Str_nameRun + '/' + Str_nameRun + '.txt'
+str_nameRunIncludeDir  = STR_nameCmsswPackage.replace('/','.') + '.' + Str_nameRun
 
 # Retrieving information from the web
 
@@ -566,6 +570,7 @@ print '> submitDQMOfflineCAF.py > input files for run %s:   %i' %(Str_run,int_nI
 if int_nInputFiles < Int_jobs:
   Int_jobs = int_nInputFiles
   print '                           number of requested jobs reduced accordingly'
+Int_jobsNew = Int_jobs
 print
 
 # magnetic field
@@ -604,39 +609,52 @@ if Bool_magFieldAuto:
     Func_Exit()
 # determine corresponding configuration file to be included
 float_magField = Func_MagConfig(Float_magField)
-str_magField   = str(int(float_magField*10)) + 'T'
+Str_magField   = str(int(float_magField*10)) + 'T'
 print '> submitDQMOfflineCAF.py > (average) magnetic field in run %s:   %s T' %(Str_run,Float_magField)
 print '                           using %s T for configuration' %(float_magField)
 print
 
 # Create scripts
 
-int_nLinesRead      = 0
-file_inputFilesCff  = file(str_nameInputFilesFile, 'r')
-lstr_linesInput     = file_inputFilesCff.readlines()
+int_nLinesRead     = 0
+file_inputFilesCff = file(str_nameInputFilesFile)
+lstr_linesInput    = file_inputFilesCff.readlines()
 file_inputFilesCff.close()
 
 # create harvesting config file and job script
 str_sedCommand  = 'sed '
-str_sedCommand += '-e \"s#xMAG_FIELDx#'         + str_magField          + '#g\" '
+str_sedCommand += '-e \"s#xMAG_FIELDx#'         + Str_magField          + '#g\" '
 str_sedCommand += '-e \"s#xGLOBAL_TAGx#'        + Str_globalTag         + '#g\" '
 str_sedCommand += '-e \"s#xINCLUDE_DIRECTORYx#' + str_nameRunIncludeDir + '#g\" '
 str_sedCommand += '-e \"s#xMERGE_PATHx#'        + Str_mergepath         + '#g\" '
-str_sedCommand += Str_pathCmsswBasePackage + '/test/SiStripCAFHarvest_template_cfg.py > ' + str_nameRun + '/SiStripCAFHarvest_cfg.py'
+str_sedCommand += Str_pathCmsswBasePackage + '/test/SiStripCAFHarvest_template_cfg.py > ' + Str_nameRun + '/SiStripCAFHarvest_cfg.py'
 os.system(str_sedCommand)
 str_sedCommand  = 'sed '
 str_sedCommand += '-e \"s#xCMSSW_BASEx#'    + Str_pathCmsswBase  + '#g\" '
-str_sedCommand += '-e \"s#xRUN_NAMEx#'      + str_nameRun        + '#g\" '
+str_sedCommand += '-e \"s#xRUN_NAMEx#'      + Str_nameRun        + '#g\" '
 str_sedCommand += '-e \"s#xMERGE_PATHx#'    + Str_mergepath      + '#g\" '
 str_sedCommand += '-e \"s#xCURRENT_DIRx#'   + Str_pathCurrentDir + '#g\" '
 str_sedCommand += '-e \"s#xDATA_TIERx#'     + Str_datatier       + '#g\" '
 str_sedCommand += '-e \"s#xCMSSW_VERSIONx#' + Str_nameCmsswRel   + '#g\" '
-str_sedCommand += Str_pathCmsswBasePackage + '/scripts/SiStripDQMCAFHarvest_template.job > ' + str_nameRun + '/SiStripCAFHarvest.job'
+str_sedCommand += Str_pathCmsswBasePackage + '/scripts/SiStripDQMCAFHarvest_template.job > ' + Str_nameRun + '/SiStripCAFHarvest.job'
 os.system(str_sedCommand)
-# prepare included CAF input files list
-str_pathInputFilesCAFCff = str_pathRunIncludeDir + '/inputFilesCAF_cff.py'
-file_inputFilesCAFCff = file(str_pathInputFilesCAFCff, 'w')
+# create included CAF input files list (mainly for compilation)
+Str_pathInputFilesCAFCff = Str_pathRunIncludeDir + '/inputFilesCAF_cff.py'
+file_inputFilesCAFCff = file(Str_pathInputFilesCAFCff, 'w')
 file_inputFilesCAFCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    processingMode = cms.untracked.string( \'Runs\' ),\n    fileNames      = cms.untracked.vstring(\n')
+for int_iJob in range(1,Int_jobs+1):
+  str_lineInput = Str_outpath + '/SiStripDQMOfflineGlobalRunCAF-' + Str_nameRun + '_' + str(int_iJob) + '.root'
+  if Bool_useCastor:
+    str_lineInput = 'rfio:' + str_lineInput
+  str_lineInput = '        \'' + str_lineInput + '\''
+  if int_iJob == Int_jobs:
+    str_lineInput += '\n'
+    file_inputFilesCAFCff.write(str_lineInput)
+    break
+  str_lineInput += ',\n'
+  file_inputFilesCAFCff.write(str_lineInput)
+file_inputFilesCAFCff.write('    )\n)\n')
+file_inputFilesCAFCff.close()
 
 str_sedCommandCommon = 'sed '
 if Bool_filter:
@@ -649,12 +667,12 @@ if Str_datatier == 'RECO':
 else:
   str_sedCommandCommon += '-e \"s#xRECO_FROM_RAWx#    #g\" '
   str_sedCommandCommon += '-e \"s#xDQM_FROM_RAWx#    #g\" '
-str_sedCommandCommon += '-e \"s#xMAG_FIELDx#'  + str_magField  + '#g\" '
+str_sedCommandCommon += '-e \"s#xMAG_FIELDx#'  + Str_magField  + '#g\" '
 str_sedCommandCommon += '-e \"s#xGLOBAL_TAGx#' + Str_globalTag + '#g\" '
-str_sedCommandCommon += '-e \"s#xRUN_NAMEx#'   + str_nameRun   + '#g\" '
+str_sedCommandCommon += '-e \"s#xRUN_NAMEx#'   + Str_nameRun   + '#g\" '
 
 if Bool_CRAB:
-  os.chdir(str_nameRun)     
+  os.chdir(Str_nameRun)     
   str_outputDir = '.'
   # create main configuration file
   str_sedCommand = str_sedCommandCommon
@@ -663,7 +681,7 @@ if Bool_CRAB:
   str_sedCommand += Str_pathCmsswBasePackage + '/test/SiStripDQMOfflineGlobalRunCAF_template_cfg.py > SiStripDQMOfflineGlobalRunCAF_cfg.py'
   os.system(str_sedCommand)
   # create included input files list
-  str_pathInputFilesJobCff = str_pathRunIncludeDir + '/inputFiles_cff.py'
+  str_pathInputFilesJobCff = Str_pathRunIncludeDir + '/inputFiles_cff.py'
   file_inputFilesJobCff = file(str_pathInputFilesJobCff, 'w')
   file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
   nLines = 0
@@ -687,43 +705,34 @@ if Bool_CRAB:
   str_sedCommand += '-e \"s#xRUNSELECTIONx#'   + Str_run                  + '#g\" '
   str_sedCommand += '-e \"s#xNUMBER_OF_JOBSx#' + str(Int_jobs)            + '#g\" '
   str_sedCommand += '-e \"s#xEMAILx#'          + Str_email                + '#g\" '
-  str_sedCommand += '-e \"s#xRUN_NAMEx#'       + str_nameRun              + '#g\" '
+  str_sedCommand += '-e \"s#xRUN_NAMEx#'       + Str_nameRun              + '#g\" '
   str_sedCommand += '-e \"s#xSTORAGE_PATHx#'   + str_outpath              + '#g\" '
   str_sedCommand += '-e \"s#xLFNx#'            + lstr_outpath[3]          + '#g\" '
   str_sedCommand += '-e \"s#xCOPY_DATAx#'      + str(int(Bool_useCastor)) + '#g\" '
   str_sedCommand += Str_pathCmsswBasePackage + '/test/SiStripDQMOfflineCAF_template.crab > crab.cfg'
   os.system(str_sedCommand)
-  os.system('crab -create')
-  # extend included CAF input files list
-  for int_iJob in range(Int_jobs): # FIXME use number of CRAB jobs created
-    str_lineInput = Str_outpath + '/SiStripDQMOfflineGlobalRunCAF-' + str_nameRun + '_' + str(int_iJob+1) + '.root'
-    if Bool_useCastor:
-      str_lineInput = 'rfio:' + str_lineInput
-    str_lineInput = '        \'' + str_lineInput + '\''
-    if int_iJob == Int_jobs-1:
-      str_lineInput += '\n'
-      file_inputFilesCAFCff.write(str_lineInput)
-      print '> submitDQMOfflineCAF.py > number of created jobs: %i' %(int_iJob+1)
-      print
-      break
-    str_lineInput += ',\n'
-    file_inputFilesCAFCff.write(str_lineInput)
   os.chdir(Str_pathCurrentDir)
 else:
+  # FIXME: following calculation has to be reviewed
+  int_nInputFilesJob = int(int_nInputFiles/Int_jobs) + 1
+  if int_nInputFiles%Int_jobs == 0:
+    int_nInputFilesJob -= 1
+  if int_nInputFiles == int_nInputFilesJob*(Int_jobs-1) and Int_jobs > 1:
+    Int_jobs -= 1
   # loop over single jobs
-  for int_iJob in range(Int_jobs):
-    str_nameJob = str_nameRun + '_' + str(int_iJob).zfill(4)
+  for int_iJob in range(1,Int_jobs+1):
+    str_nameJob = Str_nameRun + '_' + str(int_iJob).zfill(4)
     # prepare job dir
-    str_nameJobDir        = str_nameRun + "/" + str_nameJob
+    str_nameJobDir        = Str_nameRun + "/" + str_nameJob
     str_outputDir         = '/tmp/' + os.getenv('USER') + '/' + str_nameJobDir
-    str_pathJobIncludeDir = str_pathRunIncludeDir + '/' + str_nameJob
+    str_pathJobIncludeDir = Str_pathRunIncludeDir + '/' + str_nameJob
     str_nameJobIncludeDir = STR_nameCmsswPackage.replace('/','.') + '.' + str_nameJobDir.replace('/','.')
     os.mkdir(str_nameJobDir)
     os.chdir(str_nameJobDir)     
     # create job script
     str_sedCommand = 'sed '
     str_sedCommand += '-e \"s#xCMSSW_BASEx#'  + Str_pathCmsswBase  + '#g\" '
-    str_sedCommand += '-e \"s#xRUN_NAMEx#'    + str_nameRun        + '#g\" '
+    str_sedCommand += '-e \"s#xRUN_NAMEx#'    + Str_nameRun        + '#g\" '
     str_sedCommand += '-e \"s#xJOB_NAMEx#'    + str_nameJob        + '#g\" '
     str_sedCommand += '-e \"s#xCURRENT_DIRx#' + Str_pathCurrentDir + '#g\" '
     str_sedCommand += '-e \"s#xCOPYx#'        + str_castorCp       + '#g\" '
@@ -742,12 +751,6 @@ else:
     str_pathInputFilesJobCff = str_pathJobIncludeDir + '/inputFiles_cff.py'
     file_inputFilesJobCff = file(str_pathInputFilesJobCff, 'w')
     file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
-    # FIXME: following calculation has to be reviewed
-    int_nInputFilesJob = int(int_nInputFiles/Int_jobs) + 1
-    if int_nInputFiles%Int_jobs == 0:
-      int_nInputFilesJob -= 1
-    if int_nInputFiles == int_nInputFilesJob*(Int_jobs-1) and Int_jobs > 1:
-      Int_jobs -= 1
     for n_iActualLine in range(int_nLinesRead, min(int_nLinesRead+int_nInputFilesJob, int_nInputFiles)):
       str_linesInput = lstr_linesInput[n_iActualLine].replace(') );',',')
       # fix commata and end of line
@@ -760,49 +763,76 @@ else:
     file_inputFilesJobCff.close()
     # finalize job creation
     os.chdir(Str_pathCurrentDir)
-    # extend included CAF input files list
-    str_lineInput = Str_outpath + '/SiStripDQMOfflineGlobalRunCAF-' + str_nameRun + '_' + str(int_iJob+1) + '.root'
-    if Bool_useCastor:
-      str_lineInput = 'rfio:' + str_lineInput
-    str_lineInput = '        \'' + str_lineInput + '\''
     # FIXME: This protection is currently needed. Review calculations again!
     if int_nLinesRead >= int_nInputFiles:
-      str_lineInput += '\n'
-      file_inputFilesCAFCff.write(str_lineInput)
-      print '> submitDQMOfflineCAF.py > number of created jobs: %i' %(int_iJob+1)
-      print
+      Int_jobsNew = int_iJob
       break
-    str_lineInput += ',\n'
-    file_inputFilesCAFCff.write(str_lineInput)
-    
-# Finish scripts
-    
-# finish included CAF input files list
-file_inputFilesCAFCff.write('    )\n)\n')
-file_inputFilesCAFCff.close()
 
 # Compile
 
-os.chdir(str_pathRunIncludeDir+'/..')
+os.chdir(Str_pathRunIncludeDir+'/..')
 os.system('scramv1 b python')
 os.chdir(Str_pathCurrentDir)
 print
 
+# Create CRAB
+
+if Bool_CRAB:
+  os.chdir(Str_nameRun)     
+  os.system('crab -create')
+  print
+  # extract number of really created jobs
+  bool_found = False
+  file_logCRAB = file('crab'+Str_nameRun+'/log/crab.log')
+  for str_iLine in file_logCRAB.readlines():
+    if str_iLine.startswith('Total of ') and str_iLine.endswith(' jobs created.\n'):
+      bool_found = True
+      Int_jobsNew = int(str_iLine.split()[2])
+      break
+  file_logCRAB.close()
+  os.chdir(Str_pathCurrentDir)
+  if not bool_found:
+    print '> submitDQMOfflineCAF.py > could not extract number of jobs created by CRAB; check'
+    print '                           %s' %(Str_pathInputFilesCAFCff)
+    print '                           and modify manually, if necessary'
+    print
+  
+# recreate included CAF input files list according to number of created jobs, if necessary
+
+print '> submitDQMOfflineCAF.py > number of created jobs: %i' %(Int_jobsNew)
+print
+if Int_jobsNew != Int_jobs:
+  file_inputFilesCAFCff = file(Str_pathInputFilesCAFCff, 'w')
+  file_inputFilesCAFCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    processingMode = cms.untracked.string( \'Runs\' ),\n    fileNames      = cms.untracked.vstring(\n')
+  for int_iJob in range(1,Int_jobsNew+1): # FIXME use number of CRAB jobs created
+    str_lineInput = Str_outpath + '/SiStripDQMOfflineGlobalRunCAF-' + Str_nameRun + '_' + str(int_iJob) + '.root'
+    if Bool_useCastor:
+      str_lineInput = 'rfio:' + str_lineInput
+    str_lineInput = '        \'' + str_lineInput + '\''
+    if int_iJob == Int_jobsNew:
+      str_lineInput += '\n'
+      file_inputFilesCAFCff.write(str_lineInput)
+      break
+    str_lineInput += ',\n'
+    file_inputFilesCAFCff.write(str_lineInput)
+  file_inputFilesCAFCff.write('    )\n)\n')
+  file_inputFilesCAFCff.close()
+
 # Submit jobs
 
 if Dict_arguments.has_key(LSTR_functionLetters[0]):
-  os.chdir(str_nameRun)
+  os.chdir(Str_nameRun)
   if Bool_CRAB:
-    str_crabCommand = 'crab -submit -c crab' + str_nameRun
+    str_crabCommand = 'crab -submit -c crab' + Str_nameRun
     print '> submitDQMOfflineCAF.py >'
     print '  %s : %s' %(os.getcwd(),str_crabCommand)
     os.system(str_crabCommand)
     print
     time.sleep(5)
-    os.system('crab -status -c crab' + str_nameRun)
+    os.system('crab -status -c crab' + Str_nameRun)
   else:
     for int_iJob in range(Int_jobs):
-      str_nameJobDir = str_nameRun + '_' + str(int_iJob).zfill(4)
+      str_nameJobDir = Str_nameRun + '_' + str(int_iJob).zfill(4)
       os.chdir(str_nameJobDir)     
       os.chmod('SiStripDQMOfflineCAF.job',OCT_rwx_r_r)
       str_batchCommand = 'bsub -q cmscaf SiStripDQMOfflineCAF.job'
