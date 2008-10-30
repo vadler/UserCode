@@ -1,12 +1,13 @@
-  Test Release based on: CMSSW_2_1_11
+Test Release based on: CMSSW_2_1_11
 Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_1_11
 Your Test release in: /afs/cern.ch/user/c/cctrack/DQM/CMSSW_2_1_11
 --- Tag ---    -------- Package --------
-V03-02-57      DQM/SiStripMonitorClient
+V03-02-58      DQM/SiStripMonitorClient
 V04-03-03      DQM/SiStripMonitorDigi
 V00-04-01      DQM/SiStripMonitorHardware
 V03-03-08      DQMServices/Components
 V03-03-09      DQMServices/Core
 V07-00-00-16   EventFilter/SiStripRawToDigi
+V05-01-11-02   RecoTracker/TrackProducer
 ---------------------------------------
-total packages: 6 (6 displayed)
+total packages: 7 (7 displayed)
