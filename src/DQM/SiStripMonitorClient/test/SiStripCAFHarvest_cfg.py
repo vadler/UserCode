@@ -83,7 +83,7 @@ process.load( "DQM.SiStripMonitorClient.SiStripDQMOfflineGlobalRunCAF_cff" )
 # process.EDMtoMEConverter.convertOnEndRun  = True
 
 # DQM saver #
-process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_11/output'
+process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_12/output'
 
 ### Scheduling ###
 

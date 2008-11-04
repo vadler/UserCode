@@ -78,11 +78,11 @@ process.hltFilter = cms.EDFilter( "HLTHighLevel",
 ### Output ###
 
 # DQM Saver path
-process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_11/output'
+process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_12/output'
 
 # PoolOutput #
 process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_11/output/SiStripDQMOfflineGlobalRunCAF.root' ),
+    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_12/output/SiStripDQMOfflineGlobalRunCAF.root' ),
 #     fileName       = cms.untracked.string( './SiStripDQMOfflineGlobalRunCAF.root' ),
     outputCommands = cms.untracked.vstring(
         'drop *',
