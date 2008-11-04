@@ -4,7 +4,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_2_1_12
 --- Tag ---    -------- Package --------
 V01-00-01      CalibTracker/SiStripCommon
 V05-00-03      DQM/SiStripCommon
-NoTag          DQM/SiStripMonitorClient
+V03-02-60      DQM/SiStripMonitorClient
 V05-01-04      DQM/SiStripMonitorCluster
 V04-03-03      DQM/SiStripMonitorDigi
 V00-04-04      DQM/SiStripMonitorHardware
