@@ -35,13 +35,13 @@ process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck",
 ### Import ###
 
 # Magnetic fiels #
-process.load( "Configuration.StandardSequences.MagneticField_0T_cff" )
+process.load( "Configuration.StandardSequences.MagneticField_38T_cff" )
 # Geometry #
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 # Calibration 
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 process.GlobalTag.connect   = 'frontier://PromptProd/CMS_COND_21X_GLOBALTAG'
-process.GlobalTag.globaltag = 'CRAFT_V3P::All'
+process.GlobalTag.globaltag = 'CRAFT_V4P::All'
 process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
 
 ### Input ###
@@ -50,16 +50,8 @@ process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
 process.source = cms.Source( "PoolSource",
     processingMode = cms.untracked.string( 'Runs' ),
     fileNames      = cms.untracked.vstring(
-        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_1.root',
-        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_2.root',
-        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_3.root',
-        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_4.root',
-        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_5.root',
-        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_6.root',
-        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_7.root',
-        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_8.root',
-        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_9.root',
-        'rfio:/castor/cern.ch/user/v/vadler/cms/SiStripDQM/OfflineDQM/test/SiStripDQMOfflineGlobalRunCAF_10.root'
+        'file1.root',
+        'file2.root'
     )
 )
 # Input steering #
@@ -83,7 +75,7 @@ process.load( "DQM.SiStripMonitorClient.SiStripDQMOfflineGlobalRunCAF_cff" )
 # process.EDMtoMEConverter.convertOnEndRun  = True
 
 # DQM saver #
-process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_12/output'
+process.dqmSaver.dirName = '.'
 
 ### Scheduling ###
 

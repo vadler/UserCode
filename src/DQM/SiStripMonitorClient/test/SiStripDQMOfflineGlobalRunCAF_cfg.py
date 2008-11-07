@@ -39,7 +39,7 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 # Calibration 
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 process.GlobalTag.connect   = 'frontier://PromptProd/CMS_COND_21X_GLOBALTAG'
-process.GlobalTag.globaltag = 'CRAFT_V3P::All'
+process.GlobalTag.globaltag = 'CRAFT_V4P::All'
 process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
 
 ### SiStrip DQM ###
@@ -78,12 +78,11 @@ process.hltFilter = cms.EDFilter( "HLTHighLevel",
 ### Output ###
 
 # DQM Saver path
-process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_12/output'
+process.dqmSaver.dirName = '.'
 
 # PoolOutput #
 process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_1_12/output/SiStripDQMOfflineGlobalRunCAF.root' ),
-#     fileName       = cms.untracked.string( './SiStripDQMOfflineGlobalRunCAF.root' ),
+    fileName       = cms.untracked.string( './SiStripDQMOfflineGlobalRunCAF.root' ),
     outputCommands = cms.untracked.vstring(
         'drop *',
         'keep *_MEtoEDMConverter_*_SiStripDQMOfflineGlobalRunCAF'
