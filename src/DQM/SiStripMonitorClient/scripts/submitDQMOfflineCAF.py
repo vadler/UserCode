@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# $Id: submitDQMOfflineCAF.py,v 1.22 2008/11/07 11:07:01 vadler Exp $
+# $Id$
 #
 
 ## CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.py
@@ -281,13 +281,7 @@ def Func_MkDir(str_path):
   """ Function Func_MkDir():
   Create new directory
   """
-  if os.path.exists(str_path):
-    for str_root, str_dirs, str_files in os.walk(str_path, topdown = False):
-      for name in str_files:
-        os.remove(os.path.join(str_root, name))
-      for name in str_dirs:
-        os.rmdir(os.path.join(str_root, name))
-    os.rmdir(str_path)
+  shutil.rmtree(str_path, True)
   os.mkdir(str_path)
   
 ## Function Func_MagConfig(float_magFieldMeasured)
@@ -298,7 +292,6 @@ def Func_MagConfig(float_magFieldMeasured):
   Determine configuration to be used for a given magnetic field
   """
   float_magField = 0.0
-  str_magField   = '0'
   for float_valueMagField in LFLOAT_valueMagField:
     if math.fabs(float_valueMagField-float_magFieldMeasured) < math.fabs(float_magField-float_magFieldMeasured):
       float_magField = float_valueMagField
