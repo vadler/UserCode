@@ -395,39 +395,8 @@
   <class name="pat::TriggerPrimitiveRefVector" />
   <class name="edm::reftobase::Holder<reco::Candidate, pat::TriggerPrimitiveRef>" />
   <class name="edm::reftobase::RefHolder<pat::TriggerPrimitiveRef>" />
-<!--   <class name="edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerPrimitiveRefVector>" /> -->
-<!--   <class name="edm::reftobase::RefVectorHolder<pat::TriggerPrimitiveRefVector>" /> -->
-  
-  <class name="pat::TriggerObject" />
-  <class name="std::vector<pat::TriggerObject>" />
-  <class name="std::vector<pat::TriggerObject>::const_iterator" />
-  <class name="edm::Wrapper<std::vector<pat::TriggerObject> >" />
-  <class name="pat::TriggerObjectRef" />
-  <class name="pat::TriggerObjectRefVector" />
-  <class name="edm::Wrapper<pat::TriggerObjectRefVector>" />
-  <class name="edm::reftobase::Holder<reco::Candidate, pat::TriggerObjectRef>" />
-  <class name="edm::reftobase::RefHolder<pat::TriggerObjectRef>" />
-<!--   <class name="edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerObjectRefVector>" /> -->
-<!--   <class name="edm::reftobase::RefVectorHolder<pat::TriggerObjectRefVector>" /> -->
-  
-  <class name="pat::TriggerFilter" />
-  <class name="std::vector<pat::TriggerFilter>" />
-  <class name="std::vector<pat::TriggerFilter>::const_iterator" />
-  <class name="edm::Wrapper<std::vector<pat::TriggerFilter> >" />
-  <class name="pat::TriggerFilterRef" />
-  <class name="pat::TriggerFilterRefVector" />
-  <class name="edm::Wrapper<pat::TriggerFilterRefVector>" />
-  
-  <class name="pat::TriggerPath" />
-  <class name="std::vector<pat::TriggerPath>" />
-  <class name="std::vector<pat::TriggerPath>::const_iterator" />
-  <class name="edm::Wrapper<std::vector<pat::TriggerPath> >" />
-  <class name="pat::TriggerPathRef" />
-  <class name="pat::TriggerPathRefVector" />
-  <class name="edm::Wrapper<pat::TriggerPathRefVector>" />
-  
-  <class name="pat::TriggerEvent" />
-  <class name="edm::Wrapper<pat::TriggerEvent>" />
+  <class name="edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerPrimitiveRefVector>" />
+  <class name="edm::reftobase::RefVectorHolder<pat::TriggerPrimitiveRefVector>" />
 
   <class name="std::pair<pat::IsolationKeys,reco::IsoDeposit>" />
   <class name="std::vector<std::pair<pat::IsolationKeys,reco::IsoDeposit> >" />
