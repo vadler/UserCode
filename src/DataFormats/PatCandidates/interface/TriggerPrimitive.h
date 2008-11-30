@@ -40,6 +40,7 @@ namespace pat {
     public:
 
       TriggerPrimitive();
+      TriggerPrimitive( const pat::TriggerPrimitive & aTrigPrim );
       TriggerPrimitive( const reco::Particle::LorentzVector & aVec, const std::string aFilt = "", const int aType = 0, const int id = 0 );
       TriggerPrimitive( const reco::Particle::PolarLorentzVector & aVec, const std::string aFilt = "", const int aType = 0, const int id = 0 );
       virtual ~TriggerPrimitive();

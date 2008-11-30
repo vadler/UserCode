@@ -14,6 +14,13 @@ TriggerPrimitive::TriggerPrimitive() :
   triggerObjectType_( 0 ) {
 }
 
+/// copy constructor
+TriggerPrimitive::TriggerPrimitive( const TriggerPrimitive & aTrigPrim ) :
+  reco::LeafCandidate( 0, aTrigPrim.p4(), reco::Particle::Point( 0., 0., 0. ), aTrigPrim.triggerObjectId() ),
+  filterName_( aTrigPrim.filterName() ),
+  triggerObjectType_( aTrigPrim.triggerObjectType() ) {
+}
+
 /// constructor from values
 TriggerPrimitive::TriggerPrimitive( const reco::Particle::LorentzVector & aVec, const std::string aFilt, const int aType, const int id ) :
   reco::LeafCandidate( 0, aVec, reco::Particle::Point( 0., 0., 0. ), id ),
