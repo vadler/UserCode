@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: PATMuonProducer.h,v 1.14.2.1 2008/11/25 15:39:40 gpetrucc Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATMuonProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of MuonType.
 
   \author   Steven Lowette, Roger Wolf
-  \version  $Id$
+  \version  $Id: PATMuonProducer.h,v 1.14.2.1 2008/11/25 15:39:40 gpetrucc Exp $
 */
 
 
@@ -28,16 +28,17 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 
 #include "PhysicsTools/PatAlgos/interface/MultiIsolator.h"
+#include "PhysicsTools/PatAlgos/interface/EfficiencyLoader.h"
+
+#include "DataFormats/PatCandidates/interface/UserData.h"
+#include "PhysicsTools/PatAlgos/interface/PATUserDataHelper.h"
 
 #include <string>
 
 
 namespace pat {
 
-
-  class ObjectResolutionCalc;
   class LeptonLRCalc;
-
 
   class PATMuonProducer : public edm::EDProducer {
 
@@ -47,30 +48,49 @@ namespace pat {
       ~PATMuonProducer();
 
       virtual void produce(edm::Event & iEvent, const edm::EventSetup & iSetup);
+      typedef edm::RefToBase<MuonType> MuonBaseRef;
 
     private:
 
+
+      typedef std::vector<edm::Handle<edm::Association<reco::GenParticleCollection> > > GenAssociations;
+
+      typedef std::vector<edm::Handle<edm::Association<TriggerPrimitiveCollection> > > TrigAssociations;
+
+
+      void fillMuon( Muon& patMuon, 
+		     const MuonBaseRef& muonRef,
+		     const reco::CandidateBaseRef& baseRef,
+		     const GenAssociations& genMatches,
+		     const TrigAssociations&  trigMatches) const;
+
       // configurables
       edm::InputTag muonSrc_;
+      edm::InputTag pfMuonSrc_;
+      bool          useParticleFlow_;
       bool          embedTrack_;
       bool          embedStandAloneMuon_;
       bool          embedCombinedMuon_;
+      bool          embedPFCandidate_;
       bool          addGenMatch_;
-      edm::InputTag genMatchSrc_;
+      bool          embedGenMatch_;
+      std::vector<edm::InputTag> genMatchSrc_;
       bool          addTrigMatch_;
       std::vector<edm::InputTag> trigMatchSrc_;
       bool          addResolutions_;
-      bool          useNNReso_;
-      std::string   muonResoFile_;
-      bool          addMuonID_;
       bool          addLRValues_;
       // tools
-      ObjectResolutionCalc * theResoCalc_;
       GreaterByPt<Muon>      pTComparator_;
 
       pat::helper::MultiIsolator isolator_; 
       pat::helper::MultiIsolator::IsolationValuePairs isolatorTmpStorage_; // better here than recreate at each event
       std::vector<std::pair<pat::IsolationKeys,edm::InputTag> > isoDepositLabels_;
+
+      bool addEfficiencies_;
+      pat::helper::EfficiencyLoader efficiencyLoader_;
+
+      bool useUserData_;
+      pat::PATUserDataHelper<pat::Muon>      userDataHelper_;
 
   };
 

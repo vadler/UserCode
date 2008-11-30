@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: PATMETProducer.h,v 1.5.4.1 2008/11/25 15:39:40 gpetrucc Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATMETProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of METType.
 
   \author   Steven Lowette
-  \version  $Id: PATMETProducer.h,v 1.3 2008/06/08 12:24:03 vadler Exp $
+  \version  $Id: PATMETProducer.h,v 1.5.4.1 2008/11/25 15:39:40 gpetrucc Exp $
 */
 
 
@@ -24,13 +24,14 @@
 #include "PhysicsTools/Utilities/interface/EtComparator.h"
 
 #include "DataFormats/PatCandidates/interface/MET.h"
+#include "PhysicsTools/PatAlgos/interface/EfficiencyLoader.h"
+
+
+#include "DataFormats/PatCandidates/interface/UserData.h"
+#include "PhysicsTools/PatAlgos/interface/PATUserDataHelper.h"
 
 
 namespace pat {
-
-
-  class ObjectResolutionCalc;
-
 
   class PATMETProducer : public edm::EDProducer {
 
@@ -50,13 +51,17 @@ namespace pat {
       bool          addTrigMatch_;
       std::vector<edm::InputTag> trigMatchSrc_;
       bool          addResolutions_;
-      bool          useNNReso_;
-      std::string   metResoFile_;
       bool          addMuonCorr_;
       edm::InputTag muonSrc_;
       // tools
-      ObjectResolutionCalc * metResoCalc_;
       GreaterByEt<MET> eTComparator_;
+
+      bool addEfficiencies_;
+      pat::helper::EfficiencyLoader efficiencyLoader_;
+
+      bool useUserData_;
+      pat::PATUserDataHelper<pat::MET>      userDataHelper_;
+
 
   };
 

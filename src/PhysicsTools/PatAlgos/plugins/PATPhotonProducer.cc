@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: PATPhotonProducer.cc,v 1.15 2008/10/19 21:11:56 gpetrucc Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATPhotonProducer.h"
@@ -13,20 +13,45 @@
 using namespace pat;
 
 PATPhotonProducer::PATPhotonProducer(const edm::ParameterSet & iConfig) :
-  isolator_(iConfig.exists("isolation") ? iConfig.getParameter<edm::ParameterSet>("isolation") : edm::ParameterSet(), false) 
+  isolator_(iConfig.exists("isolation") ? iConfig.getParameter<edm::ParameterSet>("isolation") : edm::ParameterSet(), false) ,
+  userDataHelper_ ( iConfig.getParameter<edm::ParameterSet>("userData") )
 {
   // initialize the configurables
   photonSrc_         = iConfig.getParameter<edm::InputTag>("photonSource");
   embedSuperCluster_ = iConfig.getParameter<bool>         ("embedSuperCluster");
 
+  // photon ID configurables
+  addPhotonID_       = iConfig.getParameter<bool>         ("addPhotonID");
+  photonIDSrc_       = iConfig.getParameter<edm::InputTag>("photonIDSource");
+
    // MC matching configurables
   addGenMatch_       = iConfig.getParameter<bool>         ( "addGenMatch" );
-  genMatchSrc_       = iConfig.getParameter<edm::InputTag>( "genParticleMatch" );
+  if (addGenMatch_) {
+      embedGenMatch_ = iConfig.getParameter<bool>         ( "embedGenMatch" );
+      if (iConfig.existsAs<edm::InputTag>("genParticleMatch")) {
+          genMatchSrc_.push_back(iConfig.getParameter<edm::InputTag>( "genParticleMatch" ));
+      } else {
+          genMatchSrc_ = iConfig.getParameter<std::vector<edm::InputTag> >( "genParticleMatch" );
+      }
+  }
   
   // trigger matching configurables
   addTrigMatch_     = iConfig.getParameter<bool>         ( "addTrigMatch" );
   trigMatchSrc_     = iConfig.getParameter<std::vector<edm::InputTag> >( "trigPrimMatch" );
-  
+
+  // Efficiency configurables
+  addEfficiencies_ = iConfig.getParameter<bool>("addEfficiencies");
+  if (addEfficiencies_) {
+     efficiencyLoader_ = pat::helper::EfficiencyLoader(iConfig.getParameter<edm::ParameterSet>("efficiencies"));
+  }
+ 
+  // Check to see if the user wants to add user data
+  useUserData_ = false;
+  if ( iConfig.exists("userData") ) {
+    useUserData_ = true;
+  }
+
+ 
   // produces vector of photons
   produces<std::vector<Photon> >();
 
@@ -56,12 +81,22 @@ void PATPhotonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSe
   iEvent.getByLabel(photonSrc_, photons);
 
   // prepare the MC matching
-  edm::Handle<edm::Association<reco::GenParticleCollection> > genMatch;
+  std::vector<edm::Handle<edm::Association<reco::GenParticleCollection> > > genMatches(genMatchSrc_.size());
   if (addGenMatch_) {
-    iEvent.getByLabel(genMatchSrc_, genMatch);
+        for (size_t j = 0, nd = genMatchSrc_.size(); j < nd; ++j) {
+            iEvent.getByLabel(genMatchSrc_[j], genMatches[j]);
+        }
   }
 
-  if (isolator_.enabled()) isolator_.beginEvent(iEvent);
+  // prepare the PhotonID
+  edm::Handle<edm::ValueMap<reco::PhotonID> > photonID;
+  if (addPhotonID_) {
+    iEvent.getByLabel(photonIDSrc_, photonID);
+  }
+
+  if (isolator_.enabled()) isolator_.beginEvent(iEvent,iSetup);
+
+  if (efficiencyLoader_.enabled()) efficiencyLoader_.newEvent(iEvent);
 
   std::vector<edm::Handle<edm::ValueMap<IsoDeposit> > > deposits(isoDepositLabels_.size());
   for (size_t j = 0, nd = deposits.size(); j < nd; ++j) {
@@ -74,15 +109,17 @@ void PATPhotonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSe
     // construct the Photon from the ref -> save ref to original object
     unsigned int idx = itPhoton - photons->begin();
     edm::RefToBase<PhotonType> photonRef = photons->refAt(idx);
+    edm::Ptr<PhotonType> photonPtr = photons->ptrAt(idx);
     Photon aPhoton(photonRef);
     if (embedSuperCluster_) aPhoton.embedSuperCluster();
 
-    // store the match to the generated final state photons
+    // store the match to the generated final state muons
     if (addGenMatch_) {
-      reco::GenParticleRef genPhoton = (*genMatch)[photonRef];
-      if (genPhoton.isNonnull() && genPhoton.isAvailable() ) {
-        aPhoton.setGenPhoton(*genPhoton);
-      } // leave empty if no match found
+      for(size_t i = 0, n = genMatches.size(); i < n; ++i) {
+          reco::GenParticleRef genPhoton = (*genMatches[i])[photonRef];
+          aPhoton.addGenParticleRef(genPhoton);
+      }
+      if (embedGenMatch_) aPhoton.embedGenParticle();
     }
     
     // matches to trigger primitives
@@ -95,6 +132,15 @@ void PATPhotonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSe
           aPhoton.addTriggerMatch(*trigPrim);
         }
       }
+    }
+
+    // PhotonID
+    if (addPhotonID_) {
+        aPhoton.setPhotonID( (*photonID)[photonRef] );
+    }
+
+    if (efficiencyLoader_.enabled()) {
+        efficiencyLoader_.setEfficiencies( aPhoton, photonRef );
     }
 
     // here comes the extra functionality
@@ -110,6 +156,12 @@ void PATPhotonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSe
     for (size_t j = 0, nd = deposits.size(); j < nd; ++j) {
         aPhoton.setIsoDeposit(isoDepositLabels_[j].first, (*deposits[j])[photonRef]);
     }
+
+
+    if ( useUserData_ ) {
+      userDataHelper_.add( aPhoton, iEvent, iSetup );
+    }
+    
 
     // add the Photon to the vector of Photons
     PATPhotons->push_back(aPhoton);

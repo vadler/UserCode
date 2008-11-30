@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: PATElectronProducer.cc,v 1.20.2.2 2008/11/25 15:39:40 gpetrucc Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
@@ -7,14 +7,11 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 
-#include "DataFormats/HepMCCandidate/interface/GenParticleCandidate.h"
-#include "PhysicsTools/Utilities/interface/DeltaR.h"
 #include "DataFormats/Common/interface/Association.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
-#include "PhysicsTools/PatUtils/interface/ObjectResolutionCalc.h"
 #include "PhysicsTools/PatUtils/interface/TrackerIsolationPt.h"
 #include "PhysicsTools/PatUtils/interface/CaloIsolationEnergy.h"
 
@@ -26,7 +23,8 @@ using namespace pat;
 
 
 PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
-  isolator_(iConfig.exists("isolation") ? iConfig.getParameter<edm::ParameterSet>("isolation") : edm::ParameterSet(), false) 
+  isolator_(iConfig.exists("isolation") ? iConfig.getParameter<edm::ParameterSet>("isolation") : edm::ParameterSet(), false) ,
+  userDataHelper_ ( iConfig.getParameter<edm::ParameterSet>("userData") )
 {
 
   // general configurables
@@ -37,7 +35,14 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
   
   // MC matching configurables
   addGenMatch_      = iConfig.getParameter<bool>          ( "addGenMatch" );
-  genMatchSrc_       = iConfig.getParameter<edm::InputTag>( "genParticleMatch" );
+  if (addGenMatch_) {
+      embedGenMatch_ = iConfig.getParameter<bool>         ( "embedGenMatch" );
+      if (iConfig.existsAs<edm::InputTag>("genParticleMatch")) {
+          genMatchSrc_.push_back(iConfig.getParameter<edm::InputTag>( "genParticleMatch" ));
+      } else {
+          genMatchSrc_ = iConfig.getParameter<std::vector<edm::InputTag> >( "genParticleMatch" );
+      }
+  }
   
   // trigger matching configurables
   addTrigMatch_     = iConfig.getParameter<bool>         ( "addTrigMatch" );
@@ -45,20 +50,38 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
 
   // resolution configurables
   addResolutions_   = iConfig.getParameter<bool>         ( "addResolutions" );
-  useNNReso_        = iConfig.getParameter<bool>         ( "useNNResolutions" );
-  electronResoFile_ = iConfig.getParameter<std::string>  ( "electronResoFile" );
 
   // electron ID configurables
   addElecID_        = iConfig.getParameter<bool>         ( "addElectronID" );
-  elecIDSrc_        = iConfig.getParameter<edm::InputTag>( "electronIDSource" );
-  addElecIDRobust_  = iConfig.getParameter<bool>         ( "addElectronIDRobust" );
-  elecIDRobustSrc_  = iConfig.getParameter<edm::InputTag>( "electronIDRobustSource" );
+  if (addElecID_) {
+      // it might be a single electron ID
+      if (iConfig.existsAs<edm::InputTag>("electronIDSource")) {
+          elecIDSrcs_.push_back(NameTag("", iConfig.getParameter<edm::InputTag>("electronIDSource")));
+      }
+      // or there might be many of them
+      if (iConfig.existsAs<edm::ParameterSet>("electronIDSources")) {
+          // please don't configure me twice
+          if (!elecIDSrcs_.empty()) throw cms::Exception("Configuration") << 
+                "PATElectronProducer: you can't specify both 'electronIDSource' and 'electronIDSources'\n";
+          // read the different electron ID names
+          edm::ParameterSet idps = iConfig.getParameter<edm::ParameterSet>("electronIDSources");
+          std::vector<std::string> names = idps.getParameterNamesForType<edm::InputTag>();
+          for (std::vector<std::string>::const_iterator it = names.begin(), ed = names.end(); it != ed; ++it) {
+              elecIDSrcs_.push_back(NameTag(*it, idps.getParameter<edm::InputTag>(*it)));
+          }
+      }
+      // but in any case at least once
+      if (elecIDSrcs_.empty()) throw cms::Exception("Configuration") <<
+            "PATElectronProducer: id addElectronID is true, you must specify either:\n" <<
+            "\tInputTag electronIDSource = <someTag>\n" << "or\n" <<
+            "\tPSet electronIDSources = { \n" <<
+            "\t\tInputTag <someName> = <someTag>   // as many as you want \n " <<
+            "\t}\n";
+  }
   
   // construct resolution calculator
-  if(addResolutions_){
-    theResoCalc_= new ObjectResolutionCalc(edm::FileInPath(electronResoFile_).fullPath(), useNNReso_);
-  }
 
+  // IsoDeposit configurables
   if (iConfig.exists("isoDeposits")) {
      edm::ParameterSet depconf = iConfig.getParameter<edm::ParameterSet>("isoDeposits");
      if (depconf.exists("tracker")) isoDepositLabels_.push_back(std::make_pair(TrackerIso, depconf.getParameter<edm::InputTag>("tracker")));
@@ -74,6 +97,23 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
      }
   }
 
+  // Efficiency configurables
+  addEfficiencies_ = iConfig.getParameter<bool>("addEfficiencies");
+  if (addEfficiencies_) {
+     efficiencyLoader_ = pat::helper::EfficiencyLoader(iConfig.getParameter<edm::ParameterSet>("efficiencies"));
+  }
+
+  // Check to see if the user wants to add user data
+  useUserData_ = false;
+  if ( iConfig.exists("userData") ) {
+    useUserData_ = true;
+  }
+
+  // electron ID configurables
+  addElecShapes_        = iConfig.getParameter<bool>("addElectronShapes" );
+  reducedBarrelRecHitCollection_ = iConfig.getParameter<edm::InputTag>("reducedBarrelRecHitCollection") ;
+  reducedEndcapRecHitCollection_ = iConfig.getParameter<edm::InputTag>("reducedEndcapRecHitCollection") ;
+   
   // produces vector of muons
   produces<std::vector<Electron> >();
 
@@ -81,7 +121,6 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
 
 
 PATElectronProducer::~PATElectronProducer() {
-  if(addResolutions_) delete theResoCalc_;
 }
 
 
@@ -91,7 +130,9 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
   edm::Handle<edm::View<ElectronType> > electrons;
   iEvent.getByLabel(electronSrc_, electrons);
 
-  if (isolator_.enabled()) isolator_.beginEvent(iEvent);
+  if (isolator_.enabled()) isolator_.beginEvent(iEvent,iSetup);
+
+  if (efficiencyLoader_.enabled()) efficiencyLoader_.newEvent(iEvent);
 
   std::vector<edm::Handle<edm::ValueMap<IsoDeposit> > > deposits(isoDepositLabels_.size());
   for (size_t j = 0, nd = deposits.size(); j < nd; ++j) {
@@ -99,33 +140,49 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
   }
 
   // prepare the MC matching
-  edm::Handle<edm::Association<reco::GenParticleCollection> > genMatch;
+  std::vector<edm::Handle<edm::Association<reco::GenParticleCollection> > > genMatches(genMatchSrc_.size());
   if (addGenMatch_) {
-    iEvent.getByLabel(genMatchSrc_, genMatch);
+        for (size_t j = 0, nd = genMatchSrc_.size(); j < nd; ++j) {
+            iEvent.getByLabel(genMatchSrc_[j], genMatches[j]);
+        }
   }
 
-  // prepare ID extraction
-  edm::Handle<reco::ElectronIDAssociationCollection> elecIDs;
-  if (addElecID_) iEvent.getByLabel(elecIDSrc_, elecIDs);
-  edm::Handle<reco::ElectronIDAssociationCollection> elecIDRobusts;
-  if (addElecIDRobust_) iEvent.getByLabel(elecIDRobustSrc_, elecIDRobusts);
-  
+  // prepare ID extraction 
+  std::vector<edm::Handle<edm::ValueMap<float> > > idhandles;
+  std::vector<pat::Electron::IdPair>               ids;
+  if (addElecID_) {
+     idhandles.resize(elecIDSrcs_.size());
+     ids.resize(elecIDSrcs_.size());
+     for (size_t i = 0; i < elecIDSrcs_.size(); ++i) {
+        iEvent.getByLabel(elecIDSrcs_[i].second, idhandles[i]);
+        ids[i].first = elecIDSrcs_[i].first;
+     }
+  }
+
+  //prepare electron cluster shapes extraction
+  std::auto_ptr<EcalClusterLazyTools> lazyTools_;
+  if (addElecShapes_) {
+    lazyTools_ .reset(new EcalClusterLazyTools( iEvent , iSetup , reducedBarrelRecHitCollection_ , reducedEndcapRecHitCollection_ ));  
+  }
+
   std::vector<Electron> * patElectrons = new std::vector<Electron>();
   for (edm::View<ElectronType>::const_iterator itElectron = electrons->begin(); itElectron != electrons->end(); ++itElectron) {
     // construct the Electron from the ref -> save ref to original object
     unsigned int idx = itElectron - electrons->begin();
     edm::RefToBase<ElectronType> elecsRef = electrons->refAt(idx);
+    edm::Ptr<ElectronType> electronPtr = electrons->ptrAt(idx);
     Electron anElectron(elecsRef);
     if (embedGsfTrack_) anElectron.embedGsfTrack();
     if (embedSuperCluster_) anElectron.embedSuperCluster();
     if (embedTrack_) anElectron.embedTrack();
 
-    // store the match to the generated final state electrons
+    // store the match to the generated final state muons
     if (addGenMatch_) {
-      reco::GenParticleRef genElectron = (*genMatch)[elecsRef];
-      if (genElectron.isNonnull() && genElectron.isAvailable() ) {
-        anElectron.setGenLepton(*genElectron);
-      } // leave empty if no match found
+      for(size_t i = 0, n = genMatches.size(); i < n; ++i) {
+          reco::GenParticleRef genElectron = (*genMatches[i])[elecsRef];
+          anElectron.addGenParticleRef(genElectron);
+      }
+      if (embedGenMatch_) anElectron.embedGenParticle();
     }
     
     // matches to trigger primitives
@@ -141,9 +198,6 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
     }
 
     // add resolution info
-    if(addResolutions_){
-      (*theResoCalc_)(anElectron);
-    }
     
     // Isolation
     if (isolator_.enabled()) {
@@ -159,14 +213,35 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
         anElectron.setIsoDeposit(isoDepositLabels_[j].first, (*deposits[j])[elecsRef]);
     }
 
+    if (efficiencyLoader_.enabled()) {
+        efficiencyLoader_.setEfficiencies( anElectron, elecsRef );
+    }
 
     // add electron ID info
     if (addElecID_) {
-      anElectron.setLeptonID(electronID(electrons, elecIDs, idx));
+        for (size_t i = 0; i < elecIDSrcs_.size(); ++i) {
+            ids[i].second = (*idhandles[i])[elecsRef];    
+        }
+        anElectron.setElectronIDs(ids);
     }
-    if (addElecIDRobust_) {
-      anElectron.setElectronIDRobust(electronID(electrons, elecIDRobusts, idx));
+    
+
+    if ( useUserData_ ) {
+      userDataHelper_.add( anElectron, iEvent, iSetup );
     }
+    
+    //  add electron shapes info
+    if (addElecShapes_) {
+	std::vector<float> covariances = lazyTools_->covariances(*(itElectron->superCluster()->seed())) ;
+	std::vector<float> localCovariances = lazyTools_->localCovariances(*(itElectron->superCluster()->seed())) ;
+	float scSigmaEtaEta = sqrt(covariances[0]) ;
+	float scSigmaIEtaIEta = sqrt(localCovariances[0]) ;
+	float scE1x5 = lazyTools_->e1x5(*(itElectron->superCluster()->seed()))  ;
+	float scE2x5Max = lazyTools_->e2x5Max(*(itElectron->superCluster()->seed()))  ;
+	float scE5x5 = lazyTools_->e5x5(*(itElectron->superCluster()->seed())) ;
+	anElectron.setClusterShapes(scSigmaEtaEta,scSigmaIEtaIEta,scE1x5,scE2x5Max,scE5x5) ;
+    }
+    
     // add sel to selected
     patElectrons->push_back(anElectron);
   }
@@ -182,20 +257,6 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
   // clean up
   if (isolator_.enabled()) isolator_.endEvent();
 
-}
-
-
-double PATElectronProducer::electronID(const edm::Handle<edm::View<ElectronType> > & electrons,
-                                       const edm::Handle<reco::ElectronIDAssociationCollection> & elecIDs,
-	                               unsigned int idx) {
-  //find elecID for elec with index idx
-  edm::Ref<std::vector<ElectronType> > elecsRef = electrons->refAt(idx).castTo<edm::Ref<std::vector<ElectronType> > >();
-  reco::ElectronIDAssociationCollection::const_iterator elecID = elecIDs->find( elecsRef );
-
-  //return corresponding elecID (only 
-  //cut based available at the moment)
-  const reco::ElectronIDRef& id = elecID->val;
-  return id->cutBasedDecision();
 }
 
 
