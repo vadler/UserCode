@@ -20,6 +20,10 @@
 #include "DataFormats/PatCandidates/interface/EventHypothesis.h"
 #include "DataFormats/PatCandidates/interface/EventHypothesisLooper.h"
 #include "DataFormats/PatCandidates/interface/TriggerPrimitive.h"
+#include "DataFormats/PatCandidates/interface/TriggerObject.h"
+#include "DataFormats/PatCandidates/interface/TriggerFilter.h"
+#include "DataFormats/PatCandidates/interface/TriggerPath.h"
+#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
 #include "DataFormats/PatCandidates/interface/Vertexing.h"
 
@@ -340,8 +344,29 @@ namespace {
   pat::TriggerPrimitiveRefVector	         tprv;
   edm::reftobase::Holder<reco::Candidate, pat::TriggerPrimitiveRef>	 rb_cand_h_p_tp;
   edm::reftobase::RefHolder<pat::TriggerPrimitiveRef>	                 rb_rh_p_tp;
-  edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerPrimitiveRefVector>	 rb_cand_vh_tp;
-  edm::reftobase::RefVectorHolder<pat::TriggerPrimitiveRefVector>	         rb_rvh_p_tp;
+//   edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerPrimitiveRefVector>	 rb_cand_vh_tp;
+//   edm::reftobase::RefVectorHolder<pat::TriggerPrimitiveRefVector>	         rb_rvh_p_tp;
+  
+  std::vector<pat::TriggerObject>::const_iterator v_p_to_ci;
+  edm::Wrapper<std::vector<pat::TriggerObject> > w_v_p_to;
+  pat::TriggerObjectRef p_r_to;
+  edm::Wrapper<pat::TriggerObjectRefVector> w_p_rv_to;
+  edm::reftobase::Holder<reco::Candidate, pat::TriggerObjectRef> rb_cand_h_p_to;
+  edm::reftobase::RefHolder<pat::TriggerObjectRef> rb_rh_p_to;
+//   edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerObjectRefVector> rb_cand_vh_p_to;
+//   edm::reftobase::RefVectorHolder<pat::TriggerObjectRefVector> rb_rvh_p_to;
+  
+  std::vector<pat::TriggerFilter>::const_iterator v_p_tf_ci;
+  edm::Wrapper<std::vector<pat::TriggerFilter> > w_v_p_tf;
+  pat::TriggerFilterRef p_r_tf;
+  edm::Wrapper<pat::TriggerFilterRefVector> w_p_rv_tf;
+  
+  std::vector<pat::TriggerPath>::const_iterator v_p_tp_ci;
+  edm::Wrapper<std::vector<pat::TriggerPath> > w_v_p_tp;
+  pat::TriggerPathRef p_r_tp;
+  edm::Wrapper<pat::TriggerPathRefVector> w_p_rv_tp;
+  
+  edm::Wrapper<pat::TriggerEvent > w_p_te;
 
   std::vector<std::pair<pat::IsolationKeys,reco::IsoDeposit> >	 v_p_ik_id;
 
