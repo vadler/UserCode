@@ -23,7 +23,7 @@
 
 
 // #include "DataFormats/PatCandidates/interface/TriggerObject.h"
-#include "DataFormats/PatCandidates/interface/TriggerFilter.h"
+// #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
 // #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
 #include <string>
@@ -61,13 +61,13 @@ namespace pat {
       /// objects related
       
       /// filters related
-      pat::TriggerFilterCollection getFilters();
-      pat::TriggerFilterCollection getFiltersFinal();
-      pat::TriggerFilter           getFilter( std::string & filterName );
-//       pat::TriggerFilter           getFilter( edm::InputTag & filterTag );
-      pat::TriggerFilter           getFilterFailed();
-      unsigned int                 nFilters();
-      unsigned int                 nFiltersFinal();
+//       pat::TriggerFilterCollection getFilters();
+//       pat::TriggerFilterCollection getFiltersFinal();
+//       pat::TriggerFilter           getFilter( std::string & filterName );
+// //       pat::TriggerFilter           getFilter( edm::InputTag & filterTag );
+//       pat::TriggerFilter           getFilterFailed();
+//       unsigned int                 nFilters();
+//       unsigned int                 nFiltersFinal();
       
       /// event related
       
@@ -78,7 +78,7 @@ namespace pat {
       bool                        run_;
       bool                        accept_;
       bool                        error_;
-      pat::TriggerFilterRefVector filters_; // initialization?
+//       pat::TriggerFilterRefVector filters_; // initialization?
     
   };
   

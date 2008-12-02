@@ -25,7 +25,7 @@ process.source = cms.Source("PoolSource",
     )
 )
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( 1 )
+    input = cms.untracked.int32( 10 )
 )
 
 process.load( "Configuration.StandardSequences.Geometry_cff" )
@@ -42,10 +42,10 @@ process.load( "PhysicsTools.PatAlgos.patLayer0_cff" )
 process.load( "PhysicsTools.PatAlgos.patLayer1_cff" )
 
 process.p = cms.Path(
+    process.hltEventAnalyzerAOD       +
+    process.triggerSummaryAnalyzerAOD +
     process.patLayer0 *  
-    process.patLayer1 +
-    process.hltEventAnalyzerAOD +
-    process.triggerSummaryAnalyzerAOD
+    process.patLayer1
 )
 
 # Output module configuration

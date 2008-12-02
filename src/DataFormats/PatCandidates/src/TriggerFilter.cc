@@ -1,5 +1,5 @@
 //
-// $Id:$
+// $Id$
 //
 
 
@@ -111,19 +111,19 @@ bool          TriggerFilter::wasAccept()
 
 /// objects related
 
-pat::TriggerObjectCollection TriggerFilter::getObjects() // this certainly has to be checked, protection added
-{
-  pat::TriggerObjectCollection objects;
-  for ( pat::TriggerObjectRefVector::iterator i = objects_.begin(); i != objects_.end(); i++ ) {
-    objects.push_back( **i );
-  }
-  return objects;
-}
-
-unsigned int TriggerFilter::nObjects()
-{
-  return objects_.size();
-}
+// pat::TriggerObjectCollection TriggerFilter::getObjects() // this certainly has to be checked, protection added
+// {
+//   pat::TriggerObjectCollection objects;
+//   for ( pat::TriggerObjectRefVector::iterator i = objects_.begin(); i != objects_.end(); i++ ) {
+//     objects.push_back( **i );
+//   }
+//   return objects;
+// }
+// 
+// unsigned int TriggerFilter::nObjects()
+// {
+//   return objects_.size();
+// }
 
 /// paths related
 

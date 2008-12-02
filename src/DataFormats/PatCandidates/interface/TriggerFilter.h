@@ -22,7 +22,7 @@
 */
 
 
-#include "DataFormats/PatCandidates/interface/TriggerObject.h"
+// #include "DataFormats/PatCandidates/interface/TriggerObject.h"
 // #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 // #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
@@ -62,8 +62,8 @@ namespace pat {
       bool          wasAccept();
       
       /// objects related
-      pat::TriggerObjectCollection getObjects();
-      unsigned int                 nObjects();
+/*      pat::TriggerObjectCollection getObjects();
+      unsigned int                 nObjects();*/
       
       /// paths related
       
@@ -77,7 +77,7 @@ namespace pat {
       unsigned int                objectId_; // what is this in this case?
       bool                        run_;
       bool                        accept_;
-      pat::TriggerObjectRefVector objects_; // initialization?
+//       pat::TriggerObjectRefVector objects_; // initialization?
         
   };
   

@@ -30,14 +30,15 @@
 // #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 // #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
+#include <string>
 #include <vector>
 
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/HLTReco/interface/TriggerObject.h"
 #include "DataFormats/Common/interface/RefToBase.h"
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
-#include "DataFormats/Candidate/interface/Candidate.h"
-#include "DataFormats/HLTReco/interface/TriggerObject.h"
 
 
 namespace pat {
@@ -48,12 +49,16 @@ namespace pat {
 
       /// constructors and desctructor
       TriggerObject();
-      TriggerObject( const reco::Particle::LorentzVector & vec, const int id = 0 );
-      TriggerObject( const reco::Particle::PolarLorentzVector & vec, const int id = 0 );
-      TriggerObject( const trigger::TriggerObject & aTrigObj );
+      TriggerObject( const reco::Particle::LorentzVector & vec, const int id = 0, const int type = 0 );
+      TriggerObject( const reco::Particle::PolarLorentzVector & vec, const int id = 0, const int type = 0 );
+      TriggerObject( const trigger::TriggerObject & aTrigObj, const int type = 0 );
       virtual ~TriggerObject();
       
       /// object related
+      void setCollection( std::string & collection );
+      void setType( int type );
+      std::string getCollection();
+      int         getType();
       
       /// filters related
       
@@ -61,19 +66,24 @@ namespace pat {
       
     protected:
     
-      std::vector<edm::RefToBase<reco::Candidate> > patObjectMatches_; // initialization?
+      std::string collection_;
+      int         type_; // special filter related ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
+      
+      TriggerFilterRefVector filters_;
+    
+//       std::vector< edm::RefToBase< reco::Candidate > > patObjectMatches_; // initialization?
 
   };
   
 
   /// collection of TriggerObject
-  typedef std::vector< TriggerObject >                TriggerObjectCollection;
+  typedef std::vector< TriggerObject >              TriggerObjectCollection;
   /// persistent reference to a TriggerObjectCollection
-  typedef edm::Ref< TriggerObjectCollection >         TriggerObjectRef;
+  typedef edm::Ref< TriggerObjectCollection >       TriggerObjectRef;
   /// persistent reference to a TriggerObjectCollection product
-  typedef edm::RefProd< TriggerObjectCollection >     TriggerObjectRefProd;
+  typedef edm::RefProd< TriggerObjectCollection >   TriggerObjectRefProd;
   /// vector of reference to TriggerObject in the same collection
-  typedef edm::RefVector< TriggerObjectCollection >   TriggerObjectRefVector;
+  typedef edm::RefVector< TriggerObjectCollection > TriggerObjectRefVector;
 
 }
 
