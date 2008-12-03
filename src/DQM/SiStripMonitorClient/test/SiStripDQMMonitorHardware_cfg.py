@@ -68,7 +68,7 @@ process.DQM.collectorHost = ''
 process.load( "DQMServices.Components.DQMEnvironment_cfi" )
 # File saving
 process.dqmSaver.convention        = 'Online'
-process.dqmSaver.dirName           = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_2_2_0_pre1/output'
+process.dqmSaver.dirName           = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_2_2_0/output'
 process.dqmSaver.producer          = 'DQM'
 process.dqmSaver.saveByRun         = 1
 process.dqmSaver.saveAtJobEnd      = True
@@ -236,7 +236,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # DQM Saver path #
 
-process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_2_0_pre1/output'
+process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_2_2_0/output'
 
 ### Scheduling ###
 

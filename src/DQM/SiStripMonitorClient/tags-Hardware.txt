@@ -1,9 +1,7 @@
-Test Release based on: CMSSW_2_2_0_pre1
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_0_pre1
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_2_2_0_pre1
---- Tag ---    -------- Package --------                        
-NoTag          DQM/SiStripMonitorClient                         
-V00-05-02      DQM/SiStripMonitorHardware                       
-V07-00-00-19   EventFilter/SiStripRawToDigi                     
+Test Release based on: CMSSW_2_2_0
+Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_0
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_2_2_0
+--- Tag --- -------- Package --------                        
+V03-02-63   DQM/SiStripMonitorClient                         
 ---------------------------------------
-total packages: 3 (3 displayed)
+total packages: 1 (1 displayed)
