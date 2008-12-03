@@ -22,10 +22,6 @@
 */
 
 
-// #include "DataFormats/PatCandidates/interface/TriggerObject.h"
-// #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
-// #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
-
 #include <string>
 #include <vector>
 
@@ -46,7 +42,7 @@ namespace pat {
       TriggerPath( std::string & name, unsigned int prescale, bool run, bool accept, bool error);
       virtual ~TriggerPath();
       
-      /// path related
+      /// setters & getters
       void setName( std::string & name );
       void setPrescale( unsigned int prescale );
       void setRun( bool run );
@@ -58,27 +54,13 @@ namespace pat {
       bool         wasAccept();
       bool         wasError();
       
-      /// objects related
-      
-      /// filters related
-//       pat::TriggerFilterCollection getFilters();
-//       pat::TriggerFilterCollection getFiltersFinal();
-//       pat::TriggerFilter           getFilter( std::string & filterName );
-// //       pat::TriggerFilter           getFilter( edm::InputTag & filterTag );
-//       pat::TriggerFilter           getFilterFailed();
-//       unsigned int                 nFilters();
-//       unsigned int                 nFiltersFinal();
-      
-      /// event related
-      
     protected:
     
-      std::string                 name_;
-      unsigned int                prescale_;
-      bool                        run_;
-      bool                        accept_;
-      bool                        error_;
-//       pat::TriggerFilterRefVector filters_; // initialization?
+      std::string  name_;
+      unsigned int prescale_;
+      bool         run_;
+      bool         accept_;
+      bool         error_;
     
   };
   

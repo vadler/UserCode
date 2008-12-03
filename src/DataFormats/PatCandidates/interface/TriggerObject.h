@@ -26,16 +26,11 @@
 
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
 
-// #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
-// #include "DataFormats/PatCandidates/interface/TriggerPath.h"
-// #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
-
 #include <string>
 #include <vector>
 
-#include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HLTReco/interface/TriggerObject.h"
-#include "DataFormats/Common/interface/RefToBase.h"
+// #include "DataFormats/Common/interface/RefToBase.h"
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
@@ -54,22 +49,16 @@ namespace pat {
       TriggerObject( const trigger::TriggerObject & aTrigObj, const int type = 0 );
       virtual ~TriggerObject();
       
-      /// object related
+      /// setters & getters
       void setCollection( std::string & collection );
       void setType( int type );
       std::string getCollection();
       int         getType();
       
-      /// filters related
-      
-      /// PATObject match related
-      
     protected:
     
       std::string collection_;
       int         type_; // special filter related ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
-      
-      TriggerFilterRefVector filters_;
     
 //       std::vector< edm::RefToBase< reco::Candidate > > patObjectMatches_; // initialization?
 

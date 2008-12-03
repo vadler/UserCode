@@ -38,7 +38,7 @@ TriggerObject::~TriggerObject()
 {
 }
 
-/// object related
+/// setters
 
 void TriggerObject::setCollection( std::string & collection )
 {
@@ -50,6 +50,8 @@ void TriggerObject::setType( int type )
   type_ = type;
 }
 
+/// getters
+
 std::string TriggerObject::getCollection()
 {
   return collection_;
@@ -59,7 +61,3 @@ int TriggerObject::getType()
 {
   return type_;
 }
-      
-/// filters related
-      
-/// PATObject match related

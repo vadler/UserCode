@@ -22,9 +22,9 @@
 */
 
 
-// #include "DataFormats/PatCandidates/interface/TriggerPath.h"
-// #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
-// #include "DataFormats/PatCandidates/interface/TriggerObject.h"
+#include "DataFormats/PatCandidates/interface/TriggerPath.h"
+#include "DataFormats/PatCandidates/interface/TriggerFilter.h"
+#include "DataFormats/PatCandidates/interface/TriggerObject.h"
 
 #include <string>
    
@@ -62,7 +62,6 @@ namespace pat {
       bool                      run_;
       bool                      accept_;
       bool                      error_;
-//       pat::TriggerPathRefVector paths_; // initialization?      
         
   };
 

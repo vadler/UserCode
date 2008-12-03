@@ -12,6 +12,7 @@ using namespace pat;
 
 TriggerFilter::TriggerFilter() :
   label_(),
+  type_(),
   labelInput_(),
   objectId_(),
   run_(),
@@ -21,9 +22,9 @@ TriggerFilter::TriggerFilter() :
 
 /// constructor from values
 
-TriggerFilter::TriggerFilter( std::string & label, std::string & type ) :
+TriggerFilter::TriggerFilter( const std::string & label ) :
   label_( label ),
-  type_(type),
+  type_(),
   labelInput_(),
   objectId_(),
   run_(),
@@ -31,9 +32,9 @@ TriggerFilter::TriggerFilter( std::string & label, std::string & type ) :
 {
 }
 
-TriggerFilter::TriggerFilter( edm::InputTag & tag, std::string & type ) :
+TriggerFilter::TriggerFilter( const edm::InputTag & tag ) :
   label_( tag.label() ),
-  type_(type),
+  type_(),
   labelInput_(),
   objectId_(),
   run_(),
@@ -47,7 +48,7 @@ TriggerFilter::~TriggerFilter()
 {
 }
 
-/// filter related
+/// setters
 
 void TriggerFilter::setLabel( std::string & label )
 {
@@ -79,6 +80,8 @@ void TriggerFilter::setWasAccept( bool accept )
   accept_ = accept;
 }
 
+/// getters
+
 std::string & TriggerFilter::getLabel()
 {
   return label_;
@@ -108,23 +111,3 @@ bool          TriggerFilter::wasAccept()
 {
   return accept_;
 }
-
-/// objects related
-
-// pat::TriggerObjectCollection TriggerFilter::getObjects() // this certainly has to be checked, protection added
-// {
-//   pat::TriggerObjectCollection objects;
-//   for ( pat::TriggerObjectRefVector::iterator i = objects_.begin(); i != objects_.end(); i++ ) {
-//     objects.push_back( **i );
-//   }
-//   return objects;
-// }
-// 
-// unsigned int TriggerFilter::nObjects()
-// {
-//   return objects_.size();
-// }
-
-/// paths related
-
-/// event related

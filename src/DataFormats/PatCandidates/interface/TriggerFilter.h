@@ -22,10 +22,6 @@
 */
 
 
-// #include "DataFormats/PatCandidates/interface/TriggerObject.h"
-// #include "DataFormats/PatCandidates/interface/TriggerPath.h"
-// #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
-
 #include <string>
 #include <vector>
    
@@ -33,7 +29,6 @@
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
 
 namespace pat {
 
@@ -43,11 +38,11 @@ namespace pat {
 
       /// constructors and desctructor
       TriggerFilter();
-      TriggerFilter( std::string & label, std::string & type );
-      TriggerFilter( edm::InputTag & tag, std::string & type );
+      TriggerFilter( const std::string & label );
+      TriggerFilter( const edm::InputTag & tag );
       virtual ~TriggerFilter();
       
-      /// filter related
+      /// setters & getters
       void setLabel( std::string & label );
       void setType( std::string & type );
       void setLableInput( std::string & labelInput );
@@ -57,27 +52,18 @@ namespace pat {
       std::string & getLabel();
       std::string & getType();
       std::string & getLabelInput();
-      unsigned int  getObjectId();
+      unsigned int  getObjectId();                 
       bool          wasRun();
       bool          wasAccept();
       
-      /// objects related
-/*      pat::TriggerObjectCollection getObjects();
-      unsigned int                 nObjects();*/
-      
-      /// paths related
-      
-      /// event related
-      
     protected:
     
-      std::string                 label_;
-      std::string                 type_;
-      std::string                 labelInput_;
-      unsigned int                objectId_; // what is this in this case?
-      bool                        run_;
-      bool                        accept_;
-//       pat::TriggerObjectRefVector objects_; // initialization?
+      std::string  label_;
+      std::string  type_;
+      std::string  labelInput_;
+      unsigned int objectId_; // what is this in this case (alternating sometimes, e.g.: 84, 86)?
+      bool         run_;
+      bool         accept_;
         
   };
   

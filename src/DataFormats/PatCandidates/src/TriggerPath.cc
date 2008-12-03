@@ -45,7 +45,7 @@ TriggerPath::~TriggerPath()
 {
 }
 
-/// path related
+/// setters
 
 void TriggerPath::setName( std::string & name )
 {
@@ -72,6 +72,8 @@ void TriggerPath::setError( bool error )
   error_ = error;
 }
 
+/// getters
+
 std::string TriggerPath::getName()
 {
   return name_;
@@ -96,55 +98,3 @@ bool TriggerPath::wasError()
 {
   return error_;
 }
-
-/// objects related
-
-/// filters related
-
-// pat::TriggerFilterCollection TriggerPath::getFilters() // this certainly has to be checked, protection added
-// {
-//   pat::TriggerFilterCollection filters;
-//   for ( pat::TriggerFilterRefVector::iterator i = filters_.begin(); i != filters_.end(); i++ ) {
-//     filters.push_back( **i );
-//   }
-//   return filters;
-// }
-// 
-// pat::TriggerFilterCollection TriggerPath::getFiltersFinal()
-// {
-//   pat::TriggerFilterCollection dummy; // dummy
-//   return dummy;
-// }
-// 
-// pat::TriggerFilter TriggerPath::getFilter( std::string & filterName )
-// {
-//   pat::TriggerFilter dummy; // dummy
-//   return dummy;
-// }
-// 
-// // pat::TriggerFilter TriggerPath::getFilter( edm::InputTag & filterTag )
-// // {
-// //   return getFilter( filterTag.label() );
-// // }
-// 
-// pat::TriggerFilter TriggerPath::getFilterFailed() // this certainly has to be checked, protection added
-// {
-//   pat::TriggerFilter filter;
-//   for ( pat::TriggerFilterRefVector::iterator i = filters_.begin(); i != filters_.end(); i++ ) {
-//     filter = **i;
-//     if ( ! filter.wasAccept() ) return filter;
-//   }
-//   return filter;
-// }
-// 
-// unsigned int TriggerPath::nFilters()
-// {
-//   return filters_.size();
-// }
-// 
-// unsigned int TriggerPath::nFiltersFinal()
-// {
-//   return getFiltersFinal().size();
-// }
-
-/// event related
