@@ -13,5 +13,5 @@ from PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff import *
 #FIXME: Why do we need this here?
 from PhysicsTools.PatAlgos.selectionLayer1.leptonCountFilter_cfi import *
 allObjects = cms.Sequence(layer1Muons*layer1Electrons*layer1Taus*countLayer1Leptons*layer1Photons*layer1Jets*layer1METs*layer1Hemispheres)
-patLayer1 = cms.Sequence(allObjects*layer1TriggerEvent)
+patLayer1 = cms.Sequence(allObjects*patLayer1Trigger)
 

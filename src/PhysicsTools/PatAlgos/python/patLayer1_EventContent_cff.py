@@ -20,7 +20,10 @@ patLayer1EventContent = cms.PSet(
     'keep *_selectedLayer1Taus_*_*', 
     'keep *_selectedLayer1Jets_*_*', 
     'keep *_selectedLayer1METs_*_*',
-    'keep *_layer1Triggers_*_*',
+    'keep *_patTriggerObjects_*_*',
+    'keep *_patTriggerFilters_*_*',
+    'keep *_patTriggerPaths_*_*',
+    'keep *_patTriggerEvent_*_*',
     'keep patPFParticles_*_*_*',
     'keep *_selectedLayer1Hemispheres_*_*'
   )
