@@ -54,7 +54,7 @@ void PATTriggerPathProducer::produce( edm::Event& iEvent, const edm::EventSetup&
   for ( unsigned int iP = 0; iP < sizePaths; ++iP ) {
     std::string namePath( hltConfig_.triggerName( iP ) );
     unsigned int indexPath( hltConfig_.triggerIndex( namePath ) );
-    TriggerPath triggerPath( namePath, 1, handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), handleTriggerResults->index( indexPath );
+    TriggerPath triggerPath( namePath, 1, handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), handleTriggerResults->index( indexPath ) );
     
     triggerPaths->push_back( triggerPath );
   }
