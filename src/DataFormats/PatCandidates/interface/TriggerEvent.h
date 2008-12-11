@@ -27,6 +27,9 @@
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
 
 #include <string>
+
+#include "DataFormats/Provenance/interface/ProductID.h"
+// #include "DataFormats/Common/interface/AssociationMap.h"
    
 
 namespace pat {
@@ -45,10 +48,10 @@ namespace pat {
       void setRun( bool run );
       void setAccept( bool accept );
       void setError( bool error );
-      std::string getNameHltTable();
-      bool        wasRun();
-      bool        wasAccept();
-      bool        wasError();
+      std::string nameHltTable() const;
+      bool        wasRun() const;
+      bool        wasAccept() const;
+      bool        wasError() const;
       
       /// paths related
       
@@ -58,10 +61,20 @@ namespace pat {
       
     protected:
     
-      std::string               nameHltTable_;
-      bool                      run_;
-      bool                      accept_;
-      bool                      error_;
+      /// event related data members
+      std::string nameHltTable_;
+      bool        run_;
+      bool        accept_;
+      bool        error_;
+      
+      /// paths related data members
+      TriggerPathRefProd paths_;
+      
+      /// filters related data members
+      TriggerFilterRefProd filters_;
+      
+      /// objects related data members
+      TriggerObjectRefProd objects_;
         
   };
 

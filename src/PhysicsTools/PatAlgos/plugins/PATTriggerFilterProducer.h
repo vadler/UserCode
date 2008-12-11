@@ -24,6 +24,9 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 
 #include <string>
+#include <vector>
+#include <map>
+#include <cassert>
 
 #include "FWCore/Framework/interface/Run.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -31,7 +34,9 @@
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
+#include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
 
 #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
 
@@ -52,6 +57,7 @@ namespace pat {
       
       HLTConfigProvider hltConfig_;
       std::string       nameProcess_;
+      edm::InputTag     tagTriggerResults_;
       edm::InputTag     tagTriggerEvent_;
 
   };

@@ -50,22 +50,22 @@ void TriggerEvent::setError( bool error )
   error_ = error;
 }
 
-std::string TriggerEvent::getNameHltTable()
+std::string TriggerEvent::nameHltTable() const
 {
   return nameHltTable_;
 }
 
-bool TriggerEvent::wasRun()
+bool TriggerEvent::wasRun() const
 {
   return run_;
 }
 
-bool TriggerEvent::wasAccept()
+bool TriggerEvent::wasAccept() const
 {
   return accept_;
 }
 
-bool TriggerEvent::wasError()
+bool TriggerEvent::wasError() const
 {
   return error_;
 }

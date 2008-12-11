@@ -74,12 +74,12 @@ void TriggerPath::setError( bool error )
 
 /// getters
 
-std::string TriggerPath::getName()
+std::string TriggerPath::name()
 {
   return name_;
 }
 
-unsigned int TriggerPath::getPrescale()
+unsigned int TriggerPath::prescale()
 {
   return prescale_;
 }

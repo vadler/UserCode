@@ -35,20 +35,16 @@ void PATTriggerObjectProducer::produce( edm::Event& iEvent, const edm::EventSetu
   
   // store used trigger object types
   
-  std::map< trigger::size_type, int > filterIds;
+  std::multimap< trigger::size_type, int > filterIds;
+  
   for ( unsigned int iF = 0; iF < handleTriggerEvent->sizeFilters(); ++iF ) {
-    const trigger::Vids & ids = handleTriggerEvent->filterIds( iF );   
     const trigger::Keys & keys = handleTriggerEvent->filterKeys( iF );
-    const trigger::size_type sizeIds( ids.size() );
+    const trigger::Vids & ids = handleTriggerEvent->filterIds( iF );   
     const trigger::size_type sizeKeys( keys.size() );
+    const trigger::size_type sizeIds( ids.size() );
     assert( sizeIds == sizeKeys );
     for ( unsigned int iK = 0; iK < sizeKeys; ++iK ) {
-      if ( filterIds.find( keys[ iK ] ) == filterIds.end() ) {
-        filterIds[ keys[ iK ] ] = ids[ iK ];
-      } else if ( filterIds[ keys[ iK ] ] != ids[ iK ] ) {
-        edm::LogWarning( "warningDiffVid" ) << "trigger::TriggerObject " << keys[ iK ] << " has differing types " << filterIds[ keys[ iK ] ] << " and " << ids[ iK ] << "\n"
-                                            << "Type " << filterIds[ keys[ iK ] ] << " is used for the pat::TriggerObject";
-      }
+      filterIds.insert( std::pair< trigger::size_type, int >( keys[ iK ], ids[ iK ] ) );
     }
   }
   
@@ -66,10 +62,13 @@ void PATTriggerObjectProducer::produce( edm::Event& iEvent, const edm::EventSetu
     }
     std::string collectionTag( handleTriggerEvent->collectionTag( iC ).encode() );
     triggerObject.setCollection( collectionTag );
-    // set type
-    if ( filterIds.find( iO ) != filterIds.end() ) {
-      triggerObject.setType( filterIds[ iO ] );
+    // set filter ID
+    for ( std::multimap< trigger::size_type, int >::iterator iM = filterIds.begin(); iM != filterIds.end(); ++iM ) {
+      if ( iM->first == iO && ! triggerObject.hasFilterId( iM->second ) ) {
+        triggerObject.addFilterId( iM->second );
+      }
     }
+    
     triggerObjects->push_back( triggerObject );
   }
   

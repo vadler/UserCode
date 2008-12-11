@@ -28,6 +28,8 @@
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
+// #include "DataFormats/Common/interface/Ptr.h"
+// #include "DataFormats/Common/interface/PtrVector.h"
 
 
 namespace pat {
@@ -48,14 +50,15 @@ namespace pat {
       void setRun( bool run );
       void setAccept( bool accept );
       void setError( bool error );
-      std::string  getName();
-      unsigned int getPrescale();
+      std::string  name();
+      unsigned int prescale();
       bool         wasRun();
       bool         wasAccept();
       bool         wasError();
       
     protected:
     
+      /// data members
       std::string  name_;
       unsigned int prescale_;
       bool         run_;
@@ -67,12 +70,16 @@ namespace pat {
 
   /// collection of TriggerPath
   typedef std::vector< TriggerPath >              TriggerPathCollection;
-  /// persistent reference to a TriggerPathCollection
+  /// persistent reference to an item in a TriggerPathCollection
   typedef edm::Ref< TriggerPathCollection >       TriggerPathRef;
   /// persistent reference to a TriggerPathCollection product
   typedef edm::RefProd< TriggerPathCollection >   TriggerPathRefProd;
-  /// vector of reference to TriggerPath in the same collection
+  /// vector of persistent references to items in the same TriggerPathCollection
   typedef edm::RefVector< TriggerPathCollection > TriggerPathRefVector;
+//   /// persistent reference to an item in a TriggerPathCollection in the edm::Event
+//   typedef edm::Ptr< TriggerPathCollection >       TriggerPathPtr;
+//   /// vector of persistent references to items in the same TriggerPathCollection in the edm::Event
+//   typedef edm::PtrVector< TriggerPathCollection > TriggerPathPtrVector;
 
 }
 
