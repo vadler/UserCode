@@ -47,15 +47,10 @@ namespace pat {
       /// setters & getters
       void setLabel( std::string & label );
       void setType( std::string & type );
-      void addInputCollection( std::string & inputCollection );
       void addObjectId( unsigned int objectId );
       bool setStatus( int status ); // only -1,0,1 accepted; returns 'false' (and does not modify the status) otherwise
       std::string                 label() const;
       std::string                 type() const;
-      std::vector< std::string >  inputCollections() const;
-      std::string                 inputCollection( const unsigned int i ) const;
-      unsigned int                sizeInputCollections() const;
-      bool                        hasInputCollection( const std::string & inputCollection ) const;
       std::vector< unsigned int > objectIds() const;                 
       unsigned int                objectId( const unsigned int i ) const;                 
       unsigned int                sizeObjectIds() const;                 
@@ -67,9 +62,8 @@ namespace pat {
       /// data members
       std::string                 label_;
       std::string                 type_;
-      std::vector< std::string >  inputCollections_; // how to extract this?
-      std::vector< unsigned int > objectIds_;        // special filter related object ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
-      int                         status_;           // -1: not run, 0: failed, 1: succeeded
+      std::vector< unsigned int > objectIds_; // special filter related object ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
+      int                         status_;    // -1: not run, 0: failed, 1: succeeded
         
   };
   

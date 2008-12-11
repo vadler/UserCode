@@ -15,7 +15,6 @@ TriggerFilter::TriggerFilter() :
   type_(),
   status_()
 {
-  inputCollections_.clear();
   objectIds_.clear();
 }
 
@@ -26,7 +25,6 @@ TriggerFilter::TriggerFilter( const std::string & label , const int status ) :
   type_(),
   status_( status )
 {
-  inputCollections_.clear();
   objectIds_.clear();
 }
 
@@ -35,7 +33,6 @@ TriggerFilter::TriggerFilter( const edm::InputTag & tag , const int status ) :
   type_(),
   status_( status )
 {
-  inputCollections_.clear();
   objectIds_.clear();
 }
 
@@ -55,11 +52,6 @@ void TriggerFilter::setLabel( std::string & label )
 void TriggerFilter::setType( std::string & type )
 {
   type_ = type;
-}
-
-void TriggerFilter::addInputCollection( std::string & inputCollection )
-{
-  inputCollections_.push_back( inputCollection );
 }
 
 void TriggerFilter::addObjectId( unsigned int objectId )
@@ -86,33 +78,6 @@ std::string TriggerFilter::label() const
 std::string TriggerFilter::type() const
 {
   return type_;
-}
-
-std::vector< std::string > TriggerFilter::inputCollections() const
-{
-  return inputCollections_;
-}
-
-std::string TriggerFilter::inputCollection( const unsigned int i ) const
-{
-  return inputCollections_[ i ];
-}
-
-unsigned int TriggerFilter::sizeInputCollections() const
-{
-  return inputCollections_.size();
-}
-
-bool TriggerFilter::hasInputCollection( const std::string & inputCollection ) const
-{
-  bool found = false;
-  for ( std::vector< std::string >::const_iterator iI = inputCollections_.begin(); iI != inputCollections_.end(); ++iI ) {
-    if ( *iI == inputCollection ) {
-      found = true;
-      break;
-    }
-  }
-  return found;
 }
 
 std::vector< unsigned int > TriggerFilter::objectIds() const

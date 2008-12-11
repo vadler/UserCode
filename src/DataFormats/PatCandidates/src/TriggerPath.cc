@@ -15,7 +15,8 @@ TriggerPath::TriggerPath() :
   prescale_(),
   run_(),
   accept_(),
-  error_()
+  error_(),
+  lastModule_()
 {
 }
 
@@ -26,16 +27,18 @@ TriggerPath::TriggerPath( std::string & name ) :
   prescale_(),
   run_(),
   accept_(),
-  error_()
+  error_(),
+  lastModule_()
 {
 }
 
-TriggerPath::TriggerPath( std::string & name, unsigned int prescale, bool run, bool accept, bool error) :
+TriggerPath::TriggerPath( std::string & name, unsigned int prescale, bool run, bool accept, bool error, unsigned int lastModule ) :
   name_( name ),
   prescale_( prescale ),
   run_( run ),
   accept_( accept ),
-  error_( error )
+  error_( error ),
+  lastModule_( lastModule )
 {
 }
 
@@ -72,29 +75,39 @@ void TriggerPath::setError( bool error )
   error_ = error;
 }
 
+void TriggerPath::setLastModule( unsigned int lastModule )
+{
+  lastModule_ = lastModule;
+}
+
 /// getters
 
-std::string TriggerPath::name()
+std::string TriggerPath::name() const
 {
   return name_;
 }
 
-unsigned int TriggerPath::prescale()
+unsigned int TriggerPath::prescale() const
 {
   return prescale_;
 }
 
-bool TriggerPath::wasRun()
+bool TriggerPath::wasRun() const
 {
   return run_;
 }
 
-bool TriggerPath::wasAccept()
+bool TriggerPath::wasAccept() const
 {
   return accept_;
 }
 
-bool TriggerPath::wasError()
+bool TriggerPath::wasError() const
 {
   return error_;
+}
+
+unsigned int TriggerPath::lastModule() const
+{
+  return lastModule_;
 }

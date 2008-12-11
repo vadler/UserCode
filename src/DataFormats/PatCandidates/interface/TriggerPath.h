@@ -41,7 +41,7 @@ namespace pat {
       /// constructors and desctructor
       TriggerPath();
       TriggerPath( std::string & name);
-      TriggerPath( std::string & name, unsigned int prescale, bool run, bool accept, bool error);
+      TriggerPath( std::string & name, unsigned int prescale, bool run, bool accept, bool error, unsigned int lastModule );
       virtual ~TriggerPath();
       
       /// setters & getters
@@ -50,11 +50,13 @@ namespace pat {
       void setRun( bool run );
       void setAccept( bool accept );
       void setError( bool error );
-      std::string  name();
-      unsigned int prescale();
-      bool         wasRun();
-      bool         wasAccept();
-      bool         wasError();
+      void setLastModule( unsigned int lastModule );
+      std::string  name() const;
+      unsigned int prescale() const;
+      bool         wasRun() const;
+      bool         wasAccept() const;
+      bool         wasError() const;
+      unsigned int lastModule() const;
       
     protected:
     
@@ -64,6 +66,7 @@ namespace pat {
       bool         run_;
       bool         accept_;
       bool         error_;
+      unsigned int lastModule_;
     
   };
   

@@ -58,27 +58,27 @@ void PATTriggerFilterProducer::produce( edm::Event& iEvent, const edm::EventSetu
   
   // determine status of modules
   
-  std::map< std::string, int > moduleStates;
+  std::map< std::string, int > statesModules;
   
   for ( unsigned int iP = 0; iP < hltConfig_.size(); ++iP ) {
-    const std::string pathName( hltConfig_.triggerName( iP ) );
-    const unsigned int pathIndex( hltConfig_.triggerIndex( pathName ) );
-    const unsigned int lastModuleIndex( handleTriggerResults->index( pathIndex ) );
-    const unsigned int sizeModules( hltConfig_.size( pathName ) );
-    assert( lastModuleIndex < sizeModules );
-    std::map< unsigned int, std::string > moduleIndices;
+    const std::string namePath( hltConfig_.triggerName( iP ) );
+    const unsigned int indexPath( hltConfig_.triggerIndex( namePath ) );
+    const unsigned int indexLastModule( handleTriggerResults->index( indexPath ) );
+    const unsigned int sizeModules( hltConfig_.size( namePath ) );
+    assert( indexLastModule < sizeModules );
+    std::map< unsigned int, std::string > indicesModules;
     for ( unsigned int iM = 0; iM < sizeModules; ++iM ) {
-      const std::string moduleName( hltConfig_.moduleLabel( pathIndex, iM ) );
-      const unsigned int moduleIndex( hltConfig_.moduleIndex( pathIndex, moduleName ) );
-      moduleIndices.insert( std::pair< unsigned int, std::string >( moduleIndex, moduleName ) );
+      const std::string nameModule( hltConfig_.moduleLabel( indexPath, iM ) );
+      const unsigned int indexModule( hltConfig_.moduleIndex( indexPath, nameModule ) );
+      indicesModules.insert( std::pair< unsigned int, std::string >( indexModule, nameModule ) );
     }
-    for ( std::map< unsigned int, std::string >::iterator iM = moduleIndices.begin(); iM != moduleIndices.end(); ++iM ) {
-      if ( iM->first < lastModuleIndex ) {
-        moduleStates[ iM->second ] = 1;
-      } else if ( iM->first == lastModuleIndex ) {
-        moduleStates[ iM->second ] = handleTriggerResults->accept( pathIndex );
-      } else if ( moduleStates.find( iM->second ) == moduleStates.end() ) {
-        moduleStates[ iM->second ] = -1;
+    for ( std::map< unsigned int, std::string >::iterator iM = indicesModules.begin(); iM != indicesModules.end(); ++iM ) {
+      if ( iM->first < indexLastModule ) {
+        statesModules[ iM->second ] = 1;
+      } else if ( iM->first == indexLastModule ) {
+        statesModules[ iM->second ] = handleTriggerResults->accept( indexPath );
+      } else if ( statesModules.find( iM->second ) == statesModules.end() ) {
+        statesModules[ iM->second ] = -1;
       }
     }
   }
@@ -90,13 +90,11 @@ void PATTriggerFilterProducer::produce( edm::Event& iEvent, const edm::EventSetu
   triggerFilters->reserve( sizeFilters );
   
   for ( unsigned int iF = 0; iF < sizeFilters; ++iF ) {
-    std::string filterLabel( handleTriggerEvent->filterTag( iF ).label() );
-    TriggerFilter triggerFilter( filterLabel );
+    std::string nameFilter( handleTriggerEvent->filterTag( iF ).label() );
+    TriggerFilter triggerFilter( nameFilter );
     // set filter type
-    std::string filterType( hltConfig_.moduleType( filterLabel ) );
-    triggerFilter.setType( filterType );
-    // set input collection
-//     triggerFilter.setInputCollection(  ); // to be figured out
+    std::string typeFilter( hltConfig_.moduleType( nameFilter ) );
+    triggerFilter.setType( typeFilter );
     // set filter IDs of used objects
     const trigger::Vids & ids = handleTriggerEvent->filterIds( iF );   
     for ( unsigned int iI = 0; iI < ids.size(); ++iI ) {
@@ -106,8 +104,8 @@ void PATTriggerFilterProducer::produce( edm::Event& iEvent, const edm::EventSetu
       }
     }
     // set status
-    std::map< std::string, int >::iterator iS( moduleStates.find( filterLabel ) );
-    if ( iS != moduleStates.end() ) {
+    std::map< std::string, int >::iterator iS( statesModules.find( nameFilter ) );
+    if ( iS != statesModules.end() ) {
       if ( ! triggerFilter.setStatus( iS->second ) ) {
         triggerFilter.setStatus( -1 ); // different code for "unvalid status determined" needed?
       }
