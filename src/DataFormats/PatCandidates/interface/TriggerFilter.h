@@ -29,8 +29,6 @@
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
-// #include "DataFormats/Common/interface/Ptr.h"
-// #include "DataFormats/Common/interface/PtrVector.h"
 
 namespace pat {
 
@@ -40,21 +38,22 @@ namespace pat {
 
       /// constructors and desctructor
       TriggerFilter();
-      TriggerFilter( const std::string & label , const int status = -1 );
-      TriggerFilter( const edm::InputTag & tag , const int status = -1 );
+      TriggerFilter( const std::string & label, int status = -1 );
+      TriggerFilter( const edm::InputTag & tag, int status = -1 );
       virtual ~TriggerFilter();
       
       /// setters & getters
-      void setLabel( std::string & label );
-      void setType( std::string & type );
+      void setLabel( const std::string & label );
+      void setType( const std::string & type );
+      void addObjectKey( unsigned int objectKey );
       void addObjectId( unsigned int objectId );
       bool setStatus( int status ); // only -1,0,1 accepted; returns 'false' (and does not modify the status) otherwise
       std::string                 label() const;
       std::string                 type() const;
+      std::vector< unsigned int > objectKeys() const;                 
+      bool                        hasObjectKey( unsigned int objectKey ) const;
       std::vector< unsigned int > objectIds() const;                 
-      unsigned int                objectId( const unsigned int i ) const;                 
-      unsigned int                sizeObjectIds() const;                 
-      bool                        hasObjectId( const unsigned int objectId ) const;                 
+      bool                        hasObjectId( unsigned int objectId ) const;
       int                         status() const;
       
     protected:
@@ -62,6 +61,7 @@ namespace pat {
       /// data members
       std::string                 label_;
       std::string                 type_;
+      std::vector< unsigned int > objectKeys_;
       std::vector< unsigned int > objectIds_; // special filter related object ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
       int                         status_;    // -1: not run, 0: failed, 1: succeeded
         
@@ -76,10 +76,6 @@ namespace pat {
   typedef edm::RefProd< TriggerFilterCollection >   TriggerFilterRefProd;
   /// vector of persistent references to items in the same TriggerFilterCollection
   typedef edm::RefVector< TriggerFilterCollection > TriggerFilterRefVector;
-//   /// persistent reference to an item in a TriggerFilterCollection in the edm::Event
-//   typedef edm::Ptr< TriggerFilterCollection >       TriggerFilterPtr;
-//   /// vector of persistent references to items in the same TriggerFilterCollection in the edm::Event
-//   typedef edm::PtrVector< TriggerFilterCollection > TriggerFilterPtrVector;
 
 }
 

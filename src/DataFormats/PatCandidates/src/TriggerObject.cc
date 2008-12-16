@@ -16,12 +16,12 @@ TriggerObject::TriggerObject() :
 
 /// constructors from values
 
-TriggerObject::TriggerObject( const reco::Particle::LorentzVector & vec, const int id ) :
+TriggerObject::TriggerObject( const reco::Particle::LorentzVector & vec, int id ) :
   reco::LeafCandidate( 0, vec, reco::Particle::Point( 0., 0., 0. ), id )
 {
   filterIds_.clear();
 }
-TriggerObject::TriggerObject( const reco::Particle::PolarLorentzVector & vec, const int id ) :
+TriggerObject::TriggerObject( const reco::Particle::PolarLorentzVector & vec, int id ) :
   reco::LeafCandidate( 0, vec, reco::Particle::Point( 0., 0., 0. ), id )
 {
   filterIds_.clear();
@@ -40,7 +40,7 @@ TriggerObject::~TriggerObject()
 
 /// setters
 
-void TriggerObject::setCollection( std::string & collection )
+void TriggerObject::setCollection( const std::string & collection )
 {
   collection_ = collection;
 }
@@ -62,24 +62,12 @@ std::vector< unsigned int > TriggerObject::filterIds() const
   return filterIds_;
 }
 
-unsigned int TriggerObject::filterId( const unsigned int i ) const
+bool TriggerObject::hasFilterId( unsigned int filterId ) const
 {
-  return filterIds_[ i ];
-}
-
-unsigned int TriggerObject::sizeFilterIds() const
-{
-  return filterIds_.size();
-}
-
-bool TriggerObject::hasFilterId( const unsigned int filterId ) const
-{
-  bool found = false;
   for ( std::vector< unsigned int >::const_iterator iF = filterIds_.begin(); iF != filterIds_.end(); ++iF ) {
     if ( *iF == filterId ) {
-      found = true;
-      break;
+      return true;
     }
   }
-  return found;
+  return false;
 }

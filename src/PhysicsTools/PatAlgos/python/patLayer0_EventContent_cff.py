@@ -47,9 +47,7 @@ patLayer0EventContent = cms.PSet(
         'keep *_hltTriggerSummaryAOD_*_*', 
         'keep patTriggerPrimitivesOwned_*_*_*', 
         'keep patTriggerPrimitivesOwnededmAssociation_*_*_*',
-        'keep *_patTriggerObjects_*_*',
-        'keep *_patTriggerFilters_*_*',
-        'keep *_patTriggerPaths_*_*'
+        'keep *_patTrigger_*_*'
     )
 )
 

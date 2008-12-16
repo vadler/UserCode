@@ -58,6 +58,7 @@ namespace pat {
       std::string       nameProcess_;
       edm::InputTag     tagTriggerResults_;
       edm::InputTag     tagTriggerEvent_;
+      edm::InputTag     tagLayer0Trigger_;
 
   };
 

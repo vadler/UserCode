@@ -11,7 +11,8 @@ using namespace pat;
 PATTriggerEventProducer::PATTriggerEventProducer( const edm::ParameterSet & iConfig ) :
   nameProcess_( iConfig.getParameter< std::string >( "processName" ) ),
   tagTriggerResults_( iConfig.getParameter< edm::InputTag >( "triggerResults" ) ),
-  tagTriggerEvent_( iConfig.getParameter< edm::InputTag >( "triggerEvent" ) )
+  tagTriggerEvent_( iConfig.getParameter< edm::InputTag >( "triggerEvent" ) ),
+  tagLayer0Trigger_( iConfig.getParameter< edm::InputTag >( "layer0Trigger" ) )
 {
   if ( tagTriggerResults_.process().empty() ) {
     tagTriggerResults_ = edm::InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
@@ -54,11 +55,33 @@ void PATTriggerEventProducer::produce( edm::Event& iEvent, const edm::EventSetup
     edm::LogError( "errorTriggerEventValid" ) << "trigger::TriggerEvent product with InputTag " << tagTriggerEvent_.encode() << " not in event";
     return;
   }
+  edm::Handle< TriggerPathCollection > handleTriggerPaths;
+  iEvent.getByLabel( tagLayer0Trigger_, handleTriggerPaths );
+  edm::Handle< TriggerFilterCollection > handleTriggerFilters;
+  iEvent.getByLabel( tagLayer0Trigger_, handleTriggerFilters );
+  edm::Handle< TriggerObjectCollection > handleTriggerObjects;
+  iEvent.getByLabel( tagLayer0Trigger_, handleTriggerObjects );
 
   // produce trigger event
   
   std::string nameTable( hltConfig_.tableName() );
   std::auto_ptr< TriggerEvent > triggerEvent( new TriggerEvent( nameTable, handleTriggerResults->wasrun(), handleTriggerResults->accept(), handleTriggerResults->error() ) );
+  // set product references to layer 0 collections
+  if ( handleTriggerPaths.isValid() ) {
+    triggerEvent->setPaths( handleTriggerPaths );
+  } else {
+    edm::LogError( "errorLayer0TriggerPathsValid" ) << "pat::TriggerPathCollection product with InputTag " << tagLayer0Trigger_.encode() << " not in event";
+  }
+  if ( handleTriggerFilters.isValid() ) {
+    triggerEvent->setFilters( handleTriggerFilters );
+  } else {
+    edm::LogError( "errorLayer0TriggerFiltersValid" ) << "pat::TriggerFilterCollection product with InputTag " << tagLayer0Trigger_.encode() << " not in event";
+  }
+  if ( handleTriggerObjects.isValid() ) {
+    triggerEvent->setObjects( handleTriggerObjects );
+  } else {
+    edm::LogError( "errorLayer0TriggerObjectsValid" ) << "pat::TriggerObjectCollection product with InputTag " << tagLayer0Trigger_.encode() << " not in event";
+  }
   
   iEvent.put( triggerEvent );
 }

@@ -18,6 +18,12 @@ process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool( True )
 )
 
+# # memory check
+# process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck",
+# #     oncePerEventMode = cms.untracked.bool( True ),
+#     ignoreTotal      = cms.untracked.int32( 0 )
+# )
+
 # source
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
@@ -25,7 +31,7 @@ process.source = cms.Source("PoolSource",
     )
 )
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( 10 )
+    input = cms.untracked.int32( 100 )
 )
 
 process.load( "Configuration.StandardSequences.Geometry_cff" )
@@ -33,17 +39,17 @@ process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff"
 process.GlobalTag.globaltag = cms.string( 'IDEAL_V9::All' )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
-# HLT analyzers
-process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
-process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
+# # HLT analyzers
+# process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
+# process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
 
 # PAT Layer 0 & 1
 process.load( "PhysicsTools.PatAlgos.patLayer0_cff" )
 process.load( "PhysicsTools.PatAlgos.patLayer1_cff" )
 
 process.p = cms.Path(
-    process.hltEventAnalyzerAOD       +
-    process.triggerSummaryAnalyzerAOD +
+#     process.hltEventAnalyzerAOD       +
+#     process.triggerSummaryAnalyzerAOD +
     process.patLayer0 *  
     process.patLayer1
 )

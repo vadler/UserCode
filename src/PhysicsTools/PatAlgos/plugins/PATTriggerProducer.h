@@ -1,17 +1,17 @@
-#ifndef PhysicsTools_PatAlgos_PATTriggerFilterProducer_h
-#define PhysicsTools_PatAlgos_PATTriggerFilterProducer_h
+#ifndef PhysicsTools_PatAlgos_PATTriggerProducer_h
+#define PhysicsTools_PatAlgos_PATTriggerProducer_h
 
 
 // -*- C++ -*-
 //
 // Package:    PatAlgos
-// Class:      pat::PATTriggerFilterProducer
+// Class:      pat::PATTriggerProducer
 //
 // $Id$
 //
 /**
-  \class    pat::PATTriggerFilterProducer PATTriggerFilterProducer.h "PhysicsTools/PatAlgos/plugins/PATTriggerFilterProducer.h"
-  \brief    Produces the pat::TriggerFilterCollection in PAT layer 0.
+  \class    pat::PATTriggerProducer PATTriggerProducer.h "PhysicsTools/PatAlgos/plugins/PATTriggerProducer.h"
+  \brief    Produces the pat::TriggerPathCollection, pat::TriggerFilterCollection and pat::TriggerObjectCollection in PAT layer 0.
 
    [...]
 
@@ -38,17 +38,19 @@
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
 
+#include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
+#include "DataFormats/PatCandidates/interface/TriggerObject.h"
 
 
 namespace pat {
 
-  class PATTriggerFilterProducer : public edm::EDProducer {
+  class PATTriggerProducer : public edm::EDProducer {
 
     public:
 
-      explicit PATTriggerFilterProducer( const edm::ParameterSet & iConfig );
-      ~PATTriggerFilterProducer();
+      explicit PATTriggerProducer( const edm::ParameterSet & iConfig );
+      ~PATTriggerProducer();
 
     private:
 

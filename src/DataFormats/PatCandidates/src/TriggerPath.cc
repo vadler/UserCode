@@ -16,30 +16,33 @@ TriggerPath::TriggerPath() :
   run_(),
   accept_(),
   error_(),
-  lastModule_()
+  lastActiveModule_()
 {
+  modules_.clear();
 }
 
 /// constructor from values
 
-TriggerPath::TriggerPath( std::string & name ) :
+TriggerPath::TriggerPath( const std::string & name ) :
   name_( name ),
   prescale_(),
   run_(),
   accept_(),
   error_(),
-  lastModule_()
+  lastActiveModule_()
 {
+  modules_.clear();
 }
 
-TriggerPath::TriggerPath( std::string & name, unsigned int prescale, bool run, bool accept, bool error, unsigned int lastModule ) :
+TriggerPath::TriggerPath( const std::string & name, unsigned int prescale, bool run, bool accept, bool error, unsigned int lastActiveModule ) :
   name_( name ),
   prescale_( prescale ),
   run_( run ),
   accept_( accept ),
   error_( error ),
-  lastModule_( lastModule )
+  lastActiveModule_( lastActiveModule )
 {
+  modules_.clear();
 }
 
 /// destructor
@@ -50,7 +53,7 @@ TriggerPath::~TriggerPath()
 
 /// setters
 
-void TriggerPath::setName( std::string & name )
+void TriggerPath::setName( const std::string & name )
 {
   name_ = name;
 }
@@ -75,9 +78,14 @@ void TriggerPath::setError( bool error )
   error_ = error;
 }
 
-void TriggerPath::setLastModule( unsigned int lastModule )
+void TriggerPath::addModule( const std::string & name )
 {
-  lastModule_ = lastModule;
+  modules_.push_back( name );
+}
+
+void TriggerPath::setLastActiveModule( unsigned int lastActiveModule )
+{
+  lastActiveModule_ = lastActiveModule;
 }
 
 /// getters
@@ -107,7 +115,23 @@ bool TriggerPath::wasError() const
   return error_;
 }
 
-unsigned int TriggerPath::lastModule() const
+std::vector< std::string > TriggerPath::modules() const
 {
-  return lastModule_;
+  return modules_;
+}
+
+unsigned int TriggerPath::indexModule( const std::string & name ) const
+{
+  unsigned int i( 0 );
+  while ( i < modules().size() ) {
+    if ( name == modules_[ i ] ) {
+      return i;
+    }
+  }
+  return i;
+}
+
+unsigned int TriggerPath::lastActiveModule() const
+{
+  return lastActiveModule_;
 }

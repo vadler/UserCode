@@ -34,8 +34,6 @@
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
-// #include "DataFormats/Common/interface/Ptr.h"
-// #include "DataFormats/Common/interface/PtrVector.h"
 
 
 namespace pat {
@@ -46,19 +44,17 @@ namespace pat {
 
       /// constructors and desctructor
       TriggerObject();
-      TriggerObject( const reco::Particle::LorentzVector & vec, const int id = 0 );
-      TriggerObject( const reco::Particle::PolarLorentzVector & vec, const int id = 0 );
+      TriggerObject( const reco::Particle::LorentzVector & vec, int id = 0 );
+      TriggerObject( const reco::Particle::PolarLorentzVector & vec, int id = 0 );
       TriggerObject( const trigger::TriggerObject & aTrigObj );
       virtual ~TriggerObject();
       
       /// setters & getters
-      void setCollection( std::string & collection );
+      void setCollection( const std::string & collection );
       void addFilterId( unsigned int filterId );
       std::string                 collection() const;
       std::vector< unsigned int > filterIds() const;
-      unsigned int                filterId( const unsigned int i ) const;
-      unsigned int                sizeFilterIds() const;
-      bool                        hasFilterId( const unsigned int filterId ) const;                 
+      bool                        hasFilterId( unsigned int filterId ) const;
        
     protected:
     
@@ -79,10 +75,6 @@ namespace pat {
   typedef edm::RefProd< TriggerObjectCollection >   TriggerObjectRefProd;
   /// vector of persistent references to items in the same TriggerObjectCollection
   typedef edm::RefVector< TriggerObjectCollection > TriggerObjectRefVector;
-//   /// persistent reference to an item in a TriggerObjectCollection in the edm::Event
-//   typedef edm::Ptr< TriggerObjectCollection >       TriggerObjectPtr;
-//   /// vector of persistent references to items in the same TriggerObjectCollection in the edm::Event
-//   typedef edm::PtrVector< TriggerObjectCollection > TriggerObjectPtrVector;
 
 }
 

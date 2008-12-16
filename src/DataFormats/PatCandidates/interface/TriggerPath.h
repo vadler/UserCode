@@ -28,8 +28,6 @@
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
-// #include "DataFormats/Common/interface/Ptr.h"
-// #include "DataFormats/Common/interface/PtrVector.h"
 
 
 namespace pat {
@@ -40,33 +38,37 @@ namespace pat {
 
       /// constructors and desctructor
       TriggerPath();
-      TriggerPath( std::string & name);
-      TriggerPath( std::string & name, unsigned int prescale, bool run, bool accept, bool error, unsigned int lastModule );
+      TriggerPath( const std::string & name);
+      TriggerPath( const std::string & name, unsigned int prescale, bool run, bool accept, bool error, unsigned int lastActiveModule );
       virtual ~TriggerPath();
       
       /// setters & getters
-      void setName( std::string & name );
+      void setName( const std::string & name );
       void setPrescale( unsigned int prescale );
       void setRun( bool run );
       void setAccept( bool accept );
       void setError( bool error );
-      void setLastModule( unsigned int lastModule );
-      std::string  name() const;
-      unsigned int prescale() const;
-      bool         wasRun() const;
-      bool         wasAccept() const;
-      bool         wasError() const;
-      unsigned int lastModule() const;
+      void addModule( const std::string & name );
+      void setLastActiveModule( unsigned int lastActiveModule );
+      std::string                name() const;
+      unsigned int               prescale() const;
+      bool                       wasRun() const;
+      bool                       wasAccept() const;
+      bool                       wasError() const;
+      std::vector< std::string > modules() const; // ordered
+      unsigned int               indexModule( const std::string & name ) const; // returns sizeModules() if name unknown
+      unsigned int               lastActiveModule() const;
       
     protected:
     
       /// data members
-      std::string  name_;
-      unsigned int prescale_;
-      bool         run_;
-      bool         accept_;
-      bool         error_;
-      unsigned int lastModule_;
+      std::string                name_;
+      unsigned int               prescale_;
+      bool                       run_;
+      bool                       accept_;
+      bool                       error_;
+      std::vector< std::string > modules_; // ordered
+      unsigned int               lastActiveModule_;
     
   };
   
@@ -79,10 +81,6 @@ namespace pat {
   typedef edm::RefProd< TriggerPathCollection >   TriggerPathRefProd;
   /// vector of persistent references to items in the same TriggerPathCollection
   typedef edm::RefVector< TriggerPathCollection > TriggerPathRefVector;
-//   /// persistent reference to an item in a TriggerPathCollection in the edm::Event
-//   typedef edm::Ptr< TriggerPathCollection >       TriggerPathPtr;
-//   /// vector of persistent references to items in the same TriggerPathCollection in the edm::Event
-//   typedef edm::PtrVector< TriggerPathCollection > TriggerPathPtrVector;
 
 }
 
