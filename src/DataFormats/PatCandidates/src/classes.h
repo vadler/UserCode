@@ -350,6 +350,7 @@ namespace {
   std::vector<pat::TriggerObject>::const_iterator v_p_to_ci;
   edm::Wrapper<std::vector<pat::TriggerObject> > w_v_p_to;
   pat::TriggerObjectRef p_r_to;
+  pat::TriggerObjectRefProd p_rp_to;
   edm::Wrapper<pat::TriggerObjectRefVector> w_p_rv_to;
   edm::reftobase::Holder<reco::Candidate, pat::TriggerObjectRef> rb_cand_h_p_to;
   edm::reftobase::RefHolder<pat::TriggerObjectRef> rb_rh_p_to;
@@ -359,11 +360,13 @@ namespace {
   std::vector<pat::TriggerFilter>::const_iterator v_p_tf_ci;
   edm::Wrapper<std::vector<pat::TriggerFilter> > w_v_p_tf;
   pat::TriggerFilterRef p_r_tf;
+  pat::TriggerFilterRefProd p_rp_tf;
   edm::Wrapper<pat::TriggerFilterRefVector> w_p_rv_tf;
   
   std::vector<pat::TriggerPath>::const_iterator v_p_tp_ci;
   edm::Wrapper<std::vector<pat::TriggerPath> > w_v_p_tp;
   pat::TriggerPathRef p_r_tp;
+  pat::TriggerPathRefProd p_rp_tp;
   edm::Wrapper<pat::TriggerPathRefVector> w_p_rv_tp;
   
   edm::Wrapper<pat::TriggerEvent > w_p_te;
