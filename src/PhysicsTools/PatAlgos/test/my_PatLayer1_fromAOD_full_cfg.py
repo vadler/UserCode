@@ -56,7 +56,7 @@ process.p = cms.Path(
 
 # Output module configuration
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_0/output/PATLayer1_Output.fromAOD_full.root' ),
+    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_3/output/PATLayer1_Output.fromAOD_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),
