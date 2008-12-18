@@ -1,9 +1,0 @@
-Test Release based on: CMSSW_2_2_3
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_3
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_3
---- Tag ---    -------- Package --------                        
-B2_2_X         DataFormats/PatCandidates                        
-B2_2_X         PhysicsTools/PatAlgos                            
-B2_2_X         PhysicsTools/PatUtils                            
----------------------------------------
-total packages: 3 (3 displayed)
