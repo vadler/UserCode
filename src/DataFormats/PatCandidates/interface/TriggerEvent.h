@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerEvent
 //
-// $Id$
+// $Id: TriggerEvent.h,v 1.1.2.5 2008/12/16 18:01:57 vadler Exp $
 //
 /**
   \class    pat::TriggerEvent TriggerEvent.h "DataFormats/PatCandidates/interface/TriggerEvent.h"
@@ -18,7 +18,7 @@
    - [to be filled]
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: TriggerEvent.h,v 1.1.2.5 2008/12/16 18:01:57 vadler Exp $
 */
 
 
@@ -65,11 +65,11 @@ namespace pat {
       /// filters related
       void setFilterCollection( const edm::Handle< TriggerFilterCollection > & handleTriggerFilters );
       void setFilters( const edm::Handle< TriggerFilterCollection > & handleTriggerFilters );
-      const TriggerFilterCollection * filterCollection() const;                       // returns 0 if RefProd is null
-      const TriggerFilterCollection * filters() const;                                // returns 0 if RefProd is null
+      const TriggerFilterCollection * filterCollection() const;                             // returns 0 if RefProd is null
+      const TriggerFilterCollection * filters() const;                                      // returns 0 if RefProd is null
       const TriggerFilter           * filter( const std::string & labelFilter ) const;      // returns 0 if filter is not found
       unsigned int                    indexFilter( const std::string & labelFilter ) const; // returns size of filter collection if filter is not found
-      TriggerFilterRefVector          acceptedFilters() const;                           // transient
+      TriggerFilterRefVector          acceptedFilters() const;                              // transient
       
       /// objects related
       void setObjectCollection( const edm::Handle< TriggerObjectCollection > & handleTriggerObjects );

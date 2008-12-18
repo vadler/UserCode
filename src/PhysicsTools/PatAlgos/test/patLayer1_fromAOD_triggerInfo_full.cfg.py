@@ -18,12 +18,6 @@ process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool( True )
 )
 
-# # memory check
-# process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck",
-# #     oncePerEventMode = cms.untracked.bool( True ),
-#     ignoreTotal      = cms.untracked.int32( 0 )
-# )
-
 # source
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
@@ -39,10 +33,6 @@ process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff"
 process.GlobalTag.globaltag = cms.string( 'IDEAL_V9::All' )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
-# # HLT analyzers
-# process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
-# process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
-
 # PAT Layer 0 & 1
 process.load( "PhysicsTools.PatAlgos.patLayer0_cff" )
 process.load( "PhysicsTools.PatAlgos.triggerLayer0.triggerProducer_cff" )
@@ -50,8 +40,6 @@ process.load( "PhysicsTools.PatAlgos.patLayer1_cff" )
 process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
 
 process.p = cms.Path(
-#     process.hltEventAnalyzerAOD       +
-#     process.triggerSummaryAnalyzerAOD +
     process.patLayer0        *  
     process.patLayer0Trigger *
     process.patLayer1        *  
@@ -60,7 +48,7 @@ process.p = cms.Path(
 
 # Output module configuration
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_3/output/PATLayer1_Output.fromAOD_full.root' ),
+    fileName       = cms.untracked.string( 'PATLayer1_Output.fromAOD_triggerInfo_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),

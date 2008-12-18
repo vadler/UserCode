@@ -38,19 +38,19 @@ from PhysicsTools.PatAlgos.mcMatchLayer0.mcMatchSequences_cff   import  *
 # trigger matching
 from PhysicsTools.PatAlgos.triggerLayer0.trigMatchSequences_cff import  *
 
-# trigger information
-from PhysicsTools.PatAlgos.triggerLayer0.triggerProducer_cff import  *
+# # trigger information
+# from PhysicsTools.PatAlgos.triggerLayer0.triggerProducer_cff import  *
 
 
 patLayer0_withoutPFTau_withoutTrigMatch = cms.Sequence(
-        patLayer0Trigger *
+#         patLayer0Trigger *
         patBeforeLevel0Reco_withoutPFTau *
         patLayer0Cleaners_withoutPFTau *
         patHighLevelReco_withoutPFTau *
         patMCTruth_withoutTau
 )
 patLayer0_withoutTrigMatch = cms.Sequence(
-        patLayer0Trigger *
+#         patLayer0Trigger *
         patBeforeLevel0Reco *
         patLayer0Cleaners *
         patHighLevelReco *
