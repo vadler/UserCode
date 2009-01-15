@@ -2,10 +2,14 @@ Test Release based on: CMSSW_2_2_3
 Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_3
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_2_2_3
 --- Tag ---    -------- Package --------
+V01-00-05      CalibTracker/SiStripCommon
+V00-04-05      CalibTracker/SiStripQuality
+V05-00-07      DQM/SiStripCommon
 V05-01-09      DQM/SiStripMonitorCluster
+V03-02-05      DQM/SiStripMonitorTrack
 NoTag          DQMOffline/CalibTracker
 V03-02-01      DQMServices/ClientConfig
 V03-04-07      DQMServices/Components
 V03-04-01      DQMServices/Core
 ---------------------------------------
-total packages: 5 (5 displayed)
+total packages: 9 (9 displayed)
