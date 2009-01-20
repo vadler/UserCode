@@ -38,8 +38,8 @@ process.load( "Configuration.StandardSequences.MagneticField_0T_cff" )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 # Calibration 
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.connect   = 'frontier://PromptProd/CMS_COND_21X_GLOBALTAG'
-process.GlobalTag.globaltag = 'CRAFT_V4P::All'
+process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_COND_21X_GLOBALTAG'
+process.GlobalTag.globaltag = 'CRAFT_ALL_V4P::All'
 process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
 
 ### SiStrip DQM ###
@@ -78,7 +78,7 @@ process.hltFilter = cms.EDFilter( "HLTHighLevel",
 ### Output ###
 
 # DQM Saver path
-process.dqmSaver.dirName = '.'
+process.dqmSaver.dirName = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_0_0_pre6/output'
 
 # PoolOutput #
 process.out = cms.OutputModule( "PoolOutputModule",

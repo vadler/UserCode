@@ -23,7 +23,7 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 
 # Calibration 
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.connect   = "frontier://PromptProd/CMS_COND_21X_GLOBALTAG"
+process.GlobalTag.connect   = "frontier://FrontierProd/CMS_COND_21X_GLOBALTAG"
 process.GlobalTag.globaltag = "xGLOBAL_TAGx"
 process.es_prefer_GlobalTag = cms.ESPrefer('PoolDBESSource','GlobalTag')
 
