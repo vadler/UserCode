@@ -1,15 +1,7 @@
-Test Release based on: CMSSW_2_2_0
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_0
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_2_2_0
---- Tag ---    -------- Package --------                        
-V01-00-01      CalibTracker/SiStripCommon                       
-V05-00-03      DQM/SiStripCommon                                
-NoTag          DQM/SiStripMonitorClient                         
-V05-01-06      DQM/SiStripMonitorCluster                        
-V01-00-07      DQM/SiStripMonitorSummary                        
-V03-00-00      DQM/TrackerCommon                                
-V03-02-01      DQMServices/ClientConfig                         
-V03-04-07      DQMServices/Components                           
-V03-04-01      DQMServices/Core                                 
+Test Release based on: CMSSW_3_0_0_pre6
+Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_0_0_pre6
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_0_0_pre6
+--- Tag ---    -------- Package --------
+NoTag          DQM/SiStripMonitorClient
 ---------------------------------------
-total packages: 9 (9 displayed)
+total packages: 1 (1 displayed)
