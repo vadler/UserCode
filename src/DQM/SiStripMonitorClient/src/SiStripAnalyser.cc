@@ -1,8 +1,8 @@
 /*
  * \file SiStripAnalyser.cc
  * 
- * $Date:$
- * $Revision:$
+ * $Date: 2008/12/26 09:05:29 $
+ * $Revision: 1.42 $
  * \author  S. Dutta INFN-Pisa
  *
  */
@@ -87,10 +87,11 @@ SiStripAnalyser::SiStripAnalyser(edm::ParameterSet const& ps) :
 
 
   edm::LogInfo("SiStripAnalyser") << " SiStripAnalyser::Creating SiStripAnalyser ";
-  summaryFrequency_      = ps.getUntrackedParameter<int>("SummaryCreationFrequency",20);
-  tkMapFrequency_        = ps.getUntrackedParameter<int>("TkMapCreationFrequency",50); 
-  staticUpdateFrequency_ = ps.getUntrackedParameter<int>("StaticUpdateFrequency",10);
+  summaryFrequency_      = ps.getUntrackedParameter<int>("SummaryCreationFrequency",1);
+  tkMapFrequency_        = ps.getUntrackedParameter<int>("TkMapCreationFrequency",1); 
+  staticUpdateFrequency_ = ps.getUntrackedParameter<int>("StaticUpdateFrequency",1);
   globalStatusFilling_   = ps.getUntrackedParameter<int>("GlobalStatusFilling", 1);
+  shiftReportFrequency_  = ps.getUntrackedParameter<int>("ShiftReportFrequency", 1);   
   rawDataTag_            = ps.getUntrackedParameter<edm::InputTag>("RawDataTag"); 
   // get back-end interface
   dqmStore_ = Service<DQMStore>().operator->();
@@ -165,12 +166,14 @@ void SiStripAnalyser::beginLuminosityBlock(edm::LuminosityBlock const& lumiSeg, 
 void SiStripAnalyser::analyze(edm::Event const& e, edm::EventSetup const& eSetup){
   nEvents_++;  
   if (nEvents_ == 1 && globalStatusFilling_ > 0) {
-//   if (nEvents_ == 0 && globalStatusFilling_ > 0) {
     checkTrackerFEDs(e);
-    if (!trackerFEDsFound_) actionExecutor_->fillDummyGlobalStatus();
-    else {
+    if (!trackerFEDsFound_) {
+      actionExecutor_->fillDummyGlobalStatus();
+      actionExecutor_->createDummyShiftReport();
+    } else {
       if (globalStatusFilling_ == 1) actionExecutor_->fillGlobalStatusFromModule(dqmStore_);
       if (globalStatusFilling_ == 2) actionExecutor_->fillGlobalStatusFromLayer(dqmStore_);
+      if (shiftReportFrequency_ != -1) actionExecutor_->createShiftReport(dqmStore_);
     }
   }
 
@@ -221,9 +224,14 @@ void SiStripAnalyser::endLuminosityBlock(edm::LuminosityBlock const& lumiSeg, ed
     sistripWebInterface_->setActionFlag(SiStripWebInterface::PlotHistogramFromLayout);
     sistripWebInterface_->performAction();
   }
+  // Fill Global Status
   if (globalStatusFilling_ > 0 && trackerFEDsFound_) {
     if (globalStatusFilling_ == 1) actionExecutor_->fillGlobalStatusFromModule(dqmStore_);
     if (globalStatusFilling_ == 2) actionExecutor_->fillGlobalStatusFromLayer(dqmStore_);
+  }
+  // Create Shift Report
+  if (shiftReportFrequency_ != -1 && trackerFEDsFound_ && nLumiSecs_%shiftReportFrequency_  == 0) {
+    actionExecutor_->createShiftReport(dqmStore_);
   }
 }
 
@@ -246,7 +254,7 @@ void SiStripAnalyser::endJob(){
 void SiStripAnalyser::checkTrackerFEDs(edm::Event const& e) {
   edm::Handle<FEDRawDataCollection> rawDataHandle;
   e.getByLabel(rawDataTag_, rawDataHandle);
-  if ( ! rawDataHandle.isValid() ) return;
+  if ( !rawDataHandle.isValid() ) return;
   
   const FEDRawDataCollection& rawDataCollection = *rawDataHandle;
   const FEDNumbering numbering;
