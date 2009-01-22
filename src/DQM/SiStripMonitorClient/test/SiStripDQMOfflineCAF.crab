@@ -33,9 +33,9 @@ return_data = 0
 
 copy_data       = 1
 storage_element = srm.cern.ch
-# storage_path    = /srm/managerv2?SFN=/castor/cern.ch
+storage_pool    = None
 storage_path    = /castor/cern.ch
-lfn             = user/v/vadler/cms/SiStripDQM/OfflineDQM/test
+user_remote_dir = user/v/vadler/cms/SiStripDQM/OfflineDQM/test
 
 # publish_data            = 0
 # publish_data_name       = yourDataName
