@@ -6,8 +6,8 @@ server_name = None
 
 [CMSSW]
 
-datasetpath  = /Cosmics/BeamCommissioning08-PromptReco-v1/RECO
-runselection = 62815
+datasetpath  = /Cosmics/Commissioning08_CRAFT_ALL_V4_ReReco-v1/RECO
+runselection = 70036
 
 pset = SiStripDQMOfflineGlobalRunCAF_cfg.py
 
@@ -15,7 +15,7 @@ total_number_of_events = 10000
 number_of_jobs         =    10
 
 # use this for output from DQM saver:
-# output_file = DQM_V0001_SiStrip_R000062815.root
+# output_file = DQM_V0001_SiStrip_R000070036.root
 # use this for output from ME2EDM converter:
 output_file = ./SiStripDQMOfflineGlobalRunCAF.root
 
