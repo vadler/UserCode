@@ -14,7 +14,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # HLT analyzers
 process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
-process.hltEventAnalyzerAOD.triggerName = cms.string("HLT_L1MET20")
+process.hltEventAnalyzerAOD.triggerName = cms.string( '@' )
 process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
                                                                        
 process.p = cms.Path(
