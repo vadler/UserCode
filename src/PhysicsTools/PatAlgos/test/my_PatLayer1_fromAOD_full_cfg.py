@@ -5,13 +5,13 @@ process = cms.Process( "PAT" )
 # initialize MessageLogger and output report
 process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
 process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append( 'PATLayer0Summary' )
+process.MessageLogger.categories.append( 'PATSummaryTables' )
 process.MessageLogger.cerr.INFO = cms.untracked.PSet(
     default          = cms.untracked.PSet(
-        limit = cms.untracked.int32(0)
+        limit = cms.untracked.int32( 0 )
     ),
-    PATLayer0Summary = cms.untracked.PSet(
-        limit = cms.untracked.int32(-1)
+    PATSummaryTables = cms.untracked.PSet(
+        limit = cms.untracked.int32( -1 )
     )
 )
 process.options = cms.untracked.PSet(
@@ -36,7 +36,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = cms.string( 'IDEAL_V9::All' )
+process.GlobalTag.globaltag = cms.string( 'STARTUP_V7::All' )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
 # # HLT analyzers
@@ -44,36 +44,32 @@ process.load( "Configuration.StandardSequences.MagneticField_cff" )
 # process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
 
 # PAT Layer 0 & 1
-process.load( "PhysicsTools.PatAlgos.patLayer0_cff" )
+process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.load( "PhysicsTools.PatAlgos.triggerLayer0.triggerProducer_cff" )
-process.load( "PhysicsTools.PatAlgos.patLayer1_cff" )
 process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
 
 process.p = cms.Path(
 #     process.hltEventAnalyzerAOD       +
 #     process.triggerSummaryAnalyzerAOD +
-    process.patLayer0        *  
-    process.patLayer0Trigger *
-    process.patLayer1        *  
+    process.patDefaultSequence *  
+    process.patLayer0Trigger   *
     process.patLayer1Trigger
 )
 
 # Output module configuration
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_3/output/PATLayer1_Output.fromAOD_full.root' ),
+    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_X_2009-02-03-0000/output/my_PatLayer1_fromAOD_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),
     outputCommands = cms.untracked.vstring( 'drop *' )
 )
-process.patLayer1EventContentTrigger = cms.PSet(
-    outputCommands = cms.untracked.vstring(
-        'keep *_patTrigger_*_*',
-        'keep *_patTriggerEvent_*_*'
-    )
-)
-process.load( "PhysicsTools.PatAlgos.patLayer1_EventContent_cff" )
-process.out.outputCommands.extend( process.patLayer1EventContent.outputCommands )
-process.out.outputCommands.extend( process.patLayer1EventContentTrigger.outputCommands )
+from PhysicsTools.PatAlgos.patEventContent_cff import *
+patLayer1EventContentTrigger = [
+    'keep *_patTrigger_*_*'     ,
+    'keep *_patTriggerEvent_*_*'
+]
+process.out.outputCommands += patEventContent
+process.out.outputCommands += patLayer1EventContentTrigger
 
 process.outpath = cms.EndPath( process.out )
