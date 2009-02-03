@@ -1,5 +1,5 @@
 //
-// $Id: PATMETProducer.cc,v 1.7.4.1 2008/11/25 15:39:40 gpetrucc Exp $
+// $Id: PATMETProducer.cc,v 1.7.4.2 2009/01/14 23:56:16 gpetrucc Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATMETProducer.h"
@@ -52,6 +52,7 @@ void PATMETProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
   edm::Handle<edm::View<METType> > mets;
   iEvent.getByLabel(metSrc_, mets);
 
+  if (mets->size() != 1) throw cms::Exception("Corrupt Data") << "The input MET collection " << metSrc_.encode() << " has size " << mets->size() << " instead of 1 as it should.\n";
   if (efficiencyLoader_.enabled()) efficiencyLoader_.newEvent(iEvent);
 
   // Get the vector of generated met from the event if needed

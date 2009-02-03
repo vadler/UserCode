@@ -184,21 +184,27 @@ namespace {
        ==========================================================================================================================   */
   edm::Ptr<reco::Muon>	        ptr_mu;
   edm::PtrVector<reco::Muon>	ptrv_mu;
+  edm::Wrapper<edm::PtrVector<reco::Muon> >	ptrv_mu_w;
 
   edm::Ptr<reco::GsfElectron>	     ptr_e;
   edm::PtrVector<reco::GsfElectron>  ptrv_e;
+  edm::Wrapper<edm::PtrVector<reco::GsfElectron> >  ptrv_e_w;
 
   edm::Ptr<reco::BaseTau>	 ptr_t;
   edm::PtrVector<reco::BaseTau>	 ptrv_t;
+  edm::Wrapper<edm::PtrVector<reco::BaseTau> >	 ptrv_t_w;
 
   edm::Ptr<reco::Photon>	 ptr_ph;
   edm::PtrVector<reco::Photon>	 ptrv_ph;
+  edm::Wrapper<edm::PtrVector<reco::Photon> >	 ptrv_ph_w;
 
   edm::Ptr<reco::Jet>	     ptr_j;
   edm::PtrVector<reco::Jet>  ptrv_j;
+  edm::Wrapper<edm::PtrVector<reco::Jet> >  ptrv_j_w;
 
   edm::Ptr<reco::MET>	     ptr_m;
   edm::PtrVector<reco::MET>  ptrv_m;
+  edm::Wrapper<edm::PtrVector<reco::MET> >  ptrv_m_w;
 
   /*   ==========================================================================================================================
               PAT Dataformats: PatObjects

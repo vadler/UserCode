@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.20.2.2 2008/11/25 15:39:40 gpetrucc Exp $
+// $Id: PATElectronProducer.cc,v 1.20.2.4 2009/01/28 16:40:47 pioppi Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
@@ -11,6 +11,9 @@
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+
+#include "DataFormats/ParticleFlowCandidate/interface/IsolatedPFCandidateFwd.h"
+#include "DataFormats/ParticleFlowCandidate/interface/IsolatedPFCandidate.h"
 
 #include "PhysicsTools/PatUtils/interface/TrackerIsolationPt.h"
 #include "PhysicsTools/PatUtils/interface/CaloIsolationEnergy.h"
@@ -32,6 +35,12 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
   embedGsfTrack_    = iConfig.getParameter<bool>         ( "embedGsfTrack" );
   embedSuperCluster_= iConfig.getParameter<bool>         ( "embedSuperCluster" );
   embedTrack_       = iConfig.getParameter<bool>         ( "embedTrack" );
+
+  // pflow specific
+  pfElecSrc_           = iConfig.getParameter<edm::InputTag>( "pfElectronSource" );
+  useParticleFlow_        = iConfig.getParameter<bool>( "useParticleFlow" );
+  embedPFCandidate_   = iConfig.getParameter<bool>( "embedPFCandidate" );
+
   
   // MC matching configurables
   addGenMatch_      = iConfig.getParameter<bool>          ( "addGenMatch" );
@@ -140,11 +149,20 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
   }
 
   // prepare the MC matching
-  std::vector<edm::Handle<edm::Association<reco::GenParticleCollection> > > genMatches(genMatchSrc_.size());
+  GenAssociations  genMatches(genMatchSrc_.size());
   if (addGenMatch_) {
         for (size_t j = 0, nd = genMatchSrc_.size(); j < nd; ++j) {
             iEvent.getByLabel(genMatchSrc_[j], genMatches[j]);
         }
+  }
+
+
+  // prepare the trigger matching
+  TrigAssociations  trigMatches(trigMatchSrc_.size());
+  if ( addTrigMatch_ ) {
+    for ( size_t i = 0; i < trigMatchSrc_.size(); ++i ) {
+      iEvent.getByLabel(trigMatchSrc_[i], trigMatches[i]);
+    }
   }
 
   // prepare ID extraction 
@@ -166,36 +184,65 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
   }
 
   std::vector<Electron> * patElectrons = new std::vector<Electron>();
+
+
+  if( useParticleFlow_ ) {
+    edm::Handle< reco::IsolatedPFCandidateCollection >  pfElectrons;
+    iEvent.getByLabel(pfElecSrc_, pfElectrons);
+    unsigned index=0;
+  
+    for( reco::IsolatedPFCandidateConstIterator i = pfElectrons->begin(); 
+	 i != pfElectrons->end(); ++i, ++index) {
+      
+      const reco::IsolatedPFCandidate& pfel = *i;
+      reco::IsolatedPFCandidateRef pfRef( pfElectrons, index );
+      reco::CandidateBaseRef pfBaseRef( pfRef ); 
+
+      reco::GsfTrackRef PfTk= i->gsfTrackRef();
+ 
+      bool Matched=false;
+      for (edm::View<ElectronType>::const_iterator itElectron = electrons->begin(); itElectron != electrons->end(); ++itElectron) {
+	unsigned int idx = itElectron - electrons->begin();
+	if (Matched) continue;
+	reco::GsfTrackRef EgTk= itElectron->gsfTrack();
+	if (itElectron->gsfTrack()==i->gsfTrackRef()){
+	  const ElectronBaseRef elecsRef = electrons->refAt(idx);
+	  Electron anElectron(elecsRef);
+	  FillElectron(anElectron,elecsRef,pfBaseRef, genMatches, trigMatches);
+	  Matched=true;
+	  anElectron.setPFCandidateRef( pfRef  );
+	  if( embedPFCandidate_ ) anElectron.embedPFCandidate();
+	  patElectrons->push_back(anElectron);
+	}
+
+	
+      }
+      //Isolation
+      if (isolator_.enabled()) {
+      }
+      //Electron Id
+      if (addElecID_) {
+      }
+      //Electron Shapes
+      if (addElecShapes_) {
+      }
+      
+    }
+  }
+
+  else{
   for (edm::View<ElectronType>::const_iterator itElectron = electrons->begin(); itElectron != electrons->end(); ++itElectron) {
     // construct the Electron from the ref -> save ref to original object
     unsigned int idx = itElectron - electrons->begin();
-    edm::RefToBase<ElectronType> elecsRef = electrons->refAt(idx);
-    edm::Ptr<ElectronType> electronPtr = electrons->ptrAt(idx);
-    Electron anElectron(elecsRef);
-    if (embedGsfTrack_) anElectron.embedGsfTrack();
-    if (embedSuperCluster_) anElectron.embedSuperCluster();
-    if (embedTrack_) anElectron.embedTrack();
 
-    // store the match to the generated final state muons
-    if (addGenMatch_) {
-      for(size_t i = 0, n = genMatches.size(); i < n; ++i) {
-          reco::GenParticleRef genElectron = (*genMatches[i])[elecsRef];
-          anElectron.addGenParticleRef(genElectron);
-      }
-      if (embedGenMatch_) anElectron.embedGenParticle();
-    }
+    const ElectronBaseRef elecsRef = electrons->refAt(idx);
+    reco::CandidateBaseRef elecBaseRef(elecsRef);
+
+    //    const edm::Ptr<ElectronType> electronPtr = electrons->ptrAt(idx);
+    Electron anElectron(elecsRef);
+
+    FillElectron(anElectron,elecsRef,elecBaseRef, genMatches, trigMatches);
     
-    // matches to trigger primitives
-    if ( addTrigMatch_ ) {
-      for ( size_t i = 0; i < trigMatchSrc_.size(); ++i ) {
-        edm::Handle<edm::Association<TriggerPrimitiveCollection> > trigMatch;
-        iEvent.getByLabel(trigMatchSrc_[i], trigMatch);
-        TriggerPrimitiveRef trigPrim = (*trigMatch)[elecsRef];
-        if ( trigPrim.isNonnull() && trigPrim.isAvailable() ) {
-          anElectron.addTriggerMatch(*trigPrim);
-        }
-      }
-    }
 
     // add resolution info
     
@@ -211,10 +258,6 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 
     for (size_t j = 0, nd = deposits.size(); j < nd; ++j) {
         anElectron.setIsoDeposit(isoDepositLabels_[j].first, (*deposits[j])[elecsRef]);
-    }
-
-    if (efficiencyLoader_.enabled()) {
-        efficiencyLoader_.setEfficiencies( anElectron, elecsRef );
     }
 
     // add electron ID info
@@ -245,7 +288,7 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
     // add sel to selected
     patElectrons->push_back(anElectron);
   }
-
+  }
   
   // sort electrons in pt
   std::sort(patElectrons->begin(), patElectrons->end(), pTComparator_);
@@ -256,6 +299,39 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 
   // clean up
   if (isolator_.enabled()) isolator_.endEvent();
+
+}
+
+void PATElectronProducer::FillElectron(Electron& anElectron,
+				       const ElectronBaseRef& elecsRef,
+				       const reco::CandidateBaseRef& baseRef,
+				       const GenAssociations& genMatches,
+				       const TrigAssociations& trigMatches)const {
+  if (embedGsfTrack_) anElectron.embedGsfTrack();
+  if (embedSuperCluster_) anElectron.embedSuperCluster();
+  if (embedTrack_) anElectron.embedTrack();
+
+  // store the match to the generated final state muons
+  if (addGenMatch_) {
+    for(size_t i = 0, n = genMatches.size(); i < n; ++i) {
+      reco::GenParticleRef genElectron = (*genMatches[i])[elecsRef];
+      anElectron.addGenParticleRef(genElectron);
+    }
+    if (embedGenMatch_) anElectron.embedGenParticle();
+  }
+    // matches to trigger primitives
+    if ( addTrigMatch_ ) {
+      for ( size_t i = 0; i < trigMatchSrc_.size(); ++i ) {
+        TriggerPrimitiveRef trigPrim = (*trigMatches[i])[elecsRef];
+        if ( trigPrim.isNonnull() && trigPrim.isAvailable() ) {
+          anElectron.addTriggerMatch(*trigPrim);
+        }
+      }
+    }
+    
+    if (efficiencyLoader_.enabled()) {
+      efficiencyLoader_.setEfficiencies( anElectron, elecsRef );
+    }
 
 }
 

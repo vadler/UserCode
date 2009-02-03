@@ -5,12 +5,12 @@ process = cms.Process( "PAT" )
 # initialize MessageLogger and output report
 process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
 process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append( 'PATLayer0Summary' )
+process.MessageLogger.categories.append( 'PATSummaryTables' )
 process.MessageLogger.cerr.INFO = cms.untracked.PSet(
     default          = cms.untracked.PSet(
         limit = cms.untracked.int32(0)
     ),
-    PATLayer0Summary = cms.untracked.PSet(
+    PATSummaryTables = cms.untracked.PSet(
         limit = cms.untracked.int32(-1)
     )
 )
@@ -30,19 +30,17 @@ process.maxEvents = cms.untracked.PSet(
 
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = cms.string( 'IDEAL_V9::All' )
+process.GlobalTag.globaltag = cms.string('STARTUP_V7::All')
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
 # PAT Layer 0 & 1
-process.load( "PhysicsTools.PatAlgos.patLayer0_cff" )
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
 process.load( "PhysicsTools.PatAlgos.triggerLayer0.triggerProducer_cff" )
-process.load( "PhysicsTools.PatAlgos.patLayer1_cff" )
 process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
 
 process.p = cms.Path(
-    process.patLayer0        *  
-    process.patLayer0Trigger *
-    process.patLayer1        *  
+    process.patDefaultSequence *  
+    process.patLayer0Trigger   *  ## FIXME
     process.patLayer1Trigger
 )
 
@@ -54,14 +52,12 @@ process.out = cms.OutputModule("PoolOutputModule",
     ),
     outputCommands = cms.untracked.vstring( 'drop *' )
 )
-process.patLayer1EventContentTrigger = cms.PSet(
-    outputCommands = cms.untracked.vstring(
-        'keep *_patTrigger_*_*',
-        'keep *_patTriggerEvent_*_*'
-    )
-)
-process.load( "PhysicsTools.PatAlgos.patLayer1_EventContent_cff" )
-process.out.outputCommands.extend( process.patLayer1EventContent.outputCommands )
-process.out.outputCommands.extend( process.patLayer1EventContentTrigger.outputCommands )
+from PhysicsTools.PatAlgos.patEventContent_cff import *
+patLayer1EventContentTrigger = [
+    'keep *_patTrigger_*_*',
+    'keep *_patTriggerEvent_*_*'
+]
+process.out.outputCommands += patEventContent
+process.out.outputCommands += patLayer1EventContentTrigger
 
 process.outpath = cms.EndPath( process.out )

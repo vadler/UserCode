@@ -1,5 +1,5 @@
 //
-// $Id: PATJetProducer.h,v 1.10.4.1 2008/11/25 15:39:40 gpetrucc Exp $
+// $Id: PATJetProducer.h,v 1.10.4.5 2009/01/22 12:08:59 gpetrucc Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATJetProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of JetType.
 
   \author   Steven Lowette, Jeremy Andrea
-  \version  $Id: PATJetProducer.h,v 1.10.4.1 2008/11/25 15:39:40 gpetrucc Exp $
+  \version  $Id: PATJetProducer.h,v 1.10.4.5 2009/01/22 12:08:59 gpetrucc Exp $
 */
 
 
@@ -23,7 +23,7 @@
 #include "FWCore/ParameterSet/interface/InputTag.h"
 #include "DataFormats/Common/interface/View.h"
 
-#include "PhysicsTools/Utilities/interface/EtComparator.h"
+#include "PhysicsTools/Utilities/interface/PtComparator.h"
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -63,23 +63,23 @@ namespace pat {
       bool                     addPartonJetMatch_;
       edm::InputTag            partonJetSrc_;
       bool                     addJetCorrFactors_;
-      edm::InputTag            jetCorrFactorsSrc_;
+      std::vector<edm::InputTag> jetCorrFactorsSrc_;
       bool                     addTrigMatch_;
       std::vector<edm::InputTag> trigMatchSrc_;
 
-      bool                     addBTagInfo_;
-      bool                     addDiscriminators_; 
-      edm::InputTag            discriminatorModule_;
-      std::set<std::string>    discriminatorNames_;
-      bool                     addTagInfoRefs_; 
-      edm::InputTag            tagInfoModule_;
-      std::set<std::string>    tagInfoNames_;
+      bool                       addBTagInfo_;
+      bool                       addDiscriminators_; 
+      std::vector<edm::InputTag> discriminatorTags_;
+      std::vector<std::string>   discriminatorLabels_;
+      bool                       addTagInfos_; 
+      std::vector<edm::InputTag> tagInfoTags_;
+      std::vector<std::string>   tagInfoLabels_;
       bool                     addAssociatedTracks_;
       edm::InputTag            trackAssociation_;
       bool                     addJetCharge_;
       edm::InputTag            jetCharge_;
       // tools
-      GreaterByEt<Jet>                   eTComparator_;
+      GreaterByPt<Jet>                   pTComparator_;
 
       bool addEfficiencies_;
       pat::helper::EfficiencyLoader efficiencyLoader_;

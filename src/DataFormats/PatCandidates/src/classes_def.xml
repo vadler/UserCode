@@ -154,21 +154,27 @@
        ========================================================================================================================== -->
   <class name="edm::Ptr<reco::Muon>" />
   <class name="edm::PtrVector<reco::Muon>" />
+  <class name="edm::Wrapper<edm::PtrVector<reco::Muon> >" />
 
   <class name="edm::Ptr<reco::GsfElectron>" />
   <class name="edm::PtrVector<reco::GsfElectron>" />
+  <class name="edm::Wrapper<edm::PtrVector<reco::GsfElectron> >" />
 
   <class name="edm::Ptr<reco::BaseTau>" />
   <class name="edm::PtrVector<reco::BaseTau>" />
+  <class name="edm::Wrapper<edm::PtrVector<reco::BaseTau> >" />
 
   <class name="edm::Ptr<reco::Photon>" />
   <class name="edm::PtrVector<reco::Photon>" />
+  <class name="edm::Wrapper<edm::PtrVector<reco::Photon> >" />
 
   <class name="edm::Ptr<reco::Jet>" />
   <class name="edm::PtrVector<reco::Jet>" />
+  <class name="edm::Wrapper<edm::PtrVector<reco::Jet> >" />
 
   <class name="edm::Ptr<reco::MET>" />
   <class name="edm::PtrVector<reco::MET>" />
+  <class name="edm::Wrapper<edm::PtrVector<reco::MET> >" />
 
   <!-- ==========================================================================================================================
               PAT Dataformats: PatObjects
@@ -189,6 +195,8 @@
   <class name="pat::Lepton<pat::TauType>" />
 
   <!-- PAT Objects, and embedded data  -->
+     <class name="reco::CandidatePtrVector" /> 
+     <class name="std::vector<reco::CandidatePtrVector>" />
   <class name="pat::Electron" />
   <class name="pat::Muon" />
   <class name="pat::Tau" />

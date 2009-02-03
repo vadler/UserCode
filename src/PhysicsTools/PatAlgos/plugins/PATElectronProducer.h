@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.h,v 1.12.2.2 2008/11/25 15:39:40 gpetrucc Exp $
+// $Id: PATElectronProducer.h,v 1.12.2.3 2009/01/16 15:55:21 pioppi Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATElectronProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of ElectronType.
 
   \author   Steven Lowette, James Lamb
-  \version  $Id: PATElectronProducer.h,v 1.12.2.2 2008/11/25 15:39:40 gpetrucc Exp $
+  \version  $Id: PATElectronProducer.h,v 1.12.2.3 2009/01/16 15:55:21 pioppi Exp $
 */
 
 
@@ -56,6 +56,7 @@ namespace pat {
       ~PATElectronProducer();  
 
       virtual void produce(edm::Event & iEvent, const edm::EventSetup & iSetup);
+      typedef edm::RefToBase<ElectronType> ElectronBaseRef;
 
     private:
 
@@ -71,6 +72,23 @@ namespace pat {
       std::vector<edm::InputTag> trigMatchSrc_;
       bool          addResolutions_;
       bool          addElecID_;
+
+      /// pflow specific
+      bool          useParticleFlow_;
+      edm::InputTag pfElecSrc_;
+      bool          embedPFCandidate_; 
+
+      typedef std::vector<edm::Handle<edm::Association<reco::GenParticleCollection> > > GenAssociations;
+
+      typedef std::vector<edm::Handle<edm::Association<TriggerPrimitiveCollection> > > TrigAssociations;
+
+      void FillElectron(Electron& aEl,
+			const ElectronBaseRef& elecRef,
+			const reco::CandidateBaseRef& baseRef,
+			const GenAssociations& genMatches,
+			const TrigAssociations& trigMatches) const;
+  
+
       typedef std::pair<std::string, edm::InputTag> NameTag;
       std::vector<NameTag> elecIDSrcs_;
 
