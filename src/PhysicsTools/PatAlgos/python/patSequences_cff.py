@@ -21,6 +21,9 @@ from PhysicsTools.PatAlgos.cleaningLayer1.cleanLayer1Objects_cff import *
 # count selected layer 1 objects (including total number of leptons): sequence countLayer1Objects
 from PhysicsTools.PatAlgos.selectionLayer1.countLayer1Objects_cff import *
 
+# trigger info
+from PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff import *
+
 beforeLayer1Objects = cms.Sequence(
     patAODReco +  # use '+', as there is no dependency 
     patMCTruth +  # among these sequences

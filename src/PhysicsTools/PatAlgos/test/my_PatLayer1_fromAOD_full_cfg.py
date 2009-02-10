@@ -25,7 +25,7 @@ process.options = cms.untracked.PSet(
 # )
 
 # source
-process.source = cms.Source("PoolSource", 
+process.source = cms.Source( "PoolSource", 
     fileNames = cms.untracked.vstring(
         'file:/afs/cern.ch/cms/PRS/top/cmssw-data/relval200-for-pat-testing/FullSimTTBar-2_2_X_2008-11-03-STARTUP_V7-AODSIM.100.root'
     )
@@ -45,31 +45,24 @@ process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
 # PAT Layer 0 & 1
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
-process.load( "PhysicsTools.PatAlgos.triggerLayer0.triggerProducer_cff" )
-process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
 
 process.p = cms.Path(
 #     process.hltEventAnalyzerAOD       +
 #     process.triggerSummaryAnalyzerAOD +
-    process.patDefaultSequence *  
-    process.patLayer0Trigger   *
-    process.patLayer1Trigger
+    process.patDefaultSequence *
+    process.patTriggerSequence
 )
 
 # Output module configuration
-process.out = cms.OutputModule("PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_X_2009-02-03-0000/output/my_PatLayer1_fromAOD_full.root' ),
+process.out = cms.OutputModule( "PoolOutputModule",
+    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_X_2009-02-10-0000/output/my_PatLayer1_fromAOD_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),
     outputCommands = cms.untracked.vstring( 'drop *' )
 )
 from PhysicsTools.PatAlgos.patEventContent_cff import *
-patLayer1EventContentTrigger = [
-    'keep *_patTrigger_*_*'     ,
-    'keep *_patTriggerEvent_*_*'
-]
 process.out.outputCommands += patEventContent
-process.out.outputCommands += patLayer1EventContentTrigger
+process.out.outputCommands += patTriggerEventContent
 
 process.outpath = cms.EndPath( process.out )

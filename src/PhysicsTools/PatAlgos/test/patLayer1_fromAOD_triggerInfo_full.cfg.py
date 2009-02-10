@@ -8,10 +8,10 @@ process.MessageLogger.cerr.threshold = 'INFO'
 process.MessageLogger.categories.append( 'PATSummaryTables' )
 process.MessageLogger.cerr.INFO = cms.untracked.PSet(
     default          = cms.untracked.PSet(
-        limit = cms.untracked.int32(0)
+        limit = cms.untracked.int32( 0 )
     ),
     PATSummaryTables = cms.untracked.PSet(
-        limit = cms.untracked.int32(-1)
+        limit = cms.untracked.int32( -1 )
     )
 )
 process.options = cms.untracked.PSet(
@@ -19,7 +19,7 @@ process.options = cms.untracked.PSet(
 )
 
 # source
-process.source = cms.Source("PoolSource", 
+process.source = cms.Source( "PoolSource", 
     fileNames = cms.untracked.vstring(
         'file:/afs/cern.ch/cms/PRS/top/cmssw-data/relval200-for-pat-testing/FullSimTTBar-2_2_X_2008-11-03-STARTUP_V7-AODSIM.100.root'
     )
@@ -30,22 +30,19 @@ process.maxEvents = cms.untracked.PSet(
 
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = cms.string('STARTUP_V7::All')
+process.GlobalTag.globaltag = cms.string( 'STARTUP_V7::All' )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
 # PAT Layer 0 & 1
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
-process.load( "PhysicsTools.PatAlgos.triggerLayer0.triggerProducer_cff" )
-process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
+process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 
 process.p = cms.Path(
-    process.patDefaultSequence *  
-    process.patLayer0Trigger   *  ## FIXME
-    process.patLayer1Trigger
+    process.patDefaultSequence *
+    process.patTriggerSequence
 )
 
 # Output module configuration
-process.out = cms.OutputModule("PoolOutputModule",
+process.out = cms.OutputModule( "PoolOutputModule",
     fileName       = cms.untracked.string( 'PATLayer1_Output.fromAOD_triggerInfo_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
@@ -53,11 +50,7 @@ process.out = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring( 'drop *' )
 )
 from PhysicsTools.PatAlgos.patEventContent_cff import *
-patLayer1EventContentTrigger = [
-    'keep *_patTrigger_*_*',
-    'keep *_patTriggerEvent_*_*'
-]
 process.out.outputCommands += patEventContent
-process.out.outputCommands += patLayer1EventContentTrigger
+process.out.outputCommands += patTriggerEventContent
 
 process.outpath = cms.EndPath( process.out )

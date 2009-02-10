@@ -9,7 +9,7 @@ patEventContentNoLayer1Cleaning = [
     'keep *_selectedLayer1Taus_*_*', 
     'keep *_selectedLayer1Jets_*_*', 
     'keep *_layer1METs_*_*',
-    'keep *_selectedLayer1PFParticles_*_*',
+    'keep *_selectedLayer1PFParticles_*_*'
 ]
 
 patEventContent = [
@@ -20,7 +20,7 @@ patEventContent = [
     'keep *_cleanLayer1Jets_*_*', 
     'keep *_layer1METs_*_*',
     'keep *_cleanLayer1Hemispheres_*_*',
-    'keep *_cleanLayer1PFParticles_*_*',
+    'keep *_cleanLayer1PFParticles_*_*'
 ]
 
 patExtraAodEventContent = [
@@ -36,5 +36,10 @@ patExtraAodEventContent = [
     'keep *_offlinePrimaryVertices_*_*',
     # TRIGGER
     'keep edmTriggerResults_TriggerResults_*_HLT', 
-    'keep *_hltTriggerSummaryAOD_*_*',
+    'keep *_hltTriggerSummaryAOD_*_*'
+]
+
+patTriggerEventContent = [
+    'keep *_patTrigger_*_*'     ,
+    'keep *_patTriggerEvent_*_*'
 ]
