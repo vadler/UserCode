@@ -199,7 +199,12 @@
      <class name="std::vector<reco::CandidatePtrVector>" />
   <class name="pat::Electron" />
   <class name="pat::Muon" />
-  <class name="pat::Tau" />
+  <class name="pat::Tau">
+    <field name="isolationTracksTransientRefVector_"      transient="true" />
+    <field name="isolationTracksTransientRefVectorFixed_" transient="true" />
+    <field name="signalTracksTransientRefVector_"         transient="true" />
+    <field name="signalTracksTransientRefVectorFixed_"    transient="true" />
+  </class>
      <class name="pat::tau::TauPFSpecific" />
      <class name="std::vector<pat::tau::TauPFSpecific>" />
      <class name="pat::tau::TauCaloSpecific" />

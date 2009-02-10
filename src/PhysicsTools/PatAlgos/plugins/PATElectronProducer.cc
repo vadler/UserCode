@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.20.2.4 2009/01/28 16:40:47 pioppi Exp $
+// $Id: PATElectronProducer.cc,v 1.20.2.8 2009/02/07 00:59:51 pioppi Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
@@ -12,8 +12,8 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
-#include "DataFormats/ParticleFlowCandidate/interface/IsolatedPFCandidateFwd.h"
-#include "DataFormats/ParticleFlowCandidate/interface/IsolatedPFCandidate.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
 #include "PhysicsTools/PatUtils/interface/TrackerIsolationPt.h"
 #include "PhysicsTools/PatUtils/interface/CaloIsolationEnergy.h"
@@ -96,6 +96,12 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
      if (depconf.exists("tracker")) isoDepositLabels_.push_back(std::make_pair(TrackerIso, depconf.getParameter<edm::InputTag>("tracker")));
      if (depconf.exists("ecal"))    isoDepositLabels_.push_back(std::make_pair(ECalIso, depconf.getParameter<edm::InputTag>("ecal")));
      if (depconf.exists("hcal"))    isoDepositLabels_.push_back(std::make_pair(HCalIso, depconf.getParameter<edm::InputTag>("hcal")));
+     if (depconf.exists("particle"))           isoDepositLabels_.push_back(std::make_pair(ParticleIso, depconf.getParameter<edm::InputTag>("particle")));
+     if (depconf.exists("chargedparticle"))    isoDepositLabels_.push_back(std::make_pair(ChargedParticleIso, depconf.getParameter<edm::InputTag>("chargedparticle")));
+     if (depconf.exists("neutralparticle")) isoDepositLabels_.push_back(std::make_pair(NeutralParticleIso,depconf.getParameter<edm::InputTag>("neutralparticle")));
+     if (depconf.exists("gammaparticle"))    isoDepositLabels_.push_back(std::make_pair(GammaParticleIso, depconf.getParameter<edm::InputTag>("gammaparticle")));
+
+
      if (depconf.exists("user")) {
         std::vector<edm::InputTag> userdeps = depconf.getParameter<std::vector<edm::InputTag> >("user");
         std::vector<edm::InputTag>::const_iterator it = userdeps.begin(), ed = userdeps.end();
@@ -177,8 +183,7 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
      }
   }
 
-  //prepare electron cluster shapes extraction
-  std::auto_ptr<EcalClusterLazyTools> lazyTools_;
+
   if (addElecShapes_) {
     lazyTools_ .reset(new EcalClusterLazyTools( iEvent , iSetup , reducedBarrelRecHitCollection_ , reducedEndcapRecHitCollection_ ));  
   }
@@ -187,19 +192,19 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 
 
   if( useParticleFlow_ ) {
-    edm::Handle< reco::IsolatedPFCandidateCollection >  pfElectrons;
+    edm::Handle< reco::PFCandidateCollection >  pfElectrons;
     iEvent.getByLabel(pfElecSrc_, pfElectrons);
     unsigned index=0;
   
-    for( reco::IsolatedPFCandidateConstIterator i = pfElectrons->begin(); 
+    for( reco::PFCandidateConstIterator i = pfElectrons->begin(); 
 	 i != pfElectrons->end(); ++i, ++index) {
-      
-      const reco::IsolatedPFCandidate& pfel = *i;
-      reco::IsolatedPFCandidateRef pfRef( pfElectrons, index );
-      reco::CandidateBaseRef pfBaseRef( pfRef ); 
 
-      reco::GsfTrackRef PfTk= i->gsfTrackRef();
- 
+      reco::PFCandidateRef pfRef(pfElectrons,index);
+      reco::PFCandidatePtr ptrToMother(pfElectrons,index);
+      reco::CandidateBaseRef pfBaseRef( pfRef ); 
+      
+      reco::GsfTrackRef PfTk= i->gsfTrackRef(); 
+
       bool Matched=false;
       for (edm::View<ElectronType>::const_iterator itElectron = electrons->begin(); itElectron != electrons->end(); ++itElectron) {
 	unsigned int idx = itElectron - electrons->begin();
@@ -212,20 +217,38 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 	  Matched=true;
 	  anElectron.setPFCandidateRef( pfRef  );
 	  if( embedPFCandidate_ ) anElectron.embedPFCandidate();
+
+	  if (isolator_.enabled()){
+	    reco::CandidatePtr mother =  ptrToMother->sourceCandidatePtr(0);
+	    isolator_.fill(mother, isolatorTmpStorage_);
+	    typedef pat::helper::MultiIsolator::IsolationValuePairs IsolationValuePairs;
+	    for (IsolationValuePairs::const_reverse_iterator it = isolatorTmpStorage_.rbegin(), 
+		   ed = isolatorTmpStorage_.rend(); it != ed; ++it) {
+	      anElectron.setIsolation(it->first, it->second);
+	    }
+	    for (size_t j = 0, nd = deposits.size(); j < nd; ++j) {
+	      anElectron.setIsoDeposit(isoDepositLabels_[j].first, (*deposits[j])[mother]);
+	    }
+	  }
+	  //Electron Id
+	  if (addElecID_) {
+	    //STANDARD EL ID 
+	    for (size_t i = 0; i < elecIDSrcs_.size(); ++i) {
+	      ids[i].second = (*idhandles[i])[elecsRef];    
+	    }
+	    //SPECIFIC PF ID
+	    ids.push_back(std::make_pair("pf_evspi",pfRef->mva_e_pi()));
+	    ids.push_back(std::make_pair("pf_evsmu",pfRef->mva_e_mu()));
+	    anElectron.setElectronIDs(ids);
+	  }
+
 	  patElectrons->push_back(anElectron);
+
 	}
 
 	
       }
-      //Isolation
-      if (isolator_.enabled()) {
-      }
-      //Electron Id
-      if (addElecID_) {
-      }
-      //Electron Shapes
-      if (addElecShapes_) {
-      }
+ 
       
     }
   }
@@ -273,17 +296,6 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
       userDataHelper_.add( anElectron, iEvent, iSetup );
     }
     
-    //  add electron shapes info
-    if (addElecShapes_) {
-	std::vector<float> covariances = lazyTools_->covariances(*(itElectron->superCluster()->seed())) ;
-	std::vector<float> localCovariances = lazyTools_->localCovariances(*(itElectron->superCluster()->seed())) ;
-	float scSigmaEtaEta = sqrt(covariances[0]) ;
-	float scSigmaIEtaIEta = sqrt(localCovariances[0]) ;
-	float scE1x5 = lazyTools_->e1x5(*(itElectron->superCluster()->seed()))  ;
-	float scE2x5Max = lazyTools_->e2x5Max(*(itElectron->superCluster()->seed()))  ;
-	float scE5x5 = lazyTools_->e5x5(*(itElectron->superCluster()->seed())) ;
-	anElectron.setClusterShapes(scSigmaEtaEta,scSigmaIEtaIEta,scE1x5,scE2x5Max,scE5x5) ;
-    }
     
     // add sel to selected
     patElectrons->push_back(anElectron);
@@ -332,7 +344,17 @@ void PATElectronProducer::FillElectron(Electron& anElectron,
     if (efficiencyLoader_.enabled()) {
       efficiencyLoader_.setEfficiencies( anElectron, elecsRef );
     }
-
+    //  add electron shapes info
+    if (addElecShapes_) {
+	std::vector<float> covariances = lazyTools_->covariances(*(elecsRef->superCluster()->seed())) ;
+	std::vector<float> localCovariances = lazyTools_->localCovariances(*(elecsRef->superCluster()->seed())) ;
+	float scSigmaEtaEta = sqrt(covariances[0]) ;
+	float scSigmaIEtaIEta = sqrt(localCovariances[0]) ;
+	float scE1x5 = lazyTools_->e1x5(*(elecsRef->superCluster()->seed()))  ;
+	float scE2x5Max = lazyTools_->e2x5Max(*(elecsRef->superCluster()->seed()))  ;
+	float scE5x5 = lazyTools_->e5x5(*(elecsRef->superCluster()->seed())) ;
+	anElectron.setClusterShapes(scSigmaEtaEta,scSigmaIEtaIEta,scE1x5,scE2x5Max,scE5x5) ;
+    }
 }
 
 

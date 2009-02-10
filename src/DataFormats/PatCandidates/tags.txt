@@ -1,6 +1,6 @@
-Test Release based on: CMSSW_2_2_X_2009-02-03-0000
-Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc4_ia32_gcc345/tue/2.2-tue-00/CMSSW_2_2_X_2009-02-03-0000
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_X_2009-02-03-0000
+Test Release based on: CMSSW_2_2_X_2009-02-10-0000
+Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc4_ia32_gcc345/tue/2.2-tue-00/CMSSW_2_2_X_2009-02-10-0000
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_X_2009-02-10-0000
 --- Tag ---    -------- Package --------                        
 B2_2_X         DataFormats/PatCandidates                        
 B2_2_X         PhysicsTools/PatAlgos                            
