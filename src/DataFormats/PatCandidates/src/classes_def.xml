@@ -415,6 +415,8 @@
   <class name="std::vector<pat::TriggerObject>" />
   <class name="std::vector<pat::TriggerObject>::const_iterator" />
   <class name="edm::Wrapper<std::vector<pat::TriggerObject> >" />
+  <class name="pat::TriggerObjectMatches" />
+  <class name="edm::Wrapper<pat::TriggerObjectMatches>" />
   <class name="pat::TriggerObjectRef" />
   <class name="pat::TriggerObjectRefProd" />
   <class name="pat::TriggerObjectRefVector" />

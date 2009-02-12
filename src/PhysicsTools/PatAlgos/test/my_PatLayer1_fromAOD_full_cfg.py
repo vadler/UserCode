@@ -64,5 +64,6 @@ process.out = cms.OutputModule( "PoolOutputModule",
 from PhysicsTools.PatAlgos.patEventContent_cff import *
 process.out.outputCommands += patEventContent
 process.out.outputCommands += patTriggerEventContent
+process.out.outputCommands += [ 'keep patTriggerObjectsedmAssociation_*_*_*' ]
 
 process.outpath = cms.EndPath( process.out )

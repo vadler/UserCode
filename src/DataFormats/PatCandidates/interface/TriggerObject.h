@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerObject
 //
-// $Id$
+// $Id: TriggerObject.h,v 1.1.2.1 2008/12/18 11:26:15 vadler Exp $
 //
 /**
   \class    pat::TriggerObject TriggerObject.h "DataFormats/PatCandidates/interface/TriggerObject.h"
@@ -20,7 +20,7 @@
    to store the trigger object id from trigger::TriggerObject::id_.
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: TriggerObject.h,v 1.1.2.1 2008/12/18 11:26:15 vadler Exp $
 */
 
 
@@ -34,6 +34,7 @@
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
+#include "DataFormats/Common/interface/Association.h"
 
 
 namespace pat {
@@ -75,6 +76,8 @@ namespace pat {
   typedef edm::RefProd< TriggerObjectCollection >   TriggerObjectRefProd;
   /// vector of persistent references to items in the same TriggerObjectCollection
   typedef edm::RefVector< TriggerObjectCollection > TriggerObjectRefVector;
+  /// association of TriggerObjects to store matches to Candidates
+  typedef edm::Association< TriggerObjectCollection > TriggerObjectMatches;
 
 }
 
