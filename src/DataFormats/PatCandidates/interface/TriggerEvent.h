@@ -102,7 +102,11 @@ namespace pat {
       TriggerFilterRefVector     pathFilters( const std::string & namePath, bool all = true ) const; // transient; setting 'all' to 'false' returns the run filters only.
       std::vector< std::string > filterCollections( const std::string & labelFilter ) const;         // returns the used collections, not the configuration
       TriggerObjectRefVector     filterObjects( const std::string & labelFilter ) const;             // transient
+      bool                       objectInFilter( const TriggerObjectRef objectRef, const std::string & labelFilter ) const;
       TriggerObjectRefVector     pathObjects( const std::string & namePath ) const;                  // transient
+      bool                       objectInPath( const TriggerObjectRef objectRef, const std::string & namePath ) const;
+      TriggerFilterRefVector     objectFilters( const TriggerObjectRef objectRef ) const;            // transient
+      TriggerPathRefVector       objectPaths( const TriggerObjectRef objectRef ) const;              // transient
       
     protected:
     
