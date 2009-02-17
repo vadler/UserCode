@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: TriggerFilter.cc,v 1.1.2.1 2008/12/18 11:26:16 vadler Exp $
 //
 
 
@@ -54,12 +54,12 @@ void TriggerFilter::setType( const std::string & type )
   type_ = type;
 }
 
-void TriggerFilter::addObjectKey( unsigned int objectKey )
+void TriggerFilter::addObjectKey( unsigned objectKey )
 {
   objectKeys_.push_back( objectKey );
 }
 
-void TriggerFilter::addObjectId( unsigned int objectId )
+void TriggerFilter::addObjectId( unsigned objectId )
 {
   objectIds_.push_back( objectId );
 }
@@ -85,14 +85,14 @@ std::string TriggerFilter::type() const
   return type_;
 }
 
-std::vector< unsigned int > TriggerFilter::objectKeys() const
+std::vector< unsigned > TriggerFilter::objectKeys() const
 {
   return objectKeys_;
 }
 
-bool TriggerFilter::hasObjectKey( unsigned int objectKey ) const
+bool TriggerFilter::hasObjectKey( unsigned objectKey ) const
 {
-  for ( std::vector< unsigned int >::const_iterator iO = objectKeys_.begin(); iO != objectKeys_.end(); ++iO ) {
+  for ( std::vector< unsigned >::const_iterator iO = objectKeys_.begin(); iO != objectKeys_.end(); ++iO ) {
     if ( *iO == objectKey ) {
       return true;
     }
@@ -100,14 +100,14 @@ bool TriggerFilter::hasObjectKey( unsigned int objectKey ) const
   return false;
 }
 
-std::vector< unsigned int > TriggerFilter::objectIds() const
+std::vector< unsigned > TriggerFilter::objectIds() const
 {
   return objectIds_;
 }
 
-bool TriggerFilter::hasObjectId( unsigned int objectId ) const
+bool TriggerFilter::hasObjectId( unsigned objectId ) const
 {
-  for ( std::vector< unsigned int >::const_iterator iO = objectIds_.begin(); iO != objectIds_.end(); ++iO ) {
+  for ( std::vector< unsigned >::const_iterator iO = objectIds_.begin(); iO != objectIds_.end(); ++iO ) {
     if ( *iO == objectId ) {
       return true;
     }

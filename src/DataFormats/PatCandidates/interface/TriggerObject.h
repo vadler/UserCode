@@ -30,7 +30,6 @@
 #include <vector>
 
 #include "DataFormats/HLTReco/interface/TriggerObject.h"
-// #include "DataFormats/Common/interface/RefToBase.h"
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
@@ -52,30 +51,29 @@ namespace pat {
       
       /// setters & getters
       void setCollection( const std::string & collection );
-      void addFilterId( unsigned int filterId );
-      std::string                 collection() const;
-      std::vector< unsigned int > filterIds() const;
-      bool                        hasFilterId( unsigned int filterId ) const;
+      void addFilterId( unsigned filterId );
+      std::string             collection() const;
+      std::vector< unsigned > filterIds() const;
+      bool                    hasFilterId( unsigned filterId ) const;
        
     protected:
     
       /// data members
-      std::string                 collection_;
-      std::vector< unsigned int > filterIds_;  // special filter related ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
-    
-//       std::vector< edm::RefToBase< reco::Candidate > > patObjectMatches_; // initialization?
+      std::string             collection_;
+      std::vector< unsigned > filterIds_;  // special filter related ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
+                                           // empty, if object was not used in last active filter
 
   };
   
 
   /// collection of TriggerObject
-  typedef std::vector< TriggerObject >              TriggerObjectCollection;
+  typedef std::vector< TriggerObject >                TriggerObjectCollection;
   /// persistent reference to an item in a TriggerObjectCollection
-  typedef edm::Ref< TriggerObjectCollection >       TriggerObjectRef;
+  typedef edm::Ref< TriggerObjectCollection >         TriggerObjectRef;
   /// persistent reference to a TriggerObjectCollection product
-  typedef edm::RefProd< TriggerObjectCollection >   TriggerObjectRefProd;
+  typedef edm::RefProd< TriggerObjectCollection >     TriggerObjectRefProd;
   /// vector of persistent references to items in the same TriggerObjectCollection
-  typedef edm::RefVector< TriggerObjectCollection > TriggerObjectRefVector;
+  typedef edm::RefVector< TriggerObjectCollection >   TriggerObjectRefVector;
   /// association of TriggerObjects to store matches to Candidates
   typedef edm::Association< TriggerObjectCollection > TriggerObjectMatches;
 

@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerPath
 //
-// $Id$
+// $Id: TriggerPath.h,v 1.1.2.1 2008/12/18 11:26:15 vadler Exp $
 //
 /**
   \class    pat::TriggerPath TriggerPath.h "DataFormats/PatCandidates/interface/TriggerPath.h"
@@ -18,7 +18,7 @@
    - [to be filled]
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: TriggerPath.h,v 1.1.2.1 2008/12/18 11:26:15 vadler Exp $
 */
 
 
@@ -39,36 +39,36 @@ namespace pat {
       /// constructors and desctructor
       TriggerPath();
       TriggerPath( const std::string & name);
-      TriggerPath( const std::string & name, unsigned int prescale, bool run, bool accept, bool error, unsigned int lastActiveModule );
+      TriggerPath( const std::string & name, unsigned prescale, bool run, bool accept, bool error, unsigned lastActiveModule );
       virtual ~TriggerPath();
       
       /// setters & getters
       void setName( const std::string & name );
-      void setPrescale( unsigned int prescale );
+      void setPrescale( unsigned prescale );
       void setRun( bool run );
       void setAccept( bool accept );
       void setError( bool error );
       void addModule( const std::string & name );
-      void setLastActiveModule( unsigned int lastActiveModule );
+      void setLastActiveModule( unsigned lastActiveModule );
       std::string                name() const;
-      unsigned int               prescale() const;
+      unsigned                   prescale() const;
       bool                       wasRun() const;
       bool                       wasAccept() const;
       bool                       wasError() const;
       std::vector< std::string > modules() const; // ordered
-      unsigned int               indexModule( const std::string & name ) const; // returns sizeModules() if name unknown
-      unsigned int               lastActiveModule() const;
+      unsigned                   indexModule( const std::string & name ) const; // returns sizeModules() if name unknown
+      unsigned                   lastActiveModule() const;
       
     protected:
     
       /// data members
       std::string                name_;
-      unsigned int               prescale_;
+      unsigned                   prescale_;
       bool                       run_;
       bool                       accept_;
       bool                       error_;
       std::vector< std::string > modules_; // ordered
-      unsigned int               lastActiveModule_;
+      unsigned                   lastActiveModule_;
     
   };
   

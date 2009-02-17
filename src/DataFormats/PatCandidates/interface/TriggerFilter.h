@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerFilter
 //
-// $Id$
+// $Id: TriggerFilter.h,v 1.1.2.1 2008/12/18 11:26:15 vadler Exp $
 //
 /**
   \class    pat::TriggerFilter TriggerFilter.h "DataFormats/PatCandidates/interface/TriggerFilter.h"
@@ -18,7 +18,7 @@
    - [to be filled]
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: TriggerFilter.h,v 1.1.2.1 2008/12/18 11:26:15 vadler Exp $
 */
 
 
@@ -45,25 +45,25 @@ namespace pat {
       /// setters & getters
       void setLabel( const std::string & label );
       void setType( const std::string & type );
-      void addObjectKey( unsigned int objectKey );
-      void addObjectId( unsigned int objectId );
+      void addObjectKey( unsigned objectKey );
+      void addObjectId( unsigned objectId );
       bool setStatus( int status ); // only -1,0,1 accepted; returns 'false' (and does not modify the status) otherwise
-      std::string                 label() const;
-      std::string                 type() const;
-      std::vector< unsigned int > objectKeys() const;                 
-      bool                        hasObjectKey( unsigned int objectKey ) const;
-      std::vector< unsigned int > objectIds() const;                 
-      bool                        hasObjectId( unsigned int objectId ) const;
-      int                         status() const;
+      std::string             label() const;
+      std::string             type() const;
+      std::vector< unsigned > objectKeys() const;                 
+      bool                    hasObjectKey( unsigned objectKey ) const;
+      std::vector< unsigned > objectIds() const;                 
+      bool                    hasObjectId( unsigned objectId ) const;
+      int                     status() const;
       
     protected:
     
       /// data members
-      std::string                 label_;
-      std::string                 type_;
-      std::vector< unsigned int > objectKeys_;
-      std::vector< unsigned int > objectIds_; // special filter related object ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
-      int                         status_;    // -1: not run, 0: failed, 1: succeeded
+      std::string             label_;
+      std::string             type_;
+      std::vector< unsigned > objectKeys_;
+      std::vector< unsigned > objectIds_; // special filter related object ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
+      int                     status_;    // -1: not run, 0: failed, 1: succeeded
         
   };
   

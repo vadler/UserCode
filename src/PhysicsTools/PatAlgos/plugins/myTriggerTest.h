@@ -7,7 +7,7 @@
 // Package:    PatAlgos
 // Class:      pat::myTriggerTest
 // 
-// $Id$
+// $Id: myTriggerTest.h,v 1.1.2.1 2008/12/18 11:19:38 vadler Exp $
 //
 /**
   \class myTriggerTest myTriggerTest.h "PhysicsTools/myTriggerTest/plugins/myTriggerTest.h"
@@ -16,7 +16,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: myTriggerTest.h,v 1.1.2.1 2008/12/18 11:19:38 vadler Exp $
 */
 
 
@@ -69,8 +69,8 @@ namespace pat {
       edm::InputTag     tagTriggerResults_;
       edm::InputTag     tagTriggerEvent_;
       std::string       namePATProcess_;
-      edm::InputTag     tagLayer0Trigger_;
-      edm::InputTag     tagLayer1Trigger_;
+      edm::InputTag     tagPatTrigger_;
+      edm::InputTag     tagPatTriggerEvent_;
       std::map< std::string, TH1D* > histos1D_;
       std::map< std::string, TH2D* > histos2D_;
   };

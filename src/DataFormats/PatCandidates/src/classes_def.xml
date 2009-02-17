@@ -445,6 +445,9 @@
   <class name="edm::Wrapper<pat::TriggerPathRefVector>" />
   
   <class name="pat::TriggerEvent" />
+  <class name="pat::TriggerEvent::TriggerObjectMatchResult" />
+  <class name="std::vector<pat::TriggerEvent::TriggerObjectMatchResult>" />
+  <class name="std::vector<pat::TriggerEvent::TriggerObjectMatchResult>::const_iterator" />
   <class name="edm::Wrapper<pat::TriggerEvent>" />
 
   <class name="std::pair<pat::IsolationKeys,reco::IsoDeposit>" />

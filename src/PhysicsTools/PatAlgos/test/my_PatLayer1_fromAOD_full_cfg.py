@@ -8,7 +8,7 @@ process.MessageLogger.cerr.threshold = 'INFO'
 process.MessageLogger.categories.append( 'PATSummaryTables' )
 process.MessageLogger.cerr.INFO = cms.untracked.PSet(
     default          = cms.untracked.PSet(
-        limit = cms.untracked.int32( 0 )
+        limit = cms.untracked.int32( -1 )
     ),
     PATSummaryTables = cms.untracked.PSet(
         limit = cms.untracked.int32( -1 )
@@ -55,7 +55,7 @@ process.p = cms.Path(
 
 # Output module configuration
 process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_X_2009-02-10-0000/output/my_PatLayer1_fromAOD_full.root' ),
+    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_5/output/my_PatLayer1_fromAOD_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),

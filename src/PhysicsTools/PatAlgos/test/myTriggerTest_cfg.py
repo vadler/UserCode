@@ -9,7 +9,7 @@ process.options = cms.untracked.PSet(
 
 process.source = cms.Source( "PoolSource",
     fileNames = cms.untracked.vstring(
-        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_X_2009-02-10-0000/output/my_PatLayer1_fromAOD_full.root'
+        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_5/output/my_PatLayer1_fromAOD_full.root'
     )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -17,16 +17,16 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 process.TFileService = cms.Service( "TFileService",
-    fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_X_2009-02-10-0000/output/myTriggerTest.root' )
+    fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_5/output/myTriggerTest.root' )
 )
 
 process.test = cms.EDAnalyzer( "myTriggerTest",
-    hltProcessName = cms.string( 'HLT' ),
-    triggerResults = cms.InputTag( "TriggerResults" ),
-    triggerEvent   = cms.InputTag( "hltTriggerSummaryAOD" ),
-    patProcessName = cms.string( 'PAT' ),
-    layer0Trigger  = cms.InputTag( "patTrigger" ),
-    layer1Trigger  = cms.InputTag( "patTriggerEvent" )
+    hltProcessName  = cms.string( 'HLT' ),
+    triggerResults  = cms.InputTag( "TriggerResults" ),
+    triggerEvent    = cms.InputTag( "hltTriggerSummaryAOD" ),
+    patProcessName  = cms.string( 'PAT' ),
+    patTrigger      = cms.InputTag( "patTrigger" ),
+    patTriggerEvent = cms.InputTag( "patTriggerEvent" )
 )
 
 process.p = cms.Path(

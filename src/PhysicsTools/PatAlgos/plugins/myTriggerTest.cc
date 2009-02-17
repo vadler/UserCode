@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: myTriggerTest.cc,v 1.1.2.1 2008/12/18 11:19:38 vadler Exp $
 //
 
 
@@ -13,8 +13,8 @@ myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   tagTriggerResults_( iConfig.getParameter< edm::InputTag >( "triggerResults" ) ),
   tagTriggerEvent_( iConfig.getParameter< edm::InputTag >( "triggerEvent" ) ),
   namePATProcess_( iConfig.getParameter< std::string >( "patProcessName" ) ),
-  tagLayer0Trigger_( iConfig.getParameter< edm::InputTag >( "layer0Trigger" ) ),
-  tagLayer1Trigger_( iConfig.getParameter< edm::InputTag >( "layer1Trigger" ) ),
+  tagPatTrigger_( iConfig.getParameter< edm::InputTag >( "patTrigger" ) ),
+  tagPatTriggerEvent_( iConfig.getParameter< edm::InputTag >( "patTriggerEvent" ) ),
   histos1D_(),
   histos2D_()
 {
@@ -24,11 +24,11 @@ myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   if ( tagTriggerEvent_.process().empty() ) {
     tagTriggerEvent_ = edm::InputTag( tagTriggerEvent_.label(), tagTriggerEvent_.instance(), nameHLTProcess_ );
   }
-  if ( tagLayer0Trigger_.process().empty() ) {
-    tagLayer0Trigger_ = edm::InputTag( tagLayer0Trigger_.label(), tagLayer0Trigger_.instance(), namePATProcess_ );
+  if ( tagPatTrigger_.process().empty() ) {
+    tagPatTrigger_ = edm::InputTag( tagPatTrigger_.label(), tagPatTrigger_.instance(), namePATProcess_ );
   }
-  if ( tagLayer1Trigger_.process().empty() ) {
-    tagLayer1Trigger_ = edm::InputTag( tagLayer1Trigger_.label(), tagLayer1Trigger_.instance(), namePATProcess_ );
+  if ( tagPatTriggerEvent_.process().empty() ) {
+    tagPatTriggerEvent_ = edm::InputTag( tagPatTriggerEvent_.label(), tagPatTriggerEvent_.instance(), namePATProcess_ );
   }
 }
 
@@ -57,13 +57,13 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   edm::Handle< trigger::TriggerEvent > handleTriggerEvent;
   iEvent.getByLabel( tagTriggerEvent_, handleTriggerEvent );
   edm::Handle< TriggerEvent > handlePatTriggerEvent;
-  iEvent.getByLabel( tagLayer1Trigger_, handlePatTriggerEvent );
+  iEvent.getByLabel( tagPatTriggerEvent_, handlePatTriggerEvent );
   edm::Handle< TriggerPathCollection > handlePatTriggerPaths;
-  iEvent.getByLabel( tagLayer0Trigger_, handlePatTriggerPaths );
+  iEvent.getByLabel( tagPatTrigger_, handlePatTriggerPaths );
   edm::Handle< TriggerFilterCollection > handlePatTriggerFilters;
-  iEvent.getByLabel( tagLayer0Trigger_, handlePatTriggerFilters );
+  iEvent.getByLabel( tagPatTrigger_, handlePatTriggerFilters );
   edm::Handle< TriggerObjectCollection > handlePatTriggerObjects;
-  iEvent.getByLabel( tagLayer0Trigger_, handlePatTriggerObjects );
+  iEvent.getByLabel( tagPatTrigger_, handlePatTriggerObjects );
   
   histos2D_[ "nPathsComp" ]->Fill( hltConfig_.size(), handlePatTriggerEvent->paths()->size() );
   

@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: TriggerPath.cc,v 1.1.2.1 2008/12/18 11:26:16 vadler Exp $
 //
 
 
@@ -34,7 +34,7 @@ TriggerPath::TriggerPath( const std::string & name ) :
   modules_.clear();
 }
 
-TriggerPath::TriggerPath( const std::string & name, unsigned int prescale, bool run, bool accept, bool error, unsigned int lastActiveModule ) :
+TriggerPath::TriggerPath( const std::string & name, unsigned prescale, bool run, bool accept, bool error, unsigned lastActiveModule ) :
   name_( name ),
   prescale_( prescale ),
   run_( run ),
@@ -58,7 +58,7 @@ void TriggerPath::setName( const std::string & name )
   name_ = name;
 }
 
-void TriggerPath::setPrescale( unsigned int prescale )
+void TriggerPath::setPrescale( unsigned prescale )
 {
   prescale_ = prescale;
 }
@@ -83,7 +83,7 @@ void TriggerPath::addModule( const std::string & name )
   modules_.push_back( name );
 }
 
-void TriggerPath::setLastActiveModule( unsigned int lastActiveModule )
+void TriggerPath::setLastActiveModule( unsigned lastActiveModule )
 {
   lastActiveModule_ = lastActiveModule;
 }
@@ -95,7 +95,7 @@ std::string TriggerPath::name() const
   return name_;
 }
 
-unsigned int TriggerPath::prescale() const
+unsigned TriggerPath::prescale() const
 {
   return prescale_;
 }
@@ -120,9 +120,9 @@ std::vector< std::string > TriggerPath::modules() const
   return modules_;
 }
 
-unsigned int TriggerPath::indexModule( const std::string & name ) const
+unsigned TriggerPath::indexModule( const std::string & name ) const
 {
-  unsigned int i( 0 );
+  unsigned i( 0 );
   while ( i < modules().size() ) {
     if ( name == modules_[ i ] ) {
       return i;
@@ -131,7 +131,7 @@ unsigned int TriggerPath::indexModule( const std::string & name ) const
   return i;
 }
 
-unsigned int TriggerPath::lastActiveModule() const
+unsigned TriggerPath::lastActiveModule() const
 {
   return lastActiveModule_;
 }

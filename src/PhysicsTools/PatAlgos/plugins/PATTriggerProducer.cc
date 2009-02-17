@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: PATTriggerProducer.cc,v 1.1.2.1 2008/12/18 13:18:47 vadler Exp $
 //
 
 
@@ -59,33 +59,33 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
 
   // produce trigger paths and determine status of modules
   
-  const unsigned int sizePaths( hltConfig_.size() );
+  const unsigned sizePaths( hltConfig_.size() );
   
   std::auto_ptr< TriggerPathCollection > triggerPaths( new TriggerPathCollection() );
   triggerPaths->reserve( sizePaths );
   
   std::map< std::string, int > statesModules;
 
-  for ( unsigned int iP = 0; iP < sizePaths; ++iP ) {
+  for ( unsigned iP = 0; iP < sizePaths; ++iP ) {
     // initialize path
     const std::string namePath( hltConfig_.triggerName( iP ) );
-    const unsigned int indexPath( hltConfig_.triggerIndex( namePath ) );
+    const unsigned indexPath( hltConfig_.triggerIndex( namePath ) );
     TriggerPath triggerPath( namePath, 1, handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), handleTriggerResults->index( indexPath ) );
     // add module names to path and states' map
-    const unsigned int indexLastModule( handleTriggerResults->index( indexPath ) );
-    const unsigned int sizeModules( hltConfig_.size( namePath ) );
+    const unsigned indexLastModule( handleTriggerResults->index( indexPath ) );
+    const unsigned sizeModules( hltConfig_.size( namePath ) );
     assert( indexLastModule < sizeModules );
-    std::map< unsigned int, std::string > indicesModules;
-    for ( unsigned int iM = 0; iM < sizeModules; ++iM ) {
+    std::map< unsigned, std::string > indicesModules;
+    for ( unsigned iM = 0; iM < sizeModules; ++iM ) {
       const std::string nameModule( hltConfig_.moduleLabel( indexPath, iM ) );
-      const unsigned int indexModule( hltConfig_.moduleIndex( indexPath, nameModule ) );
+      const unsigned indexModule( hltConfig_.moduleIndex( indexPath, nameModule ) );
       triggerPath.addModule( nameModule );
-      indicesModules.insert( std::pair< unsigned int, std::string >( indexModule, nameModule ) );
+      indicesModules.insert( std::pair< unsigned, std::string >( indexModule, nameModule ) );
     }
     // store path
     triggerPaths->push_back( triggerPath );
     // store module states to be used for the filters
-    for ( std::map< unsigned int, std::string >::const_iterator iM = indicesModules.begin(); iM != indicesModules.end(); ++iM ) {
+    for ( std::map< unsigned, std::string >::const_iterator iM = indicesModules.begin(); iM != indicesModules.end(); ++iM ) {
       if ( iM->first < indexLastModule ) {
         statesModules[ iM->second ] = 1;
       } else if ( iM->first == indexLastModule ) {
@@ -101,14 +101,14 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
   // produce trigger filters and store used trigger object types
   // (trigger filters from TriggerEvent, which contains only the "last active filter" (doesn't help for x-channels))
   
-  const unsigned int sizeFilters( handleTriggerEvent->sizeFilters() );
+  const unsigned sizeFilters( handleTriggerEvent->sizeFilters() );
   
   std::auto_ptr< TriggerFilterCollection > triggerFilters( new TriggerFilterCollection() );
   triggerFilters->reserve( sizeFilters );
   
   std::multimap< trigger::size_type, int > filterIds;
   
-  for ( unsigned int iF = 0; iF < sizeFilters; ++iF ) {
+  for ( unsigned iF = 0; iF < sizeFilters; ++iF ) {
     const std::string nameFilter( handleTriggerEvent->filterTag( iF ).label() );
     TriggerFilter triggerFilter( nameFilter );
     // set filter type
@@ -117,18 +117,15 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
     // set filter IDs of used objects
     const trigger::Keys & keys = handleTriggerEvent->filterKeys( iF );
     const trigger::Vids & ids = handleTriggerEvent->filterIds( iF );   
-    const trigger::size_type sizeKeys( keys.size() );
-    const trigger::size_type sizeIds( ids.size() );
-    for ( unsigned int iK = 0; iK < sizeKeys; ++iK ) {
-      const unsigned int objectKey( keys[ iK ] );
+    for ( unsigned iK = 0; iK < keys.size(); ++iK ) {
+      const unsigned objectKey( keys[ iK ] );
       if ( triggerFilter.hasObjectKey( objectKey ) == triggerFilter.objectKeys().size() ) {
         triggerFilter.addObjectKey( objectKey );
       }
     }
-    for ( unsigned int iI = 0; iI < sizeIds; ++iI ) {
-      const unsigned int objectId( ids[ iI ] );
-      if ( ! triggerFilter.hasObjectId( objectId ) ) {
-        triggerFilter.addObjectId( objectId );
+    for ( unsigned iI = 0; iI < ids.size(); ++iI ) {
+      if ( ! triggerFilter.hasObjectId( ids[ iI ] ) ) {
+        triggerFilter.addObjectId( ids[ iI ] );
       }
     }
     // set status from path info
@@ -143,9 +140,9 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
     // store filter
     triggerFilters->push_back( triggerFilter );
     // store used trigger object types to be used with the objects
-    assert( sizeIds == sizeKeys );
-    for ( unsigned int iK = 0; iK < sizeKeys; ++iK ) {
-      filterIds.insert( std::pair< trigger::size_type, int >( keys[ iK ], ids[ iK ] ) );
+    assert( ids.size() == keys.size() );
+    for ( unsigned iK = 0; iK < keys.size(); ++iK ) {
+      filterIds.insert( std::pair< trigger::size_type, int >( keys[ iK ], ids[ iK ] ) ); // only for objects used in last active filter
     }
   }
 
@@ -153,20 +150,19 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
   
   // produce trigger objects
   
-  const unsigned int sizeObjects( handleTriggerEvent->sizeObjects() );
+  const unsigned sizeObjects( handleTriggerEvent->sizeObjects() );
   
   std::auto_ptr< TriggerObjectCollection > triggerObjects( new TriggerObjectCollection() );
   triggerObjects->reserve( sizeObjects );
   
   const trigger::Keys & collectionKeys( handleTriggerEvent->collectionKeys() );
-  for ( unsigned int iO = 0, iC = 0; iO < sizeObjects && iC < handleTriggerEvent->sizeCollections(); ++iO ) {
+  for ( unsigned iO = 0, iC = 0; iO < sizeObjects && iC < handleTriggerEvent->sizeCollections(); ++iO ) {
     TriggerObject triggerObject( handleTriggerEvent->getObjects().at( iO ) );
     // set collection
     while ( iO >= collectionKeys[ iC ] ) {
       ++iC;
     }
-    const std::string collectionTag( handleTriggerEvent->collectionTag( iC ).encode() );
-    triggerObject.setCollection( collectionTag );
+    triggerObject.setCollection( handleTriggerEvent->collectionTag( iC ).encode() );
     // set filter ID
     for ( std::multimap< trigger::size_type, int >::iterator iM = filterIds.begin(); iM != filterIds.end(); ++iM ) {
       if ( iM->first == iO && ! triggerObject.hasFilterId( iM->second ) ) {

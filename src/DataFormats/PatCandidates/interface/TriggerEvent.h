@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerEvent
 //
-// $Id: TriggerEvent.h,v 1.1.2.5 2008/12/16 18:01:57 vadler Exp $
+// $Id: TriggerEvent.h,v 1.1.2.1 2008/12/18 11:26:14 vadler Exp $
 //
 /**
   \class    pat::TriggerEvent TriggerEvent.h "DataFormats/PatCandidates/interface/TriggerEvent.h"
@@ -18,7 +18,7 @@
    - [to be filled]
 
   \author   Volker Adler
-  \version  $Id: TriggerEvent.h,v 1.1.2.5 2008/12/16 18:01:57 vadler Exp $
+  \version  $Id: TriggerEvent.h,v 1.1.2.1 2008/12/18 11:26:14 vadler Exp $
 */
 
 
@@ -29,6 +29,7 @@
 #include <string>
 #include <vector>
 
+#include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Common/interface/Handle.h"
    
 
@@ -37,6 +38,25 @@ namespace pat {
   class TriggerEvent {
 
     public:
+    
+      // nested class to store trigger object matches 
+      class TriggerObjectMatchResult {
+      
+        public:
+        
+          TriggerObjectMatches triggerObjectMatches_;
+          std::string          triggerMatcher_;
+          
+          TriggerObjectMatchResult() {};
+          TriggerObjectMatchResult( const TriggerObjectMatches & trigMatches, const std::string & matcher ) :
+            triggerObjectMatches_(),
+            triggerMatcher_( matcher )
+          {
+            triggerObjectMatches_ += trigMatches;
+          };
+          virtual ~TriggerObjectMatchResult() {};
+      
+      };
 
       /// constructors and desctructor
       TriggerEvent();
@@ -59,7 +79,7 @@ namespace pat {
       const TriggerPathCollection * pathCollection() const;                          // returns 0 if RefProd is null
       const TriggerPathCollection * paths() const;                                   // returns 0 if RefProd is null
       const TriggerPath           * path( const std::string & namePath ) const;      // returns 0 if path is not found
-      unsigned int                  indexPath( const std::string & namePath ) const; // returns size of filter collection if filter is not found
+      unsigned                      indexPath( const std::string & namePath ) const; // returns size of filter collection if filter is not found
       TriggerPathRefVector          acceptedPaths() const;                           // transient
       
       /// filters related
@@ -68,12 +88,13 @@ namespace pat {
       const TriggerFilterCollection * filterCollection() const;                             // returns 0 if RefProd is null
       const TriggerFilterCollection * filters() const;                                      // returns 0 if RefProd is null
       const TriggerFilter           * filter( const std::string & labelFilter ) const;      // returns 0 if filter is not found
-      unsigned int                    indexFilter( const std::string & labelFilter ) const; // returns size of filter collection if filter is not found
+      unsigned                        indexFilter( const std::string & labelFilter ) const; // returns size of filter collection if filter is not found
       TriggerFilterRefVector          acceptedFilters() const;                              // transient
       
       /// objects related
       void setObjectCollection( const edm::Handle< TriggerObjectCollection > & handleTriggerObjects );
       void setObjects( const edm::Handle< TriggerObjectCollection > & handleTriggerObjects );
+      void addObjectMatchResult( const TriggerObjectMatches & trigMatches, const std::string & matcher );
       const TriggerObjectCollection * objectCollection() const; // returns 0 if RefProd is null
       const TriggerObjectCollection * objects() const;          // returns 0 if RefProd is null
       
@@ -98,8 +119,9 @@ namespace pat {
       TriggerFilterRefProd filters_;
       
       /// objects related data members
-      TriggerObjectRefProd objects_;
-        
+      TriggerObjectRefProd                    objects_;
+      std::vector< TriggerObjectMatchResult > objectMatchResults_;
+      
   };
 
 }

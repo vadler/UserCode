@@ -376,7 +376,8 @@ namespace {
   pat::TriggerPathRefProd p_rp_tp;
   edm::Wrapper<pat::TriggerPathRefVector> w_p_rv_tp;
   
-  edm::Wrapper<pat::TriggerEvent > w_p_te;
+  std::vector<pat::TriggerEvent::TriggerObjectMatchResult>::const_iterator v_p_tetm_ci;
+  edm::Wrapper<pat::TriggerEvent> w_p_te;
 
   std::vector<std::pair<pat::IsolationKeys,reco::IsoDeposit> >	 v_p_ik_id;
 

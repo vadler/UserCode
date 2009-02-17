@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: TriggerObject.cc,v 1.1.2.1 2008/12/18 11:26:16 vadler Exp $
 //
 
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
@@ -45,7 +45,7 @@ void TriggerObject::setCollection( const std::string & collection )
   collection_ = collection;
 }
 
-void TriggerObject::addFilterId( unsigned int filterId )
+void TriggerObject::addFilterId( unsigned filterId )
 {
   filterIds_.push_back( filterId );
 }
@@ -57,14 +57,14 @@ std::string TriggerObject::collection() const
   return collection_;
 }
 
-std::vector< unsigned int > TriggerObject::filterIds() const
+std::vector< unsigned > TriggerObject::filterIds() const
 {
   return filterIds_;
 }
 
-bool TriggerObject::hasFilterId( unsigned int filterId ) const
+bool TriggerObject::hasFilterId( unsigned filterId ) const
 {
-  for ( std::vector< unsigned int >::const_iterator iF = filterIds_.begin(); iF != filterIds_.end(); ++iF ) {
+  for ( std::vector< unsigned >::const_iterator iF = filterIds_.begin(); iF != filterIds_.end(); ++iF ) {
     if ( *iF == filterId ) {
       return true;
     }
