@@ -85,22 +85,22 @@ void PATTriggerEventProducer::produce( edm::Event& iEvent, const edm::EventSetup
     edm::LogError( "errorTriggerObjectsValid" ) << "pat::TriggerObjectCollection product with InputTag " << tagTriggerProducer_.encode() << " not in event";
   }
   // add trigger matches
-  std::vector< edm::Handle< TriggerObjectMatches > > handlesTriggerMatches( tagsTriggerMatcher_.size() );
+  std::vector< edm::Handle< TriggerObjectMatch > > handlesTriggerMatches( tagsTriggerMatcher_.size() );
   for ( unsigned i = 0; i < handlesTriggerMatches.size(); ++i ) {
     edm::InputTag & tagTriggerObjectMatcher( tagsTriggerMatcher_.at( i ) );
-    edm::Handle< TriggerObjectMatches > & handleTriggerObjectMatch( handlesTriggerMatches.at( i ) );
+    edm::Handle< TriggerObjectMatch > & handleTriggerObjectMatch( handlesTriggerMatches.at( i ) );
     iEvent.getByLabel( tagTriggerObjectMatcher, handleTriggerObjectMatch );
     if ( ! handleTriggerObjectMatch.isValid() ) {
-      edm::LogError( "errorTriggerMatchValid" ) << "pat::TriggerObjectMatches product with InputTag " << tagTriggerObjectMatcher.encode() << " not in event";
+      edm::LogError( "errorTriggerMatchValid" ) << "pat::TriggerObjectMatch product with InputTag " << tagTriggerObjectMatcher.encode() << " not in event";
       continue;
     }
-    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatches > it( *( handleTriggerObjectMatch ), edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) );
-    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatches > itEnd( it.end() );
+    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *( handleTriggerObjectMatch ), edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) );
+    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > itEnd( it.end() );
     for ( ; it != itEnd; ++it ) {
       if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {
         if ( handleTriggerObjects.id() != it->second.id() ) {
-          edm::LogWarning( "warningTriggerObjectMatches" ) << "pat::TriggerObjectMatches " << tagTriggerObjectMatcher.encode() << "points to pat::TriggerObjectCollection with product ID " << it->second.id() << ",\n"
-                                                           << "whereas the pat::TriggerObjectCollection in the event has product ID " << handleTriggerObjects.id() << "!";
+          edm::LogWarning( "warningTriggerObjectMatch" ) << "pat::TriggerObjectMatch " << tagTriggerObjectMatcher.encode() << "points to pat::TriggerObjectCollection with product ID " << it->second.id() << ",\n"
+                                                         << "whereas the pat::TriggerObjectCollection in the event has product ID " << handleTriggerObjects.id() << "!";
           continue;
         }
         triggerEvent->addObjectMatchResult( *handleTriggerObjectMatch, tagTriggerObjectMatcher.encode() );

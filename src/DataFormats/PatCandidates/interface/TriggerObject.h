@@ -68,17 +68,19 @@ namespace pat {
   
 
   /// collection of TriggerObject
-  typedef std::vector< TriggerObject >                  TriggerObjectCollection;
+  typedef std::vector< TriggerObject >                    TriggerObjectCollection;
   /// persistent reference to an item in a TriggerObjectCollection
-  typedef edm::Ref< TriggerObjectCollection >           TriggerObjectRef;
+  typedef edm::Ref< TriggerObjectCollection >             TriggerObjectRef;
   /// persistent reference to a TriggerObjectCollection product
-  typedef edm::RefProd< TriggerObjectCollection >       TriggerObjectRefProd;
+  typedef edm::RefProd< TriggerObjectCollection >         TriggerObjectRefProd;
   /// vector of persistent references to items in the same TriggerObjectCollection
-  typedef edm::RefVector< TriggerObjectCollection >     TriggerObjectRefVector;
+  typedef edm::RefVector< TriggerObjectCollection >       TriggerObjectRefVector;
   /// association of TriggerObjects to store matches to Candidates
-  typedef edm::Association< TriggerObjectCollection >   TriggerObjectMatches;
+  typedef edm::Association< TriggerObjectCollection >     TriggerObjectMatch;
   /// container to store matches from different producers
-  typedef std::map< std::string, TriggerObjectMatches > TriggerObjectMatchesCollection;
+  typedef std::map< std::string, TriggerObjectMatch >     TriggerObjectMatchMap;
+  /// container to store match references from different producers
+  typedef std::map< std::string, TriggerObjectRefVector > TriggerObjectMatchContainer;
 
 }
 

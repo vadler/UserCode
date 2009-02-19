@@ -355,9 +355,9 @@ namespace {
   
   std::vector<pat::TriggerObject>::const_iterator v_p_to_ci;
   edm::Wrapper<std::vector<pat::TriggerObject> > w_v_p_to;
-  edm::Wrapper<pat::TriggerObjectMatches> w_a_p_to;
-//   std::map<std::string, pat::TriggerObjectMatches>::const_iterator m_s_a_p_to_ci;
-  edm::Wrapper<std::map<std::string, pat::TriggerObjectMatches> > w_m_s_a_p_to;
+  edm::Wrapper<pat::TriggerObjectMatch> w_a_p_to;
+//   std::map<std::string, pat::TriggerObjectMatch>::const_iterator m_s_a_p_to_ci;
+  edm::Wrapper<std::map<std::string, pat::TriggerObjectMatch> > w_m_s_a_p_to;
   pat::TriggerObjectRef p_r_to;
   pat::TriggerObjectRefProd p_rp_to;
   edm::Wrapper<pat::TriggerObjectRefVector> w_p_rv_to;
