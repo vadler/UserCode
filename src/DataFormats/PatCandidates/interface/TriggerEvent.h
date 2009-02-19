@@ -53,8 +53,8 @@ namespace pat {
       TriggerFilterRefProd filters_;
       
       /// objects related data members
-      TriggerObjectRefProd  objects_;
-      TriggerObjectMatchMap objectMatchResults_;
+      TriggerObjectRefProd        objects_;
+      TriggerObjectMatchContainer objectMatchResults_;
 
     public:
     
@@ -90,10 +90,10 @@ namespace pat {
       /// objects related
       void setObjects( const edm::Handle< TriggerObjectCollection > & handleTriggerObjects );
       bool addObjectMatchResult( const TriggerObjectMatch & trigMatches, const std::string & labelMatcher ); // returns 'false' if 'matcher' alreadey exists
-      const TriggerObjectCollection * objects() const;                                             // returns 0 if RefProd is null
-      TriggerObjectRefVector          objects( unsigned filterId ) const;                          // transient
-      const TriggerObjectMatchMap   * objectMatchResults() const;
-      const TriggerObjectMatch      * objectMatchResult( const std::string & labelMatcher ) const; // returns 0 if 'labelMatcher' not found
+      const TriggerObjectCollection     * objects() const;                                             // returns 0 if RefProd is null
+      TriggerObjectRefVector              objects( unsigned filterId ) const;                          // transient
+      const TriggerObjectMatchContainer * objectMatchResults() const;
+      const TriggerObjectMatch          * objectMatchResult( const std::string & labelMatcher ) const; // returns 0 if 'labelMatcher' not found
       
       /// x-collection related
       TriggerFilterRefVector     pathFilters( const std::string & namePath, bool all = true ) const;                                      // transient; setting 'all' to 'false' returns the run filters only.
@@ -108,12 +108,11 @@ namespace pat {
       TriggerPathRefVector       objectPaths( const TriggerObjectRef & objectRef  ) const;                                                // transient
       
       /// trigger matches
-      TriggerObjectRefVector      triggerMatchObjects( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher ) const; // transient
-      TriggerObjectRefVector      triggerMatchObjectsFilter( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher, const std::string & labelFilter ) const; // transient
-      TriggerObjectRefVector      triggerMatchObjectsPath( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher, const std::string & namePath ) const; // transient
-      TriggerObjectMatchContainer triggerMatchObjectsAll( const reco::CandidateBaseRef & candRef ) const; // transient
-      TriggerObjectMatchContainer triggerMatchObjectsFilterAll( const reco::CandidateBaseRef & candRef, const std::string & labelFilter ) const; // transient
-      TriggerObjectMatchContainer triggerMatchObjectsPathAll( const reco::CandidateBaseRef & candRef, const std::string & namePath ) const; // transient
+      TriggerObjectMatchMap        triggerMatchObjects( const reco::CandidateBaseRef & candRef ) const;                                                                                 // transient
+      // PAT objects do not have multiple trigger matches per matcher module
+      TriggerObjectRef             triggerMatchObject( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher ) const;                                        // transient, returns null-Ref if no match is found
+      // trigger objects can have multiple trigger matches per matcher module (resolveAmbiguities=false)
+      reco::CandidateBaseRefVector triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher ) const;                                                                                  // transient
       
   };
 

@@ -140,16 +140,16 @@ TriggerObjectRefVector TriggerEvent::objects( unsigned filterId ) const
   return theObjects;
 }
 
-const TriggerObjectMatchMap * TriggerEvent::objectMatchResults() const
+const TriggerObjectMatchContainer * TriggerEvent::objectMatchResults() const
 {
   return &objectMatchResults_;
 }
 
 const TriggerObjectMatch * TriggerEvent::objectMatchResult( const std::string & labelMatcher ) const
 {
-  const TriggerObjectMatchMap::const_iterator theMatch( objectMatchResults()->find( labelMatcher ) );
-  if ( theMatch != objectMatchResults()->end() ) {
-    return &( theMatch->second );
+  const TriggerObjectMatchContainer::const_iterator iMatch( objectMatchResults()->find( labelMatcher ) );
+  if ( iMatch != objectMatchResults()->end() ) {
+    return &( iMatch->second );
   }
   return 0;
 }
@@ -271,65 +271,32 @@ TriggerPathRefVector TriggerEvent::objectPaths( const TriggerObjectRef & objectR
 
 /// trigger matches
 
-TriggerObjectRefVector TriggerEvent::triggerMatchObjects( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher ) const
+TriggerObjectMatchMap TriggerEvent::triggerMatchObjects( const reco::CandidateBaseRef & candRef ) const
 {
-  TriggerObjectRefVector theObjects;
-//   for (  ) { // FIXME what about unresolved ambiguities in matcher configuration?
-    const TriggerObjectRef objectRef( ( *( objectMatchResult( labelMatcher ) ) )[ candRef ] );
-    if ( objectRef.isNonnull() && objectRef.isAvailable() ) {
-      theObjects.push_back( objectRef );
-    }
-//   }
-  return theObjects;
-}
-
-TriggerObjectRefVector TriggerEvent::triggerMatchObjectsFilter( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher, const std::string & labelFilter ) const
-{
-  TriggerObjectRefVector theObjects;
-//   for (  ) { // FIXME what about unresolved ambiguities in matcher configuration?
-    const TriggerObjectRef objectRef( ( *( objectMatchResult( labelMatcher ) ) )[ candRef ] );
-    if ( objectRef.isNonnull() && objectRef.isAvailable() && objectInFilter( objectRef, labelFilter ) ) {
-      theObjects.push_back( objectRef );
-    }
-//   }
-  return theObjects;
-}
-
-TriggerObjectRefVector TriggerEvent::triggerMatchObjectsPath( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher, const std::string & namePath ) const
-{
-  TriggerObjectRefVector theObjects;
-//   for (  ) { // FIXME what about unresolved ambiguities in matcher configuration?
-    const TriggerObjectRef objectRef( ( *( objectMatchResult( labelMatcher ) ) )[ candRef ] );
-    if ( objectRef.isNonnull() && objectRef.isAvailable() && objectInPath( objectRef, namePath ) ) {
-      theObjects.push_back( objectRef );
-    }
-//   }
-  return theObjects;
-}
-
-TriggerObjectMatchContainer TriggerEvent::triggerMatchObjectsAll( const reco::CandidateBaseRef & candRef ) const
-{
-  TriggerObjectMatchContainer theContainer;
-  for ( TriggerObjectMatchMap::const_iterator iMatch = objectMatchResults()->begin(); iMatch != objectMatchResults()->end(); ++iMatch ) {
-    theContainer[ iMatch->first ] = triggerMatchObjects( candRef, iMatch->first );
+  TriggerObjectMatchMap theContainer;
+  for ( TriggerObjectMatchContainer::const_iterator iMatch = objectMatchResults()->begin(); iMatch != objectMatchResults()->end(); ++iMatch ) {
+    theContainer[ iMatch->first ] = triggerMatchObject( candRef, iMatch->first );
   }
   return theContainer;
 }
 
-TriggerObjectMatchContainer TriggerEvent::triggerMatchObjectsFilterAll( const reco::CandidateBaseRef & candRef, const std::string & labelFilter ) const
+TriggerObjectRef TriggerEvent::triggerMatchObject( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher ) const
 {
-  TriggerObjectMatchContainer theContainer;
-  for ( TriggerObjectMatchMap::const_iterator iMatch = objectMatchResults()->begin(); iMatch != objectMatchResults()->end(); ++iMatch ) {
-    theContainer[ iMatch->first ] = triggerMatchObjectsFilter( candRef, iMatch->first, labelFilter );
+  const TriggerObjectRef objectRef( ( *( objectMatchResult( labelMatcher ) ) )[ candRef ] );
+  if ( objectRef.isNonnull() && objectRef.isAvailable() ) {
+    return objectRef;
   }
-  return theContainer;
+  return TriggerObjectRef();
 }
 
-TriggerObjectMatchContainer TriggerEvent::triggerMatchObjectsPathAll( const reco::CandidateBaseRef & candRef, const std::string & namePath ) const
+reco::CandidateBaseRefVector TriggerEvent::triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher ) const
 {
-  TriggerObjectMatchContainer theContainer;
-  for ( TriggerObjectMatchMap::const_iterator iMatch = objectMatchResults()->begin(); iMatch != objectMatchResults()->end(); ++iMatch ) {
-    theContainer[ iMatch->first ] = triggerMatchObjectsPath( candRef, iMatch->first, namePath );
-  }
-  return theContainer;
+  reco::CandidateBaseRefVector theCands;
+//   const TriggerObjectMatch * matchResult( objectMatchResult( labelMatcher ) );
+//   for ( TriggerObjectMatch::const_iterator iMatch = matchResult->begin(); iMatch != matchResult->end(); ++iMatch  ) {
+//     if (  ) {
+//       theCands.push_back( candRef );
+//     }
+//   }
+  return theCands;
 }

@@ -103,7 +103,9 @@ void PATTriggerEventProducer::produce( edm::Event& iEvent, const edm::EventSetup
                                                          << "whereas the pat::TriggerObjectCollection in the event has product ID " << handleTriggerObjects.id() << "!";
           continue;
         }
-        triggerEvent->addObjectMatchResult( *handleTriggerObjectMatch, tagTriggerObjectMatcher.encode() );
+        if ( ! ( triggerEvent->addObjectMatchResult( *handleTriggerObjectMatch, tagTriggerObjectMatcher.encode() ) ) ) {
+          edm::LogWarning( "warningTriggerObjectMatchRepli" ) << "pat::TriggerEvent contains already a pat::TriggerObjectMatch from matcher module" << tagTriggerObjectMatcher.encode();
+        }
       }
     }
   }
