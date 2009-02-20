@@ -5,6 +5,8 @@
 
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
+#include "DataFormats/Common/interface/AssociativeIterator.h"
+
 
 using namespace pat;
 
@@ -145,6 +147,8 @@ const TriggerObjectMatchContainer * TriggerEvent::objectMatchResults() const
   return &objectMatchResults_;
 }
 
+// checks existance of key with std::map::find() and returns an unvalid pointer 
+// instead of adding a new element to the map and returning a valid but empty pointer by using operator[]
 const TriggerObjectMatch * TriggerEvent::objectMatchResult( const std::string & labelMatcher ) const
 {
   const TriggerObjectMatchContainer::const_iterator iMatch( objectMatchResults()->find( labelMatcher ) );
@@ -282,21 +286,29 @@ TriggerObjectMatchMap TriggerEvent::triggerMatchObjects( const reco::CandidateBa
 
 TriggerObjectRef TriggerEvent::triggerMatchObject( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher ) const
 {
-  const TriggerObjectRef objectRef( ( *( objectMatchResult( labelMatcher ) ) )[ candRef ] );
-  if ( objectRef.isNonnull() && objectRef.isAvailable() ) {
-    return objectRef;
+  const TriggerObjectMatch * matchResult( objectMatchResult( labelMatcher ) );
+  if ( matchResult ) {
+    TriggerObjectRef objectRef( ( *matchResult )[ candRef ] );
+    if ( objectRef.isNonnull() && objectRef.isAvailable() ) {
+      return objectRef;
+    }
   }
   return TriggerObjectRef();
 }
 
-reco::CandidateBaseRefVector TriggerEvent::triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher ) const
+// Finds matching candidates by iterating over edm::Association, since this in on-directional;
+// The used edm::AssiciativIterator needs the event!
+reco::CandidateBaseRefVector TriggerEvent::triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher, const edm::Event & iEvent ) const
 {
   reco::CandidateBaseRefVector theCands;
-//   const TriggerObjectMatch * matchResult( objectMatchResult( labelMatcher ) );
-//   for ( TriggerObjectMatch::const_iterator iMatch = matchResult->begin(); iMatch != matchResult->end(); ++iMatch  ) {
-//     if (  ) {
-//       theCands.push_back( candRef );
-//     }
-//   }
+  edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *( objectMatchResult( labelMatcher ) ), edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) );
+  edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > itEnd( it.end() );
+  for ( ; it != itEnd; ++it ) {
+    if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {
+      if ( it->second == objectRef ) {
+        theCands.push_back( it->first );
+      }
+    }
+  }
   return theCands;
 }

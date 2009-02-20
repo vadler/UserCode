@@ -32,35 +32,7 @@ TriggerObject::TriggerObject( const trigger::TriggerObject & trigObj ) :
   filterIds_.clear();
 }
 
-/// destructor
-
-TriggerObject::~TriggerObject()
-{
-}
-
-/// setters
-
-void TriggerObject::setCollection( const std::string & collection )
-{
-  collection_ = collection;
-}
-
-void TriggerObject::addFilterId( unsigned filterId )
-{
-  filterIds_.push_back( filterId );
-}
-
 /// getters
-
-std::string TriggerObject::collection() const
-{
-  return collection_;
-}
-
-std::vector< unsigned > TriggerObject::filterIds() const
-{
-  return filterIds_;
-}
 
 bool TriggerObject::hasFilterId( unsigned filterId ) const
 {

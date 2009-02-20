@@ -33,33 +33,6 @@
 namespace pat {
 
   class TriggerPath {
-
-    public:
-
-      /// constructors and desctructor
-      TriggerPath();
-      TriggerPath( const std::string & name);
-      TriggerPath( const std::string & name, unsigned prescale, bool run, bool accept, bool error, unsigned lastActiveModule );
-      virtual ~TriggerPath();
-      
-      /// setters & getters
-      void setName( const std::string & name );
-      void setPrescale( unsigned prescale );
-      void setRun( bool run );
-      void setAccept( bool accept );
-      void setError( bool error );
-      void addModule( const std::string & name );
-      void setLastActiveModule( unsigned lastActiveModule );
-      std::string                name() const;
-      unsigned                   prescale() const;
-      bool                       wasRun() const;
-      bool                       wasAccept() const;
-      bool                       wasError() const;
-      std::vector< std::string > modules() const; // ordered
-      unsigned                   indexModule( const std::string & name ) const; // returns sizeModules() if name unknown
-      unsigned                   lastActiveModule() const;
-      
-    protected:
     
       /// data members
       std::string                name_;
@@ -69,6 +42,31 @@ namespace pat {
       bool                       error_;
       std::vector< std::string > modules_; // ordered
       unsigned                   lastActiveModule_;
+
+    public:
+
+      /// constructors and desctructor
+      TriggerPath();
+      TriggerPath( const std::string & name);
+      TriggerPath( const std::string & name, unsigned prescale, bool run, bool accept, bool error, unsigned lastActiveModule );
+      virtual ~TriggerPath() {};
+      
+      /// setters & getters
+      void setName( const std::string & name )              { name_ = name; };
+      void setPrescale( unsigned prescale )                 { prescale_ = prescale; };
+      void setRun( bool run )                               { run_ = run; };
+      void setAccept( bool accept )                         { accept_ = accept; };
+      void setError( bool error )                           { error_ = error; };
+      void addModule( const std::string & name )            { modules_.push_back( name ); };
+      void setLastActiveModule( unsigned lastActiveModule ) { lastActiveModule_ = lastActiveModule; };
+      std::string                name() const             { return name_; };
+      unsigned                   prescale() const         { return prescale_; };
+      bool                       wasRun() const           { return run_; };
+      bool                       wasAccept() const        { return accept_; };
+      bool                       wasError() const         { return error_; };
+      std::vector< std::string > modules() const          { return modules_; }; // ordered
+      unsigned                   lastActiveModule() const { return lastActiveModule_; };
+      unsigned                   indexModule( const std::string & name ) const; // returns size of modules_ if name unknown
     
   };
   

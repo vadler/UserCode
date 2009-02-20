@@ -33,30 +33,6 @@
 namespace pat {
 
   class TriggerFilter {
-
-    public:
-
-      /// constructors and desctructor
-      TriggerFilter();
-      TriggerFilter( const std::string & label, int status = -1 );
-      TriggerFilter( const edm::InputTag & tag, int status = -1 );
-      virtual ~TriggerFilter();
-      
-      /// setters & getters
-      void setLabel( const std::string & label );
-      void setType( const std::string & type );
-      void addObjectKey( unsigned objectKey );
-      void addObjectId( unsigned objectId );
-      bool setStatus( int status ); // only -1,0,1 accepted; returns 'false' (and does not modify the status) otherwise
-      std::string             label() const;
-      std::string             type() const;
-      std::vector< unsigned > objectKeys() const;                 
-      bool                    hasObjectKey( unsigned objectKey ) const;
-      std::vector< unsigned > objectIds() const;                 
-      bool                    hasObjectId( unsigned objectId ) const;
-      int                     status() const;
-      
-    protected:
     
       /// data members
       std::string             label_;
@@ -64,6 +40,28 @@ namespace pat {
       std::vector< unsigned > objectKeys_;
       std::vector< unsigned > objectIds_; // special filter related object ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
       int                     status_;    // -1: not run, 0: failed, 1: succeeded
+
+    public:
+
+      /// constructors and desctructor
+      TriggerFilter();
+      TriggerFilter( const std::string & label, int status = -1 );
+      TriggerFilter( const edm::InputTag & tag, int status = -1 );
+      virtual ~TriggerFilter() {};
+      
+      /// setters & getters
+      void setLabel( const std::string & label ) { label_ = label; };
+      void setType( const std::string & type )   { type_ = type; };
+      void addObjectKey( unsigned objectKey )    { objectKeys_.push_back( objectKey ); };
+      void addObjectId( unsigned objectId )      { objectIds_.push_back( objectId ); };
+      bool setStatus( int status ); // only -1,0,1 accepted; returns 'false' (and does not modify the status) otherwise
+      std::string             label() const      { return label_; };
+      std::string             type() const       { return type_; };
+      std::vector< unsigned > objectKeys() const { return objectKeys_; };                 
+      std::vector< unsigned > objectIds() const  { return objectIds_; };                 
+      int                     status() const     { return status_; };
+      bool                    hasObjectKey( unsigned objectKey ) const;
+      bool                    hasObjectId( unsigned objectId ) const;
         
   };
   

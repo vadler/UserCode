@@ -94,7 +94,7 @@ void PATTriggerEventProducer::produce( edm::Event& iEvent, const edm::EventSetup
       edm::LogError( "errorTriggerMatchValid" ) << "pat::TriggerObjectMatch product with InputTag " << tagTriggerObjectMatcher.encode() << " not in event";
       continue;
     }
-    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *( handleTriggerObjectMatch ), edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) );
+    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *handleTriggerObjectMatch, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) );
     edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > itEnd( it.end() );
     for ( ; it != itEnd; ++it ) {
       if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {

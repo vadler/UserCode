@@ -29,6 +29,7 @@
 #include <string>
 #include <vector>
 
+#include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
@@ -37,8 +38,6 @@
 namespace pat {
 
   class TriggerEvent {
-      
-    protected:
     
       /// event related data members
       std::string nameHltTable_;
@@ -112,7 +111,7 @@ namespace pat {
       // PAT objects do not have multiple trigger matches per matcher module
       TriggerObjectRef             triggerMatchObject( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher ) const;                                        // transient, returns null-Ref if no match is found
       // trigger objects can have multiple trigger matches per matcher module (resolveAmbiguities=false)
-      reco::CandidateBaseRefVector triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher ) const;                                                                                  // transient
+      reco::CandidateBaseRefVector triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher, const edm::Event & iEvent ) const;                                                                                  // transient
       
   };
 

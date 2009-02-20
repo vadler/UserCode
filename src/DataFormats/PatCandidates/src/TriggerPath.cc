@@ -45,93 +45,16 @@ TriggerPath::TriggerPath( const std::string & name, unsigned prescale, bool run,
   modules_.clear();
 }
 
-/// destructor
-
-TriggerPath::~TriggerPath()
-{
-}
-
-/// setters
-
-void TriggerPath::setName( const std::string & name )
-{
-  name_ = name;
-}
-
-void TriggerPath::setPrescale( unsigned prescale )
-{
-  prescale_ = prescale;
-}
-
-void TriggerPath::setRun( bool run )
-{
-  run_ = run;
-}
-
-void TriggerPath::setAccept( bool accept )
-{
-  accept_ = accept;
-}
-
-void TriggerPath::setError( bool error )
-{
-  error_ = error;
-}
-
-void TriggerPath::addModule( const std::string & name )
-{
-  modules_.push_back( name );
-}
-
-void TriggerPath::setLastActiveModule( unsigned lastActiveModule )
-{
-  lastActiveModule_ = lastActiveModule;
-}
-
 /// getters
 
-std::string TriggerPath::name() const
-{
-  return name_;
-}
-
-unsigned TriggerPath::prescale() const
-{
-  return prescale_;
-}
-
-bool TriggerPath::wasRun() const
-{
-  return run_;
-}
-
-bool TriggerPath::wasAccept() const
-{
-  return accept_;
-}
-
-bool TriggerPath::wasError() const
-{
-  return error_;
-}
-
-std::vector< std::string > TriggerPath::modules() const
-{
-  return modules_;
-}
-
+// returns size of modules_ if name unknown
 unsigned TriggerPath::indexModule( const std::string & name ) const
 {
   unsigned i( 0 );
   while ( i < modules().size() ) {
-    if ( name == modules_[ i ] ) {
+    if ( name == modules().at( i ) ) {
       return i;
     }
   }
   return i;
-}
-
-unsigned TriggerPath::lastActiveModule() const
-{
-  return lastActiveModule_;
 }

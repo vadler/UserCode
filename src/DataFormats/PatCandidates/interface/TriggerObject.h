@@ -40,6 +40,11 @@
 namespace pat {
 
   class TriggerObject : public reco::LeafCandidate {
+    
+      /// data members
+      std::string             collection_;
+      std::vector< unsigned > filterIds_;  // special filter related ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
+                                           // empty, if object was not used in last active filter
 
     public:
 
@@ -48,21 +53,14 @@ namespace pat {
       TriggerObject( const reco::Particle::LorentzVector & vec, int id = 0 );
       TriggerObject( const reco::Particle::PolarLorentzVector & vec, int id = 0 );
       TriggerObject( const trigger::TriggerObject & aTrigObj );
-      virtual ~TriggerObject();
+      virtual ~TriggerObject() {};
       
       /// setters & getters
-      void setCollection( const std::string & collection );
-      void addFilterId( unsigned filterId );
-      std::string             collection() const;
-      std::vector< unsigned > filterIds() const;
+      void setCollection( const std::string & collection ) { collection_ = collection; };
+      void addFilterId( unsigned filterId )                { filterIds_.push_back( filterId ); };
+      std::string             collection() const { return collection_; };
+      std::vector< unsigned > filterIds() const  { return filterIds_; };
       bool                    hasFilterId( unsigned filterId ) const;
-       
-    protected:
-    
-      /// data members
-      std::string             collection_;
-      std::vector< unsigned > filterIds_;  // special filter related ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
-                                           // empty, if object was not used in last active filter
 
   };
   
