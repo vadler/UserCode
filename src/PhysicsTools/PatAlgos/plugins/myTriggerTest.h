@@ -61,8 +61,8 @@ namespace pat {
       virtual void beginJob( const edm::EventSetup & iSetup ) ;
       virtual void beginRun( edm::Run & iRun, const edm::EventSetup & iSetup );
       virtual void analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup );
-      virtual void endRun() ;
-      virtual void endJob() ;
+      virtual void endRun();
+      virtual void endJob();
   
       HLTConfigProvider hltConfig_;
       std::string       nameHLTProcess_;
@@ -71,6 +71,7 @@ namespace pat {
       std::string       namePATProcess_;
       edm::InputTag     tagPatTrigger_;
       edm::InputTag     tagPatTriggerEvent_;
+           
       std::map< std::string, TH1D* > histos1D_;
       std::map< std::string, TH2D* > histos2D_;
   };

@@ -13,14 +13,14 @@ process.source = cms.Source( "PoolSource",
     )
 )
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( 1 )
+    input = cms.untracked.int32( -1 )
 )
 
 process.TFileService = cms.Service( "TFileService",
     fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_5/output/myTriggerTest.root' )
 )
 
-process.test = cms.EDAnalyzer( "myTriggerTest",
+process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
     hltProcessName  = cms.string( 'HLT' ),
     triggerResults  = cms.InputTag( "TriggerResults" ),
     triggerEvent    = cms.InputTag( "hltTriggerSummaryAOD" ),
@@ -30,5 +30,5 @@ process.test = cms.EDAnalyzer( "myTriggerTest",
 )
 
 process.p = cms.Path(
-    process.test
+    process.triggerTest
 )

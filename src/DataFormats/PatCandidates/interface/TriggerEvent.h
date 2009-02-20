@@ -67,16 +67,17 @@ namespace pat {
       void setRun( bool run )                          { run_          = run; };
       void setAccept( bool accept )                    { accept_       = accept; };
       void setError( bool error )                      { error         = error; };
-      std::string nameHltTable() const                 { return nameHltTable_; };
-      bool        wasRun() const                       { return run_; };
-      bool        wasAccept() const                    { return accept_; };
-      bool        wasError() const                     { return error_; };
+      std::string                nameHltTable() const { return nameHltTable_; };
+      bool                       wasRun() const       { return run_; };
+      bool                       wasAccept() const    { return accept_; };
+      bool                       wasError() const     { return error_; };
+      std::vector< std::string > triggerMatchers() const;
       
       /// paths related
       void setPaths( const edm::Handle< TriggerPathCollection > & handleTriggerPaths );
       const TriggerPathCollection * paths() const;                                   // returns 0 if RefProd is null
       const TriggerPath           * path( const std::string & namePath ) const;      // returns 0 if path is not found
-      unsigned                      indexPath( const std::string & namePath ) const; // returns size of filter collection if filter is not found
+      unsigned                      indexPath( const std::string & namePath ) const; // returns size of path collection if path is not found
       TriggerPathRefVector          acceptedPaths() const;                           // transient
       
       /// filters related
@@ -89,10 +90,10 @@ namespace pat {
       /// objects related
       void setObjects( const edm::Handle< TriggerObjectCollection > & handleTriggerObjects );
       bool addObjectMatchResult( const TriggerObjectMatch & trigMatches, const std::string & labelMatcher ); // returns 'false' if 'matcher' alreadey exists
-      const TriggerObjectCollection     * objects() const;                                             // returns 0 if RefProd is null
-      TriggerObjectRefVector              objects( unsigned filterId ) const;                          // transient
+      const TriggerObjectCollection     * objects() const;                                                   // returns 0 if RefProd is null
+      TriggerObjectRefVector              objects( unsigned filterId ) const;                                // transient
       const TriggerObjectMatchContainer * objectMatchResults() const;
-      const TriggerObjectMatch          * objectMatchResult( const std::string & labelMatcher ) const; // returns 0 if 'labelMatcher' not found
+      const TriggerObjectMatch          * objectMatchResult( const std::string & labelMatcher ) const;       // returns 0 if 'labelMatcher' not found
       
       /// x-collection related
       TriggerFilterRefVector     pathFilters( const std::string & namePath, bool all = true ) const;                                      // transient; setting 'all' to 'false' returns the run filters only.

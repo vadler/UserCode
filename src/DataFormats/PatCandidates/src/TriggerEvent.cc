@@ -21,6 +21,17 @@ TriggerEvent::TriggerEvent( const std::string & nameHltTable, bool run, bool acc
   objectMatchResults_.clear();
 }
 
+
+/// event related
+std::vector< std::string > TriggerEvent::triggerMatchers() const
+{
+  std::vector< std::string > theMatchers( objectMatchResults()->size() );
+  for ( TriggerObjectMatchContainer::const_iterator iMatch = objectMatchResults()->begin(); iMatch != objectMatchResults()->end(); ++iMatch ) {
+    theMatchers.push_back( iMatch->first );
+  }
+  return theMatchers;
+}
+
 /// paths related
 
 void TriggerEvent::setPaths( const edm::Handle< TriggerPathCollection > & handleTriggerPaths )
