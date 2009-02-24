@@ -67,33 +67,30 @@ namespace pat {
       void setRun( bool run )                          { run_          = run; };
       void setAccept( bool accept )                    { accept_       = accept; };
       void setError( bool error )                      { error         = error; };
-      std::string                nameHltTable() const { return nameHltTable_; };
-      bool                       wasRun() const       { return run_; };
-      bool                       wasAccept() const    { return accept_; };
-      bool                       wasError() const     { return error_; };
-      std::vector< std::string > triggerMatchers() const;
+      std::string nameHltTable() const { return nameHltTable_; };
+      bool        wasRun() const       { return run_; };
+      bool        wasAccept() const    { return accept_; };
+      bool        wasError() const     { return error_; };
       
       /// paths related
-      void setPaths( const edm::Handle< TriggerPathCollection > & handleTriggerPaths );
-      const TriggerPathCollection * paths() const;                                   // returns 0 if RefProd is null
+      void setPaths( const edm::Handle< TriggerPathCollection > & handleTriggerPaths ) { paths_ = TriggerPathRefProd( handleTriggerPaths ); };
+      const TriggerPathCollection * paths() const { return paths_.get(); };          // returns 0 if RefProd is null
       const TriggerPath           * path( const std::string & namePath ) const;      // returns 0 if path is not found
       unsigned                      indexPath( const std::string & namePath ) const; // returns size of path collection if path is not found
       TriggerPathRefVector          acceptedPaths() const;                           // transient
       
       /// filters related
-      void setFilters( const edm::Handle< TriggerFilterCollection > & handleTriggerFilters );
-      const TriggerFilterCollection * filters() const;                                      // returns 0 if RefProd is null
+      void setFilters( const edm::Handle< TriggerFilterCollection > & handleTriggerFilters ) { filters_ = TriggerFilterRefProd( handleTriggerFilters ); };
+      const TriggerFilterCollection * filters() const { return filters_.get(); };           // returns 0 if RefProd is null
       const TriggerFilter           * filter( const std::string & labelFilter ) const;      // returns 0 if filter is not found
       unsigned                        indexFilter( const std::string & labelFilter ) const; // returns size of filter collection if filter is not found
       TriggerFilterRefVector          acceptedFilters() const;                              // transient
       
       /// objects related
-      void setObjects( const edm::Handle< TriggerObjectCollection > & handleTriggerObjects );
+      void setObjects( const edm::Handle< TriggerObjectCollection > & handleTriggerObjects ) { objects_ = TriggerObjectRefProd( handleTriggerObjects ); };
       bool addObjectMatchResult( const TriggerObjectMatch & trigMatches, const std::string & labelMatcher ); // returns 'false' if 'matcher' alreadey exists
-      const TriggerObjectCollection     * objects() const;                                                   // returns 0 if RefProd is null
+      const TriggerObjectCollection     * objects() const { return objects_.get(); };                        // returns 0 if RefProd is null
       TriggerObjectRefVector              objects( unsigned filterId ) const;                                // transient
-      const TriggerObjectMatchContainer * objectMatchResults() const;
-      const TriggerObjectMatch          * objectMatchResult( const std::string & labelMatcher ) const;       // returns 0 if 'labelMatcher' not found
       
       /// x-collection related
       TriggerFilterRefVector     pathFilters( const std::string & namePath, bool all = true ) const;                                      // transient; setting 'all' to 'false' returns the run filters only.
@@ -108,11 +105,15 @@ namespace pat {
       TriggerPathRefVector       objectPaths( const TriggerObjectRef & objectRef  ) const;                                                // transient
       
       /// trigger matches
-      TriggerObjectMatchMap        triggerMatchObjects( const reco::CandidateBaseRef & candRef ) const;                                                                                 // transient
+      std::vector< std::string >          triggerMatchers() const;
+      const TriggerObjectMatchContainer * triggerObjectMatchResults() const { return &objectMatchResults_; };
+      const TriggerObjectMatch          * triggerObjectMatchResult( const std::string & labelMatcher ) const;                                                              // returns 0 if 'labelMatcher' not found
+      // For retrieving matches for given refs, the event has to be passed as argument due to the usage of edm::AssociativeIterator
       // PAT objects do not have multiple trigger matches per matcher module
-      TriggerObjectRef             triggerMatchObject( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher ) const;                                        // transient, returns null-Ref if no match is found
+      TriggerObjectRef                    triggerMatchObject( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher, const edm::Event & iEvent ) const; // transient, returns null-Ref if no match is found
+      TriggerObjectMatchMap               triggerMatchObjects( const reco::CandidateBaseRef & candRef, const edm::Event & iEvent ) const;                                  // transient
       // trigger objects can have multiple trigger matches per matcher module (resolveAmbiguities=false)
-      reco::CandidateBaseRefVector triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher, const edm::Event & iEvent ) const;                                                                                  // transient
+      reco::CandidateBaseRefVector        triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher, const edm::Event & iEvent ) const; // transient                                                                                 // transient
       
   };
 
