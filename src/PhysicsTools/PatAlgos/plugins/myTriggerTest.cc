@@ -10,8 +10,10 @@
 #include "DataFormats/Common/interface/AssociativeIterator.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 
+#include "TMath.h"
 
 using namespace pat;
+using namespace TMath;
 
 myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   nameHLTProcess_( iConfig.getParameter< std::string >( "hltProcessName" ) ),
@@ -83,9 +85,15 @@ void myTriggerTest::beginJob( const edm::EventSetup & iSetup )
   histos2D_[ "objectId" ] = fileService->make< TH2D >( "objectId", "Object filter IDs vs. filter object IDs", 25, 80.5, 105.5, 25, 80.5, 105.5 );
   histos2D_[ "objectId" ]->SetXTitle( "filter object ID" );
   histos2D_[ "objectId" ]->SetYTitle( "object filter ID" );
-  histos2D_[ "ptObjCand" ] = fileService->make< TH2D >( "ptObjCand", "Object vs. candidate p_T", 100, 0., 1000., 100, 0., 1000. );
+  histos2D_[ "ptObjCand" ] = fileService->make< TH2D >( "ptObjCand", "Object vs. candidate p_{T}", 60, 0., 300., 60, 0., 300. );
   histos2D_[ "ptObjCand" ]->SetXTitle( "candidate" );
   histos2D_[ "ptObjCand" ]->SetYTitle( "object" );
+  histos2D_[ "etaObjCand" ] = fileService->make< TH2D >( "etaObjCand", "Object vs. candidate #eta", 50, -2.5, 2.5, 50, -2.5, 2.5 );
+  histos2D_[ "etaObjCand" ]->SetXTitle( "candidate" );
+  histos2D_[ "etaObjCand" ]->SetYTitle( "object" );
+  histos2D_[ "phiObjCand" ] = fileService->make< TH2D >( "phiObjCand", "Object vs. candidate #phi", 60, -Pi(), Pi(), 60, -Pi(), Pi() );
+  histos2D_[ "phiObjCand" ]->SetXTitle( "candidate" );
+  histos2D_[ "phiObjCand" ]->SetYTitle( "object" );
   
   // This should normally happen in beginRun()
   if ( ! hltConfig_.init( nameHLTProcess_ ) ) {
@@ -223,12 +231,14 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   }
   // trigger matches
   const TriggerObjectMatchContainer * triggerMatches( handlePatTriggerEvent->triggerObjectMatchResults() );
+  TriggerObjectMatchContainer triggerMatchContainer( *triggerMatches ); // cannot be const due to usage of 'operator[]'
   const std::vector< std::string > matches( handlePatTriggerEvent->triggerMatchers() );
   for ( unsigned iMatch = 0; iMatch < matches.size(); ++iMatch ) {
-    edm::LogWarning( "matcherLabel" ) << "Matcher label: " << matches.at( iMatch );
-//     edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *( handlePatTriggerEvent->triggerObjectMatchResult( matches.at( iMatch ) ) ), edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
+    const std::string match( matches.at( iMatch ) );
+    edm::LogWarning( "matcherLabel" ) << "Matcher label: " << match;
     edm::Handle< TriggerObjectMatch > triggerMatch;
-    iEvent.getByLabel( matches.at( iMatch ), triggerMatch );
+    iEvent.getByLabel( match, triggerMatch );
+    const TriggerObjectMatch * triggerMatchEvent( handlePatTriggerEvent->triggerObjectMatchResult( match ) );
     if ( triggerMatch->empty() ) {
       break;
     }
@@ -259,7 +269,9 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                        << "        product ID: " << objRef.id() << "\n"
                                        << "        key       : " << objRef.key();
       histos2D_[ "ptObjCand" ]->Fill( candRef->pt(), objRef->pt() );
-      const TriggerObjectRef matchObjRef( handlePatTriggerEvent->triggerMatchObject( candRef, matches.at( iMatch ), iEvent ) );
+      histos2D_[ "etaObjCand" ]->Fill( candRef->eta(), objRef->eta() );
+      histos2D_[ "phiObjCand" ]->Fill( candRef->phi(), objRef->phi() );
+      const TriggerObjectRef matchObjRef( handlePatTriggerEvent->triggerMatchObject( candRef, match, iEvent ) );
       if ( matchObjRef.isNonnull() && matchObjRef.isAvailable() ) {
         edm::LogWarning( "matchObjRefEvent" ) << "    Object reference from event:\n"
                                               << "        product ID: " << matchObjRef.id() << "\n"
@@ -276,7 +288,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                               << "        null      : " << matchObjRef.isNull() << "\n"
                                               << "        available : " << matchObjRef.isAvailable();
       }
-      const reco::CandidateBaseRefVector matchCandRefs( handlePatTriggerEvent->triggerMatchCandidates( objRef, matches.at( iMatch ), iEvent ) );
+      const reco::CandidateBaseRefVector matchCandRefs( handlePatTriggerEvent->triggerMatchCandidates( objRef, match, iEvent ) );
       bool found( false );
       for ( reco::CandidateBaseRefVector::const_iterator iCand = matchCandRefs.begin(); iCand != matchCandRefs.end(); ++iCand ) {
         if ( *iCand == candRef ) {
@@ -291,7 +303,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       const TriggerObjectMatchMap matchMap( handlePatTriggerEvent->triggerMatchObjects( candRef, iEvent ) );
       if ( matchMap.empty() ) {
         edm::LogError( "emptyMatchMap" ) << "    No entry in match map:\n"
-                                         << "        matcher name:  " <<  matches.at( iMatch ) << "\n"
+                                         << "        matcher name:  " <<  match << "\n"
                                          << "        candidate ref: " << candRef.id() << " " << candRef.key();
       }
       ++it;
