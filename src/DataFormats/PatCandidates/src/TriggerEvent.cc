@@ -5,6 +5,7 @@
 
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/Common/interface/AssociativeIterator.h"
 
 
@@ -92,13 +93,19 @@ TriggerFilterRefVector TriggerEvent::acceptedFilters() const
 
 /// objects related
 
-bool TriggerEvent::addObjectMatchResult( const TriggerObjectMatch & trigMatches, const std::string & labelMatcher )
+bool TriggerEvent::addObjectMatchResult( const TriggerObjectMatchRefProd & trigMatches, const std::string & labelMatcher )
 {
   if ( triggerObjectMatchResults()->find( labelMatcher ) == triggerObjectMatchResults()->end() ) {
     objectMatchResults_[ labelMatcher ] = trigMatches;
     return true;
   }
+  edm::LogWarning( "existingObjectMatchResult" ) << "Tried adding trigger object match result from " << labelMatcher << ", although existing.\n"
+                                              << "Skipped.";
   return false;
+}
+bool TriggerEvent::addObjectMatchResult( const edm::Handle< TriggerObjectMatch > & trigMatches, const std::string & labelMatcher )
+{
+  return addObjectMatchResult( TriggerObjectMatchRefProd( trigMatches ), labelMatcher );
 }
 
 TriggerObjectRefVector TriggerEvent::objects( unsigned filterId ) const
@@ -243,7 +250,7 @@ const TriggerObjectMatch * TriggerEvent::triggerObjectMatchResult( const std::st
 {
   const TriggerObjectMatchContainer::const_iterator iMatch( triggerObjectMatchResults()->find( labelMatcher ) );
   if ( iMatch != triggerObjectMatchResults()->end() ) {
-    return &( iMatch->second );
+    return iMatch->second.get();
   }
   return 0;
 }
@@ -268,8 +275,9 @@ TriggerObjectRef TriggerEvent::triggerMatchObject( const reco::CandidateBaseRef 
 TriggerObjectMatchMap TriggerEvent::triggerMatchObjects( const reco::CandidateBaseRef & candRef, const edm::Event & iEvent ) const
 {
   TriggerObjectMatchMap theContainer;
-  for ( TriggerObjectMatchContainer::const_iterator iMatch = triggerObjectMatchResults()->begin(); iMatch != triggerObjectMatchResults()->end(); ++iMatch ) {
-    theContainer[ iMatch->first ] = triggerMatchObject( candRef, iMatch->first, iEvent );
+  const std::vector< std::string > matchers( triggerMatchers() );
+  for ( size_t iMatch = 0; iMatch < matchers.size(); ++iMatch ) {
+    theContainer[ matchers.at( iMatch ) ] = triggerMatchObject( candRef, matchers.at( iMatch ), iEvent );
   }
   return theContainer;
 }

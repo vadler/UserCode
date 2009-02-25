@@ -36,8 +36,8 @@ TriggerObject::TriggerObject( const trigger::TriggerObject & trigObj ) :
 
 bool TriggerObject::hasFilterId( unsigned filterId ) const
 {
-  for ( std::vector< unsigned >::const_iterator iF = filterIds_.begin(); iF != filterIds_.end(); ++iF ) {
-    if ( *iF == filterId ) {
+  for ( unsigned iF = 0; iF < filterIds().size(); ++iF ) {
+    if ( filterIds().at( iF ) == filterId ) {
       return true;
     }
   }

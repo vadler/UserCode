@@ -344,10 +344,10 @@ namespace {
   std::vector<pat::TriggerPrimitive>	 v_tp;
   std::vector<pat::TriggerPrimitive *>	 vp_tp;
   edm::Wrapper<pat::TriggerPrimitiveCollection>	 w_tpc;
-  edm::Wrapper<pat::TriggerPrimitiveMatch>	 w_tpm;
   pat::TriggerPrimitiveRef	                 tpr;
   pat::TriggerPrimitiveRefProd	                 tprp;
   pat::TriggerPrimitiveRefVector	         tprv;
+  edm::Wrapper<pat::TriggerPrimitiveMatch>	 w_tpm;
   edm::reftobase::Holder<reco::Candidate, pat::TriggerPrimitiveRef>	 rb_cand_h_p_tp;
   edm::reftobase::RefHolder<pat::TriggerPrimitiveRef>	                 rb_rh_p_tp;
 //   edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerPrimitiveRefVector>	 rb_cand_vh_tp;
@@ -355,16 +355,20 @@ namespace {
   
   std::vector<pat::TriggerObject>::const_iterator v_p_to_ci;
   edm::Wrapper<std::vector<pat::TriggerObject> > w_v_p_to;
-  edm::Wrapper<pat::TriggerObjectMatch> w_a_p_to;
-//   std::map<std::string, pat::TriggerObjectMatch>::const_iterator m_s_a_p_to_ci;
-  edm::Wrapper<std::map<std::string, pat::TriggerObjectMatch> > w_m_s_a_p_to;
   pat::TriggerObjectRef p_r_to;
+  std::map<std::string, pat::TriggerObjectRef> m_p_r_to;
+//   std::map<std::string, pat::TriggerObjectRef>::const_iterator  m_p_r_to_ci;
+  edm::Wrapper<std::map<std::string, pat::TriggerObjectRef> > w_m_p_r_to;
   pat::TriggerObjectRefProd p_rp_to;
   edm::Wrapper<pat::TriggerObjectRefVector> w_p_rv_to;
+  edm::Wrapper<pat::TriggerObjectMatch> w_a_p_to;
   edm::reftobase::Holder<reco::Candidate, pat::TriggerObjectRef> rb_cand_h_p_to;
   edm::reftobase::RefHolder<pat::TriggerObjectRef> rb_rh_p_to;
 //   edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerObjectRefVector> rb_cand_vh_p_to;
 //   edm::reftobase::RefVectorHolder<pat::TriggerObjectRefVector> rb_rvh_p_to;
+  pat::TriggerObjectMatchRefProd a_p_rp_to;
+//   std::map<std::string, pat::TriggerObjectMatchRefProd>::const_iterator m_s_a_p_rp_to_ci;
+  edm::Wrapper<std::map<std::string, pat::TriggerObjectMatchRefProd> > w_m_s_a_p_rp_to;
   
   std::vector<pat::TriggerFilter>::const_iterator v_p_tf_ci;
   edm::Wrapper<std::vector<pat::TriggerFilter> > w_v_p_tf;
