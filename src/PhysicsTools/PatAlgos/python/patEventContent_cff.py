@@ -40,7 +40,6 @@ patExtraAodEventContent = [
 ]
 
 patTriggerEventContent = [
-    'keep *_patTrigger_*_*'                     ,
-    'keep *_patTriggerEvent_*_*'                ,
-    'keep patTriggerObjectsedmAssociation_*_*_*'
+    'keep *_patTrigger_*_*',
+    'keep *_patTriggerEvent_*_*'
 ]
