@@ -5,8 +5,9 @@ patTriggerEvent = cms.EDProducer( "PATTriggerEventProducer",
     triggerResults     = cms.InputTag( "TriggerResults" ),
     triggerEvent       = cms.InputTag( "hltTriggerSummaryAOD" ),
     patTriggerProducer = cms.InputTag( "patTrigger" ),
-    patTriggerMatches  = cms.VInputTag( "electronTriggerMatchHltElectrons",
-                                        "muonTriggerMatchL1Muons",
-                                        "tauTriggerMatchTriggerTaus" )
+    patTriggerMatches  = cms.VInputTag( "electronTriggerMatchHltElectrons"
+                                      , "muonTriggerMatchL1Muons"
+                                      , "tauTriggerMatchTriggerTaus"
+                                      )
 )
 

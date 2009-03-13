@@ -12,49 +12,56 @@ using namespace pat;
 
 TriggerPath::TriggerPath() :
   name_(),
+  index_(),
   prescale_(),
   run_(),
   accept_(),
   error_(),
-  lastActiveModule_()
+  lastActiveModuleSlot_()
 {
   modules_.clear();
+  filterIndices_.clear();
 }
 
 /// constructor from values
 
 TriggerPath::TriggerPath( const std::string & name ) :
   name_( name ),
+  index_(),
   prescale_(),
   run_(),
   accept_(),
   error_(),
-  lastActiveModule_()
+  lastActiveModuleSlot_()
 {
   modules_.clear();
+  filterIndices_.clear();
 }
 
-TriggerPath::TriggerPath( const std::string & name, unsigned prescale, bool run, bool accept, bool error, unsigned lastActiveModule ) :
+TriggerPath::TriggerPath( const std::string & name, unsigned index, unsigned prescale, bool run, bool accept, bool error, unsigned lastActiveModule ) :
   name_( name ),
+  index_( index ),
   prescale_( prescale ),
   run_( run ),
   accept_( accept ),
   error_( error ),
-  lastActiveModule_( lastActiveModule )
+  lastActiveModuleSlot_( lastActiveModule )
 {
   modules_.clear();
+  filterIndices_.clear();
 }
 
 /// getters
 
-// returns size of modules_ if name unknown
-unsigned TriggerPath::indexModule( const std::string & name ) const
+// returns size of modules_ if name unknown and -1 if 'modules_' not filled
+int TriggerPath::indexModule( const std::string & name ) const
 {
   unsigned i( 0 );
   while ( i < modules().size() ) {
     if ( name == modules().at( i ) ) {
-      return i;
+      return ( int )i;
     }
+    ++i;
   }
-  return i;
+  return i == 0 ? -1 : ( int )i;
 }

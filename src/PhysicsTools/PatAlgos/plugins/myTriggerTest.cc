@@ -22,6 +22,7 @@ myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   namePATProcess_( iConfig.getParameter< std::string >( "patProcessName" ) ),
   tagPatTrigger_( iConfig.getParameter< edm::InputTag >( "patTrigger" ) ),
   tagPatTriggerEvent_( iConfig.getParameter< edm::InputTag >( "patTriggerEvent" ) ),
+  testPathModuleTags_( iConfig.getParameter< bool >( "testPathModuleTags" ) ),
   histos1D_(),
   histos2D_()
 {
@@ -49,12 +50,17 @@ void myTriggerTest::beginJob( const edm::EventSetup & iSetup )
   histos2D_[ "nPaths" ] = fileService->make< TH2D >( "nPaths", "Number of paths", 201, -0.5, 200.5, 201, -0.5, 200.5 );
   histos2D_[ "nPaths" ]->SetXTitle( "HLTConfigProvider" );
   histos2D_[ "nPaths" ]->SetYTitle( "pat::TriggerEvent->paths()" );
-  histos2D_[ "nModules" ] = fileService->make< TH2D >( "nModules", "Number of modules per trigger path", 121, -0.5, 120.5, 121, -0.5, 120.5 );
-  histos2D_[ "nModules" ]->SetXTitle( "HLTConfigProvider" );
-  histos2D_[ "nModules" ]->SetYTitle( "pat::TriggerPath->modules()" );
+  if ( testPathModuleTags_ ) {
+    histos2D_[ "nModules" ] = fileService->make< TH2D >( "nModules", "Number of modules per trigger path", 121, -0.5, 120.5, 121, -0.5, 120.5 );
+    histos2D_[ "nModules" ]->SetXTitle( "HLTConfigProvider" );
+    histos2D_[ "nModules" ]->SetYTitle( "pat::TriggerPath->modules()" );
+  }
+  histos2D_[ "nFilters" ] = fileService->make< TH2D >( "nFilters", "Number of active filters per trigger path", 6, -0.5, 5.5, 6, -0.5, 5.5 );
+  histos2D_[ "nFilters" ]->SetXTitle( "pat::TriggerEvent->pathFilters" );
+  histos2D_[ "nFilters" ]->SetYTitle( "pat::TriggerPath->filterIndices()" );
   histos2D_[ "iLastModule" ] = fileService->make< TH2D >( "iLastModule", "Index of last active module per trigger path", 121, -0.5, 120.5, 121, -0.5, 120.5 );
-  histos2D_[ "iLastModule" ]->SetXTitle( "HLTConfigProvider" );
-  histos2D_[ "iLastModule" ]->SetYTitle( "pat::TriggerPath->lastActiveModule()" );
+  histos2D_[ "iLastModule" ]->SetXTitle( "HLTConfigProvider.size()" );
+  histos2D_[ "iLastModule" ]->SetYTitle( "pat::TriggerPath->lastActiveModuleSlot()" );
   histos1D_[ "nFilterIds" ] = fileService->make< TH1D >( "nFilterIds", "Number of filter IDs per trigger object", 6, -0.5, 5.5 );
   histos1D_[ "nFilterIds" ]->SetXTitle( "filter IDs" );
   histos1D_[ "nFilterIds" ]->SetYTitle( "entries" );
@@ -103,6 +109,9 @@ void myTriggerTest::beginJob( const edm::EventSetup & iSetup )
 
 void myTriggerTest::beginRun( edm::Run & iRun, const edm::EventSetup & iSetup )
 {
+//   if ( ! hltConfig_.init( nameHLTProcess_ ) ) {
+//     edm::LogError( "hltConfigExtraction" ) << "HLT config extraction error with process name " << nameHLTProcess_;
+//   }
 }
 
 void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup )
@@ -128,32 +137,41 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   
   if ( hltConfig_.size() == myEventPaths->size() ) {
     for ( TriggerPathCollection::const_iterator iPath = myEventPaths->begin(); iPath != myEventPaths->end(); ++iPath ) {
-      const TriggerFilterRefVector       myFilters( handlePatTriggerEvent->pathFilters( iPath->name(), true ) );
-      const std::vector< std::string >   names( iPath->modules() );                             
+      const TriggerFilterRefVector       myModules( handlePatTriggerEvent->pathModules( iPath->name(), true ) );
       const std::vector< std::string > & namesHltConfig( hltConfig_.moduleLabels( iPath->name() ) );
-      unsigned lastModule( iPath->lastActiveModule() );
+      unsigned lastModule( iPath->lastActiveModuleSlot() );
       unsigned lastModuleTriggerResults( handleTriggerResults->index( handlePatTriggerEvent->indexPath( iPath->name() ) ) );
-      if ( names.size() == namesHltConfig.size() && namesHltConfig.size() == myFilters.size() ) {
-        for ( size_t iModule = 0; iModule < names.size(); ++iModule ) {
-          if ( names[ iModule ] != namesHltConfig[ iModule ] ) {
-            edm::LogError( "nameModule" ) << "    Module #" << iModule << " with different names in path " << iPath->name() << ":\n"
-                                          << "        HLTConfigProvider: " << namesHltConfig[ iModule ] << "\n"
-                                          << "        pat::TriggerPath : " << names[ iModule ];
+      if ( testPathModuleTags_ ) {
+        const std::vector< std::string >   namesModules( iPath->modules() );                             
+        if ( namesModules.size() == namesHltConfig.size() && namesHltConfig.size() == myModules.size() ) {
+          for ( size_t iModule = 0; iModule < namesModules.size(); ++iModule ) {
+            if ( namesModules[ iModule ] != namesHltConfig[ iModule ] ) {
+              edm::LogError( "nameModule" ) << "    Module #" << iModule << " with different namesModules in path " << iPath->name() << ":\n"
+                                            << "        HLTConfigProvider: " << namesHltConfig[ iModule ] << "\n"
+                                            << "        pat::TriggerPath : " << namesModules[ iModule ];
+            }
           }
+        } else {
+          edm::LogError( "nModules" ) << "    Number of HLT modules differ in path " << iPath->name() << ":\n"
+                                      << "        HLTConfigProvider          : " << namesHltConfig.size() << "\n"
+                                      << "        pat::TriggerPath           : " << namesModules.size() << "\n"
+                                      << "        pat::TriggerFilterRefVector: " << myModules.size();
         }
-      } else {
-        edm::LogError( "nModules" ) << "    Number of HLT modules differ in path " << iPath->name() << ":\n"
-                                    << "        HLTConfigProvider          : " << namesHltConfig.size() << "\n"
-                                    << "        pat::TriggerPath           : " << names.size() << "\n"
-                                    << "        pat::TriggerFilterRefVector: " << myFilters.size();
+        histos2D_[ "nModules" ]->Fill( namesHltConfig.size(), namesModules.size() );
       }
-      histos2D_[ "nModules" ]->Fill( namesHltConfig.size(), names.size() );
       if ( lastModule != lastModuleTriggerResults ) {
         edm::LogError( "iLastModule" ) << "    Index of last active HLT module differs in path " << iPath->name() << ":\n"
                                        << "        TriggerResults::HLT: " << lastModuleTriggerResults << "\n"
                                        << "        pat::TriggerPath   : " << lastModule;
       }
-      histos2D_[ "iLastModule" ]->Fill( namesHltConfig.size(), names.size() );
+      const TriggerFilterRefVector  myFilters( handlePatTriggerEvent->pathFilters( iPath->name() ) );
+      if ( iPath->filterIndices().size() != myFilters.size() ) {
+        edm::LogError( "nFilters" ) << "    Number of HLT active filters differ in path " << iPath->name() << ":\n"
+                                    << "        pat::TriggerPath           : " << iPath->filterIndices().size() << "\n"
+                                    << "        pat::TriggerFilterRefVector: " << myFilters.size();
+      }
+      histos2D_[ "nFilters" ]->Fill( myFilters.size(), iPath->filterIndices().size() );
+      histos2D_[ "iLastModule" ]->Fill( namesHltConfig.size(), lastModule );
     }
   } else {
     edm::LogError( "nPaths" ) << "    Number of HLT paths differ:\n"
@@ -194,6 +212,37 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   }
   
   // pat::TriggerPath
+  for ( TriggerPathCollection::const_iterator iPath = myEventPaths->begin(); iPath != myEventPaths->end(); ++iPath ) {
+    if ( ! iPath->wasAccept() ) {
+      const std::string labelLastActiveModule( hltConfig_.moduleLabel( iPath->index(), iPath->lastActiveModuleSlot() ) );
+      const std::string labelLastActiveFilter( handlePatTriggerFilters->at( iPath->filterIndices().back() ).label() );
+      if ( labelLastActiveModule != labelLastActiveFilter ) {
+        edm::LogWarning( "lastActiveLabel" ) << "    Labels for last active module differ in failing path " << iPath->name() << ":\n"
+                                             << "        from stored last active module slot:" << labelLastActiveModule << "\n"
+                                             << "        from link to last active filter    :" << labelLastActiveFilter;
+      }
+    }
+    if ( testPathModuleTags_ ) {
+      const std::vector< std::string > pathModules( iPath->modules() );
+      unsigned found( 0 );
+      for ( size_t iModule = 0; iModule < pathModules.size(); ++iModule ) {
+        if ( handlePatTriggerEvent->indexFilter( pathModules.at( iModule ) ) == myEventFilters->size() ) {
+          edm::LogWarning( "moduleNotInFilters" ) << "    Module from path not found in filter collection:\n"
+                                                  << "        path  : " << iPath->name() << "\n"
+                                                  << "        module: " << pathModules.at( iModule );
+        } else {
+          ++found;
+          edm::LogWarning( "moduleInFilters" ) << "    Module from path found in filter collection:\n"
+                                               << "        path  : " << iPath->name() << "\n"
+                                               << "        module: " << pathModules.at( iModule );
+        }
+      }
+      edm::LogWarning( "foundFilters" ) << "    Found filters in path " << iPath->name() << ": " << found;
+//       if ( found > 1 ) {
+//         edm::LogWarning( "foundManyFilters" ) << "FOUND MORE THAN ONE FILTER !!!";
+//       }
+    }
+  }
   
   // pat::TriggerEvent
   const TriggerPathRefVector pathRefs( handlePatTriggerEvent->acceptedPaths() );
@@ -238,7 +287,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
     edm::LogWarning( "matcherLabel" ) << "Matcher label: " << match;
     edm::Handle< TriggerObjectMatch > triggerMatch;
     iEvent.getByLabel( match, triggerMatch );
-    const TriggerObjectMatch * triggerMatchEvent( handlePatTriggerEvent->triggerObjectMatchResult( match ) );
+//     const TriggerObjectMatch * triggerMatchEvent( handlePatTriggerEvent->triggerObjectMatchResult( match ) );
     if ( triggerMatch->empty() ) {
       break;
     }
@@ -287,6 +336,17 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                               << "        key       : " << matchObjRef.key() << "\n"
                                               << "        null      : " << matchObjRef.isNull() << "\n"
                                               << "        available : " << matchObjRef.isAvailable();
+      }
+      const TriggerFilterRefVector objFilters( handlePatTriggerEvent->objectFilters( objRef ) );
+      for ( TriggerFilterRefVector::const_iterator iFilter = objFilters.begin(); iFilter != objFilters.end(); ++iFilter ) {
+        edm::LogWarning( "matchObjFilter" ) << "    Object used in filter:\n"
+                                            << "        label: " << ( *iFilter )->label() << "\n"
+                                            << "        type : " << ( *iFilter )->type();
+        if ( ! ( *iFilter )->hasObjectKey( objRef.key() ) ) {
+          edm::LogError( "wrongObjFilterKey" ) << "    Object key not found in keys from filter:\n"
+                                               << "        object key : " << objRef.key() << "\n"
+                                               << "        size filter: " << ( *iFilter )->objectKeys().size();
+        }
       }
       const reco::CandidateBaseRefVector matchCandRefs( handlePatTriggerEvent->triggerMatchCandidates( objRef, match, iEvent ) );
       bool found( false );

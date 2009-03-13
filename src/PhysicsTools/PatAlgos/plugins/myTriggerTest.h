@@ -71,6 +71,7 @@ namespace pat {
       std::string       namePATProcess_;
       edm::InputTag     tagPatTrigger_;
       edm::InputTag     tagPatTriggerEvent_;
+      bool              testPathModuleTags_;
            
       std::map< std::string, TH1D* > histos1D_;
       std::map< std::string, TH2D* > histos2D_;

@@ -21,12 +21,13 @@ process.TFileService = cms.Service( "TFileService",
 )
 
 process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
-    hltProcessName  = cms.string( 'HLT' ),
-    triggerResults  = cms.InputTag( "TriggerResults" ),
-    triggerEvent    = cms.InputTag( "hltTriggerSummaryAOD" ),
-    patProcessName  = cms.string( 'PAT' ),
-    patTrigger      = cms.InputTag( "patTrigger" ),
-    patTriggerEvent = cms.InputTag( "patTriggerEvent" )
+    hltProcessName     = cms.string( 'HLT' ),
+    triggerResults     = cms.InputTag( "TriggerResults" ),
+    triggerEvent       = cms.InputTag( "hltTriggerSummaryAOD" ),
+    patProcessName     = cms.string( 'PAT' ),
+    patTrigger         = cms.InputTag( "patTrigger" ),
+    patTriggerEvent    = cms.InputTag( "patTriggerEvent" ),
+    testPathModuleTags = cms.bool( False )
 )
 
 process.p = cms.Path(

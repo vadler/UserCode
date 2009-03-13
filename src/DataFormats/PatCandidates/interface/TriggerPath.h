@@ -36,37 +36,43 @@ namespace pat {
     
       /// data members
       std::string                name_;
+      unsigned                   index_;         // in trigger table
       unsigned                   prescale_;
       bool                       run_;
       bool                       accept_;
       bool                       error_;
-      std::vector< std::string > modules_; // ordered
-      unsigned                   lastActiveModule_;
+      std::vector< std::string > modules_;       // ordered; not necessarily in filter collection
+      std::vector< unsigned >    filterIndices_; // indices of active filters in filter collection; needed, if 'modules_' kept empty
+      unsigned                   lastActiveModuleSlot_;
 
     public:
 
       /// constructors and desctructor
       TriggerPath();
       TriggerPath( const std::string & name);
-      TriggerPath( const std::string & name, unsigned prescale, bool run, bool accept, bool error, unsigned lastActiveModule );
+      TriggerPath( const std::string & name, unsigned index, unsigned prescale, bool run, bool accept, bool error, unsigned lastActiveModuleSlot );
       virtual ~TriggerPath() {};
       
       /// setters & getters
-      void setName( const std::string & name )              { name_ = name; };
-      void setPrescale( unsigned prescale )                 { prescale_ = prescale; };
-      void setRun( bool run )                               { run_ = run; };
-      void setAccept( bool accept )                         { accept_ = accept; };
-      void setError( bool error )                           { error_ = error; };
-      void addModule( const std::string & name )            { modules_.push_back( name ); };
-      void setLastActiveModule( unsigned lastActiveModule ) { lastActiveModule_ = lastActiveModule; };
-      std::string                name() const             { return name_; };
-      unsigned                   prescale() const         { return prescale_; };
-      bool                       wasRun() const           { return run_; };
-      bool                       wasAccept() const        { return accept_; };
-      bool                       wasError() const         { return error_; };
-      std::vector< std::string > modules() const          { return modules_; }; // ordered
-      unsigned                   lastActiveModule() const { return lastActiveModule_; };
-      unsigned                   indexModule( const std::string & name ) const; // returns size of modules_ if name unknown
+      void setName( const std::string & name )                  { name_                 = name; };
+      void setIndex( unsigned index )                           { index_                = index; };
+      void setPrescale( unsigned prescale )                     { prescale_             = prescale; };
+      void setRun( bool run )                                   { run_                  = run; };
+      void setAccept( bool accept )                             { accept_               = accept; };
+      void setError( bool error )                               { error_                = error; };
+      void setLastActiveModule( unsigned lastActiveModuleSlot ) { lastActiveModuleSlot_ = lastActiveModuleSlot; };
+      void addModule( const std::string & name )                { modules_.push_back( name ); };
+      void addFilterIndex( const unsigned index )               { filterIndices_.push_back( index ); };
+      std::string                name() const                 { return name_; };
+      unsigned                   index() const                { return index_; };
+      unsigned                   prescale() const             { return prescale_; };
+      bool                       wasRun() const               { return run_; };
+      bool                       wasAccept() const            { return accept_; };
+      bool                       wasError() const             { return error_; };
+      unsigned                   lastActiveModuleSlot() const { return lastActiveModuleSlot_; };
+      std::vector< std::string > modules() const              { return modules_; };       // ordered
+      std::vector< unsigned >    filterIndices() const        { return filterIndices_; }; // ordered
+      int                        indexModule( const std::string & name ) const;           // returns size of 'modules_' ( modules().size() ) if name unknown and -1 if 'modules_' not filled
     
   };
   

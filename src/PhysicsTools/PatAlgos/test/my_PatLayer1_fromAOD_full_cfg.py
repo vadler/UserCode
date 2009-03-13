@@ -49,8 +49,7 @@ process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
 #     process.hltEventAnalyzerAOD       +
 #     process.triggerSummaryAnalyzerAOD +
-    process.patDefaultSequence *
-    process.patTriggerSequence
+    process.patDefaultSequence
 )
 
 # Output module configuration
@@ -61,12 +60,18 @@ process.out = cms.OutputModule( "PoolOutputModule",
     ),
     outputCommands = cms.untracked.vstring( 'drop *' )
 )
+
+# Event content
 from PhysicsTools.PatAlgos.patEventContent_cff import *
 process.out.outputCommands += patEventContent
-process.out.outputCommands += patTriggerEventContent
-for matchLabel in process.patTriggerEvent.patTriggerMatches:
-    process.out.outputCommands += [ 'keep patTriggerObjectsedmAssociation_' + matchLabel + '_*_*' ]
+
+# Trigger
+from PhysicsTools.PatAlgos.tools.trigTools import *
+switchOffTriggerOld(process)
+switchOnTrigger(process)
 process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
                               , 'keep *_hltTriggerSummaryAOD_*_*' ]
 
-process.outpath = cms.EndPath( process.out )
+process.outpath = cms.EndPath(
+    process.out
+)

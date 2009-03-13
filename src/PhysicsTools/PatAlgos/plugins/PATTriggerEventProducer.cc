@@ -96,16 +96,16 @@ void PATTriggerEventProducer::produce( edm::Event& iEvent, const edm::EventSetup
     if ( ! ( triggerEvent->addObjectMatchResult( handlesTriggerMatches.at( i ), labelTriggerObjectMatcher ) ) ) {
       edm::LogWarning( "triggerObjectMatchReplication" ) << "pat::TriggerEvent contains already a pat::TriggerObjectMatch from matcher module " << labelTriggerObjectMatcher;
     }
-//     // some checks on the association, only warning output here
+//     // some checks on the association, only debug output here
 //     edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *( handlesTriggerMatches.at( i ) ), edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
 //     while ( it != itEnd ) {
 //       if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {
 //         if ( handleTriggerObjects.id() != it->second.id() ) {
-//           edm::LogWarning( "triggerObjectMatchID" ) << "pat::TriggerObjectMatch " << labelTriggerObjectMatcher << "points to pat::TriggerObjectCollection with product ID " << it->second.id() << ",\n"
+//           edm::LogDebug( "triggerObjectMatchID" ) << "pat::TriggerObjectMatch " << labelTriggerObjectMatcher << "points to pat::TriggerObjectCollection with product ID " << it->second.id() << ",\n"
 //                                                     << "whereas the pat::TriggerObjectCollection in the event has product ID " << handleTriggerObjects.id() << "!";
 //         }
 //       } else {
-//         edm::LogWarning( "triggerObjectMatchValid" ) << "Unvalid association in pat::TriggerObjectMatch " << labelTriggerObjectMatcher << ":\n"
+//         edm::LogDebug( "triggerObjectMatchValid" ) << "Unvalid association in pat::TriggerObjectMatch " << labelTriggerObjectMatcher << ":\n"
 //                                                      << "candidate      product/key: " << it->first.id()  << "/" << it->first.key() << "\n"
 //                                                      << "trigger object product/key: " << it->second.id() << "/" << it->second.key();
 //       }
