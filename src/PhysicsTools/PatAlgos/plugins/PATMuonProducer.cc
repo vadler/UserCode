@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.cc,v 1.19.2.1 2008/11/25 15:39:40 gpetrucc Exp $
+// $Id: PATMuonProducer.cc,v 1.19.2.2 2009/03/12 16:24:14 tucker Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATMuonProducer.h"
@@ -10,6 +10,8 @@
 
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
+
+#include "DataFormats/TrackReco/interface/TrackToTrackMap.h"
 
 #include "DataFormats/ParticleFlowCandidate/interface/IsolatedPFCandidateFwd.h"
 #include "DataFormats/ParticleFlowCandidate/interface/IsolatedPFCandidate.h"
@@ -44,9 +46,17 @@ PATMuonProducer::PATMuonProducer(const edm::ParameterSet & iConfig) :
   embedTrack_          = iConfig.getParameter<bool>         ( "embedTrack" );
   embedStandAloneMuon_ = iConfig.getParameter<bool>         ( "embedStandAloneMuon" );
   embedCombinedMuon_   = iConfig.getParameter<bool>         ( "embedCombinedMuon" );
+  embedPickyMuon_      = iConfig.getParameter<bool>         ( "embedPickyMuon" );
+  embedTpfmsMuon_      = iConfig.getParameter<bool>         ( "embedTpfmsMuon" );
   embedPFCandidate_   = iConfig.getParameter<bool>( "embedPFCandidate" );
   
-  
+  // TeV refit names
+  addTeVRefits_ = iConfig.getParameter<bool>("addTeVRefits");
+  if (addTeVRefits_) {
+    pickySrc_ = iConfig.getParameter<edm::InputTag>("pickySrc");
+    tpfmsSrc_ = iConfig.getParameter<edm::InputTag>("tpfmsSrc");
+  }
+
   // MC matching configurables
   addGenMatch_   = iConfig.getParameter<bool>         ( "addGenMatch" );
   if (addGenMatch_) {
@@ -167,6 +177,14 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
   else {
     edm::Handle<edm::View<MuonType> > muons;
     iEvent.getByLabel(muonSrc_, muons);
+
+    // prepare the TeV refit track retrieval
+    edm::Handle<reco::TrackToTrackMap> pickyMap, tpfmsMap;
+    if (addTeVRefits_) {
+      iEvent.getByLabel(pickySrc_, pickyMap);
+      iEvent.getByLabel(tpfmsSrc_, tpfmsMap);
+    }
+    
     for (edm::View<MuonType>::const_iterator itMuon = muons->begin(); itMuon != muons->end(); ++itMuon) {
       
       
@@ -178,6 +196,27 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
       Muon aMuon(muonRef);
       
       fillMuon( aMuon, muonRef, muonBaseRef, genMatches, trigMatches );
+
+      // store the TeV refit track refs (only available for globalMuons)
+      if (addTeVRefits_ && itMuon->isGlobalMuon()) {
+	reco::TrackToTrackMap::const_iterator it;
+	const reco::TrackRef& globalTrack = itMuon->globalTrack();
+	
+	// If the getByLabel calls failed above (i.e. if the TeV refit
+	// maps/collections were not in the event), then the TrackRefs
+	// in the Muon object will remain null.
+	if (!pickyMap.failedToGet()) {
+	  it = pickyMap->find(globalTrack);
+	  if (it != pickyMap->end()) aMuon.setPickyMuon(it->val);
+	  if (embedPickyMuon_) aMuon.embedPickyMuon();
+	}
+ 
+	if (!tpfmsMap.failedToGet()) {
+	  it = tpfmsMap->find(globalTrack);
+	  if (it != tpfmsMap->end()) aMuon.setTpfmsMuon(it->val);
+	  if (embedTpfmsMuon_) aMuon.embedTpfmsMuon();
+	}
+      }
       
       // Isolation
       if (isolator_.enabled()) {

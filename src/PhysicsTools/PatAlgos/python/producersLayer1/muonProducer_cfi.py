@@ -29,6 +29,8 @@ allLayer1Muons = cms.EDProducer("PATMuonProducer",
     embedTrack          = cms.bool(False), ## whether to embed in AOD externally stored tracker track
     embedCombinedMuon   = cms.bool(True), ## whether to embed in AOD externally stored combined muon track
     embedStandAloneMuon = cms.bool(True), ## whether to embed in AOD externally stored standalone muon track
+    embedPickyMuon      = cms.bool(True), ## whether to embed in AOD externally stored TeV-refit picky muon track
+    embedTpfmsMuon      = cms.bool(True), ## whether to embed in AOD externally stored TeV-refit TPFMS muon track
     embedPFCandidate = cms.bool(False),
 
     # isolation configurables
@@ -81,6 +83,10 @@ allLayer1Muons = cms.EDProducer("PATMuonProducer",
     addEfficiencies = cms.bool(False),
     efficiencies    = cms.PSet(),
 
+    # TeV refit tracks
+    addTeVRefits = cms.bool(True),
+    pickySrc = cms.InputTag("tevMuons", "picky"),
+    tpfmsSrc = cms.InputTag("tevMuons", "firstHit"),
 )
 
 
