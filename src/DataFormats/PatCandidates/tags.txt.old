@@ -3,8 +3,13 @@ Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_5
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_5
 --- Tag ---    -------- Package --------                        
 V01-08-00      CondFormats/JetMETObjects                        
+V08-06-00-03   DataFormats/Common                               
 B2_2_X         DataFormats/PatCandidates                        
+V00-16-10      DataFormats/RecoCandidate                        
+V01-02-04      PhysicsTools/IsolationAlgos                      
 B2_2_X         PhysicsTools/PatAlgos                            
 B2_2_X         PhysicsTools/PatUtils                            
+V08-06-16-06-02 PhysicsTools/RecoAlgos                           
+V07-03-21-01   PhysicsTools/UtilAlgos                           
 ---------------------------------------
-total packages: 4 (4 displayed)
+total packages: 9 (9 displayed)
