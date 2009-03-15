@@ -38,13 +38,30 @@
 
 
 namespace pat {
-
+ 
   class TriggerObject : public reco::LeafCandidate {
+  
+      /// friends to have access to the private methods dealing with transient data members
+      template< class T1, class T2 > friend class PATTriggerMatchSelector;
+      friend class PATTriggerMatchSelector< reco::CandidateView::value_type, std::vector< TriggerObject >::value_type >;
+      friend class PATTriggerProducer;
     
       /// data members
       std::string             collection_;
       std::vector< unsigned > filterIds_;  // special filter related ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
                                            // empty, if object was not used in last active filter
+                                           
+      /// transient data members
+      std::vector< std::string > filterLabels_; // used for trigger match definition
+      std::vector< std::string > pathNames_;    // used for trigger match definition
+      
+      /// transient methods
+      void addFilterLabel( const std::string & filterLabel ) { if ( ! hasFilterLabel( filterLabel ) ) filterLabels_.push_back( filterLabel ); };
+      void addPathName( const std::string & pathName )       { if ( ! hasPathName( pathName ) )       pathNames_.push_back( pathName ); };
+      std::vector< std::string > filterLabels() const { return filterLabels_; };
+      std::vector< std::string > pathNames() const    { return pathNames_; };
+      bool                       hasFilterLabel( const std::string & filterLabel ) const;
+      bool                       hasPathName( const std::string & pathName ) const;
 
     public:
 

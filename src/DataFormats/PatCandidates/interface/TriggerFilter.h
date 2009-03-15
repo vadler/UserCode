@@ -51,9 +51,9 @@ namespace pat {
       
       /// setters & getters
       void setLabel( const std::string & label ) { label_ = label; };
-      void setType( const std::string & type )   { type_ = type; };
-      void addObjectKey( unsigned objectKey )    { objectKeys_.push_back( objectKey ); };
-      void addObjectId( unsigned objectId )      { objectIds_.push_back( objectId ); };
+      void setType( const std::string & type )   { type_  = type; };
+      void addObjectKey( unsigned objectKey )    { if ( ! hasObjectKey( objectKey ) ) objectKeys_.push_back( objectKey ); };
+      void addObjectId( unsigned objectId )      { if ( ! hasObjectId( objectId ) )   objectIds_.push_back( objectId ); };
       bool setStatus( int status ); // only -1,0,1 accepted; returns 'false' (and does not modify the status) otherwise
       std::string             label() const      { return label_; };
       std::string             type() const       { return type_; };
