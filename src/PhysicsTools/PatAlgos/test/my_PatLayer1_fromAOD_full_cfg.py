@@ -53,17 +53,14 @@ process.p = cms.Path(
 )
 
 # Output module configuration
+from PhysicsTools.PatAlgos.patEventContent_cff import *
 process.out = cms.OutputModule( "PoolOutputModule",
     fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_6/output/my_PatLayer1_fromAOD_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),
-    outputCommands = cms.untracked.vstring( 'drop *' )
+    outputCommands = cms.untracked.vstring( 'drop *', *patEventContent )
 )
-
-# Event content
-from PhysicsTools.PatAlgos.patEventContent_cff import *
-process.out.outputCommands += patEventContent
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *

@@ -1,5 +1,5 @@
 //
-// $Id: TriggerEvent.cc,v 1.1.2.1 2008/12/18 11:26:16 vadler Exp $
+// $Id: TriggerEvent.cc,v 1.1.2.14 2009/03/13 12:10:35 vadler Exp $
 //
 
 
@@ -100,7 +100,7 @@ bool TriggerEvent::addObjectMatchResult( const TriggerObjectMatchRefProd & trigM
     return true;
   }
   edm::LogWarning( "existingObjectMatchResult" ) << "Tried adding trigger object match result from " << labelMatcher << ", although existing.\n"
-                                              << "Skipped.";
+                                                 << "Skipped.";
   return false;
 }
 bool TriggerEvent::addObjectMatchResult( const edm::Handle< TriggerObjectMatch > & trigMatches, const std::string & labelMatcher )
@@ -128,7 +128,7 @@ TriggerFilterRefVector TriggerEvent::pathModules( const std::string & namePath, 
   if ( path( namePath )->modules().size() == 0 ) {
     return thePathFilters;
   }
-  const unsigned onePastLastFilter = all ? path( namePath )->modules().size() : path( namePath )->lastActiveModuleSlot() + 1;
+  const unsigned onePastLastFilter = all ? path( namePath )->modules().size() : path( namePath )->lastActiveFilterSlot() + 1;
   for ( unsigned iM = 0; iM < onePastLastFilter; ++iM ) {
     const std::string labelFilter( path( namePath )->modules().at( iM ) );
     const TriggerFilterRef filterRef( filters(), indexFilter( labelFilter ) ); // NULL, if filter was not in trigger::TriggerEvent

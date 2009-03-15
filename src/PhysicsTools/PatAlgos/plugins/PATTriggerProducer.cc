@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.1.2.1 2008/12/18 13:18:47 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.1.2.7 2009/03/13 12:10:36 vadler Exp $
 //
 
 
@@ -12,7 +12,7 @@ PATTriggerProducer::PATTriggerProducer( const edm::ParameterSet & iConfig ) :
   nameProcess_( iConfig.getParameter< std::string >( "processName" ) ),
   tagTriggerResults_( iConfig.getParameter< edm::InputTag >( "triggerResults" ) ),
   tagTriggerEvent_( iConfig.getParameter< edm::InputTag >( "triggerEvent" ) ),
-  addPathModuleTags_( iConfig.getParameter< bool >( "addPathModuleTags" ) )
+  addPathModuleLabels_( iConfig.getParameter< bool >( "addPathModuleLabels" ) )
 {
   if ( tagTriggerResults_.process().empty() ) {
     tagTriggerResults_ = edm::InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
@@ -73,15 +73,15 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
     // initialize path
     const std::string namePath( hltConfig_.triggerName( iP ) );
     const unsigned indexPath( hltConfig_.triggerIndex( namePath ) );
-    const unsigned indexLastModule( handleTriggerResults->index( indexPath ) );
-    TriggerPath triggerPath( namePath, indexPath, 1, handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), indexLastModule );
+    const unsigned indexLastFilter( handleTriggerResults->index( indexPath ) );
+    TriggerPath triggerPath( namePath, indexPath, 0, handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), indexLastFilter );
     // add module names to path and states' map
     const unsigned sizeModules( hltConfig_.size( namePath ) );
-    assert( indexLastModule < sizeModules );
+    assert( indexLastFilter < sizeModules );
     std::map< unsigned, std::string > indicesModules;
     for ( unsigned iM = 0; iM < sizeModules; ++iM ) {
       const std::string nameModule( hltConfig_.moduleLabel( indexPath, iM ) );
-      if ( addPathModuleTags_ ) {
+      if ( addPathModuleLabels_ ) {
         triggerPath.addModule( nameModule );
       }
       const unsigned indexFilter( handleTriggerEvent->filterIndex( edm::InputTag( nameModule, "", nameProcess_ ) ) );
@@ -96,9 +96,9 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
     triggerPaths->push_back( triggerPath );
     // store module states to be used for the filters
     for ( std::map< unsigned, std::string >::const_iterator iM = indicesModules.begin(); iM != indicesModules.end(); ++iM ) {
-      if ( iM->first < indexLastModule ) {
+      if ( iM->first < indexLastFilter ) {
         moduleStates[ iM->second ] = 1;
-      } else if ( iM->first == indexLastModule ) {
+      } else if ( iM->first == indexLastFilter ) {
         moduleStates[ iM->second ] = handleTriggerResults->accept( indexPath );
       } else if ( moduleStates.find( iM->second ) == moduleStates.end() ) {
         moduleStates[ iM->second ] = -1;

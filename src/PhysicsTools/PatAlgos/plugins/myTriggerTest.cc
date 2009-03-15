@@ -1,5 +1,5 @@
 //
-// $Id: myTriggerTest.cc,v 1.1.2.1 2008/12/18 11:19:38 vadler Exp $
+// $Id: myTriggerTest.cc,v 1.1.2.6 2009/03/13 12:10:36 vadler Exp $
 //
 
 
@@ -58,9 +58,9 @@ void myTriggerTest::beginJob( const edm::EventSetup & iSetup )
   histos2D_[ "nFilters" ] = fileService->make< TH2D >( "nFilters", "Number of active filters per trigger path", 6, -0.5, 5.5, 6, -0.5, 5.5 );
   histos2D_[ "nFilters" ]->SetXTitle( "pat::TriggerEvent->pathFilters" );
   histos2D_[ "nFilters" ]->SetYTitle( "pat::TriggerPath->filterIndices()" );
-  histos2D_[ "iLastModule" ] = fileService->make< TH2D >( "iLastModule", "Index of last active module per trigger path", 121, -0.5, 120.5, 121, -0.5, 120.5 );
-  histos2D_[ "iLastModule" ]->SetXTitle( "HLTConfigProvider.size()" );
-  histos2D_[ "iLastModule" ]->SetYTitle( "pat::TriggerPath->lastActiveModuleSlot()" );
+  histos2D_[ "iLastFilter" ] = fileService->make< TH2D >( "iLastFilter", "Index of last active module per trigger path", 121, -0.5, 120.5, 121, -0.5, 120.5 );
+  histos2D_[ "iLastFilter" ]->SetXTitle( "HLTConfigProvider.size()" );
+  histos2D_[ "iLastFilter" ]->SetYTitle( "pat::TriggerPath->lastActiveFilterSlot()" );
   histos1D_[ "nFilterIds" ] = fileService->make< TH1D >( "nFilterIds", "Number of filter IDs per trigger object", 6, -0.5, 5.5 );
   histos1D_[ "nFilterIds" ]->SetXTitle( "filter IDs" );
   histos1D_[ "nFilterIds" ]->SetYTitle( "entries" );
@@ -139,10 +139,11 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
     for ( TriggerPathCollection::const_iterator iPath = myEventPaths->begin(); iPath != myEventPaths->end(); ++iPath ) {
       const TriggerFilterRefVector       myModules( handlePatTriggerEvent->pathModules( iPath->name(), true ) );
       const std::vector< std::string > & namesHltConfig( hltConfig_.moduleLabels( iPath->name() ) );
-      unsigned lastModule( iPath->lastActiveModuleSlot() );
+      unsigned lastFilter( iPath->lastActiveFilterSlot() );
+      bool     lastFilterDecision(  );
       unsigned lastModuleTriggerResults( handleTriggerResults->index( handlePatTriggerEvent->indexPath( iPath->name() ) ) );
       if ( testPathModuleTags_ ) {
-        const std::vector< std::string >   namesModules( iPath->modules() );                             
+        const std::vector< std::string > namesModules( iPath->modules() );
         if ( namesModules.size() == namesHltConfig.size() && namesHltConfig.size() == myModules.size() ) {
           for ( size_t iModule = 0; iModule < namesModules.size(); ++iModule ) {
             if ( namesModules[ iModule ] != namesHltConfig[ iModule ] ) {
@@ -151,7 +152,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                             << "        pat::TriggerPath : " << namesModules[ iModule ];
             }
           }
-        } else {
+        } else if ( namesModules.size() > 0 ) {
           edm::LogError( "nModules" ) << "    Number of HLT modules differ in path " << iPath->name() << ":\n"
                                       << "        HLTConfigProvider          : " << namesHltConfig.size() << "\n"
                                       << "        pat::TriggerPath           : " << namesModules.size() << "\n"
@@ -159,10 +160,10 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         }
         histos2D_[ "nModules" ]->Fill( namesHltConfig.size(), namesModules.size() );
       }
-      if ( lastModule != lastModuleTriggerResults ) {
-        edm::LogError( "iLastModule" ) << "    Index of last active HLT module differs in path " << iPath->name() << ":\n"
+      if ( lastFilter != lastModuleTriggerResults ) {
+        edm::LogError( "iLastFilter" ) << "    Index of last active HLT module differs in path " << iPath->name() << ":\n"
                                        << "        TriggerResults::HLT: " << lastModuleTriggerResults << "\n"
-                                       << "        pat::TriggerPath   : " << lastModule;
+                                       << "        pat::TriggerPath   : " << lastFilter;
       }
       const TriggerFilterRefVector  myFilters( handlePatTriggerEvent->pathFilters( iPath->name() ) );
       if ( iPath->filterIndices().size() != myFilters.size() ) {
@@ -171,7 +172,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                     << "        pat::TriggerFilterRefVector: " << myFilters.size();
       }
       histos2D_[ "nFilters" ]->Fill( myFilters.size(), iPath->filterIndices().size() );
-      histos2D_[ "iLastModule" ]->Fill( namesHltConfig.size(), lastModule );
+      histos2D_[ "iLastFilter" ]->Fill( namesHltConfig.size(), lastFilter );
     }
   } else {
     edm::LogError( "nPaths" ) << "    Number of HLT paths differ:\n"
@@ -214,12 +215,29 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   // pat::TriggerPath
   for ( TriggerPathCollection::const_iterator iPath = myEventPaths->begin(); iPath != myEventPaths->end(); ++iPath ) {
     if ( ! iPath->wasAccept() ) {
-      const std::string labelLastActiveModule( hltConfig_.moduleLabel( iPath->index(), iPath->lastActiveModuleSlot() ) );
-      const std::string labelLastActiveFilter( handlePatTriggerFilters->at( iPath->filterIndices().back() ).label() );
-      if ( labelLastActiveModule != labelLastActiveFilter ) {
-        edm::LogWarning( "lastActiveLabel" ) << "    Labels for last active module differ in failing path " << iPath->name() << ":\n"
-                                             << "        from stored last active module slot:" << labelLastActiveModule << "\n"
-                                             << "        from link to last active filter    :" << labelLastActiveFilter;
+      const std::string labelLastActiveModule( hltConfig_.moduleLabel( iPath->index(), iPath->lastActiveFilterSlot() ) );
+      if ( iPath->filterIndices().size() > 0 ) {
+        const std::string labelLastActiveFilter( handlePatTriggerFilters->at( iPath->filterIndices().size() - 1 ).label() );
+        if ( labelLastActiveModule != labelLastActiveFilter ) {
+          if ( ! handlePatTriggerEvent->filter( labelLastActiveModule ) ) {
+            edm::LogWarning( "lastActiveLabel" ) << "    Labels for last active module differ in failing path " << iPath->name() << ":\n"
+                                                 << "        from stored last active filter slot   :"                                           << labelLastActiveModule << " --> not found!" <<  "\n"
+                                                 << "        from link to last active filter    (" << iPath->filterIndices().size() - 1 << "):" << labelLastActiveFilter << " --> " << handlePatTriggerEvent->filter( labelLastActiveFilter )->status();
+          } else {
+            edm::LogWarning( "lastActiveLabel" ) << "    Labels for last active module differ in failing path " << iPath->name() << ":\n"
+                                                 << "        from stored last active filter slot:"                                              << labelLastActiveModule << " --> " << handlePatTriggerEvent->filter( labelLastActiveModule )->status() << "\n"
+                                                 << "        from link to last active filter    (" << iPath->filterIndices().size() - 1 << "):" << labelLastActiveFilter << " --> " << handlePatTriggerEvent->filter( labelLastActiveFilter )->status();
+          }
+          for ( size_t iFilter = 0; iFilter < iPath->filterIndices().size(); ++iFilter ) {
+            if ( myEventFilters->at( iFilter ).label() == labelLastActiveModule ) {
+              edm::LogWarning( "lastActiveLabelFound" ) << "        but found it here: " << iFilter;
+              break;
+            }
+          }
+        }
+      } else {
+        edm::LogWarning( "filterIndices" ) << "    Active filters empty in failing path " << iPath->name() << ":\n"
+                                           << "        last active module from last active filter slot: " << labelLastActiveModule;
       }
     }
     if ( testPathModuleTags_ ) {
@@ -238,9 +256,6 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         }
       }
       edm::LogWarning( "foundFilters" ) << "    Found filters in path " << iPath->name() << ": " << found;
-//       if ( found > 1 ) {
-//         edm::LogWarning( "foundManyFilters" ) << "FOUND MORE THAN ONE FILTER !!!";
-//       }
     }
   }
   

@@ -37,25 +37,23 @@ process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 
 process.p = cms.Path(
-    process.patDefaultSequence *
-    process.patTriggerSequence
+    process.patDefaultSequence
 )
 
 # Output module configuration
+from PhysicsTools.PatAlgos.patEventContent_cff import *
 process.out = cms.OutputModule( "PoolOutputModule",
     fileName       = cms.untracked.string( 'PATLayer1_Output.fromAOD_triggerInfo_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),
-    outputCommands = cms.untracked.vstring( 'drop *' )
+    outputCommands = cms.untracked.vstring( 'drop *', *patEventContent )
 )
-from PhysicsTools.PatAlgos.patEventContent_cff import *
-process.out.outputCommands += patEventContent
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOffTriggerOld(process)
-switchOnTrigger(process)
+switchOffTriggerMatchingOld( process )
+switchOnTrigger( process )
 
 process.outpath = cms.EndPath(
     process.out
