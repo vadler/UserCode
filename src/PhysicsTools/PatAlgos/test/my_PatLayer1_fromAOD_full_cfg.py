@@ -64,7 +64,7 @@ process.out = cms.OutputModule( "PoolOutputModule",
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOffTriggerOld(process)
+switchOffTriggerMatchingOld(process)
 switchOnTrigger(process)
 process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
                               , 'keep *_hltTriggerSummaryAOD_*_*' ]
