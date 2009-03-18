@@ -363,6 +363,34 @@ muonTriggerMatchL1Muons = cms.EDFilter( "PATTriggerMatcherDRDPtLessByR",
     resolveByMatchQuality = cms.bool( False )
 )
 
+muonTriggerMatchAll = cms.EDFilter( "PATTriggerMatcherDRDPtLessByR",
+    src     = cms.InputTag( "cleanLayer1Muons" ),
+    matched = cms.InputTag( "patTrigger" ),
+    andOr          = cms.bool( True ),
+    filterIds      = cms.vuint32( 81 ),
+    filterLabels   = cms.vstring( 'hltMuLevel1PathL1Filtered' ),
+    pathNames      = cms.vstring( '*' ),
+    collectionTags = cms.vstring( '*' ),
+    maxDPtRel = cms.double( 0.5 ),
+    maxDeltaR = cms.double( 0.5 ),
+    resolveAmbiguities    = cms.bool( True ),
+    resolveByMatchQuality = cms.bool( False )
+)
+
+muonTriggerMatchNone = cms.EDFilter( "PATTriggerMatcherDRDPtLessByR",
+    src     = cms.InputTag( "cleanLayer1Muons" ),
+    matched = cms.InputTag( "patTrigger" ),
+    andOr          = cms.bool( False ),
+    filterIds      = cms.vuint32( 81 ),
+    filterLabels   = cms.vstring( 'hltMuLevel1PathL1Filtered' ),
+    pathNames      = cms.vstring( 'someFunnyPath' ),
+    collectionTags = cms.vstring( '*' ),
+    maxDPtRel = cms.double( 0.5 ),
+    maxDeltaR = cms.double( 0.5 ),
+    resolveAmbiguities    = cms.bool( True ),
+    resolveByMatchQuality = cms.bool( False )
+)
+
 tauTriggerMatchTriggerTaus = cms.EDFilter( "PATTriggerMatcherDRDPtLessByR",
     src     = cms.InputTag( "cleanLayer1Taus" ),
     matched = cms.InputTag( "patTrigger" ),
@@ -536,5 +564,7 @@ patTriggerMatcher = cms.Sequence(
    electronTriggerMatchHltElectrons +
    electronTriggerMatchL1Electrons  +
    muonTriggerMatchL1Muons          +
+   muonTriggerMatchAll              +
+   muonTriggerMatchNone             +
    tauTriggerMatchTriggerTaus
 )
