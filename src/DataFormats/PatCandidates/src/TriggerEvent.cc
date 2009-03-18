@@ -258,26 +258,19 @@ std::vector< std::string > TriggerEvent::triggerMatchers() const
   return theMatchers;
 }
 
-const TriggerObjectMatch * TriggerEvent::triggerObjectMatchResult( const std::string & labelMatcher, const edm::Event & iEvent ) const
+const TriggerObjectMatch * TriggerEvent::triggerObjectMatchResult( const std::string & labelMatcher ) const
 {
-//   const TriggerObjectMatchContainer::const_iterator iMatch( triggerObjectMatchResults()->find( labelMatcher ) );
-  edm::Handle< TriggerObjectMatch > matchResult;
-  iEvent.getByLabel( labelMatcher, matchResult );
-//   if ( iMatch != triggerObjectMatchResults()->end() ) {
-//     return iMatch->second.get();
-  if ( matchResult.isValid() ) {
-    return matchResult.product();
+  const TriggerObjectMatchContainer::const_iterator iMatch( triggerObjectMatchResults()->find( labelMatcher ) );
+  if ( iMatch != triggerObjectMatchResults()->end() ) {
+    return iMatch->second.get();
   }
   return 0;
 }
 
 TriggerObjectRef TriggerEvent::triggerMatchObject( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher, const edm::Event & iEvent ) const
 {
-//   const TriggerObjectMatch * matchResult( triggerObjectMatchResult( labelMatcher ) );
-  edm::Handle< TriggerObjectMatch > matchResult;
-  iEvent.getByLabel( labelMatcher, matchResult );
-//   if ( matchResult ) {
-  if ( matchResult.isValid() ) {
+  const TriggerObjectMatch * matchResult( triggerObjectMatchResult( labelMatcher ) );
+  if ( matchResult ) {
     edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *matchResult, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
     while ( it != itEnd ) {
       if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {
@@ -304,11 +297,8 @@ TriggerObjectMatchMap TriggerEvent::triggerMatchObjects( const reco::CandidateBa
 reco::CandidateBaseRefVector TriggerEvent::triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher, const edm::Event & iEvent ) const
 {
   reco::CandidateBaseRefVector theCands;
-//   const TriggerObjectMatch * matchResult( triggerObjectMatchResult( labelMatcher ) );
-  edm::Handle< TriggerObjectMatch > matchResult;
-  iEvent.getByLabel( labelMatcher, matchResult );
-//   if ( matchResult ) {
-  if ( matchResult.isValid() ) {
+  const TriggerObjectMatch * matchResult( triggerObjectMatchResult( labelMatcher ) );
+  if ( matchResult ) {
     edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *matchResult, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
     while ( it != itEnd ) {
       if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {

@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerEventProducer.cc,v 1.1.2.1 2008/12/18 13:18:47 vadler Exp $
+// $Id: PATTriggerEventProducer.cc,v 1.1.2.2 2009/03/15 12:24:14 vadler Exp $
 //
 
 
@@ -85,32 +85,17 @@ void PATTriggerEventProducer::produce( edm::Event& iEvent, const edm::EventSetup
     edm::LogError( "triggerObjectsValid" ) << "pat::TriggerObjectCollection product with InputTag " << tagTriggerProducer_.encode() << " not in event";
   }
   // set product references to trigger match association
-  std::vector< edm::Handle< TriggerObjectMatch > > handlesTriggerMatches( tagsTriggerMatcher_.size() );
-  iEvent.getManyByType( handlesTriggerMatches );
-  for ( unsigned i = 0; i < handlesTriggerMatches.size(); ++i ) {
-    const std::string labelTriggerObjectMatcher( tagsTriggerMatcher_.at( i ).encode() );
-    if ( ! handlesTriggerMatches.at( i ).isValid() ) {
+  for ( size_t iMatch = 0; iMatch < tagsTriggerMatcher_.size(); ++iMatch ) {
+    const std::string labelTriggerObjectMatcher( tagsTriggerMatcher_.at( iMatch ).encode() );
+    edm::Handle< TriggerObjectMatch > handleTriggerMatch;
+    iEvent.getByLabel( labelTriggerObjectMatcher, handleTriggerMatch );
+    if ( ! handleTriggerMatch.isValid() ) {
       edm::LogError( "triggerMatchValid" ) << "pat::TriggerObjectMatch product with InputTag " << labelTriggerObjectMatcher << " not in event";
       continue;
     }
-    if ( ! ( triggerEvent->addObjectMatchResult( handlesTriggerMatches.at( i ), labelTriggerObjectMatcher ) ) ) {
+    if ( ! ( triggerEvent->addObjectMatchResult( handleTriggerMatch, labelTriggerObjectMatcher ) ) ) {
       edm::LogWarning( "triggerObjectMatchReplication" ) << "pat::TriggerEvent contains already a pat::TriggerObjectMatch from matcher module " << labelTriggerObjectMatcher;
     }
-//     // some checks on the association, only debug output here
-//     edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *( handlesTriggerMatches.at( i ) ), edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
-//     while ( it != itEnd ) {
-//       if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {
-//         if ( handleTriggerObjects.id() != it->second.id() ) {
-//           edm::LogDebug( "triggerObjectMatchID" ) << "pat::TriggerObjectMatch " << labelTriggerObjectMatcher << "points to pat::TriggerObjectCollection with product ID " << it->second.id() << ",\n"
-//                                                     << "whereas the pat::TriggerObjectCollection in the event has product ID " << handleTriggerObjects.id() << "!";
-//         }
-//       } else {
-//         edm::LogDebug( "triggerObjectMatchValid" ) << "Unvalid association in pat::TriggerObjectMatch " << labelTriggerObjectMatcher << ":\n"
-//                                                      << "candidate      product/key: " << it->first.id()  << "/" << it->first.key() << "\n"
-//                                                      << "trigger object product/key: " << it->second.id() << "/" << it->second.key();
-//       }
-//       ++it;
-//     }
   }
   
   iEvent.put( triggerEvent );

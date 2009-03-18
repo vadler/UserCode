@@ -312,7 +312,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       edm::LogError( "missingMatch" ) << "    Match " << match << " empty";
       break;
     }
-    const TriggerObjectMatch * triggerMatchEvent( handlePatTriggerEvent->triggerObjectMatchResult( match, iEvent ) );
+    const TriggerObjectMatch * triggerMatchEvent( handlePatTriggerEvent->triggerObjectMatchResult( match ) );
     if ( triggerMatchEvent != triggerMatch.product() ) {
       edm::LogError( "matchPtr" ) << "    Matcher pointers differ:\n"
                                   << "        from edm::Handle::product()                          : " << triggerMatch.product() << "\n"

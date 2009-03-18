@@ -110,8 +110,7 @@ namespace pat {
       std::vector< std::string >          triggerMatchers() const;
       const TriggerObjectMatchContainer * triggerObjectMatchResults() const { return &objectMatchResults_; };
       // pat::TriggerObjectMatch can contain empty references in case no match for a PAT object was found.
-//       const TriggerObjectMatch          * triggerObjectMatchResult( const std::string & labelMatcher ) const;                                                              // performs proper "range check" (better than '(*triggerObjectMatchResults())[labelMatcher]'), returns 0 if 'labelMatcher' not found
-      const TriggerObjectMatch          * triggerObjectMatchResult( const std::string & labelMatcher, const edm::Event & iEvent ) const;                                                              // performs proper "range check" (better than '(*triggerObjectMatchResults())[labelMatcher]'), returns 0 if 'labelMatcher' not found
+      const TriggerObjectMatch          * triggerObjectMatchResult( const std::string & labelMatcher ) const;                                                              // performs proper "range check" (better than '(*triggerObjectMatchResults())[labelMatcher]'), returns 0 if 'labelMatcher' not found
       // For retrieving matches for given refs, the event has to be passed as argument due to the usage of edm::AssociativeIterator
       // PAT objects do not have multiple trigger matches per matcher module
       TriggerObjectRef                    triggerMatchObject( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher, const edm::Event & iEvent ) const; // transient, returns null-Ref if no match is found
