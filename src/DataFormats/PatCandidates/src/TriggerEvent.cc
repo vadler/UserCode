@@ -258,11 +258,15 @@ std::vector< std::string > TriggerEvent::triggerMatchers() const
   return theMatchers;
 }
 
-const TriggerObjectMatch * TriggerEvent::triggerObjectMatchResult( const std::string & labelMatcher ) const
+const TriggerObjectMatch * TriggerEvent::triggerObjectMatchResult( const std::string & labelMatcher, const edm::Event & iEvent ) const
 {
-  const TriggerObjectMatchContainer::const_iterator iMatch( triggerObjectMatchResults()->find( labelMatcher ) );
-  if ( iMatch != triggerObjectMatchResults()->end() ) {
-    return iMatch->second.get();
+//   const TriggerObjectMatchContainer::const_iterator iMatch( triggerObjectMatchResults()->find( labelMatcher ) );
+  edm::Handle< TriggerObjectMatch > matchResult;
+  iEvent.getByLabel( labelMatcher, matchResult );
+//   if ( iMatch != triggerObjectMatchResults()->end() ) {
+//     return iMatch->second.get();
+  if ( matchResult.isValid() ) {
+    return matchResult.product();
   }
   return 0;
 }

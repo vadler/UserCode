@@ -8,6 +8,8 @@ patTriggerEvent = cms.EDProducer( "PATTriggerEventProducer",
     patTriggerMatches  = cms.VInputTag( "electronTriggerMatchHltElectrons"
                                       , "electronTriggerMatchL1Electrons"
                                       , "muonTriggerMatchL1Muons"
+                                      , "muonTriggerMatchAll"
+                                      , "muonTriggerMatchNone"
                                       , "tauTriggerMatchTriggerTaus"
                                       )
 )

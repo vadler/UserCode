@@ -309,7 +309,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
     edm::Handle< TriggerObjectMatch > triggerMatch;
     iEvent.getByLabel( match, triggerMatch );
     if ( triggerMatch->empty() ) {
-      edm::LogError( "missingMatch" ) << "    Match " << match << " missing in event";
+      edm::LogError( "missingMatch" ) << "    Match " << match << " empty";
       break;
     }
     const TriggerObjectMatch * triggerMatchEvent( handlePatTriggerEvent->triggerObjectMatchResult( match ) );
@@ -317,6 +317,8 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       edm::LogError( "matchPtr" ) << "    Matcher pointers differ:\n"
                                   << "        from edm::Handle::product()                          : " << triggerMatch.product() << "\n"
                                   << "        from pat::TriggerEvent::triggerObjectMatchResult(...): " << triggerMatchEvent;
+    } else {
+      if ( displayMatches_ ) edm::LogWarning( "matchPtr" ) << "    Matcher pointers ok";
     }
     edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *triggerMatch, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
     while ( it != itEnd ) {

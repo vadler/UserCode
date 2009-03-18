@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerEvent
 //
-// $Id: TriggerEvent.h,v 1.1.2.1 2008/12/18 11:26:14 vadler Exp $
+// $Id: TriggerEvent.h,v 1.1.2.2 2009/03/15 12:24:13 vadler Exp $
 //
 /**
   \class    pat::TriggerEvent TriggerEvent.h "DataFormats/PatCandidates/interface/TriggerEvent.h"
@@ -18,7 +18,7 @@
    - [to be filled]
 
   \author   Volker Adler
-  \version  $Id: TriggerEvent.h,v 1.1.2.1 2008/12/18 11:26:14 vadler Exp $
+  \version  $Id: TriggerEvent.h,v 1.1.2.2 2009/03/15 12:24:13 vadler Exp $
 */
 
 
@@ -110,7 +110,8 @@ namespace pat {
       std::vector< std::string >          triggerMatchers() const;
       const TriggerObjectMatchContainer * triggerObjectMatchResults() const { return &objectMatchResults_; };
       // pat::TriggerObjectMatch can contain empty references in case no match for a PAT object was found.
-      const TriggerObjectMatch          * triggerObjectMatchResult( const std::string & labelMatcher ) const;                                                              // performs proper "range check" (better than '(*triggerObjectMatchResults())[labelMatcher]'), returns 0 if 'labelMatcher' not found
+//       const TriggerObjectMatch          * triggerObjectMatchResult( const std::string & labelMatcher ) const;                                                              // performs proper "range check" (better than '(*triggerObjectMatchResults())[labelMatcher]'), returns 0 if 'labelMatcher' not found
+      const TriggerObjectMatch          * triggerObjectMatchResult( const std::string & labelMatcher, const edm::Event & iEvent ) const;                                                              // performs proper "range check" (better than '(*triggerObjectMatchResults())[labelMatcher]'), returns 0 if 'labelMatcher' not found
       // For retrieving matches for given refs, the event has to be passed as argument due to the usage of edm::AssociativeIterator
       // PAT objects do not have multiple trigger matches per matcher module
       TriggerObjectRef                    triggerMatchObject( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher, const edm::Event & iEvent ) const; // transient, returns null-Ref if no match is found
