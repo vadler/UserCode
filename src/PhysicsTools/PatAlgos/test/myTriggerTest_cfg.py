@@ -27,7 +27,13 @@ process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
     patProcessName     = cms.string( 'PAT' ),
     patTrigger         = cms.InputTag( "patTrigger" ),
     patTriggerEvent    = cms.InputTag( "patTriggerEvent" ),
-    testPathModuleTags = cms.bool( False )
+    testPathModuleTags = cms.bool( False ),
+    displayNumbers     = cms.bool( False ),
+    displayObjects     = cms.bool( False ),
+    displayFilters     = cms.bool( False ),
+    displayPaths       = cms.bool( False ),
+    displayEvent       = cms.bool( False ),
+    displayMatches     = cms.bool( True )
 )
 
 process.p = cms.Path(

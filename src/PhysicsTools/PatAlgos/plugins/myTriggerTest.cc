@@ -23,6 +23,12 @@ myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   tagPatTrigger_( iConfig.getParameter< edm::InputTag >( "patTrigger" ) ),
   tagPatTriggerEvent_( iConfig.getParameter< edm::InputTag >( "patTriggerEvent" ) ),
   testPathModuleTags_( iConfig.getParameter< bool >( "testPathModuleTags" ) ),
+  displayNumbers_( iConfig.getParameter< bool >( "displayNumbers" ) ),
+  displayObjects_( iConfig.getParameter< bool >( "displayObjects" ) ),
+  displayFilters_( iConfig.getParameter< bool >( "displayFilters" ) ),
+  displayPaths_( iConfig.getParameter< bool >( "displayPaths" ) ),
+  displayEvent_( iConfig.getParameter< bool >( "displayEvent" ) ),
+  displayMatches_( iConfig.getParameter< bool >( "displayMatches" ) ),
   histos1D_(),
   histos2D_()
 {
@@ -220,24 +226,24 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         const std::string labelLastActiveFilter( handlePatTriggerFilters->at( iPath->filterIndices().size() - 1 ).label() );
         if ( labelLastActiveModule != labelLastActiveFilter ) {
           if ( ! handlePatTriggerEvent->filter( labelLastActiveModule ) ) {
-            edm::LogWarning( "lastActiveLabel" ) << "    Labels for last active module differ in failing path " << iPath->name() << ":\n"
-                                                 << "        from stored last active filter slot   :"                                           << labelLastActiveModule << " --> not found!" <<  "\n"
-                                                 << "        from link to last active filter    (" << iPath->filterIndices().size() - 1 << "):" << labelLastActiveFilter << " --> " << handlePatTriggerEvent->filter( labelLastActiveFilter )->status();
+            if ( displayPaths_ ) edm::LogWarning( "lastActiveLabel" ) << "    Labels for last active module differ in failing path " << iPath->name() << ":\n"
+                                                                      << "        from stored last active filter slot   :"                                           << labelLastActiveModule << " --> not found!" <<  "\n"
+                                                                      << "        from link to last active filter    (" << iPath->filterIndices().size() - 1 << "):" << labelLastActiveFilter << " --> " << handlePatTriggerEvent->filter( labelLastActiveFilter )->status();
           } else {
-            edm::LogWarning( "lastActiveLabel" ) << "    Labels for last active module differ in failing path " << iPath->name() << ":\n"
-                                                 << "        from stored last active filter slot:"                                              << labelLastActiveModule << " --> " << handlePatTriggerEvent->filter( labelLastActiveModule )->status() << "\n"
-                                                 << "        from link to last active filter    (" << iPath->filterIndices().size() - 1 << "):" << labelLastActiveFilter << " --> " << handlePatTriggerEvent->filter( labelLastActiveFilter )->status();
+            if ( displayPaths_ ) edm::LogWarning( "lastActiveLabel" ) << "    Labels for last active module differ in failing path " << iPath->name() << ":\n"
+                                                                      << "        from stored last active filter slot:"                                              << labelLastActiveModule << " --> " << handlePatTriggerEvent->filter( labelLastActiveModule )->status() << "\n"
+                                                                      << "        from link to last active filter    (" << iPath->filterIndices().size() - 1 << "):" << labelLastActiveFilter << " --> " << handlePatTriggerEvent->filter( labelLastActiveFilter )->status();
           }
           for ( size_t iFilter = 0; iFilter < iPath->filterIndices().size(); ++iFilter ) {
             if ( myEventFilters->at( iFilter ).label() == labelLastActiveModule ) {
-              edm::LogWarning( "lastActiveLabelFound" ) << "        but found it here: " << iFilter;
+              if ( displayPaths_ ) edm::LogWarning( "lastActiveLabelFound" ) << "        but found it here: " << iFilter;
               break;
             }
           }
         }
       } else {
-        edm::LogWarning( "filterIndices" ) << "    Active filters empty in failing path " << iPath->name() << ":\n"
-                                           << "        last active module from last active filter slot: " << labelLastActiveModule;
+        if ( displayPaths_ ) edm::LogWarning( "filterIndices" ) << "    Active filters empty in failing path " << iPath->name() << ":\n"
+                                                                << "        last active module from last active filter slot: " << labelLastActiveModule;
       }
     }
     if ( testPathModuleTags_ ) {
@@ -245,17 +251,17 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       unsigned found( 0 );
       for ( size_t iModule = 0; iModule < pathModules.size(); ++iModule ) {
         if ( handlePatTriggerEvent->indexFilter( pathModules.at( iModule ) ) == myEventFilters->size() ) {
-          edm::LogWarning( "moduleNotInFilters" ) << "    Module from path not found in filter collection:\n"
-                                                  << "        path  : " << iPath->name() << "\n"
-                                                  << "        module: " << pathModules.at( iModule );
+          if ( displayPaths_ ) edm::LogWarning( "moduleNotInFilters" ) << "    Module from path not found in filter collection:\n"
+                                                                       << "        path  : " << iPath->name() << "\n"
+                                                                       << "        module: " << pathModules.at( iModule );
         } else {
           ++found;
-          edm::LogWarning( "moduleInFilters" ) << "    Module from path found in filter collection:\n"
-                                               << "        path  : " << iPath->name() << "\n"
-                                               << "        module: " << pathModules.at( iModule );
+          if ( displayPaths_ ) edm::LogWarning( "moduleInFilters" ) << "    Module from path found in filter collection:\n"
+                                                                    << "        path  : " << iPath->name() << "\n"
+                                                                    << "        module: " << pathModules.at( iModule );
         }
       }
-      edm::LogWarning( "foundFilters" ) << "    Found filters in path " << iPath->name() << ": " << found;
+      if ( displayPaths_ ) edm::LogWarning( "foundFilters" ) << "    Found filters in path " << iPath->name() << ": " << found;
     }
   }
   
@@ -299,12 +305,18 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   const std::vector< std::string > matches( handlePatTriggerEvent->triggerMatchers() );
   for ( unsigned iMatch = 0; iMatch < matches.size(); ++iMatch ) {
     const std::string match( matches.at( iMatch ) );
-    edm::LogWarning( "matcherLabel" ) << "Matcher label: " << match;
+    if ( displayMatches_ ) edm::LogWarning( "matcherLabel" ) << "Matcher label: " << match;
     edm::Handle< TriggerObjectMatch > triggerMatch;
     iEvent.getByLabel( match, triggerMatch );
-//     const TriggerObjectMatch * triggerMatchEvent( handlePatTriggerEvent->triggerObjectMatchResult( match ) );
     if ( triggerMatch->empty() ) {
+      edm::LogError( "missingMatch" ) << "    Match " << match << " missing in event";
       break;
+    }
+    const TriggerObjectMatch * triggerMatchEvent( handlePatTriggerEvent->triggerObjectMatchResult( match ) );
+    if ( triggerMatchEvent != triggerMatch.product() ) {
+      edm::LogError( "matchPtr" ) << "    Matcher pointers differ:\n"
+                                  << "        from edm::Handle::product()                          : " << triggerMatch.product() << "\n"
+                                  << "        from pat::TriggerEvent::triggerObjectMatchResult(...): " << triggerMatchEvent;
     }
     edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *triggerMatch, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
     while ( it != itEnd ) {
@@ -316,22 +328,24 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                           << "        key       : " << candRef.key() << "\n"
                                           << "        null      : " << candRef.isNull() << "\n"
                                           << "        available : " << candRef.isAvailable();
-        break;
+        ++it;
+        continue;
       }
-      edm::LogWarning( "matchCandRef" ) << "    Candidate reference:\n"
-                                        << "        product ID: " << candRef.id() << "\n"
-                                        << "        key       : " << candRef.key();
+      if ( displayMatches_ ) edm::LogWarning( "matchCandRef" ) << "    Candidate reference:\n"
+                                                               << "        product ID: " << candRef.id() << "\n"
+                                                               << "        key       : " << candRef.key();
       if ( objRef.isNull() || ! objRef.isAvailable() ) {
         edm::LogError( "noMatchObjRef" ) << "    Object reference cannot be dereferenced:\n"
                                          << "        product ID: " << objRef.id() << "\n"
                                          << "        key       : " << objRef.key() << "\n"
                                          << "        null      : " << objRef.isNull() << "\n"
                                          << "        available : " << objRef.isAvailable();
-        break;
+        ++it;
+        continue;
       }
-      edm::LogWarning( "matchObjRef" ) << "    Object reference:\n"
-                                       << "        product ID: " << objRef.id() << "\n"
-                                       << "        key       : " << objRef.key();
+      if ( displayMatches_ ) edm::LogWarning( "matchObjRef" ) << "    Object reference:\n"
+                                                              << "        product ID: " << objRef.id() << "\n"
+                                                              << "        key       : " << objRef.key();
       histos2D_[ "ptObjCand" ]->Fill( candRef->pt(), objRef->pt() );
       histos2D_[ "etaObjCand" ]->Fill( candRef->eta(), objRef->eta() );
       histos2D_[ "phiObjCand" ]->Fill( candRef->phi(), objRef->phi() );
@@ -354,9 +368,9 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       }
       const TriggerFilterRefVector objFilters( handlePatTriggerEvent->objectFilters( objRef ) );
       for ( TriggerFilterRefVector::const_iterator iFilter = objFilters.begin(); iFilter != objFilters.end(); ++iFilter ) {
-        edm::LogWarning( "matchObjFilter" ) << "    Object used in filter:\n"
-                                            << "        label: " << ( *iFilter )->label() << "\n"
-                                            << "        type : " << ( *iFilter )->type();
+        if ( displayMatches_ ) edm::LogWarning( "matchObjFilter" ) << "    Object used in filter:\n"
+                                                                   << "        label: " << ( *iFilter )->label() << "\n"
+                                                                   << "        type : " << ( *iFilter )->type();
         if ( ! ( *iFilter )->hasObjectKey( objRef.key() ) ) {
           edm::LogError( "wrongObjFilterKey" ) << "    Object key not found in keys from filter:\n"
                                                << "        object key : " << objRef.key() << "\n"
@@ -371,9 +385,11 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
           break;
         }
       }
-      if ( ! found ) {
-        edm::LogError( "matchCandRefs" ) << "    Matching candidate objects do not correspond:\n"
-                                         << "        edm::Association:     " << candRef.id()      << " " << candRef.key() << "not found in triggerMatchCandidates()";
+      if ( found ) {
+        if ( displayMatches_ ) edm::LogWarning( "matchCandRefs" ) << "    Matching candidate object found";
+      } else {
+        edm::LogError( "noMatchCandRefs" ) << "    Matching candidate objects do not correspond:\n"
+                                           << "        edm::Association:     " << candRef.id()      << " " << candRef.key() << " not found in triggerMatchCandidates()";
       }
       const TriggerObjectMatchMap matchMap( handlePatTriggerEvent->triggerMatchObjects( candRef, iEvent ) );
       if ( matchMap.empty() ) {
