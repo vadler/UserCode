@@ -6,7 +6,7 @@ server_name = None
 
 [CMSSW]
 
-datasetpath  = /Cosmics/Commissioning08_CRAFT_ALL_V4_ReReco-v1/RECO
+datasetpath  = /Cosmics/Commissioning08_CRAFT_ALL_V9_225-v2/RECO
 runselection = 70036
 
 pset = SiStripDQMOfflineGlobalRunCAF_cfg.py
@@ -35,7 +35,7 @@ copy_data       = 1
 storage_element = srm.cern.ch
 storage_pool    = None
 storage_path    = /castor/cern.ch
-user_remote_dir = user/v/vadler/cms/SiStripDQM/OfflineDQM/test
+user_remote_dir = user/u/user
 
 # publish_data            = 0
 # publish_data_name       = yourDataName
