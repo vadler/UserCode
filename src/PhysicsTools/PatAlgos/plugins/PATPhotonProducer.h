@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: PATPhotonProducer.h,v 1.16 2009/03/26 20:44:37 vadler Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATPhotonProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of PhotonType.
 
   \author   Steven Lowette
-  \version  $Id$
+  \version  $Id: PATPhotonProducer.h,v 1.16 2009/03/26 20:44:37 vadler Exp $
 */
 
 
@@ -21,18 +21,18 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "PhysicsTools/Utilities/interface/EtComparator.h"
+#include "CommonTools/Utils/interface/EtComparator.h"
 
 #include "DataFormats/PatCandidates/interface/Photon.h"
 
-
 #include "PhysicsTools/PatAlgos/interface/MultiIsolator.h"
+#include "PhysicsTools/PatAlgos/interface/EfficiencyLoader.h"
+
+
+#include "DataFormats/PatCandidates/interface/UserData.h"
+#include "PhysicsTools/PatAlgos/interface/PATUserDataHelper.h"
 
 namespace pat {
-
-
-  class ObjectResolutionCalc;
-
 
   class PATPhotonProducer : public edm::EDProducer {
 
@@ -50,7 +50,8 @@ namespace pat {
       bool embedSuperCluster_;
 
       bool addGenMatch_;
-      edm::InputTag genMatchSrc_;
+      bool embedGenMatch_;
+      std::vector<edm::InputTag> genMatchSrc_;
 
       bool addTrigMatch_;
       std::vector<edm::InputTag> trigMatchSrc_;
@@ -62,6 +63,15 @@ namespace pat {
       pat::helper::MultiIsolator::IsolationValuePairs isolatorTmpStorage_; // better here than recreate at each event
       std::vector<std::pair<pat::IsolationKeys,edm::InputTag> > isoDepositLabels_;
 
+      bool addEfficiencies_;
+      pat::helper::EfficiencyLoader efficiencyLoader_;
+
+      bool          addPhotonID_;
+      typedef std::pair<std::string, edm::InputTag> NameTag;
+      std::vector<NameTag> photIDSrcs_;
+
+      bool useUserData_;
+      pat::PATUserDataHelper<pat::Photon>      userDataHelper_;
 
   };
 

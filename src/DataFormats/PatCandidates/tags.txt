@@ -1,0 +1,14 @@
+Test Release based on: CMSSW_3_1_0_pre4
+Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_1_0_pre4
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0_pre4
+--- Tag ---    -------- Package --------                        
+V00-00-05      CommonTools/Utils                                
+V05-07-00      DataFormats/Math                                 
+NoTag          DataFormats/PatCandidates                        
+V00-06-12      DataFormats/RecoCandidate                        
+V00-13-04      DataFormats/TauReco                              
+NoTag          PhysicsTools/PatAlgos                            
+NoTag          PhysicsTools/PatUtils                            
+V07-04-01      PhysicsTools/UtilAlgos                           
+---------------------------------------
+total packages: 8 (8 displayed)

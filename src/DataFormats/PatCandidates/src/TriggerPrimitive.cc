@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: TriggerPrimitive.cc,v 1.5 2008/12/05 12:32:42 hegner Exp $
 //
 
 #include "DataFormats/PatCandidates/interface/TriggerPrimitive.h"
@@ -12,13 +12,6 @@ TriggerPrimitive::TriggerPrimitive() :
   reco::LeafCandidate(),
   filterName_( "" ),
   triggerObjectType_( 0 ) {
-}
-
-/// copy constructor
-TriggerPrimitive::TriggerPrimitive( const TriggerPrimitive & aTrigPrim ) :
-  reco::LeafCandidate( 0, aTrigPrim.p4(), reco::Particle::Point( 0., 0., 0. ), aTrigPrim.triggerObjectId() ),
-  filterName_( aTrigPrim.filterName() ),
-  triggerObjectType_( aTrigPrim.triggerObjectType() ) {
 }
 
 /// constructor from values
@@ -69,5 +62,5 @@ void TriggerPrimitive::setTriggerObjectType( const int aType ) {
 
 /// set trigger object id
 void TriggerPrimitive::setTriggerObjectId( const int id ) {
-  reco::Particle::setPdgId( id );
+  setPdgId( id );
 }

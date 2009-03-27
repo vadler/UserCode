@@ -1,45 +1,97 @@
 import FWCore.ParameterSet.Config as cms
 
 allLayer1Electrons = cms.EDProducer("PATElectronProducer",
-    addElectronIDRobust = cms.bool(True),
-    electronLRFile = cms.string('PhysicsTools/PatUtils/data/ElectronLRDistros.root'),
-    addGenMatch = cms.bool(True),
-    addResolutions = cms.bool(True),
-    electronResoFile = cms.string('PhysicsTools/PatUtils/data/Resolutions_electron.root'),
-    addLRValues = cms.bool(True),
-    isoDeposits = cms.PSet(
+    # General configurables
+    electronSource = cms.InputTag("electronsNoDuplicates"),
 
+                                    
+    # user data to add
+    userData = cms.PSet(
+      # add custom classes here
+      userClasses = cms.PSet(
+        src = cms.VInputTag('')
+      ),
+      # add doubles here
+      userFloats = cms.PSet(
+        src = cms.VInputTag('')
+      ),
+      # add ints here
+      userInts = cms.PSet(
+        src = cms.VInputTag('')
+      ),
+      # add "inline" functions here
+      userFunctions = cms.vstring(""),
+      userFunctionLabels = cms.vstring("")
     ),
-    electronSource = cms.InputTag("allLayer0Electrons"),
-    addElectronID = cms.bool(True),
-    useNNResolutions = cms.bool(False),
-    electronIDRobustSource = cms.InputTag("electronIdRobust"),
+
+    # Embedding of AOD items
+    embedTrack        = cms.bool(False), ## whether to embed in AOD externally stored track (note: gsf electrons don't have a track)
+    embedGsfTrack     = cms.bool(True), ## whether to embed in AOD externally stored gsf track
+    embedSuperCluster = cms.bool(True), ## whether to embed in AOD externally stored supercluster
+
+    # resolution configurables
+    addResolutions   = cms.bool(False),
+
+    # pflow specific
+    pfElectronSource = cms.InputTag("pfElectrons"),
+    useParticleFlow =  cms.bool( False ),
+    embedPFCandidate = cms.bool(False),
+
+    # Store isolation values
     isolation = cms.PSet(
-        hcal = cms.PSet(
-            src = cms.InputTag("layer0ElectronIsolations","egammaTowerIsolation")
-        ),
         tracker = cms.PSet(
-            src = cms.InputTag("layer0ElectronIsolations","egammaElectronTkIsolation")
+            src = cms.InputTag("eleIsoFromDepsTk"),
         ),
-        user = cms.VPSet(cms.PSet(
-            src = cms.InputTag("layer0ElectronIsolations","egammaElectronTkNumIsolation")
-        ), 
-            cms.PSet(
-                src = cms.InputTag("layer0ElectronIsolations","egammaEcalRelIsolation")
-            ), 
-            cms.PSet(
-                src = cms.InputTag("layer0ElectronIsolations","egammaHOETower")
-            )),
         ecal = cms.PSet(
-            src = cms.InputTag("layer0ElectronIsolations","egammaEcalIsolation")
-        )
+            src = cms.InputTag("eleIsoFromDepsEcalFromHits"),
+        ),
+        hcal = cms.PSet(
+            src = cms.InputTag("eleIsoFromDepsHcalFromTowers"),
+        ),
+        user = cms.VPSet(),
     ),
-    electronIDSource = cms.InputTag("electronId"),
-    tracksSource = cms.InputTag("generalTracks"),
-    genParticleMatch = cms.InputTag("electronMatch"),
+    # Store IsoDeposits
+    isoDeposits = cms.PSet(
+        tracker = cms.InputTag("eleIsoDepositTk"),
+        ecal    = cms.InputTag("eleIsoDepositEcalFromHits"),
+        hcal    = cms.InputTag("eleIsoDepositHcalFromTowers"),
+    ),
+
+
+    # electron ID configurables
+    addElectronID = cms.bool(True),
+    electronIDSources = cms.PSet(
+        # configure many IDs as InputTag <someName> = <someTag>
+        # you can comment out those you don't want to save some disk space
+        eidRobustLoose      = cms.InputTag("eidRobustLoose"),
+        eidRobustTight      = cms.InputTag("eidRobustTight"),
+        eidLoose            = cms.InputTag("eidLoose"),
+        eidTight            = cms.InputTag("eidTight"),
+        eidRobustHighEnergy = cms.InputTag("eidRobustHighEnergy"),
+    ),
+
+    # Trigger matching configurables
     addTrigMatch = cms.bool(True),
-    trigPrimMatch  = cms.VInputTag("electronTrigMatchHLT1ElectronRelaxed",
-        "electronTrigMatchCandHLT1ElectronStartup")
+    # trigger primitive sources to be used for the matching
+    trigPrimMatch = cms.VInputTag(
+            cms.InputTag("electronTrigMatchHLT1ElectronRelaxed"), 
+            cms.InputTag("electronTrigMatchCandHLT1ElectronStartup")
+    ),
+
+    # MC matching configurables
+    addGenMatch      = cms.bool(True),
+    embedGenMatch    = cms.bool(False),
+    genParticleMatch = cms.InputTag("electronMatch"), ## Association between electrons and generator particles
+
+    # Efficiencies
+    addEfficiencies = cms.bool(False),
+    efficiencies    = cms.PSet(),
+    
+    # electron cluster shape configurables
+    addElectronShapes = cms.bool(True),
+    reducedBarrelRecHitCollection = cms.InputTag("reducedEcalRecHitsEB"),
+    reducedEndcapRecHitCollection = cms.InputTag("reducedEcalRecHitsEE"),
+
 )
 
 
