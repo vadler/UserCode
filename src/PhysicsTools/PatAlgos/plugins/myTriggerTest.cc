@@ -25,6 +25,7 @@ myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   testPathModuleTags_( iConfig.getParameter< bool >( "testPathModuleTags" ) ),
   displayNumbers_( iConfig.getParameter< bool >( "displayNumbers" ) ),
   displayObjects_( iConfig.getParameter< bool >( "displayObjects" ) ),
+  displayObjectsStandAlone_( iConfig.getParameter< bool >( "displayObjectsStandAlone" ) ),
   displayFilters_( iConfig.getParameter< bool >( "displayFilters" ) ),
   displayPaths_( iConfig.getParameter< bool >( "displayPaths" ) ),
   displayEvent_( iConfig.getParameter< bool >( "displayEvent" ) ),
@@ -134,6 +135,8 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   iEvent.getByLabel( tagPatTrigger_, handlePatTriggerFilters );
   edm::Handle< TriggerObjectCollection > handlePatTriggerObjects;
   iEvent.getByLabel( tagPatTrigger_, handlePatTriggerObjects );
+  edm::Handle< TriggerObjectStandAloneCollection > handlePatTriggerObjectsStandAlone;
+  iEvent.getByLabel( tagPatTrigger_, handlePatTriggerObjectsStandAlone );
   
   const TriggerPathCollection   * myEventPaths( handlePatTriggerEvent->paths() );
   const TriggerFilterCollection * myEventFilters( handlePatTriggerEvent->filters() );
@@ -199,6 +202,8 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       histos1D_[ "badFilterIds" ]->Fill( iObject->hasFilterId( ids.at( iId ) + 25 ) ); // arbitrarilly set not to interfere with existing IDs
     }
   }
+  
+  // pat::TriggerObjectStandAlone
   
   // pat::TriggerFilter
   for ( TriggerFilterCollection::const_iterator iFilter = myEventFilters->begin(); iFilter != myEventFilters->end(); ++iFilter ) {
@@ -299,18 +304,44 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       }
     }
   }
+  
   // trigger matches
   const TriggerObjectMatchContainer * triggerMatches( handlePatTriggerEvent->triggerObjectMatchResults() );
   TriggerObjectMatchContainer triggerMatchContainer( *triggerMatches ); // cannot be const due to usage of 'operator[]'
   const std::vector< std::string > matches( handlePatTriggerEvent->triggerMatchers() );
   for ( unsigned iMatch = 0; iMatch < matches.size(); ++iMatch ) {
+    bool continueHere( false );
     const std::string match( matches.at( iMatch ) );
     if ( displayMatches_ ) edm::LogWarning( "matcherLabel" ) << "Matcher label: " << match;
+    edm::Handle< TriggerObjectStandAloneMatch > triggerStandAloneMatch;
+    iEvent.getByLabel( match, triggerStandAloneMatch );
+    if ( ! triggerStandAloneMatch.isValid() ) {
+      edm::LogError( "missingStandAloneMatch" ) << "    Stand-alone match " << match << " missing";
+      continueHere = true;
+    } else if ( triggerStandAloneMatch->empty() ) {
+      edm::LogWarning( "emptyStandAloneMatch" ) << "    Stand-alone match " << match << " empty";
+    }
     edm::Handle< TriggerObjectMatch > triggerMatch;
-    iEvent.getByLabel( match, triggerMatch );
-    if ( triggerMatch->empty() ) {
-      edm::LogError( "missingMatch" ) << "    Match " << match << " empty";
-      break;
+    const edm::InputTag matchTag( tagPatTriggerEvent_.label(), match ); // pat::TriggerObjectMatch produced by PATTriggerEventProducer with the matcher label as instance
+    iEvent.getByLabel( matchTag, triggerMatch );
+    if ( ! triggerMatch.isValid() ) {
+      edm::LogError( "missingMatch" ) << "    Match " << matchTag.encode() << " missing";
+      continueHere = true;
+    } else if ( triggerMatch->empty() ) {
+      edm::LogWarning( "emptyMatch" ) << "    Match " << matchTag.encode() << " empty";
+    }
+    if ( ! continueHere ) {
+      if ( triggerStandAloneMatch->size() != triggerMatch->size() ) {
+        edm::LogError( "matchSizes" ) << "    Matches differ in size:\n"
+                                      << "        Stand-alone match " << match             << ": " << triggerStandAloneMatch->size() << "\n"
+                                      << "        Match             " << matchTag.encode() << ": " << triggerMatch->size();
+        continueHere = true;
+      } else if ( displayMatches_ ) {
+        edm::LogWarning( "matchSizes" ) << "    Matches " << match << " size: " << triggerStandAloneMatch->size();
+      }
+    }
+    if ( continueHere ) {
+      continue;
     }
     const TriggerObjectMatch * triggerMatchEvent( handlePatTriggerEvent->triggerObjectMatchResult( match ) );
     if ( triggerMatchEvent != triggerMatch.product() ) {
@@ -321,33 +352,98 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       if ( displayMatches_ ) edm::LogWarning( "matchPtr" ) << "    Matcher pointers ok";
     }
     edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *triggerMatch, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
-    while ( it != itEnd ) {
+    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectStandAloneMatch > itSa( *triggerStandAloneMatch, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itSaEnd( itSa.end() );
+    while ( it != itEnd && itSa != itSaEnd ) {
+      bool continueNow( false );
       const reco::CandidateBaseRef candRef( it->first );
-      const TriggerObjectRef       objRef( it->second );
       if ( candRef.isNull() || ! candRef.isAvailable() ) {
-        edm::LogError( "noMatchCandRef" ) << "    Candidate reference cannot be dereferenced:\n"
-                                          << "        product ID: " << candRef.id() << "\n"
-                                          << "        key       : " << candRef.key() << "\n"
-                                          << "        null      : " << candRef.isNull() << "\n"
-                                          << "        available : " << candRef.isAvailable();
-        ++it;
-        continue;
+        if ( candRef.id().id() != 0 ) {
+          edm::LogError( "noMatchCandRef" ) << "    Candidate reference cannot be dereferenced:\n"
+                                            << "        product ID: " << candRef.id() << "\n"
+                                            << "        key       : " << candRef.key() << "\n"
+                                            << "        null      : " << candRef.isNull() << "\n"
+                                            << "        available : " << candRef.isAvailable();
+        }
+        continueNow = true;
       }
-      if ( displayMatches_ ) edm::LogWarning( "matchCandRef" ) << "    Candidate reference:\n"
-                                                               << "        product ID: " << candRef.id() << "\n"
-                                                               << "        key       : " << candRef.key();
+      if ( displayMatches_ && ! continueNow ) edm::LogWarning( "matchCandRef" ) << "    Candidate reference:\n"
+                                                                                << "        product ID: " << candRef.id() << "\n"
+                                                                                << "        key       : " << candRef.key();
+      const TriggerObjectRef objRef( it->second );
       if ( objRef.isNull() || ! objRef.isAvailable() ) {
-        edm::LogError( "noMatchObjRef" ) << "    Object reference cannot be dereferenced:\n"
-                                         << "        product ID: " << objRef.id() << "\n"
-                                         << "        key       : " << objRef.key() << "\n"
-                                         << "        null      : " << objRef.isNull() << "\n"
-                                         << "        available : " << objRef.isAvailable();
+        if ( objRef.id().id() != 0 ) {
+          edm::LogError( "noMatchObjRef" ) << "    Object reference cannot be dereferenced:\n"
+                                           << "        product ID: " << objRef.id() << "\n"
+                                           << "        key       : " << objRef.key() << "\n"
+                                           << "        null      : " << objRef.isNull() << "\n"
+                                           << "        available : " << objRef.isAvailable();
+        }
+        continueNow = true;
+      }
+      if ( displayMatches_ && ! continueNow ) edm::LogWarning( "matchObjRef" ) << "    Object reference:\n"
+                                                                               << "        product ID: " << objRef.id() << "\n"
+                                                                               << "        key       : " << objRef.key();
+      const reco::CandidateBaseRef candRefSa( itSa->first );
+      if ( candRefSa.isNull() || ! candRefSa.isAvailable() ) {
+        if ( candRefSa.id().id() != 0 ) {
+          edm::LogError( "noMatchCandRefSa" ) << "    Stand-alone candidate reference cannot be dereferenced:\n"
+                                              << "        product ID: " << candRefSa.id() << "\n"
+                                              << "        key       : " << candRefSa.key() << "\n"
+                                              << "        null      : " << candRefSa.isNull() << "\n"
+                                              << "        available : " << candRefSa.isAvailable();
+        }
+        continueNow = true;
+      }
+      if ( displayMatches_ && ! continueNow ) edm::LogWarning( "matchCandRefSa" ) << "    Stand-alone candidate reference:\n"
+                                                                                  << "        product ID: " << candRefSa.id() << "\n"
+                                                                                  << "        key       : " << candRefSa.key();
+      const TriggerObjectStandAloneRef objRefSa( itSa->second );
+      if ( objRefSa.isNull() || ! objRefSa.isAvailable() ) {
+        if ( objRefSa.id().id() != 0 ) {
+          edm::LogError( "noMatchObjRefSa" ) << "    Stand-alone object reference cannot be dereferenced:\n"
+                                             << "        product ID: " << objRefSa.id() << "\n"
+                                             << "        key       : " << objRefSa.key() << "\n"
+                                             << "        null      : " << objRefSa.isNull() << "\n"
+                                             << "        available : " << objRefSa.isAvailable();
+        }
+        continueNow = true;
+      }
+      if ( displayMatches_ && ! continueNow ) edm::LogWarning( "matchObjRefSa" ) << "    Stand-alone object reference:\n"
+                                                                                 << "        product ID: " << objRefSa.id() << "\n"
+                                                                                 << "        key       : " << objRefSa.key();
+      if ( continueNow ) {
         ++it;
+        ++itSa;
         continue;
       }
-      if ( displayMatches_ ) edm::LogWarning( "matchObjRef" ) << "    Object reference:\n"
-                                                              << "        product ID: " << objRef.id() << "\n"
-                                                              << "        key       : " << objRef.key();
+      // check correspondance of match and stand-alone match
+      if ( candRef.id() != candRefSa.id() ) {
+        edm::LogError( "candRefIds" ) << "    Candidate IDs differ:\n"
+                                      << "        candidate            : " << candRef.id() << "\n"
+                                      << "        stand-alone candidate: " << candRefSa.id();
+        continueNow = true;
+      }
+      if ( candRef.key() != candRefSa.key() ) {
+        edm::LogError( "candRefKeys" ) << "    Candidate keys differ:\n"
+                                       << "        candidate            : " << candRef.key() << "\n"
+                                       << "        stand-alone candidate: " << candRefSa.key();
+        continueNow = true;
+      }
+      if ( objRef.id() == objRefSa.id() && objRef.id().id() != 0 ) {
+        edm::LogError( "objRefIds" ) << "    Object IDs are equal: " << objRef.id();
+        continueNow = true;
+      }
+      if ( objRef.key() != objRefSa.key() ) {
+        edm::LogError( "objRefKeys" ) << "    Object keys differ:\n"
+                                      << "        object            : " << objRef.key() << "\n"
+                                      << "        stand-alone object: " << objRefSa.key();
+        continueNow = true;
+      }
+      if ( continueNow ) {
+        ++it;
+        ++itSa;
+        continue;
+      }
       histos2D_[ "ptObjCand" ]->Fill( candRef->pt(), objRef->pt() );
       histos2D_[ "etaObjCand" ]->Fill( candRef->eta(), objRef->eta() );
       histos2D_[ "phiObjCand" ]->Fill( candRef->phi(), objRef->phi() );
@@ -400,6 +496,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                          << "        candidate ref: " << candRef.id() << " " << candRef.key();
       }
       ++it;
+      ++itSa;
     }
   }
   

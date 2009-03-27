@@ -21,19 +21,20 @@ process.TFileService = cms.Service( "TFileService",
 )
 
 process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
-    hltProcessName     = cms.string( 'HLT' ),
-    triggerResults     = cms.InputTag( "TriggerResults" ),
-    triggerEvent       = cms.InputTag( "hltTriggerSummaryAOD" ),
-    patProcessName     = cms.string( 'PAT' ),
-    patTrigger         = cms.InputTag( "patTrigger" ),
-    patTriggerEvent    = cms.InputTag( "patTriggerEvent" ),
-    testPathModuleTags = cms.bool( False ),
-    displayNumbers     = cms.bool( False ),
-    displayObjects     = cms.bool( False ),
-    displayFilters     = cms.bool( False ),
-    displayPaths       = cms.bool( False ),
-    displayEvent       = cms.bool( False ),
-    displayMatches     = cms.bool( True )
+    hltProcessName           = cms.string( 'HLT' ),
+    triggerResults           = cms.InputTag( "TriggerResults" ),
+    triggerEvent             = cms.InputTag( "hltTriggerSummaryAOD" ),
+    patProcessName           = cms.string( 'PAT' ),
+    patTrigger               = cms.InputTag( "patTrigger" ),
+    patTriggerEvent          = cms.InputTag( "patTriggerEvent" ),
+    testPathModuleTags       = cms.bool( False ),
+    displayNumbers           = cms.bool( False ),
+    displayObjects           = cms.bool( False ),
+    displayObjectsStandAlone = cms.bool( False ),
+    displayFilters           = cms.bool( False ),
+    displayPaths             = cms.bool( False ),
+    displayEvent             = cms.bool( False ),
+    displayMatches           = cms.bool( True )
 )
 
 process.p = cms.Path(

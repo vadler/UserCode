@@ -88,5 +88,3 @@ allLayer1Muons = cms.EDProducer("PATMuonProducer",
     pickySrc = cms.InputTag("tevMuons", "picky"),
     tpfmsSrc = cms.InputTag("tevMuons", "firstHit"),
 )
-
-

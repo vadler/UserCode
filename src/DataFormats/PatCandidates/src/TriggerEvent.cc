@@ -1,5 +1,5 @@
 //
-// $Id: TriggerEvent.cc,v 1.1.2.2 2009/03/15 12:24:13 vadler Exp $
+// $Id: TriggerEvent.cc,v 1.1.2.3 2009/03/18 19:08:22 vadler Exp $
 //
 
 
@@ -104,6 +104,10 @@ bool TriggerEvent::addObjectMatchResult( const TriggerObjectMatchRefProd & trigM
   return false;
 }
 bool TriggerEvent::addObjectMatchResult( const edm::Handle< TriggerObjectMatch > & trigMatches, const std::string & labelMatcher )
+{
+  return addObjectMatchResult( TriggerObjectMatchRefProd( trigMatches ), labelMatcher );
+}
+bool TriggerEvent::addObjectMatchResult( const edm::OrphanHandle< TriggerObjectMatch > & trigMatches, const std::string & labelMatcher )
 {
   return addObjectMatchResult( TriggerObjectMatchRefProd( trigMatches ), labelMatcher );
 }

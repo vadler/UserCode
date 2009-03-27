@@ -32,6 +32,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Common/interface/Handle.h"
+#include "DataFormats/Common/interface/OrphanHandle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
    
 
@@ -88,10 +89,11 @@ namespace pat {
       
       /// objects related
       void setObjects( const edm::Handle< TriggerObjectCollection > & handleTriggerObjects ) { objects_ = TriggerObjectRefProd( handleTriggerObjects ); };
-      bool addObjectMatchResult( const TriggerObjectMatchRefProd & trigMatches, const std::string & labelMatcher );         // returns 'false' if 'matcher' alreadey exists
-      bool addObjectMatchResult( const edm::Handle< TriggerObjectMatch > & trigMatches, const std::string & labelMatcher ); // returns 'false' if 'matcher' alreadey exists
-      const TriggerObjectCollection     * objects() const { return objects_.get(); };                                       // returns 0 if RefProd is null
-      TriggerObjectRefVector              objects( unsigned filterId ) const;                                               // transient
+      bool addObjectMatchResult( const TriggerObjectMatchRefProd & trigMatches, const std::string & labelMatcher );               // returns 'false' if 'matcher' alreadey exists
+      bool addObjectMatchResult( const edm::Handle< TriggerObjectMatch > & trigMatches, const std::string & labelMatcher );       // returns 'false' if 'matcher' alreadey exists
+      bool addObjectMatchResult( const edm::OrphanHandle< TriggerObjectMatch > & trigMatches, const std::string & labelMatcher ); // returns 'false' if 'matcher' alreadey exists
+      const TriggerObjectCollection     * objects() const { return objects_.get(); };                                             // returns 0 if RefProd is null
+      TriggerObjectRefVector              objects( unsigned filterId ) const;                                                     // transient
       
       /// x-collection related
       TriggerFilterRefVector     pathModules( const std::string & namePath, bool all = true ) const;                          // transient; setting 'all' to 'false' returns the run filters only.

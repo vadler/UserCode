@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.h,v 1.14.2.2 2009/03/12 16:24:14 tucker Exp $
+// $Id: PATMuonProducer.h,v 1.14.2.5 2009/03/25 12:48:09 lusito Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATMuonProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of MuonType.
 
   \author   Steven Lowette, Roger Wolf
-  \version  $Id: PATMuonProducer.h,v 1.14.2.2 2009/03/12 16:24:14 tucker Exp $
+  \version  $Id: PATMuonProducer.h,v 1.14.2.5 2009/03/25 12:48:09 lusito Exp $
 */
 
 
@@ -39,6 +39,9 @@
 namespace pat {
 
   class LeptonLRCalc;
+  class TrackerIsolationPt;
+  class CaloIsolationEnergy;
+
 
   class PATMuonProducer : public edm::EDProducer {
 
@@ -52,31 +55,22 @@ namespace pat {
 
     private:
 
-
-      typedef std::vector<edm::Handle<edm::Association<reco::GenParticleCollection> > > GenAssociations;
-
-      typedef std::vector<edm::Handle<edm::Association<TriggerPrimitiveCollection> > > TrigAssociations;
-
-
-      void fillMuon( Muon& patMuon, 
-		     const MuonBaseRef& muonRef,
-		     const reco::CandidateBaseRef& baseRef,
-		     const GenAssociations& genMatches,
-		     const TrigAssociations&  trigMatches) const;
-
       // configurables
       edm::InputTag muonSrc_;
-      edm::InputTag pfMuonSrc_;
-      bool          useParticleFlow_;
+
       bool          embedTrack_;
       bool          embedStandAloneMuon_;
       bool          embedCombinedMuon_;
+
+
       bool          embedPickyMuon_;
       bool          embedTpfmsMuon_;
-      bool          embedPFCandidate_;
+      
       bool          addTeVRefits_;
       edm::InputTag pickySrc_;
       edm::InputTag tpfmsSrc_;
+
+  
       bool          addGenMatch_;
       bool          embedGenMatch_;
       std::vector<edm::InputTag> genMatchSrc_;
@@ -84,6 +78,27 @@ namespace pat {
       std::vector<edm::InputTag> trigMatchSrc_;
       bool          addResolutions_;
       bool          addLRValues_;
+
+
+      // pflow specific
+      bool          useParticleFlow_;
+      edm::InputTag pfMuonSrc_;
+      bool          embedPFCandidate_;
+
+
+      typedef std::vector<edm::Handle<edm::Association<reco::GenParticleCollection> > > GenAssociations;
+
+      typedef std::vector<edm::Handle<edm::Association<TriggerPrimitiveCollection> > > TrigAssociations;
+
+
+      void fillMuon( Muon& aMuon, 
+		     const MuonBaseRef& muonRef,
+		     const reco::CandidateBaseRef& baseRef,
+		     const GenAssociations& genMatches,
+		     const TrigAssociations&  trigMatches) const;
+
+     
+
       // tools
       GreaterByPt<Muon>      pTComparator_;
 
