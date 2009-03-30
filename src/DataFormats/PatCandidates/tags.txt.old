@@ -1,6 +1,6 @@
-Test Release based on: CMSSW_2_2_6
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_6
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_6
+Test Release based on: CMSSW_2_2_7
+Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_7
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_7
 --- Tag ---    -------- Package --------                        
 V01-08-00      CondFormats/JetMETObjects                        
 V08-06-00-03   DataFormats/Common                               
@@ -11,5 +11,6 @@ B2_2_X         PhysicsTools/PatAlgos
 B2_2_X         PhysicsTools/PatUtils                            
 V08-06-16-06-02 PhysicsTools/RecoAlgos                           
 V07-03-25-01   PhysicsTools/UtilAlgos                           
+V06-09-07-01   PhysicsTools/Utilities                           
 ---------------------------------------
-total packages: 9 (9 displayed)
+total packages: 10 (10 displayed)
