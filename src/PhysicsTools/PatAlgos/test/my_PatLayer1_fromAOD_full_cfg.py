@@ -55,7 +55,7 @@ process.p = cms.Path(
 # Output module configuration
 from PhysicsTools.PatAlgos.patEventContent_cff import *
 process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0_pre4/output/my_PatLayer1_fromAOD_full.root' ),
+    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_X_2009-04-01-0800/output/my_PatLayer1_fromAOD_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),
@@ -65,10 +65,16 @@ process.out = cms.OutputModule( "PoolOutputModule",
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOffTriggerMatchingOld(process)
-switchOnTrigger(process)
-process.out.outputCommands += [ 'keep patTriggerObjectStandAlones_patTrigger_*_PAT'
-                              , 'keep edmTriggerResults_TriggerResults_*_HLT'
+### switch START ###
+# ## no stand-alone trigger objects
+# switchOnTrigger(process)
+## all; default to run myTriggerTest_cfg.py afterwards
+switchOnTriggerAll(process)
+process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
                               , 'keep *_hltTriggerSummaryAOD_*_*' ]
+# ## stand-alone trigger objects only
+# switchOnTriggerStandAlone(process)
+### switch END ###
 
 process.outpath = cms.EndPath(
     process.out
