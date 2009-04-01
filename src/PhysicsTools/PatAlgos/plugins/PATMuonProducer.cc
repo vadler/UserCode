@@ -33,8 +33,7 @@ using namespace std;
 
 PATMuonProducer::PATMuonProducer(const edm::ParameterSet & iConfig) :
   isolator_(iConfig.exists("isolation") ? iConfig.getParameter<edm::ParameterSet>("isolation") : edm::ParameterSet(), false),
-  userDataHelper_ ( iConfig.getParameter<edm::ParameterSet>("userData") )
-
+  useUserData_(iConfig.exists("userData"))
 {
 
   
@@ -119,9 +118,8 @@ PATMuonProducer::PATMuonProducer(const edm::ParameterSet & iConfig) :
   }
 
   // Check to see if the user wants to add user data
-  useUserData_ = false;
-  if ( iConfig.exists("userData") ) {
-    useUserData_ = true;
+  if ( useUserData_ ) {
+    userDataHelper_ = PATUserDataHelper<Muon>(iConfig.getParameter<edm::ParameterSet>("userData"));
   }
 
   // produces vector of muons
