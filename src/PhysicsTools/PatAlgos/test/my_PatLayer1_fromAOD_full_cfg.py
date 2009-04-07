@@ -28,7 +28,8 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source( "PoolSource", 
     fileNames = cms.untracked.vstring(
         'file:/afs/cern.ch/cms/PRS/top/cmssw-data/relval200-for-pat-testing/FullSimTTBar-2_2_X_2008-11-03-STARTUP_V7-AODSIM.100.root'
-    )
+    ),
+    skipEvents = cms.untracked.uint32( 0 )
 )
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32( 100 )
@@ -68,12 +69,12 @@ switchOffTriggerMatchingOld(process)
 ### switch START ###
 # ## no stand-alone trigger objects
 # switchOnTrigger(process)
-# ## all; default to run myTriggerTest_cfg.py afterwards
-# switchOnTriggerAll(process)
-# process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
-#                               , 'keep *_hltTriggerSummaryAOD_*_*' ]
-## stand-alone trigger objects only
-switchOnTriggerStandAlone(process)
+## all; default to run myTriggerTest_cfg.py afterwards
+switchOnTriggerAll(process)
+process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
+                              , 'keep *_hltTriggerSummaryAOD_*_*' ]
+# ## stand-alone trigger objects only
+# switchOnTriggerStandAlone(process)
 ### switch END ###
 
 process.outpath = cms.EndPath(
