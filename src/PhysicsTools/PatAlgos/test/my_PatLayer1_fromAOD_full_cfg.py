@@ -71,6 +71,7 @@ switchOffTriggerMatchingOld(process)
 # switchOnTrigger(process)
 ## all; default to run myTriggerTest_cfg.py afterwards
 switchOnTriggerAll(process)
+process.out.outputCommands += patEventContentTriggerMatch
 process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
                               , 'keep *_hltTriggerSummaryAOD_*_*' ]
 # ## stand-alone trigger objects only

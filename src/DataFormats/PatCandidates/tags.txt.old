@@ -14,9 +14,7 @@ B2_2_X         PhysicsTools/PatAlgos
 B2_2_X         PhysicsTools/PatUtils                            
 PfElecTauMuIso_for22x PhysicsTools/PFCandProducer                      
 V08-06-16-06-02 PhysicsTools/RecoAlgos                           
-V07-03-25-01   PhysicsTools/UtilAlgos                           
-V06-09-07-01   PhysicsTools/Utilities                           
 RB300309       RecoJets/JetAssociationAlgorithms                
 RB300309       RecoJets/JetAssociationProducers                 
 ---------------------------------------
-total packages: 16 (16 displayed)
+total packages: 14 (14 displayed)
