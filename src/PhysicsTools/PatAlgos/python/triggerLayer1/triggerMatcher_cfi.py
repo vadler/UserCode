@@ -559,7 +559,7 @@ tauTriggerMatchHLTDoubleIsoTauTrk3 = cms.EDFilter( "PATTriggerMatcherDRDPtLessBy
 )
 
 
-# matching sequence
+# sequences
 patTriggerMatcher = cms.Sequence(
    electronTriggerMatchHltElectrons +
    electronTriggerMatchL1Electrons  +
@@ -567,36 +567,4 @@ patTriggerMatcher = cms.Sequence(
    muonTriggerMatchAll              +
    muonTriggerMatchNone             +
    tauTriggerMatchTriggerTaus
-)
-
-
-# embedding in electrons
-cleanLayer1ElectronsTriggerMatch = cms.EDProducer( "PATTriggerMatchElectronEmbedder",
-    src     = cms.InputTag( "cleanLayer1Electrons" ),
-    matches = cms.VInputTag( "electronTriggerMatchHltElectrons"
-                         , "electronTriggerMatchL1Electrons"
-                         )
-)
-
-# embedding in muons
-cleanLayer1MuonsTriggerMatch = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
-    src     = cms.InputTag( "cleanLayer1Muons" ),
-    matches = cms.VInputTag( "muonTriggerMatchL1Muons"
-                           , "muonTriggerMatchAll"
-                           , "muonTriggerMatchNone"
-                           )
-)
-
-# embedding in taus
-cleanLayer1TausTriggerMatch = cms.EDProducer( "PATTriggerMatchTauEmbedder",
-    src     = cms.InputTag( "cleanLayer1Taus" ),
-    matches = cms.VInputTag( "tauTriggerMatchTriggerTaus" )
-)
-
-
-# embeding sequence
-patTriggerMatchEmbedder = cms.Sequence(
-    cleanLayer1ElectronsTriggerMatch +
-    cleanLayer1MuonsTriggerMatch     +
-    cleanLayer1TausTriggerMatch
 )
