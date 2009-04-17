@@ -68,14 +68,17 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOffTriggerMatchingOld(process)
 ### switch START ###
 # ## no stand-alone trigger objects
-# switchOnTrigger(process)
+# switchOnTrigger( process )
 ## all; default to run myTriggerTest_cfg.py afterwards
-switchOnTriggerAll(process)
-process.out.outputCommands += patEventContentTriggerMatch
+switchOnTriggerAll( process )
+switchOnTriggerMatchEmbedding( process )
 process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
-                              , 'keep *_hltTriggerSummaryAOD_*_*' ]
+                              , 'keep *_hltTriggerSummaryAOD_*_*'
+                              ]
 # ## stand-alone trigger objects only
-# switchOnTriggerStandAlone(process)
+# switchOnTriggerStandAlone( process )
+# ## embedded trigger object matches only
+# switchOnTriggerMatchEmbedding( process )
 ### switch END ###
 
 process.outpath = cms.EndPath(

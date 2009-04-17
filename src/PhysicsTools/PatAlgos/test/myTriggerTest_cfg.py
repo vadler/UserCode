@@ -21,20 +21,41 @@ process.TFileService = cms.Service( "TFileService",
 )
 
 process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
-    hltProcessName           = cms.string( 'HLT' ),
-    triggerResults           = cms.InputTag( "TriggerResults" ),
-    triggerEvent             = cms.InputTag( "hltTriggerSummaryAOD" ),
-    patProcessName           = cms.string( 'PAT' ),
-    patTrigger               = cms.InputTag( "patTrigger" ),
-    patTriggerEvent          = cms.InputTag( "patTriggerEvent" ),
-    testPathModuleTags       = cms.bool( False ),
-    displayNumbers           = cms.bool( False ),
-    displayObjects           = cms.bool( False ),
+    hltProcessName  = cms.string( 'HLT' ),
+    triggerResults  = cms.InputTag( "TriggerResults" ),
+    triggerEvent    = cms.InputTag( "hltTriggerSummaryAOD" ),
+    patProcessName  = cms.string( 'PAT' ),
+    patTrigger      = cms.InputTag( "patTrigger" ),
+    patTriggerEvent = cms.InputTag( "patTriggerEvent" ),
+    # general
+    testPathModuleTags = cms.bool( False ),
+    displayNumbers     = cms.bool( False ),
+    # objects
+    displayObjects = cms.bool( False ),
+    # stannd-alone objects
     displayObjectsStandAlone = cms.bool( False ),
-    displayFilters           = cms.bool( False ),
-    displayPaths             = cms.bool( False ),
-    displayEvent             = cms.bool( False ),
-    displayMatches           = cms.bool( True )
+    # filters
+    displayFilters = cms.bool( False ),
+    # paths
+    displayPaths = cms.bool( False ),
+    # event
+    displayEvent = cms.bool( False ),
+    # matching
+    displayMatches = cms.bool( False ),
+    # embedding
+    displayEmbedding      = cms.bool( True ),
+    patPhotons            = cms.InputTag( "cleanLayer1Photons" ),
+    patElectrons          = cms.InputTag( "cleanLayer1Electrons" ),
+    patMuons              = cms.InputTag( "cleanLayer1Muons" ),
+    patTaus               = cms.InputTag( "cleanLayer1Taus" ),
+    patJets               = cms.InputTag( "cleanLayer1Jets" ),
+    patMETs               = cms.InputTag( "layer1METs" ),
+    patPhotonsEmbedding   = cms.InputTag( "cleanLayer1PhotonsTriggerMatch" ),
+    patElectronsEmbedding = cms.InputTag( "cleanLayer1ElectronsTriggerMatch" ),
+    patMuonsEmbedding     = cms.InputTag( "cleanLayer1MuonsTriggerMatch" ),
+    patTausEmbedding      = cms.InputTag( "cleanLayer1TausTriggerMatch" ),
+    patJetsEmbedding      = cms.InputTag( "cleanLayer1JetsTriggerMatch" ),
+    patMETsEmbedding      = cms.InputTag( "layer1METsTriggerMatch" )
 )
 
 process.p = cms.Path(

@@ -1,5 +1,5 @@
 //
-// $Id: myTriggerTest.cc,v 1.1.2.6 2009/03/13 12:10:36 vadler Exp $
+// $Id: myTriggerTest.cc,v 1.1.2.12 2009/03/27 21:08:46 vadler Exp $
 //
 
 
@@ -30,6 +30,19 @@ myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   displayPaths_( iConfig.getParameter< bool >( "displayPaths" ) ),
   displayEvent_( iConfig.getParameter< bool >( "displayEvent" ) ),
   displayMatches_( iConfig.getParameter< bool >( "displayMatches" ) ),
+  displayEmbedding_( iConfig.getParameter< bool >( "displayEmbedding" ) ),
+  tagPatPhotons_( iConfig.getParameter< edm::InputTag >( "patPhotons" ) ),
+  tagPatElectrons_( iConfig.getParameter< edm::InputTag >( "patElectrons" ) ),
+  tagPatMuons_( iConfig.getParameter< edm::InputTag >( "patMuons" ) ),
+  tagPatTaus_( iConfig.getParameter< edm::InputTag >( "patTaus" ) ),
+  tagPatJets_( iConfig.getParameter< edm::InputTag >( "patJets" ) ),
+  tagPatMETs_( iConfig.getParameter< edm::InputTag >( "patMETs" ) ),
+  tagPatPhotonsEmbedding_( iConfig.getParameter< edm::InputTag >( "patPhotonsEmbedding" ) ),
+  tagPatElectronsEmbedding_( iConfig.getParameter< edm::InputTag >( "patElectronsEmbedding" ) ),
+  tagPatMuonsEmbedding_( iConfig.getParameter< edm::InputTag >( "patMuonsEmbedding" ) ),
+  tagPatTausEmbedding_( iConfig.getParameter< edm::InputTag >( "patTausEmbedding" ) ),
+  tagPatJetsEmbedding_( iConfig.getParameter< edm::InputTag >( "patJetsEmbedding" ) ),
+  tagPatMETsEmbedding_( iConfig.getParameter< edm::InputTag >( "patMETsEmbedding" ) ),
   histos1D_(),
   histos2D_()
 {
@@ -116,6 +129,7 @@ void myTriggerTest::beginJob( const edm::EventSetup & iSetup )
 
 void myTriggerTest::beginRun( edm::Run & iRun, const edm::EventSetup & iSetup )
 {
+// FIXME Why does this not work  h e r e , but in the c'tor?
 //   if ( ! hltConfig_.init( nameHLTProcess_ ) ) {
 //     edm::LogError( "hltConfigExtraction" ) << "HLT config extraction error with process name " << nameHLTProcess_;
 //   }
@@ -193,6 +207,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   // Method checking
   
   // pat::TriggerObject
+  
   for ( TriggerObjectCollection::const_iterator iObject = myEventObjects->begin(); iObject != myEventObjects->end(); ++iObject ) {
     const std::vector< unsigned > ids( iObject->filterIds() );
     histos1D_[ "nFilterIds" ]->Fill( ids.size() );
@@ -206,6 +221,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   // pat::TriggerObjectStandAlone
   
   // pat::TriggerFilter
+  
   for ( TriggerFilterCollection::const_iterator iFilter = myEventFilters->begin(); iFilter != myEventFilters->end(); ++iFilter ) {
     const std::vector< unsigned > keys( iFilter->objectKeys() );
     for ( size_t iKey = 0; iKey < keys.size(); ++iKey ) {
@@ -224,6 +240,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   }
   
   // pat::TriggerPath
+  
   for ( TriggerPathCollection::const_iterator iPath = myEventPaths->begin(); iPath != myEventPaths->end(); ++iPath ) {
     if ( ! iPath->wasAccept() ) {
       const std::string labelLastActiveModule( hltConfig_.moduleLabel( iPath->index(), iPath->lastActiveFilterSlot() ) );
@@ -271,6 +288,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   }
   
   // pat::TriggerEvent
+  
   const TriggerPathRefVector pathRefs( handlePatTriggerEvent->acceptedPaths() );
   for ( TriggerPathRefVector::const_iterator iPath = pathRefs.begin(); iPath != pathRefs.end(); ++iPath ) {
     if ( ! ( *iPath )->wasAccept() ) {
@@ -306,10 +324,11 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   }
   
   // trigger matches
+  
   const TriggerObjectMatchContainer * triggerMatches( handlePatTriggerEvent->triggerObjectMatchResults() );
   TriggerObjectMatchContainer triggerMatchContainer( *triggerMatches ); // cannot be const due to usage of 'operator[]'
   const std::vector< std::string > matches( handlePatTriggerEvent->triggerMatchers() );
-  for ( unsigned iMatch = 0; iMatch < matches.size(); ++iMatch ) {
+  for ( size_t iMatch = 0; iMatch < matches.size(); ++iMatch ) {
     bool continueHere( false );
     const std::string match( matches.at( iMatch ) );
     if ( displayMatches_ ) edm::LogWarning( "matcherLabel" ) << "Matcher label: " << match;
@@ -499,7 +518,117 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       ++itSa;
     }
   }
-  
+
+  // Checking embedding
+
+  edm::Handle< PhotonCollection > handlePatPhotons;
+  iEvent.getByLabel( tagPatPhotons_, handlePatPhotons );
+  const unsigned prodIdPhotons( handlePatPhotons.id().id() );
+  edm::Handle< ElectronCollection > handlePatElectrons;
+  iEvent.getByLabel( tagPatElectrons_, handlePatElectrons );
+  const unsigned prodIdElectrons( handlePatElectrons.id().id() );
+  edm::Handle< MuonCollection > handlePatMuons;
+  iEvent.getByLabel( tagPatMuons_, handlePatMuons );
+  const unsigned prodIdMuons( handlePatMuons.id().id() );
+  edm::Handle< TauCollection > handlePatTaus;
+  iEvent.getByLabel( tagPatTaus_, handlePatTaus );
+  const unsigned prodIdTaus( handlePatTaus.id().id() );
+  edm::Handle< JetCollection > handlePatJets;
+  iEvent.getByLabel( tagPatJets_, handlePatJets );
+  const unsigned prodIdJets( handlePatJets.id().id() );
+  edm::Handle< METCollection > handlePatMETs;
+  iEvent.getByLabel( tagPatMETs_, handlePatMETs );
+  const unsigned prodIdMETs( handlePatMETs.id().id() );
+  edm::Handle< PhotonCollection > handlePatPhotonsEmbedding;
+  iEvent.getByLabel( tagPatPhotonsEmbedding_, handlePatPhotonsEmbedding );
+  edm::Handle< ElectronCollection > handlePatElectronsEmbedding;
+  iEvent.getByLabel( tagPatElectronsEmbedding_, handlePatElectronsEmbedding );
+  edm::Handle< MuonCollection > handlePatMuonsEmbedding;
+  iEvent.getByLabel( tagPatMuonsEmbedding_, handlePatMuonsEmbedding );
+  edm::Handle< TauCollection > handlePatTausEmbedding;
+  iEvent.getByLabel( tagPatTausEmbedding_, handlePatTausEmbedding );
+  edm::Handle< JetCollection > handlePatJetsEmbedding;
+  iEvent.getByLabel( tagPatJetsEmbedding_, handlePatJetsEmbedding );
+  edm::Handle< METCollection > handlePatMETsEmbedding;
+  iEvent.getByLabel( tagPatMETsEmbedding_, handlePatMETsEmbedding );
+
+  for ( size_t iMatch = 0; iMatch < matches.size(); ++iMatch ) {
+    const std::string match( matches.at( iMatch ) );
+    edm::Handle< TriggerObjectStandAloneMatch > triggerStandAloneMatch;
+    iEvent.getByLabel( match, triggerStandAloneMatch );
+    if ( ! triggerStandAloneMatch.isValid() ) {
+      edm::LogError( "missingStandAloneMatch" ) << "    Stand-alone match " << match << " missing";
+      continue;
+    }
+    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectStandAloneMatch > itSa( *triggerStandAloneMatch, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itSaEnd( itSa.end() );
+    while ( itSa != itSaEnd ) {
+      const TriggerObjectStandAloneRef objRefSa( itSa->second );
+      if ( objRefSa.isNull() || ! objRefSa.isAvailable() ) {
+        ++itSa;
+        continue;
+      }
+      const reco::CandidateBaseRef candRefSa( itSa->first );
+      bool found( false );
+      if ( candRefSa.id().id() == prodIdPhotons ) {
+        const TriggerObjectStandAloneCollection & trigObjColl( handlePatPhotonsEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+            found = true;
+          }
+        }
+      } else if ( candRefSa.id().id() == prodIdElectrons ) {
+        const TriggerObjectStandAloneCollection & trigObjColl( handlePatElectronsEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+            found = true;
+          }
+        }
+      } else if ( candRefSa.id().id() == prodIdMuons ) {
+        const TriggerObjectStandAloneCollection & trigObjColl( handlePatMuonsEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+            found = true;
+          }
+        }
+      } else if ( candRefSa.id().id() == prodIdTaus ) {
+        const TriggerObjectStandAloneCollection & trigObjColl( handlePatTausEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+            found = true;
+          }
+        }
+      } else if ( candRefSa.id().id() == prodIdJets ) {
+        const TriggerObjectStandAloneCollection & trigObjColl( handlePatJetsEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+            found = true;
+          }
+        }
+      } else if ( candRefSa.id().id() == prodIdMETs ) {
+        const TriggerObjectStandAloneCollection & trigObjColl( handlePatMETsEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+            found = true;
+          }
+        }
+      } else {
+        edm::LogError( "missingProductId" ) << "    ProductID " << candRefSa.id().id() << " not present in collection map";
+        ++itSa;
+        continue;
+      }
+      if ( ! found ) {
+        edm::LogError( "missingMatch" ) << "    Match not found:";
+      }
+      ++itSa;
+    }
+  }  
+
 }
 
 void myTriggerTest::endRun()
