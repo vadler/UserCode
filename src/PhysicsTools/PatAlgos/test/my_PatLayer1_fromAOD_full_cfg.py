@@ -65,7 +65,7 @@ process.out = cms.OutputModule( "PoolOutputModule",
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOffTriggerMatchingOld(process)
+switchOffTriggerMatchingOld( process )
 ### switch START ###
 # ## no stand-alone trigger objects
 # switchOnTrigger( process )
