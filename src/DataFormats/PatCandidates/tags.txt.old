@@ -2,7 +2,7 @@ Test Release based on: CMSSW_2_2_8
 Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_8
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_8
 --- Tag ---    -------- Package --------                        
-V01-08-03      CondFormats/JetMETObjects                        
+V01-08-04      CondFormats/JetMETObjects                        
 V09-01-02      DataFormats/Candidate                            
 V08-06-00-03   DataFormats/Common                               
 B2_2_X         DataFormats/PatCandidates                        
