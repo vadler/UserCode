@@ -52,10 +52,6 @@ switchJetCollection(process,
 #        jetCorrLabel=None,#=('S5','Calo'), # If you have JES corrections, you can apply them even to BasicJets
 #        doType1MET=False)                  # Type1MET dows not work on BasicJets :-(
 
-# Switch off old trigger matching
-from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
-switchOffTriggerMatchingOld( process )
-
 #process.content = cms.EDAnalyzer("EventContentAnalyzer")
 process.p = cms.Path(
                 ## process.iterativeCone5BasicJets +  ## Turn on this to run tests on BasicJets

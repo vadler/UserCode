@@ -57,10 +57,6 @@ addJetCollection(process,cms.InputTag('iterativeCone5PFJets'), 'PFr',
                         doJTA=True,doBTagging=True,jetCorrLabel=None,doType1MET=True,doL1Counters=False,
                         genJetCollection=cms.InputTag("iterativeCone5GenJets"))
 
-# Switch off old trigger matching
-from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
-switchOffTriggerMatchingOld( process )
-
 process.content = cms.EDAnalyzer("EventContentAnalyzer")
 process.p = cms.Path(
                 ## FIXME process.iterativeCone5BasicJets +  ## Turn on this to run tests on BasicJets

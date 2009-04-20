@@ -38,13 +38,8 @@ makeTrackCandidates(process,
                    'ecalTowers':0.3,          # 'tracker' => as muon track iso
                    'hcalTowers':0.3},         # 'ecalTowers', 'hcalTowers' => as muon iso from calo towers.
         isodeposits=[],                       # examples: 'tracker','ecalTowers','hcalTowers'; [] = empty list = none   
-        mcAs=cms.InputTag("muons"),           # Replicate MC match as the one used by PAT on this AOD collection (None = no mc match)
-        triggerAs=[]                          # Replicate trigger match as all the ones used by PAT on these AOD collections (None = no trig.)
+        mcAs=cms.InputTag("muons")            # Replicate MC match as the one used by PAT on this AOD collection (None = no mc match)
         );                                    #  you can specify more than one collection for this
-
-# Switch off old trigger matching
-from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
-switchOffTriggerMatchingOld( process )
 
 process.p = cms.Path(
         process.patDefaultSequence 

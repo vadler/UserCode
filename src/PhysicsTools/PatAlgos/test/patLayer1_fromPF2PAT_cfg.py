@@ -30,9 +30,6 @@ process.load("PhysicsTools.PatAlgos.patSequences_cff")
 # Configure PAT to use PF2PAT instead of AOD sources
 from PhysicsTools.PatAlgos.tools.pfTools import *
 usePF2PAT(process)
-# Switch off old trigger matching
-from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
-switchOffTriggerMatchingOld( process )
 
 process.p = cms.Path(
     process.patDefaultSequence  

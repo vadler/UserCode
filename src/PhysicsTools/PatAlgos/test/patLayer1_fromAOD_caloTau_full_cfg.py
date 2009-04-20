@@ -31,9 +31,6 @@ process.load("PhysicsTools.PatAlgos.patSequences_cff")
 # Switch to CaloTau (outputs will be allLayer0CaloTaus, allLayer1Taus, selectedLayer1Taus)
 from PhysicsTools.PatAlgos.tools.tauTools import switchToCaloTau
 switchToCaloTau(process)
-# Switch off old trigger matching
-from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
-switchOffTriggerMatchingOld( process )
 
 process.p = cms.Path(
         #process.content +             # uncomment to get a dump of the input to PAT

@@ -1,5 +1,5 @@
 //
-// $Id: PATTauProducer.h,v 1.15 2009/03/26 20:44:37 vadler Exp $
+// $Id: PATTauProducer.h,v 1.17 2009/04/20 19:49:14 vadler Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATTauProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of TauType.
 
   \author   Steven Lowette, Christophe Delaere
-  \version  $Id: PATTauProducer.h,v 1.15 2009/03/26 20:44:37 vadler Exp $
+  \version  $Id: PATTauProducer.h,v 1.17 2009/04/20 19:49:14 vadler Exp $
 */
 
 
@@ -67,8 +67,6 @@ namespace pat {
       bool          addGenJetMatch_;
       bool          embedGenJetMatch_;
       edm::InputTag genJetMatchSrc_;
-      bool          addTrigMatch_;
-      std::vector<edm::InputTag> trigMatchSrc_;
       bool          addResolutions_;
       bool          addTauID_;
       typedef std::pair<std::string, edm::InputTag> NameTag;
@@ -89,6 +87,8 @@ namespace pat {
 
       template <typename TauCollectionType, typename TauDiscrType> float getTauIdDiscriminator(const edm::Handle<TauCollectionType>&, size_t, const edm::Handle<TauDiscrType>&);
 
+      bool          addDecayMode_;
+      edm::InputTag decayModeSrc_;
   };
 
 }

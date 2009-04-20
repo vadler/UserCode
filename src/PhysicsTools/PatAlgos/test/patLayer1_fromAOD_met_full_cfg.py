@@ -29,7 +29,6 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 # extraction of met sequences
 process.load("PhysicsTools.PatAlgos.recoLayer0.jetMETCorrections_cff")
 process.load("PhysicsTools.PatAlgos.producersLayer1.metProducer_cfi")
-process.layer1METs.addTrigMatch = False
 #process.content = cms.EDAnalyzer("EventContentAnalyzer")
 
 process.p = cms.Path(

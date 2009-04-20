@@ -30,10 +30,6 @@ process.load("PhysicsTools.PatAlgos.patSequences_cff")
 from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
 removeCleaning(process)
 
-# Switch off old trigger matching
-from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
-switchOffTriggerMatchingOld( process )
-
 process.p = cms.Path(
     process.patDefaultSequence  
 )

@@ -33,7 +33,6 @@ process.load("PhysicsTools.PatAlgos.recoLayer0.pfCandidateIsoDepositSelection_cf
 process.load("PhysicsTools.PatAlgos.recoLayer0.tauIsolation_cff")
 process.load("PhysicsTools.PatAlgos.recoLayer0.tauDiscriminators_cff")  ##missing modules and inputs
 process.load("PhysicsTools.PatAlgos.producersLayer1.tauProducer_cfi")
-process.allLayer1Taus.addTrigMatch = False
 #process.content = cms.EDAnalyzer("EventContentAnalyzer")
 
 process.p = cms.Path(

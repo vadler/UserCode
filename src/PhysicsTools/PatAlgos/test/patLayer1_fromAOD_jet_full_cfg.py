@@ -32,7 +32,6 @@ process.load("PhysicsTools.PatAlgos.recoLayer0.jetTracksCharge_cff")
 process.load("PhysicsTools.PatAlgos.recoLayer0.jetMETCorrections_cff")
 process.load("PhysicsTools.PatAlgos.mcMatchLayer0.mcMatchSequences_cff")
 process.load("PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi")
-process.allLayer1Jets.addTrigMatch = False
 process.content = cms.EDAnalyzer("EventContentAnalyzer")
 
 # replacements to make the muons work

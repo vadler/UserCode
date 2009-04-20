@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 allLayer1Taus = cms.EDProducer("PATTauProducer",
     # input
-    tauSource = cms.InputTag("pfRecoTauProducer"),
+    tauSource = cms.InputTag("fixedConePFTauProducer"),
 
     # add user data
     userData = cms.PSet(
@@ -31,28 +31,28 @@ allLayer1Taus = cms.EDProducer("PATTauProducer",
     # isolation
     isolation = cms.PSet(
         pfAllParticles = cms.PSet(
-            src = cms.InputTag("patLayer0PFTauIsolation", "tauIsoDepositPFCandidates"),
+            src = cms.InputTag("tauIsoDepositPFCandidates"),
             deltaR = cms.double(0.5)
         ),
         pfChargedHadron = cms.PSet(
-            src = cms.InputTag("patLayer0PFTauIsolation", "tauIsoDepositPFChargedHadrons"),
+            src = cms.InputTag("tauIsoDepositPFChargedHadrons"),
             deltaR = cms.double(0.5)
         ),
         pfNeutralHadron = cms.PSet(
-            src = cms.InputTag("patLayer0PFTauIsolation", "tauIsoDepositPFNeutralHadrons"),
+            src = cms.InputTag("tauIsoDepositPFNeutralHadrons"),
             deltaR = cms.double(0.5)
         ),
         pfGamma = cms.PSet(
-            src = cms.InputTag("patLayer0PFTauIsolation", "tauIsoDepositPFGammas"),
+            src = cms.InputTag("tauIsoDepositPFGammas"),
             deltaR = cms.double(0.5)
         )
     ),                           
     # embed IsoDeposits
     isoDeposits = cms.PSet(
-        pfAllParticles = cms.InputTag("patLayer0PFTauIsolation", "tauIsoDepositPFCandidates"),
-        pfChargedHadron = cms.InputTag("patLayer0PFTauIsolation", "tauIsoDepositPFChargedHadrons"),
-        pfNeutralHadron = cms.InputTag("patLayer0PFTauIsolation", "tauIsoDepositPFNeutralHadrons"),
-        pfGamma = cms.InputTag("patLayer0PFTauIsolation", "tauIsoDepositPFGammas")
+        pfAllParticles = cms.InputTag("tauIsoDepositPFCandidates"),
+        pfChargedHadron = cms.InputTag("tauIsoDepositPFChargedHadrons"),
+        pfNeutralHadron = cms.InputTag("tauIsoDepositPFNeutralHadrons"),
+        pfGamma = cms.InputTag("tauIsoDepositPFGammas")
     ),
 
     # tau ID (for efficiency studies)
@@ -61,18 +61,18 @@ allLayer1Taus = cms.EDProducer("PATTauProducer",
         # configure many IDs as InputTag <someName> = <someTag>
         # you can comment out those you don't want to save some
         # disk space
-        leadingTrackFinding = cms.InputTag("pfRecoTauDiscriminationByLeadingTrackFinding"),
-        leadingTrackPtCut = cms.InputTag("pfRecoTauDiscriminationByLeadingTrackPtCut"),
-        trackIsolation = cms.InputTag("pfRecoTauDiscriminationByTrackIsolation"),
-        ecalIsolation = cms.InputTag("pfRecoTauDiscriminationByECALIsolation"),
-        byIsolation = cms.InputTag("pfRecoTauDiscriminationByIsolation"),
-        againstElectron = cms.InputTag("pfRecoTauDiscriminationAgainstElectron"),
-        againstMuon = cms.InputTag("pfRecoTauDiscriminationAgainstMuon")
+        leadingTrackFinding = cms.InputTag("fixedConePFTauDiscriminationByLeadingTrackFinding"),
+        leadingTrackPtCut = cms.InputTag("fixedConePFTauDiscriminationByLeadingTrackPtCut"),
+        trackIsolation = cms.InputTag("fixedConePFTauDiscriminationByTrackIsolation"),
+        ecalIsolation = cms.InputTag("fixedConePFTauDiscriminationByECALIsolation"),
+        byIsolation = cms.InputTag("fixedConePFTauDiscriminationByIsolation"),
+        againstElectron = cms.InputTag("fixedConePFTauDiscriminationAgainstElectron"),
+        againstMuon = cms.InputTag("fixedConePFTauDiscriminationAgainstMuon")
     ),
 
-    # trigger matching configurables
-    addTrigMatch  = cms.bool(False),
-    trigPrimMatch = cms.VInputTag(''),
+    # tau decay mode configurables
+    addDecayMode = cms.bool(False),
+    decayModeSrc = cms.InputTag("fixedConePFTauDecayModeProducer"),                    
 
     # mc matching configurables
     addGenMatch      = cms.bool(True),

@@ -36,7 +36,6 @@ process.load("PhysicsTools.PFCandProducer.pfMET_cfi")
 ### This doesn't take care of the trigger matching
 process.layer1PFMETs = process.layer1METs.clone(
     metSource = cms.InputTag("pfMET"),
-    addTrigMatch = cms.bool(False),
     addMuonCorrections = cms.bool(False),
 )
 process.allLayer1Objects.replace( process.layer1METs, process.layer1METs + process.layer1PFMETs)
@@ -45,18 +44,10 @@ process.allLayer1Objects.replace( process.layer1METs, process.layer1METs + proce
 ##
 ##   # Get old label for MET
 ##   oldMETSource = process.layer1METs.metSource
-##   
-##   # Replace 'old MET' with 'pfMET' in trigger matching
-##   from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceParam
-##   massSearchReplaceParam(process.patTrigMatch, "src", oldMETSource, cms.InputTag("pfMET"))
-##   
+##
 ##   # Use PF MET to make PAT MET
 ##   process.layer1METs.metSource = cms.InputTag("pfMET")
 ##   process.layer1METs.addMuonCorrections = False
-
-# Switch off old trigger matching
-from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
-switchOffTriggerMatchingOld( process )
 
 # Now we break up process.patLayer0
 process.p = cms.Path(

@@ -1,5 +1,5 @@
 //
-// $Id: PATTauProducer.cc,v 1.22 2009/03/26 22:38:58 hegner Exp $
+// $Id: PATTauProducer.cc,v 1.25 2009/04/20 19:49:14 vadler Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATTauProducer.h"
@@ -11,10 +11,10 @@
 #include "DataFormats/Common/interface/Ref.h"
 
 #include "DataFormats/TauReco/interface/PFTau.h"
-//#include "DataFormats/TauReco/interface/PFTauDiscriminatorByIsolation.h"
 #include "DataFormats/TauReco/interface/PFTauDiscriminator.h"
+#include "DataFormats/TauReco/interface/PFTauDecayMode.h"
+#include "DataFormats/TauReco/interface/PFTauDecayModeAssociation.h"
 #include "DataFormats/TauReco/interface/CaloTau.h"
-#include "DataFormats/TauReco/interface/CaloTauDiscriminatorByIsolation.h"
 #include "DataFormats/TauReco/interface/CaloTauDiscriminator.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
@@ -53,8 +53,6 @@ PATTauProducer::PATTauProducer(const edm::ParameterSet & iConfig):
     genJetMatchSrc_    = iConfig.getParameter<edm::InputTag>( "genJetMatch" );
   }
 
-  addTrigMatch_   = iConfig.getParameter<bool>               ( "addTrigMatch" );
-  trigMatchSrc_   = iConfig.getParameter<std::vector<edm::InputTag> >( "trigPrimMatch" );
   addResolutions_ = iConfig.getParameter<bool>         ( "addResolutions" );
 
   // tau ID configurables
@@ -83,6 +81,12 @@ PATTauProducer::PATTauProducer(const edm::ParameterSet & iConfig):
       "\tPSet tauIDSources = { \n" <<
       "\t\tInputTag <someName> = <someTag>   // as many as you want \n " <<
       "\t}\n";
+  }
+  
+  // tau decay mode configurables
+  addDecayMode_ = iConfig.getParameter<bool>         ( "addDecayMode" );
+  if ( addDecayMode_ ) {
+    decayModeSrc_ = iConfig.getParameter<edm::InputTag>( "decayModeSrc" );
   }
 
   // IsoDeposit configurables
@@ -185,18 +189,6 @@ void PATTauProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
         aTau.setGenJet( genJetTau );
       } // leave empty if no match found
     }
-        
-    // matches to trigger primitives
-    if ( addTrigMatch_ ) {
-      for ( size_t i = 0; i < trigMatchSrc_.size(); ++i ) {
-        edm::Handle<edm::Association<TriggerPrimitiveCollection> > trigMatch;
-        iEvent.getByLabel(trigMatchSrc_[i], trigMatch);
-        TriggerPrimitiveRef trigPrim = (*trigMatch)[tausRef];
-        if ( trigPrim.isNonnull() && trigPrim.isAvailable() ) {
-          aTau.addTriggerMatch(*trigPrim);
-        }
-      }
-    }
 
     // prepare ID extraction 
     if ( addTauID_ ) {
@@ -235,6 +227,20 @@ void PATTauProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
       }
 
       aTau.setTauIDs(ids);
+    }
+
+    // extraction of reconstructed tau decay mode 
+    if ( addDecayMode_ ) {
+      edm::Handle<reco::PFTauDecayModeAssociation> pfDecayModeAssoc;
+      iEvent.getByLabel(decayModeSrc_, pfDecayModeAssoc);
+      edm::Handle<reco::PFTauCollection> pfTaus;
+      iEvent.getByLabel(tauSrc_, pfTaus);
+      reco::PFTauRef pfTauRef(pfTaus, idx);
+      // need PFTauRef (edm::RefToBase<reco::BaseTau> does not suffice) 
+      // for PFTauDecayMode look-up
+      //const reco::PFTauDecayMode& pfDecayMode = (*pfDecayModeAssoc)[tausRef];
+      const reco::PFTauDecayMode& pfDecayMode = (*pfDecayModeAssoc)[pfTauRef];
+      aTau.setDecayMode(pfDecayMode.getDecayMode());
     }
 
     // Isolation

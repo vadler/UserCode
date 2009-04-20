@@ -31,7 +31,6 @@ process.load("PhysicsTools.PatAlgos.recoLayer0.photonId_cff")
 process.load("PhysicsTools.PatAlgos.recoLayer0.photonIsolation_cff")
 process.load("PhysicsTools.PatAlgos.mcMatchLayer0.mcMatchSequences_cff")
 process.load("PhysicsTools.PatAlgos.producersLayer1.photonProducer_cfi")
-process.allLayer1Photons.addTrigMatch = False
 #process.content = cms.EDAnalyzer("EventContentAnalyzer")
 
 process.p = cms.Path(
@@ -51,3 +50,4 @@ process.out = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('drop *', *patEventContent ) # you need a '*' to unpack the list of commands 'patEventContent'
 )
 process.outpath = cms.EndPath(process.out)
+

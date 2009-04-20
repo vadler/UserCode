@@ -52,7 +52,6 @@ process.out = cms.OutputModule( "PoolOutputModule",
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOffTriggerMatchingOld( process )
 switchOnTrigger( process )
 
 process.outpath = cms.EndPath(

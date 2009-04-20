@@ -29,7 +29,6 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 # extraction of muon sequences
 process.load("PhysicsTools.PatAlgos.recoLayer0.muonIsolation_cff")
 process.load("PhysicsTools.PatAlgos.producersLayer1.muonProducer_cfi")
-process.allLayer1Muons.addTrigMatch = False
 process.load("PhysicsTools.PatAlgos.mcMatchLayer0.mcMatchSequences_cff")
 #process.content = cms.EDAnalyzer("EventContentAnalyzer")
 

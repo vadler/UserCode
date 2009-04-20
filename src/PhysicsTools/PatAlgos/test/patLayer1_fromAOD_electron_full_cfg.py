@@ -32,7 +32,6 @@ process.load("PhysicsTools.PatAlgos.recoLayer0.electronIsolation_cff")
 process.load("PhysicsTools.PatAlgos.recoLayer0.duplicatedElectrons_cfi")
 process.load("PhysicsTools.PatAlgos.mcMatchLayer0.mcMatchSequences_cff")
 process.load("PhysicsTools.PatAlgos.producersLayer1.electronProducer_cfi")
-process.allLayer1Electrons.addTrigMatch = False
 #process.content = cms.EDAnalyzer("EventContentAnalyzer")
 
 process.p = cms.Path(
