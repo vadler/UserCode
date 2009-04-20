@@ -10,10 +10,10 @@
    .
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: PATTriggerMatchEmbedder.cc,v 1.1.2.2 2009/04/20 12:33:27 vadler Exp $
 */
 //
-// $Id$
+// $Id: PATTriggerMatchEmbedder.cc,v 1.1.2.2 2009/04/20 12:33:27 vadler Exp $
 //
 
 
@@ -86,23 +86,23 @@ void PATTriggerMatchEmbedder< PATObjectType, RecoObjectType >::produce( edm::Eve
     return;
   }
 
-  for ( size_t iMatch = 0; iMatch < matches_.size(); ++iMatch ) {
-    edm::Handle< TriggerObjectStandAloneMatch > match;
-    iEvent.getByLabel( matches_.at( iMatch ), match );
-    if ( ! match.isValid() ) {
-      edm::LogError( "missingInputMatch" ) << "Input match with InputTag " << matches_.at( iMatch ).encode() << " not in event.";
-      continue;
-    }
-    for ( typename edm::View< PATObjectType >::const_iterator iCand = candidates->begin(); iCand != candidates->end(); ++iCand ) {
-      const unsigned index( iCand - candidates->begin() );
-      const edm::RefToBase< RecoObjectType > candRef( candidates->refAt( index ) );
-      PATObjectType cand( candRef );
+  for ( typename edm::View< PATObjectType >::const_iterator iCand = candidates->begin(); iCand != candidates->end(); ++iCand ) {
+    const unsigned index( iCand - candidates->begin() );
+    const edm::RefToBase< RecoObjectType > candRef( candidates->refAt( index ) );
+    PATObjectType cand( candRef );
+    for ( size_t iMatch = 0; iMatch < matches_.size(); ++iMatch ) {
+      edm::Handle< TriggerObjectStandAloneMatch > match;
+      iEvent.getByLabel( matches_.at( iMatch ), match );
+      if ( ! match.isValid() ) {
+        edm::LogError( "missingInputMatch" ) << "Input match with InputTag " << matches_.at( iMatch ).encode() << " not in event.";
+        continue;
+      }
       const TriggerObjectStandAloneRef trigRef( ( *match )[ candRef ] );
       if ( trigRef.isNonnull() && trigRef.isAvailable() ) {
         cand.addTriggerObjectMatch( *trigRef );
       }
-      output->push_back( cand );
     }
+    output->push_back( cand );
   }
 
   iEvent.put( output );
