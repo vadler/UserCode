@@ -41,6 +41,12 @@
 #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+#include "DataFormats/PatCandidates/interface/Photon.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "PhysicsTools/UtilAlgos/interface/TFileService.h"
@@ -80,7 +86,20 @@ namespace pat {
       bool              displayPaths_;
       bool              displayEvent_;
       bool              displayMatches_;
-           
+      bool              displayEmbedding_;
+      edm::InputTag     tagPatPhotons_;
+      edm::InputTag     tagPatElectrons_;
+      edm::InputTag     tagPatMuons_;
+      edm::InputTag     tagPatTaus_;
+      edm::InputTag     tagPatJets_;
+      edm::InputTag     tagPatMETs_;
+      edm::InputTag     tagPatPhotonsEmbedding_;
+      edm::InputTag     tagPatElectronsEmbedding_;
+      edm::InputTag     tagPatMuonsEmbedding_;
+      edm::InputTag     tagPatTausEmbedding_;
+      edm::InputTag     tagPatJetsEmbedding_;
+      edm::InputTag     tagPatMETsEmbedding_;
+
       std::map< std::string, TH1D* > histos1D_;
       std::map< std::string, TH2D* > histos2D_;
   };
