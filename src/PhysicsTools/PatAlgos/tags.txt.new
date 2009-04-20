@@ -1,10 +1,11 @@
-Test Release based on: CMSSW_2_2_7
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_7
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_7
+Test Release based on: CMSSW_2_2_8
+Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_8
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_8
 --- Tag ---    -------- Package --------                        
 V01-08-03      CondFormats/JetMETObjects                        
+V09-01-02      DataFormats/Candidate                            
 V08-06-00-03   DataFormats/Common                               
-NoTag          DataFormats/PatCandidates                        
+B2_2_X         DataFormats/PatCandidates                        
 V00-16-10      DataFormats/RecoCandidate                        
 RB300309       JetMETCorrections/Algorithms                     
 RB300309       JetMETCorrections/Configuration                  
@@ -17,4 +18,4 @@ V08-06-16-06-02 PhysicsTools/RecoAlgos
 RB300309       RecoJets/JetAssociationAlgorithms                
 RB300309       RecoJets/JetAssociationProducers                 
 ---------------------------------------
-total packages: 14 (14 displayed)
+total packages: 15 (15 displayed)
