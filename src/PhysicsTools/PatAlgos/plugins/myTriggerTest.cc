@@ -5,12 +5,9 @@
 
 #include "PhysicsTools/PatAlgos/plugins/myTriggerTest.h"
 
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
-
-#include "DataFormats/Common/interface/AssociativeIterator.h"
-#include "DataFormats/Candidate/interface/Candidate.h"
-
 #include "TMath.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "DataFormats/Common/interface/AssociativeIterator.h"
 
 using namespace pat;
 using namespace TMath;
@@ -551,6 +548,45 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   iEvent.getByLabel( tagPatJetsEmbedding_, handlePatJetsEmbedding );
   edm::Handle< METCollection > handlePatMETsEmbedding;
   iEvent.getByLabel( tagPatMETsEmbedding_, handlePatMETsEmbedding );
+  if ( displayEmbedding_ ) {
+    edm::LogWarning( "productIds" ) << "    PAT object product IDs:\n"
+                                    << "        photons  : " << prodIdPhotons   << " (orig) " << handlePatPhotonsEmbedding.id().id()   << " (new)\n"
+                                    << "        electrons: " << prodIdElectrons << " (orig) " << handlePatElectronsEmbedding.id().id() << " (new)\n"
+                                    << "        muon     : " << prodIdMuons     << " (orig) " << handlePatMuonsEmbedding.id().id()     << " (new)\n"
+                                    << "        taus     : " << prodIdTaus      << " (orig) " << handlePatTausEmbedding.id().id()      << " (new)\n"
+                                    << "        jets     : " << prodIdJets      << " (orig) " << handlePatJetsEmbedding.id().id()      << " (new)\n"
+                                    << "        METs     : " << prodIdMETs      << " (orig) " << handlePatMETsEmbedding.id().id()      << " (new)";
+  }
+  if ( handlePatPhotons->size() != handlePatPhotonsEmbedding->size() ) {
+    edm::LogError( "sizeMismatch" ) << "    Photon collections differ in size:\n"
+                                    << "        orig: " << handlePatPhotons->size() << "\n"
+                                    << "        new : " << handlePatPhotonsEmbedding->size();
+  }
+  if ( handlePatElectrons->size() != handlePatElectronsEmbedding->size() ) {
+    edm::LogError( "sizeMismatch" ) << "    Electron collections differ in size:\n"
+                                    << "        orig: " << handlePatElectrons->size() << "\n"
+                                    << "        new : " << handlePatElectronsEmbedding->size();
+  }
+  if ( handlePatMuons->size() != handlePatMuonsEmbedding->size() ) {
+    edm::LogError( "sizeMismatch" ) << "    Muon collections differ in size:\n"
+                                    << "        orig: " << handlePatMuons->size() << "\n"
+                                    << "        new : " << handlePatMuonsEmbedding->size();
+  }
+  if ( handlePatTaus->size() != handlePatTausEmbedding->size() ) {
+    edm::LogError( "sizeMismatch" ) << "    Tau collections differ in size:\n"
+                                    << "        orig: " << handlePatTaus->size() << "\n"
+                                    << "        new : " << handlePatTausEmbedding->size();
+  }
+  if ( handlePatJets->size() != handlePatJetsEmbedding->size() ) {
+    edm::LogError( "sizeMismatch" ) << "    Jet collections differ in size:\n"
+                                    << "        orig: " << handlePatJets->size() << "\n"
+                                    << "        new : " << handlePatJetsEmbedding->size();
+  }
+  if ( handlePatMETs->size() != handlePatMETsEmbedding->size() ) {
+    edm::LogError( "sizeMismatch" ) << "    MET collections differ in size:\n"
+                                    << "        orig: " << handlePatMETs->size() << "\n"
+                                    << "        new : " << handlePatMETsEmbedding->size();
+  }
 
   for ( size_t iMatch = 0; iMatch < matches.size(); ++iMatch ) {
     const std::string match( matches.at( iMatch ) );
@@ -568,62 +604,121 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         continue;
       }
       const reco::CandidateBaseRef candRefSa( itSa->first );
+      const unsigned oldId( candRefSa.id().id() );
+      if ( displayEmbedding_ ) {
+        edm::LogWarning( "checkedProdId" ) << "    Checking product ID " << oldId << "\n"
+                                           << "        matcher label: " << match;
+      }
       bool found( false );
-      if ( candRefSa.id().id() == prodIdPhotons ) {
+      unsigned newId;
+      if ( oldId == prodIdPhotons ) {
+        newId = handlePatPhotonsEmbedding.id().id();
         const TriggerObjectStandAloneCollection & trigObjColl( handlePatPhotonsEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        if ( trigObjColl.empty() ) {
+          edm::LogError( "emptyMatchColl" ) << "    Empty embedded match collection found:\n"
+                                            << "        product ID: " << newId;
+          ++itSa;
+          continue;
+        }
         for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
-          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
-               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+//           if ( displayEmbedding_ ) {
+//             edm::LogWarning( "embedColl" ) << ;
+//           }
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection()/* &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()        */ ) {
             found = true;
           }
         }
-      } else if ( candRefSa.id().id() == prodIdElectrons ) {
+      } else if ( oldId == prodIdElectrons ) {
+        newId = handlePatElectronsEmbedding.id().id();
         const TriggerObjectStandAloneCollection & trigObjColl( handlePatElectronsEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        if ( trigObjColl.empty() ) {
+          edm::LogError( "emptyMatchColl" ) << "    Empty embedded match collection found:\n"
+                                            << "        product ID: " << newId;
+          ++itSa;
+          continue;
+        }
         for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
-          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
-               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection()/* &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()        */ ) {
             found = true;
           }
         }
-      } else if ( candRefSa.id().id() == prodIdMuons ) {
+      } else if ( oldId == prodIdMuons ) {
+        newId = handlePatMuonsEmbedding.id().id();
         const TriggerObjectStandAloneCollection & trigObjColl( handlePatMuonsEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        if ( trigObjColl.empty() ) {
+          edm::LogError( "emptyMatchColl" ) << "    Empty embedded match collection found:\n"
+                                            << "        product ID: " << newId;
+          ++itSa;
+          continue;
+        }
         for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
-          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
-               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection()/* &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()        */ ) {
             found = true;
           }
         }
-      } else if ( candRefSa.id().id() == prodIdTaus ) {
+      } else if ( oldId == prodIdTaus ) {
+        newId = handlePatTausEmbedding.id().id();
         const TriggerObjectStandAloneCollection & trigObjColl( handlePatTausEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        if ( trigObjColl.empty() ) {
+          edm::LogError( "emptyMatchColl" ) << "    Empty embedded match collection found:\n"
+                                            << "        product ID: " << newId;
+          ++itSa;
+          continue;
+        }
         for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
-          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
-               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection()/* &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()        */ ) {
             found = true;
           }
         }
-      } else if ( candRefSa.id().id() == prodIdJets ) {
+      } else if ( oldId == prodIdJets ) {
+        newId = handlePatJetsEmbedding.id().id();
         const TriggerObjectStandAloneCollection & trigObjColl( handlePatJetsEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        if ( trigObjColl.empty() ) {
+          edm::LogError( "emptyMatchColl" ) << "    Empty embedded match collection found:\n"
+                                            << "        product ID: " << newId;
+          ++itSa;
+          continue;
+        }
         for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
-          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
-               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection()/* &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()        */ ) {
             found = true;
           }
         }
-      } else if ( candRefSa.id().id() == prodIdMETs ) {
+      } else if ( oldId == prodIdMETs ) {
+        newId = handlePatMETsEmbedding.id().id();
         const TriggerObjectStandAloneCollection & trigObjColl( handlePatMETsEmbedding->at( candRefSa.key() ).triggerObjectMatches() );
+        if ( trigObjColl.empty() ) {
+          edm::LogError( "emptyMatchColl" ) << "    Empty embedded match collection found:\n"
+                                            << "        product ID: " << newId;
+          ++itSa;
+          continue;
+        }
         for ( size_t iTrigObj = 0; iTrigObj < trigObjColl.size(); ++iTrigObj ) {
-          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection() &
-               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()         ) {
+          if ( trigObjColl.at( iTrigObj ).collection() == objRefSa->collection()/* &
+               trigObjColl.at( iTrigObj ).p4()         == objRefSa->p4()        */ ) {
             found = true;
           }
         }
       } else {
-        edm::LogError( "missingProductId" ) << "    ProductID " << candRefSa.id().id() << " not present in collection map";
+        edm::LogError( "missingProductId" ) << "    ProductID " << oldId << " not present in collection map";
         ++itSa;
         continue;
       }
       if ( ! found ) {
-        edm::LogError( "missingMatch" ) << "    Match not found:";
+        edm::LogError( "missingMatch" ) << "    Match not found:\n"
+                                        << "        product ID (orig): " << oldId << "\n"
+                                        << "        product ID (new) : " << newId << "\n"
+                                        << "        object key       : " << candRefSa.key();
+      } else if ( displayEmbedding_ ) {
+          edm::LogWarning( "foundMatch" ) << "    Match found:\n"
+                                          << "        product ID (orig): " << oldId << "\n"
+                                          << "        product ID (new) : " << newId << "\n"
+                                          << "        object key       : " << candRefSa.key();
       }
       ++itSa;
     }
