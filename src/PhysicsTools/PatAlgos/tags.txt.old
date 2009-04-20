@@ -10,7 +10,7 @@ V00-16-10      DataFormats/RecoCandidate
 RB300309       JetMETCorrections/Algorithms                     
 RB300309       JetMETCorrections/Configuration                  
 V01-02-05      PhysicsTools/IsolationAlgos                      
-V01-02-05      PhysicsTools/JetCharge                           
+V01-02-06      PhysicsTools/JetCharge                           
 B2_2_X         PhysicsTools/PatAlgos                            
 B2_2_X         PhysicsTools/PatUtils                            
 PfElecTauMuIso_for22x PhysicsTools/PFCandProducer                      
