@@ -1,5 +1,5 @@
 //
-// $Id: TriggerEvent.cc,v 1.1.2.14 2009/03/13 12:10:35 vadler Exp $
+// $Id: TriggerEvent.cc,v 1.1.2.3 2009/03/18 19:08:22 vadler Exp $
 //
 
 
@@ -104,6 +104,10 @@ bool TriggerEvent::addObjectMatchResult( const TriggerObjectMatchRefProd & trigM
   return false;
 }
 bool TriggerEvent::addObjectMatchResult( const edm::Handle< TriggerObjectMatch > & trigMatches, const std::string & labelMatcher )
+{
+  return addObjectMatchResult( TriggerObjectMatchRefProd( trigMatches ), labelMatcher );
+}
+bool TriggerEvent::addObjectMatchResult( const edm::OrphanHandle< TriggerObjectMatch > & trigMatches, const std::string & labelMatcher )
 {
   return addObjectMatchResult( TriggerObjectMatchRefProd( trigMatches ), labelMatcher );
 }
@@ -280,7 +284,7 @@ TriggerObjectRef TriggerEvent::triggerMatchObject( const reco::CandidateBaseRef 
       }
       ++it;
     }
-  }
+  }  
   return TriggerObjectRef();
 }
 
@@ -297,14 +301,17 @@ TriggerObjectMatchMap TriggerEvent::triggerMatchObjects( const reco::CandidateBa
 reco::CandidateBaseRefVector TriggerEvent::triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher, const edm::Event & iEvent ) const
 {
   reco::CandidateBaseRefVector theCands;
-  edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *( triggerObjectMatchResult( labelMatcher ) ), edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
-  while ( it != itEnd ) {
-    if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {
-      if ( it->second == objectRef ) {
-        theCands.push_back( it->first );
+  const TriggerObjectMatch * matchResult( triggerObjectMatchResult( labelMatcher ) );
+  if ( matchResult ) {
+    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *matchResult, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
+    while ( it != itEnd ) {
+      if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {
+        if ( it->second == objectRef ) {
+          theCands.push_back( it->first );
+        }
       }
+      ++it;
     }
-    ++it;
   }
   return theCands;
 }
