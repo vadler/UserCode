@@ -215,7 +215,7 @@ patTrigMatchHLT1PhotonRelaxed = cms.Sequence(patHLT1PhotonRelaxed * photonTrigMa
 patTrigMatchHLT2Photon = cms.Sequence(patHLT2Photon * photonTrigMatchHLT2Photon)
 patTrigMatchHLT2PhotonRelaxed = cms.Sequence(patHLT2PhotonRelaxed * photonTrigMatchHLT2PhotonRelaxed)
 patTrigMatchHLT1Electron = cms.Sequence(patHLT1Electron * electronTrigMatchHLT1Electron)
-patTrigMatchHLT1ElectronRelaxed = cms.Sequence(patHLT1ElectronRelaxed * electronTrigMatchHLT1ElectronRelaxed + jetTrigMatchHLT1ElectronRelaxed)
+patTrigMatchHLT1ElectronRelaxed = cms.Sequence(patHLT1ElectronRelaxed * (electronTrigMatchHLT1ElectronRelaxed + jetTrigMatchHLT1ElectronRelaxed))
 patTrigMatchHLT2Electron = cms.Sequence(patHLT2Electron * electronTrigMatchHLT2Electron)
 patTrigMatchHLT2ElectronRelaxed = cms.Sequence(patHLT2ElectronRelaxed * electronTrigMatchHLT2ElectronRelaxed)
 patTrigMatchHLT1MuonIso = cms.Sequence(patHLT1MuonIso * muonTrigMatchHLT1MuonIso)
@@ -226,7 +226,7 @@ patTrigMatchHLT2TauPixel = cms.Sequence(patHLT2TauPixel * tauTrigMatchHLT2TauPix
 patTrigMatchHLT2jet = cms.Sequence(patHLT2jet * jetTrigMatchHLT2jet)
 patTrigMatchHLT3jet = cms.Sequence(patHLT3jet * jetTrigMatchHLT3jet)
 patTrigMatchHLT4jet   = cms.Sequence(patHLT4jet * jetTrigMatchHLT4jet)
-patTrigMatchHLT1MET65 = cms.Sequence(patHLT1MET65 * metTrigMatchHLT1MET65 + muonTrigMatchHLT1MET65)
+patTrigMatchHLT1MET65 = cms.Sequence(patHLT1MET65 * (metTrigMatchHLT1MET65 + muonTrigMatchHLT1MET65))
 
 
 ## patTuple ##
