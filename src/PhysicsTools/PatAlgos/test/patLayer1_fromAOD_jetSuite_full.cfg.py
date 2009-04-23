@@ -18,15 +18,14 @@ process.source = cms.Source("PoolSource",
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 
-
-# PAT Layer 0+1
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
-
 ## Load additional RECO config
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string('STARTUP_V7::All')
 process.load("Configuration.StandardSequences.MagneticField_cff")
+
+# PAT Layer 0+1
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
@@ -34,7 +33,6 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 ## FIXME ### make also some basic jets for testing
 ## FIXME from RecoJets.JetProducers.BasicJetIcone5_cfi import iterativeCone5BasicJets
 ## FIXME process.iterativeCone5BasicJets = iterativeCone5BasicJets.clone(src = cms.InputTag("towerMaker"))
-
 
 addJetCollection(process,cms.InputTag('sisCone5CaloJets'),'SC5',
                         doJTA=True,doBTagging=True,jetCorrLabel=('SC5','Calo'),doType1MET=True,doL1Counters=False,
@@ -57,9 +55,19 @@ addJetCollection(process,cms.InputTag('iterativeCone5PFJets'), 'PFr',
                         doJTA=True,doBTagging=True,jetCorrLabel=None,doType1MET=True,doL1Counters=False,
                         genJetCollection=cms.InputTag("iterativeCone5GenJets"))
 
-# Switch off old trigger matching
-from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
-switchOffTriggerMatchingOld( process )
+# Switch trigger matching off
+from PhysicsTools.PatAlgos.tools.trigTools import switchTriggerOff
+switchTriggerOff( process )
+## FIXME Trigger matches are screwed up
+##       maybe even more...; 
+process.allLayer1JetsPFr.addTrigMatch = False
+process.allLayer1JetsPFc.addTrigMatch = False
+process.allLayer1JetsSC5.addTrigMatch = False
+process.allLayer1JetsSC7.addTrigMatch = False
+process.allLayer1JetsKT4.addTrigMatch = False
+process.allLayer1JetsKT6.addTrigMatch = False
+process.layer1METsSC5.addTrigMatch    = False
+process.layer1METsKT4.addTrigMatch    = False
 
 process.content = cms.EDAnalyzer("EventContentAnalyzer")
 process.p = cms.Path(
