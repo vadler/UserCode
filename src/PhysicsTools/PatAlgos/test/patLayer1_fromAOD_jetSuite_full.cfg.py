@@ -28,6 +28,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
+from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
 
 # Taking away BasicJets because RecoJets/JetProducers/python/BasicJetIcone5_cfi.py in 2.2.X is wrong
 ## FIXME ### make also some basic jets for testing
@@ -37,37 +38,34 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 addJetCollection(process,cms.InputTag('sisCone5CaloJets'),'SC5',
                         doJTA=True,doBTagging=True,jetCorrLabel=('SC5','Calo'),doType1MET=True,doL1Counters=False,
                         genJetCollection=cms.InputTag("sisCone5GenJets"))
+process.allLayer1JetsSC5.addTrigMatch = False
+process.layer1METsSC5.addTrigMatch    = False
 addJetCollection(process,cms.InputTag('sisCone7CaloJets'),'SC7',
                         doJTA=True,doBTagging=False,jetCorrLabel=None,doType1MET=True,doL1Counters=False,
                         genJetCollection=cms.InputTag("sisCone5GenJets"))
+process.allLayer1JetsSC7.addTrigMatch = False
 addJetCollection(process,cms.InputTag('kt4CaloJets'),'KT4',
                         doJTA=True,doBTagging=True,jetCorrLabel=('KT4','Calo'),doType1MET=True,doL1Counters=False,
                         genJetCollection=cms.InputTag("kt4GenJets"))
+process.allLayer1JetsKT4.addTrigMatch = False
+process.layer1METsKT4.addTrigMatch    = False
 addJetCollection(process,cms.InputTag('kt6CaloJets'),'KT6',
                         doJTA=True,doBTagging=False,jetCorrLabel=None,doType1MET=True,doL1Counters=False,
                         genJetCollection=cms.InputTag("kt6GenJets"))
+process.allLayer1JetsKT6.addTrigMatch = False
 ## FIXME addJetCollection(process,cms.InputTag('iterativeCone5BasicJets'), 'BJ5',
 ## FIXME                        doJTA=True,doBTagging=True,jetCorrLabel=('MC5','Calo'),doType1MET=True,doL1Counters=False)
 addJetCollection(process,cms.InputTag('iterativeCone5PFJets'), 'PFc',
                         doJTA=True,doBTagging=True,jetCorrLabel=None,doType1MET=True,doL1Counters=False,
                         genJetCollection=cms.InputTag("iterativeCone5GenJets"))
+process.allLayer1JetsPFc.addTrigMatch = False
 addJetCollection(process,cms.InputTag('iterativeCone5PFJets'), 'PFr',
                         doJTA=True,doBTagging=True,jetCorrLabel=None,doType1MET=True,doL1Counters=False,
                         genJetCollection=cms.InputTag("iterativeCone5GenJets"))
+process.allLayer1JetsPFr.addTrigMatch = False
 
 # Switch trigger matching off
-from PhysicsTools.PatAlgos.tools.trigTools import switchTriggerOff
-switchTriggerOff( process )
-## FIXME Trigger matches are screwed up
-##       maybe even more...; 
-process.allLayer1JetsPFr.addTrigMatch = False
-process.allLayer1JetsPFc.addTrigMatch = False
-process.allLayer1JetsSC5.addTrigMatch = False
-process.allLayer1JetsSC7.addTrigMatch = False
-process.allLayer1JetsKT4.addTrigMatch = False
-process.allLayer1JetsKT6.addTrigMatch = False
-process.layer1METsSC5.addTrigMatch    = False
-process.layer1METsKT4.addTrigMatch    = False
+switchOffTriggerMatchingOld( process )
 
 process.content = cms.EDAnalyzer("EventContentAnalyzer")
 process.p = cms.Path(
