@@ -1,5 +1,5 @@
 //
-// $Id: myTriggerTest.cc,v 1.1.2.12 2009/03/27 21:08:46 vadler Exp $
+// $Id: myTriggerTest.cc,v 1.4 2009/04/20 18:06:37 vadler Exp $
 //
 
 
@@ -81,7 +81,7 @@ void myTriggerTest::beginJob( const edm::EventSetup & iSetup )
   histos1D_[ "nFilterIds" ] = fileService->make< TH1D >( "nFilterIds", "Number of filter IDs per trigger object", 6, -0.5, 5.5 );
   histos1D_[ "nFilterIds" ]->SetXTitle( "filter IDs" );
   histos1D_[ "nFilterIds" ]->SetYTitle( "entries" );
-  histos1D_[ "filterIds" ] = fileService->make< TH1D >( "filterIds", "Filter IDs per trigger object", 25, 80.5, 106.5 );
+  histos1D_[ "filterIds" ] = fileService->make< TH1D >( "filterIds", "Filter IDs per trigger object", 201, -100.5, 100.5 );
   histos1D_[ "filterIds" ]->SetXTitle( "filter ID" );
   histos1D_[ "filterIds" ]->SetYTitle( "entries" );
   histos1D_[ "goodFilterIds" ] = fileService->make< TH1D >( "goodFilterIds", "Existing filter ID found?", 2, -0.5, 1.5 );
@@ -93,7 +93,7 @@ void myTriggerTest::beginJob( const edm::EventSetup & iSetup )
   histos1D_[ "objectKeys" ] = fileService->make< TH1D >( "objectKeys", "Object keys per filter", 251, -0.5, 250.5 );
   histos1D_[ "objectKeys" ]->SetXTitle( "object keys" );
   histos1D_[ "objectKeys" ]->SetYTitle( "entries" );
-  histos1D_[ "objectIds" ] = fileService->make< TH1D >( "objectIds", "Object IDs per filter", 25, 80.5, 105.5 );
+  histos1D_[ "objectIds" ] = fileService->make< TH1D >( "objectIds", "Object IDs per filter", 201, -100.5, 100.5 );
   histos1D_[ "objectIds" ]->SetXTitle( "object IDs" );
   histos1D_[ "objectIds" ]->SetYTitle( "entries" );
   histos2D_[ "nObjectIdsKeys" ] = fileService->make< TH2D >( "nObjectIdsKeys", "Number of trigger object IDs vs. number of trigger object keys per trigger filter", 6, -0.5, 5.5, 6, -0.5, 5.5 );
@@ -105,7 +105,7 @@ void myTriggerTest::beginJob( const edm::EventSetup & iSetup )
   histos1D_[ "filterAcceptedStatus" ] = fileService->make< TH1D >( "filterAcceptedStatus", "Accepted filter status", 3, -1.5, 1.5 );
   histos1D_[ "filterAcceptedStatus" ]->SetXTitle( "status" );
   histos1D_[ "filterAcceptedStatus" ]->SetYTitle( "entries" );
-  histos2D_[ "objectId" ] = fileService->make< TH2D >( "objectId", "Object filter IDs vs. filter object IDs", 25, 80.5, 105.5, 25, 80.5, 105.5 );
+  histos2D_[ "objectId" ] = fileService->make< TH2D >( "objectId", "Object filter IDs vs. filter object IDs", 201, -100.5, 100.5, 201, -100.5, 100.5 );
   histos2D_[ "objectId" ]->SetXTitle( "filter object ID" );
   histos2D_[ "objectId" ]->SetYTitle( "object filter ID" );
   histos2D_[ "ptObjCand" ] = fileService->make< TH2D >( "ptObjCand", "Object vs. candidate p_{T}", 60, 0., 300., 60, 0., 300. );
@@ -206,7 +206,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   // pat::TriggerObject
   
   for ( TriggerObjectCollection::const_iterator iObject = myEventObjects->begin(); iObject != myEventObjects->end(); ++iObject ) {
-    const std::vector< unsigned > ids( iObject->filterIds() );
+    const std::vector< int > ids( iObject->filterIds() );
     histos1D_[ "nFilterIds" ]->Fill( ids.size() );
     for ( size_t iId = 0; iId < ids.size(); ++iId ) {
       histos1D_[ "filterIds" ]->Fill( ids.at( iId ) );
@@ -229,7 +229,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       }
       histos1D_[ "objectKeys" ]->Fill( keys.at( iKey ) );
     }
-    const std::vector< unsigned > ids( iFilter->objectIds() );
+    const std::vector< int > ids( iFilter->objectIds() );
     for ( size_t iId = 0; iId < ids.size(); ++iId ) {
       histos1D_[ "objectIds" ]->Fill( ids.at( iId ) );
     }
@@ -302,11 +302,11 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                       << "        status      : " << ( *iFilter )->status();
     }
     histos1D_[ "filterAcceptedStatus" ]->Fill( ( *iFilter )->status() );
-    const std::vector< unsigned > ids( ( *iFilter )->objectIds() );
+    const std::vector< int > ids( ( *iFilter )->objectIds() );
     for ( size_t iId = 0; iId < ids.size(); ++iId ) {
       const TriggerObjectRefVector objectRefs( handlePatTriggerEvent->objects( ids.at( iId ) ) );
       for ( TriggerObjectRefVector::const_iterator iObject = objectRefs.begin(); iObject != objectRefs.end(); ++iObject ) {
-        const std::vector< unsigned > ids2( ( *iObject )->filterIds() );
+        const std::vector< int > ids2( ( *iObject )->filterIds() );
         if ( ! ( *iObject )->hasFilterId( ids.at( iId ) ) ) {
           edm::LogError( "objectFilterId" ) << "    Wrong filter ID found:\n"
                                             << "        filter           : " << ( *iFilter )->label() << "\n"

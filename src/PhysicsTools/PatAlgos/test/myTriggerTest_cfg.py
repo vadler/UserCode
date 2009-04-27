@@ -28,18 +28,18 @@ process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
     patTrigger      = cms.InputTag( "patTrigger" ),
     patTriggerEvent = cms.InputTag( "patTriggerEvent" ),
     # general
-    testPathModuleTags = cms.bool( False ),
-    displayNumbers     = cms.bool( False ),
+    testPathModuleTags = cms.bool( True ),
+    displayNumbers     = cms.bool( True ),
     # objects
-    displayObjects = cms.bool( False ),
+    displayObjects = cms.bool( True ),
     # stand-alone objects
-    displayObjectsStandAlone = cms.bool( False ),
+    displayObjectsStandAlone = cms.bool( True ),
     # filters
-    displayFilters = cms.bool( False ),
+    displayFilters = cms.bool( True ),
     # paths
-    displayPaths = cms.bool( False ),
+    displayPaths = cms.bool( True ),
     # event
-    displayEvent = cms.bool( False ),
+    displayEvent = cms.bool( True ),
     # matching
     displayMatches = cms.bool( True ),
     # embedding
