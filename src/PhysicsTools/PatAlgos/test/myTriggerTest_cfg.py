@@ -9,7 +9,7 @@ process.options = cms.untracked.PSet(
 
 process.source = cms.Source( "PoolSource",
     fileNames = cms.untracked.vstring(
-        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_8/output/my_PatLayer1_fromAOD_full.root'
+        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_9/output/my_PatLayer1_fromAOD_full.root'
     )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -17,7 +17,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 process.TFileService = cms.Service( "TFileService",
-    fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_8/output/myTriggerTest.root' )
+    fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_9/output/myTriggerTest.root' )
 )
 
 process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
@@ -28,20 +28,20 @@ process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
     patTrigger      = cms.InputTag( "patTrigger" ),
     patTriggerEvent = cms.InputTag( "patTriggerEvent" ),
     # general
-    testPathModuleTags = cms.bool( False ),
-    displayNumbers     = cms.bool( False ),
+    testPathModuleTags = cms.bool( True ),
+    displayNumbers     = cms.bool( True ),
     # objects
-    displayObjects = cms.bool( False ),
+    displayObjects = cms.bool( True ),
     # stannd-alone objects
-    displayObjectsStandAlone = cms.bool( False ),
+    displayObjectsStandAlone = cms.bool( True ),
     # filters
-    displayFilters = cms.bool( False ),
+    displayFilters = cms.bool( True ),
     # paths
-    displayPaths = cms.bool( False ),
+    displayPaths = cms.bool( True ),
     # event
-    displayEvent = cms.bool( False ),
+    displayEvent = cms.bool( True ),
     # matching
-    displayMatches = cms.bool( False ),
+    displayMatches = cms.bool( True ),
     # embedding
     displayEmbedding      = cms.bool( True ),
     patPhotons            = cms.InputTag( "cleanLayer1Photons" ),
