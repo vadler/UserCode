@@ -15,15 +15,14 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 # source
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-    'file:/afs/cern.ch/user/h/hegner/public/test2.root' 
-   #'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_1_0_pre4/RelValTTbar/GEN-SIM-RECO/IDEAL_30X_v1/0003/00E48100-3A16-DE11-A693-001617DBCF6A.root'
+        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/50D4BADB-FA32-DE11-BA01-000423D98DC4.root'
     )
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string('IDEAL_30X::All')
+process.GlobalTag.globaltag = cms.string('IDEAL_31X::All')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
 # extraction of jet sequences
@@ -34,9 +33,9 @@ process.load("PhysicsTools.PatAlgos.mcMatchLayer0.mcMatchSequences_cff")
 process.load("PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi")
 process.content = cms.EDAnalyzer("EventContentAnalyzer")
 
-# replacements to make the muons work
-process.allLayer1Jets.addDiscriminators    = False  ## NAN
-process.allLayer1Jets.discriminatorSources = []     ## NAN
+# replacements currently needed to make the jets work
+process.allLayer1Jets.addDiscriminators    = False
+process.allLayer1Jets.discriminatorSources = []
 
 process.p = cms.Path(
      process.patJetCharge *  

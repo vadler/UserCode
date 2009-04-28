@@ -35,6 +35,9 @@ process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
 # PAT Layer 0 & 1
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
+# replacements currently needed to make the jets work
+process.allLayer1Jets.addDiscriminators    = False
+process.allLayer1Jets.discriminatorSources = []
 
 process.p = cms.Path(
     process.patDefaultSequence

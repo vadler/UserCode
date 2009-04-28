@@ -14,18 +14,21 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 # source
 process.source = cms.Source("PoolSource", 
-    fileNames = cms.untracked.vstring('file:/afs/cern.ch/cms/PRS/top/cmssw-data/relval200-for-pat-testing/FullSimTTBar-2_2_X_2008-11-03-STARTUP_V7-AODSIM.100.root')
+    fileNames = cms.untracked.vstring('/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/50D4BADB-FA32-DE11-BA01-000423D98DC4.root')
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string('STARTUP_V7::All')
+process.GlobalTag.globaltag = cms.string('IDEAL_31X::All')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
 # PAT Layer 0+1
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
 #process.content = cms.EDAnalyzer("EventContentAnalyzer")
+# replacements currently needed to make the jets work
+process.allLayer1Jets.addDiscriminators    = False
+process.allLayer1Jets.discriminatorSources = []
 
 from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
 removeCleaning(process)
