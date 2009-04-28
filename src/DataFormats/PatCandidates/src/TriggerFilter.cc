@@ -1,5 +1,5 @@
 //
-// $Id: TriggerFilter.cc,v 1.2 2009/03/26 21:49:08 vadler Exp $
+// $Id: TriggerFilter.cc,v 1.1.2.8 2009/02/20 13:47:41 vadler Exp $
 //
 
 
@@ -52,18 +52,18 @@ bool TriggerFilter::setStatus( int status )
 
 bool TriggerFilter::hasObjectKey( unsigned objectKey ) const
 {
-  for ( size_t iO = 0; iO < objectKeys().size(); ++iO ) {
-    if ( objectKeys().at( iO ) == objectKey ) {
+  for ( std::vector< unsigned >::const_iterator iO = objectKeys_.begin(); iO != objectKeys_.end(); ++iO ) {
+    if ( *iO == objectKey ) {
       return true;
     }
   }
   return false;
 }
 
-bool TriggerFilter::hasObjectId( int objectId ) const
+bool TriggerFilter::hasObjectId( unsigned objectId ) const
 {
-  for ( size_t iO = 0; iO < objectIds().size(); ++iO ) {
-    if ( objectIds().at( iO ) == objectId ) {
+  for ( std::vector< unsigned >::const_iterator iO = objectIds_.begin(); iO != objectIds_.end(); ++iO ) {
+    if ( *iO == objectId ) {
       return true;
     }
   }

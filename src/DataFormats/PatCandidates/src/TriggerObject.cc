@@ -1,5 +1,5 @@
 //
-// $Id: TriggerObject.cc,v 1.4 2009/04/27 20:45:18 vadler Exp $
+// $Id: TriggerObject.cc,v 1.2 2009/03/26 21:49:08 vadler Exp $
 //
 
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
@@ -26,17 +26,16 @@ TriggerObject::TriggerObject( const reco::Particle::PolarLorentzVector & vec, in
 {
   filterIds_.clear();
 }
-TriggerObject::TriggerObject( const trigger::TriggerObject & trigObj ) :
-  reco::LeafCandidate( 0, trigObj.particle().p4(), reco::Particle::Point( 0., 0., 0. ), trigObj.id() )
+TriggerObject::TriggerObject( const trigger::TriggerObject & trigObj )
 {
-  filterIds_.clear();
+  TriggerObject( trigObj.particle().p4(), trigObj.id() );
 }
 
 /// getters
 
-bool TriggerObject::hasFilterId( int filterId ) const
+bool TriggerObject::hasFilterId( unsigned filterId ) const
 {
-  for ( size_t iF = 0; iF < filterIds().size(); ++iF ) {
+  for ( unsigned iF = 0; iF < filterIds().size(); ++iF ) {
     if ( filterIds().at( iF ) == filterId ) {
       return true;
     }
