@@ -27,16 +27,7 @@ process.options = cms.untracked.PSet(
 # source
 process.source = cms.Source( "PoolSource", 
     fileNames = cms.untracked.vstring(
-#         'file:/afs/cern.ch/user/h/hegner/public/test2.root' 
-#         'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_1_0_pre4/RelValTTbar/GEN-SIM-RECO/IDEAL_30X_v1/0003/00E48100-3A16-DE11-A693-001617DBCF6A.root'
-        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/12B74DD2-F932-DE11-921C-0016177CA7A0.root',
-        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/406012BC-FB32-DE11-AD0F-000423D94990.root',
-        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/50D4BADB-FA32-DE11-BA01-000423D98DC4.root',
-        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/6E122CEB-FA32-DE11-9055-000423D99264.root',
-        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/8823A234-FC32-DE11-A251-001617E30F58.root',
-        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/98E8674A-FB32-DE11-BD4A-000423D99896.root',
-        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/9A2FD94C-2033-DE11-B10A-001617DF785A.root',
-        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/F64ABC78-1733-DE11-866C-000423D98E6C.root'
+        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/50D4BADB-FA32-DE11-BA01-000423D98DC4.root'
     )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -81,6 +72,7 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 # switchOnTrigger( process )
 ## all; default to run myTriggerTest_cfg.py afterwards
 switchOnTriggerAll( process )
+process.patTrigger.addPathModuleLabels = True
 switchOnTriggerMatchEmbedding( process )
 process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
                               , 'keep *_hltTriggerSummaryAOD_*_*'

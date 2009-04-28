@@ -21,7 +21,7 @@ process.options = cms.untracked.PSet(
 # source
 process.source = cms.Source( "PoolSource", 
     fileNames = cms.untracked.vstring(
-        'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_1_0_pre4/RelValTTbar/GEN-SIM-RECO/IDEAL_30X_v1/0003/00E48100-3A16-DE11-A693-001617DBCF6A.root'
+        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/50D4BADB-FA32-DE11-BA01-000423D98DC4.root'
     )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -30,7 +30,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = cms.string( 'IDEAL_30X::All' )
+process.GlobalTag.globaltag = cms.string( 'IDEAL_31X::All' )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
 # PAT Layer 0 & 1
