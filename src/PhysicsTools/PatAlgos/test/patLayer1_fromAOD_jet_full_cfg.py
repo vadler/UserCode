@@ -33,18 +33,14 @@ process.load("PhysicsTools.PatAlgos.mcMatchLayer0.mcMatchSequences_cff")
 process.load("PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi")
 process.content = cms.EDAnalyzer("EventContentAnalyzer")
 
-# replacements currently needed to make the jets work
-process.allLayer1Jets.addDiscriminators    = False
-process.allLayer1Jets.discriminatorSources = []
-
 process.p = cms.Path(
      process.patJetCharge *  
      process.patJetCorrections *
      process.jetPartonMatch *
      process.jetGenJetMatch *
      process.jetFlavourId *  
-     process.allLayer1Jets 
-#    process.content
+     process.allLayer1Jets # * 
+  #  process.content
 )
 
 # Output module configuration

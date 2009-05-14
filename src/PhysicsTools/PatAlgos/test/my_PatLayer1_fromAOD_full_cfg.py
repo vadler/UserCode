@@ -45,7 +45,7 @@ process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
 # PAT Layer 0 & 1
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
-# replacements to make the muons work
+# replacements currently needed to make the jets work
 process.allLayer1Jets.addDiscriminators    = False
 process.allLayer1Jets.discriminatorSources = []
 
@@ -67,6 +67,7 @@ process.out = cms.OutputModule( "PoolOutputModule",
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
+process.p *= process.cleanLayer1Objects
 ### switch START ###
 # ## no stand-alone trigger objects
 # switchOnTrigger( process )

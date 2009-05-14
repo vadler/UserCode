@@ -4,9 +4,9 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0_pre6
 --- Tag ---    -------- Package --------                        
 V01-08-04      CondFormats/JetMETObjects                        
 NoTag          DataFormats/PatCandidates                        
-PATv2_20090416 PhysicsTools/HepMCCandAlgos                      
+V09-31-02      PhysicsTools/HepMCCandAlgos                      
 NoTag          PhysicsTools/PatAlgos                            
 NoTag          PhysicsTools/PatUtils                            
-PfElecTauMuIso_for22x PhysicsTools/PFCandProducer                      
+V03-01-14      PhysicsTools/PFCandProducer                      
 ---------------------------------------
 total packages: 6 (6 displayed)

@@ -55,6 +55,7 @@ process.out = cms.OutputModule( "PoolOutputModule",
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
+process.p *= process.cleanLayer1Objects
 switchOnTrigger( process )
 
 process.outpath = cms.EndPath(

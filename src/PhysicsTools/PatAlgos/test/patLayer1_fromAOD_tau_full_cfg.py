@@ -32,7 +32,10 @@ process.load("PhysicsTools.PatAlgos.recoLayer0.pfCandidateIsoDepositSelection_cf
 process.load("PhysicsTools.PatAlgos.recoLayer0.tauIsolation_cff")
 process.load("PhysicsTools.PatAlgos.recoLayer0.tauDiscriminators_cff")  ##missing modules and inputs
 process.load("PhysicsTools.PatAlgos.producersLayer1.tauProducer_cfi")
-#process.content = cms.EDAnalyzer("EventContentAnalyzer")
+process.content = cms.EDAnalyzer("EventContentAnalyzer")
+
+# replacements to make the taus work with 310pre6
+process.allLayer1Taus.addTauID = False
 
 process.p = cms.Path(
     process.patPFCandidateIsoDepositSelection +
@@ -40,7 +43,8 @@ process.p = cms.Path(
     process.tauMatch +
     process.tauGenJets +
     process.tauGenJetMatch +
-    process.allLayer1Taus
+    process.allLayer1Taus # +
+#   process.content
 )
 
 # Output module configuration
