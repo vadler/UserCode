@@ -1,5 +1,5 @@
 //
-// $Id: PATMETProducer.cc,v 1.7.4.2 2009/01/14 23:56:16 gpetrucc Exp $
+// $Id: PATMETProducer.cc,v 1.7.4.3 2009/04/30 09:11:46 gpetrucc Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATMETProducer.h"
@@ -22,12 +22,17 @@ PATMETProducer::PATMETProducer(const edm::ParameterSet & iConfig):
   genMETSrc_      = iConfig.getParameter<edm::InputTag>("genMETSource");
   addTrigMatch_   = iConfig.getParameter<bool>         ( "addTrigMatch" );
   trigMatchSrc_   = iConfig.getParameter<std::vector<edm::InputTag> >( "trigPrimMatch" );
-  addResolutions_ = iConfig.getParameter<bool>         ("addResolutions");
 
   // Efficiency configurables
   addEfficiencies_ = iConfig.getParameter<bool>("addEfficiencies");
   if (addEfficiencies_) {
      efficiencyLoader_ = pat::helper::EfficiencyLoader(iConfig.getParameter<edm::ParameterSet>("efficiencies"));
+  }
+
+  // Resolution configurables
+  addResolutions_ = iConfig.getParameter<bool>("addResolutions");
+  if (addResolutions_) {
+     resolutionLoader_ = pat::helper::KinResolutionsLoader(iConfig.getParameter<edm::ParameterSet>("resolutions"));
   }
 
   // Check to see if the user wants to add user data
@@ -54,6 +59,7 @@ void PATMETProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
 
   if (mets->size() != 1) throw cms::Exception("Corrupt Data") << "The input MET collection " << metSrc_.encode() << " has size " << mets->size() << " instead of 1 as it should.\n";
   if (efficiencyLoader_.enabled()) efficiencyLoader_.newEvent(iEvent);
+  if (resolutionLoader_.enabled()) resolutionLoader_.newEvent(iEvent, iSetup);
 
   // Get the vector of generated met from the event if needed
   edm::Handle<edm::View<reco::GenMET> > genMETs;
@@ -85,6 +91,10 @@ void PATMETProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
 
     if (efficiencyLoader_.enabled()) {
         efficiencyLoader_.setEfficiencies( amet, metsRef );
+    }
+
+    if (resolutionLoader_.enabled()) {
+        resolutionLoader_.setResolutions(amet);
     }
 
 

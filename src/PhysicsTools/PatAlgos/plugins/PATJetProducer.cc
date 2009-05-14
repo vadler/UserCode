@@ -1,5 +1,5 @@
 //
-// $Id: PATJetProducer.cc,v 1.26.2.8 2009/02/18 15:53:55 rwolf Exp $
+// $Id: PATJetProducer.cc,v 1.26.2.9 2009/04/30 09:11:46 gpetrucc Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATJetProducer.h"
@@ -57,7 +57,6 @@ PATJetProducer::PATJetProducer(const edm::ParameterSet& iConfig)  :
   jetCorrFactorsSrc_       = iConfig.getParameter<std::vector<edm::InputTag> >( "jetCorrFactorsSource" );
   addTrigMatch_            = iConfig.getParameter<bool>                       ( "addTrigMatch" );
   trigMatchSrc_            = iConfig.getParameter<std::vector<edm::InputTag> >( "trigPrimMatch" );
-  addResolutions_          = iConfig.getParameter<bool> 		      ( "addResolutions" );
   addBTagInfo_             = iConfig.getParameter<bool> 		      ( "addBTagInfo" );
   addDiscriminators_       = iConfig.getParameter<bool> 		      ( "addDiscriminators" );
   discriminatorTags_       = iConfig.getParameter<std::vector<edm::InputTag> >( "discriminatorSources" );
@@ -72,6 +71,12 @@ PATJetProducer::PATJetProducer(const edm::ParameterSet& iConfig)  :
   addEfficiencies_ = iConfig.getParameter<bool>("addEfficiencies");
   if (addEfficiencies_) {
      efficiencyLoader_ = pat::helper::EfficiencyLoader(iConfig.getParameter<edm::ParameterSet>("efficiencies"));
+  }
+
+  // Resolution configurables
+  addResolutions_ = iConfig.getParameter<bool>("addResolutions");
+  if (addResolutions_) {
+     resolutionLoader_ = pat::helper::KinResolutionsLoader(iConfig.getParameter<edm::ParameterSet>("resolutions"));
   }
 
 
@@ -125,6 +130,7 @@ void PATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
   iEvent.getByLabel(jetsSrc_, jets);
 
   if (efficiencyLoader_.enabled()) efficiencyLoader_.newEvent(iEvent);
+  if (resolutionLoader_.enabled()) resolutionLoader_.newEvent(iEvent, iSetup);
 
   // for jet flavour
   edm::Handle<reco::JetFlavourMatchingCollection> jetFlavMatch;
@@ -233,6 +239,11 @@ void PATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
 
     if (efficiencyLoader_.enabled()) {
         efficiencyLoader_.setEfficiencies( ajet, jetRef );
+    }
+
+    // IMPORTANT: DO THIS AFTER JES CORRECTIONS
+    if (resolutionLoader_.enabled()) {
+        resolutionLoader_.setResolutions(ajet);
     }
 
     // TO BE IMPLEMENTED FOR >=1_5_X: do the PartonJet matching

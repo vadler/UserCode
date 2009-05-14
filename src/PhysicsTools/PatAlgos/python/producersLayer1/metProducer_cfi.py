@@ -24,9 +24,6 @@ layer1METs = cms.EDProducer("PATMETProducer",
       userFunctionLabels = cms.vstring("")
     ),
 
-    # Resolution configurables
-    addResolutions   = cms.bool(False),
-
     # Muon correction configurables
     addMuonCorrections = cms.bool(True),
     muonSource         = cms.InputTag("muons"), ## muon input source for corrections
@@ -42,6 +39,10 @@ layer1METs = cms.EDProducer("PATMETProducer",
     # Efficiencies
     addEfficiencies = cms.bool(False),
     efficiencies    = cms.PSet(),
+    
+    # resolution configurables
+    addResolutions = cms.bool(False),
+    resolutions      = cms.PSet(),
 
 )
 

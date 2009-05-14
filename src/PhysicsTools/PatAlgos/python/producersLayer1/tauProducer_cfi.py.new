@@ -28,9 +28,6 @@ allLayer1Taus = cms.EDProducer("PATTauProducer",
     embedSignalTracks    = cms.bool(False), ## whether to embed in AOD externally stored signal tracks
     embedIsolationTracks = cms.bool(False), ## whether to embed in AOD externally stored isolation tracks
 
-    # resolution configurables
-    addResolutions = cms.bool(False),
-
     # isolation configurables
     isolation = cms.PSet(
         pfAllParticles = cms.PSet(
@@ -95,6 +92,10 @@ allLayer1Taus = cms.EDProducer("PATTauProducer",
     # Efficiencies
     addEfficiencies = cms.bool(False),
     efficiencies    = cms.PSet(),
+    
+    # resolution configurables
+    addResolutions = cms.bool(False),
+    resolutions    = cms.PSet(),
 
 )
 

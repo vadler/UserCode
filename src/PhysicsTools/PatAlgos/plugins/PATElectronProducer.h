@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.h,v 1.12.2.4 2009/02/06 23:54:55 pioppi Exp $
+// $Id: PATElectronProducer.h,v 1.12.2.5 2009/04/30 09:11:45 gpetrucc Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATElectronProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of ElectronType.
 
   \author   Steven Lowette, James Lamb
-  \version  $Id: PATElectronProducer.h,v 1.12.2.4 2009/02/06 23:54:55 pioppi Exp $
+  \version  $Id: PATElectronProducer.h,v 1.12.2.5 2009/04/30 09:11:45 gpetrucc Exp $
 */
 
 
@@ -29,6 +29,7 @@
 
 #include "PhysicsTools/PatAlgos/interface/MultiIsolator.h"
 #include "PhysicsTools/PatAlgos/interface/EfficiencyLoader.h"
+#include "PhysicsTools/PatAlgos/interface/KinResolutionsLoader.h"
 
 #include "DataFormats/PatCandidates/interface/Electron.h"
 
@@ -70,7 +71,6 @@ namespace pat {
       std::vector<edm::InputTag> genMatchSrc_;
       bool          addTrigMatch_;
       std::vector<edm::InputTag> trigMatchSrc_;
-      bool          addResolutions_;
       bool          addElecID_;
 
       /// pflow specific
@@ -101,6 +101,9 @@ namespace pat {
 
       bool addEfficiencies_;
       pat::helper::EfficiencyLoader efficiencyLoader_;
+      
+      bool addResolutions_;
+      pat::helper::KinResolutionsLoader resolutionLoader_;
 
       bool useUserData_;
       pat::PATUserDataHelper<pat::Electron>      userDataHelper_;

@@ -30,9 +30,6 @@ allLayer1Jets = cms.EDProducer("PATJetProducer",
     # Jet Energy Corrections to appy and store
     addJetCorrFactors    = cms.bool(True),
     jetCorrFactorsSource = cms.VInputTag( cms.InputTag("jetCorrFactors") ), 
-    
-    # resolution configurables
-    addResolutions = cms.bool(False),
 
     # -- BTagging information ---
     addBTagInfo = cms.bool(True), # master switch
@@ -91,6 +88,10 @@ allLayer1Jets = cms.EDProducer("PATJetProducer",
     # Efficiencies
     addEfficiencies = cms.bool(False),
     efficiencies    = cms.PSet(),
+    
+    # resolution configurables
+    addResolutions = cms.bool(False),
+    resolutions      = cms.PSet(),
 )
 
 

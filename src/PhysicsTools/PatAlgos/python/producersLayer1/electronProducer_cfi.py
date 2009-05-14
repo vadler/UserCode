@@ -31,6 +31,7 @@ allLayer1Electrons = cms.EDProducer("PATElectronProducer",
 
     # resolution configurables
     addResolutions   = cms.bool(False),
+    resolutions      = cms.PSet(),
 
     # pflow specific
     pfElectronSource = cms.InputTag("pfElectrons"),

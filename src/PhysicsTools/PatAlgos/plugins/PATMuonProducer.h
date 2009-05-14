@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.h,v 1.14.2.5 2009/03/25 12:48:09 lusito Exp $
+// $Id: PATMuonProducer.h,v 1.14.2.6 2009/04/30 09:11:46 gpetrucc Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATMuonProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of MuonType.
 
   \author   Steven Lowette, Roger Wolf
-  \version  $Id: PATMuonProducer.h,v 1.14.2.5 2009/03/25 12:48:09 lusito Exp $
+  \version  $Id: PATMuonProducer.h,v 1.14.2.6 2009/04/30 09:11:46 gpetrucc Exp $
 */
 
 
@@ -29,6 +29,7 @@
 
 #include "PhysicsTools/PatAlgos/interface/MultiIsolator.h"
 #include "PhysicsTools/PatAlgos/interface/EfficiencyLoader.h"
+#include "PhysicsTools/PatAlgos/interface/KinResolutionsLoader.h"
 
 #include "DataFormats/PatCandidates/interface/UserData.h"
 #include "PhysicsTools/PatAlgos/interface/PATUserDataHelper.h"
@@ -76,7 +77,6 @@ namespace pat {
       std::vector<edm::InputTag> genMatchSrc_;
       bool          addTrigMatch_;
       std::vector<edm::InputTag> trigMatchSrc_;
-      bool          addResolutions_;
       bool          addLRValues_;
 
 
@@ -108,6 +108,9 @@ namespace pat {
 
       bool addEfficiencies_;
       pat::helper::EfficiencyLoader efficiencyLoader_;
+      
+      bool addResolutions_;
+      pat::helper::KinResolutionsLoader resolutionLoader_;
 
       bool useUserData_;
       pat::PATUserDataHelper<pat::Muon>      userDataHelper_;

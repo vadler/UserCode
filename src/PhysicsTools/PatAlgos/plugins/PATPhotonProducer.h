@@ -1,5 +1,5 @@
 //
-// $Id: PATPhotonProducer.h,v 1.12.4.1 2008/11/25 15:39:40 gpetrucc Exp $
+// $Id: PATPhotonProducer.h,v 1.12.4.2 2009/04/30 09:11:46 gpetrucc Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATPhotonProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of PhotonType.
 
   \author   Steven Lowette
-  \version  $Id: PATPhotonProducer.h,v 1.12.4.1 2008/11/25 15:39:40 gpetrucc Exp $
+  \version  $Id: PATPhotonProducer.h,v 1.12.4.2 2009/04/30 09:11:46 gpetrucc Exp $
 */
 
 
@@ -27,6 +27,7 @@
 
 #include "PhysicsTools/PatAlgos/interface/MultiIsolator.h"
 #include "PhysicsTools/PatAlgos/interface/EfficiencyLoader.h"
+#include "PhysicsTools/PatAlgos/interface/KinResolutionsLoader.h"
 
 
 #include "DataFormats/PatCandidates/interface/UserData.h"
@@ -68,6 +69,9 @@ namespace pat {
 
       bool addEfficiencies_;
       pat::helper::EfficiencyLoader efficiencyLoader_;
+      
+      bool addResolutions_;
+      pat::helper::KinResolutionsLoader resolutionLoader_;
 
       bool useUserData_;
       pat::PATUserDataHelper<pat::Photon>      userDataHelper_;

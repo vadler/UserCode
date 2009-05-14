@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.cc,v 1.19.2.5 2009/03/25 12:57:52 lusito Exp $
+// $Id: PATMuonProducer.cc,v 1.19.2.6 2009/04/30 09:11:46 gpetrucc Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATMuonProducer.h"
@@ -88,12 +88,17 @@ PATMuonProducer::PATMuonProducer(const edm::ParameterSet & iConfig) :
   trigMatchSrc_     = iConfig.getParameter<std::vector<edm::InputTag> >( "trigPrimMatch" );
   
   // resolution configurables
-  addResolutions_= iConfig.getParameter<bool>         ( "addResolutions" );
   
   // Efficiency configurables
   addEfficiencies_ = iConfig.getParameter<bool>("addEfficiencies");
   if (addEfficiencies_) {
      efficiencyLoader_ = pat::helper::EfficiencyLoader(iConfig.getParameter<edm::ParameterSet>("efficiencies"));
+  }
+
+  // Resolution configurables
+  addResolutions_ = iConfig.getParameter<bool>("addResolutions");
+  if (addResolutions_) {
+     resolutionLoader_ = pat::helper::KinResolutionsLoader(iConfig.getParameter<edm::ParameterSet>("resolutions"));
   }
 
   if (iConfig.exists("isoDeposits")) {
@@ -141,6 +146,7 @@ edm::Handle<edm::View<MuonType> > muons;
   if (isolator_.enabled()) isolator_.beginEvent(iEvent,iSetup);
 
   if (efficiencyLoader_.enabled()) efficiencyLoader_.newEvent(iEvent);
+  if (resolutionLoader_.enabled()) resolutionLoader_.newEvent(iEvent, iSetup);
 
   std::vector<edm::Handle<edm::ValueMap<IsoDeposit> > > deposits(isoDepositLabels_.size());
   for (size_t j = 0, nd = deposits.size(); j < nd; ++j) {
@@ -319,6 +325,9 @@ void PATMuonProducer::fillMuon( Muon& aMuon,
     efficiencyLoader_.setEfficiencies( aMuon, muonRef );
   }
   
+  if (resolutionLoader_.enabled()) {
+    resolutionLoader_.setResolutions(aMuon);
+  }
 
 }
 

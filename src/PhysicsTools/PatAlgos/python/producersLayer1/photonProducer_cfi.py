@@ -66,6 +66,7 @@ allLayer1Photons = cms.EDProducer("PATPhotonProducer",
 
     # Resolutions
     addResolutions  = cms.bool(False),
+    resolutions     = cms.PSet(),
 )
 
 

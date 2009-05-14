@@ -67,9 +67,6 @@ allLayer1Muons = cms.EDProducer("PATMuonProducer",
                   ),
     ),
 
-    # Resolution configurables
-    addResolutions = cms.bool(False),
-
     # Trigger matching configurables
     addTrigMatch = cms.bool(True),
     trigPrimMatch = cms.VInputTag(cms.InputTag("muonTrigMatchHLT1MuonNonIso"), cms.InputTag("muonTrigMatchHLT1MET65")),
@@ -82,6 +79,10 @@ allLayer1Muons = cms.EDProducer("PATMuonProducer",
     # Efficiencies
     addEfficiencies = cms.bool(False),
     efficiencies    = cms.PSet(),
+    
+    # resolution configurables
+    addResolutions = cms.bool(False),
+    resolutions    = cms.PSet(),
 
     # TeV refit tracks
     addTeVRefits = cms.bool(True),
