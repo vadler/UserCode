@@ -58,7 +58,7 @@ process.p = cms.Path(
 # Output module configuration
 from PhysicsTools.PatAlgos.patEventContent_cff import *
 process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0_pre6/output/my_PatLayer1_fromAOD_full.root' ),
+    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0_pre7/output/my_PatLayer1_fromAOD_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),

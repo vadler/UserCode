@@ -14,10 +14,10 @@
    .
 
   \author   Volker Adler
-  \version  $Id: PATTriggerMatchSelector.h,v 1.3 2009/04/27 13:37:59 vadler Exp $
+  \version  $Id: PATTriggerMatchSelector.h,v 1.3 2009/04/27 20:45:20 vadler Exp $
 */
 //
-// $Id: PATTriggerMatchSelector.h,v 1.3 2009/04/27 13:37:59 vadler Exp $
+// $Id: PATTriggerMatchSelector.h,v 1.3 2009/04/27 20:45:20 vadler Exp $
 //
 
 
@@ -28,9 +28,6 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
-/*  */
-#include <iostream>        
-/*  */
 
 
 namespace pat {
