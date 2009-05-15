@@ -6,5 +6,6 @@ V01-08-04      CondFormats/JetMETObjects
 NoTag          DataFormats/PatCandidates                        
 NoTag          PhysicsTools/PatAlgos                            
 NoTag          PhysicsTools/PatUtils                            
+V03-01-15      PhysicsTools/PFCandProducer                      
 ---------------------------------------
-total packages: 4 (4 displayed)
+total packages: 5 (5 displayed)
