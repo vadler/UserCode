@@ -10,6 +10,9 @@
 #include "DataFormats/Common/interface/AssociativeIterator.h"
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 
+// External code testing area
+#include "TString.h"
+
 using namespace pat;
 using namespace pat::helper;
 using namespace TMath;
@@ -290,20 +293,26 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   
   const TriggerPathRefVector pathRefs( handlePatTriggerEvent->acceptedPaths() );
   for ( TriggerPathRefVector::const_iterator iPath = pathRefs.begin(); iPath != pathRefs.end(); ++iPath ) {
+    const std::string namePath( ( *iPath )->name() );
     if ( ! ( *iPath )->wasAccept() ) {
       edm::LogError( "pathAccept" ) << "    Not-accepted path in collection of accepted paths:\n"
-                                    << "        path name: " << ( *iPath )->name();
+                                    << "        path name: " << namePath;
     }
     histos1D_[ "pathAcceptedAccept" ]->Fill( ( *iPath )->wasAccept() );
+    TriggerFilterRefVector tmpModules = handlePatTriggerEvent->pathModules( namePath );
+    TriggerFilterRefVector tmpFilters = handlePatTriggerEvent->pathFilters( namePath );
+    TriggerObjectRefVector tmpObjects = handlePatTriggerEvent->pathObjects( namePath );
   }
   const TriggerFilterRefVector filterRefs( handlePatTriggerEvent->acceptedFilters() );
   for ( TriggerFilterRefVector::const_iterator iFilter = filterRefs.begin(); iFilter != filterRefs.end(); ++iFilter ) {
+    const std::string labelFilter( ( *iFilter )->label() );
     if ( ( *iFilter )->status() != 1 ) {
       edm::LogError( "filterAccept" ) << "    Not-accepted filter in collection of accepted filter:\n"
-                                      << "        filter label: " << ( *iFilter )->label() << "\n"
+                                      << "        filter label: " << labelFilter << "\n"
                                       << "        status      : " << ( *iFilter )->status();
     }
     histos1D_[ "filterAcceptedStatus" ]->Fill( ( *iFilter )->status() );
+    TriggerObjectRefVector tmpObjects = handlePatTriggerEvent->filterObjects( labelFilter );
     const std::vector< unsigned > ids( ( *iFilter )->objectIds() );
     for ( size_t iId = 0; iId < ids.size(); ++iId ) {
       const TriggerObjectRefVector objectRefs( handlePatTriggerEvent->objects( ids.at( iId ) ) );
@@ -728,7 +737,9 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       }
       ++itSa;
     }
-  }  
+  }
+
+  // External code testing area
 
 }
 
