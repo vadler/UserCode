@@ -1,21 +1,23 @@
-Test Release based on: CMSSW_2_2_8
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_8
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_8
+Test Release based on: CMSSW_2_2_10
+Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_2_2_10
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_2_2_10
 --- Tag ---    -------- Package --------                        
 V01-08-04      CondFormats/JetMETObjects                        
-V09-01-02      DataFormats/Candidate                            
-V08-06-00-03   DataFormats/Common                               
+V00-06-02-09   DataFormats/METReco                              
+V07-02-12-03   DataFormats/MuonReco                             
 B2_2_X         DataFormats/PatCandidates                        
-V00-16-10      DataFormats/RecoCandidate                        
-RB300309       JetMETCorrections/Algorithms                     
-RB300309       JetMETCorrections/Configuration                  
-V01-02-05      PhysicsTools/IsolationAlgos                      
-V01-02-06      PhysicsTools/JetCharge                           
+V01-08-02-01   JetMETCorrections/Algorithms                     
+V01-08-15      JetMETCorrections/Configuration                  
+V03-02-06      JetMETCorrections/JetPlusTrack                   
+V02-09-02      JetMETCorrections/Modules                        
+VB04-00-02-04  JetMETCorrections/Type1MET                       
 B2_2_X         PhysicsTools/PatAlgos                            
 B2_2_X         PhysicsTools/PatUtils                            
-PfElecTauMuIso_for22x PhysicsTools/PFCandProducer                      
+V03-01-16      PhysicsTools/PFCandProducer                      
 V08-06-16-06-02 PhysicsTools/RecoAlgos                           
-RB300309       RecoJets/JetAssociationAlgorithms                
-RB300309       RecoJets/JetAssociationProducers                 
+V01-04-03      RecoJets/JetAssociationAlgorithms                
+V00-04-02-17   RecoMET/Configuration                            
+V02-05-00-21   RecoMET/METAlgorithms                            
+V02-08-02-17   RecoMET/METProducers                             
 ---------------------------------------
-total packages: 15 (15 displayed)
+total packages: 17 (17 displayed)
