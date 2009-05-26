@@ -290,20 +290,26 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   
   const TriggerPathRefVector pathRefs( handlePatTriggerEvent->acceptedPaths() );
   for ( TriggerPathRefVector::const_iterator iPath = pathRefs.begin(); iPath != pathRefs.end(); ++iPath ) {
+    const std::string namePath( ( *iPath )->name() );
     if ( ! ( *iPath )->wasAccept() ) {
       edm::LogError( "pathAccept" ) << "    Not-accepted path in collection of accepted paths:\n"
-                                    << "        path name: " << ( *iPath )->name();
+                                    << "        path name: " << namePath;
     }
     histos1D_[ "pathAcceptedAccept" ]->Fill( ( *iPath )->wasAccept() );
+    TriggerFilterRefVector tmpModules = handlePatTriggerEvent->pathModules( namePath );
+    TriggerFilterRefVector tmpFilters = handlePatTriggerEvent->pathFilters( namePath );
+    TriggerObjectRefVector tmpObjects = handlePatTriggerEvent->pathObjects( namePath );
   }
   const TriggerFilterRefVector filterRefs( handlePatTriggerEvent->acceptedFilters() );
   for ( TriggerFilterRefVector::const_iterator iFilter = filterRefs.begin(); iFilter != filterRefs.end(); ++iFilter ) {
+    const std::string labelFilter( ( *iFilter )->label() );
     if ( ( *iFilter )->status() != 1 ) {
       edm::LogError( "filterAccept" ) << "    Not-accepted filter in collection of accepted filter:\n"
-                                      << "        filter label: " << ( *iFilter )->label() << "\n"
+                                      << "        filter label: " << labelFilter << "\n"
                                       << "        status      : " << ( *iFilter )->status();
     }
     histos1D_[ "filterAcceptedStatus" ]->Fill( ( *iFilter )->status() );
+    TriggerObjectRefVector tmpObjects = handlePatTriggerEvent->filterObjects( labelFilter );
     const std::vector< int > ids( ( *iFilter )->objectIds() );
     for ( size_t iId = 0; iId < ids.size(); ++iId ) {
       const TriggerObjectRefVector objectRefs( handlePatTriggerEvent->objects( ids.at( iId ) ) );
@@ -311,7 +317,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         const std::vector< int > ids2( ( *iObject )->filterIds() );
         if ( ! ( *iObject )->hasFilterId( ids.at( iId ) ) ) {
           edm::LogError( "objectFilterId" ) << "    Wrong filter ID found:\n"
-                                            << "        filter           : " << ( *iFilter )->label() << "\n"
+                                            << "        filter           : " << labelFilter << "\n"
                                             << "        filter object ID : " << ids.at( iId ) << "\n"
                                             << "        object key       : " << ( *iObject ).key();
         }
@@ -465,7 +471,6 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       histos2D_[ "ptObjCand" ]->Fill( candRef->pt(), objRef->pt() );
       histos2D_[ "etaObjCand" ]->Fill( candRef->eta(), objRef->eta() );
       histos2D_[ "phiObjCand" ]->Fill( candRef->phi(), objRef->phi() );
-//       const TriggerObjectRef matchObjRef( handlePatTriggerEvent->triggerMatchObject( candRef, match, iEvent ) );
       const TriggerMatchHelper matchHelper;
       const TriggerObjectRef matchObjRef( matchHelper.triggerMatchObject( candRef, match, iEvent, *handlePatTriggerEvent ) );
       if ( matchObjRef.isNonnull() && matchObjRef.isAvailable() ) {
@@ -495,7 +500,6 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                                << "        size filter: " << ( *iFilter )->objectKeys().size();
         }
       }
-//       const reco::CandidateBaseRefVector matchCandRefs( handlePatTriggerEvent->triggerMatchCandidates( objRef, match, iEvent ) );
       const reco::CandidateBaseRefVector matchCandRefs( matchHelper.triggerMatchCandidates( objRef, match, iEvent, *handlePatTriggerEvent ) );
       bool found( false );
       for ( reco::CandidateBaseRefVector::const_iterator iCand = matchCandRefs.begin(); iCand != matchCandRefs.end(); ++iCand ) {
@@ -510,7 +514,6 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         edm::LogError( "noMatchCandRefs" ) << "    Matching candidate objects do not correspond:\n"
                                            << "        edm::Association:     " << candRef.id()      << " " << candRef.key() << " not found in triggerMatchCandidates()";
       }
-//       const TriggerObjectMatchMap matchMap( handlePatTriggerEvent->triggerMatchObjects( candRef, iEvent ) );
       const TriggerObjectMatchMap matchMap( matchHelper.triggerMatchObjects( candRef, iEvent, *handlePatTriggerEvent ) );
       if ( matchMap.empty() ) {
         edm::LogError( "emptyMatchMap" ) << "    No entry in match map:\n"
@@ -729,6 +732,8 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       ++itSa;
     }
   }  
+
+  // External code testing area
 
 }
 
