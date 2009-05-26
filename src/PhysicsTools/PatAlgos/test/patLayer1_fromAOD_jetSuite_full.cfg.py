@@ -10,7 +10,7 @@ process.MessageLogger.cerr.INFO = cms.untracked.PSet(
     default          = cms.untracked.PSet( limit = cms.untracked.int32(0)  ),
     PATSummaryTables = cms.untracked.PSet( limit = cms.untracked.int32(-1) )
 )
-process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 
 # source
 process.source = cms.Source("PoolSource", 
@@ -27,33 +27,87 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 # PAT Layer 0+1
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
+from PhysicsTools.PatAlgos.tools.metTools import *
+addTcMET(process, 'TC')
+
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
-# Taking away BasicJets because RecoJets/JetProducers/python/BasicJetIcone5_cfi.py in 2.2.X is wrong
-## FIXME ### make also some basic jets for testing
-## FIXME from RecoJets.JetProducers.BasicJetIcone5_cfi import iterativeCone5BasicJets
-## FIXME process.iterativeCone5BasicJets = iterativeCone5BasicJets.clone(src = cms.InputTag("towerMaker"))
+addJetCollection(process,cms.InputTag('JetPlusTrackZSPCorJetIcone5'),
+                 'JPTc',
+                 doJTA        = True,
+                 doBTagging   = True,
+                 jetCorrLabel = ('IC5','JPT'),
+                 doType1MET   = True,
+                 doL1Cleaning = True,
+                 doL1Counters = True,                 
+                 genJetCollection = cms.InputTag("iterativeCone5GenJets")
+                 )
 
-addJetCollection(process,cms.InputTag('sisCone5CaloJets'),'SC5',
-                        doJTA=True,doBTagging=True,jetCorrLabel=('SC5','Calo'),doType1MET=True,doL1Counters=False,
-                        genJetCollection=cms.InputTag("sisCone5GenJets"))
-addJetCollection(process,cms.InputTag('sisCone7CaloJets'),'SC7',
-                        doJTA=True,doBTagging=False,jetCorrLabel=None,doType1MET=True,doL1Counters=False,
-                        genJetCollection=cms.InputTag("sisCone5GenJets"))
-addJetCollection(process,cms.InputTag('kt4CaloJets'),'KT4',
-                        doJTA=True,doBTagging=True,jetCorrLabel=('KT4','Calo'),doType1MET=True,doL1Counters=False,
-                        genJetCollection=cms.InputTag("kt4GenJets"))
-addJetCollection(process,cms.InputTag('kt6CaloJets'),'KT6',
-                        doJTA=True,doBTagging=False,jetCorrLabel=None,doType1MET=True,doL1Counters=False,
-                        genJetCollection=cms.InputTag("kt6GenJets"))
-## FIXME addJetCollection(process,cms.InputTag('iterativeCone5BasicJets'), 'BJ5',
-## FIXME                        doJTA=True,doBTagging=True,jetCorrLabel=('MC5','Calo'),doType1MET=True,doL1Counters=False)
-addJetCollection(process,cms.InputTag('iterativeCone5PFJets'), 'PFc',
-                        doJTA=True,doBTagging=True,jetCorrLabel=None,doType1MET=True,doL1Counters=False,
-                        genJetCollection=cms.InputTag("iterativeCone5GenJets"))
-addJetCollection(process,cms.InputTag('iterativeCone5PFJets'), 'PFr',
-                        doJTA=True,doBTagging=True,jetCorrLabel=None,doType1MET=True,doL1Counters=False,
-                        genJetCollection=cms.InputTag("iterativeCone5GenJets"))
+addJetCollection(process,cms.InputTag('sisCone5CaloJets'),
+                 'SC5',
+                 doJTA        = True,
+                 doBTagging   = True,
+                 jetCorrLabel = ('SC5','Calo'),
+                 doType1MET   = True,
+                 doL1Cleaning = True,                 
+                 doL1Counters = False,
+                 genJetCollection=cms.InputTag("sisCone5GenJets")
+                 )
+
+addJetCollection(process,cms.InputTag('sisCone7CaloJets'),
+                 'SC7',
+                 doJTA        = True,
+                 doBTagging   = False,
+                 jetCorrLabel = None,
+                 doType1MET   = True,
+                 doL1Cleaning = True,                 
+                 doL1Counters = False,
+                 genJetCollection=cms.InputTag("sisCone5GenJets")
+                 )
+
+addJetCollection(process,cms.InputTag('kt4CaloJets'),
+                 'KT4',
+                 doJTA        = True,
+                 doBTagging   = True,
+                 jetCorrLabel = ('KT4','Calo'),
+                 doType1MET   = True,
+                 doL1Cleaning = True,                 
+                 doL1Counters = False,
+                 genJetCollection=cms.InputTag("kt4GenJets")
+                 )
+
+addJetCollection(process,cms.InputTag('kt6CaloJets'),
+                 'KT6',
+                 doJTA        = True,
+                 doBTagging   = False,
+                 jetCorrLabel = None,
+                 doType1MET   = True,
+                 doL1Cleaning = True,                 
+                 doL1Counters = False,
+                 genJetCollection=cms.InputTag("kt6GenJets")
+                 )
+
+addJetCollection(process,cms.InputTag('iterativeCone5PFJets'),
+                 'PFc',
+                 doJTA        = True,
+                 doBTagging   = True,
+                 jetCorrLabel = None,
+                 doType1MET   = True,
+                 doL1Cleaning = True,                 
+                 doL1Counters = False,
+                 genJetCollection=cms.InputTag("iterativeCone5GenJets")
+                 )
+
+addJetCollection(process,cms.InputTag('iterativeCone5PFJets'),
+                 'PFr',
+                 doJTA        = True,
+                 doBTagging   = True,
+                 jetCorrLabel = None,
+                 doType1MET   = True,
+                 doL1Cleaning = True,                 
+                 doL1Counters = False,
+                 genJetCollection=cms.InputTag("iterativeCone5GenJets")
+                 )
 
 # Switch trigger matching off
 from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
@@ -61,9 +115,8 @@ switchOffTriggerMatchingOld( process )
 
 process.content = cms.EDAnalyzer("EventContentAnalyzer")
 process.p = cms.Path(
-                ## FIXME process.iterativeCone5BasicJets +  ## Turn on this to run tests on BasicJets
                 process.patDefaultSequence  
-                #+ process.content    # uncomment to get a dump 
+                ## + process.content    # uncomment to get a dump 
             )
 
 
@@ -82,9 +135,9 @@ process.out.outputCommands += ["keep *_selectedLayer1Jets*_*_*", "keep *_layer1M
 
 #### Dump the python config
 #
-#f = open("patLayer1_fromAOD_jetSuite_full.dump.py", "w")
-#f.write(process.dumpPython())
-#f.close()
+# f = open("patLayer1_fromAOD_jetSuite_full.dump.py", "w")
+# f.write(process.dumpPython())
+# f.close()
 #
  
 #### GraphViz dumps of sequences and modules, useful for debugging.

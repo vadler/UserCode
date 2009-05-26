@@ -33,34 +33,28 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 ## ==== Example with CaloJets
 switchJetCollection(process, 
         cms.InputTag('sisCone5CaloJets'),  # Jet collection; must be already in the event when patDefaultSequence is executed
-        doJTA=True,            # Run Jet-Track association & JetCharge
-        doBTagging=True,       # Run b-tagging
-        jetCorrLabel=('SC5','Calo'), # example jet correction name; set to None for no JEC
-        doType1MET=True,       # recompute Type1 MET using these jets
+        doJTA=True,                        # Run Jet-Track association & JetCharge
+        doBTagging=True,                   # Run b-tagging
+        jetCorrLabel=('SC5','Calo'),       # example jet correction name; set to None for no JEC
+        doType1MET=True,                   # recompute Type1 MET using these jets
         genJetCollection=cms.InputTag("sisCone5GenJets")) 
 
-## ==== FOR BASIC JETS
-### make some basic jets for testing
-# from RecoJets.JetProducers.BasicJetIcone5_cfi import iterativeCone5BasicJets
-# process.iterativeCone5BasicJets = iterativeCone5BasicJets.clone(src = cms.InputTag("towerMaker"))
-#
-### configure PAT
-# switchJetCollection(process, 
-#        cms.InputTag('iterativeCone5BasicJets'), # Jet collection; must be already in the event patLayer0 sequence is executed
-#        doJTA=True,
-#        doBTagging=True,
-#        jetCorrLabel=None,#=('S5','Calo'), # If you have JES corrections, you can apply them even to BasicJets
-#        doType1MET=False)                  # Type1MET dows not work on BasicJets :-(
+## ==== Example with JPT Jets
+##switchJetCollection(process, 
+##                    cms.InputTag('JetPlusTrackZSPCorJetIcone5'),
+##                    doJTA        = True,          # Run Jet-Track association & JetCharge
+##                    doBTagging   = True,          # Run b-tagging
+##                    jetCorrLabel = ('IC5','JPT'), # example jet correction name; set to None for no JEC
+##                    doType1MET   = True,          # recompute Type1 MET using these jets
+##                    genJetCollection=cms.InputTag("iterativeCone5GenJets")
+##                    ) 
 
 # Switch off old trigger matching
 from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
 switchOffTriggerMatchingOld( process )
 
 #process.content = cms.EDAnalyzer("EventContentAnalyzer")
-process.p = cms.Path(
-                ## process.iterativeCone5BasicJets +  ## Turn on this to run tests on BasicJets
-                process.patDefaultSequence  
-            )
+process.p = cms.Path( process.patDefaultSequence )
 
 
 # Output module configuration

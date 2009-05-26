@@ -39,3 +39,10 @@ patDefaultSequence = cms.Sequence(
     countLayer1Objects
 )
 #patDefaultSequence.doc = "Default PAT Sequence from AOD to PAT Objects, including filters"
+
+patDefaultSequenceNoCleaning = cms.Sequence(
+    beforeLayer1Objects *    # using '*', as the order is fixed.
+    allLayer1Objects *
+    selectedLayer1Objects
+)
+#patDefaultSequenceUncleaned.doc = "Default PAT Sequence from AOD to PAT Objects, w/o cleaning"
