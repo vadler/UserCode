@@ -1,5 +1,5 @@
 //
-// $Id: TriggerEvent.cc,v 1.1.2.4 2009/03/27 21:31:06 vadler Exp $
+// $Id: TriggerEvent.cc,v 1.1.2.5 2009/04/28 18:34:09 vadler Exp $
 //
 
 
@@ -152,7 +152,8 @@ TriggerFilterRefVector TriggerEvent::pathFilters( const std::string & namePath )
 
 bool TriggerEvent::filterInPath( const TriggerFilterRef & filterRef, const std::string & namePath ) const
 {
-  for ( TriggerFilterRefVector::const_iterator iFilter = pathFilters( namePath ).begin(); iFilter != pathFilters( namePath ).end(); ++iFilter ) {
+  TriggerFilterRefVector theFilters = pathFilters( namePath );
+  for ( TriggerFilterRefVector::const_iterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
     if ( filterRef == *iFilter ) {
       return true;
     }
@@ -218,9 +219,11 @@ TriggerFilterRefVector TriggerEvent::objectFilters( const TriggerObjectRef & obj
 TriggerObjectRefVector TriggerEvent::pathObjects( const std::string & namePath ) const
 {
   TriggerObjectRefVector thePathObjects;
-  for ( TriggerFilterRefVector::const_iterator iFilter = pathFilters( namePath ).begin(); iFilter != pathFilters( namePath ).end(); ++iFilter ) {
+  TriggerFilterRefVector theFilters = pathFilters( namePath );
+  for ( TriggerFilterRefVector::const_iterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
     const std::string labelFilter( ( *iFilter )->label() );
-    for ( TriggerObjectRefVector::const_iterator iObject = filterObjects( labelFilter ).begin(); iObject != filterObjects( labelFilter ).end(); ++iObject ) {
+    TriggerObjectRefVector theObjects = filterObjects( labelFilter );
+    for ( TriggerObjectRefVector::const_iterator iObject = theObjects.begin(); iObject != theObjects.end(); ++iObject ) {
       thePathObjects.push_back( *iObject );
     }
   }
@@ -229,7 +232,8 @@ TriggerObjectRefVector TriggerEvent::pathObjects( const std::string & namePath )
 
 bool TriggerEvent::objectInPath( const TriggerObjectRef & objectRef, const std::string & namePath ) const
 {
-  for ( TriggerFilterRefVector::const_iterator iFilter = pathFilters( namePath ).begin(); iFilter != pathFilters( namePath ).end(); ++iFilter ) {
+  TriggerFilterRefVector theFilters = pathFilters( namePath );
+  for ( TriggerFilterRefVector::const_iterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
     if ( objectInFilter( objectRef, ( *iFilter )->label() ) ) {
       return true;
     }
