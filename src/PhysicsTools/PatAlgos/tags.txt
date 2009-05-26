@@ -6,13 +6,18 @@ V01-08-04      CondFormats/JetMETObjects
 V00-06-02-09   DataFormats/METReco                              
 V07-02-12-03   DataFormats/MuonReco                             
 B2_2_X         DataFormats/PatCandidates                        
+V01-08-02-01   JetMETCorrections/Algorithms                     
+V01-08-15      JetMETCorrections/Configuration                  
+V03-02-06      JetMETCorrections/JetPlusTrack                   
+V02-09-02      JetMETCorrections/Modules                        
 VB04-00-02-04  JetMETCorrections/Type1MET                       
 B2_2_X         PhysicsTools/PatAlgos                            
 B2_2_X         PhysicsTools/PatUtils                            
-V03-01-15      PhysicsTools/PFCandProducer                      
+V03-01-16      PhysicsTools/PFCandProducer                      
 V08-06-16-06-02 PhysicsTools/RecoAlgos                           
+V01-04-03      RecoJets/JetAssociationAlgorithms                
 V00-04-02-17   RecoMET/Configuration                            
 V02-05-00-21   RecoMET/METAlgorithms                            
 V02-08-02-17   RecoMET/METProducers                             
 ---------------------------------------
-total packages: 12 (12 displayed)
+total packages: 17 (17 displayed)
