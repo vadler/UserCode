@@ -1,5 +1,5 @@
 //
-// $Id: TriggerEvent.cc,v 1.1.2.5 2009/04/28 18:34:09 vadler Exp $
+// $Id: TriggerEvent.cc,v 1.1.2.6 2009/05/26 12:46:04 vadler Exp $
 //
 
 
@@ -163,7 +163,17 @@ bool TriggerEvent::filterInPath( const TriggerFilterRef & filterRef, const std::
 
 TriggerPathRefVector TriggerEvent::filterPaths( const TriggerFilterRef & filterRef ) const
 {
-  return TriggerPathRefVector();
+  TriggerPathRefVector theFilterPaths;
+  size_t cPaths( 0 );
+  for ( TriggerPathCollection::const_iterator iPath = paths()->begin(); iPath != paths()->end(); ++iPath ) {
+    const std::string namePath( iPath->name() );
+    if ( filterInPath( filterRef, namePath ) ) {
+      const TriggerPathRef pathRef( paths(), cPaths );
+      theFilterPaths.push_back( pathRef );
+    }
+    ++cPaths;
+  }
+  return theFilterPaths;
 }
 
 std::vector< std::string > TriggerEvent::filterCollections( const std::string & labelFilter ) const
