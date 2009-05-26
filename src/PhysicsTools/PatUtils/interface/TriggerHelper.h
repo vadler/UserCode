@@ -25,8 +25,8 @@
 #include <string>
 
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
-#include "DataFormats/PatCandidates/interface/TriggerObject.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
+#include "FWCore/Framework/interface/Event.h"
 
 
 namespace pat {
