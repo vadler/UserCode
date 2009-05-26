@@ -11,7 +11,6 @@
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 
 // External code testing area
-#include "TString.h"
 
 using namespace pat;
 using namespace pat::helper;
@@ -320,7 +319,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         const std::vector< unsigned > ids2( ( *iObject )->filterIds() );
         if ( ! ( *iObject )->hasFilterId( ids.at( iId ) ) ) {
           edm::LogError( "objectFilterId" ) << "    Wrong filter ID found:\n"
-                                            << "        filter           : " << ( *iFilter )->label() << "\n"
+                                            << "        filter           : " << labelFilter << "\n"
                                             << "        filter object ID : " << ids.at( iId ) << "\n"
                                             << "        object key       : " << ( *iObject ).key();
         }
@@ -474,7 +473,6 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       histos2D_[ "ptObjCand" ]->Fill( candRef->pt(), objRef->pt() );
       histos2D_[ "etaObjCand" ]->Fill( candRef->eta(), objRef->eta() );
       histos2D_[ "phiObjCand" ]->Fill( candRef->phi(), objRef->phi() );
-//       const TriggerObjectRef matchObjRef( handlePatTriggerEvent->triggerMatchObject( candRef, match, iEvent ) );
       const TriggerMatchHelper matchHelper;
       const TriggerObjectRef matchObjRef( matchHelper.triggerMatchObject( candRef, match, iEvent, *handlePatTriggerEvent ) );
       if ( matchObjRef.isNonnull() && matchObjRef.isAvailable() ) {
@@ -504,7 +502,6 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                                << "        size filter: " << ( *iFilter )->objectKeys().size();
         }
       }
-//       const reco::CandidateBaseRefVector matchCandRefs( handlePatTriggerEvent->triggerMatchCandidates( objRef, match, iEvent ) );
       const reco::CandidateBaseRefVector matchCandRefs( matchHelper.triggerMatchCandidates( objRef, match, iEvent, *handlePatTriggerEvent ) );
       bool found( false );
       for ( reco::CandidateBaseRefVector::const_iterator iCand = matchCandRefs.begin(); iCand != matchCandRefs.end(); ++iCand ) {
@@ -519,7 +516,6 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         edm::LogError( "noMatchCandRefs" ) << "    Matching candidate objects do not correspond:\n"
                                            << "        edm::Association:     " << candRef.id()      << " " << candRef.key() << " not found in triggerMatchCandidates()";
       }
-//       const TriggerObjectMatchMap matchMap( handlePatTriggerEvent->triggerMatchObjects( candRef, iEvent ) );
       const TriggerObjectMatchMap matchMap( matchHelper.triggerMatchObjects( candRef, iEvent, *handlePatTriggerEvent ) );
       if ( matchMap.empty() ) {
         edm::LogError( "emptyMatchMap" ) << "    No entry in match map:\n"
