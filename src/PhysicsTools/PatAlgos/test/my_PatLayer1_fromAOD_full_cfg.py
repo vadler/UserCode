@@ -27,7 +27,7 @@ process.options = cms.untracked.PSet(
 # source
 process.source = cms.Source( "PoolSource", 
     fileNames = cms.untracked.vstring(
-        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/50D4BADB-FA32-DE11-BA01-000423D98DC4.root'
+        '/store/relval/CMSSW_3_1_0_pre9/RelValTTbar/GEN-SIM-RECO/STARTUP_31X_v1/0006/36E83BE1-814E-DE11-8C34-000423D9863C.root'
     )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -58,7 +58,7 @@ process.p = cms.Path(
 # Output module configuration
 from PhysicsTools.PatAlgos.patEventContent_cff import *
 process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0_pre7/output/my_PatLayer1_fromAOD_full.root' ),
+    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0_pre9/output/my_PatLayer1_fromAOD_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),

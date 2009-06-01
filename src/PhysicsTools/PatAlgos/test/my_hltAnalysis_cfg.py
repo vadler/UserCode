@@ -5,9 +5,7 @@ process = cms.Process( "HLTPROV" )
 # source
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-#         'file:/afs/cern.ch/user/h/hegner/public/test2.root' 
-#         'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_1_0_pre4/RelValTTbar/GEN-SIM-RECO/IDEAL_30X_v1/0003/00E48100-3A16-DE11-A693-001617DBCF6A.root'
-        '/store/relval/CMSSW_3_1_0_pre6/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0002/12B74DD2-F932-DE11-921C-0016177CA7A0.root',
+        '/store/relval/CMSSW_3_1_0_pre9/RelValTTbar/GEN-SIM-RECO/STARTUP_31X_v1/0006/36E83BE1-814E-DE11-8C34-000423D9863C.root'
     )
 )
 process.maxEvents = cms.untracked.PSet(
