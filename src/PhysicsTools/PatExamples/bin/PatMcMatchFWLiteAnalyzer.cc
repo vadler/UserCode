@@ -98,8 +98,8 @@ int main(int argc, char* argv[])
   
   //open output file
   TFile outFile( "rootPatMcMatch.root", "recreate" );
-  outFile.mkdir(".analyzeMcMatchPat");
-  outFile.cd(".analyzeMcMatchPat");
+  outFile.mkdir("analyzeMcMatchPat");
+  outFile.cd("analyzeMcMatchPat");
   muonPt_->Write( );
   jetPt_->Write( );
   outFile.Close();
