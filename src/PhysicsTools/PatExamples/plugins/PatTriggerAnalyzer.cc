@@ -2,7 +2,6 @@
 #include "PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.h"
 
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
-#include "DataFormats/Common/interface/AssociativeIterator.h"
 
 #include "TMath.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
