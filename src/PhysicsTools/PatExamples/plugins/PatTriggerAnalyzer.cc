@@ -67,7 +67,7 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
 
 //   YOUR ANALYSIS CODE GOES HERE!
 
-  const TriggerObjectMatch * triggerMatch( triggerEvent->triggerObjectMatchResult( muonMatch ) );
+  const TriggerObjectMatch * triggerMatch( triggerEvent->triggerObjectMatchResult( muonMatch_ ) );
   for ( size_t iMuon = 0; iMuon < muons->size(); ++iMuon ) { // loop over muon references (PAT muons have been used in the matcher in task 3)
     const reco::CandidateBaseRef candBaseRef( MuonRef( muons, iMuon ) );
     const TriggerObjectRef trigRef( matchHelper.triggerMatchObject( candBaseRef, triggerMatch, iEvent, *triggerEvent ) );
