@@ -508,3 +508,5 @@ def addJetCollection(process,
     process.allLayer1Summary.candidates += [ cms.InputTag('allLayer1Jets'+postfixLabel) ]
     ## add new selectedLayer1Jets collection output to the pat summary
     process.selectedLayer1Summary.candidates += [ cms.InputTag('selectedLayer1Jets'+postfixLabel) ]
+    ## add new cleanLayer1Jets collection output to the pat summary
+    process.cleanLayer1Summary.candidates += [ cms.InputTag('cleanLayer1Jets'+postfixLabel) ]    

@@ -8,7 +8,8 @@ def switchOffTriggerMatchingOld( process ):
     process.allLayer1Photons.addTrigMatch   = False
     process.allLayer1Taus.addTrigMatch      = False
     process.layer1METs.addTrigMatch         = False
-#     process.patDefaultSequence.remove( process.patTrigMatch )
+    process.patDefaultSequence.remove( process.patTrigMatch )
+    process.patDefaultSequenceNoCleaning.remove( process.patTrigMatch )
 
 # for (temporary) backwards compatibility
 def switchTriggerOff( process ):
