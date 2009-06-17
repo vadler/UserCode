@@ -1,5 +1,5 @@
 //
-// $Id: TriggerHelper.cc,v 1.2 2009/04/28 19:34:20 vadler Exp $
+// $Id: TriggerHelper.cc,v 1.3 2009/06/17 13:40:40 vadler Exp $
 //
 
 
@@ -21,7 +21,7 @@ TriggerObjectRef TriggerMatchHelper::triggerMatchObject( const reco::CandidateBa
     edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *matchResult, edm::EdmEventItemGetter< reco::CandidateBaseRef >( event ) ), itEnd( it.end() );
     while ( it != itEnd ) {
       if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {
-        if ( it->first == candRef ) {
+        if ( it->first.id() == candRef.id() && it->first.key() == candRef.key() ) {
           return TriggerObjectRef( it->second );
         }
       }
