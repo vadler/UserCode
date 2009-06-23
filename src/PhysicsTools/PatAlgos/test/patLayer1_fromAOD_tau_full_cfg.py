@@ -35,7 +35,7 @@ process.load("PhysicsTools.PatAlgos.producersLayer1.tauProducer_cfi")
 process.content = cms.EDAnalyzer("EventContentAnalyzer")
 
 # replacements to make the taus work with 310pre6
-process.allLayer1Taus.addTauID = False
+# process.allLayer1Taus.addTauID = False
 
 process.p = cms.Path(
     process.patPFCandidateIsoDepositSelection +
