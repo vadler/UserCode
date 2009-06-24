@@ -289,7 +289,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   // pat::TriggerEvent
   
   const TriggerPathRefVector pathRefs( handlePatTriggerEvent->acceptedPaths() );
-  for ( TriggerPathRefVector::const_iterator iPath = pathRefs.begin(); iPath != pathRefs.end(); ++iPath ) {
+  for ( TriggerPathRefVectorIterator iPath = pathRefs.begin(); iPath != pathRefs.end(); ++iPath ) {
     const std::string namePath( ( *iPath )->name() );
     if ( ! ( *iPath )->wasAccept() ) {
       edm::LogError( "pathAccept" ) << "    Not-accepted path in collection of accepted paths:\n"
@@ -301,7 +301,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
     TriggerObjectRefVector tmpObjects = handlePatTriggerEvent->pathObjects( namePath );
   }
   const TriggerFilterRefVector filterRefs( handlePatTriggerEvent->acceptedFilters() );
-  for ( TriggerFilterRefVector::const_iterator iFilter = filterRefs.begin(); iFilter != filterRefs.end(); ++iFilter ) {
+  for ( TriggerFilterRefVectorIterator iFilter = filterRefs.begin(); iFilter != filterRefs.end(); ++iFilter ) {
     const std::string labelFilter( ( *iFilter )->label() );
     if ( ( *iFilter )->status() != 1 ) {
       edm::LogError( "filterAccept" ) << "    Not-accepted filter in collection of accepted filter:\n"
@@ -313,7 +313,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
     const std::vector< int > ids( ( *iFilter )->objectIds() );
     for ( size_t iId = 0; iId < ids.size(); ++iId ) {
       const TriggerObjectRefVector objectRefs( handlePatTriggerEvent->objects( ids.at( iId ) ) );
-      for ( TriggerObjectRefVector::const_iterator iObject = objectRefs.begin(); iObject != objectRefs.end(); ++iObject ) {
+      for ( TriggerObjectRefVectorIterator iObject = objectRefs.begin(); iObject != objectRefs.end(); ++iObject ) {
         const std::vector< int > ids2( ( *iObject )->filterIds() );
         if ( ! ( *iObject )->hasFilterId( ids.at( iId ) ) ) {
           edm::LogError( "objectFilterId" ) << "    Wrong filter ID found:\n"
@@ -490,7 +490,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
                                               << "        available : " << matchObjRef.isAvailable();
       }
       const TriggerFilterRefVector objFilters( handlePatTriggerEvent->objectFilters( objRef ) );
-      for ( TriggerFilterRefVector::const_iterator iFilter = objFilters.begin(); iFilter != objFilters.end(); ++iFilter ) {
+      for ( TriggerFilterRefVectorIterator iFilter = objFilters.begin(); iFilter != objFilters.end(); ++iFilter ) {
         if ( displayMatches_ ) edm::LogWarning( "matchObjFilter" ) << "    Object used in filter:\n"
                                                                    << "        label: " << ( *iFilter )->label() << "\n"
                                                                    << "        type : " << ( *iFilter )->type();
