@@ -178,9 +178,6 @@ namespace {
                                    Should be elsewhere.
                                    Needed by PAT after reshuffling, at least for Electrons and Photons
        ==========================================================================================================================   */
-  edm::Ptr<reco::Muon>	        ptr_mu;
-  edm::PtrVector<reco::Muon>	ptrv_mu;
-
   edm::Ptr<reco::GsfElectron>	     ptr_e;
   edm::PtrVector<reco::GsfElectron>  ptrv_e;
 
@@ -339,6 +336,7 @@ namespace {
   pat::TriggerObjectRefProd rp_p_to;
   edm::Wrapper<pat::TriggerObjectRefProd> w_rp_p_to;
   pat::TriggerObjectRefVector rv_p_to;
+  pat::TriggerObjectRefVectorIterator rv_p_to_i;
   pat::TriggerObjectMatch a_p_to;
   edm::reftobase::Holder<reco::Candidate, pat::TriggerObjectRef> h_p_to;
   edm::reftobase::RefHolder<pat::TriggerObjectRef> rh_p_to;
@@ -358,6 +356,7 @@ namespace {
   pat::TriggerObjectStandAloneRefProd rp_p_tosa;
   edm::Wrapper<pat::TriggerObjectStandAloneRefProd> w_rp_p_tosa;
   pat::TriggerObjectStandAloneRefVector rv_p_tosa;
+  pat::TriggerObjectStandAloneRefVectorIterator rv_p_tosa_i;
   pat::TriggerObjectStandAloneMatch a_p_tosa;
   edm::reftobase::Holder<reco::Candidate, pat::TriggerObjectStandAloneRef> h_p_tosa;
   edm::reftobase::RefHolder<pat::TriggerObjectStandAloneRef> rh_p_tosa;
@@ -372,6 +371,7 @@ namespace {
   pat::TriggerFilterRefProd rp_p_tf;
   edm::Wrapper<pat::TriggerFilterRefProd> w_rp_p_tf;
   pat::TriggerFilterRefVector rv_p_tf;
+  pat::TriggerFilterRefVectorIterator rv_p_tf_i;
 
   pat::TriggerPathCollection v_p_tp;
   pat::TriggerPathCollection::const_iterator v_p_tp_ci;
@@ -380,6 +380,7 @@ namespace {
   pat::TriggerPathRefProd rp_p_tp;
   edm::Wrapper<pat::TriggerPathRefProd> w_rp_p_tp;
   pat::TriggerPathRefVector rv_p_tp;
+  pat::TriggerPathRefVectorIterator rv_p_tp_i;
   
   edm::Wrapper<pat::TriggerEvent> w_p_te;
 

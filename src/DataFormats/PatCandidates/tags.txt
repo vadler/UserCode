@@ -1,12 +1,12 @@
-Test Release based on: CMSSW_3_1_0_pre6
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_1_0_pre6
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0_pre6
---- Tag ---    -------- Package --------                        
-V01-08-04      CondFormats/JetMETObjects                        
-NoTag          DataFormats/PatCandidates                        
-V09-31-02      PhysicsTools/HepMCCandAlgos                      
-NoTag          PhysicsTools/PatAlgos                            
-NoTag          PhysicsTools/PatUtils                            
-V03-01-14      PhysicsTools/PFCandProducer                      
+Test Release based on: CMSSW_3_1_0_pre10
+Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_1_0_pre10
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0_pre10
+-------- Package --------                        --- Tag ---    --- RelTag --- 
+CondFormats/JetMETObjects                        V01-08-04      V01-08-03      
+DataFormats/MuonReco                             V08-00-06      V08-00-04      
+DataFormats/PatCandidates                        NoTag          V05-03-04      
+PhysicsTools/PatAlgos                            NoTag          V07-04-04      
+PhysicsTools/PatUtils                            NoTag          V03-07-03      
+PhysicsTools/PFCandProducer                      V03-01-16      V03-01-14      
 ---------------------------------------
 total packages: 6 (6 displayed)
