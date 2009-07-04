@@ -4,16 +4,16 @@ process = cms.Process( "PAT" )
 
 # initialize MessageLogger and output report
 process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
-process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append( 'PATSummaryTables' )
-process.MessageLogger.cerr.INFO = cms.untracked.PSet(
-    default          = cms.untracked.PSet(
-        limit = cms.untracked.int32( -1 )
-    ),
-    PATSummaryTables = cms.untracked.PSet(
-        limit = cms.untracked.int32( -1 )
-    )
-)
+# process.MessageLogger.cerr.threshold = 'INFO'
+# process.MessageLogger.categories.append( 'PATSummaryTables' )
+# process.MessageLogger.cerr.INFO = cms.untracked.PSet(
+#     default          = cms.untracked.PSet(
+#         limit = cms.untracked.int32( -1 )
+#     ),
+#     PATSummaryTables = cms.untracked.PSet(
+#         limit = cms.untracked.int32( -1 )
+#     )
+# )
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool( True )
 )
@@ -27,7 +27,7 @@ process.options = cms.untracked.PSet(
 # source
 process.source = cms.Source( "PoolSource", 
     fileNames = cms.untracked.vstring(
-        '/store/relval/CMSSW_3_1_0_pre9/RelValTTbar/GEN-SIM-RECO/STARTUP_31X_v1/0006/36E83BE1-814E-DE11-8C34-000423D9863C.root'
+        '/store/relval/CMSSW_3_1_0_pre10/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0008/CC80B73A-CA57-DE11-BC2F-000423D99896.root'
     )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -36,7 +36,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = cms.string( 'IDEAL_31X::All' )
+process.GlobalTag.globaltag = cms.string( 'MC_31X_V1::All' )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
 # # HLT analyzers
@@ -45,9 +45,9 @@ process.load( "Configuration.StandardSequences.MagneticField_cff" )
 
 # PAT Layer 0 & 1
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
-# replacements currently needed to make the jets work
-process.allLayer1Jets.addDiscriminators    = False
-process.allLayer1Jets.discriminatorSources = []
+# replacements currently needed to make the electrons work
+process.allLayer1Electrons.addElectronShapes = False
+process.allLayer1Electrons.addElectronID     = False
 
 process.p = cms.Path(
 #     process.hltEventAnalyzerAOD       +
@@ -58,7 +58,7 @@ process.p = cms.Path(
 # Output module configuration
 from PhysicsTools.PatAlgos.patEventContent_cff import *
 process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0_pre10/output/my_PatLayer1_fromAOD_full.root' ),
+    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0/output/my_PatLayer1_fromAOD_full.root' ),
     SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring( 'p' )
     ),

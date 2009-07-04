@@ -1,5 +1,5 @@
 //
-// $Id: PATTauProducer.cc,v 1.27 2009/06/08 17:32:26 hegner Exp $
+// $Id: PATTauProducer.cc,v 1.29 2009/07/02 12:31:58 cbern Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATTauProducer.h"
@@ -56,7 +56,6 @@ PATTauProducer::PATTauProducer(const edm::ParameterSet & iConfig):
     genJetMatchSrc_    = iConfig.getParameter<edm::InputTag>( "genJetMatch" );
   }
 
-  addResolutions_ = iConfig.getParameter<bool>         ( "addResolutions" );
 
   // tau ID configurables
   addTauID_       = iConfig.getParameter<bool>         ( "addTauID" );
@@ -99,9 +98,9 @@ PATTauProducer::PATTauProducer(const edm::ParameterSet & iConfig):
     if ( depconf.exists("ecal")            ) isoDepositLabels_.push_back(std::make_pair(ECalIso, depconf.getParameter<edm::InputTag>("ecal")));
     if ( depconf.exists("hcal")            ) isoDepositLabels_.push_back(std::make_pair(HCalIso, depconf.getParameter<edm::InputTag>("hcal")));
     if ( depconf.exists("pfAllParticles")  ) isoDepositLabels_.push_back(std::make_pair(ParticleIso, depconf.getParameter<edm::InputTag>("pfAllParticles")));
-    if ( depconf.exists("pfChargedHadron") ) isoDepositLabels_.push_back(std::make_pair(ChargedParticleIso, depconf.getParameter<edm::InputTag>("pfChargedHadron")));
-    if ( depconf.exists("pfNeutralHadron") ) isoDepositLabels_.push_back(std::make_pair(NeutralParticleIso,depconf.getParameter<edm::InputTag>("pfNeutralHadron")));
-    if ( depconf.exists("pfGamma")         ) isoDepositLabels_.push_back(std::make_pair(GammaParticleIso, depconf.getParameter<edm::InputTag>("pfGamma")));
+    if ( depconf.exists("pfChargedHadron") ) isoDepositLabels_.push_back(std::make_pair(ChargedHadronIso, depconf.getParameter<edm::InputTag>("pfChargedHadron")));
+    if ( depconf.exists("pfNeutralHadron") ) isoDepositLabels_.push_back(std::make_pair(NeutralHadronIso,depconf.getParameter<edm::InputTag>("pfNeutralHadron")));
+    if ( depconf.exists("pfGamma")         ) isoDepositLabels_.push_back(std::make_pair(PhotonIso, depconf.getParameter<edm::InputTag>("pfGamma")));
     
     if ( depconf.exists("user") ) {
       std::vector<edm::InputTag> userdeps = depconf.getParameter<std::vector<edm::InputTag> >("user");
@@ -117,6 +116,12 @@ PATTauProducer::PATTauProducer(const edm::ParameterSet & iConfig):
   addEfficiencies_ = iConfig.getParameter<bool>("addEfficiencies");
   if (addEfficiencies_) {
      efficiencyLoader_ = pat::helper::EfficiencyLoader(iConfig.getParameter<edm::ParameterSet>("efficiencies"));
+  }
+
+  // Resolution configurables
+  addResolutions_ = iConfig.getParameter<bool>("addResolutions");
+  if (addResolutions_) {
+     resolutionLoader_ = pat::helper::KinResolutionsLoader(iConfig.getParameter<edm::ParameterSet>("resolutions"));
   }
 
   // Check to see if the user wants to add user data
@@ -148,6 +153,7 @@ void PATTauProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
   if (isolator_.enabled()) isolator_.beginEvent(iEvent,iSetup);
 
   if (efficiencyLoader_.enabled()) efficiencyLoader_.newEvent(iEvent);
+  if (resolutionLoader_.enabled()) resolutionLoader_.newEvent(iEvent, iSetup);
    
   std::vector<edm::Handle<edm::ValueMap<IsoDeposit> > > deposits(isoDepositLabels_.size());
   for (size_t j = 0, nd = deposits.size(); j < nd; ++j) {
@@ -265,6 +271,10 @@ void PATTauProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
       efficiencyLoader_.setEfficiencies( aTau, tausRef );
     }
 
+    if (resolutionLoader_.enabled()) {
+      resolutionLoader_.setResolutions(aTau);
+    }
+
     if ( useUserData_ ) {
       userDataHelper_.add( aTau, iEvent, iSetup );
     }
@@ -317,7 +327,7 @@ void PATTauProducer::fillDescriptions(edm::ConfigurationDescriptions & descripti
   iDesc.add<edm::InputTag>("genJetMatch", edm::InputTag("tauGenJetMatch"));
 
 
-  iDesc.add<bool>("addResolutions",false);
+  pat::helper::KinResolutionsLoader::fillDescription(iDesc);
 
   // tau ID configurables
   iDesc.add<bool>("addTauID", true)->setComment("add tau ID variables");

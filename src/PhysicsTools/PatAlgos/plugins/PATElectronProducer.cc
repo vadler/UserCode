@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.27 2009/06/08 17:32:26 hegner Exp $
+// $Id: PATElectronProducer.cc,v 1.29 2009/07/02 12:31:58 cbern Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
@@ -58,6 +58,10 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
 
   // resolution configurables
   addResolutions_   = iConfig.getParameter<bool>         ( "addResolutions" );
+  if (addResolutions_) {
+     resolutionLoader_ = pat::helper::KinResolutionsLoader(iConfig.getParameter<edm::ParameterSet>("resolutions"));
+  }
+
 
   // electron ID configurables
   addElecID_        = iConfig.getParameter<bool>         ( "addElectronID" );
@@ -95,10 +99,6 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
      if (depconf.exists("tracker")) isoDepositLabels_.push_back(std::make_pair(TrackerIso, depconf.getParameter<edm::InputTag>("tracker")));
      if (depconf.exists("ecal"))    isoDepositLabels_.push_back(std::make_pair(ECalIso, depconf.getParameter<edm::InputTag>("ecal")));
      if (depconf.exists("hcal"))    isoDepositLabels_.push_back(std::make_pair(HCalIso, depconf.getParameter<edm::InputTag>("hcal")));
-     if (depconf.exists("particle"))           isoDepositLabels_.push_back(std::make_pair(ParticleIso, depconf.getParameter<edm::InputTag>("particle")));
-     if (depconf.exists("chargedparticle"))    isoDepositLabels_.push_back(std::make_pair(ChargedParticleIso, depconf.getParameter<edm::InputTag>("chargedparticle")));
-     if (depconf.exists("neutralparticle")) isoDepositLabels_.push_back(std::make_pair(NeutralParticleIso,depconf.getParameter<edm::InputTag>("neutralparticle")));
-     if (depconf.exists("gammaparticle"))    isoDepositLabels_.push_back(std::make_pair(GammaParticleIso, depconf.getParameter<edm::InputTag>("gammaparticle")));
 
 
      if (depconf.exists("user")) {
@@ -146,6 +146,7 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
   if (isolator_.enabled()) isolator_.beginEvent(iEvent,iSetup);
 
   if (efficiencyLoader_.enabled()) efficiencyLoader_.newEvent(iEvent);
+  if (resolutionLoader_.enabled()) resolutionLoader_.newEvent(iEvent, iSetup);
 
   std::vector<edm::Handle<edm::ValueMap<IsoDeposit> > > deposits(isoDepositLabels_.size());
   for (size_t j = 0, nd = deposits.size(); j < nd; ++j) {
@@ -319,6 +320,11 @@ void PATElectronProducer::FillElectron(Electron& anElectron,
     if (efficiencyLoader_.enabled()) {
       efficiencyLoader_.setEfficiencies( anElectron, elecsRef );
     }
+    
+    if (resolutionLoader_.enabled()) {
+      resolutionLoader_.setResolutions(anElectron);
+    }
+
     //  add electron shapes info
     if (addElecShapes_) {
 	std::vector<float> covariances = lazyTools_->covariances(*(elecsRef->superCluster()->seed())) ;
@@ -360,8 +366,6 @@ void PATElectronProducer::fillDescriptions(edm::ConfigurationDescriptions & desc
                  edm::ParameterDescription<std::vector<edm::InputTag> >("genParticleMatch", emptySourceVector, true)
 		 )->setComment("input with MC match information");
 
-  iDesc.add<bool>("addResolutions",false);
-
   // electron ID configurables
   iDesc.add<bool>("addElectronID",true)->setComment("add electron ID variables");
   edm::ParameterSetDescription electronIDSourcesPSet;
@@ -376,10 +380,6 @@ void PATElectronProducer::fillDescriptions(edm::ConfigurationDescriptions & desc
   isoDepositsPSet.addOptional<edm::InputTag>("tracker"); 
   isoDepositsPSet.addOptional<edm::InputTag>("ecal");
   isoDepositsPSet.addOptional<edm::InputTag>("hcal");
-  isoDepositsPSet.addOptional<edm::InputTag>("particle");
-  isoDepositsPSet.addOptional<edm::InputTag>("chargedparticle");
-  isoDepositsPSet.addOptional<edm::InputTag>("neutralparticle");
-  isoDepositsPSet.addOptional<edm::InputTag>("gammaparticle");
   isoDepositsPSet.addOptional<std::vector<edm::InputTag> >("user");
   iDesc.addOptional("isoDeposits", isoDepositsPSet);
 
@@ -402,6 +402,9 @@ void PATElectronProducer::fillDescriptions(edm::ConfigurationDescriptions & desc
   edm::ParameterSetDescription isolationPSet;
   isolationPSet.setAllowAnything(); // TODO: the pat helper needs to implement a description.
   iDesc.add("isolation", isolationPSet);
+
+  // Resolution configurables
+  pat::helper::KinResolutionsLoader::fillDescription(iDesc);
 
   descriptions.add("PATElectronProducer", iDesc);
 
