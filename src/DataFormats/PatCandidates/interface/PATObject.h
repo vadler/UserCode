@@ -1,5 +1,5 @@
 //
-// $Id: PATObject.h,v 1.21.2.3 2009/04/06 16:21:06 gpetrucc Exp $
+// $Id: PATObject.h,v 1.21.2.5 2009/06/25 14:09:20 gpetrucc Exp $
 //
 
 #ifndef DataFormats_PatCandidates_PATObject_h
@@ -15,7 +15,7 @@
    https://hypernews.cern.ch/HyperNews/CMS/get/physTools.html
 
   \author   Steven Lowette, Giovanni Petrucciani, Frederic Ronga, Volker Adler, Sal Rappoccio
-  \version  $Id: PATObject.h,v 1.21.2.3 2009/04/06 16:21:06 gpetrucc Exp $
+  \version  $Id: PATObject.h,v 1.21.2.5 2009/06/25 14:09:20 gpetrucc Exp $
 */
 
 
@@ -204,6 +204,18 @@ namespace pat {
         return std::find(userIntLabels_.begin(), userIntLabels_.end(), key) != userIntLabels_.end();
       }
 
+      /// Get user-defined candidate ptr
+      /// Note: it will a null pointer if the key is not found; you can check if the key exists with 'hasUserInt' method.
+      reco::CandidatePtr userCand( const std::string & key ) const;
+      /// Set user-defined int
+      void addUserCand( const std::string & label,  const reco::CandidatePtr & data );
+      /// Get list of user-defined int names
+      const std::vector<std::string> & userCandNames() const  { return userCandLabels_; }
+      /// Return true if there is a user-defined int with a given name
+      bool hasUserCand( const std::string & key ) const {
+        return std::find(userCandLabels_.begin(), userCandLabels_.end(), key) != userCandLabels_.end();
+      }
+
       // === New Kinematic Resolutions
       /// Return the kinematic resolutions associated to this object, possibly specifying a label for it.
       /// If not present, it will throw an exception.
@@ -286,6 +298,9 @@ namespace pat {
       // User int values
       std::vector<std::string>      userIntLabels_;
       std::vector<int32_t>          userInts_;
+      // User candidate matches
+      std::vector<std::string>        userCandLabels_;
+      std::vector<reco::CandidatePtr> userCands_;
 
       /// Kinematic resolutions.
       std::vector<pat::CandKinResolution> kinResolutions_;
@@ -557,6 +572,25 @@ namespace pat {
     userIntLabels_.push_back(label);
     userInts_.push_back( data );
   }
+
+  template <class ObjectType>
+  reco::CandidatePtr PATObject<ObjectType>::userCand( const std::string & key ) const
+  {
+    std::vector<std::string>::const_iterator it = std::find(userCandLabels_.begin(), userCandLabels_.end(), key);
+    if (it != userCandLabels_.end()) {
+        return userCands_[it - userCandLabels_.begin()];
+    }
+    return reco::CandidatePtr();
+  }
+
+  template <class ObjectType>
+  void PATObject<ObjectType>::addUserCand( const std::string &label,
+					   const reco::CandidatePtr & data )
+  {
+    userCandLabels_.push_back(label);
+    userCands_.push_back( data );
+  }
+
 
   template <class ObjectType>
   const pat::CandKinResolution & PATObject<ObjectType>::getKinResolution(const std::string &label) const {

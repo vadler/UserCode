@@ -19,6 +19,10 @@ allLayer1Electrons = cms.EDProducer("PATElectronProducer",
       userInts = cms.PSet(
         src = cms.VInputTag('')
       ),
+      # add candidate ptrs here
+      userCands = cms.PSet(
+        src = cms.VInputTag('')
+      ),
       # add "inline" functions here
       userFunctions = cms.vstring(""),
       userFunctionLabels = cms.vstring("")

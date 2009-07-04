@@ -37,6 +37,7 @@ switchJetCollection(process, cms.InputTag('iterativeCone5PFJets'),
         jetCorrLabel=None, # You may want to apply jet energy corrections
         doType1MET=False)          # You don't want CaloMET with PFJets, do you?
 process.allLayer1Jets.embedCaloTowers   = False
+process.patDefaultSequence.remove(process.allLayer1MHTs)
 # Switch off old trigger matching
 from PhysicsTools.PatAlgos.tools.trigTools import switchOffTriggerMatchingOld
 switchOffTriggerMatchingOld( process )
