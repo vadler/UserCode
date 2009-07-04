@@ -1,12 +1,11 @@
 //
-// $Id: TriggerEvent.cc,v 1.1.2.3 2009/03/18 19:08:22 vadler Exp $
+// $Id: TriggerEvent.cc,v 1.1.2.6 2009/05/26 12:46:04 vadler Exp $
 //
 
 
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/Common/interface/AssociativeIterator.h"
 
 
 using namespace pat;
@@ -153,7 +152,8 @@ TriggerFilterRefVector TriggerEvent::pathFilters( const std::string & namePath )
 
 bool TriggerEvent::filterInPath( const TriggerFilterRef & filterRef, const std::string & namePath ) const
 {
-  for ( TriggerFilterRefVector::const_iterator iFilter = pathFilters( namePath ).begin(); iFilter != pathFilters( namePath ).end(); ++iFilter ) {
+  TriggerFilterRefVector theFilters = pathFilters( namePath );
+  for ( TriggerFilterRefVectorIterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
     if ( filterRef == *iFilter ) {
       return true;
     }
@@ -163,7 +163,17 @@ bool TriggerEvent::filterInPath( const TriggerFilterRef & filterRef, const std::
 
 TriggerPathRefVector TriggerEvent::filterPaths( const TriggerFilterRef & filterRef ) const
 {
-  return TriggerPathRefVector();
+  TriggerPathRefVector theFilterPaths;
+  size_t cPaths( 0 );
+  for ( TriggerPathCollection::const_iterator iPath = paths()->begin(); iPath != paths()->end(); ++iPath ) {
+    const std::string namePath( iPath->name() );
+    if ( filterInPath( filterRef, namePath ) ) {
+      const TriggerPathRef pathRef( paths(), cPaths );
+      theFilterPaths.push_back( pathRef );
+    }
+    ++cPaths;
+  }
+  return theFilterPaths;
 }
 
 std::vector< std::string > TriggerEvent::filterCollections( const std::string & labelFilter ) const
@@ -219,9 +229,11 @@ TriggerFilterRefVector TriggerEvent::objectFilters( const TriggerObjectRef & obj
 TriggerObjectRefVector TriggerEvent::pathObjects( const std::string & namePath ) const
 {
   TriggerObjectRefVector thePathObjects;
-  for ( TriggerFilterRefVector::const_iterator iFilter = pathFilters( namePath ).begin(); iFilter != pathFilters( namePath ).end(); ++iFilter ) {
+  TriggerFilterRefVector theFilters = pathFilters( namePath );
+  for ( TriggerFilterRefVectorIterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
     const std::string labelFilter( ( *iFilter )->label() );
-    for ( TriggerObjectRefVector::const_iterator iObject = filterObjects( labelFilter ).begin(); iObject != filterObjects( labelFilter ).end(); ++iObject ) {
+    TriggerObjectRefVector theObjects = filterObjects( labelFilter );
+    for ( TriggerObjectRefVectorIterator iObject = theObjects.begin(); iObject != theObjects.end(); ++iObject ) {
       thePathObjects.push_back( *iObject );
     }
   }
@@ -230,7 +242,8 @@ TriggerObjectRefVector TriggerEvent::pathObjects( const std::string & namePath )
 
 bool TriggerEvent::objectInPath( const TriggerObjectRef & objectRef, const std::string & namePath ) const
 {
-  for ( TriggerFilterRefVector::const_iterator iFilter = pathFilters( namePath ).begin(); iFilter != pathFilters( namePath ).end(); ++iFilter ) {
+  TriggerFilterRefVector theFilters = pathFilters( namePath );
+  for ( TriggerFilterRefVectorIterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
     if ( objectInFilter( objectRef, ( *iFilter )->label() ) ) {
       return true;
     }
@@ -269,49 +282,4 @@ const TriggerObjectMatch * TriggerEvent::triggerObjectMatchResult( const std::st
     return iMatch->second.get();
   }
   return 0;
-}
-
-TriggerObjectRef TriggerEvent::triggerMatchObject( const reco::CandidateBaseRef & candRef, const std::string & labelMatcher, const edm::Event & iEvent ) const
-{
-  const TriggerObjectMatch * matchResult( triggerObjectMatchResult( labelMatcher ) );
-  if ( matchResult ) {
-    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *matchResult, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
-    while ( it != itEnd ) {
-      if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {
-        if ( it->first == candRef ) {
-          return TriggerObjectRef( it->second );
-        }
-      }
-      ++it;
-    }
-  }  
-  return TriggerObjectRef();
-}
-
-TriggerObjectMatchMap TriggerEvent::triggerMatchObjects( const reco::CandidateBaseRef & candRef, const edm::Event & iEvent ) const
-{
-  TriggerObjectMatchMap theContainer;
-  const std::vector< std::string > matchers( triggerMatchers() );
-  for ( size_t iMatch = 0; iMatch < matchers.size(); ++iMatch ) {
-    theContainer[ matchers.at( iMatch ) ] = triggerMatchObject( candRef, matchers.at( iMatch ), iEvent );
-  }
-  return theContainer;
-}
-
-reco::CandidateBaseRefVector TriggerEvent::triggerMatchCandidates( const TriggerObjectRef & objectRef, const std::string & labelMatcher, const edm::Event & iEvent ) const
-{
-  reco::CandidateBaseRefVector theCands;
-  const TriggerObjectMatch * matchResult( triggerObjectMatchResult( labelMatcher ) );
-  if ( matchResult ) {
-    edm::AssociativeIterator< reco::CandidateBaseRef, TriggerObjectMatch > it( *matchResult, edm::EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
-    while ( it != itEnd ) {
-      if ( it->first.isNonnull() && it->second.isNonnull() && it->second.isAvailable() ) {
-        if ( it->second == objectRef ) {
-          theCands.push_back( it->first );
-        }
-      }
-      ++it;
-    }
-  }
-  return theCands;
 }
