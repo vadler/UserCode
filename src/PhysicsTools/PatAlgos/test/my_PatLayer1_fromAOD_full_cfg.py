@@ -1,22 +1,10 @@
-import FWCore.ParameterSet.Config as cms
-
-process = cms.Process( "PAT" )
-
-# initialize MessageLogger and output report
-process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
-# process.MessageLogger.cerr.threshold = 'INFO'
-# process.MessageLogger.categories.append( 'PATSummaryTables' )
-# process.MessageLogger.cerr.INFO = cms.untracked.PSet(
-#     default          = cms.untracked.PSet(
-#         limit = cms.untracked.int32( -1 )
-#     ),
-#     PATSummaryTables = cms.untracked.PSet(
-#         limit = cms.untracked.int32( -1 )
-#     )
-# )
-process.options = cms.untracked.PSet(
-    wantSummary = cms.untracked.bool( True )
-)
+from PhysicsTools.PatAlgos.patTemplate_cfg import *
+# process.GlobalTag.globaltag =  ...
+# process.source.fileNames    = [ ... ]
+# process.maxEvents.input     = ...
+# process.out.outputCommands  = [ ... ]
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_2/output/my_PatLayer1_fromAOD_full.root'
+# process.options.wantSummary = False
 
 # # memory check
 # process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck",
@@ -24,30 +12,12 @@ process.options = cms.untracked.PSet(
 #     ignoreTotal      = cms.untracked.int32( 0 )
 # )
 
-# source
-process.source = cms.Source( "PoolSource", 
-    fileNames = cms.untracked.vstring(
-        '/store/relval/CMSSW_3_1_0_pre10/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0008/CC80B73A-CA57-DE11-BC2F-000423D99896.root'
-    )
-)
-process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( 100 )
-)
-
-process.load( "Configuration.StandardSequences.Geometry_cff" )
-process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = cms.string( 'MC_31X_V1::All' )
-process.load( "Configuration.StandardSequences.MagneticField_cff" )
-
 # # HLT analyzers
 # process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
 # process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
 
-# PAT Layer 0 & 1
-process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
-# replacements currently needed to make the electrons work
-process.allLayer1Electrons.addElectronShapes = False
-process.allLayer1Electrons.addElectronID     = False
+# PAT
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
 process.p = cms.Path(
 #     process.hltEventAnalyzerAOD       +
@@ -55,19 +25,8 @@ process.p = cms.Path(
     process.patDefaultSequence
 )
 
-# Output module configuration
-from PhysicsTools.PatAlgos.patEventContent_cff import *
-process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_0/output/my_PatLayer1_fromAOD_full.root' ),
-    SelectEvents   = cms.untracked.PSet(
-        SelectEvents = cms.vstring( 'p' )
-    ),
-    outputCommands = cms.untracked.vstring( 'drop *', *patEventContent )
-)
-
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-process.p *= process.cleanLayer1Objects
 ### switch START ###
 # ## no stand-alone trigger objects
 # switchOnTrigger( process )
@@ -83,7 +42,3 @@ process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
 # ## embedded trigger object matches only
 # switchOnTriggerMatchEmbedding( process )
 ### switch END ###
-
-process.outpath = cms.EndPath(
-    process.out
-)

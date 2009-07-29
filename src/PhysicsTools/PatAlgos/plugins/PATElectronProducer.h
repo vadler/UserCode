@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.h,v 1.18 2009/06/25 23:49:35 gpetrucc Exp $
+// $Id: PATElectronProducer.h,v 1.19 2009/07/08 08:51:14 salerno Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATElectronProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of reco::GsfElectron.
 
   \author   Steven Lowette, James Lamb
-  \version  $Id: PATElectronProducer.h,v 1.18 2009/06/25 23:49:35 gpetrucc Exp $
+  \version  $Id: PATElectronProducer.h,v 1.19 2009/07/08 08:51:14 salerno Exp $
 */
 
 
@@ -104,14 +104,6 @@ namespace pat {
       bool useUserData_;
       pat::PATUserDataHelper<pat::Electron>      userDataHelper_;
       
-      //Add electron Cluster Shapes */
-      bool         addElecShapes_;
-      //Ecal Cluster Lazy Tools
-      std::auto_ptr<EcalClusterLazyTools> lazyTools_;
-
-      //For the Cluster Shape reading */
-      edm::InputTag reducedBarrelRecHitCollection_;
-      edm::InputTag reducedEndcapRecHitCollection_;
       
   };
 

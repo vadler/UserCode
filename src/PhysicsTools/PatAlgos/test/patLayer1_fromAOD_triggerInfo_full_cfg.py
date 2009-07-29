@@ -1,53 +1,24 @@
-import FWCore.ParameterSet.Config as cms
+# This is an example PAT configuration showing the production of PAT Trigger information
 
-process = cms.Process( "PAT" )
+# Starting with a skeleton process which gets imported with the following line
+from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
-# initialize MessageLogger and output report
-process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
-process.options = cms.untracked.PSet(
-    wantSummary = cms.untracked.bool( True )
-)
+# load the standard PAT config
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
-# source
-process.source = cms.Source( "PoolSource", 
-    fileNames = cms.untracked.vstring(
-        '/store/relval/CMSSW_3_1_0_pre10/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0008/CC80B73A-CA57-DE11-BC2F-000423D99896.root'
-    )
-)
-process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( 100 )
-)
-
-process.load( "Configuration.StandardSequences.Geometry_cff" )
-process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = cms.string( 'MC_31X_V1::All' )
-process.load( "Configuration.StandardSequences.MagneticField_cff" )
-
-# PAT Layer 0 & 1
-process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
-# replacements currently needed to make the electrons work
-process.allLayer1Electrons.addElectronShapes = False
-process.allLayer1Electrons.addElectronID     = False
+# add the trigger information to the configuration
+from PhysicsTools.PatAlgos.tools.trigTools import *
+switchOnTrigger( process )
 
 process.p = cms.Path(
     process.patDefaultSequence
 )
 
-# Output module configuration
-from PhysicsTools.PatAlgos.patEventContent_cff import *
-process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( 'PATLayer1_Output.fromAOD_triggerInfo_full.root' ),
-    SelectEvents   = cms.untracked.PSet(
-        SelectEvents = cms.vstring( 'p' )
-    ),
-    outputCommands = cms.untracked.vstring( 'drop *', *patEventContent )
-)
-
-# Trigger
-from PhysicsTools.PatAlgos.tools.trigTools import *
-process.p *= process.cleanLayer1Objects
-switchOnTrigger( process )
-
-process.outpath = cms.EndPath(
-    process.out
-)
+# In addition you usually want to change the following parameters:
+#
+#   process.GlobalTag.globaltag =  ...     ## (according to https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions)
+#   process.source.fileNames = [ ... ]     ## (e.g. 'file:AOD.root')
+#   process.maxEvents.input = ...          ## (e.g. -1 to run on all events)
+#   process.out.outputCommands = [ ... ]   ## (e.g. taken from PhysicsTools/PatAlgos/python/patEventContent_cff.py)
+#   process.out.fileName = ...             ## (e.g. 'myTuple.root')
+#   process.options.wantSummary = False    ## (to suppress the long output at the end of the job)
