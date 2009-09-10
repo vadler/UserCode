@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.h,v 1.19 2009/07/08 08:51:14 salerno Exp $
+// $Id: PATElectronProducer.h,v 1.21 2009/08/26 08:34:05 cbern Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATElectronProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of reco::GsfElectron.
 
   \author   Steven Lowette, James Lamb
-  \version  $Id: PATElectronProducer.h,v 1.19 2009/07/08 08:51:14 salerno Exp $
+  \version  $Id: PATElectronProducer.h,v 1.21 2009/08/26 08:34:05 cbern Exp $
 */
 
 
@@ -76,13 +76,40 @@ namespace pat {
       edm::InputTag pfElecSrc_;
       bool          embedPFCandidate_; 
 
-      typedef std::vector<edm::Handle<edm::Association<reco::GenParticleCollection> > > GenAssociations;
+      /// embed high level selection variables?
+      bool          embedHighLevelSelection_;
+      edm::InputTag beamLineSrc_;
 
-      void FillElectron(Electron& aEl,
-			const edm::RefToBase<reco::GsfElectron>& elecRef,
-			const reco::CandidateBaseRef& baseRef,
-			const GenAssociations& genMatches) const;
-  
+      typedef std::vector<edm::Handle<edm::Association<reco::GenParticleCollection> > > GenAssociations;
+      typedef edm::RefToBase<reco::GsfElectron> ElectronBaseRef;
+      typedef std::vector< edm::Handle< edm::ValueMap<IsoDeposit> > > IsoDepositMaps;
+      typedef std::vector< edm::Handle< edm::ValueMap<double> > > IsolationValueMaps;
+
+
+      /// common electron filling, for both the standard and PF2PAT case
+      void fillElectron( Electron& aElectron, 
+			 const ElectronBaseRef& electronRef,
+			 const reco::CandidateBaseRef& baseRef,
+			 const GenAssociations& genMatches, 
+			 const IsoDepositMaps& deposits, 
+			 const IsolationValueMaps& isolationValues) const;
+
+      void fillElectron2( Electron& anElectron, 
+			  const reco::CandidatePtr& candPtrForIsolation,
+			  const reco::CandidatePtr& candPtrForGenMatch,
+			  const reco::CandidatePtr& candPtrForLoader,
+			  const GenAssociations& genMatches, 
+			  const IsoDepositMaps& deposits,
+			  const IsolationValueMaps& isolationValues ) const; 
+
+      typedef std::pair<pat::IsolationKeys,edm::InputTag> IsolationLabel;
+      typedef std::vector<IsolationLabel> IsolationLabels;
+
+      /// fill the labels vector from the contents of the parameter set, 
+      /// for the isodeposit or isolation values embedding
+      void readIsolationLabels( const edm::ParameterSet & iConfig,
+				const char* psetName, 
+				IsolationLabels& labels); 
 
       bool          addElecID_;
       typedef std::pair<std::string, edm::InputTag> NameTag;
@@ -93,7 +120,8 @@ namespace pat {
 
       pat::helper::MultiIsolator isolator_; 
       pat::helper::MultiIsolator::IsolationValuePairs isolatorTmpStorage_; // better here than recreate at each event
-      std::vector<std::pair<pat::IsolationKeys,edm::InputTag> > isoDepositLabels_;
+      IsolationLabels isoDepositLabels_;
+      IsolationLabels isolationValueLabels_;
 
       bool addEfficiencies_;
       pat::helper::EfficiencyLoader efficiencyLoader_;

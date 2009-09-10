@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerEventProducer.cc,v 1.1.2.4 2009/03/27 21:31:06 vadler Exp $
+// $Id: PATTriggerEventProducer.cc,v 1.4 2009/08/25 20:48:01 hegner Exp $
 //
 
 
@@ -8,7 +8,7 @@
 #include <cassert>
 
 #include "DataFormats/Common/interface/AssociativeIterator.h"
-
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 using namespace pat;
 

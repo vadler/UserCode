@@ -6,7 +6,7 @@ allLayer1Electrons = cms.EDProducer("PATElectronProducer",
 
     # use particle flow instead of std reco    
     useParticleFlow  =  cms.bool( False ),
-    pfElectronSource = cms.InputTag("pfElectrons"),
+    pfElectronSource = cms.InputTag("pfIsolatedElectrons"),
                                     
     # user data to add
     userData = cms.PSet(
@@ -35,7 +35,7 @@ allLayer1Electrons = cms.EDProducer("PATElectronProducer",
     embedTrack        = cms.bool(False), ## embed in AOD externally stored track (note: gsf electrons don't have a track)
     embedGsfTrack     = cms.bool(True),  ## embed in AOD externally stored gsf track
     embedSuperCluster = cms.bool(True),  ## embed in AOD externally stored supercluster
-    embedPFCandidate  = cms.bool(False), ## embed in AOD externally stored particle flow candidate
+    embedPFCandidate  = cms.bool(True), ## embed in AOD externally stored particle flow candidate
                                     
     # isolation
     isolation = cms.PSet(
@@ -70,8 +70,8 @@ allLayer1Electrons = cms.EDProducer("PATElectronProducer",
     ),
 
     # mc matching
-    addGenMatch      = cms.bool(False),
-    embedGenMatch    = cms.bool(False),
+    addGenMatch      = cms.bool(True),
+    embedGenMatch    = cms.bool(True),
     genParticleMatch = cms.InputTag("electronMatch"), ## Association between electrons and generator particles
     
     # efficiencies
@@ -81,6 +81,10 @@ allLayer1Electrons = cms.EDProducer("PATElectronProducer",
     # resolution configurables
     addResolutions   = cms.bool(False),
     resolutions      = cms.PSet(),
+
+    # high level selections
+    embedHighLevelSelection = cms.bool(True),
+    beamLineSrc             = cms.InputTag("offlineBeamSpot")
 )
 
 

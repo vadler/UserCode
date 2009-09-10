@@ -1,10 +1,10 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.5 2009/04/27 20:45:20 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.7 2009/09/05 17:13:56 vadler Exp $
 //
 
 
 #include "PhysicsTools/PatAlgos/plugins/PATTriggerProducer.h"
-
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include <cassert>
 
 
@@ -200,14 +200,12 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
     TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
     for ( std::multimap< trigger::size_type, std::string >::iterator iM = filterLabels.begin(); iM != filterLabels.end(); ++iM ) {
       if ( iM->first == iO ) {
+        triggerObjectStandAlone.addFilterLabel( iM->second );
         for ( std::multimap< std::string, std::string >::iterator iP = filterPaths.begin(); iP != filterPaths.end(); ++iP ) {
           if ( iP->first == iM->second ) {
             triggerObjectStandAlone.addPathName( iP->second );
-            break;
           }
         }
-        triggerObjectStandAlone.addFilterLabel( iM->second );
-        break;
       }
     }
 
