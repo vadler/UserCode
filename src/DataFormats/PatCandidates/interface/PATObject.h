@@ -1,5 +1,5 @@
 //
-// $Id: PATObject.h,v 1.25 2009/04/20 19:47:18 vadler Exp $
+// $Id: PATObject.h,v 1.28 2009/07/30 16:58:38 gpetrucc Exp $
 //
 
 #ifndef DataFormats_PatCandidates_PATObject_h
@@ -15,7 +15,7 @@
    https://hypernews.cern.ch/HyperNews/CMS/get/physTools.html
 
   \author   Steven Lowette, Giovanni Petrucciani, Frederic Ronga, Volker Adler, Sal Rappoccio
-  \version  $Id: PATObject.h,v 1.25 2009/04/20 19:47:18 vadler Exp $
+  \version  $Id: PATObject.h,v 1.28 2009/07/30 16:58:38 gpetrucc Exp $
 */
 
 
@@ -33,6 +33,7 @@
 #include "DataFormats/PatCandidates/interface/UserData.h"
 #include "DataFormats/Common/interface/OwnVector.h"
 
+#include "DataFormats/PatCandidates/interface/CandKinResolution.h"
 
 namespace pat {
 
@@ -92,7 +93,15 @@ namespace pat {
       /// Get a generator level particle reference with a given pdg id and status
       /// If there is no MC match with that pdgId and status, it will return a null ref
       /// Note: this might be a transient ref if the genParticle was embedded
-      reco::GenParticleRef      genParticleById(int pdgId, int status) const ;
+      /// If status == 0, only the pdgId will be checked; likewise, if pdgId == 0, only the status will be checked.
+      /// When autoCharge is set to true, and a charged reco particle is matched to a charged gen particle,
+      /// positive pdgId means 'same charge', negative pdgId means 'opposite charge'; 
+      /// for example, electron.genParticleById(11,0,true) will get an e^+ matched to e^+ or e^- matched to e^-, 
+      /// while genParticleById(-15,0,true) will get e^+ matched to e^- or vice versa.
+      /// If a neutral reco particle is matched to a charged gen particle, the sign of the pdgId passed to getParticleById must match that of the gen particle;
+      /// for example photon.getParticleById(11) will match gamma to e^-, while genParticleById(-11) will match gamma to e^+ (pdgId=-11)
+      // implementation note: uint8_t instead of bool, because the string parser doesn't allow bool currently
+      reco::GenParticleRef      genParticleById(int pdgId, int status, uint8_t autoCharge=0) const ;
 
       /// Get generator level particle, as C++ pointer (might be 0 if the ref was null)
       /// If you stored multiple GenParticles, you can specify which one you want.
@@ -196,7 +205,69 @@ namespace pat {
       bool hasUserInt( const std::string & key ) const {
         return std::find(userIntLabels_.begin(), userIntLabels_.end(), key) != userIntLabels_.end();
       }
- 
+
+      /// Get user-defined candidate ptr
+      /// Note: it will a null pointer if the key is not found; you can check if the key exists with 'hasUserInt' method.
+      reco::CandidatePtr userCand( const std::string & key ) const;
+      /// Set user-defined int
+      void addUserCand( const std::string & label,  const reco::CandidatePtr & data );
+      /// Get list of user-defined cand names
+      const std::vector<std::string> & userCandNames() const  { return userCandLabels_; }
+      /// Return true if there is a user-defined int with a given name
+      bool hasUserCand( const std::string & key ) const {
+        return std::find(userCandLabels_.begin(), userCandLabels_.end(), key) != userCandLabels_.end();
+      }
+
+      // === New Kinematic Resolutions
+      /// Return the kinematic resolutions associated to this object, possibly specifying a label for it.
+      /// If not present, it will throw an exception.
+      const pat::CandKinResolution & getKinResolution(const std::string &label="") const ;
+
+      /// Check if the kinematic resolutions are stored into this object (possibly specifying a label for them)
+      bool hasKinResolution(const std::string &label="") const ;
+      
+      /// Add a kinematic resolution to this object (possibly with a label)
+      void setKinResolution(const pat::CandKinResolution &resol, const std::string &label="") ;
+
+      /// Resolution on eta, possibly with a label to specify which resolution to use
+      double resolEta(const std::string &label="") const { return getKinResolution(label).resolEta(this->p4()); }
+
+      /// Resolution on theta, possibly with a label to specify which resolution to use
+      double resolTheta(const std::string &label="") const { return getKinResolution(label).resolTheta(this->p4()); }
+
+      /// Resolution on phi, possibly with a label to specify which resolution to use
+      double resolPhi(const std::string &label="") const { return getKinResolution(label).resolPhi(this->p4()); }
+
+      /// Resolution on energy, possibly with a label to specify which resolution to use
+      double resolE(const std::string &label="") const { return getKinResolution(label).resolE(this->p4()); }
+
+      /// Resolution on et, possibly with a label to specify which resolution to use
+      double resolEt(const std::string &label="") const { return getKinResolution(label).resolEt(this->p4()); }
+
+      /// Resolution on p, possibly with a label to specify which resolution to use
+      double resolP(const std::string &label="") const { return getKinResolution(label).resolP(this->p4()); }
+
+      /// Resolution on pt, possibly with a label to specify which resolution to use
+      double resolPt(const std::string &label="") const { return getKinResolution(label).resolPt(this->p4()); }
+
+      /// Resolution on 1/p, possibly with a label to specify which resolution to use
+      double resolPInv(const std::string &label="") const { return getKinResolution(label).resolPInv(this->p4()); }
+
+      /// Resolution on px, possibly with a label to specify which resolution to use
+      double resolPx(const std::string &label="") const { return getKinResolution(label).resolPx(this->p4()); }
+
+      /// Resolution on py, possibly with a label to specify which resolution to use
+      double resolPy(const std::string &label="") const { return getKinResolution(label).resolPy(this->p4()); }
+
+      /// Resolution on pz, possibly with a label to specify which resolution to use
+      double resolPz(const std::string &label="") const { return getKinResolution(label).resolPz(this->p4()); }
+
+      /// Resolution on mass, possibly with a label to specify which resolution to use
+      /// Note: this will be zero if a mass-constrained parametrization is used for this object 
+      double resolM(const std::string &label="") const { return getKinResolution(label).resolM(this->p4()); }
+
+
+
     protected:
       // reference back to the original object
       edm::Ptr<reco::Candidate> refToOrig_;
@@ -228,6 +299,15 @@ namespace pat {
       // User int values
       std::vector<std::string>      userIntLabels_;
       std::vector<int32_t>          userInts_;
+      // User candidate matches
+      std::vector<std::string>        userCandLabels_;
+      std::vector<reco::CandidatePtr> userCands_;
+
+      /// Kinematic resolutions.
+      std::vector<pat::CandKinResolution> kinResolutions_;
+      /// Labels for the kinematic resolutions. 
+      /// if (kinResolutions_.size() == kinResolutionLabels_.size()+1), then the first resolution has no label.
+      std::vector<std::string>            kinResolutionLabels_;
 
     private:
       const pat::UserData *  userDataObject_(const std::string &key) const ;
@@ -395,11 +475,24 @@ namespace pat {
   }
 
   template <class ObjectType>
-  reco::GenParticleRef PATObject<ObjectType>::genParticleById(int pdgId, int status) const {
+  reco::GenParticleRef PATObject<ObjectType>::genParticleById(int pdgId, int status, uint8_t autoCharge) const {
         // get a vector, avoiding an unneeded copy if there is no embedding
         const std::vector<reco::GenParticleRef> & vec = (genParticleEmbedded_.empty() ? genParticleRef_ : genParticleRefs());
         for (std::vector<reco::GenParticleRef>::const_iterator ref = vec.begin(), end = vec.end(); ref != end; ++ref) {
-            if (ref->isNonnull() && ((*ref)->pdgId() == pdgId) && ((*ref)->status() == status)) return *ref;
+            if (ref->isNonnull()) {
+                const reco::GenParticle & g = **ref;
+                if ((status != 0) && (g.status() != status)) continue;
+                if (pdgId == 0) {
+                    return *ref;
+                } else if (!autoCharge) {
+                    if (pdgId == g.pdgId()) return *ref;
+                } else if (abs(pdgId) == abs(g.pdgId())) {
+                    // I want pdgId > 0 to match "correct charge" (for charged particles)
+                    if (g.charge() == 0) return *ref;
+                    else if ((this->charge() == 0) && (pdgId == g.pdgId())) return *ref;
+                    else if (g.charge()*this->charge()*pdgId > 0) return *ref;
+                }
+            }
         }
         return reco::GenParticleRef();
   }
@@ -476,6 +569,95 @@ namespace pat {
     userIntLabels_.push_back(label);
     userInts_.push_back( data );
   }
+
+  template <class ObjectType>
+  reco::CandidatePtr PATObject<ObjectType>::userCand( const std::string & key ) const
+  {
+    std::vector<std::string>::const_iterator it = std::find(userCandLabels_.begin(), userCandLabels_.end(), key);
+    if (it != userCandLabels_.end()) {
+        return userCands_[it - userCandLabels_.begin()];
+    }
+    return reco::CandidatePtr();
+  }
+
+  template <class ObjectType>
+  void PATObject<ObjectType>::addUserCand( const std::string &label,
+					   const reco::CandidatePtr & data )
+  {
+    userCandLabels_.push_back(label);
+    userCands_.push_back( data );
+  }
+
+
+  template <class ObjectType>
+  const pat::CandKinResolution & PATObject<ObjectType>::getKinResolution(const std::string &label) const {
+    if (label.empty()) {
+        if (kinResolutionLabels_.size()+1 == kinResolutions_.size()) {
+            return kinResolutions_[0];
+        } else {
+            throw cms::Exception("Missing Data", "This object does not contain an un-labelled kinematic resolution");
+        }
+    } else {
+        std::vector<std::string>::const_iterator match = std::find(kinResolutionLabels_.begin(), kinResolutionLabels_.end(), label);
+        if (match == kinResolutionLabels_.end()) {
+            cms::Exception ex("Missing Data");
+            ex << "This object does not contain a kinematic resolution with name '" << label << "'.\n";
+            ex << "The known labels are: " ;
+            for (std::vector<std::string>::const_iterator it = kinResolutionLabels_.begin(); it != kinResolutionLabels_.end(); ++it) {
+                ex << "'" << *it << "' ";
+            }
+            ex << "\n";
+            throw ex;
+        } else {
+            if (kinResolutionLabels_.size()+1 == kinResolutions_.size()) {
+                // skip un-labelled resolution
+                return kinResolutions_[match - kinResolutionLabels_.begin() + 1];
+            } else {
+                // all are labelled, so this is the real index
+                return kinResolutions_[match - kinResolutionLabels_.begin()];
+            }
+        }
+    }
+  }
+
+  template <class ObjectType>
+  bool PATObject<ObjectType>::hasKinResolution(const std::string &label) const {
+    if (label.empty()) {
+        return (kinResolutionLabels_.size()+1 == kinResolutions_.size());
+    } else {
+        std::vector<std::string>::const_iterator match = std::find(kinResolutionLabels_.begin(), kinResolutionLabels_.end(), label);
+        return match != kinResolutionLabels_.end();
+    }
+  }
+
+  template <class ObjectType>
+  void PATObject<ObjectType>::setKinResolution(const pat::CandKinResolution &resol, const std::string &label) {
+    if (label.empty()) {
+        if (kinResolutionLabels_.size()+1 == kinResolutions_.size()) {
+            // There is already an un-labelled object. Replace it
+            kinResolutions_[0] = resol;
+        } else {
+            // Insert. Note that the un-labelled is always the first, so we need to insert before begin()
+            // (for an empty vector, this should not cost more than push_back)
+            kinResolutions_.insert(kinResolutions_.begin(), resol);
+        }
+    } else {
+        std::vector<std::string>::iterator match = std::find(kinResolutionLabels_.begin(), kinResolutionLabels_.end(), label);
+        if (match != kinResolutionLabels_.end()) {
+            // Existing object: replace
+            if (kinResolutionLabels_.size()+1 == kinResolutions_.size()) {
+                kinResolutions_[(match - kinResolutionLabels_.begin())+1] = resol;
+            } else {
+                kinResolutions_[(match - kinResolutionLabels_.begin())] = resol;
+            }
+        } else {
+            kinResolutionLabels_.push_back(label);
+            kinResolutions_.push_back(resol);
+        }
+    }
+  }
+
+
 
 
 }
