@@ -1,6 +1,6 @@
-Test Release based on: CMSSW_3_3_0_pre2
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_3_0_pre2
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_0_pre2
+Test Release based on: CMSSW_3_3_0_pre3
+Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_3_0_pre3
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_0_pre3
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 CondFormats/JetMETObjects                        V01-08-08      V01-08-03-03   
 DataFormats/PatCandidates                        NoTag          V05-06-02      
