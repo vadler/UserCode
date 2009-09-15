@@ -3,9 +3,6 @@
 # Starting with a skeleton process which gets imported with the following line
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
-# load the standard PAT config
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
-
 # add the trigger information to the configuration
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger( process )
