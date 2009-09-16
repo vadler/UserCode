@@ -4,8 +4,12 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_0_pre3
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 CondFormats/JetMETObjects                        V01-08-08      V01-08-03-03   
 DataFormats/PatCandidates                        NoTag          V05-06-02      
-JetMETCorrections/Configuration                  V01-08-21      V01-08-18      
+JetMETCorrections/Algorithms                     V01-08-05      V01-08-01      
+JetMETCorrections/Configuration                  V01-08-22      V01-08-18      
+JetMETCorrections/JetPlusTrack                   V03-02-09      V03-02-05-03   
+JetMETCorrections/Modules                        V02-09-05      V02-09-04-01   
+JetMETCorrections/Type1MET                       V04-01-05      V04-01-04      
 PhysicsTools/PatAlgos                            NoTag          V07-08-14      
 PhysicsTools/PatUtils                            NoTag          V03-07-05      
 ---------------------------------------
-total packages: 5 (5 displayed)
+total packages: 9 (9 displayed)
