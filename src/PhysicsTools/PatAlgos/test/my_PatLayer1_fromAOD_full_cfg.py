@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 # process.source.fileNames    = [ ... ]
 # process.maxEvents.input     = ...
 # process.out.outputCommands  = [ ... ]
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_0_pre3/output/my_PatLayer1_fromAOD_full.root'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_0_pre4/output/my_PatLayer1_fromAOD_full.root'
 # process.options.wantSummary = False
 
 # # memory check
@@ -15,9 +15,6 @@ process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_0_pr
 # # HLT analyzers
 # process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
 # process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
-
-# PAT
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
 process.p = cms.Path(
 #     process.hltEventAnalyzerAOD       +
