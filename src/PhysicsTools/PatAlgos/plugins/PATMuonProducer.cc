@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.cc,v 1.30 2009/08/11 04:28:39 srappocc Exp $
+// $Id: PATMuonProducer.cc,v 1.31 2009/09/23 10:09:26 hegner Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATMuonProducer.h"
@@ -458,7 +458,7 @@ void PATMuonProducer::fillDescriptions(edm::ConfigurationDescriptions & descript
                  )->setComment("input with high level selection");
 
 
-  descriptions.add("PATMuonProducer", iDesc);
+  //descriptions.add("PATMuonProducer", iDesc);
 
 }
 

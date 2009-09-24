@@ -3,7 +3,9 @@ Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_3_0_pre4
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_0_pre4
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        NoTag          V05-06-05      
+PhysicsTools/HepMCCandAlgos                      V11-01-01      V11-00-00      
 PhysicsTools/PatAlgos                            NoTag          V07-09-09      
 PhysicsTools/PatUtils                            NoTag          V03-07-06      
+PhysicsTools/Utilities                           V07-02-01      V07-00-03      
 ---------------------------------------
-total packages: 3 (3 displayed)
+total packages: 5 (5 displayed)
