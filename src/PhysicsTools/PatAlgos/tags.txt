@@ -1,15 +1,10 @@
-Test Release based on: CMSSW_3_1_2
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_1_2
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_2
+Test Release based on: CMSSW_3_1_3
+Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_1_3
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_3
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CondFormats/JetMETObjects                        V01-08-08      V01-08-03-03   
-DataFormats/PatCandidates                        NoTag          V05-06-00      
-JetMETCorrections/Algorithms                     V01-08-04-01   V01-08-01      
-JetMETCorrections/Configuration                  V01-08-21      V01-08-18      
-JetMETCorrections/Modules                        V02-09-05      V02-09-04      
-PhysicsTools/PatAlgos                            B3_1_X         V07-08-05      
-PhysicsTools/PatUtils                            NoTag          V03-07-04      
-PhysicsTools/PFCandProducer                      V04-02-02      V04-01-03      
-RecoJets/JetAlgorithms                           V02-10-01      V02-10-00      
+DataFormats/PatCandidates                        NoTag          V05-06-06      
+PhysicsTools/PatAlgos                            B3_1_X         V07-08-23      
+PhysicsTools/PatUtils                            B3_1_X         V03-07-06      
+PhysicsTools/Utilities                           V07-01-02      V07-00-01      
 ---------------------------------------
-total packages: 9 (9 displayed)
+total packages: 4 (4 displayed)
