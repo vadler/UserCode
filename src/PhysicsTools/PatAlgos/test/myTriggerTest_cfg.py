@@ -9,7 +9,7 @@ process.options = cms.untracked.PSet(
 
 process.source = cms.Source( "PoolSource",
     fileNames = cms.untracked.vstring(
-        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_0_pre5/output/my_PatLayer1_fromAOD_full.root'
+        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_0_pre5/output/myPatLayer1_fromAOD_full.root'
     )
 )
 process.maxEvents = cms.untracked.PSet(
