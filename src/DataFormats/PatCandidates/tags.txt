@@ -6,6 +6,6 @@ DataFormats/PatCandidates                        NoTag          V05-06-05
 PhysicsTools/PatAlgos                            NoTag          V07-09-09-01   
 PhysicsTools/PatExamples                         NoTag                         
 PhysicsTools/PatUtils                            NoTag          V03-07-06-01   
-PhysicsTools/Utilities                           V07-02-01      V07-00-03-01   
+PhysicsTools/Utilities                           V07-02-02      V07-00-03-01   
 ---------------------------------------
 total packages: 5 (5 displayed)
