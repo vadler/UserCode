@@ -4,8 +4,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_0_pre5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        NoTag          V05-06-05      
 PhysicsTools/PatAlgos                            NoTag          V07-09-09-01   
-PhysicsTools/PatExamples                         NoTag                         
 PhysicsTools/PatUtils                            NoTag          V03-07-06-01   
 PhysicsTools/Utilities                           V07-02-02      V07-00-03-01   
 ---------------------------------------
-total packages: 5 (5 displayed)
+total packages: 4 (4 displayed)
