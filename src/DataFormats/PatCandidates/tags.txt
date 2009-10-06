@@ -2,7 +2,7 @@ Test Release based on: CMSSW_3_1_4
 Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_1_4
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_4
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/PatCandidates                        V05-06-08      V05-06-06      
+DataFormats/PatCandidates                        B3_1_X         V05-06-06      
 PhysicsTools/PatAlgos                            B3_1_X         V07-08-25      
 PhysicsTools/PatUtils                            B3_1_X         V03-08-03      
 ---------------------------------------
