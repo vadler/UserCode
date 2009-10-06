@@ -5,5 +5,6 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_1_4
 DataFormats/PatCandidates                        B3_1_X         V05-06-06      
 PhysicsTools/PatAlgos                            B3_1_X         V07-08-25      
 PhysicsTools/PatUtils                            B3_1_X         V03-08-03      
+PhysicsTools/PFCandProducer                      V04-02-02-01   V04-02-02      
 ---------------------------------------
-total packages: 3 (3 displayed)
+total packages: 4 (4 displayed)
