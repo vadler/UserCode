@@ -1,5 +1,5 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.GlobalTag.globaltag = 'STARTUP31X_V4::All'
+process.GlobalTag.globaltag = 'STARTUP31X_V6::All'
 process.source.fileNames    = [ '/store/relval/CMSSW_3_3_0_pre6/RelValTTbar/GEN-SIM-RECO/STARTUP31X_V8-v1/0005/9EA6A564-FCB0-DE11-A4D1-001D09F29849.root' ]
 # process.maxEvents.input     = ...
 # process.out.outputCommands  = [ ... ]
