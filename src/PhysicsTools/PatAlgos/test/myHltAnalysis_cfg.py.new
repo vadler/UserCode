@@ -5,11 +5,11 @@ process = cms.Process( "HLTPROV" )
 # source
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        '/store/relval/CMSSW_3_1_0_pre10/RelValTTbar/GEN-SIM-RECO/IDEAL_31X_v1/0008/CC80B73A-CA57-DE11-BC2F-000423D99896.root'
+        '/store/relval/CMSSW_3_1_4/RelValTTbar/GEN-SIM-RECO/STARTUP31X_V2/0005/E6E11BD7-C7B0-DE11-A4A8-001D09F291D2.root'
     )
 )
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( 1 )
+    input = cms.untracked.int32( 10 )
 )
 
 # HLT analyzers
