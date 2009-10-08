@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.cc,v 1.30.2.1 2009/09/24 14:28:51 rwolf Exp $
+// $Id: PATMuonProducer.cc,v 1.30.2.2 2009/10/08 04:22:35 srappocc Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATMuonProducer.h"
@@ -280,18 +280,22 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
 
       // embed high level selection
       if ( embedHighLevelSelection_ ) {
-	// get the global track
-	reco::TrackRef globalTrack = itMuon->globalTrack();
+	// get the tracks
+	reco::TrackRef innerTrack = itMuon->innerTrack();
+	reco::TrackRef globalTrack= itMuon->globalTrack();
       
 	// Make sure the collection it points to is there
+	if ( innerTrack.isNonnull() && innerTrack.isAvailable() ) {
+	  unsigned int nhits = innerTrack->numberOfValidHits();
+	  aMuon.setNumberOfValidHits( nhits );
+	}
+
 	if ( globalTrack.isNonnull() && globalTrack.isAvailable() ) {
 	  double norm_chi2 = globalTrack->chi2() / globalTrack->ndof();
 	  double corr_d0 = globalTrack->dxy( beamPoint );
-	  unsigned int nhits = globalTrack->numberOfValidHits();
 	  
 	  aMuon.setDB( corr_d0 );
 	  aMuon.setNormChi2( norm_chi2 );
-	  aMuon.setNumberOfValidHits( nhits );
 	}
       }
       
