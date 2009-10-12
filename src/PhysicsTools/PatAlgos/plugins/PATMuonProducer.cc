@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.cc,v 1.30.2.2 2009/10/08 04:22:35 srappocc Exp $
+// $Id: PATMuonProducer.cc,v 1.30.2.3 2009/10/09 20:36:20 srappocc Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATMuonProducer.h"
@@ -288,13 +288,13 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
 	if ( innerTrack.isNonnull() && innerTrack.isAvailable() ) {
 	  unsigned int nhits = innerTrack->numberOfValidHits();
 	  aMuon.setNumberOfValidHits( nhits );
+
+	  double corr_d0 = -1.0 * innerTrack->dxy( beamPoint );
+	  aMuon.setDB( corr_d0 );
 	}
 
 	if ( globalTrack.isNonnull() && globalTrack.isAvailable() ) {
 	  double norm_chi2 = globalTrack->chi2() / globalTrack->ndof();
-	  double corr_d0 = globalTrack->dxy( beamPoint );
-	  
-	  aMuon.setDB( corr_d0 );
 	  aMuon.setNormChi2( norm_chi2 );
 	}
       }
