@@ -25,10 +25,13 @@
    Input:
    
    Text files in order to make the results of hDQM and TkMap based flags available to the script have to be provided:
+   - ./certSiStrip.txt
    - ./hDQMSiStrip.txt
    - ./TkMapSiStrip.txt
+   - ./certPixel.txt
    - ./hDQMPixel.txt
    - ./TkMapPixel.txt
+   - ./certTracking.txt
    The format of the entries in these files is the following:
    On line per run of the structure
    RUNNUMBER FLAG [COMMENT]
@@ -88,10 +91,13 @@ TString FlagIToS( const Int_t flag );
 TString pathDqmData_( "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Express" ); // configurable
 TString nameFileList_( "fileList.txt" );
 TString nameFileRR_( "runRegistry.xml" );
+TString nameFileCertSiStrip_( "certSiStrip.txt" );
 TString nameFileHDQMSiStrip_( "hDQMSiStrip.txt" );
 TString nameFileTkMapSiStrip_( "tkMapSiStrip.txt" );
+TString nameFileCertPixel_( "certPixel.txt" );
 TString nameFileHDQMPixel_( "hDQMPixel.txt" );
 TString nameFileTkMapPixel_( "tkMapPixel.txt" );
+TString nameFileCertTracking_( "certTracking.txt" );
 TString nameLog_( "trackerRunCertification.txt" );
 Int_t  minRun_( 1073741824 ); // 2^30
 Int_t  maxRun_(          0 );
@@ -119,6 +125,9 @@ enum Flags { // flags' enumeration
 const Double_t minReportSummaryDet_( 0.98 );
 const Double_t minReportSummarySubDet_( 0.95 );
 const Double_t minReportSummaryTracking_( 0.85 );
+const Int_t    iRunNewStruct_( 111948 );
+const Int_t    iRunStartDeconProbl_( 110213 );
+const Int_t    iRunStopDeconProbl_( iRunNewStruct_ );
 
 // Certificates and flags
 vector< TString > sRunNumbers_;
@@ -129,6 +138,7 @@ UInt_t nRunsChangedSiStrip_( 0 );
 map< TString, TString > sSiStrip_;
 map< TString, TString > sRRSiStrip_;
 map< TString, TString > sDQMSiStrip_;
+map< TString, TString > sCertSiStrip_;
 map< TString, TString > sHDQMSiStrip_;
 map< TString, TString > sTkMapSiStrip_;
 map< TString, vector< TString > > sRunCommentsSiStrip_;
@@ -138,6 +148,7 @@ UInt_t nRunsChangedPixel_( 0 );
 map< TString, TString > sPixel_;
 map< TString, TString > sRRPixel_;
 map< TString, TString > sDQMPixel_;
+map< TString, TString > sCertPixel_;
 map< TString, TString > sHDQMPixel_;
 map< TString, TString > sTkMapPixel_;
 map< TString, vector< TString > > sRunCommentsPixel_;
@@ -147,6 +158,7 @@ UInt_t nRunsChangedTracking_( 0 );
 map< TString, TString > sTracking_;
 map< TString, TString > sRRTracking_;
 map< TString, TString > sDQMTracking_;
+map< TString, TString > sCertTracking_;
 map< TString, vector< TString > > sRunCommentsTracking_;
 // Certificates and flags (run-by-run)
 TString sRunNumber_( "0" );
@@ -212,6 +224,14 @@ Bool_t  readFiles()
   // Initialize
   Bool_t check( kTRUE );
 
+  // open and check SiStrip certification file
+  ifstream fileCertSiStripRead;
+  fileCertSiStripRead.open( nameFileCertSiStrip_.Data() );
+  if ( ! fileCertSiStripRead ) {
+    cout << "    ERROR: no SiStrip general certificates' file" << endl;
+    check = kFALSE;
+  }
+
   // open and check SiStrip hDQM file
   ifstream fileHDQMSiStripRead;
   fileHDQMSiStripRead.open( nameFileHDQMSiStrip_.Data() );
@@ -225,6 +245,14 @@ Bool_t  readFiles()
   fileTkMapSiStripRead.open( nameFileTkMapSiStrip_.Data() );
   if ( ! fileTkMapSiStripRead ) {
     cout << "    ERROR: no SiStrip TkMap certificates' file" << endl;
+    check = kFALSE;
+  }
+
+  // open and check Pixel certification file
+  ifstream fileCertPixelRead;
+  fileCertPixelRead.open( nameFileCertPixel_.Data() );
+  if ( ! fileCertPixelRead ) {
+    cout << "    ERROR: no Pixel general certificates' file" << endl;
     check = kFALSE;
   }
 
@@ -244,8 +272,25 @@ Bool_t  readFiles()
     check = kFALSE;
   }
 
+  // open and check Tracking certification file
+  ifstream fileCertTrackingRead;
+  fileCertTrackingRead.open( nameFileCertTracking_.Data() );
+  if ( ! fileCertTrackingRead ) {
+    cout << "    ERROR: no Tracking general certificates' file" << endl;
+    check = kFALSE;
+  }
+
   // Read data
   if ( check ) {
+    while ( fileCertSiStripRead.good() ) {
+      TString runNumber, runFlag;
+      fileCertSiStripRead >> runNumber >> runFlag;
+      if ( runNumber.Length() == 0 || runFlag != "BAD" ) continue;
+      string comment;
+      getline( fileCertSiStripRead, comment );
+      TString runComment( comment.c_str() );
+      sCertSiStrip_[ runNumber ] = runComment;
+    }
     while ( fileHDQMSiStripRead.good() ) {
       TString runNumber, runFlag;
       fileHDQMSiStripRead >> runNumber >> runFlag;
@@ -263,6 +308,15 @@ Bool_t  readFiles()
       getline( fileTkMapSiStripRead, comment );
       TString runComment( comment.c_str() );
       sTkMapSiStrip_[ runNumber ] = runComment;
+    }
+    while ( fileCertPixelRead.good() ) {
+      TString runNumber, runFlag;
+      fileCertPixelRead >> runNumber >> runFlag;
+      if ( runNumber.Length() == 0 || runFlag != "BAD" ) continue;
+      string comment;
+      getline( fileCertPixelRead, comment );
+      TString runComment( comment.c_str() );
+      sCertPixel_[ runNumber ] = runComment;
     }
     while ( fileHDQMPixelRead.good() ) {
       TString runNumber, runFlag;
@@ -282,12 +336,24 @@ Bool_t  readFiles()
       TString runComment( comment.c_str() );
       sTkMapPixel_[ runNumber ] = runComment;
     }
+    while ( fileCertTrackingRead.good() ) {
+      TString runNumber, runFlag;
+      fileCertTrackingRead >> runNumber >> runFlag;
+      if ( runNumber.Length() == 0 || runFlag != "BAD" ) continue;
+      string comment;
+      getline( fileCertTrackingRead, comment );
+      TString runComment( comment.c_str() );
+      sCertTracking_[ runNumber ] = runComment;
+    }
   }
   
+  fileCertSiStripRead.close();
   fileHDQMSiStripRead.close();
   fileTkMapSiStripRead.close();
+  fileCertPixelRead.close();
   fileHDQMPixelRead.close();
   fileTkMapPixelRead.close();
+  fileCertTrackingRead.close();
 
   return check;
 
@@ -598,7 +664,7 @@ void certifyRun()
     Bool_t flagDet;
     Bool_t flagSubDet;
     Bool_t flagSToN;
-    if ( 110213 <= sRunNumber_.Atoi() && sRunNumber_.Atoi() <= 111948 ) { // special treatment for switch to deconvolution mode without changing CMSSW release
+    if ( iRunStartDeconProbl_ <= sRunNumber_.Atoi() && sRunNumber_.Atoi() <= iRunStopDeconProbl_ ) { // special treatment for switch to deconvolution mode without changing CMSSW release
       flagDet = kTRUE;
       flagSubDet = ( // FIXME to be discussed (this is from DQM shifter instr.)
         ( fCertificates_[ "ReportSiStrip_DetFraction_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TECB" ] > minReportSummarySubDet_ ) &&
@@ -630,7 +696,7 @@ void certifyRun()
     }
     Bool_t flagDAQ;
     Bool_t flagDCS;
-    if ( sRunNumber_.Atoi() <= 111948 ) { // Change of DQM output structure with new CMSSW release
+    if ( sRunNumber_.Atoi() <= iRunNewStruct_ ) { // Change of DQM output structure with new CMSSW release
 //       flagDAQ = ( fCertificates_[ "DAQSiStripDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQSiStripDaqFraction" ] > 0.98 );
       flagDAQ = kTRUE; // FIXME clear up correct threshold
       flagDCS = ( fCertificates_[ "DCSSiStripDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSSiStripDcsFraction" ] == ( Double_t )GOOD );
@@ -638,16 +704,12 @@ void certifyRun()
       flagDAQ = ( fCertificates_[ "SiStripDAQSummary" ] == ( Double_t )EXCL || fCertificates_[ "SiStripDAQSummary" ] > minReportSummarySubDet_ ); // FIXME clear up correct threshold/treatment
       flagDCS = ( fCertificates_[ "SiStripDCSSummary" ] == ( Double_t )EXCL || fCertificates_[ "SiStripDCSSummary" ] == ( Double_t )GOOD );
     }
-    Bool_t flagExcept1( // TIB/TID off in runs 112171 - 112700 --> SiStrip BAD
-      ( sRunNumber_.Atoi() < 112171 || 112700 < sRunNumber_.Atoi() ) ||
-      ! ( fCertificates_[ "ReportSiStrip_TIB" ] == ( Double_t )EXCL && fCertificates_[ "ReportSiStrip_TIDB" ] == ( Double_t )EXCL && fCertificates_[ "ReportSiStrip_TIDF" ] == ( Double_t )EXCL ) // FIXME
-    );
 //     Bool_t flagDQM( flagDet * flagSubDet * flagSToN * flagDAQ * flagDSC );
     Bool_t flagDQM( flagDet * flagSubDet * flagSToN * flagDAQ ); // FIXME DCS info not yet determined correctly
-    flagDQM *= flagExcept1; // TIB/TID off in runs 112171 - 112700 --> SiStrip BAD
+    Bool_t flagCert( sCertSiStrip_.find( sRunNumber_ )   == sCertSiStrip_.end() );
     Bool_t flagHDQM( sHDQMSiStrip_.find( sRunNumber_ )   == sHDQMSiStrip_.end() );
     Bool_t flagTkMap( sTkMapSiStrip_.find( sRunNumber_ ) == sTkMapSiStrip_.end() );
-    iFlags[ sSubSys_[ SiStrip ] ] = ( Int_t )( flagDQM * flagHDQM * flagTkMap );
+    iFlags[ sSubSys_[ SiStrip ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM * flagTkMap );
     
     sRRSiStrip_[ sRunNumber_ ] = FlagIToS( iFlagsRR_[ sSubSys_[ SiStrip ] ] );
     sDQMSiStrip_[ sRunNumber_ ] = FlagIToS( ( Int_t )( flagDQM ) );
@@ -658,12 +720,9 @@ void certifyRun()
     if ( ! flagSToN )    comments.push_back( "too low S/N in a sub-system" );
     if ( ! flagDAQ )     comments.push_back( "DAQSummary BAD" );
 //     if ( ! flagDCS )     comments.push_back( "DCSSummary BAD" ); // FIXME DCS info not yet determined correctly
+    if ( ! flagCert )    comments.push_back( "general: " + sCertSiStrip_[ sRunNumber_ ] );
     if ( ! flagHDQM )    comments.push_back( "hDQM: " + sHDQMSiStrip_[ sRunNumber_ ] );
     if ( ! flagTkMap )   comments.push_back( "TkMap: " + sTkMapSiStrip_[ sRunNumber_ ] );
-    if ( ! flagExcept1 ) { // TIB/TID off in runs 112171 - 112700 --> SiStrip BAD
-      comments.clear();
-      comments.push_back( "TIB/TID off in runs 112171 - 112700" );
-    }
     if ( iFlags[ sSubSys_[ SiStrip ] ] == BAD ) {
       ++nRunsBadSiStrip_;
       sRunCommentsSiStrip_[ sRunNumber_ ] = comments;
@@ -677,7 +736,7 @@ void certifyRun()
     );
     Bool_t flagDAQ;
     Bool_t flagDCS;
-    if ( sRunNumber_.Atoi() < 111948 ) {
+    if ( sRunNumber_.Atoi() < iRunNewStruct_ ) {
 //       flagDAQ = ( fCertificates_[ "DAQPixelDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQPixelDaqFraction" ] > 0.98 );
       flagDAQ = kTRUE; // FIXME clear up correct threshold
       flagDCS = ( fCertificates_[ "DCSPixelDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSPixelDcsFraction" ] == ( Double_t )GOOD );
@@ -687,9 +746,10 @@ void certifyRun()
     }
 //     Bool_t flagDQM( flagReportSummary * flagDAQ * flagDCS );
     Bool_t flagDQM( flagReportSummary * flagDAQ ); // FIXME DCS info not yet determined correctly
+    Bool_t flagCert( sCertPixel_.find( sRunNumber_ ) == sCertPixel_.end() );
     Bool_t flagHDQM( sHDQMPixel_.find( sRunNumber_ ) == sHDQMPixel_.end() );
     Bool_t flagTkMap( sTkMapPixel_.find( sRunNumber_ ) == sTkMapPixel_.end() );
-    iFlags[ sSubSys_[ Pixel ] ] = ( Int_t )( flagDQM * flagHDQM * flagTkMap );
+    iFlags[ sSubSys_[ Pixel ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM * flagTkMap );
     
     sRRPixel_[ sRunNumber_ ] = FlagIToS( iFlagsRR_[ sSubSys_[ Pixel ] ] );
     sDQMPixel_[ sRunNumber_ ] = FlagIToS( ( Int_t )( flagDQM ) );
@@ -698,6 +758,7 @@ void certifyRun()
     if ( ! flagReportSummary ) comments.push_back( "ReportSummary BAD" );
     if ( ! flagDAQ )           comments.push_back( "DAQSummary BAD" );
 //     if ( ! flagDCS )           comments.push_back( "DCSSummary BAD" ); // FIXME DCS info not yet determined correctly
+    if ( ! flagCert )          comments.push_back( "general: " + sCertPixel_[ sRunNumber_ ] );
     if ( ! flagHDQM )          comments.push_back( "hDQM: " + sHDQMPixel_[ sRunNumber_ ] );
     if ( ! flagTkMap )         comments.push_back( "TkMap: " + sTkMapPixel_[ sRunNumber_ ] );
     if ( iFlags[ sSubSys_[ Pixel ] ] == BAD ) {
@@ -718,7 +779,8 @@ void certifyRun()
       fCertificates_[ "ReportTrackRecHits" ] > minReportSummaryTracking_
     );
     Bool_t flagDQM( flagChi2 * flagRate * flagRecHits );
-    iFlags[ sSubSys_[ Tracking ] ] = ( Int_t )( flagDQM );
+    Bool_t flagCert( sCertTracking_.find( sRunNumber_ )   == sCertTracking_.end() );
+    iFlags[ sSubSys_[ Tracking ] ] = ( Int_t )( flagDQM * flagCert );
 
     sRRTracking_[ sRunNumber_ ]  = FlagIToS( iFlagsRR_[ sSubSys_[ Tracking ] ] );
     sDQMTracking_[ sRunNumber_ ] = FlagIToS( -99 );
@@ -727,6 +789,7 @@ void certifyRun()
     if ( ! flagChi2 )    comments.push_back( "Chi2/DoF too low" );
     if ( ! flagRate )    comments.push_back( "Track rate too low" );
     if ( ! flagRecHits ) comments.push_back( "Too few RecHits" );
+    if ( ! flagCert )    comments.push_back( "general: " + sCertTracking_[ sRunNumber_ ] );
     if ( iFlags[ sSubSys_[ Tracking ] ] == BAD ) {
       ++nRunsBadTracking_;
       sRunCommentsTracking_[ sRunNumber_ ] = comments;
