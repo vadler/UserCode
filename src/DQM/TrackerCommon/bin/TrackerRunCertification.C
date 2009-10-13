@@ -207,7 +207,7 @@ int main( int argc, char * argv[] )
   // Run
   if ( ! readFiles() )           return 11;
   if ( ! createInputFileList() ) return 12;
-//   if ( ! createRRFile() )        return 13;
+  if ( ! createRRFile() )        return 13;
   certifyRunRange();
 
   return 0;
@@ -218,7 +218,7 @@ int main( int argc, char * argv[] )
 /// Check existance of input files for hDQM and TkMap certificates and read them.
 /// Only existing entries for bad runs are taken into account. Not appearing runs are assumed to be good without further warning.
 /// Returns 'kTRUE', if all needed files are found, 'kFALSE' otherwise.
-Bool_t  readFiles()
+Bool_t readFiles()
 {
 
   // Initialize
