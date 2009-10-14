@@ -1,5 +1,5 @@
 //
-// $Id: PATPhotonProducer.cc,v 1.25 2009/06/25 23:49:35 gpetrucc Exp $
+// $Id: PATPhotonProducer.cc,v 1.26 2009/10/13 14:23:56 rwolf Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATPhotonProducer.h"
@@ -16,7 +16,7 @@
 using namespace pat;
 
 PATPhotonProducer::PATPhotonProducer(const edm::ParameterSet & iConfig) :
-  isolator_(iConfig.exists("isolation") ? iConfig.getParameter<edm::ParameterSet>("isolation") : edm::ParameterSet(), false) ,
+  isolator_(iConfig.exists("userIsolation") ? iConfig.getParameter<edm::ParameterSet>("userIsolation") : edm::ParameterSet(), false) ,
   useUserData_(iConfig.exists("userData"))
 {
   // initialize the configurables
@@ -259,7 +259,7 @@ void PATPhotonProducer::fillDescriptions(edm::ConfigurationDescriptions & descri
 
   edm::ParameterSetDescription isolationPSet;
   isolationPSet.setAllowAnything(); // TODO: the pat helper needs to implement a description.
-  iDesc.add("isolation", isolationPSet);
+  iDesc.add("userIsolation", isolationPSet);
 
   descriptions.add("PATPhotonProducer", iDesc);
 
