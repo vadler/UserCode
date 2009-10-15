@@ -11,19 +11,6 @@
 
    The procedure of certifying data of a given run range is automated in order to speed up the procedure and to reduce the Tracker Offline Shift Leader's workload.
 
-   Usage:
-   
-   $ cmsrel CMSSW_RELEASE
-   $ cd  CMSSW_RELEASE/src
-   $ cmsenv
-   $ TrackerRunCertification [FIRTS [LAST [PATH] ] ]
-
-   All arguments are optional, but must be given in the correct order:
-   - FIRST: run number to start certification from
-   - LAST:  run number to end the certification with
-   - PATH:  basic path to DQM output files in AFS, from where these files are visible (default: /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Express)
-   If no argument is given, the certification will be run for all runs with DQM files found in the default PATH.
-
    Input:
    
    Text files in order to make the results of hDQM and TkMap based flags available to the script have to be provided:
@@ -59,6 +46,24 @@
    The (lengthy) stdout provides a complete list of all in-/output flags of all analyzed runs and at its end a summary only with the output flags.
    This summary can be used to populate the Tracker Good/Bad Run List (http://cmstac05.cern.ch/ajax/pierro/offShift/#good_bad_run).
    It makes sense to pipe the stdout to another text file.
+
+   Usage:
+   
+   $ cmsrel CMSSW_RELEASE
+   $ cd CMSSW_RELEASE/src
+   $ cmsenv
+   $ cvs co -r Vxx-yy-zz DQM/TrackerCommon
+   $ scram b -j 5
+   $ rehash
+   $ cd WORKING_DIRECTORY
+   $ [create input files]
+   $ TrackerRunCertification [FIRTS [LAST [PATH] ] ]
+
+   All arguments are optional, but must be given in the correct order:
+   - FIRST: run number to start certification from
+   - LAST:  run number to end the certification with
+   - PATH:  basic path to DQM output files in AFS, from where these files are visible (default: /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Express)
+   If no argument is given, the certification will be run for all runs with DQM files found in the default PATH.
 
   \author   Volker Adler
   \version  $Id$
