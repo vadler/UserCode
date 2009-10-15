@@ -2,7 +2,7 @@
 //
 // Package: DQM/TrackerCommon
 //
-// $Id: TrackerRunCertification.C,v 1.4 2009/10/15 13:36:15 vadler Exp $
+// $Id$
 //
 /**
   \brief    Performs DQM offline certification for SiStrip, Pixel and Tracking
@@ -51,7 +51,7 @@
    Output:
 
   \author   Volker Adler
-  \version  $Id: TrackerRunCertification.C,v 1.4 2009/10/15 13:36:15 vadler Exp $
+  \version  $Id$
 */
 
 
@@ -889,7 +889,24 @@ void writeOutput()
   
   fileLog.close();
 
-  cout << endl << "SUMMARY available in ./" << nameLog_.Data() << endl << endl;
+  cout << endl << "SUMMARY:" << endl << endl;
+  for ( UInt_t iRun = 0; iRun < sRunNumbers_.size(); ++iRun ) {
+    cout << "  " << sRunNumbers_.at( iRun ) << ":" << endl;
+    cout << "    " << sSubSys_[ 0 ] << ": " << sSiStrip_[ sRunNumbers_.at( iRun ) ] << endl;
+    for ( UInt_t iCom = 0; iCom < sRunCommentsSiStrip_[ sRunNumbers_.at( iRun ) ].size(); ++iCom ) {
+      cout << "      " << sRunCommentsSiStrip_[ sRunNumbers_.at( iRun ) ].at( iCom ).Data() << endl;
+    }
+    cout << "    " << sSubSys_[ 1 ] << ": " << sPixel_[ sRunNumbers_.at( iRun ) ] << endl;
+    for ( UInt_t iCom = 0; iCom < sRunCommentsPixel_[ sRunNumbers_.at( iRun ) ].size(); ++iCom ) {
+      cout << "      " << sRunCommentsPixel_[ sRunNumbers_.at( iRun ) ].at( iCom ).Data() << endl;
+    }
+    cout << "    " << sSubSys_[ 2 ] << ": " << sTracking_[ sRunNumbers_.at( iRun ) ] << endl;
+    for ( UInt_t iCom = 0; iCom < sRunCommentsTracking_[ sRunNumbers_.at( iRun ) ].size(); ++iCom ) {
+      cout << "      " << sRunCommentsTracking_[ sRunNumbers_.at( iRun ) ].at( iCom ).Data() << endl;
+    }
+  }
+  
+  cout << endl << "Certification SUMMARY to be sent to CMS DQM team available in ./" << nameLog_.Data() << endl << endl;
   
   return;
 
