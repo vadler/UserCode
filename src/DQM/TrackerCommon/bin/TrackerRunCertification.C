@@ -2,7 +2,7 @@
 //
 // Package: DQM/TrackerCommon
 //
-// $Id$
+// $Id: TrackerRunCertification.C,v 1.4 2009/10/15 13:36:15 vadler Exp $
 //
 /**
   \brief    Performs DQM offline certification for SiStrip, Pixel and Tracking
@@ -51,7 +51,7 @@
    Output:
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: TrackerRunCertification.C,v 1.4 2009/10/15 13:36:15 vadler Exp $
 */
 
 
@@ -742,8 +742,8 @@ void certifyRun()
     if ( ! flagDAQ )     comments.push_back( "DAQSummary BAD" );
 //     if ( ! flagDCS )     comments.push_back( "DCSSummary BAD" ); // FIXME DCS info not yet determined correctly
     if ( ! flagCert )    comments.push_back( "general: " + sCertSiStrip_[ sRunNumber_ ] );
-    if ( ! flagHDQM )    comments.push_back( "hDQM: " + sHDQMSiStrip_[ sRunNumber_ ] );
-    if ( ! flagTkMap )   comments.push_back( "TkMap: " + sTkMapSiStrip_[ sRunNumber_ ] );
+    if ( ! flagHDQM )    comments.push_back( "hDQM   : " + sHDQMSiStrip_[ sRunNumber_ ] );
+    if ( ! flagTkMap )   comments.push_back( "TkMap  : " + sTkMapSiStrip_[ sRunNumber_ ] );
     if ( iFlags[ sSubSys_[ SiStrip ] ] == BAD ) {
       ++nRunsBadSiStrip_;
       sRunCommentsSiStrip_[ sRunNumber_ ] = comments;
@@ -780,8 +780,8 @@ void certifyRun()
     if ( ! flagDAQ )           comments.push_back( "DAQSummary BAD" );
 //     if ( ! flagDCS )           comments.push_back( "DCSSummary BAD" ); // FIXME DCS info not yet determined correctly
     if ( ! flagCert )          comments.push_back( "general: " + sCertPixel_[ sRunNumber_ ] );
-    if ( ! flagHDQM )          comments.push_back( "hDQM: " + sHDQMPixel_[ sRunNumber_ ] );
-    if ( ! flagTkMap )         comments.push_back( "TkMap: " + sTkMapPixel_[ sRunNumber_ ] );
+    if ( ! flagHDQM )          comments.push_back( "hDQM   : " + sHDQMPixel_[ sRunNumber_ ] );
+    if ( ! flagTkMap )         comments.push_back( "TkMap  : " + sTkMapPixel_[ sRunNumber_ ] );
     if ( iFlags[ sSubSys_[ Pixel ] ] == BAD ) {
       ++nRunsBadPixel_;
       sRunCommentsPixel_[ sRunNumber_ ] = comments;
@@ -812,6 +812,7 @@ void certifyRun()
     if ( ! flagRate )    comments.push_back( "Track rate too low" );
     if ( ! flagRecHits ) comments.push_back( "Too few RecHits" );
     if ( ! flagCert )    comments.push_back( "general: " + sCertTracking_[ sRunNumber_ ] );
+    if ( ! flagHDQM )    comments.push_back( "hDQM   : " + sHDQMTracking_[ sRunNumber_ ] );
     if ( iFlags[ sSubSys_[ Tracking ] ] == BAD ) {
       ++nRunsBadTracking_;
       sRunCommentsTracking_[ sRunNumber_ ] = comments;
