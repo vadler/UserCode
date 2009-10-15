@@ -805,29 +805,34 @@ void certifyRun()
 
   // Tracking
   if ( bAvailable_[ sSubSys_[ Tracking ] ] ) {
-    Bool_t flagChi2(
-      fCertificates_[ "ReportTrackChi2overDoF" ] > minReportSummaryTracking_
-    );
-    Bool_t flagRate(
-      fCertificates_[ "ReportTrackRate" ] > minReportSummaryTracking_
-    );
-    Bool_t flagRecHits(
-      fCertificates_[ "ReportTrackRecHits" ] > minReportSummaryTracking_
-    );
-    Bool_t flagDQM( flagChi2 * flagRate * flagRecHits );
+    Bool_t flagDQM( kFALSE );
     Bool_t flagCert( sCertTracking_.find( sRunNumber_ ) == sCertTracking_.end() );
     Bool_t flagHDQM( sHDQMTracking_.find( sRunNumber_ ) == sHDQMTracking_.end() );
-    iFlags[ sSubSys_[ Tracking ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM );
-
     sRRTracking_[ sRunNumber_ ]  = FlagIToS( iFlagsRR_[ sSubSys_[ Tracking ] ] );
-    sDQMTracking_[ sRunNumber_ ] = FlagIToS( -99 );
-    sTracking_[ sRunNumber_ ]    = FlagIToS( iFlags[ sSubSys_[ Tracking ] ] );
     vector< TString > comments;
-    if ( ! flagChi2 )    comments.push_back( "Chi2/DoF too low" );
-    if ( ! flagRate )    comments.push_back( "Track rate too low" );
-    if ( ! flagRecHits ) comments.push_back( "Too few RecHits" );
-    if ( ! flagCert )    comments.push_back( "general: " + sCertTracking_[ sRunNumber_ ] );
-    if ( ! flagHDQM )    comments.push_back( "hDQM   : " + sHDQMTracking_[ sRunNumber_ ] );
+    if ( iFlagsRR_[ sSubSys_[ SiStrip ] ] == EXCL && iFlagsRR_[ sSubSys_[ Pixel ] ] == EXCL ) {
+      comments.push_back( "SiStrip and Pixel EXCL: no reasonable Tracking" );
+    } else {
+      Bool_t flagChi2(
+        fCertificates_[ "ReportTrackChi2overDoF" ] > minReportSummaryTracking_
+      );
+      Bool_t flagRate(
+        fCertificates_[ "ReportTrackRate" ] > minReportSummaryTracking_
+      );
+      Bool_t flagRecHits(
+        fCertificates_[ "ReportTrackRecHits" ] > minReportSummaryTracking_
+      );
+      flagDQM  = flagChi2 * flagRate * flagRecHits;
+
+      if ( ! flagChi2 )    comments.push_back( "Chi2/DoF too low" );
+      if ( ! flagRate )    comments.push_back( "Track rate too low" );
+      if ( ! flagRecHits ) comments.push_back( "Too few RecHits" );
+      if ( ! flagCert )    comments.push_back( "general: " + sCertTracking_[ sRunNumber_ ] );
+      if ( ! flagHDQM )    comments.push_back( "hDQM   : " + sHDQMTracking_[ sRunNumber_ ] );
+    }
+    iFlags[ sSubSys_[ Tracking ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM );
+    sDQMTracking_[ sRunNumber_ ] = FlagIToS( ( Int_t )( flagDQM ) );
+    sTracking_[ sRunNumber_ ] = FlagIToS( iFlags[ sSubSys_[ Tracking ] ] );
     if ( iFlags[ sSubSys_[ Tracking ] ] == BAD ) {
       ++nRunsBadTracking_;
       sRunCommentsTracking_[ sRunNumber_ ] = comments;
