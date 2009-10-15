@@ -5,9 +5,11 @@
 // $Id$
 //
 /**
-  \brief    Performs DQM offline certification for SiStrip, Pixel and Tracking
+  \brief    Performs DQM offline data certification for SiStrip, Pixel and Tracking
 
    Purpose:
+
+   The procedure of certifying data of a given run range is automated in order to speed up the procedure and to reduce the Tracker Offline Shift Leader's workload.
 
    Usage:
    
@@ -34,21 +36,29 @@
    - ./certTracking.txt
    - ./hDQMTracking.txt
    The format of the entries in these files is the following:
-   On line per run of the structure
+   One line per run of the structure
    RUNNUMBER FLAG [COMMENT]
    where:
    - RUNNUMBER is obvious
-   - FLAG is either "GOOD" or "BAD"
-     Anything different from "BAD" will be treated as "GOOD"
+   - FLAG is either "GOOD" or "BAD" (Anything different from "BAD" will be treated as "GOOD".)
    - COMMENT is an "obligatory" explanation in case of flag "BAD", which can have more than one word.
      However, brief'n'clear statements are preferred (to be standardized in the future).
    The files can be empty, but must be present!
 
-   Further sources of input are:
+   Further necessary sources of input are:
    - RunRegistry
-   - DQM output fils available in AFS
+   - DQM output files available in AFS
 
    Output:
+
+   Text file
+   - ./trackerRunCertification.txt
+   to be sent directly to the CMS DQM team as reply to the weekly certification request.
+   It contains a list of all flags changed with respect to the RunRegistry, including the reason(s) in case the flag is changed to BAD.
+
+   The (lengthy) stdout provides a complete list of all in-/output flags of all analyzed runs and at its end a summary only with the output flags.
+   This summary can be used to populate the Tracker Good/Bad Run List (http://cmstac05.cern.ch/ajax/pierro/offShift/#good_bad_run).
+   It makes sense to pipe the stdout to another text file.
 
   \author   Volker Adler
   \version  $Id$
@@ -764,7 +774,7 @@ void certifyRun()
     } else {
       flagDAQ = ( fCertificates_[ "PixelDAQSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDAQSummary" ] == ( Double_t )GOOD ); // FIXME Follow up flag definition
       flagDCS = ( fCertificates_[ "PixelDCSSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDCSSummary" ] == ( Double_t )GOOD );
-    }
+    } 
 //     Bool_t flagDQM( flagReportSummary * flagDAQ * flagDCS );
     Bool_t flagDQM( flagReportSummary * flagDAQ ); // FIXME DCS info not yet determined correctly
     Bool_t flagCert( sCertPixel_.find( sRunNumber_ ) == sCertPixel_.end() );
