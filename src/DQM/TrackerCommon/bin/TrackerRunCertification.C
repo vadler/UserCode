@@ -146,10 +146,9 @@ enum Flags { // flags' enumeration
 };
 const Double_t minReportSummarySiStripDet_( 0.98 );
 const Double_t minReportSummarySiStripSubDet_( 0.95 );
+const Double_t minPixel_( 0.85 );
 const Double_t minReportSummaryTracking_( 0.85 );
-const Int_t    iRunNewStruct_( 111948 );
-const Int_t    iRunStartDeconProbl_( 110213 );
-const Int_t    iRunStopDeconProbl_( iRunNewStruct_ );
+const Int_t    iRunStartDecon_( 110213 ); // first run in deconvolution mode
 
 // Certificates and flags
 vector< TString > sRunNumbers_;
@@ -230,7 +229,7 @@ int main( int argc, char * argv[] )
   // Run
   if ( ! readFiles() )           return 11;
   if ( ! createInputFileList() ) return 12;
-  if ( ! createRRFile() )        return 13;
+//   if ( ! createRRFile() )        return 13;
   certifyRunRange();
 
   return 0;
@@ -701,17 +700,42 @@ void certifyRun()
     Bool_t flagDet;
     Bool_t flagSubDet;
     Bool_t flagSToN;
-    if ( iRunStartDeconProbl_ <= sRunNumber_.Atoi() && sRunNumber_.Atoi() <= iRunStopDeconProbl_ ) { // special treatment for switch to deconvolution mode without changing CMSSW release
-      flagDet = kTRUE;
-      flagSubDet = ( // FIXME to be discussed (this is from DQM shifter instr.)
-        ( fCertificates_[ "ReportSiStrip_DetFraction_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TECB" ] > minReportSummarySiStripSubDet_ ) &&
-        ( fCertificates_[ "ReportSiStrip_DetFraction_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TECF" ] > minReportSummarySiStripSubDet_ ) &&
-        ( fCertificates_[ "ReportSiStrip_DetFraction_TIB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIB" ]  > minReportSummarySiStripSubDet_ ) &&
-        ( fCertificates_[ "ReportSiStrip_DetFraction_TIDB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIDB" ] > minReportSummarySiStripSubDet_ ) &&
-        ( fCertificates_[ "ReportSiStrip_DetFraction_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIDF" ] > minReportSummarySiStripSubDet_ ) &&
-        ( fCertificates_[ "ReportSiStrip_DetFraction_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TOB" ]  > minReportSummarySiStripSubDet_ )
-      );
-      flagSToN =kTRUE;
+    Bool_t flagDAQ;
+    Bool_t flagDCS;
+    if ( sVersion_.Contains( "CMSSW_3_2_4" ) ) {
+      if ( iRunStartDecon_ <= sRunNumber_.Atoi() ) {
+        flagDet = kTRUE;
+        flagSubDet = ( // FIXME to be discussed (this is from DQM shifter instr.)
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TECB" ] > minReportSummarySiStripSubDet_ ) &&
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TECF" ] > minReportSummarySiStripSubDet_ ) &&
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TIB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIB" ]  > minReportSummarySiStripSubDet_ ) &&
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TIDB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIDB" ] > minReportSummarySiStripSubDet_ ) &&
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIDF" ] > minReportSummarySiStripSubDet_ ) &&
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TOB" ]  > minReportSummarySiStripSubDet_ )
+        );
+        flagSToN =kTRUE;
+      } else {
+        flagDet = ( fCertificates_[ "SiStripReportSummary" ] > minReportSummarySiStripDet_ );
+        flagSubDet = ( // FIXME to be discussed (this is from DQM shifter instr.)
+          ( fCertificates_[ "ReportSiStrip_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECB" ] > minReportSummarySiStripSubDet_ ) &&
+          ( fCertificates_[ "ReportSiStrip_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECF" ] > minReportSummarySiStripSubDet_ ) &&
+          ( fCertificates_[ "ReportSiStrip_TIB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIB" ]  > minReportSummarySiStripSubDet_ ) &&
+          ( fCertificates_[ "ReportSiStrip_TIDB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIDB" ] > minReportSummarySiStripSubDet_ ) &&
+          ( fCertificates_[ "ReportSiStrip_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIDF" ] > minReportSummarySiStripSubDet_ ) &&
+          ( fCertificates_[ "ReportSiStrip_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TOB" ]  > minReportSummarySiStripSubDet_ )
+        );
+        flagSToN = (
+          ( fCertificates_[ "ReportSiStrip_SToNFlag_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TECB" ] == ( Double_t )GOOD ) &&
+          ( fCertificates_[ "ReportSiStrip_SToNFlag_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TECF" ] == ( Double_t )GOOD ) &&
+          ( fCertificates_[ "ReportSiStrip_SToNFlag_TIB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TIB" ]  == ( Double_t )GOOD ) &&
+          ( fCertificates_[ "ReportSiStrip_SToNFlag_TIDB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TIDB" ] == ( Double_t )GOOD ) &&
+          ( fCertificates_[ "ReportSiStrip_SToNFlag_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TIDF" ] == ( Double_t )GOOD ) &&
+          ( fCertificates_[ "ReportSiStrip_SToNFlag_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TOB" ]  == ( Double_t )GOOD )
+        );
+      }
+//       flagDAQ = ( fCertificates_[ "DAQSiStripDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQSiStripDaqFraction" ] > 0.98 );
+      flagDAQ = kTRUE; // FIXME clear up correct threshold
+      flagDCS = ( fCertificates_[ "DCSSiStripDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSSiStripDcsFraction" ] == ( Double_t )GOOD );
     } else {
       flagDet = ( fCertificates_[ "SiStripReportSummary" ] > minReportSummarySiStripDet_ );
       flagSubDet = ( // FIXME to be discussed (this is from DQM shifter instr.)
@@ -730,14 +754,6 @@ void certifyRun()
         ( fCertificates_[ "ReportSiStrip_SToNFlag_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TIDF" ] == ( Double_t )GOOD ) &&
         ( fCertificates_[ "ReportSiStrip_SToNFlag_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TOB" ]  == ( Double_t )GOOD )
       );
-    }
-    Bool_t flagDAQ;
-    Bool_t flagDCS;
-    if ( sRunNumber_.Atoi() <= iRunNewStruct_ ) { // Change of DQM output structure with new CMSSW release
-//       flagDAQ = ( fCertificates_[ "DAQSiStripDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQSiStripDaqFraction" ] > 0.98 );
-      flagDAQ = kTRUE; // FIXME clear up correct threshold
-      flagDCS = ( fCertificates_[ "DCSSiStripDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSSiStripDcsFraction" ] == ( Double_t )GOOD );
-    } else {
       flagDAQ = ( fCertificates_[ "SiStripDAQSummary" ] == ( Double_t )EXCL || fCertificates_[ "SiStripDAQSummary" ] > minReportSummarySiStripSubDet_ ); // FIXME clear up correct threshold/treatment
       flagDCS = ( fCertificates_[ "SiStripDCSSummary" ] == ( Double_t )EXCL || fCertificates_[ "SiStripDCSSummary" ] == ( Double_t )GOOD );
     }
@@ -772,20 +788,18 @@ void certifyRun()
   sRRPixel_[ sRunNumber_ ] = FlagIToS( iFlagsRR_[ sSubSys_[ Pixel ] ] );
   if ( bAvailable_[ sSubSys_[ Pixel ] ] ) {
     Bool_t flagReportSummary(
-      fCertificates_[ "PixelReportSummary" ] == ( Double_t )GOOD
+      fCertificates_[ "PixelReportSummary" ] > minPixel_
     );
     Bool_t flagDAQ;
     Bool_t flagDCS;
-    if ( sRunNumber_.Atoi() < iRunNewStruct_ ) {
-//       flagDAQ = ( fCertificates_[ "DAQPixelDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQPixelDaqFraction" ] > 0.98 );
-      flagDAQ = kTRUE; // FIXME clear up correct threshold
-      flagDCS = ( fCertificates_[ "DCSPixelDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSPixelDcsFraction" ] == ( Double_t )GOOD );
+    if ( sVersion_.Contains( "CMSSW_3_2_4" ) ) {
+      flagDAQ = ( fCertificates_[ "DAQPixelDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQPixelDaqFraction" ] > minPixel_ );
+      flagDCS = ( fCertificates_[ "DCSPixelDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSPixelDcsFraction" ] > minPixel_ );
     } else {
-      flagDAQ = ( fCertificates_[ "PixelDAQSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDAQSummary" ] == ( Double_t )GOOD ); // FIXME Follow up flag definition
-      flagDCS = ( fCertificates_[ "PixelDCSSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDCSSummary" ] == ( Double_t )GOOD );
+      flagDAQ = ( fCertificates_[ "PixelDAQSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDAQSummary" ] > minPixel_ );
+      flagDCS = ( fCertificates_[ "PixelDCSSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDCSSummary" ] > minPixel_ );
     } 
-//     Bool_t flagDQM( flagReportSummary * flagDAQ * flagDCS );
-    Bool_t flagDQM( flagReportSummary * flagDAQ ); // FIXME DCS info not yet determined correctly
+    Bool_t flagDQM( flagReportSummary * flagDAQ * flagDCS );
     Bool_t flagCert( sCertPixel_.find( sRunNumber_ ) == sCertPixel_.end() );
     Bool_t flagHDQM( sHDQMPixel_.find( sRunNumber_ ) == sHDQMPixel_.end() );
     iFlags[ sSubSys_[ Pixel ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM );
@@ -795,7 +809,7 @@ void certifyRun()
     vector< TString > comments;
     if ( ! flagReportSummary ) comments.push_back( "ReportSummary BAD" );
     if ( ! flagDAQ )           comments.push_back( "DAQSummary BAD" );
-//     if ( ! flagDCS )           comments.push_back( "DCSSummary BAD" ); // FIXME DCS info not yet determined correctly
+    if ( ! flagDCS )           comments.push_back( "DCSSummary BAD" );
     if ( ! flagCert )          comments.push_back( "general: " + sCertPixel_[ sRunNumber_ ] );
     if ( ! flagHDQM )          comments.push_back( "hDQM   : " + sHDQMPixel_[ sRunNumber_ ] );
     if ( iFlags[ sSubSys_[ Pixel ] ] == BAD ) {
