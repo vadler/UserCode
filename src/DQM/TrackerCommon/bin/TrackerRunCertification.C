@@ -144,10 +144,9 @@ enum Flags { // flags' enumeration
   BAD    =   0,
   GOOD   =   1
 };
+const Double_t minGood_( 0.95 );
+const Double_t maxBad_( 0.85 );
 const Double_t minReportSummarySiStripDet_( 0.98 );
-const Double_t minReportSummarySiStripSubDet_( 0.95 );
-const Double_t minPixel_( 0.85 );
-const Double_t minReportSummaryTracking_( 0.85 );
 const Int_t    iRunStartDecon_( 110213 ); // first run in deconvolution mode
 
 // Certificates and flags
@@ -705,24 +704,24 @@ void certifyRun()
     if ( sVersion_.Contains( "CMSSW_3_2_4" ) ) {
       if ( iRunStartDecon_ <= sRunNumber_.Atoi() ) {
         flagDet = kTRUE;
-        flagSubDet = ( // FIXME to be discussed (this is from DQM shifter instr.)
-          ( fCertificates_[ "ReportSiStrip_DetFraction_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TECB" ] > minReportSummarySiStripSubDet_ ) &&
-          ( fCertificates_[ "ReportSiStrip_DetFraction_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TECF" ] > minReportSummarySiStripSubDet_ ) &&
-          ( fCertificates_[ "ReportSiStrip_DetFraction_TIB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIB" ]  > minReportSummarySiStripSubDet_ ) &&
-          ( fCertificates_[ "ReportSiStrip_DetFraction_TIDB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIDB" ] > minReportSummarySiStripSubDet_ ) &&
-          ( fCertificates_[ "ReportSiStrip_DetFraction_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIDF" ] > minReportSummarySiStripSubDet_ ) &&
-          ( fCertificates_[ "ReportSiStrip_DetFraction_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TOB" ]  > minReportSummarySiStripSubDet_ )
+        flagSubDet = (
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TECB" ] > minGood_ ) &&
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TECF" ] > minGood_ ) &&
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TIB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIB" ]  > minGood_ ) &&
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TIDB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIDB" ] > minGood_ ) &&
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TIDF" ] > minGood_ ) &&
+          ( fCertificates_[ "ReportSiStrip_DetFraction_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_DetFraction_TOB" ]  > minGood_ )
         );
         flagSToN =kTRUE;
       } else {
         flagDet = ( fCertificates_[ "SiStripReportSummary" ] > minReportSummarySiStripDet_ );
-        flagSubDet = ( // FIXME to be discussed (this is from DQM shifter instr.)
-          ( fCertificates_[ "ReportSiStrip_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECB" ] > minReportSummarySiStripSubDet_ ) &&
-          ( fCertificates_[ "ReportSiStrip_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECF" ] > minReportSummarySiStripSubDet_ ) &&
-          ( fCertificates_[ "ReportSiStrip_TIB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIB" ]  > minReportSummarySiStripSubDet_ ) &&
-          ( fCertificates_[ "ReportSiStrip_TIDB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIDB" ] > minReportSummarySiStripSubDet_ ) &&
-          ( fCertificates_[ "ReportSiStrip_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIDF" ] > minReportSummarySiStripSubDet_ ) &&
-          ( fCertificates_[ "ReportSiStrip_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TOB" ]  > minReportSummarySiStripSubDet_ )
+        flagSubDet = (
+          ( fCertificates_[ "ReportSiStrip_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECB" ] > minGood_ ) &&
+          ( fCertificates_[ "ReportSiStrip_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECF" ] > minGood_ ) &&
+          ( fCertificates_[ "ReportSiStrip_TIB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIB" ]  > minGood_ ) &&
+          ( fCertificates_[ "ReportSiStrip_TIDB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIDB" ] > minGood_ ) &&
+          ( fCertificates_[ "ReportSiStrip_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIDF" ] > minGood_ ) &&
+          ( fCertificates_[ "ReportSiStrip_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TOB" ]  > minGood_ )
         );
         flagSToN = (
           ( fCertificates_[ "ReportSiStrip_SToNFlag_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TECB" ] == ( Double_t )GOOD ) &&
@@ -733,18 +732,17 @@ void certifyRun()
           ( fCertificates_[ "ReportSiStrip_SToNFlag_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TOB" ]  == ( Double_t )GOOD )
         );
       }
-//       flagDAQ = ( fCertificates_[ "DAQSiStripDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQSiStripDaqFraction" ] > 0.98 );
-      flagDAQ = kTRUE; // FIXME clear up correct threshold
+      flagDAQ = ( fCertificates_[ "DAQSiStripDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQSiStripDaqFraction" ] > minGood_ );
       flagDCS = ( fCertificates_[ "DCSSiStripDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSSiStripDcsFraction" ] == ( Double_t )GOOD );
     } else {
       flagDet = ( fCertificates_[ "SiStripReportSummary" ] > minReportSummarySiStripDet_ );
-      flagSubDet = ( // FIXME to be discussed (this is from DQM shifter instr.)
-        ( fCertificates_[ "ReportSiStrip_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECB" ] > minReportSummarySiStripSubDet_ ) &&
-        ( fCertificates_[ "ReportSiStrip_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECF" ] > minReportSummarySiStripSubDet_ ) &&
-        ( fCertificates_[ "ReportSiStrip_TIB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIB" ]  > minReportSummarySiStripSubDet_ ) &&
-        ( fCertificates_[ "ReportSiStrip_TIDB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIDB" ] > minReportSummarySiStripSubDet_ ) &&
-        ( fCertificates_[ "ReportSiStrip_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIDF" ] > minReportSummarySiStripSubDet_ ) &&
-        ( fCertificates_[ "ReportSiStrip_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TOB" ]  > minReportSummarySiStripSubDet_ )
+      flagSubDet = (
+        ( fCertificates_[ "ReportSiStrip_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECB" ] > minGood_ ) &&
+        ( fCertificates_[ "ReportSiStrip_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECF" ] > minGood_ ) &&
+        ( fCertificates_[ "ReportSiStrip_TIB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIB" ]  > minGood_ ) &&
+        ( fCertificates_[ "ReportSiStrip_TIDB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIDB" ] > minGood_ ) &&
+        ( fCertificates_[ "ReportSiStrip_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TIDF" ] > minGood_ ) &&
+        ( fCertificates_[ "ReportSiStrip_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TOB" ]  > minGood_ )
       );
       flagSToN = (
         ( fCertificates_[ "ReportSiStrip_SToNFlag_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TECB" ] == ( Double_t )GOOD ) &&
@@ -754,11 +752,11 @@ void certifyRun()
         ( fCertificates_[ "ReportSiStrip_SToNFlag_TIDF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TIDF" ] == ( Double_t )GOOD ) &&
         ( fCertificates_[ "ReportSiStrip_SToNFlag_TOB" ]  == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_SToNFlag_TOB" ]  == ( Double_t )GOOD )
       );
-      flagDAQ = ( fCertificates_[ "SiStripDAQSummary" ] == ( Double_t )EXCL || fCertificates_[ "SiStripDAQSummary" ] > minReportSummarySiStripSubDet_ ); // FIXME clear up correct threshold/treatment
+      flagDAQ = ( fCertificates_[ "SiStripDAQSummary" ] == ( Double_t )EXCL || fCertificates_[ "SiStripDAQSummary" ] > minGood_ );
       flagDCS = ( fCertificates_[ "SiStripDCSSummary" ] == ( Double_t )EXCL || fCertificates_[ "SiStripDCSSummary" ] == ( Double_t )GOOD );
     }
 //     Bool_t flagDQM( flagDet * flagSubDet * flagSToN * flagDAQ * flagDSC );
-    Bool_t flagDQM( flagDet * flagSubDet * flagSToN * flagDAQ ); // FIXME DCS info not yet determined correctly
+    Bool_t flagDQM( flagDet * flagSubDet * flagSToN ); // FIXME DAQ and DCS info currently ignored
     Bool_t flagCert( sCertSiStrip_.find( sRunNumber_ )   == sCertSiStrip_.end() );
     Bool_t flagHDQM( sHDQMSiStrip_.find( sRunNumber_ )   == sHDQMSiStrip_.end() );
     Bool_t flagTkMap( sTkMapSiStrip_.find( sRunNumber_ ) == sTkMapSiStrip_.end() );
@@ -770,8 +768,8 @@ void certifyRun()
     if ( ! flagDet )     comments.push_back( "too low overall fraction of good modules" );
     if ( ! flagSubDet )  comments.push_back( "too low fraction of good modules in a sub-system" );
     if ( ! flagSToN )    comments.push_back( "too low S/N in a sub-system" );
-    if ( ! flagDAQ )     comments.push_back( "DAQSummary BAD" );
-//     if ( ! flagDCS )     comments.push_back( "DCSSummary BAD" ); // FIXME DCS info not yet determined correctly
+//     if ( ! flagDAQ )     comments.push_back( "DAQSummary BAD" ); // FIXME DAQ and DCS info currently ignored
+//     if ( ! flagDCS )     comments.push_back( "DCSSummary BAD" ); // FIXME DAQ and DCS info currently ignored
     if ( ! flagCert )    comments.push_back( "general: " + sCertSiStrip_[ sRunNumber_ ] );
     if ( ! flagHDQM )    comments.push_back( "hDQM   : " + sHDQMSiStrip_[ sRunNumber_ ] );
     if ( ! flagTkMap )   comments.push_back( "TkMap  : " + sTkMapSiStrip_[ sRunNumber_ ] );
@@ -788,16 +786,16 @@ void certifyRun()
   sRRPixel_[ sRunNumber_ ] = FlagIToS( iFlagsRR_[ sSubSys_[ Pixel ] ] );
   if ( bAvailable_[ sSubSys_[ Pixel ] ] ) {
     Bool_t flagReportSummary(
-      fCertificates_[ "PixelReportSummary" ] > minPixel_
+      fCertificates_[ "PixelReportSummary" ] > maxBad_
     );
     Bool_t flagDAQ;
     Bool_t flagDCS;
     if ( sVersion_.Contains( "CMSSW_3_2_4" ) ) {
-      flagDAQ = ( fCertificates_[ "DAQPixelDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQPixelDaqFraction" ] > minPixel_ );
-      flagDCS = ( fCertificates_[ "DCSPixelDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSPixelDcsFraction" ] > minPixel_ );
+      flagDAQ = ( fCertificates_[ "DAQPixelDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQPixelDaqFraction" ] > maxBad_ );
+      flagDCS = ( fCertificates_[ "DCSPixelDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSPixelDcsFraction" ] > maxBad_ );
     } else {
-      flagDAQ = ( fCertificates_[ "PixelDAQSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDAQSummary" ] > minPixel_ );
-      flagDCS = ( fCertificates_[ "PixelDCSSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDCSSummary" ] > minPixel_ );
+      flagDAQ = ( fCertificates_[ "PixelDAQSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDAQSummary" ] > maxBad_ );
+      flagDCS = ( fCertificates_[ "PixelDCSSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDCSSummary" ] > maxBad_ );
     } 
     Bool_t flagDQM( flagReportSummary * flagDAQ * flagDCS );
     Bool_t flagCert( sCertPixel_.find( sRunNumber_ ) == sCertPixel_.end() );
@@ -832,13 +830,13 @@ void certifyRun()
       comments.push_back( "SiStrip and Pixel EXCL: no reasonable Tracking" );
     } else {
       Bool_t flagChi2(
-        fCertificates_[ "ReportTrackChi2overDoF" ] > minReportSummaryTracking_
+        fCertificates_[ "ReportTrackChi2overDoF" ] > maxBad_
       );
       Bool_t flagRate(
-        fCertificates_[ "ReportTrackRate" ] > minReportSummaryTracking_
+        fCertificates_[ "ReportTrackRate" ] > maxBad_
       );
       Bool_t flagRecHits(
-        fCertificates_[ "ReportTrackRecHits" ] > minReportSummaryTracking_
+        fCertificates_[ "ReportTrackRecHits" ] > maxBad_
       );
       flagDQM  = flagChi2 * flagRate * flagRecHits;
 
