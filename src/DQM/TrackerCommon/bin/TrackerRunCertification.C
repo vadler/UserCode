@@ -104,22 +104,29 @@ TString FlagIToS( const Int_t flag );
 
 // Global variables, incl. default initialisation
 TString pathDqmData_( "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Express" ); // configurable
-TString nameFileList_( "fileList.txt" );
-TString nameFileRR_( "runRegistry.xml" );
-TString nameFileCertSiStrip_( "certSiStrip.txt" );
-TString nameFileHDQMSiStrip_( "hDQMSiStrip.txt" );
-TString nameFileTkMapSiStrip_( "tkMapSiStrip.txt" );
-TString nameFileCertPixel_( "certPixel.txt" );
-TString nameFileHDQMPixel_( "hDQMPixel.txt" );
-TString nameFileCertTracking_( "certTracking.txt" );
-TString nameFileHDQMTracking_( "hDQMTracking.txt" );
-TString nameLog_( "trackerRunCertification.txt" );
 Int_t  minRun_( 1073741824 ); // 2^30
 Int_t  maxRun_(          0 );
 Int_t  minRange_( maxRun_ ); // configurable
 Int_t  maxRange_( minRun_ ); // configurable
 
 // Global constants
+const TString nameFileList_( "fileList.txt" );
+const TString nameFileRR_( "runRegistry.xml" );
+const TString nameFileCertSiStrip_( "certSiStrip.txt" );
+const TString nameFileHDQMSiStrip_( "hDQMSiStrip.txt" );
+const TString nameFileTkMapSiStrip_( "tkMapSiStrip.txt" );
+const TString nameFileCertPixel_( "certPixel.txt" );
+const TString nameFileHDQMPixel_( "hDQMPixel.txt" );
+const TString nameFileCertTracking_( "certTracking.txt" );
+const TString nameFileHDQMTracking_( "hDQMTracking.txt" );
+const TString nameLog_( "trackerRunCertification.txt" );
+const TString nameDirHead_( "DQMData" );
+const TString nameDirBase_( "EventInfo" );
+const TString nameDirCert_( "CertificationContents" );
+const TString nameDirReport_( "reportSummaryContents" );
+const TString nameDirDAQ_( "DAQContents" );
+const TString nameDirDCS_( "DCSContents" );
+const TString pathRunFragment_( "/Run /" );
 const UInt_t nSubSys_( 3 );
 const TString sSubSys_[ nSubSys_ ] = { // sub-system directory names in DQM files
   "SiStrip",
@@ -177,6 +184,7 @@ map< TString, TString > sHDQMTracking_;
 map< TString, vector< TString > > sRunCommentsTracking_;
 // Certificates and flags (run-by-run)
 TString sRunNumber_( "0" );
+TString sVersion_;
 map< TString, Double_t > fCertificates_;
 map< TString, Int_t >    iFlagsRR_;
 map< TString, Bool_t >   bAvailable_;
@@ -596,21 +604,22 @@ Bool_t readDQM( const TString & pathFile )
 
   // Browse certification folders
   vector< TString > nameCertDir;
+  nameCertDir.push_back( nameDirHead_ );
   for ( UInt_t iSys = 0; iSys < nSubSys_; ++iSys ) {
     bAvailable_[ sSubSys_[ iSys ] ] = ( iFlagsRR_[ sSubSys_[ iSys ] ] != EXCL );
     if ( bAvailable_[ sSubSys_[ iSys ] ] ) {
-      const TString baseDir( "/DQMData/Run /" + sSubSys_[ iSys ] + "/Run summary/EventInfo" );
+      const TString baseDir( nameDirHead_ + pathRunFragment_ + sSubSys_[ iSys ] + "/Run summary/" + nameDirBase_ );
       nameCertDir.push_back( baseDir );
-      nameCertDir.push_back( baseDir + "/CertificationContents" );
-      nameCertDir.push_back( baseDir + "/reportSummaryContents" );
+      nameCertDir.push_back( baseDir + "/" + nameDirCert_ );
+      nameCertDir.push_back( baseDir + "/" + nameDirReport_ );
       if ( iSys != Tracking ) {
-        nameCertDir.push_back( baseDir + "/DAQContents" );
-        nameCertDir.push_back( baseDir + "/DCSContents" );
+        nameCertDir.push_back( baseDir + "/" + nameDirDAQ_ );
+        nameCertDir.push_back( baseDir + "/" + nameDirDCS_ );
       }
     }
   }
   for ( UInt_t iDir = 0; iDir < nameCertDir.size(); ++iDir ) {
-    TString nameCurDir( nameCertDir.at( iDir ).Insert( nameCertDir.at( iDir ).Index( "Run " ) + 4, sRunNumber_ ) );
+    const TString nameCurDir( nameCertDir.at( iDir ).Contains( pathRunFragment_ ) ? nameCertDir.at( iDir ).Insert( nameCertDir.at( iDir ).Index( "Run " ) + 4, sRunNumber_ ) : nameCertDir.at( iDir ) );
     TDirectory * dirSub( ( TDirectory * )fileDQM->Get( nameCurDir.Data() ) );
     if ( ! dirSub ) {
       cout << "    WARNING: " << nameCurDir.Data() << " does not exist" << endl;
@@ -620,7 +629,8 @@ Bool_t readDQM( const TString & pathFile )
   }
   
   fileDQM->Close();
-  
+
+  cout << "    " << sVersion_ << endl;
   for ( map< TString, Double_t >::const_iterator cert = fCertificates_.begin(); cert != fCertificates_.end(); ++cert ) {
     cout << "    " << cert->first << ": " << cert->second << endl;
   }
@@ -641,25 +651,36 @@ void readCertificates( TDirectory * dir )
     const Int_t index1( nameKey.Index( ">" ) );
     if ( index1 == kNPOS ) continue;
     TString nameCert( nameKey( 1, index1 - 1 ) );
+    if ( TString( dir->GetName() ) == nameDirHead_ ) {
+      if ( nameCert.CompareTo( "ReleaseTag" ) == 0 ) {
+        const Ssiz_t indexKey( nameKey.Index( "s=" ) + 2 );
+        const TString nameKeyBrake( nameKey( indexKey, nameKey.Length() - indexKey ) );
+        sVersion_ = nameKeyBrake( 0, nameKeyBrake.Index( "<" ) );
+      }
+      continue;
+    }
     TString nameCertFirst( nameCert( 0, 1 ) );
     nameCertFirst.ToUpper();
     nameCert.Replace( 0, 1, nameCertFirst );
-    if ( TString( dir->GetName() ) == "EventInfo" ) { // indicates summaries
+    if ( TString( dir->GetName() ) == nameDirBase_ ) { // indicates summaries
       if ( ! nameCert.Contains( "Summary" ) ) continue;
       const TString nameDir( dir->GetPath() );
       const UInt_t index2( nameDir.Index( "/", nameDir.Index( ":" ) + 10 ) );
       const TString nameSub( nameDir( index2 + 1, nameDir.Index( "/", index2 + 1 ) - index2 - 1 ) );
       nameCert.Prepend( nameSub );
-    } else if ( TString( dir->GetName() ) == "CertificationContents" ) {
+    } else if ( TString( dir->GetName() ) == nameDirCert_ ) {
       nameCert.Prepend( "Cert" );
-    } else if ( TString( dir->GetName() ) == "DAQContents" ) {
+    } else if ( TString( dir->GetName() ) == nameDirDAQ_ ) {
       nameCert.Prepend( "DAQ" );
-    } else if ( TString( dir->GetName() ) == "DCSContents" ) {
+    } else if ( TString( dir->GetName() ) == nameDirDCS_ ) {
       nameCert.Prepend( "DCS" );
     } else {
       nameCert.Prepend( "Report" );
     }
-    fCertificates_[ nameCert ] = atof( ( nameKey( nameKey.Index( "f=" ) + 2, nameKey.Length() - nameKey.Index( "f=" ) - 2 ) ).Data() );
+    const Ssiz_t  indexKey( nameKey.Index( "f=" ) + 2 );
+    const TString nameKeyBrake( nameKey( indexKey, nameKey.Length() - indexKey ) );
+    const TString nameKeyBrakeAll( nameKeyBrake( 0, nameKeyBrake.Index( "<" ) ) );
+    fCertificates_[ nameCert ] = atof( nameKeyBrakeAll.Data() );
   }
   
   return;
@@ -675,6 +696,7 @@ void certifyRun()
   map< TString, Int_t > iFlags;
   
   // SiStrip
+  sRRSiStrip_[ sRunNumber_ ] = FlagIToS( iFlagsRR_[ sSubSys_[ SiStrip ] ] );
   if ( bAvailable_[ sSubSys_[ SiStrip ] ] ) {
     Bool_t flagDet;
     Bool_t flagSubDet;
@@ -726,7 +748,6 @@ void certifyRun()
     Bool_t flagTkMap( sTkMapSiStrip_.find( sRunNumber_ ) == sTkMapSiStrip_.end() );
     iFlags[ sSubSys_[ SiStrip ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM * flagTkMap );
     
-    sRRSiStrip_[ sRunNumber_ ]  = FlagIToS( iFlagsRR_[ sSubSys_[ SiStrip ] ] );
     sDQMSiStrip_[ sRunNumber_ ] = FlagIToS( ( Int_t )( flagDQM ) );
     sSiStrip_[ sRunNumber_ ]    = FlagIToS( iFlags[ sSubSys_[ SiStrip ] ] );
     vector< TString > comments;
@@ -742,9 +763,13 @@ void certifyRun()
       ++nRunsBadSiStrip_;
       sRunCommentsSiStrip_[ sRunNumber_ ] = comments;
     }
+  } else {
+    sDQMSiStrip_[ sRunNumber_ ] = sRRSiStrip_[ sRunNumber_ ];
+    sSiStrip_[ sRunNumber_ ]    = sRRSiStrip_[ sRunNumber_ ];
   }
 
   // Pixel
+  sRRPixel_[ sRunNumber_ ] = FlagIToS( iFlagsRR_[ sSubSys_[ Pixel ] ] );
   if ( bAvailable_[ sSubSys_[ Pixel ] ] ) {
     Bool_t flagReportSummary(
       fCertificates_[ "PixelReportSummary" ] == ( Double_t )GOOD
@@ -765,7 +790,6 @@ void certifyRun()
     Bool_t flagHDQM( sHDQMPixel_.find( sRunNumber_ ) == sHDQMPixel_.end() );
     iFlags[ sSubSys_[ Pixel ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM );
     
-    sRRPixel_[ sRunNumber_ ]  = FlagIToS( iFlagsRR_[ sSubSys_[ Pixel ] ] );
     sDQMPixel_[ sRunNumber_ ] = FlagIToS( ( Int_t )( flagDQM ) );
     sPixel_[ sRunNumber_ ]    = FlagIToS( iFlags[ sSubSys_[ Pixel ] ] );
     vector< TString > comments;
@@ -778,14 +802,17 @@ void certifyRun()
       ++nRunsBadPixel_;
       sRunCommentsPixel_[ sRunNumber_ ] = comments;
     }
+  } else {
+    sDQMPixel_[ sRunNumber_ ] = sRRPixel_[ sRunNumber_ ];
+    sPixel_[ sRunNumber_ ]    = sRRPixel_[ sRunNumber_ ];
   }
 
   // Tracking
+  sRRTracking_[ sRunNumber_ ] = FlagIToS( iFlagsRR_[ sSubSys_[ Tracking ] ] );
   if ( bAvailable_[ sSubSys_[ Tracking ] ] ) {
     Bool_t flagDQM( kFALSE );
     Bool_t flagCert( sCertTracking_.find( sRunNumber_ ) == sCertTracking_.end() );
     Bool_t flagHDQM( sHDQMTracking_.find( sRunNumber_ ) == sHDQMTracking_.end() );
-    sRRTracking_[ sRunNumber_ ]  = FlagIToS( iFlagsRR_[ sSubSys_[ Tracking ] ] );
     vector< TString > comments;
     if ( iFlagsRR_[ sSubSys_[ SiStrip ] ] == EXCL && iFlagsRR_[ sSubSys_[ Pixel ] ] == EXCL ) {
       comments.push_back( "SiStrip and Pixel EXCL: no reasonable Tracking" );
@@ -814,6 +841,9 @@ void certifyRun()
       ++nRunsBadTracking_;
       sRunCommentsTracking_[ sRunNumber_ ] = comments;
     }
+  } else {
+    sDQMTracking_[ sRunNumber_ ] = sRRTracking_[ sRunNumber_ ];
+    sTracking_[ sRunNumber_ ]    = sRRTracking_[ sRunNumber_ ];
   }
 
   for ( map< TString, Int_t >::const_iterator iSys = iFlags.begin(); iSys != iFlags.end(); ++iSys ) {
