@@ -2,7 +2,7 @@
 //
 // Package: DQM/TrackerCommon
 //
-// $Id: TrackerRunCertification.C,v 1.13 2009/10/16 16:39:06 vadler Exp $
+// $Id$
 //
 /**
   \brief    Performs DQM offline data certification for SiStrip, Pixel and Tracking
@@ -65,7 +65,7 @@
    If no argument is given, the certification will be run for all runs with DQM files found in the default PATH.
 
   \author   Volker Adler
-  \version  $Id: TrackerRunCertification.C,v 1.13 2009/10/16 16:39:06 vadler Exp $
+  \version  $Id$
 */
 
 
@@ -146,7 +146,6 @@ enum Flags { // flags' enumeration
 };
 const Double_t minGood_( 0.95 );
 const Double_t maxBad_( 0.85 );
-const Double_t minReportSummarySiStripDet_( 0.98 );
 const Int_t    iRunStartDecon_( 110213 ); // first run in deconvolution mode
 
 // Certificates and flags
@@ -181,7 +180,7 @@ map< TString, TString > sCertTracking_;
 map< TString, TString > sHDQMTracking_;
 map< TString, vector< TString > > sRunCommentsTracking_;
 // Certificates and flags (run-by-run)
-TString sRunNumber_( "0" );
+TString sRunNumber_;
 TString sVersion_;
 map< TString, Double_t > fCertificates_;
 map< TString, Int_t >    iFlagsRR_;
@@ -714,7 +713,7 @@ void certifyRun()
         );
         flagSToN =kTRUE;
       } else {
-        flagDet = ( fCertificates_[ "SiStripReportSummary" ] > minReportSummarySiStripDet_ );
+        flagDet = ( fCertificates_[ "SiStripReportSummary" ] > minGood_ );
         flagSubDet = (
           ( fCertificates_[ "ReportSiStrip_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECB" ] > minGood_ ) &&
           ( fCertificates_[ "ReportSiStrip_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECF" ] > minGood_ ) &&
@@ -735,7 +734,7 @@ void certifyRun()
       flagDAQ = ( fCertificates_[ "DAQSiStripDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQSiStripDaqFraction" ] > minGood_ );
       flagDCS = ( fCertificates_[ "DCSSiStripDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSSiStripDcsFraction" ] == ( Double_t )GOOD );
     } else {
-      flagDet = ( fCertificates_[ "SiStripReportSummary" ] > minReportSummarySiStripDet_ );
+      flagDet = ( fCertificates_[ "SiStripReportSummary" ] > minGood_ );
       flagSubDet = (
         ( fCertificates_[ "ReportSiStrip_TECB" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECB" ] > minGood_ ) &&
         ( fCertificates_[ "ReportSiStrip_TECF" ] == ( Double_t )EXCL || fCertificates_[ "ReportSiStrip_TECF" ] > minGood_ ) &&
