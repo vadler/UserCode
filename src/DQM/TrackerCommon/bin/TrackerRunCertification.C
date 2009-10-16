@@ -2,7 +2,7 @@
 //
 // Package: DQM/TrackerCommon
 //
-// $Id$
+// $Id: TrackerRunCertification.C,v 1.13 2009/10/16 16:39:06 vadler Exp $
 //
 /**
   \brief    Performs DQM offline data certification for SiStrip, Pixel and Tracking
@@ -65,7 +65,7 @@
    If no argument is given, the certification will be run for all runs with DQM files found in the default PATH.
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: TrackerRunCertification.C,v 1.13 2009/10/16 16:39:06 vadler Exp $
 */
 
 
@@ -228,7 +228,7 @@ int main( int argc, char * argv[] )
   // Run
   if ( ! readFiles() )           return 11;
   if ( ! createInputFileList() ) return 12;
-//   if ( ! createRRFile() )        return 13;
+  if ( ! createRRFile() )        return 13;
   certifyRunRange();
 
   return 0;
