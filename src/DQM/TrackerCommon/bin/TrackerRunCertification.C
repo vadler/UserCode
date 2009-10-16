@@ -19,7 +19,6 @@
    - ./TkMapSiStrip.txt
    - ./certPixel.txt
    - ./hDQMPixel.txt
-   - ./TkMapPixel.txt
    - ./certTracking.txt
    - ./hDQMTracking.txt
    The format of the entries in these files is the following:
@@ -112,7 +111,6 @@ TString nameFileHDQMSiStrip_( "hDQMSiStrip.txt" );
 TString nameFileTkMapSiStrip_( "tkMapSiStrip.txt" );
 TString nameFileCertPixel_( "certPixel.txt" );
 TString nameFileHDQMPixel_( "hDQMPixel.txt" );
-TString nameFileTkMapPixel_( "tkMapPixel.txt" );
 TString nameFileCertTracking_( "certTracking.txt" );
 TString nameFileHDQMTracking_( "hDQMTracking.txt" );
 TString nameLog_( "trackerRunCertification.txt" );
@@ -167,7 +165,6 @@ map< TString, TString > sRRPixel_;
 map< TString, TString > sDQMPixel_;
 map< TString, TString > sCertPixel_;
 map< TString, TString > sHDQMPixel_;
-map< TString, TString > sTkMapPixel_;
 map< TString, vector< TString > > sRunCommentsPixel_;
 UInt_t nRunsExclTracking_( 0 );
 UInt_t nRunsBadTracking_( 0 );
@@ -282,14 +279,6 @@ Bool_t readFiles()
     check = kFALSE;
   }
 
-  // open and check Pixel TkMap file
-  ifstream fileTkMapPixelRead;
-  fileTkMapPixelRead.open( nameFileTkMapPixel_.Data() );
-  if ( ! fileTkMapPixelRead ) {
-    cout << "    ERROR: no Pixel TkMap certificates' file" << endl;
-    check = kFALSE;
-  }
-
   // open and check Tracking certification file
   ifstream fileCertTrackingRead;
   fileCertTrackingRead.open( nameFileCertTracking_.Data() );
@@ -353,15 +342,6 @@ Bool_t readFiles()
       TString runComment( comment.c_str() );
       sHDQMPixel_[ runNumber ] = runComment;
     }
-    while ( fileTkMapPixelRead.good() ) {
-      TString runNumber, runFlag;
-      fileTkMapPixelRead >> runNumber >> runFlag;
-      if ( runNumber.Length() == 0 || runFlag != "BAD" ) continue;
-      string comment;
-      getline( fileTkMapPixelRead, comment );
-      TString runComment( comment.c_str() );
-      sTkMapPixel_[ runNumber ] = runComment;
-    }
     while ( fileCertTrackingRead.good() ) {
       TString runNumber, runFlag;
       fileCertTrackingRead >> runNumber >> runFlag;
@@ -387,7 +367,6 @@ Bool_t readFiles()
   fileTkMapSiStripRead.close();
   fileCertPixelRead.close();
   fileHDQMPixelRead.close();
-  fileTkMapPixelRead.close();
   fileCertTrackingRead.close();
   fileHDQMTrackingRead.close();
 
@@ -747,9 +726,9 @@ void certifyRun()
     Bool_t flagTkMap( sTkMapSiStrip_.find( sRunNumber_ ) == sTkMapSiStrip_.end() );
     iFlags[ sSubSys_[ SiStrip ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM * flagTkMap );
     
-    sRRSiStrip_[ sRunNumber_ ] = FlagIToS( iFlagsRR_[ sSubSys_[ SiStrip ] ] );
+    sRRSiStrip_[ sRunNumber_ ]  = FlagIToS( iFlagsRR_[ sSubSys_[ SiStrip ] ] );
     sDQMSiStrip_[ sRunNumber_ ] = FlagIToS( ( Int_t )( flagDQM ) );
-    sSiStrip_[ sRunNumber_ ] = FlagIToS( iFlags[ sSubSys_[ SiStrip ] ] );
+    sSiStrip_[ sRunNumber_ ]    = FlagIToS( iFlags[ sSubSys_[ SiStrip ] ] );
     vector< TString > comments;
     if ( ! flagDet )     comments.push_back( "too low overall fraction of good modules" );
     if ( ! flagSubDet )  comments.push_back( "too low fraction of good modules in a sub-system" );
@@ -784,19 +763,17 @@ void certifyRun()
     Bool_t flagDQM( flagReportSummary * flagDAQ ); // FIXME DCS info not yet determined correctly
     Bool_t flagCert( sCertPixel_.find( sRunNumber_ ) == sCertPixel_.end() );
     Bool_t flagHDQM( sHDQMPixel_.find( sRunNumber_ ) == sHDQMPixel_.end() );
-    Bool_t flagTkMap( sTkMapPixel_.find( sRunNumber_ ) == sTkMapPixel_.end() );
-    iFlags[ sSubSys_[ Pixel ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM * flagTkMap );
+    iFlags[ sSubSys_[ Pixel ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM );
     
-    sRRPixel_[ sRunNumber_ ] = FlagIToS( iFlagsRR_[ sSubSys_[ Pixel ] ] );
+    sRRPixel_[ sRunNumber_ ]  = FlagIToS( iFlagsRR_[ sSubSys_[ Pixel ] ] );
     sDQMPixel_[ sRunNumber_ ] = FlagIToS( ( Int_t )( flagDQM ) );
-    sPixel_[ sRunNumber_ ] = FlagIToS( iFlags[ sSubSys_[ Pixel ] ] );
+    sPixel_[ sRunNumber_ ]    = FlagIToS( iFlags[ sSubSys_[ Pixel ] ] );
     vector< TString > comments;
     if ( ! flagReportSummary ) comments.push_back( "ReportSummary BAD" );
     if ( ! flagDAQ )           comments.push_back( "DAQSummary BAD" );
 //     if ( ! flagDCS )           comments.push_back( "DCSSummary BAD" ); // FIXME DCS info not yet determined correctly
     if ( ! flagCert )          comments.push_back( "general: " + sCertPixel_[ sRunNumber_ ] );
     if ( ! flagHDQM )          comments.push_back( "hDQM   : " + sHDQMPixel_[ sRunNumber_ ] );
-    if ( ! flagTkMap )         comments.push_back( "TkMap  : " + sTkMapPixel_[ sRunNumber_ ] );
     if ( iFlags[ sSubSys_[ Pixel ] ] == BAD ) {
       ++nRunsBadPixel_;
       sRunCommentsPixel_[ sRunNumber_ ] = comments;
@@ -832,7 +809,7 @@ void certifyRun()
     }
     iFlags[ sSubSys_[ Tracking ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM );
     sDQMTracking_[ sRunNumber_ ] = FlagIToS( ( Int_t )( flagDQM ) );
-    sTracking_[ sRunNumber_ ] = FlagIToS( iFlags[ sSubSys_[ Tracking ] ] );
+    sTracking_[ sRunNumber_ ]    = FlagIToS( iFlags[ sSubSys_[ Tracking ] ] );
     if ( iFlags[ sSubSys_[ Tracking ] ] == BAD ) {
       ++nRunsBadTracking_;
       sRunCommentsTracking_[ sRunNumber_ ] = comments;
@@ -860,7 +837,7 @@ void writeOutput()
   // Initialize
   ofstream fileLog;
   fileLog.open( nameLog_.Data() );
-  fileLog << "Tracker Certification runs " << minRange_ << " - " << maxRange_ << endl << "==========================================" << endl << endl;
+  fileLog << "Tracker Certification runs " << minRun_ << " - " << maxRun_ << endl << "==========================================" << endl << endl;
   fileLog << "Used DQM files found in " << pathDqmData_ << endl << endl;
   fileLog << "# of runs certified         : " << sRunNumbers_.size()   << endl;
   fileLog << "# of runs not found in RR   : " << nRunsNotRR_           << endl << endl;
