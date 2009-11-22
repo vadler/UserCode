@@ -56,7 +56,7 @@
    $ rehash
    $ cd WORKING_DIRECTORY
    $ [create input files]
-   $ TrackerRunCertification [FIRTS [LAST [PATH] ] ]
+   $ TrackerRunCertification [FIRST [LAST [PATH] ] ]
 
    All arguments are optional, but must be given in the correct order:
    - FIRST: run number to start certification from
@@ -76,6 +76,7 @@
 #include <iostream>
 #include <sstream>
 
+// RooT, needs '<use name="root">' in the BuildFile
 #include "TROOT.h"
 #include "TSystem.h"
 #include "TString.h"
@@ -104,6 +105,7 @@ TString FlagIToS( const Int_t flag );
 
 // Global variables, incl. default initialisation
 TString pathDqmData_( "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Express" ); // configurable
+TString nameDataset_( "/Cosmics/CRAFT09-CRAFT09_R_V4_CosmicsSeq_v1/RECO" );   // FIXME Make configurable
 Int_t  minRun_( 1073741824 ); // 2^30
 Int_t  maxRun_(          0 );
 Int_t  minRange_( maxRun_ ); // configurable
@@ -200,7 +202,7 @@ int main( int argc, char * argv[] )
     if ( ! sRun.IsDigit() ) {
       cout << "  ERROR: wrong usage" << endl;
       cout << "  TrackerRunCertification [basic path of DQM data] [first run number] [last run number]" << endl;
-      cout << "  (\"first run number\") was not a number";
+      cout << "  (\"first run number\") was not a number" << endl;
       return 1;
     }
     minRange_ = sRun.Atoi();
@@ -210,7 +212,7 @@ int main( int argc, char * argv[] )
     if ( ! sRun.IsDigit() ) {
       cout << "  ERROR: wrong usage" << endl;
       cout << "  TrackerRunCertification [basic path of DQM data] [first run number] [last run number]" << endl;
-      cout << "  (\"last run number\") was not a number";
+      cout << "  (\"last run number\") was not a number" << endl;
       return 1;
     }
     maxRange_ = sRun.Atoi();
@@ -244,64 +246,13 @@ Bool_t readFiles()
   // Initialize
   Bool_t check( kTRUE );
 
-  // open and check SiStrip certification file
+  // open and check and read SiStrip certification file
   ifstream fileCertSiStripRead;
   fileCertSiStripRead.open( nameFileCertSiStrip_.Data() );
   if ( ! fileCertSiStripRead ) {
     cout << "    ERROR: no SiStrip general certificates' file" << endl;
     check = kFALSE;
-  }
-
-  // open and check SiStrip hDQM file
-  ifstream fileHDQMSiStripRead;
-  fileHDQMSiStripRead.open( nameFileHDQMSiStrip_.Data() );
-  if ( ! fileHDQMSiStripRead ) {
-    cout << "    ERROR: no SiStrip hDQM certificates' file" << endl;
-    check = kFALSE;
-  }
-
-  // open and check SiStrip TkMap file
-  ifstream fileTkMapSiStripRead;
-  fileTkMapSiStripRead.open( nameFileTkMapSiStrip_.Data() );
-  if ( ! fileTkMapSiStripRead ) {
-    cout << "    ERROR: no SiStrip TkMap certificates' file" << endl;
-    check = kFALSE;
-  }
-
-  // open and check Pixel certification file
-  ifstream fileCertPixelRead;
-  fileCertPixelRead.open( nameFileCertPixel_.Data() );
-  if ( ! fileCertPixelRead ) {
-    cout << "    ERROR: no Pixel general certificates' file" << endl;
-    check = kFALSE;
-  }
-
-  // open and check Pixel hDQM file
-  ifstream fileHDQMPixelRead;
-  fileHDQMPixelRead.open( nameFileHDQMPixel_.Data() );
-  if ( ! fileHDQMPixelRead ) {
-    cout << "    ERROR: no Pixel hDQM certificates' file" << endl;
-    check = kFALSE;
-  }
-
-  // open and check Tracking certification file
-  ifstream fileCertTrackingRead;
-  fileCertTrackingRead.open( nameFileCertTracking_.Data() );
-  if ( ! fileCertTrackingRead ) {
-    cout << "    ERROR: no Tracking general certificates' file" << endl;
-    check = kFALSE;
-  }
-
-  // open and check Tracking hDQM file
-  ifstream fileHDQMTrackingRead;
-  fileHDQMTrackingRead.open( nameFileHDQMTracking_.Data() );
-  if ( ! fileHDQMTrackingRead ) {
-    cout << "    ERROR: no Tracking hDQM certificates' file" << endl;
-    check = kFALSE;
-  }
-
-  // Read data
-  if ( check ) {
+  } else {
     while ( fileCertSiStripRead.good() ) {
       TString runNumber, runFlag;
       fileCertSiStripRead >> runNumber >> runFlag;
@@ -311,6 +262,16 @@ Bool_t readFiles()
       TString runComment( comment.c_str() );
       sCertSiStrip_[ runNumber ] = runComment;
     }
+  }
+  fileCertSiStripRead.close();
+
+  // open and check and read SiStrip hDQM file
+  ifstream fileHDQMSiStripRead;
+  fileHDQMSiStripRead.open( nameFileHDQMSiStrip_.Data() );
+  if ( ! fileHDQMSiStripRead ) {
+    cout << "    ERROR: no SiStrip hDQM certificates' file" << endl;
+    check = kFALSE;
+  } else {
     while ( fileHDQMSiStripRead.good() ) {
       TString runNumber, runFlag;
       fileHDQMSiStripRead >> runNumber >> runFlag;
@@ -320,6 +281,16 @@ Bool_t readFiles()
       TString runComment( comment.c_str() );
       sHDQMSiStrip_[ runNumber ] = runComment;
     }
+  }
+  fileHDQMSiStripRead.close();
+
+  // open and check and read SiStrip TkMap file
+  ifstream fileTkMapSiStripRead;
+  fileTkMapSiStripRead.open( nameFileTkMapSiStrip_.Data() );
+  if ( ! fileTkMapSiStripRead ) {
+    cout << "    ERROR: no SiStrip TkMap certificates' file" << endl;
+    check = kFALSE;
+  } else {
     while ( fileTkMapSiStripRead.good() ) {
       TString runNumber, runFlag;
       fileTkMapSiStripRead >> runNumber >> runFlag;
@@ -329,6 +300,16 @@ Bool_t readFiles()
       TString runComment( comment.c_str() );
       sTkMapSiStrip_[ runNumber ] = runComment;
     }
+  }
+  fileTkMapSiStripRead.close();
+
+  // open and check and read Pixel certification file
+  ifstream fileCertPixelRead;
+  fileCertPixelRead.open( nameFileCertPixel_.Data() );
+  if ( ! fileCertPixelRead ) {
+    cout << "    ERROR: no Pixel general certificates' file" << endl;
+    check = kFALSE;
+  } else {
     while ( fileCertPixelRead.good() ) {
       TString runNumber, runFlag;
       fileCertPixelRead >> runNumber >> runFlag;
@@ -338,6 +319,16 @@ Bool_t readFiles()
       TString runComment( comment.c_str() );
       sCertPixel_[ runNumber ] = runComment;
     }
+  }
+  fileCertPixelRead.close();
+
+  // open and check and read Pixel hDQM file
+  ifstream fileHDQMPixelRead;
+  fileHDQMPixelRead.open( nameFileHDQMPixel_.Data() );
+  if ( ! fileHDQMPixelRead ) {
+    cout << "    ERROR: no Pixel hDQM certificates' file" << endl;
+    check = kFALSE;
+  } else {
     while ( fileHDQMPixelRead.good() ) {
       TString runNumber, runFlag;
       fileHDQMPixelRead >> runNumber >> runFlag;
@@ -347,6 +338,16 @@ Bool_t readFiles()
       TString runComment( comment.c_str() );
       sHDQMPixel_[ runNumber ] = runComment;
     }
+  }
+  fileHDQMPixelRead.close();
+
+  // open and check and read Tracking certification file
+  ifstream fileCertTrackingRead;
+  fileCertTrackingRead.open( nameFileCertTracking_.Data() );
+  if ( ! fileCertTrackingRead ) {
+    cout << "    ERROR: no Tracking general certificates' file" << endl;
+    check = kFALSE;
+  } else {
     while ( fileCertTrackingRead.good() ) {
       TString runNumber, runFlag;
       fileCertTrackingRead >> runNumber >> runFlag;
@@ -356,6 +357,16 @@ Bool_t readFiles()
       TString runComment( comment.c_str() );
       sCertTracking_[ runNumber ] = runComment;
     }
+  }
+  fileCertTrackingRead.close();
+
+  // open and check and read Tracking hDQM file
+  ifstream fileHDQMTrackingRead;
+  fileHDQMTrackingRead.open( nameFileHDQMTracking_.Data() );
+  if ( ! fileHDQMTrackingRead ) {
+    cout << "    ERROR: no Tracking hDQM certificates' file" << endl;
+    check = kFALSE;
+  } else {
     while ( fileHDQMTrackingRead.good() ) {
       TString runNumber, runFlag;
       fileHDQMTrackingRead >> runNumber >> runFlag;
@@ -366,13 +377,6 @@ Bool_t readFiles()
       sHDQMTracking_[ runNumber ] = runComment;
     }
   }
-  
-  fileCertSiStripRead.close();
-  fileHDQMSiStripRead.close();
-  fileTkMapSiStripRead.close();
-  fileCertPixelRead.close();
-  fileHDQMPixelRead.close();
-  fileCertTrackingRead.close();
   fileHDQMTrackingRead.close();
 
   return check;
@@ -433,42 +437,27 @@ Bool_t createInputFileList()
 Bool_t createRRFile()
 {
 
-  const TString xmlRRAddress( "http://pccmsdqm04.cern.ch/runregistry/runregisterdata?format=xml&intpl=xml&mime=text/xml&qtype=RUN_NUMBER&sortname=RUN_NUMBER" );
-  const TString nameFileRRTmp( nameFileRR_ + ".tmp" );
-  gSystem->Exec( TString( "wget -q -O " ).Append( nameFileRRTmp ).Append( " " ).Append( xmlRRAddress ).Data() );
-  clock_t sleep( 2 * CLOCKS_PER_SEC + clock() ); // minimum 2 seconds delay to have the file completely downloaded
-  while ( sleep > clock() );
+  gSystem->Exec( TString( "rm -f " ).Append( nameFileRR_ ) );
+  gSystem->Exec( TString( "$CMSSW_BASE/src/DQM/TrackerCommon/bin/preTrackerRunCertification.py > " ).Append( nameFileRR_ ) );
 
-  // Convert RR file to be readable by TXMLEngine
-  TXMLEngine * xmlRR( new TXMLEngine );
-  XMLDocPointer_t xmlRRDoc( xmlRR->NewDoc() );
-  xmlRR->SaveDoc( xmlRRDoc, nameFileRR_.Data() );
-  xmlRR->FreeDoc( xmlRRDoc );
-  ifstream fileRRTmp;
-  fileRRTmp.open( nameFileRRTmp.Data() );
-  if ( ! fileRRTmp ) {
-    cout << "  ERROR: temporary RR file does not exist" << endl;
+  ifstream fileRR;
+  fileRR.open( nameFileRR_.Data() );
+  if ( ! fileRR ) {
+    cout << "  ERROR: RR file does not exist" << endl;
     cout << "  Please, check access to RR" << endl;
     return kFALSE;
   }
-  ofstream fileRR;
-  fileRR.open( nameFileRR_.Data(), ios_base::app );
-  const UInt_t maxLength( 131071 ); // hard-coding for what?
+  const UInt_t maxLength( 131071 ); // FIXME hard-coding for what?
   char xmlLine[ maxLength ];
   UInt_t lines( 0 );
-  while ( fileRRTmp.getline( xmlLine, maxLength ) ) {
-    fileRR << xmlLine << endl;
-    ++lines;
-  }
-  gSystem->Exec( TString( "rm " + nameFileRRTmp ).Data() );
+  while ( lines <= 1 && fileRR.getline( xmlLine, maxLength ) ) ++lines;
   if ( lines <= 1 ) {
     cout << "  ERROR: empty RR file" << endl;
     cout << "  Please, check access to RR" << endl;
     return kFALSE;
   }
   fileRR.close();
-  fileRRTmp.close();
-  
+
   return kTRUE;
 
 }
@@ -519,36 +508,81 @@ Bool_t readRR( const TString & pathFile )
 
   // Initialize
   map< TString, TString > sFlagsRR;
+  map< TString, TString > sCommentsRR;
   iFlagsRR_.clear();
 
-  // Read RR file
+  // Read RR file corresponding to output format type 'xml_all'
   TXMLEngine * xmlRR( new TXMLEngine );
   XMLDocPointer_t  xmlRRDoc( xmlRR->ParseFile( nameFileRR_.Data() ) );
   XMLNodePointer_t nodeMain( xmlRR->DocGetRootElement( xmlRRDoc ) );
-  vector< TString > nameFlagNode;
-  nameFlagNode.push_back( "on_STRIP" );
-  nameFlagNode.push_back( "on_PIX" );
-  nameFlagNode.push_back( "off_STRIP" );
-  nameFlagNode.push_back( "off_PIX" );
-  nameFlagNode.push_back( "off_TRACK" );
+  vector< TString > nameCmpNode;
+  nameCmpNode.push_back( "STRIP" );
+  nameCmpNode.push_back( "PIX" );
+  nameCmpNode.push_back( "TRACK" );
   Bool_t foundRun( kFALSE );
   XMLNodePointer_t nodeRun( xmlRR->GetChild( nodeMain ) );
   while ( nodeRun ) {
     XMLNodePointer_t nodeRunChild( xmlRR->GetChild( nodeRun ) );
-    while ( nodeRunChild && TString( xmlRR->GetNodeName( nodeRunChild ) ) != "RUN_NUMBER" ) {
+    while ( nodeRunChild && TString( xmlRR->GetNodeName( nodeRunChild ) ) != "NUMBER" ) {
       nodeRunChild = xmlRR->GetNext( nodeRunChild );
     }
     if ( nodeRunChild ) {
       if ( xmlRR->GetNodeContent( nodeRunChild ) == sRunNumber_ ) {
         nodeRunChild = xmlRR->GetChild( nodeRun );
-        while ( nodeRunChild ) {
-          const TString nameNode( xmlRR->GetNodeName( nodeRunChild ) );
-          for ( UInt_t iNameNode = 0; iNameNode < nameFlagNode.size(); ++iNameNode ) {
-            if ( nameNode == nameFlagNode.at( iNameNode ) ) {
-              sFlagsRR[ nameNode ] = TString( xmlRR->GetNodeContent( nodeRunChild ) );
-            }
-          }
+        while ( nodeRunChild && TString( xmlRR->GetNodeName( nodeRunChild ) ) != "DATASETS" ) {
           nodeRunChild = xmlRR->GetNext( nodeRunChild );
+        }
+        if ( nodeRunChild ) {
+          XMLNodePointer_t nodeDataset( xmlRR->GetChild( nodeRunChild ) );
+          while ( nodeDataset ) {
+            XMLNodePointer_t nodeDatasetChild( xmlRR->GetChild( nodeDataset ) );
+            while ( nodeDatasetChild && TString( xmlRR->GetNodeName( nodeDatasetChild ) ) != "NAME" ) {
+              nodeDatasetChild = xmlRR->GetNext( nodeDatasetChild );
+            }
+            if ( nodeDatasetChild ) {
+              if ( TString( xmlRR->GetNodeContent( nodeDatasetChild ) ) == nameDataset_ ) { // FIXME hard-coding
+                // FIXME Put additional checks on online status etc. here.
+                nodeDatasetChild = xmlRR->GetChild( nodeDataset );
+                while ( nodeDatasetChild && TString( xmlRR->GetNodeName( nodeDatasetChild ) ) != "CMPS" ) {
+                  nodeDatasetChild = xmlRR->GetNext( nodeDatasetChild );
+                }
+                if ( nodeDatasetChild ) {
+                  XMLNodePointer_t nodeCmp( xmlRR->GetChild( nodeDatasetChild ) );
+                  while ( nodeCmp ) {
+                    XMLNodePointer_t nodeCmpChild( xmlRR->GetChild( nodeCmp ) );
+                    while ( nodeCmpChild && TString( xmlRR->GetNodeName( nodeCmpChild ) ) != "NAME" ) {
+                      nodeCmpChild = xmlRR->GetNext( nodeCmpChild );
+                    }
+                    if ( nodeCmpChild ) {
+                      for ( UInt_t iNameNode = 0; iNameNode < nameCmpNode.size(); ++iNameNode ) {
+                        if ( xmlRR->GetNodeContent( nodeCmpChild ) == nameCmpNode.at( iNameNode ) ) {
+                          TString nameNode( "RR_" + nameCmpNode.at( iNameNode ) );
+                          XMLNodePointer_t nodeCmpChildNew = xmlRR->GetChild( nodeCmp );
+                          while ( nodeCmpChildNew && TString( xmlRR->GetNodeName( nodeCmpChildNew ) ) != "VALUE" ) {
+                            nodeCmpChildNew = xmlRR->GetNext( nodeCmpChildNew );
+                          }
+                          if ( nodeCmpChildNew ) {
+                            sFlagsRR[ nameNode ] = TString( xmlRR->GetNodeContent( nodeCmpChildNew ) );
+                            if ( sFlagsRR[ nameNode ] = "BAD" ) {
+                              nodeCmpChildNew = xmlRR->GetChild( nodeCmp );
+                              while ( nodeCmpChildNew && TString( xmlRR->GetNodeName( nodeCmpChildNew ) ) != "COMMENT" ) {
+                                nodeCmpChildNew = xmlRR->GetNext( nodeCmpChildNew );
+                              }
+                              if ( nodeCmpChildNew ) {
+                                sCommentsRR[ nameNode ] = TString( xmlRR->GetNodeContent( nodeCmpChildNew ) );
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    nodeCmp = xmlRR->GetNext( nodeCmp );
+                  }
+                }
+              }
+            }
+            nodeDataset = xmlRR->GetNext( nodeDataset );
+          }
         }
         foundRun = kTRUE;
         break;
@@ -570,9 +604,9 @@ Bool_t readRR( const TString & pathFile )
   }
   // FIXME Check for missing RR flags possibly needed here(?)
 
-  iFlagsRR_[ sSubSys_[ SiStrip ] ]  = FlagSToI( sFlagsRR[ "off_STRIP" ] );
-  iFlagsRR_[ sSubSys_[ Pixel ] ]    = FlagSToI( sFlagsRR[ "off_PIX" ] );
-  iFlagsRR_[ sSubSys_[ Tracking ] ] = FlagSToI( sFlagsRR[ "off_TRACK" ] );
+  iFlagsRR_[ sSubSys_[ SiStrip ] ]  = FlagSToI( sFlagsRR[ "RR_STRIP" ] );
+  iFlagsRR_[ sSubSys_[ Pixel ] ]    = FlagSToI( sFlagsRR[ "RR_PIX" ] );
+  iFlagsRR_[ sSubSys_[ Tracking ] ] = FlagSToI( sFlagsRR[ "RR_TRACK" ] );
   if ( iFlagsRR_[ sSubSys_[ SiStrip ] ] == EXCL ) ++nRunsExclSiStrip_;
   if ( iFlagsRR_[ sSubSys_[ Pixel ] ] == EXCL ) ++nRunsExclPixel_;
   if ( iFlagsRR_[ sSubSys_[ SiStrip ] ] == EXCL && iFlagsRR_[ sSubSys_[ Pixel ] ] == EXCL ) ++nRunsExclTracking_;
@@ -582,7 +616,7 @@ Bool_t readRR( const TString & pathFile )
 }
 
 
-/// Reads autom,atically created certification flags/values from the DQM file for a given run
+/// Reads automatically created certification flags/values from the DQM file for a given run
 /// Returns 'kTRUE', if the DQM file is readable, 'kFALSE' otherwise.
 Bool_t readDQM( const TString & pathFile )
 {                    
@@ -637,7 +671,7 @@ Bool_t readDQM( const TString & pathFile )
 }
 
 
-/// Extract run certificates from DQM file
+/// Extract run certificates from DQM file               http://www.redhat.com/firefox-welcome/
 void readCertificates( TDirectory * dir )
 {
   
