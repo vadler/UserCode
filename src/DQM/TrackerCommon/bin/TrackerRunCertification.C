@@ -56,13 +56,25 @@
    $ rehash
    $ cd WORKING_DIRECTORY
    $ [create input files]
-   $ TrackerRunCertification [FIRST [LAST [PATH] ] ]
+   $ TrackerRunCertification [OPTION1] [ARGUMENT1] [OPTION2] [ARGUMENT2] ...
 
-   All arguments are optional, but must be given in the correct order:
-   - FIRST: run number to start certification from
-   - LAST:  run number to end the certification with
-   - PATH:  basic path to DQM output files in AFS, from where these files are visible (default: /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Express)
-   If no argument is given, the certification will be run for all runs with DQM files found in the default PATH.
+   Valid options are:
+     -p
+       path to DQM files
+       default: /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Express
+     -d
+       dataset as in RunRegistry
+       default: /StreamExpress/Commissioning09-Express-v8/DQM"
+     -r
+       create new RR file? (false, if not explicitely "TRUE", "True" or "true")
+       default: false
+     -l
+       lower bound of run numbers to consider
+       default: 0
+     -u
+       upper bound of run numbers to consider
+       default: 1073741824
+     The default is used for any option not explicitely given in the command line.
 
   \author   Volker Adler
   \version  $Id$
