@@ -68,7 +68,6 @@
   \version  $Id$
 */
 
-
 #include <map>
 #include <vector>
 #include <string>
@@ -437,8 +436,7 @@ Bool_t createInputFileList()
 Bool_t createRRFile()
 {
 
-  gSystem->Exec( TString( "rm -f " ).Append( nameFileRR_ ) );
-  gSystem->Exec( TString( "$CMSSW_BASE/src/DQM/TrackerCommon/bin/preTrackerRunCertification.py > " ).Append( nameFileRR_ ) );
+  gSystem->Exec( TString( "$CMSSW_BASE/src/DQM/TrackerCommon/bin/preTrackerRunCertification.py " ).Append( nameFileRR_ ) );
 
   ifstream fileRR;
   fileRR.open( nameFileRR_.Data() );
