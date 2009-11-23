@@ -14,8 +14,8 @@ iArgument  = 0
 for argument in sys.argv[ 1:-1 ]:
   iArgument = iArgument + 1
   if argument in dArguments.keys():
-    del dArguments[ argument ]
     if not sys.argv[ iArgument + 1 ] in dArguments.keys():
+      del dArguments[ argument ]
       dArguments[ argument ] = sys.argv[ iArgument + 1 ]
 
 # Data extraction and local storage
