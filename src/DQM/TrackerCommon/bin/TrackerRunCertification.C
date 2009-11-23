@@ -102,13 +102,13 @@ TString RunNumber( const TString & pathFile );
 Int_t   FlagSToI( const TString & flag );
 TString FlagIToS( const Int_t flag );
 
-// Global variables, incl. default initialisation
-TString pathDqmData_( "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Express" ); // configurable
-TString nameDataset_( "/StreamExpress/Commissioning09-Express-v8/DQM" );   // FIXME Make configurable
-Int_t  minRun_( 1073741824 ); // 2^30
-Int_t  maxRun_(          0 );
-Int_t  minRange_( maxRun_ ); // configurable
-Int_t  maxRange_( minRun_ ); // configurable
+// Configurables
+map< TString, TString > sArguments;
+Bool_t newRR_;
+Int_t  minRange_;
+Int_t  maxRange_;
+Int_t  minRun_;
+Int_t  maxRun_;
 
 // Global constants
 const TString nameFileList_( "fileList.txt" );
@@ -194,41 +194,32 @@ int main( int argc, char * argv[] )
 {
 
   cout << endl;
+
+  // Initialize defaults
+  sArguments[ "-p" ] = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Express"; // path to DQM files
+  sArguments[ "-d" ] = "/StreamExpress/Commissioning09-Express-v8/DQM";      // dataset
+  sArguments[ "-r" ] = "false";                                              // create new RR file? (false, if not explicitely true)
+  sArguments[ "-l" ] = "0";                                                  // lower bound of run numbers to consider
+  sArguments[ "-u" ] = "1073741824"; // 2^30                                 // upper bound of run numbers to consider
+  minRun_ = sArguments[ "-u" ].Atoi();
+  maxRun_ = sArguments[ "-l" ].Atoi();
   
   // Input arguments
-  if ( argc > 1 ) {
-    const TString sRun( argv[ 1 ] );
-    if ( ! sRun.IsDigit() ) {
-      cout << "  ERROR: wrong usage" << endl;
-      cout << "  TrackerRunCertification [basic path of DQM data] [first run number] [last run number]" << endl;
-      cout << "  (\"first run number\") was not a number" << endl;
-      return 1;
+  for ( int iArgument = 1; iArgument < argc; ++iArgument ) {
+    if ( sArguments.find( argv[ iArgument ] ) != sArguments.end() ) {
+      if ( sArguments.find( argv[ iArgument + 1 ] ) == sArguments.end() ) {
+        sArguments[ argv[ iArgument ] ] = argv[ iArgument + 1 ];
+      }
     }
-    minRange_ = sRun.Atoi();
   }
-  if ( argc > 2 ) {
-    const TString sRun( argv[ 2 ] );
-    if ( ! sRun.IsDigit() ) {
-      cout << "  ERROR: wrong usage" << endl;
-      cout << "  TrackerRunCertification [basic path of DQM data] [first run number] [last run number]" << endl;
-      cout << "  (\"last run number\") was not a number" << endl;
-      return 1;
-    }
-    maxRange_ = sRun.Atoi();
-  }
-  if ( argc > 3 ) {
-    pathDqmData_ = argv[ 3 ];
-  }
-  if ( argc > 4 ) {
-    cout << "  WARNING: too many arguments" << endl;
-    cout << "  TrackerRunCertification [first run number] [last run number] [basic path of DQM data]" << endl;
-    cout << "  redundant arguments discarded" << endl;
-  };
+  newRR_    = ( sArguments[ "-r" ] == "TRUE" || sArguments[ "-r" ] == "True" || sArguments[ "-r" ] == "true" );
+  minRange_ = sArguments[ "-l" ].Atoi();
+  maxRange_ = sArguments[ "-u" ].Atoi();
 
   // Run
-  if ( ! readFiles() )           return 11;
-  if ( ! createInputFileList() ) return 12;
-//   if ( ! createRRFile() )        return 13;
+  if ( ! readFiles() )              return 11;
+  if ( ! createInputFileList() )    return 12;
+  if ( newRR_ && ! createRRFile() ) return 13;
   certifyRunRange();
 
   return 0;
@@ -390,7 +381,7 @@ Bool_t createInputFileList()
 
   // Create input file list on the fly
   gSystem->Exec( TString( "rm " + nameFileList_ ).Data() );
-  gSystem->Exec( TString( "ls -1 " + pathDqmData_ + "/*/*/*.root > " + nameFileList_ ).Data() );
+  gSystem->Exec( TString( "ls -1 " + sArguments[ "-p" ] + "/*/*/*.root > " + nameFileList_ ).Data() );
   ofstream fileListWrite;
   fileListWrite.open( nameFileList_.Data(), ios_base::app );
   fileListWrite << "EOF";
@@ -423,7 +414,7 @@ Bool_t createInputFileList()
 
   if ( nFiles == 0 ) {
     cout << "  WARNING: no files to certify" << endl;
-    cout << "  no files found in " << pathDqmData_ << " between the run numbers " << minRange_ << " and " << maxRange_ << endl;
+    cout << "  no files found in " << sArguments[ "-p" ] << " between the run numbers " << minRange_ << " and " << maxRange_ << endl;
     return kFALSE;
   }
   return kTRUE;
@@ -532,7 +523,7 @@ Bool_t readRR( const TString & pathFile )
             XMLNodePointer_t nodeDatasetChild( xmlRR->GetChild( nodeDataset ) );
             while ( nodeDatasetChild && TString( xmlRR->GetNodeName( nodeDatasetChild ) ) != "NAME" ) nodeDatasetChild = xmlRR->GetNext( nodeDatasetChild );
             if ( nodeDatasetChild ) {
-              if ( TString( xmlRR->GetNodeContent( nodeDatasetChild ) ) == nameDataset_ ) { // FIXME hard-coding
+              if ( TString( xmlRR->GetNodeContent( nodeDatasetChild ) ) == sArguments[ "-d" ] ) { // FIXME hard-coding
                 // FIXME Put additional checks on online status etc. here.
                 nodeDatasetChild = xmlRR->GetChild( nodeDataset );
                 while ( nodeDatasetChild && TString( xmlRR->GetNodeName( nodeDatasetChild ) ) != "CMPS" ) nodeDatasetChild = xmlRR->GetNext( nodeDatasetChild );
@@ -905,7 +896,7 @@ void writeOutput()
   ofstream fileLog;
   fileLog.open( nameLog_.Data() );
   fileLog << "Tracker Certification runs " << minRun_ << " - " << maxRun_ << endl << "==========================================" << endl << endl;
-  fileLog << "Used DQM files found in " << pathDqmData_ << endl << endl;
+  fileLog << "Used DQM files found in " << sArguments[ "-p" ] << endl << endl;
   fileLog << "# of runs certified         : " << sRunNumbers_.size()   << endl;
   fileLog << "# of runs not found in RR   : " << nRunsNotRR_           << endl << endl;
   fileLog << "# of runs w/o SiStrip       : " << nRunsExclSiStrip_     << endl;
