@@ -104,7 +104,7 @@ TString FlagIToS( const Int_t flag );
 
 // Global variables, incl. default initialisation
 TString pathDqmData_( "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Express" ); // configurable
-TString nameDataset_( "/Cosmics/CRAFT09-CRAFT09_R_V4_CosmicsSeq_v1/RECO" );   // FIXME Make configurable
+TString nameDataset_( "/StreamExpress/Commissioning09-Express-v8/DQM" );   // FIXME Make configurable
 Int_t  minRun_( 1073741824 ); // 2^30
 Int_t  maxRun_(          0 );
 Int_t  minRange_( maxRun_ ); // configurable
@@ -228,7 +228,7 @@ int main( int argc, char * argv[] )
   // Run
   if ( ! readFiles() )           return 11;
   if ( ! createInputFileList() ) return 12;
-  if ( ! createRRFile() )        return 13;
+//   if ( ! createRRFile() )        return 13;
   certifyRunRange();
 
   return 0;
@@ -436,7 +436,7 @@ Bool_t createInputFileList()
 Bool_t createRRFile()
 {
 
-  gSystem->Exec( TString( "$CMSSW_BASE/src/DQM/TrackerCommon/bin/preTrackerRunCertification.py " ).Append( nameFileRR_ ) );
+  gSystem->Exec( TString( "$CMSSW_BASE/src/DQM/TrackerCommon/bin/preTrackerRunCertification.py -s http://pccmsdqm04.cern.ch/runregistry/xmlrpc -w GLOBAL -m xml_all -f " ).Append( nameFileRR_ ) ); // all option added hier, just to be on the safe side
 
   ifstream fileRR;
   fileRR.open( nameFileRR_.Data() );
@@ -518,54 +518,40 @@ Bool_t readRR( const TString & pathFile )
   nameCmpNode.push_back( "PIX" );
   nameCmpNode.push_back( "TRACK" );
   Bool_t foundRun( kFALSE );
-  XMLNodePointer_t nodeRun( xmlRR->GetChild( nodeMain ) );
+  XMLNodePointer_t nodeRun( xmlRR->GetChild( nodeMain ) );  
   while ( nodeRun ) {
     XMLNodePointer_t nodeRunChild( xmlRR->GetChild( nodeRun ) );
-    while ( nodeRunChild && TString( xmlRR->GetNodeName( nodeRunChild ) ) != "NUMBER" ) {
-      nodeRunChild = xmlRR->GetNext( nodeRunChild );
-    }
+    while ( nodeRunChild && TString( xmlRR->GetNodeName( nodeRunChild ) ) != "NUMBER" ) nodeRunChild = xmlRR->GetNext( nodeRunChild );
     if ( nodeRunChild ) {
       if ( xmlRR->GetNodeContent( nodeRunChild ) == sRunNumber_ ) {
         nodeRunChild = xmlRR->GetChild( nodeRun );
-        while ( nodeRunChild && TString( xmlRR->GetNodeName( nodeRunChild ) ) != "DATASETS" ) {
-          nodeRunChild = xmlRR->GetNext( nodeRunChild );
-        }
+        while ( nodeRunChild && TString( xmlRR->GetNodeName( nodeRunChild ) ) != "DATASETS" ) nodeRunChild = xmlRR->GetNext( nodeRunChild );
         if ( nodeRunChild ) {
           XMLNodePointer_t nodeDataset( xmlRR->GetChild( nodeRunChild ) );
           while ( nodeDataset ) {
             XMLNodePointer_t nodeDatasetChild( xmlRR->GetChild( nodeDataset ) );
-            while ( nodeDatasetChild && TString( xmlRR->GetNodeName( nodeDatasetChild ) ) != "NAME" ) {
-              nodeDatasetChild = xmlRR->GetNext( nodeDatasetChild );
-            }
+            while ( nodeDatasetChild && TString( xmlRR->GetNodeName( nodeDatasetChild ) ) != "NAME" ) nodeDatasetChild = xmlRR->GetNext( nodeDatasetChild );
             if ( nodeDatasetChild ) {
               if ( TString( xmlRR->GetNodeContent( nodeDatasetChild ) ) == nameDataset_ ) { // FIXME hard-coding
                 // FIXME Put additional checks on online status etc. here.
                 nodeDatasetChild = xmlRR->GetChild( nodeDataset );
-                while ( nodeDatasetChild && TString( xmlRR->GetNodeName( nodeDatasetChild ) ) != "CMPS" ) {
-                  nodeDatasetChild = xmlRR->GetNext( nodeDatasetChild );
-                }
+                while ( nodeDatasetChild && TString( xmlRR->GetNodeName( nodeDatasetChild ) ) != "CMPS" ) nodeDatasetChild = xmlRR->GetNext( nodeDatasetChild );
                 if ( nodeDatasetChild ) {
                   XMLNodePointer_t nodeCmp( xmlRR->GetChild( nodeDatasetChild ) );
                   while ( nodeCmp ) {
                     XMLNodePointer_t nodeCmpChild( xmlRR->GetChild( nodeCmp ) );
-                    while ( nodeCmpChild && TString( xmlRR->GetNodeName( nodeCmpChild ) ) != "NAME" ) {
-                      nodeCmpChild = xmlRR->GetNext( nodeCmpChild );
-                    }
+                    while ( nodeCmpChild && TString( xmlRR->GetNodeName( nodeCmpChild ) ) != "NAME" ) nodeCmpChild = xmlRR->GetNext( nodeCmpChild );
                     if ( nodeCmpChild ) {
                       for ( UInt_t iNameNode = 0; iNameNode < nameCmpNode.size(); ++iNameNode ) {
                         if ( xmlRR->GetNodeContent( nodeCmpChild ) == nameCmpNode.at( iNameNode ) ) {
                           TString nameNode( "RR_" + nameCmpNode.at( iNameNode ) );
                           XMLNodePointer_t nodeCmpChildNew = xmlRR->GetChild( nodeCmp );
-                          while ( nodeCmpChildNew && TString( xmlRR->GetNodeName( nodeCmpChildNew ) ) != "VALUE" ) {
-                            nodeCmpChildNew = xmlRR->GetNext( nodeCmpChildNew );
-                          }
+                          while ( nodeCmpChildNew && TString( xmlRR->GetNodeName( nodeCmpChildNew ) ) != "VALUE" ) nodeCmpChildNew = xmlRR->GetNext( nodeCmpChildNew );
                           if ( nodeCmpChildNew ) {
                             sFlagsRR[ nameNode ] = TString( xmlRR->GetNodeContent( nodeCmpChildNew ) );
-                            if ( sFlagsRR[ nameNode ] = "BAD" ) {
+                            if ( sFlagsRR[ nameNode ] == "BAD" ) {
                               nodeCmpChildNew = xmlRR->GetChild( nodeCmp );
-                              while ( nodeCmpChildNew && TString( xmlRR->GetNodeName( nodeCmpChildNew ) ) != "COMMENT" ) {
-                                nodeCmpChildNew = xmlRR->GetNext( nodeCmpChildNew );
-                              }
+                              while ( nodeCmpChildNew && TString( xmlRR->GetNodeName( nodeCmpChildNew ) ) != "COMMENT" ) nodeCmpChildNew = xmlRR->GetNext( nodeCmpChildNew );
                               if ( nodeCmpChildNew ) {
                                 sCommentsRR[ nameNode ] = TString( xmlRR->GetNodeContent( nodeCmpChildNew ) );
                               }
@@ -577,6 +563,7 @@ Bool_t readRR( const TString & pathFile )
                     nodeCmp = xmlRR->GetNext( nodeCmp );
                   }
                 }
+                break;
               }
             }
             nodeDataset = xmlRR->GetNext( nodeDataset );
@@ -600,7 +587,14 @@ Bool_t readRR( const TString & pathFile )
   for ( map< TString, TString >::const_iterator flag = sFlagsRR.begin(); flag != sFlagsRR.end(); ++flag ) {
     cout << "    RR: " << flag->first << ": " << flag->second << endl;
   }
-  // FIXME Check for missing RR flags possibly needed here(?)
+  for ( UInt_t iNameNode = 0; iNameNode < nameCmpNode.size(); ++iNameNode ) {
+    TString nameNode( "RR_" + nameCmpNode.at( iNameNode ) );
+    if ( sFlagsRR.find( nameNode ) == sFlagsRR.end() ) {
+      cout << "    WARNING: component " << nameCmpNode.at( iNameNode ).Data() << "not found in RR" << endl;
+      cout << "    Automatically set to EXCL" << endl;
+      sFlagsRR[ nameNode ] = "EXCL";
+    }
+  }
 
   iFlagsRR_[ sSubSys_[ SiStrip ] ]  = FlagSToI( sFlagsRR[ "RR_STRIP" ] );
   iFlagsRR_[ sSubSys_[ Pixel ] ]    = FlagSToI( sFlagsRR[ "RR_PIX" ] );
