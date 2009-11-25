@@ -609,7 +609,7 @@ Bool_t readRR( const TString & pathFile )
                   XMLNodePointer_t nodeCmp( xmlRR->GetChild( nodeDatasetChild ) );
                   while ( nodeCmp ) {
                     XMLNodePointer_t nodeCmpChild( xmlRR->GetChild( nodeCmp ) );
-                    while ( nodeCmpChild && TString( xmlRR                    ->GetNodeName( nodeCmpChild ) ) != "NAME" ) nodeCmpChild = xmlRR->GetNext( nodeCmpChild );
+                    while ( nodeCmpChild && TString( xmlRR->GetNodeName( nodeCmpChild ) ) != "NAME" ) nodeCmpChild = xmlRR->GetNext( nodeCmpChild );
                     if ( nodeCmpChild ) {
                       for ( UInt_t iNameNode = 0; iNameNode < nameCmpNode.size(); ++iNameNode ) {
                         if ( xmlRR->GetNodeContent( nodeCmpChild ) == nameCmpNode.at( iNameNode ) ) {
