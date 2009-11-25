@@ -12,15 +12,16 @@
    The procedure of certifying data of a given run range is automated in order to speed up the procedure and to reduce the Tracker Offline Shift Leader's workload.
 
    Input:
-   
-   Text files in order to make the results of hDQM and TkMap based flags available to the script have to be provided:
-   - ./certSiStrip.txt
-   - ./hDQMSiStrip.txt
-   - ./TkMapSiStrip.txt
-   - ./certPixel.txt
-   - ./hDQMPixel.txt
-   - ./certTracking.txt
-   - ./hDQMTracking.txt
+
+   Text files in order to make the results of hDQM and TkMap based flags available to the script have to be provided
+   in $CMSSW_BASE/src/DQM/TrackerCommon/data/ (default) or any path given in the corresponding command line option '-i':
+   - certSiStrip.txt
+   - hDQMSiStrip.txt
+   - TkMapSiStrip.txt
+   - certPixel.txt
+   - hDQMPixel.txt
+   - certTracking.txt
+   - hDQMTracking.txt
    The format of the entries in these files is the following:
    One line per run of the structure
    RUNNUMBER FLAG [COMMENT]
@@ -38,16 +39,16 @@
    Output:
 
    Text file
-   - ./trackerRunCertification.txt
+   - [as explained for command line option '-o']
    to be sent directly to the CMS DQM team as reply to the weekly certification request.
    It contains a list of all flags changed with respect to the RunRegistry, including the reason(s) in case the flag is changed to BAD.
 
-   The (lengthy) stdout provides a complete list of all in-/output flags of all analyzed runs and at its end a summary only with the output flags.
+   The (lengthy) stdout can provide a complete list of all in-/output flags of all analyzed runs and at its end a summary only with the output flags.
    This summary can be used to populate the Tracker Good/Bad Run List (http://cmstac05.cern.ch/ajax/pierro/offShift/#good_bad_run).
    It makes sense to pipe the stdout to another text file.
 
    Usage:
-   
+
    $ cmsrel CMSSW_RELEASE
    $ cd CMSSW_RELEASE/src
    $ cmsenv
@@ -74,6 +75,9 @@
      -o
        path to output log file
        default: ./trackerRunCertification[DATASET from '-d' option with '/' --> '__'].txt
+     -L
+       path to file with DQM input file list
+       default: ./fileList[DATASET from '-d' option with '/' --> '__'].txt
      -l
        lower bound of run numbers to consider
        default: 0
@@ -142,7 +146,6 @@ Int_t   minRun_;
 Int_t   maxRun_;
 
 // Global constants
-const TString nameFileList_( "fileList.txt" );
 const TString nameFileRR_( "runRegistry.xml" );
 const TString nameFileCertSiStrip_( "certSiStrip.txt" );
 const TString nameFileHDQMSiStrip_( "hDQMSiStrip.txt" );
@@ -240,13 +243,14 @@ int main( int argc, char * argv[] )
   sArguments[ "-u" ] = "1073741824"; // 2^30                                 // upper bound of run numbers to consider
   sArguments[ "-i" ] = TString( gSystem->Getenv( "CMSSW_BASE" ) ) + "/src/DQM/TrackerCommon/data"; // path to additional input files
   sArguments[ "-o" ] = "";                                                   // path to main output file
+  sArguments[ "-L" ] = "";                                                   // path to file with DQM input file list
   minRun_ = sArguments[ "-u" ].Atoi();
   maxRun_ = sArguments[ "-l" ].Atoi();
   sOptions[ "-rr" ]     = kFALSE;
   sOptions[ "-rronly" ] = kFALSE;
   sOptions[ "-v" ]      = kFALSE;
   sOptions[ "-h" ]      = kFALSE;
-  
+
   // Input arguments (very simple)
   if ( argc == 1 ) {
     displayHelp();
@@ -271,12 +275,15 @@ int main( int argc, char * argv[] )
   }
   if ( sArguments[ "-d" ] == "" ) {
     cerr << "    ERROR: no dataset given with '-d' option" << endl;
-    return 10;
+    return 1;
   }
   convertDataset_ = sArguments[ "-d" ];
   convertDataset_.ReplaceAll( "/", "__" );
   if ( sArguments[ "-o" ] == "" ) {
     sArguments[ "-o" ] = TString( "trackerRunCertification" + convertDataset_ + ".txt" );
+  }
+  if ( sArguments[ "-L" ] == "" ) {
+    sArguments[ "-L" ] = TString( "fileList" + convertDataset_ + ".txt" );
   }
   if ( sArguments[ "-P" ] == "" ) {
     sArguments[ "-P" ] = TString( "*" + convertDataset_ + ".root" );
@@ -448,18 +455,18 @@ Bool_t createInputFileList()
 {
 
   // Create input file list on the fly
-  gSystem->Exec( TString( "rm " + nameFileList_ ).Data() );
-  gSystem->Exec( TString( "ls -1 " + sArguments[ "-p" ] + "/*/*/" + sArguments[ "-P" ] + " > " + nameFileList_ ).Data() );
+  gSystem->Exec( TString( "rm -f " + sArguments[ "-L" ] ).Data() );
+  gSystem->Exec( TString( "ls -1 " + sArguments[ "-p" ] + "/*/*/" + sArguments[ "-P" ] + " > " + sArguments[ "-L" ] ).Data() );
   ofstream fileListWrite;
-  fileListWrite.open( nameFileList_.Data(), ios_base::app );
+  fileListWrite.open( sArguments[ "-L" ].Data(), ios_base::app );
   fileListWrite << "EOF";
   fileListWrite.close();
-  
+
   // Loop over input file list and recreate it according to run range
   ifstream fileListRead;
-  fileListRead.open( nameFileList_.Data() );
+  fileListRead.open( sArguments[ "-L" ].Data() );
   ofstream fileListNewWrite;
-  const TString nameFileListNew( nameFileList_ + ".new" );
+  const TString nameFileListNew( sArguments[ "-L" ] + ".new" );
   fileListNewWrite.open( nameFileListNew, ios_base::app );
   UInt_t nFiles( 0 );
   while ( fileListRead.good() ) {
@@ -467,21 +474,21 @@ Bool_t createInputFileList()
     fileListRead >> pathFile;
     if ( pathFile.Length() == 0 ) continue;
     sRunNumber_ = RunNumber( pathFile );
-    if ( ! sRunNumber_.IsDigit() ) continue;
+    if ( ! RunNumber( pathFile ).IsDigit() ) continue;
     ++nFiles;
-    const Int_t iRun( sRunNumber_.Atoi() );
+    const Int_t iRun( RunNumber( pathFile ).Atoi() );
     if ( minRange_ > iRun || iRun > maxRange_ ) continue;
     fileListNewWrite << pathFile << endl;
     if ( iRun < minRun_ ) minRun_ = iRun;
     if ( iRun > maxRun_ ) maxRun_ = iRun;
   }
-  
+
   fileListRead.close();
   fileListNewWrite.close();
-  gSystem->Exec( TString( "mv " ).Append( nameFileListNew ).Append( " " ).Append( nameFileList_ ) );
+  gSystem->Exec( TString( "mv " ).Append( nameFileListNew ).Append( " " ).Append( sArguments[ "-L" ] ) );
 
   if ( nFiles == 0 ) {
-    cerr << "  WARNING: no files to certify" << endl;
+    cerr << "  ERROR: no files to certify" << endl;
     cerr << "  no files found in " << sArguments[ "-p" ] << " between the run numbers " << minRange_ << " and " << maxRange_ << endl;
     return kFALSE;
   }
@@ -496,7 +503,7 @@ Bool_t createRRFile()
 {
 
   cerr << "  Extracting RunRegistry output ... ";
-  gSystem->Exec( TString( TString( gSystem->Getenv( "CMSSW_BASE" ) ) + "/src/DQM/TrackerCommon/bin/preTrackerRunCertification.py -s http://pccmsdqm04.cern.ch/runregistry/xmlrpc -w GLOBAL -m xml_all -f " ).Append( nameFileRR_ ) ); // all options added hier, just to be on the safe side
+  gSystem->Exec( TString( TString( gSystem->Getenv( "CMSSW_BASE" ) ) + "/src/DQM/TrackerCommon/bin/getRunRegistry.py -s http://pccmsdqm04.cern.ch/runregistry/xmlrpc -w GLOBAL -m xml_all -f " ).Append( nameFileRR_ ) ); // all options added hier, just to be on the safe side
   cerr << "done" << endl << endl;
 
   ifstream fileRR;
@@ -528,7 +535,7 @@ void certifyRunRange()
 
   // Loop over runs
   ifstream fileListRead;
-  fileListRead.open( nameFileList_.Data() );
+  fileListRead.open( sArguments[ "-L" ].Data() );
   while ( fileListRead.good() ) {
     TString pathFile;
     fileListRead >> pathFile;
@@ -542,7 +549,7 @@ void certifyRunRange()
   }
   fileListRead.close();
   writeOutput();
-  
+
   return;
 
 }
@@ -602,7 +609,7 @@ Bool_t readRR( const TString & pathFile )
                   XMLNodePointer_t nodeCmp( xmlRR->GetChild( nodeDatasetChild ) );
                   while ( nodeCmp ) {
                     XMLNodePointer_t nodeCmpChild( xmlRR->GetChild( nodeCmp ) );
-                    while ( nodeCmpChild && TString( xmlRR->GetNodeName( nodeCmpChild ) ) != "NAME" ) nodeCmpChild = xmlRR->GetNext( nodeCmpChild );
+                    while ( nodeCmpChild && TString( xmlRR                    ->GetNodeName( nodeCmpChild ) ) != "NAME" ) nodeCmpChild = xmlRR->GetNext( nodeCmpChild );
                     if ( nodeCmpChild ) {
                       for ( UInt_t iNameNode = 0; iNameNode < nameCmpNode.size(); ++iNameNode ) {
                         if ( xmlRR->GetNodeContent( nodeCmpChild ) == nameCmpNode.at( iNameNode ) ) {
@@ -639,7 +646,7 @@ Bool_t readRR( const TString & pathFile )
     nodeRun = xmlRR->GetNext( nodeRun );
   }
   xmlRR->FreeDoc( xmlRRDoc );
-  
+
   if ( ! foundRun ) {
     ++nRunsNotRR_;
     cout << " --> not found in RR" << endl;
@@ -651,7 +658,7 @@ Bool_t readRR( const TString & pathFile )
     cout << "    Dataset " << sArguments[ "-d" ] << " not found in RR" << endl;
     return kFALSE;
   }
-  
+
   if ( sOptions[ "-v" ] ) for ( map< TString, TString >::const_iterator flag = sFlagsRR.begin(); flag != sFlagsRR.end(); ++flag ) cout << "    " << flag->first << ": " << flag->second << endl;
   for ( UInt_t iNameNode = 0; iNameNode < nameCmpNode.size(); ++iNameNode ) {
     TString nameNode( "RR_" + nameCmpNode.at( iNameNode ) );
@@ -674,7 +681,7 @@ Bool_t readRR( const TString & pathFile )
   if ( iFlagsRR_[ sSubSys_[ Pixel ] ]   == MISSING ) ++nRunsMissPixel_;
   if ( ( iFlagsRR_[ sSubSys_[ SiStrip ] ] == EXCL || iFlagsRR_[ sSubSys_[ SiStrip ] ] == MISSING ) &&
        ( iFlagsRR_[ sSubSys_[ Pixel ] ]   == EXCL || iFlagsRR_[ sSubSys_[ Pixel ] ]   == MISSING ) ) ++nRunsNoTracking_;
-  
+
   return kTRUE;
 
 }
@@ -683,7 +690,7 @@ Bool_t readRR( const TString & pathFile )
 /// Reads automatically created certification flags/values from the DQM file for a given run
 /// Returns 'kTRUE', if the DQM file is readable, 'kFALSE' otherwise.
 Bool_t readDQM( const TString & pathFile )
-{                    
+{
 
   // Initialize
   fCertificates_.clear();
@@ -722,23 +729,23 @@ Bool_t readDQM( const TString & pathFile )
     }
     readCertificates( dirSub );
   }
-  
+
   fileDQM->Close();
 
   if ( sOptions[ "-v" ] ) {
     cout << "    " << sVersion_ << endl;
     for ( map< TString, Double_t >::const_iterator cert = fCertificates_.begin(); cert != fCertificates_.end(); ++cert ) cout << "    " << cert->first << ": " << cert->second << endl;
   }
-  
+
   return kTRUE;
-  
+
 }
 
 
 /// Extract run certificates from DQM file
 void readCertificates( TDirectory * dir )
 {
-  
+
   TIter nextKey( dir->GetListOfKeys() );
   TKey * key;
   while ( ( key = ( TKey * )nextKey() ) ) {
@@ -777,7 +784,7 @@ void readCertificates( TDirectory * dir )
     const TString nameKeyBrakeAll( nameKeyBrake( 0, nameKeyBrake.Index( "<" ) ) );
     fCertificates_[ nameCert ] = atof( nameKeyBrakeAll.Data() );
   }
-  
+
   return;
 
 }
@@ -786,10 +793,10 @@ void readCertificates( TDirectory * dir )
 /// Determine actual certification flags per run and sub-system
 void certifyRun()
 {
-  
+
   // Initialize
   map< TString, Int_t > iFlags;
-  
+
   // SiStrip
   sRRSiStrip_[ sRunNumber_ ] = FlagConvert( iFlagsRR_[ sSubSys_[ SiStrip ] ] );
   if ( bAvailable_[ sSubSys_[ SiStrip ] ] ) {
@@ -874,7 +881,7 @@ void certifyRun()
     Bool_t flagHDQM( sHDQMSiStrip_.find( sRunNumber_ )   == sHDQMSiStrip_.end() );
     Bool_t flagTkMap( sTkMapSiStrip_.find( sRunNumber_ ) == sTkMapSiStrip_.end() );
     iFlags[ sSubSys_[ SiStrip ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM * flagTkMap );
-    
+
     sDQMSiStrip_[ sRunNumber_ ] = FlagConvert( ( Int_t )( flagDQM ) );
     sSiStrip_[ sRunNumber_ ]    = FlagConvert( iFlags[ sSubSys_[ SiStrip ] ] );
     vector< TString > comments;
@@ -914,7 +921,7 @@ void certifyRun()
     Bool_t flagCert( sCertPixel_.find( sRunNumber_ ) == sCertPixel_.end() );
     Bool_t flagHDQM( sHDQMPixel_.find( sRunNumber_ ) == sHDQMPixel_.end() );
     iFlags[ sSubSys_[ Pixel ] ] = ( Int_t )( flagDQM * flagCert * flagHDQM );
-    
+
     sDQMPixel_[ sRunNumber_ ] = FlagConvert( ( Int_t )( flagDQM ) );
     sPixel_[ sRunNumber_ ]    = FlagConvert( iFlags[ sSubSys_[ Pixel ] ] );
     vector< TString > comments;
@@ -998,7 +1005,7 @@ void certifyRun()
       }
     }
   }
-  
+
   return;
 
 }
@@ -1068,7 +1075,7 @@ void writeOutput()
       }
     }
   }
-  
+
   fileLog.close();
 
   cout << endl << "SUMMARY:" << endl << endl;
@@ -1087,9 +1094,9 @@ void writeOutput()
       cout << "      " << sRunCommentsTracking_[ sRunNumbers_.at( iRun ) ].at( iCom ).Data() << endl;
     }
   }
-  
+
   cout << endl << "Certification SUMMARY to be sent to CMS DQM team available in ./" << sArguments[ "-o" ].Data() << endl << endl;
-  
+
   return;
 
 }
@@ -1105,13 +1112,14 @@ void displayHelp()
   cerr << "  The procedure of certifying data of a given run range is automated in order to speed up the procedure and to reduce the Tracker Offline Shift Leader's workload." << endl << endl;
   cerr << "  Input:" << endl << endl;
   cerr << "  Text files in order to make the results of hDQM and TkMap based flags available to the script have to be provided:" << endl;
-  cerr << "  - ./certSiStrip.txt" << endl;
-  cerr << "  - ./hDQMSiStrip.txt" << endl;
-  cerr << "  - ./TkMapSiStrip.txt" << endl;
-  cerr << "  - ./certPixel.txt" << endl;
-  cerr << "  - ./hDQMPixel.txt" << endl;
-  cerr << "  - ./certTracking.txt" << endl;
-  cerr << "  - ./hDQMTracking.txt" << endl;
+  cerr << "  in $CMSSW_BASE/src/DQM/TrackerCommon/data/ (default) or any path given in the corresponding command line option '-i':" << endl;
+  cerr << "  - certSiStrip.txt" << endl;
+  cerr << "  - hDQMSiStrip.txt" << endl;
+  cerr << "  - TkMapSiStrip.txt" << endl;
+  cerr << "  - certPixel.txt" << endl;
+  cerr << "  - hDQMPixel.txt" << endl;
+  cerr << "  - certTracking.txt" << endl;
+  cerr << "  - hDQMTracking.txt" << endl;
   cerr << "  The format of the entries in these files is the following:" << endl;
   cerr << "  One line per run of the structure" << endl;
   cerr << "  RUNNUMBER FLAG [COMMENT]" << endl;
@@ -1126,10 +1134,10 @@ void displayHelp()
   cerr << "  - DQM output files available in AFS" << endl << endl;
   cerr << "  Output:" << endl << endl;
   cerr << "  Text file" << endl;
-  cerr << "  - ./trackerRunCertification.txt" << endl;
+  cerr << "  - [as explained for command line option '-o']" << endl;
   cerr << "  to be sent directly to the CMS DQM team as reply to the weekly certification request." << endl;
   cerr << "  It contains a list of all flags changed with respect to the RunRegistry, including the reason(s) in case the flag is changed to BAD." << endl << endl;
-  cerr << "  The (lengthy) stdout provides a complete list of all in-/output flags of all analyzed runs and at its end a summary only with the output flags." << endl;
+  cerr << "  The (lengthy) stdout can provide a complete list of all in-/output flags of all analyzed runs and at its end a summary only with the output flags." << endl;
   cerr << "  This summary can be used to populate the Tracker Good/Bad Run List (http://cmstac05.cern.ch/ajax/pierro/offShift/#good_bad_run)." << endl;
   cerr << "  It makes sense to pipe the stdout to another text file." << endl << endl;
   cerr << "  Usage:" << endl << endl;
