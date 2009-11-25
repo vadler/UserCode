@@ -5,7 +5,7 @@
 import sys
 import xmlrpclib
 
-# Argument handling (very simple)
+# Option handling (very simple, no validity checks)
 dArguments = { '-s': 'http://pccmsdqm04.cern.ch/runregistry/xmlrpc', # RunRegistry API proxy server
                '-w': 'GLOBAL'                                      , # workspace
                '-t': 'xml_all'                                     , # output format type
