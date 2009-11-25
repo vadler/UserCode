@@ -913,8 +913,9 @@ void certifyRun()
     if ( sVersion_.Contains( "CMSSW_3_2_4" ) ) { // old version with different naming
       flagDAQ = ( fCertificates_[ "DAQPixelDaqFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQPixelDaqFraction" ] > maxBad_ );
       flagDCS = ( fCertificates_[ "DCSPixelDcsFraction" ] == ( Double_t )EXCL || fCertificates_[ "DCSPixelDcsFraction" ] > maxBad_ );
-    } else { // unidentified bug in Pixel DAQ fraction determination
-      flagDAQ = ( ( fCertificates_[ "DAQPixelBarrelFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQPixelBarrelFraction" ] > 0. ) &&  ( fCertificates_[ "DAQPixelEndcapFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQPixelEndcapFraction" ] > 0. ) );
+    } else {
+//       flagDAQ = ( fCertificates_[ "PixelDAQSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDAQSummary" ] > maxBad_ ); // unidentified bug in Pixel DAQ fraction determination
+      flagDAQ = ( ( fCertificates_[ "DAQPixelBarrelFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQPixelBarrelFraction" ] > 0. ) &&  ( fCertificates_[ "DAQPixelEndcapFraction" ] == ( Double_t )EXCL || fCertificates_[ "DAQPixelEndcapFraction" ] > 0. ) ); // unidentified bug in Pixel DAQ fraction determination
       flagDCS = ( fCertificates_[ "PixelDCSSummary" ] == ( Double_t )EXCL || fCertificates_[ "PixelDCSSummary" ] > maxBad_ );
     }
     Bool_t flagDQM( flagReportSummary * flagDAQ * flagDCS );
