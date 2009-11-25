@@ -741,7 +741,7 @@ void readCertificates( TDirectory * dir )
   
   TIter nextKey( dir->GetListOfKeys() );
   TKey * key;
-  while ( key = ( TKey * )nextKey() ) {
+  while ( ( key = ( TKey * )nextKey() ) ) {
     const TString nameKey( key->GetName() );
     const Int_t index1( nameKey.Index( ">" ) );
     if ( index1 == kNPOS ) continue;
