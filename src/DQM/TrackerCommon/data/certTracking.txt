@@ -94,3 +94,20 @@
 112697 BAD issue with track p_T, since TIB/TID are off
 112698 BAD issue with track p_T, since TIB/TID are off
 112700 BAD issue with track p_T, since TIB/TID are off
+122270 BAD issue with track p_T, since TIB/TID/TEC off
+122294 BAD issue with track p_T, since TIB/TID/TEC off
+122301 BAD issue with track p_T, since TIB/TID/TEC off
+122314 BAD issue with track p_T, since TIB/TID/TEC off
+122497 BAD SiStrip switched off during run
+122504 BAD issue with track p_T, since TIB/TID off
+122506 BAD issue with track p_T, since TIB/TID off
+122511 BAD issue with track p_T, since TIB/TID off
+122519 BAD issue with track p_T, since TIB/TID off
+122524 BAD issue with track p_T, since TIB/TID/TEC off
+122542 BAD issue with track p_T, since TIB/TID/TEC off
+122548 BAD issue with track p_T, since TIB/TID/TEC off
+122560 BAD issue with track p_T, since TIB/TID/TEC off
+122564 BAD issue with track p_T, since TIB/TID/TEC off
+122568 BAD issue with track p_T, since TIB/TID/TEC off
+122574 BAD issue with track p_T, since TIB/TID/TEC off
+122580 BAD issue with track p_T, since TIB/TID/TEC off
