@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 from PhysicsTools.PatAlgos.patEventContent_cff import *
-    
+
 def switchOnTrigger( process ):
     """ Enables trigger information in PAT  """
     ## add trigger modules to path
