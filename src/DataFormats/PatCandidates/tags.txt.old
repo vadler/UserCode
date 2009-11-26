@@ -1,15 +1,15 @@
-Test Release based on: CMSSW_3_4_0_pre1
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_4_0_pre1
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_4_0_pre1
+Test Release based on: CMSSW_3_4_0_pre6
+Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_4_0_pre6
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_4_0_pre6
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CommonTools/Utils                                V00-00-08-04   V00-00-08-02   
-CondFormats/JetMETObjects                        V01-08-08-02   V01-08-08-01   
-DataFormats/FWLite                               V00-15-05      V00-15-03      
-DataFormats/PatCandidates                        NoTag          V05-06-10      
-JetMETCorrections/Configuration                  V01-08-31      V01-08-23      
-PhysicsTools/FWLite                              V02-00-12      V02-00-08      
-PhysicsTools/PatAlgos                            NoTag          V07-09-15      
-PhysicsTools/PatUtils                            NoTag          V03-09-02      
-PhysicsTools/Utilities                           V07-02-03      V07-02-02      
+DataFormats/JetReco                              V03-26-06      V03-26-05      
+DataFormats/METReco                              V03-01-06      V03-01-00-01   
+DataFormats/PatCandidates                        NoTag          V05-09-00      
+PhysicsTools/PFCandProducer                      V04-03-03      V04-03-02      
+PhysicsTools/PatAlgos                            NoTag          V07-10-02      
+PhysicsTools/PatUtils                            NoTag          V03-09-07      
+RecoMET/Configuration                            V00-06-16      V00-06-13      
+RecoMET/METAlgorithms                            V02-08-03      V02-07-10-02   
+RecoMET/METProducers                             V03-01-05      V03-00-14-00   
 ---------------------------------------
 total packages: 9 (9 displayed)
