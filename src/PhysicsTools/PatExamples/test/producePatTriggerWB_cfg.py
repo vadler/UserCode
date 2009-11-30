@@ -1,25 +1,21 @@
 # Start with pre-defined skeleton process
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+process.maxEvents.input     = 1000 # Reduce number of events for testing.
+process.out.fileName        = 'edmPatTriggerWB.root'
+process.options.wantSummary = False # to suppress the long output at the end of the job
 
 # Load the standard PAT config
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
-
-# Switch to selected PAT objects
-from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
-removeCleaning( process )
-
-# Define the path
 process.p = cms.Path(
     process.patDefaultSequence
 )
 
-process.maxEvents.input     = 1000 # Reduce number of events for testing.
-process.out.fileName        = 'edmPatTrigger.root'
-process.options.wantSummary = False # to suppress the long output at the end of the job
+### PAT trigger ###
+process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
 
-# PAT trigger
+## Define own trigger match ##
 process.muonTriggerMatchHLTMuons = cms.EDFilter( "PATTriggerMatcherDRLessByR",
-    src     = cms.InputTag( "selectedLayer1Muons" ),
+    src     = cms.InputTag( "cleanLayer1Muons" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
     filterIdsEnum  = cms.vstring( 'TriggerMuon' ),
@@ -32,11 +28,20 @@ process.muonTriggerMatchHLTMuons = cms.EDFilter( "PATTriggerMatcherDRLessByR",
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( True )
 )
-process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
+
+## Execute own trigger match and remove other from path ##
+
+# Add own trigger match to path #
 process.patTriggerMatcher += process.muonTriggerMatchHLTMuons
+
+# Remove anything else as found in PhysicsTools/PatAlgos/python/triggerLayer1/triggerMatcher_cfi.py
 process.patTriggerMatcher.remove( process.patTriggerElectronMatcher )
 process.patTriggerMatcher.remove( process.patTriggerMuonMatcher )
 process.patTriggerMatcher.remove( process.patTriggerTauMatcher )
+
+# Put own trigger match to TriggerEvent #
 process.patTriggerEvent.patTriggerMatches = [ "muonTriggerMatchHLTMuons" ]
+
+# Switch everything on #
 from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
 switchOnTrigger( process )
