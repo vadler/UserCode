@@ -3,7 +3,7 @@ process.GlobalTag.globaltag = 'STARTUP31X_V8::All'
 process.source.fileNames    = [ '/store/relval/CMSSW_3_3_0/RelValTTbar/GEN-SIM-RECO/STARTUP31X_V8-v1/0002/DE92DA13-72B7-DE11-8F2C-001731AF67E5.root' ]
 # process.maxEvents.input     = ...
 # process.out.outputCommands  = [ ... ]
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_5/output/myPatLayer1_fromAOD_full.root'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_6/output/myPatLayer1_fromAOD_full.root'
 # process.options.wantSummary = False
 
 # # memory check
