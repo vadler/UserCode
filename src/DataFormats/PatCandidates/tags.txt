@@ -1,6 +1,6 @@
-Test Release based on: CMSSW_3_4_X_2009-12-01-0200
-Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_ia32_gcc434/tue/3.4-tue-02/CMSSW_3_4_X_2009-12-01-0200
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_4_X_2009-12-01-0200
+Test Release based on: CMSSW_3_4_0_pre7
+Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_4_0_pre7
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_4_0_pre7
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/Candidate                            V10-00-16      V10-00-15      
 DataFormats/JetReco                              V03-26-09      V03-26-06      
