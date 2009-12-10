@@ -73,6 +73,7 @@ namespace pat {
         filterIdsEnumMap.insert( std::make_pair( "TriggerL1TechTrig"    , trigger::TriggerL1TechTrig ) );
         filterIdsEnumMap.insert( std::make_pair( "TriggerL1Castor"      , trigger::TriggerL1Castor ) );
         filterIdsEnumMap.insert( std::make_pair( "TriggerL1BPTX"        , trigger::TriggerL1BPTX ) );
+        filterIdsEnumMap.insert( std::make_pair( "TriggerL1GtExternal"  , trigger::TriggerL1GtExternal ) );
         // HLT
         filterIdsEnumMap.insert( std::make_pair( "TriggerPhoton"  , trigger::TriggerPhoton ) );
         filterIdsEnumMap.insert( std::make_pair( "TriggerElectron", trigger::TriggerElectron ) );
