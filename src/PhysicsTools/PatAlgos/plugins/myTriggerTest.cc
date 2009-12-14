@@ -1,5 +1,5 @@
 //
-// $Id: myTriggerTest.cc,v 1.4 2009/04/20 18:06:37 vadler Exp $
+// $Id: myTriggerTest.cc,v 1.8 2009/06/24 15:34:30 vadler Exp $
 //
 
 
@@ -63,7 +63,7 @@ myTriggerTest::~myTriggerTest()
 {
 }
 
-void myTriggerTest::beginJob( const edm::EventSetup & iSetup )
+void myTriggerTest::beginJob()
 {
   edm::Service< TFileService > fileService;
   histos2D_[ "nPaths" ] = fileService->make< TH2D >( "nPaths", "Number of paths", 201, -0.5, 200.5, 201, -0.5, 200.5 );
@@ -119,19 +119,13 @@ void myTriggerTest::beginJob( const edm::EventSetup & iSetup )
   histos2D_[ "phiObjCand" ] = fileService->make< TH2D >( "phiObjCand", "Object vs. candidate #phi", 60, -Pi(), Pi(), 60, -Pi(), Pi() );
   histos2D_[ "phiObjCand" ]->SetXTitle( "candidate" );
   histos2D_[ "phiObjCand" ]->SetYTitle( "object" );
-  
-  // This should normally happen in beginRun()
-  if ( ! hltConfig_.init( nameHLTProcess_ ) ) {
-    edm::LogError( "hltConfigExtraction" ) << "HLT config extraction error with process name " << nameHLTProcess_;
-  }
 }
 
 void myTriggerTest::beginRun( edm::Run & iRun, const edm::EventSetup & iSetup )
 {
-// FIXME Why does this not work  h e r e , but in the c'tor?
-//   if ( ! hltConfig_.init( nameHLTProcess_ ) ) {
-//     edm::LogError( "hltConfigExtraction" ) << "HLT config extraction error with process name " << nameHLTProcess_;
-//   }
+  if ( ! hltConfig_.init( nameHLTProcess_ ) ) {
+    edm::LogError( "hltConfigExtraction" ) << "HLT config extraction error with process name " << nameHLTProcess_;
+  }
 }
 
 void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup )
@@ -150,13 +144,13 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   iEvent.getByLabel( tagPatTrigger_, handlePatTriggerObjects );
   edm::Handle< TriggerObjectStandAloneCollection > handlePatTriggerObjectsStandAlone;
   iEvent.getByLabel( tagPatTrigger_, handlePatTriggerObjectsStandAlone );
-  
+
   const TriggerPathCollection   * myEventPaths( handlePatTriggerEvent->paths() );
   const TriggerFilterCollection * myEventFilters( handlePatTriggerEvent->filters() );
   const TriggerObjectCollection * myEventObjects( handlePatTriggerEvent->objects() );
-  
+
   // Number checking
-  
+
   if ( hltConfig_.size() == myEventPaths->size() ) {
     for ( TriggerPathCollection::const_iterator iPath = myEventPaths->begin(); iPath != myEventPaths->end(); ++iPath ) {
       const TriggerFilterRefVector       myModules( handlePatTriggerEvent->pathModules( iPath->name(), true ) );
@@ -200,13 +194,13 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
     edm::LogError( "nPaths" ) << "    Number of HLT paths differ:\n"
                               << "        HLTConfigProvider         : " << hltConfig_.size() << "\n"
                               << "        pat::TriggerPathCollection: " << myEventPaths->size();
-  }  
+  }
   histos2D_[ "nPaths" ]->Fill( hltConfig_.size(), myEventPaths->size() );
-  
+
   // Method checking
-  
+
   // pat::TriggerObject
-  
+
   for ( TriggerObjectCollection::const_iterator iObject = myEventObjects->begin(); iObject != myEventObjects->end(); ++iObject ) {
     const std::vector< int > ids( iObject->filterIds() );
     histos1D_[ "nFilterIds" ]->Fill( ids.size() );
@@ -216,11 +210,11 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       histos1D_[ "badFilterIds" ]->Fill( iObject->hasFilterId( ids.at( iId ) + 25 ) ); // arbitrarilly set not to interfere with existing IDs
     }
   }
-  
+
   // pat::TriggerObjectStandAlone
-  
+
   // pat::TriggerFilter
-  
+
   for ( TriggerFilterCollection::const_iterator iFilter = myEventFilters->begin(); iFilter != myEventFilters->end(); ++iFilter ) {
     const std::vector< unsigned > keys( iFilter->objectKeys() );
     for ( size_t iKey = 0; iKey < keys.size(); ++iKey ) {
@@ -237,9 +231,9 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
     }
     histos2D_[ "nObjectIdsKeys" ]->Fill( keys.size(), ids.size() );
   }
-  
+
   // pat::TriggerPath
-  
+
   for ( TriggerPathCollection::const_iterator iPath = myEventPaths->begin(); iPath != myEventPaths->end(); ++iPath ) {
     if ( ! iPath->wasAccept() ) {
       const std::string labelLastActiveModule( hltConfig_.moduleLabel( iPath->index(), iPath->lastActiveFilterSlot() ) );
@@ -285,9 +279,9 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       if ( displayPaths_ ) edm::LogWarning( "foundFilters" ) << "    Found filters in path " << iPath->name() << ": " << found;
     }
   }
-  
+
   // pat::TriggerEvent
-  
+
   const TriggerPathRefVector pathRefs( handlePatTriggerEvent->acceptedPaths() );
   for ( TriggerPathRefVectorIterator iPath = pathRefs.begin(); iPath != pathRefs.end(); ++iPath ) {
     const std::string namePath( ( *iPath )->name() );
@@ -323,13 +317,13 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         }
         for ( size_t iId2 = 0; iId2 < ids2.size(); ++iId2 ) {
           histos2D_[ "objectId" ]->Fill( ids.at( iId ), ids2.at( iId2 ) );
-        } 
+        }
       }
     }
   }
-  
+
   // trigger matches
-  
+
   const TriggerObjectMatchContainer * triggerMatches( handlePatTriggerEvent->triggerObjectMatchResults() );
   TriggerObjectMatchContainer triggerMatchContainer( *triggerMatches ); // cannot be const due to usage of 'operator[]'
   const std::vector< std::string > matches( handlePatTriggerEvent->triggerMatchers() );
@@ -477,7 +471,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         edm::LogWarning( "matchObjRefEvent" ) << "    Object reference from event:\n"
                                               << "        product ID: " << matchObjRef.id() << "\n"
                                               << "        key       : " << matchObjRef.key();
-        if ( matchObjRef != objRef ) {                                          
+        if ( matchObjRef != objRef ) {
           edm::LogError( "matchObjRefs" ) << "    Matching trigger objects do not correspond:\n"
                                           << "        edm::Association:     " << objRef.id()      << " " << objRef.key() << "\n"
                                           << "        triggerMatchObject(): " << matchObjRef.id() << " " << matchObjRef.key();
@@ -731,7 +725,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       }
       ++itSa;
     }
-  }  
+  }
 
   // External code testing area
 

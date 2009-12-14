@@ -6,8 +6,8 @@
 //
 // Package:    PatAlgos
 // Class:      pat::myTriggerTest
-// 
-// $Id: myTriggerTest.h,v 1.1.2.6 2009/03/27 21:08:46 vadler Exp $
+//
+// $Id: myTriggerTest.h,v 1.4 2009/04/20 18:06:37 vadler Exp $
 //
 /**
   \class myTriggerTest myTriggerTest.h "PhysicsTools/myTriggerTest/plugins/myTriggerTest.h"
@@ -16,7 +16,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id: myTriggerTest.h,v 1.1.2.6 2009/03/27 21:08:46 vadler Exp $
+  \version  $Id: myTriggerTest.h,v 1.4 2009/04/20 18:06:37 vadler Exp $
 */
 
 
@@ -57,20 +57,20 @@
 namespace pat {
 
   class myTriggerTest : public edm::EDAnalyzer {
-  
+
     public:
-    
+
       explicit myTriggerTest( const edm::ParameterSet & iConfig );
       ~myTriggerTest();
-    
+
     private:
-  
-      virtual void beginJob( const edm::EventSetup & iSetup ) ;
+
+      virtual void beginJob();
       virtual void beginRun( edm::Run & iRun, const edm::EventSetup & iSetup );
       virtual void analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup );
       virtual void endRun();
       virtual void endJob();
-  
+
       HLTConfigProvider hltConfig_;
       std::string       nameHLTProcess_;
       edm::InputTag     tagTriggerResults_;
