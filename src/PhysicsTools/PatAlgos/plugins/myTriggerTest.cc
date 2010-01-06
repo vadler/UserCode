@@ -1,14 +1,113 @@
+// -*- C++ -*-
 //
-// $Id: myTriggerTest.cc,v 1.8 2009/06/24 15:34:30 vadler Exp $
+// Package:    PatAlgos
+// Class:      pat::myTriggerTest
 //
+// $Id: myTriggerTest.cc,v 1.8 2009/04/20 18:06:37 vadler Exp $
+//
+/**
+  \class myTriggerTest myTriggerTest.cc "PhysicsTools/myTriggerTest/plugins/myTriggerTest.cc"
+  \brief
+
+   [...]
+
+  \author   Volker Adler
+  \version  $Id: myTriggerTest.c,v 1.8 2009/04/20 18:06:37 vadler Exp $
+ */
 
 
-#include "PhysicsTools/PatAlgos/plugins/myTriggerTest.h"
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
 
-#include "TMath.h"
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include <memory>
+#include <string>
+#include <map>
+
+#include "FWCore/Framework/interface/Run.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/InputTag.h"
+
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/HLTReco/interface/TriggerEvent.h"
+
 #include "DataFormats/Common/interface/AssociativeIterator.h"
+#include "DataFormats/PatCandidates/interface/TriggerObject.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
+#include "DataFormats/PatCandidates/interface/TriggerFilter.h"
+#include "DataFormats/PatCandidates/interface/TriggerPath.h"
+#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+#include "DataFormats/PatCandidates/interface/Photon.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
+
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "TMath.h"
+
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
+
+
+namespace pat {
+
+  class myTriggerTest : public edm::EDAnalyzer {
+
+    public:
+
+      explicit myTriggerTest( const edm::ParameterSet & iConfig );
+      ~myTriggerTest();
+
+    private:
+
+      virtual void beginJob();
+      virtual void beginRun( const edm::Run & iRun, const edm::EventSetup & iSetup );
+      virtual void analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup );
+      virtual void endRun();
+      virtual void endJob();
+
+      HLTConfigProvider hltConfig_;
+      bool              hltConfigGood_;
+      std::string       nameHLTProcess_;
+      edm::InputTag     tagTriggerResults_;
+      edm::InputTag     tagTriggerEvent_;
+      std::string       namePATProcess_;
+      edm::InputTag     tagPatTrigger_;
+      edm::InputTag     tagPatTriggerEvent_;
+      bool              testPathModuleTags_;
+      bool              displayNumbers_;
+      bool              displayObjects_;
+      bool              displayObjectsStandAlone_;
+      bool              displayFilters_;
+      bool              displayPaths_;
+      bool              displayEvent_;
+      bool              displayMatches_;
+      bool              displayEmbedding_;
+      edm::InputTag     tagPatPhotons_;
+      edm::InputTag     tagPatElectrons_;
+      edm::InputTag     tagPatMuons_;
+      edm::InputTag     tagPatTaus_;
+      edm::InputTag     tagPatJets_;
+      edm::InputTag     tagPatMETs_;
+      edm::InputTag     tagPatPhotonsEmbedding_;
+      edm::InputTag     tagPatElectronsEmbedding_;
+      edm::InputTag     tagPatMuonsEmbedding_;
+      edm::InputTag     tagPatTausEmbedding_;
+      edm::InputTag     tagPatJetsEmbedding_;
+      edm::InputTag     tagPatMETsEmbedding_;
+
+      std::map< std::string, TH1D* > histos1D_;
+      std::map< std::string, TH2D* > histos2D_;
+  };
+
+}
+
 
 using namespace pat;
 using namespace pat::helper;
@@ -121,15 +220,24 @@ void myTriggerTest::beginJob()
   histos2D_[ "phiObjCand" ]->SetYTitle( "object" );
 }
 
-void myTriggerTest::beginRun( edm::Run & iRun, const edm::EventSetup & iSetup )
+void myTriggerTest::beginRun( const edm::Run & iRun, const edm::EventSetup & iSetup )
 {
   if ( ! hltConfig_.init( nameHLTProcess_ ) ) {
+    hltConfigGood_ = false;
     edm::LogError( "hltConfigExtraction" ) << "HLT config extraction error with process name " << nameHLTProcess_;
+    return;
   }
+  hltConfigGood_ = true;
 }
 
 void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup )
 {
+  if ( ! hltConfigGood_ ) return;
+  if ( hltConfig_.size() == 0 ) {
+    edm::LogError( "hltConfigSize" ) << "HLT config contains 0 paths for process name " << nameHLTProcess_;
+    return;
+  }
+
   edm::Handle< edm::TriggerResults > handleTriggerResults;
   iEvent.getByLabel( tagTriggerResults_, handleTriggerResults );
   edm::Handle< trigger::TriggerEvent > handleTriggerEvent;
@@ -733,6 +841,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
 
 void myTriggerTest::endRun()
 {
+  if ( ! hltConfigGood_ ) return;
 }
 
 void myTriggerTest::endJob()
