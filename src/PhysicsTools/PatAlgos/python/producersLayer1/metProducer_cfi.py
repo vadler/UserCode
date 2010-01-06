@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-layer1METs = cms.EDProducer("PATMETProducer",
+patAK5CaloMETs = cms.EDProducer("PATMETProducer",
     # input 
     metSource  = cms.InputTag("metJESCorAK5CaloJetMuons"),
 
