@@ -3,7 +3,7 @@
 // Package:    PatAlgos
 // Class:      pat::myTriggerTest
 //
-// $Id: myTriggerTest.cc,v 1.8 2009/04/20 18:06:37 vadler Exp $
+// $Id: myTriggerTest.cc,v 1.10 2010/01/06 20:35:08 vadler Exp $
 //
 /**
   \class myTriggerTest myTriggerTest.cc "PhysicsTools/myTriggerTest/plugins/myTriggerTest.cc"
@@ -12,7 +12,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id: myTriggerTest.c,v 1.8 2009/04/20 18:06:37 vadler Exp $
+  \version  $Id: myTriggerTest.cc,v 1.10 2010/01/06 20:35:08 vadler Exp $
  */
 
 
@@ -23,7 +23,6 @@
 #include <string>
 #include <map>
 
-#include "FWCore/Framework/interface/Run.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
@@ -67,13 +66,10 @@ namespace pat {
     private:
 
       virtual void beginJob();
-      virtual void beginRun( const edm::Run & iRun, const edm::EventSetup & iSetup );
       virtual void analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup );
-      virtual void endRun();
       virtual void endJob();
 
       HLTConfigProvider hltConfig_;
-      bool              hltConfigGood_;
       std::string       nameHLTProcess_;
       edm::InputTag     tagTriggerResults_;
       edm::InputTag     tagTriggerEvent_;
@@ -220,19 +216,16 @@ void myTriggerTest::beginJob()
   histos2D_[ "phiObjCand" ]->SetYTitle( "object" );
 }
 
-void myTriggerTest::beginRun( const edm::Run & iRun, const edm::EventSetup & iSetup )
+void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup )
 {
-  if ( ! hltConfig_.init( nameHLTProcess_ ) ) {
-    hltConfigGood_ = false;
+  bool changed( true );
+  if ( ! hltConfig_.init( iEvent, nameHLTProcess_, changed ) ) {
     edm::LogError( "hltConfigExtraction" ) << "HLT config extraction error with process name " << nameHLTProcess_;
     return;
   }
-  hltConfigGood_ = true;
-}
-
-void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup )
-{
-  if ( ! hltConfigGood_ ) return;
+  if ( changed ) {
+    edm::LogWarning( "hltConfigChange" ) << "HLT config changed";
+  }
   if ( hltConfig_.size() == 0 ) {
     edm::LogError( "hltConfigSize" ) << "HLT config contains 0 paths for process name " << nameHLTProcess_;
     return;
@@ -837,11 +830,6 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
 
   // External code testing area
 
-}
-
-void myTriggerTest::endRun()
-{
-  if ( ! hltConfigGood_ ) return;
 }
 
 void myTriggerTest::endJob()
