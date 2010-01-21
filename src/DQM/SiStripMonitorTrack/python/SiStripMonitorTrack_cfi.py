@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from DQM.SiStripCommon.SiStripTriggerHelper_cff import *
+from DQM.SiStripCommon.SiStripTriggerHelper_cff import SiStripHltFilter_SiStripMonitorTrack
 
 # MonitorTrackGlobal
 # SiStripMonitorTrack = cms.EDFilter(

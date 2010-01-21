@@ -53,7 +53,7 @@ class SiStripTriggerHelper {
   private:
 
     // Private methods
-    bool acceptPath( const std::string & hltPathName ) const;
+    bool acceptPath( std::string hltPathName ) const;
 
 };
 

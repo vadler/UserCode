@@ -82,7 +82,7 @@ void SiStripMonitorTrack::endJob(void)
 void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
   static unsigned count( 1 ); // DEBUG
-  std::cout << count << std::endl; // DEBUG
+  std::cout << "SiStripMonitorTrack: " << count << std::endl; // DEBUG
   SiStripTriggerHelper triggerHelper;
   if ( ! triggerHelper.accept( e, conf_ ) ) return;
   ++count; // DEBUG

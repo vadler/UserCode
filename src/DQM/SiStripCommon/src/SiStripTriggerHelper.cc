@@ -17,7 +17,7 @@ using namespace edm;
 bool SiStripTriggerHelper::accept( const Event & event, const ParameterSet & config )
 {
 
-  /// Configuration parameters
+  /// Configuration parameter tags
   const string hltInputTagConfig( "hltInputTag" );
   const string hltPathConfig( "hltPaths" );
   const string andOrConfig( "andOr" );
@@ -62,7 +62,7 @@ bool SiStripTriggerHelper::accept( const Event & event, const ParameterSet & con
   }
 
   /// Determine acceptance of HLT path combination and return
-  if ( andOr_ ) { // OR combiination
+  if ( andOr_ ) { // OR combination
     for ( vector< string >::const_iterator pathName = hltPathNames_.begin(); pathName != hltPathNames_.end(); ++pathName ) {
       if ( acceptPath( *pathName ) ) return true;
     }
@@ -76,19 +76,34 @@ bool SiStripTriggerHelper::accept( const Event & event, const ParameterSet & con
 }
 
 /// Was this event accepted by this particular HLT path?
-bool SiStripTriggerHelper::acceptPath( const string & hltPathName ) const
+bool SiStripTriggerHelper::acceptPath( string hltPathName ) const
 {
-
+  if ( hltPathName.empty() ) {
+    LogError( "hltPathName" ) << "Empty path name";
+    return errorReply_;
+  }
+  bool notPath( false );
+  if ( hltPathName.at( 0 ) == '~' ) {
+    notPath = true;
+    hltPathName.erase( 0, 1 );
+    if ( hltPathName.empty() ) {
+      LogError( "hltPathName" ) << "Empty (negated) path name";
+      return errorReply_;
+    }
+  }
   const unsigned indexPath( hltConfig_.triggerIndex( hltPathName ) );
   if ( indexPath == hltConfig_.size() ) {
-    LogError( "hltPathName" ) << "Path " << hltPathName << " is not found in process " << hltInputTag_.process();
+    LogError( "hltPathInProcess" ) << "Path " << hltPathName << " is not found in process " << hltInputTag_.process();
     return errorReply_;
   }
   if ( hltTriggerResults_->error( indexPath ) ) {
     LogError( "hltPathError" ) << "Path " << hltPathName << " in error";
     return errorReply_;
   }
-  cout << "SiStripTriggerHelper: path " << hltPathName << "->" << hltTriggerResults_->accept( indexPath ) << endl; // DEBUG
-  return hltTriggerResults_->accept( indexPath );
+  cout << "SiStripTriggerHelper: path "; // DEBUG
+  if ( notPath ) cout << "~" << hltPathName; // DEBUG
+  else           cout        << hltPathName; // DEBUG
+  cout << "->" << hltTriggerResults_->accept( indexPath ) << endl; // DEBUG
+  return notPath ? ( ! hltTriggerResults_->accept( indexPath ) ) : hltTriggerResults_->accept( indexPath );
 
 }
