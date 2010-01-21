@@ -23,6 +23,7 @@
 #include "TMath.h"
 
 #include "DQM/SiStripCommon/interface/SiStripTriggerHelper.h"
+#include <iostream> // DEBUG
 
 
 static const uint16_t _NUM_SISTRIP_SUBDET_ = 4;
@@ -80,8 +81,11 @@ void SiStripMonitorTrack::endJob(void)
 // ------------ method called to produce the data  ------------
 void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
+  static unsigned count( 1 ); // DEBUG
+  std::cout << count << std::endl; // DEBUG
   SiStripTriggerHelper triggerHelper;
   if ( ! triggerHelper.accept( e, conf_ ) ) return;
+  ++count; // DEBUG
 
   tracksCollection_in_EventTree=true;
   trackAssociatorCollection_in_EventTree=true;

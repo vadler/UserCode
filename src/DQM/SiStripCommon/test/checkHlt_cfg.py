@@ -11,7 +11,9 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool( False )
 
 ## Source
 process.source = cms.Source( "PoolSource"
-                           , fileNames = cms.untracked.vstring( '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/FA54A056-42E2-DE11-A6DB-001617E30D40.root'
+                           #, fileNames = cms.untracked.vstring( '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/FA54A056-42E2-DE11-A6DB-001617E30D40.root'
+                                                              #)
+                           , fileNames = cms.untracked.vstring( '/store/express/BeamCommissioning09/ExpressPhysics/FEVT/v2/000/123/596/FEE389F2-33E2-DE11-A62E-001617C3B76E.root'
                                                               )
                            )
 ## Maximal Number of Events
