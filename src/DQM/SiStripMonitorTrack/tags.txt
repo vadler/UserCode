@@ -1,0 +1,10 @@
+Test Release based on: CMSSW_3_5_0_pre3
+Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_5_0_pre3
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_0_pre3
+-------- Package --------                        --- Tag ---    --- RelTag --- 
+DQM/SiStripCommon                                V05-00-23      V05-00-23      
+DQM/SiStripMonitorClient                         NoTag          V03-03-74      
+DQM/SiStripMonitorTrack                          V04-00-11      V04-00-11      
+DQM/TrackingMonitor                              V02-03-20      V02-03-18      
+---------------------------------------
+total packages: 4 (4 displayed)

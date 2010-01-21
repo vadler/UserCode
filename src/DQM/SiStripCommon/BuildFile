@@ -1,0 +1,17 @@
+<use name=DataFormats/SiStripDetId>
+<use name=CalibTracker/SiStripCommon>
+<use name=CommonTools/TrackerMap>
+<use name=DQMServices/Core>
+<use name=FWCore/MessageLogger>
+<use name=FWCore/ServiceRegistry>
+<use name=FWCore/Framework>
+<use name=FWCore/ParameterSet>
+<use name=DataFormats/Common>
+<use name=HLTrigger/HLTcore>
+<use name=boost>
+<use name=rootgraphics>
+<export>
+  <lib name=DQMSiStripCommon>
+  <use name=CalibTracker/SiStripCommon>
+  <use name=boost>
+</export>
