@@ -48,14 +48,14 @@ process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
     patElectrons          = cms.InputTag( "cleanPatElectrons" ),
     patMuons              = cms.InputTag( "cleanPatMuons" ),
     patTaus               = cms.InputTag( "cleanPatTaus" ),
-    patJets               = cms.InputTag( "cleanPatAK5CaloJets" ),
-    patMETs               = cms.InputTag( "patAK5CaloMETs" ),
+    patJets               = cms.InputTag( "cleanPatJets" ),
+    patMETs               = cms.InputTag( "patMETs" ),
     patPhotonsEmbedding   = cms.InputTag( "cleanPatPhotonsTriggerMatch" ),
     patElectronsEmbedding = cms.InputTag( "cleanPatElectronsTriggerMatch" ),
     patMuonsEmbedding     = cms.InputTag( "cleanPatMuonsTriggerMatch" ),
     patTausEmbedding      = cms.InputTag( "cleanPatTausTriggerMatch" ),
-    patJetsEmbedding      = cms.InputTag( "cleanPatAK5CaloJetsTriggerMatch" ),
-    patMETsEmbedding      = cms.InputTag( "patAK5CaloMETsTriggerMatch" )
+    patJetsEmbedding      = cms.InputTag( "cleanPatJetsTriggerMatch" ),
+    patMETsEmbedding      = cms.InputTag( "patMETsTriggerMatch" )
 )
 
 process.p = cms.Path(
