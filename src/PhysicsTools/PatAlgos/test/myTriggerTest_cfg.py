@@ -27,6 +27,7 @@ process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
     patProcessName  = cms.string( 'PAT' ),
     patTrigger      = cms.InputTag( "patTrigger" ),
     patTriggerEvent = cms.InputTag( "patTriggerEvent" ),
+#     patTriggerEvent = cms.InputTag( "patTriggerEventTest" ),
     # general
     testPathModuleTags = cms.bool( True ),
     displayNumbers     = cms.bool( True ),
@@ -56,6 +57,12 @@ process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
     patTausEmbedding      = cms.InputTag( "cleanPatTausTriggerMatch" ),
     patJetsEmbedding      = cms.InputTag( "cleanPatJetsTriggerMatch" ),
     patMETsEmbedding      = cms.InputTag( "patMETsTriggerMatch" )
+#     patPhotonsEmbedding   = cms.InputTag( "cleanPatPhotonsTriggerTestMatch" ),
+#     patElectronsEmbedding = cms.InputTag( "cleanPatElectronsTriggerTestMatch" ),
+#     patMuonsEmbedding     = cms.InputTag( "cleanPatMuonsTriggerTestMatch" ),
+#     patTausEmbedding      = cms.InputTag( "cleanPatTausTriggerTestMatch" ),
+#     patJetsEmbedding      = cms.InputTag( "cleanPatJetsTriggerTestMatch" ),
+#     patMETsEmbedding      = cms.InputTag( "patMETsTriggerTestMatch" )
 )
 
 process.p = cms.Path(
