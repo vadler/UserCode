@@ -22,31 +22,6 @@ process.p = cms.Path(
     process.patDefaultSequence
 )
 
-# # Trigger Test
-# process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
-# process.patTrigger.onlyStandAlone      = False
-# process.patTrigger.addPathModuleLabels = True
-# process.patDefaultSequence += process.patTriggerTestSequence
-# for matchLabel in process.patTriggerEventTest.patTriggerMatches:
-#     process.out.outputCommands += [ 'keep patTriggerObjectsedmAssociation_patTriggerEventTest_' + matchLabel + '_*' ]
-# process.patTriggerSequence += process.patTriggerTestMatchEmbedder
-# from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
-# process.out.outputCommands += [ 'keep patTriggerObjects_patTrigger_*_*'
-#                               , 'keep patTriggerFilters_patTrigger_*_*'
-#                               , 'keep patTriggerPaths_patTrigger_*_*'
-#                               , 'keep patTriggerEvent_patTriggerEventTest_*_*'
-#                               , 'keep *_cleanPatPhotonsTriggerTestMatch_*_*'
-#                               , 'keep *_cleanPatElectronsTriggerTestMatch_*_*'
-#                               , 'keep *_cleanPatMuonsTriggerTestMatch_*_*'
-#                               , 'keep *_cleanPatTausTriggerTestMatch_*_*'
-#                               , 'keep *_cleanPatJetsTriggerTestMatch_*_*'
-#                               , 'keep *_patMETsTriggerTestMatch_*_*'
-#                               , 'keep patTriggerObjectStandAlones_patTrigger_*_*'
-#                               , 'keep patTriggerObjectStandAlonesedmAssociation_*_*_*'
-#                               , 'keep edmTriggerResults_TriggerResults_*_HLT'
-#                               , 'keep *_hltTriggerSummaryAOD_*_*'
-#                               ]
-
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
 ### switch START ###

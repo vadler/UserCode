@@ -9,7 +9,7 @@ process.options = cms.untracked.PSet(
 
 process.source = cms.Source( "PoolSource",
     fileNames = cms.untracked.vstring(
-        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_0_pre3/output/myPatLayer1_fromAOD_full.root'
+        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_0_pre3/output/myPatLayer1Test_fromAOD_full.root'
     )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -17,7 +17,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 process.TFileService = cms.Service( "TFileService",
-    fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_0_pre3/output/myTriggerTest.root' )
+    fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_0_pre3/output/myTriggerTestTest.root' )
 )
 
 process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
@@ -26,7 +26,7 @@ process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
     triggerEvent    = cms.InputTag( "hltTriggerSummaryAOD" ),
     patProcessName  = cms.string( 'PAT' ),
     patTrigger      = cms.InputTag( "patTrigger" ),
-    patTriggerEvent = cms.InputTag( "patTriggerEvent" ),
+    patTriggerEvent = cms.InputTag( "patTriggerEventTest" ),
     # general
     testPathModuleTags = cms.bool( True ),
     displayNumbers     = cms.bool( True ),
@@ -50,12 +50,12 @@ process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
     patTaus               = cms.InputTag( "cleanPatTaus" ),
     patJets               = cms.InputTag( "cleanPatJets" ),
     patMETs               = cms.InputTag( "patMETs" ),
-    patPhotonsEmbedding   = cms.InputTag( "cleanPatPhotonsTriggerMatch" ),
-    patElectronsEmbedding = cms.InputTag( "cleanPatElectronsTriggerMatch" ),
-    patMuonsEmbedding     = cms.InputTag( "cleanPatMuonsTriggerMatch" ),
-    patTausEmbedding      = cms.InputTag( "cleanPatTausTriggerMatch" ),
-    patJetsEmbedding      = cms.InputTag( "cleanPatJetsTriggerMatch" ),
-    patMETsEmbedding      = cms.InputTag( "patMETsTriggerMatch" )
+    patPhotonsEmbedding   = cms.InputTag( "cleanPatPhotonsTriggerTestMatch" ),
+    patElectronsEmbedding = cms.InputTag( "cleanPatElectronsTriggerTestMatch" ),
+    patMuonsEmbedding     = cms.InputTag( "cleanPatMuonsTriggerTestMatch" ),
+    patTausEmbedding      = cms.InputTag( "cleanPatTausTriggerTestMatch" ),
+    patJetsEmbedding      = cms.InputTag( "cleanPatJetsTriggerTestMatch" ),
+    patMETsEmbedding      = cms.InputTag( "patMETsTriggerTestMatch" )
 )
 
 process.p = cms.Path(
