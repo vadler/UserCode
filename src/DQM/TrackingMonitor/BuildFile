@@ -7,7 +7,7 @@
 <use name=TrackingTools/TransientTrack>
 <use name=DataFormats/TrackReco>
 <use name=TrackingTools/DetLayers>
-<use name=DQM/SiStripCommon>
+<use name=DQM/TrackerCommon>
 <export>
    <lib name=DQMTrackingMonitor>
 </export>

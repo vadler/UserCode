@@ -1,16 +1,16 @@
-#ifndef SiStripTriggerHelper_H
-#define SiStripTriggerHelper_H
+#ifndef TriggerHelper_H
+#define TriggerHelper_H
 
 
 // -*- C++ -*-
 //
-// Package:    DQM/SiStripCommon
-// Class:      SiStripTriggerHelper
+// Package:    DQM/TrackerCommon
+// Class:      TriggerHelper
 //
 // $Id$
 //
 /**
-  \class    SiStripTriggerHelper SiStripTriggerHelper.h "DQM/SiStripCommon/interface/SiStripTriggerHelper.h"
+  \class    TriggerHelper TriggerHelper.h "DQM/TrackerCommon/interface/TriggerHelper.h"
   \brief    Provides a code based selection for HLT path combinations in order to have no failing filters in the CMSSW path.
 
    [...]
@@ -29,7 +29,7 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 
 
-class SiStripTriggerHelper {
+class TriggerHelper {
 
     // Data members
     // HLT configuration
@@ -44,8 +44,8 @@ class SiStripTriggerHelper {
   public:
 
     // Constructors and destructor
-    SiStripTriggerHelper() { hltPathNames_.clear(); };
-    ~SiStripTriggerHelper() {};
+    TriggerHelper() { hltPathNames_.clear(); };
+    ~TriggerHelper() {};
 
     // Public methods
     bool accept( const edm::Event & event, const edm::ParameterSet & config );

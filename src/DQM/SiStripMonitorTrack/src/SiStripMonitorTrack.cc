@@ -22,7 +22,7 @@
 #include "DQM/SiStripCommon/interface/SiStripHistoId.h"
 #include "TMath.h"
 
-#include "DQM/SiStripCommon/interface/SiStripTriggerHelper.h"
+#include "DQM/TrackerCommon/interface/TriggerHelper.h"
 #include <iostream> // DEBUG
 
 
@@ -83,7 +83,7 @@ void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es
 {
   static unsigned count( 1 ); // DEBUG
   std::cout << "SiStripMonitorTrack: " << count << std::endl; // DEBUG
-  SiStripTriggerHelper triggerHelper;
+  TriggerHelper triggerHelper;
   if ( ! triggerHelper.accept( e, conf_ ) ) return;
   ++count; // DEBUG
 

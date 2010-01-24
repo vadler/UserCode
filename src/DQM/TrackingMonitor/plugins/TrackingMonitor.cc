@@ -33,7 +33,7 @@
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include <string>
 
-#include "DQM/SiStripCommon/interface/SiStripTriggerHelper.h"
+#include "DQM/TrackerCommon/interface/TriggerHelper.h"
 #include <iostream> // DEBUG
 
 // TrackingMonitor
@@ -171,7 +171,7 @@ void TrackingMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
     static unsigned count( 1 ); // DEBUG
     std::cout << "TrackingMonitor: " << count << std::endl; // DEBUG
-    SiStripTriggerHelper triggerHelper;
+    TriggerHelper triggerHelper;
     if ( ! triggerHelper.accept( iEvent, conf_ ) ) return;
     ++count; // DEBUG
 

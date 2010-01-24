@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from DQM.SiStripCommon.SiStripTriggerHelper_cff import SiStripHltFilter_TrackingMonitor
+from DQM.TrackerCommon.TriggerHelper_cff import SiStripHltFilter_TrackingMonitor
 
 TrackMon = cms.EDFilter("TrackingMonitor",
     SiStripHltFilter_TrackingMonitor,

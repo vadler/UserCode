@@ -3,7 +3,7 @@
 //
 
 
-#include "DQM/SiStripCommon/interface/SiStripTriggerHelper.h"
+#include "DQM/TrackerCommon/interface/TriggerHelper.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include <iostream> // DEBUG
@@ -14,7 +14,7 @@ using namespace edm;
 
 
 /// Was this event accepted by the configured HLT paths combination?
-bool SiStripTriggerHelper::accept( const Event & event, const ParameterSet & config )
+bool TriggerHelper::accept( const Event & event, const ParameterSet & config )
 {
 
   // Configuration parameter tags
@@ -78,7 +78,7 @@ bool SiStripTriggerHelper::accept( const Event & event, const ParameterSet & con
 }
 
 /// Was this event accepted by this particular HLT path?
-bool SiStripTriggerHelper::acceptPath( string hltPathName ) const
+bool TriggerHelper::acceptPath( string hltPathName ) const
 {
 
   // Check empty strings
@@ -111,7 +111,7 @@ bool SiStripTriggerHelper::acceptPath( string hltPathName ) const
   }
 
   // Determine decision
-  cout << "SiStripTriggerHelper: path "; // DEBUG
+  cout << "TriggerHelper: path "; // DEBUG
   if ( notPath ) cout << "~" << hltPathName; // DEBUG
   else           cout        << hltPathName; // DEBUG
   cout << "->" << hltTriggerResults_->accept( indexPath ) << endl; // DEBUG
