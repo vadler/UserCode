@@ -8,51 +8,103 @@ import FWCore.ParameterSet.Config as cms
 # Paths can be negated by prepending a '~'.
 # "andOr":
 # False = AND, True = OR
-# "errorReply":
+# "errorReplyHlt":
 #
 
 SiStripHltFilter_SiStripMonitorHardware = cms.PSet(
-    hltInputTag = cms.InputTag( "TriggerResults::HLT" ),
-    hltPaths    = cms.vstring(),
-    andOr       = cms.bool( False ),
-    errorReply  = cms.bool( True )
+    # General
+    andOr = cms.bool( False ),
+    # HLT
+    hltInputTag   = cms.InputTag( "TriggerResults::HLT" ),
+    hltPaths      = cms.vstring( 'HLT_PhysicsDeclared'
+                               ),
+    andOrHlt      = cms.bool( False ),
+    errorReplyHlt = cms.bool( False ),
+    # L1
+    l1Algorithms = cms.vstring(),
+    andOrL1      = cms.bool( False ),
+    errorReplyL1 = cms.bool( False )
 )
 
 SiStripHltFilter_SiStripMonitorDigi = cms.PSet(
-    hltInputTag = cms.InputTag( "TriggerResults::HLT" ),
-    hltPaths    = cms.vstring(),
-    andOr       = cms.bool( False ),
-    errorReply  = cms.bool( True )
+    # General
+    andOr = cms.bool( False ),
+    # HLT
+    hltInputTag   = cms.InputTag( "TriggerResults::HLT" ),
+    hltPaths      = cms.vstring( 'HLT_PhysicsDeclared'
+                               ),
+    andOrHlt      = cms.bool( False ),
+    errorReplyHlt = cms.bool( False ),
+    # L1
+    l1Algorithms = cms.vstring(),
+    andOrL1      = cms.bool( False ),
+    errorReplyL1 = cms.bool( False )
 )
 
 SiStripHltFilter_SiStripMonitorCluster = cms.PSet(
-    hltInputTag = cms.InputTag( "TriggerResults::HLT" ),
-    hltPaths    = cms.vstring(),
-    andOr       = cms.bool( False ),
-    errorReply  = cms.bool( True )
+    # General
+    andOr = cms.bool( False ),
+    # HLT
+    hltInputTag   = cms.InputTag( "TriggerResults::HLT" ),
+    hltPaths      = cms.vstring( 'HLT_PhysicsDeclared'
+                               ),
+    andOrHlt      = cms.bool( False ),
+    errorReplyHlt = cms.bool( False ),
+    # L1
+    l1Algorithms = cms.vstring(),
+    andOrL1      = cms.bool( False ),
+    errorReplyL1 = cms.bool( False )
 )
 
 SiStripHltFilter_SiStripMonitorTrack = cms.PSet(
-    hltInputTag = cms.InputTag( "TriggerResults::HLT" ),
-    hltPaths    = cms.vstring( 'HLT_PhysicsDeclared'
-                             , 'HLT_ZeroBias1kHz' # DEBUG
-                             ),
-    andOr       = cms.bool( False ),
-    errorReply  = cms.bool( True )
+    # General
+    andOr = cms.bool( False ),
+    # HLT
+    hltInputTag   = cms.InputTag( "TriggerResults::HLT" ),
+    hltPaths      = cms.vstring( 'HLT_PhysicsDeclared'
+                               , 'HLT_ZeroBias1kHz'    # DEBUG
+                               ),
+    andOrHlt      = cms.bool( False ),
+    errorReplyHlt = cms.bool( False ),
+    # L1
+    l1Algorithms = cms.vstring( 'L1Tech_BPTX_plus_AND_minus.v0'    # DEBUG 0
+                              , 'L1Tech_BSC_minBias_threshold1.v0' # DEBUG 40
+#                               , 'L1Tech_BSC_minBias_threshold2.v0' # DEBUG 41
+                              , '~L1Tech_BSC_halo_beam2_inner.v0' # DEBUG ~36
+                              , '~L1Tech_BSC_halo_beam2_outer.v0' # DEBUG ~37
+                              , '~L1Tech_BSC_halo_beam1_inner.v0' # DEBUG ~38
+                              , '~L1Tech_BSC_halo_beam1_outer.v0' # DEBUG ~39
+                              ),
+    andOrL1      = cms.bool( False ),
+    errorReplyL1 = cms.bool( False )
 )
 
 SiStripHltFilter_TrackerMonitorTrack = cms.PSet(
-    hltInputTag = cms.InputTag( "TriggerResults::HLT" ),
-    hltPaths    = cms.vstring( 'HLT_PhysicsDeclared'
-                             ),
-    andOr       = cms.bool( False ),
-    errorReply  = cms.bool( True )
+    # General
+    andOr = cms.bool( False ),
+    # HLT
+    hltInputTag   = cms.InputTag( "TriggerResults::HLT" ),
+    hltPaths      = cms.vstring( 'HLT_PhysicsDeclared'
+                               ),
+    andOrHlt      = cms.bool( False ),
+    errorReplyHlt = cms.bool( False ),
+    # L1
+    l1Algorithms = cms.vstring(),
+    andOrL1      = cms.bool( False ),
+    errorReplyL1 = cms.bool( False )
 )
 
 SiStripHltFilter_TrackingMonitor = cms.PSet(
-    hltInputTag = cms.InputTag( "TriggerResults::HLT" ),
-    hltPaths    = cms.vstring( 'HLT_PhysicsDeclared'
-                             ),
-    andOr       = cms.bool( False ),
-    errorReply  = cms.bool( True )
+    # General
+    andOr = cms.bool( False ),
+    # HLT
+    hltInputTag   = cms.InputTag( "TriggerResults::HLT" ),
+    hltPaths      = cms.vstring( 'HLT_PhysicsDeclared'
+                               ),
+    andOrHlt      = cms.bool( False ),
+    errorReplyHlt = cms.bool( False ),
+    # L1
+    l1Algorithms = cms.vstring(),
+    andOrL1      = cms.bool( False ),
+    errorReplyL1 = cms.bool( False )
 )

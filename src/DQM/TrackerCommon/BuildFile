@@ -2,6 +2,7 @@
 <use name=FWCore/Framework>
 <use name=FWCore/ParameterSet>
 <use name=HLTrigger/HLTcore>
+<use name=L1Trigger/GlobalTriggerAnalyzer>
 <use name=DataFormats/Common>
 <use name=rootgraphics>
 <use name=xdaq>

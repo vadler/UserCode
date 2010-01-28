@@ -1,10 +1,13 @@
-Test Release based on: CMSSW_3_5_0_pre3
-Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_5_0_pre3
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_0_pre3
+Test Release based on: CMSSW_3_5_X_2010-01-27-0200
+Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_ia32_gcc434/wed/3.5-wed-02/CMSSW_3_5_X_2010-01-27-0200
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_X_2010-01-27-0200
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DQM/SiStripMonitorClient                         NoTag          V03-03-74      
+DQM/SiStripMonitorCluster                        V05-01-29      V05-01-29      
+DQM/SiStripMonitorDigi                           V04-03-26      V04-03-26      
+DQM/SiStripMonitorHardware                       V00-08-07      V00-08-07      
 DQM/SiStripMonitorTrack                          V04-00-11      V04-00-11      
-DQM/TrackerCommon                                NoTag          V03-01-06-02   
-DQM/TrackingMonitor                              V02-03-20      V02-03-18      
+DQM/TrackerCommon                                V03-02-01      V03-02-00      
+DQM/TrackerMonitorTrack                          V04-01-15      V04-01-15      
+DQM/TrackingMonitor                              V02-03-20      V02-03-20      
 ---------------------------------------
-total packages: 4 (4 displayed)
+total packages: 7 (7 displayed)

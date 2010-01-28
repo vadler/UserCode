@@ -34,8 +34,8 @@ process.load( "DQMOffline.Configuration.DQMOffline_SecondStep_cff" )
 process.DQMStore.referenceFileName = ''
 process.DQMStore.collateHistograms = False
 process.dqmSaver.convention = 'Offline'
-process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_5_0_pre3/RECO'
-process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_0_pre3/output'
+process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_5_X/RECO'
+process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_X_2010-01-27-0200/output'
 # process.load( "DQMServices.Components.DQMDaqInfo_cfi" )
 process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 
@@ -68,12 +68,9 @@ process.load('HLTrigger.HLTfilters.hltLevel1GTSeed_cfi')
 process.hltLevel1GTSeed.L1TechTriggerSeeding     = cms.bool(True)
 process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('0 AND ( 40 OR 41 ) AND NOT ( 36 OR 37 OR 38 OR 39 )')
 
-process.l1GT = cms.Sequence(
-  process.gtDigis *
-  process.hltLevel1GTSeed
-)
 process.raw2Digi = cms.Sequence(
-  process.siPixelDigis +
+  process.scalersRawToDigi +
+  process.siPixelDigis     +
   process.siStripDigis
 )
 process.reco = cms.Sequence(
@@ -87,25 +84,29 @@ process.reco = cms.Sequence(
 )
 process.dqm = cms.Sequence(
   process.SiStripDQMTier0          *
-  process.siPixelOfflineDQM_source *
+#   process.siPixelOfflineDQM_source *
   process.DQMMessageLogger
 )
 
 process.path = cms.Path(
-#   process.l1GT               *
+  # preparation
+  process.gtDigis            *
+#   process.hltLevel1GTSeed    *
 #   process.physicsBitSelector *
   process.raw2Digi           *
   process.reco               *
+  # DQM sources
   process.dqm                *
+  # DQM client
   process.dqmRefHistoRootFileGetter *
   process.SiStripOfflineDQMClient   *
-  process.sipixelEDAClient          *
+#   process.sipixelEDAClient          *
   process.DQMMessageLoggerClient    *
   process.siStripDaqInfo           *
-  process.siPixelDaqInfo           *
+#   process.siPixelDaqInfo           *
   process.siStripDcsInfo           *
-  process.siPixelDcsInfo           *
+#   process.siPixelDcsInfo           *
   process.siStripCertificationInfo *
-  process.siPixelCertification     *
+#   process.siPixelCertification     *
   process.dqmSaver
 )
