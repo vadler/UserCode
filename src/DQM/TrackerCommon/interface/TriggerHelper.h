@@ -36,19 +36,15 @@ class TriggerHelper {
     // L1 access
     L1GtUtils l1Gt_;
     // L1 filter configuration parameters
-    std::vector< std::string > l1AlgorithmNames_;
     bool errorReplyL1_;
     // HLT configuration
     HLTConfigProvider hltConfig_;
     // HLT filter configuration parameters
     edm::InputTag hltInputTag_;
     edm::Handle< edm::TriggerResults > hltTriggerResults_;
-    std::vector< std::string > hltPathNames_;
     bool errorReplyHlt_;
     // DCS filter configuration parameters
-    edm::InputTag dcsInputTag_;
     edm::Handle< DcsStatusCollection > dcsStatus_;
-    std::vector< int > dcsPartitions_;
     bool errorReplyDcs_;
 
   public:
@@ -59,7 +55,7 @@ class TriggerHelper {
 
     // Public methods
     bool accept( const edm::Event & event, const edm::EventSetup & setup, const edm::ParameterSet & config ); // L1, HLT and DCS combined
-    bool accept( const edm::Event & event, const edm::ParameterSet & config ); // filters for HLT and DCS only                                // HLT only (backward compatible with first version)
+    bool accept( const edm::Event & event, const edm::ParameterSet & config );                                // filters for HLT and DCS only
 
   private:
 

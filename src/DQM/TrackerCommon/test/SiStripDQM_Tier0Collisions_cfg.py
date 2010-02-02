@@ -36,7 +36,6 @@ process.DQMStore.collateHistograms = False
 process.dqmSaver.convention = 'Offline'
 process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_5_X/RECO'
 process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_0_pre5/output'
-# process.load( "DQMServices.Components.DQMDaqInfo_cfi" )
 process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 
 # Input
@@ -59,6 +58,8 @@ process.options = cms.untracked.PSet(
   fileMode    = cms.untracked.string( 'FULLMERGE' ),
   wantSummary = cms.untracked.bool( True )
 )
+
+# Filter modules
 process.physicsBitSelector = cms.EDFilter( "PhysDecl",
   applyfilter = cms.untracked.bool( True ) ,
   debugOn     = cms.untracked.bool( False )

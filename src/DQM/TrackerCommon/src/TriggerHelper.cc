@@ -16,11 +16,8 @@ using namespace edm;
 TriggerHelper::TriggerHelper()
 {
 
-  l1AlgorithmNames_.clear();
   hltTriggerResults_.clear();
-  hltPathNames_.clear();
   dcsStatus_.clear();
-  dcsPartitions_.clear();
 
 }
 
@@ -59,29 +56,24 @@ bool TriggerHelper::accept( const Event & event, const ParameterSet & config )
 bool TriggerHelper::acceptL1( const Event & event, const EventSetup & setup, const ParameterSet & config )
 {
 
-  // Configuration parameter tags
-  const string l1AlgorithmsConfig( "l1Algorithms" );
-  const string andOrConfig( "andOrL1" );
-  const string errorReplyConfig( "errorReplyL1" );
+  // Getting configuration parameters
+  const vector< string > l1AlgorithmNames( config.getParameter< vector< string > >( "l1Algorithms" ) );
+  errorReplyL1_ = config.getParameter< bool >( "errorReplyL1" );
 
-  // Getting the L1 algorithm names of question from the configuration
-  // An empty configuration parameter switches the filter off.
-  l1AlgorithmNames_ = config.getParameter< vector< string > >( l1AlgorithmsConfig );
-  if ( l1AlgorithmNames_.empty() ) return true;
+  // An empty L1 algorithms list acts as switch.
+  if ( l1AlgorithmNames.empty() ) return true;
 
-  // Getting remaining configuration parameters
-  errorReplyL1_ = config.getParameter< bool >( errorReplyConfig );
-
+  // Getting the L1 event setup
   l1Gt_.retrieveL1EventSetup( setup );
 
   // Determine decision of L1 algorithm combination and return
-  if ( config.getParameter< bool >( andOrConfig ) ) { // OR combination
-    for ( vector< string >::const_iterator l1Algorithm = l1AlgorithmNames_.begin(); l1Algorithm != l1AlgorithmNames_.end(); ++l1Algorithm ) {
+  if ( config.getParameter< bool >( "andOrL1" ) ) { // OR combination
+    for ( vector< string >::const_iterator l1Algorithm = l1AlgorithmNames.begin(); l1Algorithm != l1AlgorithmNames.end(); ++l1Algorithm ) {
       if ( acceptL1Algorithm( event, *l1Algorithm ) ) return true;
     }
     return false;
   }
-  for ( vector< string >::const_iterator l1Algorithm = l1AlgorithmNames_.begin(); l1Algorithm != l1AlgorithmNames_.end(); ++l1Algorithm ) {
+  for ( vector< string >::const_iterator l1Algorithm = l1AlgorithmNames.begin(); l1Algorithm != l1AlgorithmNames.end(); ++l1Algorithm ) {
     if ( ! acceptL1Algorithm( event, *l1Algorithm ) ) return false;
   }
   return true;
@@ -134,25 +126,13 @@ bool TriggerHelper::acceptL1Algorithm( const Event & event, string l1AlgorithmNa
 bool TriggerHelper::acceptHlt( const Event & event, const ParameterSet & config )
 {
 
-  // Configuration parameter tags
-  const string hltInputTagConfig( "hltInputTag" );
-  const string hltPathConfig( "hltPaths" );
-  const string andOrConfig( "andOrHlt" );
-  const string errorReplyConfig( "errorReplyHlt" );
+  // Getting configuration parameters
+  const vector< string > hltPathNames( config.getParameter< vector< string > >( "hltPaths" ) );
+  hltInputTag_   = config.getParameter< InputTag >( "hltInputTag" );
+  errorReplyHlt_ = config.getParameter< bool >( "errorReplyHlt" );
 
-  // Getting the TriggerResults InputTag from the configuration
-  // If an according InputTag is found in the configuration, it is expected to be meaningful and correct.
-  // If not, the filter is switched off.
-  if ( ! config.exists( hltInputTagConfig ) ) return true;
-  hltInputTag_ = config.getParameter< InputTag >( hltInputTagConfig );
-
-  // Getting the HLT path names of question from the configuration
-  // An empty configuration parameter acts also as switch.
-  hltPathNames_ = config.getParameter< vector< string > >( hltPathConfig );
-  if ( hltPathNames_.empty() ) return true;
-
-  // Getting remaining configuration parameters
-  errorReplyHlt_ = config.getParameter< bool >( errorReplyConfig );
+  // An empty HLT paths list acts as switch.
+  if ( hltPathNames.empty() ) return true;
 
   // Checking the TriggerResults InputTag
   // The process name has to be given.
@@ -180,13 +160,13 @@ bool TriggerHelper::acceptHlt( const Event & event, const ParameterSet & config 
   }
 
   // Determine decision of HLT path combination and return
-  if ( config.getParameter< bool >( andOrConfig ) ) { // OR combination
-    for ( vector< string >::const_iterator pathName = hltPathNames_.begin(); pathName != hltPathNames_.end(); ++pathName ) {
+  if ( config.getParameter< bool >( "andOrHlt" ) ) { // OR combination
+    for ( vector< string >::const_iterator pathName = hltPathNames.begin(); pathName != hltPathNames.end(); ++pathName ) {
       if ( acceptHltPath( *pathName ) ) return true;
     }
     return false;
   }
-  for ( vector< string >::const_iterator pathName = hltPathNames_.begin(); pathName != hltPathNames_.end(); ++pathName ) {
+  for ( vector< string >::const_iterator pathName = hltPathNames.begin(); pathName != hltPathNames.end(); ++pathName ) {
     if ( ! acceptHltPath( *pathName ) ) return false;
   }
   return true;
@@ -235,42 +215,29 @@ bool TriggerHelper::acceptHltPath( string hltPathName ) const
 bool TriggerHelper::acceptDcs( const edm::Event & event, const edm::ParameterSet & config )
 {
 
+  // Getting configuration parameters
+  const InputTag dcsInputTag( config.getParameter< InputTag >( "dcsInputTag" ) );
+  const vector< int > dcsPartitions( config.getParameter< vector< int > >( "dcsPartitions" ) );
+  errorReplyDcs_ = config.getParameter< bool >( "errorReplyDcs" );
 
-  // Configuration parameter tags
-  const string dcsInputTagConfig( "dcsInputTag" );
-  const string dcsPartitionsConfig( "dcsPartitions" );
-  const string andOrConfig( "andOrDcs" );
-  const string errorReplyConfig( "errorReplyDcs" );
-
-  // Getting the DcsStatusCollection InputTag from the configuration
-  // If an according InputTag is found in the configuration, it is expected to be meaningful and correct.
-  // If not, the filter is switched off.
-  if ( ! config.exists( dcsInputTagConfig ) ) return true;
-  dcsInputTag_ = config.getParameter< InputTag >( dcsInputTagConfig );
-
-  // Getting the DCS partition numbers of question from the configuration
-  // An empty configuration parameter acts also as switch.
-  dcsPartitions_ = config.getParameter< vector< int > >( dcsPartitionsConfig );
-  if ( dcsPartitions_.empty() ) return true;
-
-  // Getting remaining configuration parameters
-  errorReplyDcs_ = config.getParameter< bool >( errorReplyConfig );
+  // An empty DCS partitions list acts as switch.
+  if ( dcsPartitions.empty() ) return true;
 
   // Accessing the DcsStatusCollection
-  event.getByLabel( dcsInputTag_, dcsStatus_ );
+  event.getByLabel( dcsInputTag, dcsStatus_ );
   if ( ! dcsStatus_.isValid() ) {
-    LogError( "dcsStatusValid" ) << "DcsStatusCollection product with InputTag " << dcsInputTag_.encode() << " not in event";
+    LogError( "dcsStatusValid" ) << "DcsStatusCollection product with InputTag " << dcsInputTag.encode() << " not in event";
     return errorReplyDcs_;
   }
 
   // Determine decision of DCS partition combination and return
-  if ( config.getParameter< bool >( andOrConfig ) ) { // OR combination
-    for ( vector< int >::const_iterator partitionNumber = dcsPartitions_.begin(); partitionNumber != dcsPartitions_.end(); ++partitionNumber ) {
+  if ( config.getParameter< bool >( "andOrDcs" ) ) { // OR combination
+    for ( vector< int >::const_iterator partitionNumber = dcsPartitions.begin(); partitionNumber != dcsPartitions.end(); ++partitionNumber ) {
       if ( acceptDcsPartition( *partitionNumber ) ) return true;
     }
     return false;
   }
-  for ( vector< int >::const_iterator partitionNumber = dcsPartitions_.begin(); partitionNumber != dcsPartitions_.end(); ++partitionNumber ) {
+  for ( vector< int >::const_iterator partitionNumber = dcsPartitions.begin(); partitionNumber != dcsPartitions.end(); ++partitionNumber ) {
     if ( ! acceptDcsPartition( *partitionNumber ) ) return false;
   }
   return true;
