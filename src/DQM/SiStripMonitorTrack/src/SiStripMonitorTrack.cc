@@ -81,11 +81,14 @@ void SiStripMonitorTrack::endJob(void)
 // ------------ method called to produce the data  ------------
 void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
-  static unsigned count( 1 ); // DEBUG
-  std::cout << "  SiStripMonitorTrack: " << count << std::endl; // DEBUG
   TriggerHelper triggerHelper;
-  if ( ! triggerHelper.accept( e, es, conf_ ) ) return;
-  ++count; // DEBUG
+// DEBUG  if ( ! triggerHelper.accept( e, es, conf_ ) ) return;
+  static unsigned count( 0 ); // DEBUG
+  if ( ! triggerHelper.accept( e, es, conf_ ) ) { // DEBUG
+    std::cout << "  SiStripMonitorTrack: " << count << std::endl; // DEBUG
+    return; // DEBUG
+  } // DEBUG
+  std::cout << "  SiStripMonitorTrack: " << ++count << std::endl; // DEBUG
 
   tracksCollection_in_EventTree=true;
   trackAssociatorCollection_in_EventTree=true;

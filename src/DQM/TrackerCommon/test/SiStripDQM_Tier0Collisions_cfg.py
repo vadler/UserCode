@@ -1,13 +1,13 @@
 import FWCore.ParameterSet.Config as cms
 
 # Process
-process = cms.Process( "T0Collisions" )
+process = cms.Process( "TEST" )
 
 process.load( "FWCore.MessageService.MessageLogger_cfi" )
 
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'GR09_R_34X_V2::All'
+process.GlobalTag.globaltag = 'GR09_R_35X_V1::All'
 process.load( "Configuration.StandardSequences.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
@@ -35,7 +35,7 @@ process.DQMStore.referenceFileName = ''
 process.DQMStore.collateHistograms = False
 process.dqmSaver.convention = 'Offline'
 process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_5_X/RECO'
-process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_X_2010-01-27-0200/output'
+process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_0_pre5/output'
 # process.load( "DQMServices.Components.DQMDaqInfo_cfi" )
 process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 
@@ -57,16 +57,64 @@ process.maxEvents = cms.untracked.PSet(
 process.options = cms.untracked.PSet(
   Rethrow     = cms.untracked.vstring( 'ProductNotFound' ),
   fileMode    = cms.untracked.string( 'FULLMERGE' ),
-  wantSummary = cms.untracked.bool( False )
+  wantSummary = cms.untracked.bool( True )
 )
 process.physicsBitSelector = cms.EDFilter( "PhysDecl",
   applyfilter = cms.untracked.bool( True ) ,
   debugOn     = cms.untracked.bool( False )
 )
-process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
-process.load('HLTrigger.HLTfilters.hltLevel1GTSeed_cfi')
-process.hltLevel1GTSeed.L1TechTriggerSeeding     = cms.bool(True)
-process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('0 AND ( 40 OR 41 ) AND NOT ( 36 OR 37 OR 38 OR 39 )')
+process.load( 'L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff' )
+process.load( 'HLTrigger.HLTfilters.hltLevel1GTSeed_cfi' )
+process.hltLevel1GTSeed.L1TechTriggerSeeding     = True
+# process.hltLevel1GTSeed.L1SeedsLogicalExpression = '0 AND ( 40 OR 41 ) AND NOT ( 36 OR 37 OR 38 OR 39 )'
+process.hltLevel1GTSeed.L1SeedsLogicalExpression = '0 AND NOT ( 36 OR 37 OR 38 OR 39 )'
+process.load( 'HLTrigger.HLTfilters.hltHighLevel_cfi' )
+# process.hltHighLevel.HLTPaths = [ 'HLT_ZeroBias1kHz'
+#                                 ]
+# process.hltHighLevel.andOr    = True
+
+# process.SiStripMonitorTrack.andOr         = True
+# process.SiStripMonitorTrack.hltInputTag   = "TriggerResults::HLT"
+# process.SiStripMonitorTrack.hltPaths      = [ 'HLT_PhysicsDeclared'
+#                                             , 'HLT_ZeroBias1kHz'
+#                                             ]
+# process.SiStripMonitorTrack.andOrHlt      = False
+# process.SiStripMonitorTrack.errorReplyHlt = False
+# process.SiStripMonitorTrack.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0'    # bit 0
+# #                                             , 'L1Tech_BSC_minBias_threshold1.v0' # bit 40
+# #                                             , 'L1Tech_BSC_minBias_threshold2.v0' # bit 41
+#                                             , '~L1Tech_BSC_halo_beam2_inner.v0' # bit ~36
+#                                             , '~L1Tech_BSC_halo_beam2_outer.v0' # bit ~37
+#                                             , '~L1Tech_BSC_halo_beam1_inner.v0' # bit ~38
+#                                             , '~L1Tech_BSC_halo_beam1_outer.v0' # bit ~39
+#                                             ]
+# process.SiStripMonitorTrack.andOrL1       = False
+# process.SiStripMonitorTrack.errorReplyL1  = False
+# process.SiStripMonitorTrack.dcsInputTag   = "scalersRawToDigi"
+# process.SiStripMonitorTrack.dcsPartitions = [ 24
+#                                             , 25
+#                                             , 26
+#                                             , 27
+#                                             ]
+# process.SiStripMonitorTrack.andOrDcs      = False
+# process.SiStripMonitorTrack.errorReplyDcs = False
+# process.TrackMon.andOr         = False
+# process.TrackMon.hltInputTag   = "TriggerResults::HLT"
+# process.TrackMon.hltPaths      = [ 'HLT_PhysicsDeclared'
+#                                  ]
+# process.TrackMon.andOrHlt      = False
+# process.TrackMon.errorReplyHlt = False
+# process.TrackMon.l1Algorithms  = []
+# process.TrackMon.andOrL1       = False
+# process.TrackMon.errorReplyL1  = False
+# process.TrackMon.dcsInputTag   = "scalersRawToDigi"
+# process.TrackMon.dcsPartitions = [ 24
+#                                  , 25
+#                                  , 26
+#                                  , 27
+#                                  ]
+# process.TrackMon.andOrDcs      = False
+# process.TrackMon.errorReplyDcs = False
 
 process.raw2Digi = cms.Sequence(
   process.scalersRawToDigi +
@@ -84,15 +132,15 @@ process.reco = cms.Sequence(
 )
 process.dqm = cms.Sequence(
   process.SiStripDQMTier0          *
-#   process.siPixelOfflineDQM_source *
   process.DQMMessageLogger
 )
 
 process.path = cms.Path(
   # preparation
   process.gtDigis            *
-#   process.hltLevel1GTSeed    *
 #   process.physicsBitSelector *
+#   process.hltLevel1GTSeed    *
+#   process.hltHighLevel       *
   process.raw2Digi           *
   process.reco               *
   # DQM sources
@@ -100,13 +148,9 @@ process.path = cms.Path(
   # DQM client
   process.dqmRefHistoRootFileGetter *
   process.SiStripOfflineDQMClient   *
-#   process.sipixelEDAClient          *
   process.DQMMessageLoggerClient    *
   process.siStripDaqInfo           *
-#   process.siPixelDaqInfo           *
   process.siStripDcsInfo           *
-#   process.siPixelDcsInfo           *
   process.siStripCertificationInfo *
-#   process.siPixelCertification     *
   process.dqmSaver
 )

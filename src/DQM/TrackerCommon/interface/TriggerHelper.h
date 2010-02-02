@@ -28,7 +28,7 @@
 #include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-
+#include "DataFormats/Scalers/interface/DcsStatus.h"
 
 class TriggerHelper {
 
@@ -45,6 +45,11 @@ class TriggerHelper {
     edm::Handle< edm::TriggerResults > hltTriggerResults_;
     std::vector< std::string > hltPathNames_;
     bool errorReplyHlt_;
+    // DCS filter configuration parameters
+    edm::InputTag dcsInputTag_;
+    edm::Handle< DcsStatusCollection > dcsStatus_;
+    std::vector< int > dcsPartitions_;
+    bool errorReplyDcs_;
 
   public:
 
@@ -53,8 +58,8 @@ class TriggerHelper {
     ~TriggerHelper() {};
 
     // Public methods
-    bool accept( const edm::Event & event, const edm::EventSetup & setup, const edm::ParameterSet & config ); // L1 + HLT combined
-    bool accept( const edm::Event & event, const edm::ParameterSet & config ); // filters for HLT only                                // HLT only (backward compatible with first version)
+    bool accept( const edm::Event & event, const edm::EventSetup & setup, const edm::ParameterSet & config ); // L1, HLT and DCS combined
+    bool accept( const edm::Event & event, const edm::ParameterSet & config ); // filters for HLT and DCS only                                // HLT only (backward compatible with first version)
 
   private:
 
@@ -69,8 +74,10 @@ class TriggerHelper {
     bool acceptHltPath( std::string hltPathName ) const;
 
     // DCS
+    bool acceptDcs( const edm::Event & event, const edm::ParameterSet & config );
+    bool acceptDcsPartition( int dcsPartition ) const;
 
-    // Helpers
+    // Algos
     bool negate( std::string & word ) const;
 
 };

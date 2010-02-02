@@ -19,14 +19,17 @@ TriggerHelper::TriggerHelper()
   l1AlgorithmNames_.clear();
   hltTriggerResults_.clear();
   hltPathNames_.clear();
+  dcsStatus_.clear();
+  dcsPartitions_.clear();
 
 }
 
 
 bool TriggerHelper::accept( const edm::Event & event, const edm::EventSetup & setup, const edm::ParameterSet & config )
 {
-  if ( config.getParameter< bool >( "andOr" ) ) return ( acceptL1( event, setup, config ) || acceptHlt( event, config ) );
-  return ( acceptL1( event, setup, config ) && acceptHlt( event, config ) );
+
+  if ( config.getParameter< bool >( "andOr" ) ) return ( acceptL1( event, setup, config ) || acceptHlt( event, config ) || acceptDcs( event, config ) );
+  return ( acceptL1( event, setup, config ) && acceptHlt( event, config ) && acceptDcs( event, config ) );
 
 }
 
@@ -34,7 +37,8 @@ bool TriggerHelper::accept( const edm::Event & event, const edm::EventSetup & se
 bool TriggerHelper::accept( const Event & event, const ParameterSet & config )
 {
 
-  return acceptHlt( event, config );
+  if ( config.getParameter< bool >( "andOr" ) ) return ( acceptHlt( event, config ) || acceptDcs( event, config ) );
+  return ( acceptHlt( event, config ) && acceptDcs( event, config ) );
 
 }
 
@@ -107,8 +111,8 @@ bool TriggerHelper::acceptL1Algorithm( const Event & event, string l1AlgorithmNa
 
   // Return decision
   cout << "  TriggerHelper: algo "; // DEBUG
-  if ( notAlgo ) cout << "~" << algoName << "->" << ( ! decision ) << endl; // DEBUG
-  else           cout        << algoName << "->" <<     decision   << endl; // DEBUG
+  if ( notAlgo ) cout << "~" << algoName << " -> " << ( ! decision ) << endl; // DEBUG
+  else           cout        << algoName << " -> " <<     decision   << endl; // DEBUG
   return notAlgo ? ( ! decision ) : decision;
 
 }
@@ -210,8 +214,96 @@ bool TriggerHelper::acceptHltPath( string hltPathName ) const
   cout << "  TriggerHelper: path "; // DEBUG
   if ( notPath ) cout << "~" << hltPathName; // DEBUG
   else           cout        << hltPathName; // DEBUG
-  cout << "->" << hltTriggerResults_->accept( indexPath ) << endl; // DEBUG
+  cout << " -> " << hltTriggerResults_->accept( indexPath ) << endl; // DEBUG
   return notPath ? ( ! hltTriggerResults_->accept( indexPath ) ) : hltTriggerResults_->accept( indexPath );
+
+}
+
+
+bool TriggerHelper::acceptDcs( const edm::Event & event, const edm::ParameterSet & config )
+{
+
+
+  // Configuration parameter tags
+  const string dcsInputTagConfig( "dcsInputTag" );
+  const string dcsPartitionsConfig( "dcsPartitions" );
+  const string andOrConfig( "andOrDcs" );
+  const string errorReplyConfig( "errorReplyDcs" );
+
+  // Getting the DcsStatusCollection InputTag from the configuration
+  // If an according InputTag is found in the configuration, it is expected to be meaningful and correct.
+  // If not, the filter is switched off.
+  if ( ! config.exists( dcsInputTagConfig ) ) return true;
+  dcsInputTag_ = config.getParameter< InputTag >( dcsInputTagConfig );
+
+  // Getting the DCS partition numbers of question from the configuration
+  // An empty configuration parameter acts also as switch.
+  dcsPartitions_ = config.getParameter< vector< int > >( dcsPartitionsConfig );
+  if ( dcsPartitions_.empty() ) return true;
+
+  // Getting remaining configuration parameters
+  errorReplyDcs_ = config.getParameter< bool >( errorReplyConfig );
+
+  // Accessing the DcsStatusCollection
+  event.getByLabel( dcsInputTag_, dcsStatus_ );
+  if ( ! dcsStatus_.isValid() ) {
+    LogError( "dcsStatusValid" ) << "DcsStatusCollection product with InputTag " << dcsInputTag_.encode() << " not in event";
+    return errorReplyDcs_;
+  }
+
+  // Determine acceptance of DCS partition combination and return
+  if ( config.getParameter< bool >( andOrConfig ) ) { // OR combination
+    for ( vector< int >::const_iterator partitionNumber = dcsPartitions_.begin(); partitionNumber != dcsPartitions_.end(); ++partitionNumber ) {
+      if ( acceptDcsPartition( *partitionNumber ) ) return true;
+    }
+    return false;
+  }
+  for ( vector< int >::const_iterator partitionNumber = dcsPartitions_.begin(); partitionNumber != dcsPartitions_.end(); ++partitionNumber ) {
+    if ( ! acceptDcsPartition( *partitionNumber ) ) return false;
+  }
+  return true;
+
+}
+
+
+bool TriggerHelper::acceptDcsPartition( int dcsPartition ) const
+{
+
+  // Error checks
+  switch( dcsPartition ) {
+    case DcsStatus::EBp   :
+    case DcsStatus::EBm   :
+    case DcsStatus::EEp   :
+    case DcsStatus::EEm   :
+    case DcsStatus::HBHEa :
+    case DcsStatus::HBHEb :
+    case DcsStatus::HBHEc :
+    case DcsStatus::HF    :
+    case DcsStatus::HO    :
+    case DcsStatus::RPC   :
+    case DcsStatus::DT0   :
+    case DcsStatus::DTp   :
+    case DcsStatus::DTm   :
+    case DcsStatus::CSCp  :
+    case DcsStatus::CSCm  :
+    case DcsStatus::CASTOR:
+    case DcsStatus::TIBTID:
+    case DcsStatus::TOB   :
+    case DcsStatus::TECp  :
+    case DcsStatus::TECm  :
+    case DcsStatus::BPIX  :
+    case DcsStatus::FPIX  :
+    case DcsStatus::ESp   :
+    case DcsStatus::ESm   :
+      break;
+    default:
+      LogError( "dcsPartition" ) << "DCS partition number " << dcsPartition << " does not exist";
+      return errorReplyDcs_;
+  }
+
+  // Determine decision
+  cout << "  TriggerHelper: partition " << dcsPartition << " -> " << dcsStatus_->at( 0 ).ready( dcsPartition ) << endl; // DEBUG
+  return dcsStatus_->at( 0 ).ready( dcsPartition );
 
 }
 

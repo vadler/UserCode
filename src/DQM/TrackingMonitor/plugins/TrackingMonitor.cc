@@ -169,11 +169,14 @@ void TrackingMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 {
     using namespace edm;
 
-    static unsigned count( 1 ); // DEBUG
-    std::cout << "  TrackingMonitor: " << count << std::endl; // DEBUG
     TriggerHelper triggerHelper;
-    if ( ! triggerHelper.accept( iEvent, iSetup, conf_ ) ) return;
-    ++count; // DEBUG
+// DEBUG    if ( ! triggerHelper.accept( iEvent, iSetup, conf_ ) ) return;
+    static unsigned count( 0 ); // DEBUG
+    if ( ! triggerHelper.accept( iEvent, iSetup, conf_ ) ) { // DEBUG
+      std::cout << "  TrackingMonitor: " << count << std::endl; // DEBUG
+      return; // DEBUG
+    } // DEBUG
+    std::cout << "  TrackingMonitor: " << ++count << std::endl; // DEBUG
 
     // input tags for collections from the configuration
     InputTag trackProducer  = conf_.getParameter<edm::InputTag>("TrackProducer");
