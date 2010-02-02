@@ -28,6 +28,12 @@ TriggerHelper::TriggerHelper()
 bool TriggerHelper::accept( const edm::Event & event, const edm::EventSetup & setup, const edm::ParameterSet & config )
 {
 
+  // Getting the and/or switch from the configuration
+  // If it does not exist, the configuration is considered not to be present,
+  // and the filter dos not have any effect.
+  if ( ! config.exists( "andOr" ) ) return true;
+
+  // Determine decision
   if ( config.getParameter< bool >( "andOr" ) ) return ( acceptL1( event, setup, config ) || acceptHlt( event, config ) || acceptDcs( event, config ) );
   return ( acceptL1( event, setup, config ) && acceptHlt( event, config ) && acceptDcs( event, config ) );
 
@@ -37,6 +43,12 @@ bool TriggerHelper::accept( const edm::Event & event, const edm::EventSetup & se
 bool TriggerHelper::accept( const Event & event, const ParameterSet & config )
 {
 
+  // Getting the and/or switch from the configuration
+  // If it does not exist, the configuration is considered not to be present,
+  // and the filter dos not have any effect.
+  if ( ! config.exists( "andOr" ) ) return true;
+
+  // Determine decision
   if ( config.getParameter< bool >( "andOr" ) ) return ( acceptHlt( event, config ) || acceptDcs( event, config ) );
   return ( acceptHlt( event, config ) && acceptDcs( event, config ) );
 
@@ -62,7 +74,7 @@ bool TriggerHelper::acceptL1( const Event & event, const EventSetup & setup, con
 
   l1Gt_.retrieveL1EventSetup( setup );
 
-  // Determine acceptance of L1 algorithm combination and return
+  // Determine decision of L1 algorithm combination and return
   if ( config.getParameter< bool >( andOrConfig ) ) { // OR combination
     for ( vector< string >::const_iterator l1Algorithm = l1AlgorithmNames_.begin(); l1Algorithm != l1AlgorithmNames_.end(); ++l1Algorithm ) {
       if ( acceptL1Algorithm( event, *l1Algorithm ) ) return true;
@@ -167,7 +179,7 @@ bool TriggerHelper::acceptHlt( const Event & event, const ParameterSet & config 
     return errorReplyHlt_;
   }
 
-  // Determine acceptance of HLT path combination and return
+  // Determine decision of HLT path combination and return
   if ( config.getParameter< bool >( andOrConfig ) ) { // OR combination
     for ( vector< string >::const_iterator pathName = hltPathNames_.begin(); pathName != hltPathNames_.end(); ++pathName ) {
       if ( acceptHltPath( *pathName ) ) return true;
@@ -251,7 +263,7 @@ bool TriggerHelper::acceptDcs( const edm::Event & event, const edm::ParameterSet
     return errorReplyDcs_;
   }
 
-  // Determine acceptance of DCS partition combination and return
+  // Determine decision of DCS partition combination and return
   if ( config.getParameter< bool >( andOrConfig ) ) { // OR combination
     for ( vector< int >::const_iterator partitionNumber = dcsPartitions_.begin(); partitionNumber != dcsPartitions_.end(); ++partitionNumber ) {
       if ( acceptDcsPartition( *partitionNumber ) ) return true;
