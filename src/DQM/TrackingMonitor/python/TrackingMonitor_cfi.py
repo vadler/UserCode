@@ -1,9 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
-from DQM.TrackerCommon.TriggerHelper_cff import SiStripHltFilter_TrackingMonitor
+from DQM.TrackerCommon.TriggerHelper_cff import SiStripFilter_TrackingMonitor
 
 TrackMon = cms.EDFilter("TrackingMonitor",
-    SiStripHltFilter_TrackingMonitor,
+    SiStripFilter_TrackingMonitor,
 
     # input tags
     TrackProducer = cms.InputTag("generalTracks"),
