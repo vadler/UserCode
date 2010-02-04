@@ -76,19 +76,19 @@ process.load( 'HLTrigger.HLTfilters.hltHighLevel_cfi' )
 
 # process.SiStripMonitorTrack.andOr         = True
 # process.SiStripMonitorTrack.hltInputTag   = "TriggerResults::HLT"
-# process.SiStripMonitorTrack.hltPaths      = [ 'HLT_PhysicsDeclared'
+process.SiStripMonitorTrack.hltPaths      = [ 'HLT_PhysicsDeclared AND HLT_ZeroBias1kHz'
 #                                             , 'HLT_ZeroBias1kHz'
-#                                             ]
+                                            ]
 # process.SiStripMonitorTrack.andOrHlt      = False
 # process.SiStripMonitorTrack.errorReplyHlt = False
-process.SiStripMonitorTrack.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0'    # bit 0
-#                                             , 'L1Tech_BSC_minBias_threshold1.v0' # bit 40
-#                                             , 'L1Tech_BSC_minBias_threshold2.v0' # bit 41
-                                            , '~L1Tech_BSC_halo_beam2_inner.v0' # bit ~36
-                                            , '~L1Tech_BSC_halo_beam2_outer.v0' # bit ~37
-                                            , '~L1Tech_BSC_halo_beam1_inner.v0' # bit ~38
-                                            , '~L1Tech_BSC_halo_beam1_outer.v0' # bit ~39
-                                            ]
+# process.SiStripMonitorTrack.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0'    # bit 0
+# #                                             , 'L1Tech_BSC_minBias_threshold1.v0' # bit 40
+# #                                             , 'L1Tech_BSC_minBias_threshold2.v0' # bit 41
+#                                             , '~L1Tech_BSC_halo_beam2_inner.v0' # bit ~36
+#                                             , '~L1Tech_BSC_halo_beam2_outer.v0' # bit ~37
+#                                             , '~L1Tech_BSC_halo_beam1_inner.v0' # bit ~38
+#                                             , '~L1Tech_BSC_halo_beam1_outer.v0' # bit ~39
+#                                             ]
 # process.SiStripMonitorTrack.andOrL1       = False
 # process.SiStripMonitorTrack.errorReplyL1  = False
 # process.SiStripMonitorTrack.dcsInputTag   = "scalersRawToDigi"
@@ -108,7 +108,7 @@ process.SiStripMonitorTrack.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0'   
 process.TrackerCollisionTrackMon.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0 AND ( L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0 ) AND NOT ( L1Tech_BSC_halo_beam2_inner.v0 OR L1Tech_BSC_halo_beam2_outer.v0 OR L1Tech_BSC_halo_beam1_inner.v0 OR L1Tech_BSC_halo_beam1_outer.v0 )'
                                                  ]
 # process.TrackerCollisionTrackMon.andOrL1       = False
-# process.TrackerCollisionTrackMon.errorReplyL1  = False
+process.TrackerCollisionTrackMon.errorReplyL1  = True
 # process.TrackerCollisionTrackMon.dcsInputTag   = "scalersRawToDigi"
 # process.TrackerCollisionTrackMon.dcsPartitions = [ 24
 #                                                  , 25
