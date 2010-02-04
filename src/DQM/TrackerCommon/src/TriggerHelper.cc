@@ -1,11 +1,13 @@
 //
-// $Id: TriggerHelper.cc,v 1.1 2010/01/24 13:47:00 vadler Exp $
+// $Id: TriggerHelper.cc,v 1.5 2010/02/02 22:17:52 vadler Exp $
 //
 
 
 #include "DQM/TrackerCommon/interface/TriggerHelper.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+
+#include "DataFormats/L1GlobalTrigger/interface/L1GtLogicParser.h"
 #include <iostream> // DEBUG
 
 
@@ -22,6 +24,7 @@ TriggerHelper::TriggerHelper()
 }
 
 
+/// L1, HLT and DCS filters combined
 bool TriggerHelper::accept( const edm::Event & event, const edm::EventSetup & setup, const edm::ParameterSet & config )
 {
 
@@ -37,6 +40,7 @@ bool TriggerHelper::accept( const edm::Event & event, const edm::EventSetup & se
 }
 
 
+/// HLT and DCS filters only
 bool TriggerHelper::accept( const Event & event, const ParameterSet & config )
 {
 
@@ -82,42 +86,49 @@ bool TriggerHelper::acceptL1( const Event & event, const EventSetup & setup, con
 
 
 /// Was this event accepted by this particular L1 algorithm?
-bool TriggerHelper::acceptL1Algorithm( const Event & event, string l1AlgorithmName )
+bool TriggerHelper::acceptL1Algorithm( const Event & event, string l1LogicalExpression )
 {
 
 
   // Check empty strings
-  if ( l1AlgorithmName.empty() ) {
+  if ( l1LogicalExpression.empty() ) {
     LogError( "l1AlgorithmName" ) << "Empty algorithm name";
     return errorReplyL1_;
   }
 
   // Negated algorithms
-  bool notAlgo( negate( l1AlgorithmName ) );
-  if ( notAlgo && l1AlgorithmName.empty() ) {
+  bool notAlgo( negate( l1LogicalExpression ) );
+  if ( notAlgo && l1LogicalExpression.empty() ) {
     LogError( "l1AlgorithmName" ) << "Empty (negated) algorithm name";
     return errorReplyL1_;
   }
-  const string algoName( l1AlgorithmName );
 
-  // Get L1 decision
-  int error( -1 );
-  const bool decision( l1Gt_.decision( event, algoName, error ) );
-
-  // Error checks
-  if ( error == 1 ) {
-    LogError( "l1AlgorithmInMenu" ) << "L1 algorithm " << algoName << " does not exist in the L1 menu";
-    return errorReplyL1_;
-  } else if ( error != 0 ) {
-    LogError( "l1AlgorithmError" ) << "L1 algorithm " << algoName << " received error code " << error << " from L1GtUtils::decisionBeforeMask";
-    return errorReplyL1_;
+  // Parse logical expression and determine L1 decision
+  L1GtLogicParser l1AlgoLogicParser( l1LogicalExpression );
+  // Loop over tokens
+  for ( size_t iToken = 0; iToken < l1AlgoLogicParser.operandTokenVector().size(); ++iToken ) {
+    int error( -1 );
+    const string algoName( l1AlgoLogicParser.operandTokenVector().at( iToken ).tokenName );
+    const bool decision( l1Gt_.decision( event, algoName, error ) );
+    cout << "  TriggerHelper: algo name " << algoName << " -> " << decision << endl; // DEBUG
+    // Error checks
+    if ( error == 1 ) {
+      LogError( "l1AlgorithmInMenu" ) << "L1 algorithm " << algoName << " does not exist in the L1 menu";
+      return errorReplyL1_;
+    } else if ( error != 0 ) {
+      LogError( "l1AlgorithmError" ) << "L1 algorithm " << algoName << " received error code " << error << " from L1GtUtils::decisionBeforeMask";
+      return errorReplyL1_;
+    }
+    // Manipulate algo decision as stored in the parser
+    l1AlgoLogicParser.operandTokenVector().at( iToken ).tokenResult = decision;
   }
 
   // Return decision
-  cout << "  TriggerHelper: algo "; // DEBUG
-  if ( notAlgo ) cout << "~" << algoName << " -> " << ( ! decision ) << endl; // DEBUG
-  else           cout        << algoName << " -> " <<     decision   << endl; // DEBUG
-  return notAlgo ? ( ! decision ) : decision;
+  const bool l1Decision( l1AlgoLogicParser.expressionResult() );
+  cout << "  TriggerHelper: logical expression "; // DEBUG
+  if ( notAlgo ) cout << "~(" << l1LogicalExpression << ") -> " << ( ! l1Decision ) << endl; // DEBUG
+  else           cout         << l1LogicalExpression << " -> "  <<     l1Decision   << endl; // DEBUG
+  return notAlgo ? ( ! l1Decision ) : l1Decision;
 
 }
 

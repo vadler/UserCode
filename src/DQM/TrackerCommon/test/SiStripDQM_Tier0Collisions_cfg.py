@@ -51,7 +51,7 @@ process.source = cms.Source( "PoolSource",
   skipEvents = cms.untracked.uint32( 0 )
 )
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( 10 )
+  input = cms.untracked.int32( 100 )
 )
 process.options = cms.untracked.PSet(
   Rethrow     = cms.untracked.vstring( 'ProductNotFound' ),
@@ -81,14 +81,14 @@ process.load( 'HLTrigger.HLTfilters.hltHighLevel_cfi' )
 #                                             ]
 # process.SiStripMonitorTrack.andOrHlt      = False
 # process.SiStripMonitorTrack.errorReplyHlt = False
-# process.SiStripMonitorTrack.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0'    # bit 0
-# #                                             , 'L1Tech_BSC_minBias_threshold1.v0' # bit 40
-# #                                             , 'L1Tech_BSC_minBias_threshold2.v0' # bit 41
-#                                             , '~L1Tech_BSC_halo_beam2_inner.v0' # bit ~36
-#                                             , '~L1Tech_BSC_halo_beam2_outer.v0' # bit ~37
-#                                             , '~L1Tech_BSC_halo_beam1_inner.v0' # bit ~38
-#                                             , '~L1Tech_BSC_halo_beam1_outer.v0' # bit ~39
-#                                             ]
+process.SiStripMonitorTrack.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0'    # bit 0
+#                                             , 'L1Tech_BSC_minBias_threshold1.v0' # bit 40
+#                                             , 'L1Tech_BSC_minBias_threshold2.v0' # bit 41
+                                            , '~L1Tech_BSC_halo_beam2_inner.v0' # bit ~36
+                                            , '~L1Tech_BSC_halo_beam2_outer.v0' # bit ~37
+                                            , '~L1Tech_BSC_halo_beam1_inner.v0' # bit ~38
+                                            , '~L1Tech_BSC_halo_beam1_outer.v0' # bit ~39
+                                            ]
 # process.SiStripMonitorTrack.andOrL1       = False
 # process.SiStripMonitorTrack.errorReplyL1  = False
 # process.SiStripMonitorTrack.dcsInputTag   = "scalersRawToDigi"
@@ -105,7 +105,7 @@ process.load( 'HLTrigger.HLTfilters.hltHighLevel_cfi' )
 #                                                  ]
 # process.TrackerCollisionTrackMon.andOrHlt      = False
 # process.TrackerCollisionTrackMon.errorReplyHlt = False
-process.TrackerCollisionTrackMon.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0 AND ( L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0 )'
+process.TrackerCollisionTrackMon.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0 AND ( L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0 ) AND NOT ( L1Tech_BSC_halo_beam2_inner.v0 OR L1Tech_BSC_halo_beam2_outer.v0 OR L1Tech_BSC_halo_beam1_inner.v0 OR L1Tech_BSC_halo_beam1_outer.v0 )'
                                                  ]
 # process.TrackerCollisionTrackMon.andOrL1       = False
 # process.TrackerCollisionTrackMon.errorReplyL1  = False

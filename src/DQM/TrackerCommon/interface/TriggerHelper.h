@@ -63,7 +63,7 @@ class TriggerHelper {
 
     // L1
     bool acceptL1( const edm::Event & event, const edm::EventSetup & setup, const edm::ParameterSet & config );
-    bool acceptL1Algorithm( const edm::Event & event, std::string l1AlgorithmName );
+    bool acceptL1Algorithm( const edm::Event & event, std::string l1LogicalExpression );
 
     // HLT
     bool acceptHlt( const edm::Event & event, const edm::ParameterSet & config );
