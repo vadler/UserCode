@@ -92,14 +92,14 @@ bool TriggerHelper::acceptL1Algorithm( const Event & event, string l1LogicalExpr
 
   // Check empty strings
   if ( l1LogicalExpression.empty() ) {
-    LogError( "l1AlgorithmName" ) << "Empty algorithm name";
+    LogError( "l1LogicalExpression" ) << "Empty logical expression";
     return errorReplyL1_;
   }
 
   // Negated algorithms
   bool notAlgo( negate( l1LogicalExpression ) );
   if ( notAlgo && l1LogicalExpression.empty() ) {
-    LogError( "l1AlgorithmName" ) << "Empty (negated) algorithm name";
+    LogError( "l1LogicalExpression" ) << "Empty (negated) logical expression";
     return errorReplyL1_;
   }
 
@@ -107,19 +107,18 @@ bool TriggerHelper::acceptL1Algorithm( const Event & event, string l1LogicalExpr
   L1GtLogicParser l1AlgoLogicParser( l1LogicalExpression );
   // Loop over tokens
   for ( size_t iToken = 0; iToken < l1AlgoLogicParser.operandTokenVector().size(); ++iToken ) {
-    int error( -1 );
     const string algoName( l1AlgoLogicParser.operandTokenVector().at( iToken ).tokenName );
+    int error( -1 );
     const bool decision( l1Gt_.decision( event, algoName, error ) );
-    cout << "  TriggerHelper: algo name " << algoName << " -> " << decision << endl; // DEBUG
     // Error checks
-    if ( error == 1 ) {
-      LogError( "l1AlgorithmInMenu" ) << "L1 algorithm " << algoName << " does not exist in the L1 menu";
-      return errorReplyL1_;
-    } else if ( error != 0 ) {
-      LogError( "l1AlgorithmError" ) << "L1 algorithm " << algoName << " received error code " << error << " from L1GtUtils::decisionBeforeMask";
-      return errorReplyL1_;
+    if ( error != 0 ) {
+      if ( error == 1 ) LogError( "l1AlgorithmInMenu" ) << "L1 algorithm " << algoName << " does not exist in the L1 menu";
+      else              LogError( "l1AlgorithmError" )  << "L1 algorithm " << algoName << " received error code " << error << " from L1GtUtils::decisionBeforeMask";
+      l1AlgoLogicParser.operandTokenVector().at( iToken ).tokenResult = errorReplyL1_;
+      continue;
     }
     // Manipulate algo decision as stored in the parser
+    cout << "  TriggerHelper: algo name " << algoName << " -> " << decision << endl; // DEBUG
     l1AlgoLogicParser.operandTokenVector().at( iToken ).tokenResult = decision;
   }
 
