@@ -51,7 +51,7 @@ process.source = cms.Source( "PoolSource",
   skipEvents = cms.untracked.uint32( 0 )
 )
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( 100 )
+  input = cms.untracked.int32( 10 )
 )
 process.options = cms.untracked.PSet(
   Rethrow     = cms.untracked.vstring( 'ProductNotFound' ),
@@ -99,23 +99,24 @@ process.load( 'HLTrigger.HLTfilters.hltHighLevel_cfi' )
 #                                             ]
 # process.SiStripMonitorTrack.andOrDcs      = False
 # process.SiStripMonitorTrack.errorReplyDcs = False
-# process.TrackMon.andOr         = False
-# process.TrackMon.hltInputTag   = "TriggerResults::HLT"
-# process.TrackMon.hltPaths      = [ 'HLT_PhysicsDeclared'
-#                                  ]
-# process.TrackMon.andOrHlt      = False
-# process.TrackMon.errorReplyHlt = False
-# process.TrackMon.l1Algorithms  = []
-# process.TrackMon.andOrL1       = False
-# process.TrackMon.errorReplyL1  = False
-# process.TrackMon.dcsInputTag   = "scalersRawToDigi"
-# process.TrackMon.dcsPartitions = [ 24
-#                                  , 25
-#                                  , 26
-#                                  , 27
-#                                  ]
-# process.TrackMon.andOrDcs      = False
-# process.TrackMon.errorReplyDcs = False
+# process.TrackerCollisionTrackMon.andOr         = False
+# process.TrackerCollisionTrackMon.hltInputTag   = "TriggerResults::HLT"
+# process.TrackerCollisionTrackMon.hltPaths      = [ 'HLT_PhysicsDeclared'
+#                                                  ]
+# process.TrackerCollisionTrackMon.andOrHlt      = False
+# process.TrackerCollisionTrackMon.errorReplyHlt = False
+process.TrackerCollisionTrackMon.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0 AND ( L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0 )'
+                                                 ]
+# process.TrackerCollisionTrackMon.andOrL1       = False
+# process.TrackerCollisionTrackMon.errorReplyL1  = False
+# process.TrackerCollisionTrackMon.dcsInputTag   = "scalersRawToDigi"
+# process.TrackerCollisionTrackMon.dcsPartitions = [ 24
+#                                                  , 25
+#                                                  , 26
+#                                                  , 27
+#                                                  ]
+# process.TrackerCollisionTrackMon.andOrDcs      = False
+# process.TrackerCollisionTrackMon.errorReplyDcs = False
 
 process.raw2Digi = cms.Sequence(
   process.scalersRawToDigi +
@@ -132,7 +133,7 @@ process.reco = cms.Sequence(
   process.logErrorHarvester
 )
 process.dqm = cms.Sequence(
-  process.SiStripDQMTier0          *
+  process.SiStripDQMTier0  *
   process.DQMMessageLogger
 )
 
