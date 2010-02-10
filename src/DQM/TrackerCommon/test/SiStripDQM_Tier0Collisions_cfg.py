@@ -35,7 +35,7 @@ process.DQMStore.referenceFileName = ''
 process.DQMStore.collateHistograms = False
 process.dqmSaver.convention = 'Offline'
 process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_5_X/RECO'
-process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_0/output'
+process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_0_patch1/output'
 process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 
 # Input
