@@ -1,10 +1,12 @@
-Test Release based on: CMSSW_3_3_6
-Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_3_6
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_3_6
+Test Release based on: CMSSW_3_5_0
+Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_5_0
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_0
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/PatCandidates                        B3_3_X         V05-08-11      
-PhysicsTools/PatAlgos                            B3_3_X         V07-09-39      
-PhysicsTools/PatExamples                         NoTag          V00-01-05      
-PhysicsTools/PatUtils                            B3_3_X         V03-09-07      
+DataFormats/PatCandidates                        NoTag          V05-09-04      
+FWCore/GuiBrowsers                               V00-00-19      V00-00-15      
+PhysicsTools/PatAlgos                            NoTag          V07-10-05-05   
+PhysicsTools/PatExamples                         NoTag          V00-01-10      
+PhysicsTools/PatUtils                            NoTag          V03-09-11      
+PhysicsTools/SelectorUtils                       V00-00-05      V00-00-03      
 ---------------------------------------
-total packages: 4 (4 displayed)
+total packages: 6 (6 displayed)
