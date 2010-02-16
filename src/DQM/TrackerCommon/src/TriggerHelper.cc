@@ -1,5 +1,5 @@
 //
-// $Id: TriggerHelper.cc,v 1.5 2010/02/02 22:17:52 vadler Exp $
+// $Id: TriggerHelper.cc,v 1.8 2010/02/04 22:16:20 vadler Exp $
 //
 
 
@@ -32,9 +32,10 @@ bool TriggerHelper::accept( const edm::Event & event, const edm::EventSetup & se
   // If it does not exist, the configuration is considered not to be present,
   // and the filter dos not have any effect.
   if ( ! config.exists( "andOr" ) ) return true;
+  andOr_ = config.getParameter< bool >( "andOr" );
 
   // Determine decision
-  if ( config.getParameter< bool >( "andOr" ) ) return ( acceptL1( event, setup, config ) || acceptHlt( event, config ) || acceptDcs( event, config ) );
+  if ( andOr_ ) return ( acceptL1( event, setup, config ) || acceptHlt( event, config ) || acceptDcs( event, config ) );
   return ( acceptL1( event, setup, config ) && acceptHlt( event, config ) && acceptDcs( event, config ) );
 
 }
@@ -48,9 +49,10 @@ bool TriggerHelper::accept( const Event & event, const ParameterSet & config )
   // If it does not exist, the configuration is considered not to be present,
   // and the filter dos not have any effect.
   if ( ! config.exists( "andOr" ) ) return true;
+  andOr_ = config.getParameter< bool >( "andOr" );
 
   // Determine decision
-  if ( config.getParameter< bool >( "andOr" ) ) return ( acceptHlt( event, config ) || acceptDcs( event, config ) );
+  if ( andOr_ ) return ( acceptHlt( event, config ) || acceptDcs( event, config ) );
   return ( acceptHlt( event, config ) && acceptDcs( event, config ) );
 
 }
@@ -59,6 +61,11 @@ bool TriggerHelper::accept( const Event & event, const ParameterSet & config )
 /// Was this event accepted by the configured L1 logical expression combination?
 bool TriggerHelper::acceptL1( const Event & event, const EventSetup & setup, const ParameterSet & config )
 {
+
+  // Getting the and/or L1 switch from the configuration
+  // If it does not exist, the configuration is considered not to be present,
+  // and the filter dos not have any effect
+  if ( ! config.exists( "andOrL1" ) ) return ( ! andOr_ ); // logically neutral, depending on base conjunction
 
   // Getting configuration parameters
   const vector< string > l1LogicalExpressions( config.getParameter< vector< string > >( "l1Algorithms" ) );
@@ -88,7 +95,6 @@ bool TriggerHelper::acceptL1( const Event & event, const EventSetup & setup, con
 /// Was this event accepted by this particular L1 algorithms' logical expression?
 bool TriggerHelper::acceptL1LogicalExpression( const Event & event, string l1LogicalExpression )
 {
-
 
   // Check empty strings
   if ( l1LogicalExpression.empty() ) {
@@ -135,6 +141,11 @@ bool TriggerHelper::acceptL1LogicalExpression( const Event & event, string l1Log
 /// Was this event accepted by the configured HLT logical expression combination?
 bool TriggerHelper::acceptHlt( const Event & event, const ParameterSet & config )
 {
+
+  // Getting the and/or HLT switch from the configuration
+  // If it does not exist, the configuration is considered not to be present,
+  // and the filter dos not have any effect
+  if ( ! config.exists( "andOrHlt" ) ) return ( ! andOr_ ); // logically neutral, depending on base conjunction
 
   // Getting configuration parameters
   const vector< string > hltLogicalExpressions( config.getParameter< vector< string > >( "hltPaths" ) );
@@ -236,6 +247,11 @@ bool TriggerHelper::acceptHltLogicalExpression( string hltLogicalExpression ) co
 
 bool TriggerHelper::acceptDcs( const edm::Event & event, const edm::ParameterSet & config )
 {
+
+  // Getting the and/or DCS switch from the configuration
+  // If it does not exist, the configuration is considered not to be present,
+  // and the filter dos not have any effect
+  if ( ! config.exists( "andOrDcs" ) ) return ( ! andOr_ ); // logically neutral, depending on base conjunction
 
   // Getting configuration parameters
   const InputTag dcsInputTag( config.getParameter< InputTag >( "dcsInputTag" ) );

@@ -7,7 +7,7 @@
 // Package:    DQM/TrackerCommon
 // Class:      TriggerHelper
 //
-// $Id: TriggerHelper.h,v 1.2 2010/02/02 22:31:11 vadler Exp $
+// $Id: TriggerHelper.h,v 1.3 2010/02/04 22:30:09 vadler Exp $
 //
 /**
   \class    TriggerHelper TriggerHelper.h "DQM/TrackerCommon/interface/TriggerHelper.h"
@@ -16,7 +16,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id: TriggerHelper.h,v 1.2 2010/02/02 22:31:11 vadler Exp $
+  \version  $Id: TriggerHelper.h,v 1.3 2010/02/04 22:30:09 vadler Exp $
 */
 
 
@@ -33,6 +33,8 @@
 class TriggerHelper {
 
     // Data members
+    // General
+    bool andOr_;
     // L1 access
     L1GtUtils l1Gt_;
     // L1 filter configuration parameters
