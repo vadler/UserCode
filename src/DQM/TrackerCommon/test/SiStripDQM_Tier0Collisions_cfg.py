@@ -75,48 +75,49 @@ process.load( 'HLTrigger.HLTfilters.hltHighLevel_cfi' )
 # process.hltHighLevel.andOr    = True
 
 # process.SiStripMonitorTrack.andOr         = True
-# process.SiStripMonitorTrack.hltInputTag   = "TriggerResults::HLT"
-process.SiStripMonitorTrack.hltPaths      = [ 'HLT_PhysicsDeclared AND HLT_ZeroBias1kHz'
-#                                             , 'HLT_ZeroBias1kHz'
-                                            ]
-# process.SiStripMonitorTrack.andOrHlt      = False
-# process.SiStripMonitorTrack.errorReplyHlt = False
-# process.SiStripMonitorTrack.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0'    # bit 0
-# #                                             , 'L1Tech_BSC_minBias_threshold1.v0' # bit 40
-# #                                             , 'L1Tech_BSC_minBias_threshold2.v0' # bit 41
-#                                             , '~L1Tech_BSC_halo_beam2_inner.v0' # bit ~36
-#                                             , '~L1Tech_BSC_halo_beam2_outer.v0' # bit ~37
-#                                             , '~L1Tech_BSC_halo_beam1_inner.v0' # bit ~38
-#                                             , '~L1Tech_BSC_halo_beam1_outer.v0' # bit ~39
-#                                             ]
-# process.SiStripMonitorTrack.andOrL1       = False
-# process.SiStripMonitorTrack.errorReplyL1  = False
 # process.SiStripMonitorTrack.dcsInputTag   = "scalersRawToDigi"
 # process.SiStripMonitorTrack.dcsPartitions = [ 24
 #                                             , 25
 #                                             , 26
 #                                             , 27
 #                                             ]
-# process.SiStripMonitorTrack.andOrDcs      = False
-# process.SiStripMonitorTrack.errorReplyDcs = False
-# process.TrackerCollisionTrackMon.andOr         = False
-# process.TrackerCollisionTrackMon.hltInputTag   = "TriggerResults::HLT"
-# process.TrackerCollisionTrackMon.hltPaths      = [ 'HLT_PhysicsDeclared'
-#                                                  ]
-# process.TrackerCollisionTrackMon.andOrHlt      = False
-# process.TrackerCollisionTrackMon.errorReplyHlt = False
-process.TrackerCollisionTrackMon.l1Algorithms  = [ 'L1Tech_BPTX_plus_AND_minus.v0 AND ( L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0 ) AND NOT ( L1Tech_BSC_halo_beam2_inner.v0 OR L1Tech_BSC_halo_beam2_outer.v0 OR L1Tech_BSC_halo_beam1_inner.v0 OR L1Tech_BSC_halo_beam1_outer.v0 )'
-                                                 ]
-# process.TrackerCollisionTrackMon.andOrL1       = False
-process.TrackerCollisionTrackMon.errorReplyL1  = True
+# process.SiStripMonitorTrack.andOrDcs      = True
+# process.SiStripMonitorTrack.errorReplyDcs = True
+# process.SiStripMonitorTrack.gtInputTag    = "gtDigis"
+# process.SiStripMonitorTrack.gtStatusBits  = [ 'PhysicsDeclared'
+#                                             ]
+# process.SiStripMonitorTrack.andOrGt       = False
+# process.SiStripMonitorTrack.errorReplyGt  = False
+# process.SiStripMonitorTrack.l1Algorithms  = cms.vstring()
+# process.SiStripMonitorTrack.andOrL1       = cms.bool( False )
+# process.SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
+process.SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
+process.SiStripMonitorTrack.hltPaths      = cms.vstring( 'HLT_ZeroBias1kHz'
+                                                       )
+process.SiStripMonitorTrack.andOrHlt      = cms.bool( False )
+process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
+# process.TrackerCollisionTrackMon.andOr         = True
 # process.TrackerCollisionTrackMon.dcsInputTag   = "scalersRawToDigi"
 # process.TrackerCollisionTrackMon.dcsPartitions = [ 24
 #                                                  , 25
 #                                                  , 26
 #                                                  , 27
 #                                                  ]
-# process.TrackerCollisionTrackMon.andOrDcs      = False
-# process.TrackerCollisionTrackMon.errorReplyDcs = False
+# process.TrackerCollisionTrackMon.andOrDcs      = True
+# process.TrackerCollisionTrackMon.errorReplyDcs = True
+# process.TrackerCollisionTrackMon.gtInputTag    = "gtDigis"
+# process.TrackerCollisionTrackMon.gtStatusBits  = [ 'PhysicsDeclared'
+#                                                  ]
+# process.TrackerCollisionTrackMon.andOrGt       = False
+# process.TrackerCollisionTrackMon.errorReplyGt  = False
+process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring( 'L1Tech_BPTX_plus_AND_minus.v0 AND ( L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0 ) AND NOT ( L1Tech_BSC_halo_beam2_inner.v0 OR L1Tech_BSC_halo_beam2_outer.v0 OR L1Tech_BSC_halo_beam1_inner.v0 OR L1Tech_BSC_halo_beam1_outer.v0 )'
+                                                            )
+process.TrackerCollisionTrackMon.andOrL1       = cms.bool( False )
+process.TrackerCollisionTrackMon.errorReplyL1  = cms.bool( False )
+# process.TrackerCollisionTrackMon.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
+# process.TrackerCollisionTrackMon.hltPaths      = cms.vstring()
+# process.TrackerCollisionTrackMon.andOrHlt      = cms.bool( False )
+# process.TrackerCollisionTrackMon.errorReplyHlt = cms.bool( False )
 
 process.raw2Digi = cms.Sequence(
   process.scalersRawToDigi +
@@ -155,4 +156,21 @@ process.path = cms.Path(
   process.siStripDcsInfo           *
   process.siStripCertificationInfo *
   process.dqmSaver
+)
+
+process.out = cms.OutputModule( "PoolOutputModule",
+  fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_0_patch1/output/SiStripDQM_Tier0Collisions.root' ),
+  SelectEvents   = cms.untracked.PSet(
+    SelectEvents = cms.vstring(
+      'path'
+    )
+  ),
+  outputCommands = cms.untracked.vstring(
+    'drop *',
+    'keep *_*_*_TEST'
+  )
+)
+
+process.outpath = cms.EndPath(
+  process.out
 )

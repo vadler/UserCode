@@ -28,15 +28,8 @@ from DQM.SiStripMonitorTrack.SiStripMonitorTrack_cfi import *
 SiStripMonitorTrack.TrackProducer = 'generalTracks'
 SiStripMonitorTrack.Mod_On        = False
 SiStripMonitorTrack.FolderName    = 'Tracking/TrackParameters'
+# Filters
 SiStripMonitorTrack.andOr         = cms.bool( False )
-SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
-SiStripMonitorTrack.hltPaths      = cms.vstring( 'HLT_PhysicsDeclared'
-                                               )
-SiStripMonitorTrack.andOrHlt      = cms.bool( False )
-SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
-SiStripMonitorTrack.l1Algorithms  = cms.vstring()
-SiStripMonitorTrack.andOrL1       = cms.bool( False )
-SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
 SiStripMonitorTrack.dcsInputTag   = cms.InputTag( "scalersRawToDigi" )
 SiStripMonitorTrack.dcsPartitions = cms.vint32( 24
                                               , 25
@@ -45,6 +38,18 @@ SiStripMonitorTrack.dcsPartitions = cms.vint32( 24
                                               )
 SiStripMonitorTrack.andOrDcs      = cms.bool( False )
 SiStripMonitorTrack.errorReplyDcs = cms.bool( False )
+SiStripMonitorTrack.gtInputTag    = cms.InputTag( "gtDigis" )
+SiStripMonitorTrack.gtStatusBits  = cms.vstring( 'PhysicsDeclared'
+                                               )
+SiStripMonitorTrack.andOrGt       = cms.bool( False )
+SiStripMonitorTrack.errorReplyGt  = cms.bool( False )
+# SiStripMonitorTrack.l1Algorithms  = cms.vstring()
+# SiStripMonitorTrack.andOrL1       = cms.bool( False )
+# SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
+# SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
+# SiStripMonitorTrack.hltPaths      = cms.vstring()
+# SiStripMonitorTrack.andOrHlt      = cms.bool( False )
+# SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
 
 # TrackerMonitorTrack ####
 from DQM.TrackerMonitorTrack.MonitorTrackResiduals_cfi import *
@@ -56,15 +61,8 @@ MonitorTrackResiduals.Mod_On = False
 from DQM.TrackingMonitor.TrackerCollisionTrackingMonitor_cfi import *
 TrackerCollisionTrackMon.FolderName   = 'Tracking/TrackParameters'
 TrackerCollisionTrackMon.BSFolderName = 'Tracking/TrackParameters/BeamSpotParameters'
+# Filters
 TrackerCollisionTrackMon.andOr         = cms.bool( False )
-TrackerCollisionTrackMon.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
-TrackerCollisionTrackMon.hltPaths      = cms.vstring( 'HLT_PhysicsDeclared'
-                                                    )
-TrackerCollisionTrackMon.andOrHlt      = cms.bool( False )
-TrackerCollisionTrackMon.errorReplyHlt = cms.bool( False )
-TrackerCollisionTrackMon.l1Algorithms  = cms.vstring()
-TrackerCollisionTrackMon.andOrL1       = cms.bool( False )
-TrackerCollisionTrackMon.errorReplyL1  = cms.bool( False )
 TrackerCollisionTrackMon.dcsInputTag   = cms.InputTag( "scalersRawToDigi" )
 TrackerCollisionTrackMon.dcsPartitions = cms.vint32( 24
                                                    , 25
@@ -73,6 +71,18 @@ TrackerCollisionTrackMon.dcsPartitions = cms.vint32( 24
                                                    )
 TrackerCollisionTrackMon.andOrDcs      = cms.bool( False )
 TrackerCollisionTrackMon.errorReplyDcs = cms.bool( False )
+TrackerCollisionTrackMon.gtInputTag    = cms.InputTag( "gtDigis" )
+TrackerCollisionTrackMon.gtStatusBits  = cms.vstring( 'PhysicsDeclared'
+                                                    )
+TrackerCollisionTrackMon.andOrGt       = cms.bool( False )
+TrackerCollisionTrackMon.errorReplyGt  = cms.bool( False )
+# TrackerCollisionTrackMon.l1Algorithms  = cms.vstring()
+# TrackerCollisionTrackMon.andOrL1       = cms.bool( False )
+# TrackerCollisionTrackMon.errorReplyL1  = cms.bool( False )
+# TrackerCollisionTrackMon.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
+# TrackerCollisionTrackMon.hltPaths      = cms.vstring()
+# TrackerCollisionTrackMon.andOrHlt      = cms.bool( False )
+# TrackerCollisionTrackMon.errorReplyHlt = cms.bool( False )
 
   # DQM Services
 dqmInfoSiStrip = cms.EDFilter("DQMEventInfo",
