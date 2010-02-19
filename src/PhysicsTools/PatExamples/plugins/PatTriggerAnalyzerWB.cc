@@ -11,8 +11,8 @@
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
 
 #include "TH1D.h"
 #include "TH2D.h"
@@ -22,19 +22,19 @@
 namespace pat {
 
   class PatTriggerAnalyzerWB : public edm::EDAnalyzer {
-  
+
     public:
-    
+
       // constructor(s) and destructor
       explicit PatTriggerAnalyzerWB( const edm::ParameterSet & iConfig );
       ~PatTriggerAnalyzerWB();
-    
+
     private:
-  
+
       // methods
       virtual void beginJob() ;
       virtual void analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup );
-      
+
       // configuration parameters: input sources
       edm::InputTag triggerEvent_;
       edm::InputTag muons_;
@@ -120,7 +120,7 @@ void PatTriggerAnalyzerWB::analyze( const edm::Event & iEvent, const edm::EventS
   for ( TriggerObjectRefVector::const_iterator iTrig = trigRefVector.begin(); iTrig != trigRefVector.end(); ++iTrig ) {
     histos1D_[ "ptTrigAll" ]->Fill( ( *iTrig )->pt() );                                  // <== missing piece
   }
-  
+
 }
 
 
