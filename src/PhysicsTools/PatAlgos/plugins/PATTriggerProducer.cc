@@ -11,6 +11,17 @@
 using namespace pat;
 
 PATTriggerProducer::PATTriggerProducer( const edm::ParameterSet & iConfig ) :
+  // L1 configuration parameters
+  tagL1GtReadoutRecord_( iConfig.getParameter< edm::InputTag >( "l1GtReadoutRecord" ) ),
+  tagL1ExtraMu_( iConfig.getParameter< edm::InputTag >( "l1ExtraMu" ) ),
+  tagL1ExtraNoIsoEG_( iConfig.getParameter< edm::InputTag >( "l1ExtraNoIsoEG" ) ),
+  tagL1ExtraIsoEG_( iConfig.getParameter< edm::InputTag >( "l1ExtraIsoEG" ) ),
+  tagL1ExtraCenJet_( iConfig.getParameter< edm::InputTag >( "l1ExtraCenJet" ) ),
+  tagL1ExtraForJet_( iConfig.getParameter< edm::InputTag >( "l1ExtraForJet" ) ),
+  tagL1ExtraTauJet_( iConfig.getParameter< edm::InputTag >( "l1ExtraTauJet" ) ),
+  tagL1ExtraETM_( iConfig.getParameter< edm::InputTag >( "l1ExtraETM" ) ),
+  tagL1ExtraHTM_( iConfig.getParameter< edm::InputTag >( "l1ExtraHTM" ) ),
+  // HLT configuration parameters
   nameProcess_( iConfig.getParameter< std::string >( "processName" ) ),
   tagTriggerResults_( iConfig.getParameter< edm::InputTag >( "triggerResults" ) ),
   tagTriggerEvent_( iConfig.getParameter< edm::InputTag >( "triggerEvent" ) ),
@@ -60,7 +71,7 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
     return;
   }
 
-  // produce trigger paths and determine status of modules
+  // produce HLT paths and determine status of modules
 
   const unsigned sizePaths( hltConfig_.size() );
   const unsigned sizeFilters( handleTriggerEvent->sizeFilters() );
@@ -119,7 +130,7 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
     iEvent.put( triggerPaths );
   }
 
-  // produce trigger filters and store used trigger object types
+  // produce HLT filters and store used trigger object types
   // (only last active filter(s) available from trigger::TriggerEvent)
 
   std::auto_ptr< TriggerFilterCollection > triggerFilters( new TriggerFilterCollection() );
@@ -170,10 +181,11 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
   // produce trigger objects
 
   std::auto_ptr< TriggerObjectCollection > triggerObjects( new TriggerObjectCollection() );
-  triggerObjects->reserve( onlyStandAlone_ ? 0 : sizeObjects );
+//   triggerObjects->reserve( onlyStandAlone_ ? 0 : sizeObjects );
   std::auto_ptr< TriggerObjectStandAloneCollection > triggerObjectsStandAlone( new TriggerObjectStandAloneCollection() );
-  triggerObjectsStandAlone->reserve( sizeObjects );
+//   triggerObjectsStandAlone->reserve( sizeObjects );
 
+  // HLT
   const trigger::Keys & collectionKeys( handleTriggerEvent->collectionKeys() );
   for ( size_t iO = 0, iC = 0; iO < sizeObjects && iC < handleTriggerEvent->sizeCollections(); ++iO ) {
 
@@ -205,6 +217,144 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
       }
     }
 
+    triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+  }
+
+  // L1
+  edm::Handle< l1extra::L1MuonParticleCollection > handleL1ExtraMu;
+  iEvent.getByLabel( tagL1ExtraMu_, handleL1ExtraMu );
+  if ( ! handleL1ExtraMu.isValid() ) {
+    edm::LogError( "errorL1ExtraMuValid" ) << "l1extra::L1MuonParticleCollection product with InputTag " << tagL1ExtraMu_.encode() << " not in event";
+    return;
+  }
+  edm::Handle< l1extra::L1EmParticleCollection > handleL1ExtraNoIsoEG;
+  iEvent.getByLabel( tagL1ExtraNoIsoEG_, handleL1ExtraNoIsoEG );
+  if ( ! handleL1ExtraNoIsoEG.isValid() ) {
+    edm::LogError( "errorL1ExtraNoIsoEGValid" ) << "l1extra::L1EmParticleCollection product with InputTag " << tagL1ExtraNoIsoEG_.encode() << " not in event";
+    return;
+  }
+  edm::Handle< l1extra::L1EmParticleCollection > handleL1ExtraIsoEG;
+  iEvent.getByLabel( tagL1ExtraIsoEG_, handleL1ExtraIsoEG );
+  if ( ! handleL1ExtraIsoEG.isValid() ) {
+    edm::LogError( "errorL1ExtraisoEGValid" ) << "l1extra::L1EmParticleCollection product with InputTag " << tagL1ExtraIsoEG_.encode() << " not in event";
+    return;
+  }
+  edm::Handle< l1extra::L1JetParticleCollection > handleL1ExtraCenJet;
+  iEvent.getByLabel( tagL1ExtraCenJet_, handleL1ExtraCenJet );
+  if ( ! handleL1ExtraCenJet.isValid() ) {
+    edm::LogError( "errorL1ExtraCenJetValid" ) << "l1extra::L1JetParticleCollection product with InputTag " << tagL1ExtraCenJet_.encode() << " not in event";
+    return;
+  }
+  edm::Handle< l1extra::L1JetParticleCollection > handleL1ExtraForJet;
+  iEvent.getByLabel( tagL1ExtraForJet_, handleL1ExtraForJet );
+  if ( ! handleL1ExtraForJet.isValid() ) {
+    edm::LogError( "errorL1ExtraForJetValid" ) << "l1extra::L1JetParticleCollection product with InputTag " << tagL1ExtraForJet_.encode() << " not in event";
+    return;
+  }
+  edm::Handle< l1extra::L1JetParticleCollection > handleL1ExtraTauJet;
+  iEvent.getByLabel( tagL1ExtraTauJet_, handleL1ExtraTauJet );
+  if ( ! handleL1ExtraTauJet.isValid() ) {
+    edm::LogError( "errorL1ExtraTauJetValid" ) << "l1extra::L1JetParticleCollection product with InputTag " << tagL1ExtraTauJet_.encode() << " not in event";
+    return;
+  }
+  edm::Handle< l1extra::L1EtMissParticleCollection > handleL1ExtraETM;
+  iEvent.getByLabel( tagL1ExtraETM_, handleL1ExtraETM );
+  if ( ! handleL1ExtraETM.isValid() ) {
+    edm::LogError( "errorL1ExtraETMValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag " << tagL1ExtraETM_.encode() << " not in event";
+    return;
+  }
+  edm::Handle< l1extra::L1EtMissParticleCollection > handleL1ExtraHTM;
+  iEvent.getByLabel( tagL1ExtraHTM_, handleL1ExtraHTM );
+  if ( ! handleL1ExtraHTM.isValid() ) {
+    edm::LogError( "errorL1ExtraHTMValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag " << tagL1ExtraHTM_.encode() << " not in event";
+    return;
+  }
+  for ( size_t l1Mu = 0; l1Mu < handleL1ExtraMu->size(); ++l1Mu ) {
+    const reco::LeafCandidate * ptrMu( handleL1ExtraMu->at( l1Mu ).clone() );
+    TriggerObject triggerObject( *ptrMu );
+    triggerObject.setCollection( tagL1ExtraMu_.encode() );
+    triggerObject.addFilterId( trigger::TriggerL1Mu );
+    if ( ! onlyStandAlone_ ) {
+      triggerObjects->push_back( triggerObject );
+    }
+    TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+    triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+  }
+  for ( size_t l1NoIsoEG = 0; l1NoIsoEG < handleL1ExtraNoIsoEG->size(); ++l1NoIsoEG ) {
+    const reco::LeafCandidate * ptrNoIsoEG( handleL1ExtraNoIsoEG->at( l1NoIsoEG ).clone() );
+    TriggerObject triggerObject( *ptrNoIsoEG );
+    triggerObject.setCollection( tagL1ExtraNoIsoEG_.encode() );
+    triggerObject.addFilterId( trigger::TriggerL1NoIsoEG );
+    if ( ! onlyStandAlone_ ) {
+      triggerObjects->push_back( triggerObject );
+    }
+    TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+    triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+  }
+  for ( size_t l1IsoEG = 0; l1IsoEG < handleL1ExtraIsoEG->size(); ++l1IsoEG ) {
+    const reco::LeafCandidate * ptrIsoEG( handleL1ExtraIsoEG->at( l1IsoEG ).clone() );
+    TriggerObject triggerObject( *ptrIsoEG );
+    triggerObject.setCollection( tagL1ExtraIsoEG_.encode() );
+    triggerObject.addFilterId( trigger::TriggerL1IsoEG );
+    if ( ! onlyStandAlone_ ) {
+      triggerObjects->push_back( triggerObject );
+    }
+    TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+    triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+  }
+  for ( size_t l1CenJet = 0; l1CenJet < handleL1ExtraCenJet->size(); ++l1CenJet ) {
+    const reco::LeafCandidate * ptrCenJet( handleL1ExtraCenJet->at( l1CenJet ).clone() );
+    TriggerObject triggerObject( *ptrCenJet );
+    triggerObject.setCollection( tagL1ExtraCenJet_.encode() );
+    triggerObject.addFilterId( trigger::TriggerL1CenJet );
+    if ( ! onlyStandAlone_ ) {
+      triggerObjects->push_back( triggerObject );
+    }
+    TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+    triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+  }
+  for ( size_t l1ForJet = 0; l1ForJet < handleL1ExtraForJet->size(); ++l1ForJet ) {
+    const reco::LeafCandidate * ptrForJet( handleL1ExtraForJet->at( l1ForJet ).clone() );
+    TriggerObject triggerObject( *ptrForJet );
+    triggerObject.setCollection( tagL1ExtraForJet_.encode() );
+    triggerObject.addFilterId( trigger::TriggerL1ForJet );
+    if ( ! onlyStandAlone_ ) {
+      triggerObjects->push_back( triggerObject );
+    }
+    TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+    triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+  }
+  for ( size_t l1TauJet = 0; l1TauJet < handleL1ExtraTauJet->size(); ++l1TauJet ) {
+    const reco::LeafCandidate * ptrTauJet( handleL1ExtraTauJet->at( l1TauJet ).clone() );
+    TriggerObject triggerObject( *ptrTauJet );
+    triggerObject.setCollection( tagL1ExtraTauJet_.encode() );
+    triggerObject.addFilterId( trigger::TriggerL1TauJet );
+    if ( ! onlyStandAlone_ ) {
+      triggerObjects->push_back( triggerObject );
+    }
+    TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+    triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+  }
+  for ( size_t l1ETM = 0; l1ETM < handleL1ExtraETM->size(); ++l1ETM ) {
+    const reco::LeafCandidate * ptrETM( handleL1ExtraETM->at( l1ETM ).clone() );
+    TriggerObject triggerObject( *ptrETM );
+    triggerObject.setCollection( tagL1ExtraETM_.encode() );
+    triggerObject.addFilterId( trigger::TriggerL1ETM );
+    if ( ! onlyStandAlone_ ) {
+      triggerObjects->push_back( triggerObject );
+    }
+    TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+    triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+  }
+  for ( size_t l1HTM = 0; l1HTM < handleL1ExtraHTM->size(); ++l1HTM ) {
+    const reco::LeafCandidate * ptrHTM( handleL1ExtraHTM->at( l1HTM ).clone() );
+    TriggerObject triggerObject( *ptrHTM );
+    triggerObject.setCollection( tagL1ExtraHTM_.encode() );
+    triggerObject.addFilterId( trigger::TriggerL1HTM );
+    if ( ! onlyStandAlone_ ) {
+      triggerObjects->push_back( triggerObject );
+    }
+    TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
     triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
   }
 

@@ -31,9 +31,18 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 
+#include "DataFormats/L1Trigger/interface/L1EmParticle.h"
+#include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
+#include "DataFormats/L1Trigger/interface/L1JetParticle.h"
+#include "DataFormats/L1Trigger/interface/L1JetParticleFwd.h"
+#include "DataFormats/L1Trigger/interface/L1MuonParticle.h"
+#include "DataFormats/L1Trigger/interface/L1MuonParticleFwd.h"
+#include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
+#include "DataFormats/L1Trigger/interface/L1EtMissParticleFwd.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
+#include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
 
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
@@ -54,6 +63,17 @@ namespace pat {
 
       virtual void produce( edm::Event & iEvent, const edm::EventSetup & iSetup );
 
+      // L1
+      edm::InputTag tagL1GtReadoutRecord_;
+      edm::InputTag tagL1ExtraMu_;
+      edm::InputTag tagL1ExtraNoIsoEG_;
+      edm::InputTag tagL1ExtraIsoEG_;
+      edm::InputTag tagL1ExtraCenJet_;
+      edm::InputTag tagL1ExtraForJet_;
+      edm::InputTag tagL1ExtraTauJet_;
+      edm::InputTag tagL1ExtraETM_;
+      edm::InputTag tagL1ExtraHTM_;
+      // HLT
       HLTConfigProvider hltConfig_;
       std::string       nameProcess_;
       edm::InputTag     tagTriggerResults_;
