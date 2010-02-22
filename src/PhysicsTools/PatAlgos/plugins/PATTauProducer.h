@@ -1,5 +1,5 @@
 //
-// $Id: PATTauProducer.h,v 1.19 2009/06/25 23:49:35 gpetrucc Exp $
+// $Id: PATTauProducer.h,v 1.20 2010/02/20 21:00:28 wmtan Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATTauProducer_h
@@ -13,14 +13,14 @@
    a collection of objects of TauType.
 
   \author   Steven Lowette, Christophe Delaere
-  \version  $Id: PATTauProducer.h,v 1.19 2009/06/25 23:49:35 gpetrucc Exp $
+  \version  $Id: PATTauProducer.h,v 1.20 2010/02/20 21:00:28 wmtan Exp $
 */
 
 
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 #include "DataFormats/Common/interface/Handle.h"
 
