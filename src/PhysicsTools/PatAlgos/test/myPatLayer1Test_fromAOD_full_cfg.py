@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 #process.source.fileNames    = [ '/store/relval/CMSSW_3_4_0_pre1/RelValTTbar/GEN-SIM-RECO/STARTUP31X_V8-v1/0007/BAB355DB-DFB4-DE11-AD73-0019B9F72F97.root' ]
 # process.maxEvents.input     = ...
 # process.out.outputCommands  = [ ... ]
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_X_2010-02-22-0200/output/myPatLayer1Test_fromAOD_full.root'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0_pre1/output/myPatLayer1Test_fromAOD_full.root'
 # process.options.wantSummary = False
 
 # # memory check
@@ -24,16 +24,15 @@ process.p = cms.Path(
 
 # Trigger Test
 process.patTrigger = cms.EDProducer( "PATTriggerProducer"
-                                   ## L1
-                                   , l1GtReadoutRecord = cms.InputTag( "gtDigis", "" , "RECO" )
-                                   , l1ExtraMu         = cms.InputTag( "l1extraParticles", ""           , "RECO" )
-                                   , l1ExtraNoIsoEG    = cms.InputTag( "l1extraParticles", "NonIsolated", "RECO" )
-                                   , l1ExtraIsoEG      = cms.InputTag( "l1extraParticles", "Isolated"   , "RECO" )
-                                   , l1ExtraCenJet     = cms.InputTag( "l1extraParticles", "Central"    , "RECO" )
-                                   , l1ExtraForJet     = cms.InputTag( "l1extraParticles", "Forward"    , "RECO" )
-                                   , l1ExtraTauJet     = cms.InputTag( "l1extraParticles", "Tau"        , "RECO" )
-                                   , l1ExtraETM        = cms.InputTag( "l1extraParticles", "MET"        , "RECO" )
-                                   , l1ExtraHTM        = cms.InputTag( "l1extraParticles", "MHT"        , "RECO" )
+#                                    ## L1
+#                                    , l1ExtraMu         = cms.InputTag( "l1extraParticles", ""           , "RECO" )
+#                                    , l1ExtraNoIsoEG    = cms.InputTag( "l1extraParticles", "NonIsolated", "RECO" )
+#                                    , l1ExtraIsoEG      = cms.InputTag( "l1extraParticles", "Isolated"   , "RECO" )
+#                                    , l1ExtraCenJet     = cms.InputTag( "l1extraParticles", "Central"    , "RECO" )
+#                                    , l1ExtraForJet     = cms.InputTag( "l1extraParticles", "Forward"    , "RECO" )
+#                                    , l1ExtraTauJet     = cms.InputTag( "l1extraParticles", "Tau"        , "RECO" )
+#                                    , l1ExtraETM        = cms.InputTag( "l1extraParticles", "MET"        , "RECO" )
+#                                    , l1ExtraHTM        = cms.InputTag( "l1extraParticles", "MHT"        , "RECO" )
                                    ## HLT (L3)
                                    , processName    = cms.string( 'HLT' )
                                    , triggerResults = cms.InputTag( "TriggerResults" )
