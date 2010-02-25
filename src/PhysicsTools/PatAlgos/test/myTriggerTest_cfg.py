@@ -32,6 +32,7 @@ process.triggerTest = cms.EDAnalyzer( "myTriggerTest",
     displayNumbers     = cms.bool( True ),
     # objects
     displayObjects = cms.bool( True ),
+    testObjectsL1  = cms.bool( True ),
     # stand-alone objects
     displayObjectsStandAlone = cms.bool( True ),
     # filters

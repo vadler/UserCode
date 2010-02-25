@@ -24,15 +24,15 @@ process.p = cms.Path(
 
 # Trigger Test
 process.patTrigger = cms.EDProducer( "PATTriggerProducer"
-#                                    ## L1
-#                                    , l1ExtraMu         = cms.InputTag( "l1extraParticles", ""           , "RECO" )
-#                                    , l1ExtraNoIsoEG    = cms.InputTag( "l1extraParticles", "NonIsolated", "RECO" )
-#                                    , l1ExtraIsoEG      = cms.InputTag( "l1extraParticles", "Isolated"   , "RECO" )
-#                                    , l1ExtraCenJet     = cms.InputTag( "l1extraParticles", "Central"    , "RECO" )
-#                                    , l1ExtraForJet     = cms.InputTag( "l1extraParticles", "Forward"    , "RECO" )
-#                                    , l1ExtraTauJet     = cms.InputTag( "l1extraParticles", "Tau"        , "RECO" )
-#                                    , l1ExtraETM        = cms.InputTag( "l1extraParticles", "MET"        , "RECO" )
-#                                    , l1ExtraHTM        = cms.InputTag( "l1extraParticles", "MHT"        , "RECO" )
+                                   ## L1
+                                   , l1ExtraMu         = cms.InputTag( "l1extraParticles", ""           , "RECO" )
+                                   , l1ExtraNoIsoEG    = cms.InputTag( "l1extraParticles", "NonIsolated", "RECO" )
+                                   , l1ExtraIsoEG      = cms.InputTag( "l1extraParticles", "Isolated"   , "RECO" )
+                                   , l1ExtraCenJet     = cms.InputTag( "l1extraParticles", "Central"    , "RECO" )
+                                   , l1ExtraForJet     = cms.InputTag( "l1extraParticles", "Forward"    , "RECO" )
+                                   , l1ExtraTauJet     = cms.InputTag( "l1extraParticles", "Tau"        , "RECO" )
+                                   , l1ExtraETM        = cms.InputTag( "l1extraParticles", "MET"        , "RECO" )
+                                   , l1ExtraHTM        = cms.InputTag( "l1extraParticles", "MHT"        , "RECO" )
                                    ## HLT (L3)
                                    , processName    = cms.string( 'HLT' )
                                    , triggerResults = cms.InputTag( "TriggerResults" )
@@ -238,4 +238,7 @@ process.out.outputCommands += [ 'keep patTriggerObjects_patTrigger_*_*'
                               , 'keep patTriggerObjectStandAlonesedmAssociation_*_*_*'
                               , 'keep edmTriggerResults_TriggerResults_*_HLT'
                               , 'keep *_hltTriggerSummaryAOD_*_*'
+                              , 'keep L1GlobalTriggerReadoutRecord_gtDigis_*_*'
+                              , 'keep *_l1GtRecord_*_*'
+                              , 'keep *_l1extraParticles_*_*'
                               ]

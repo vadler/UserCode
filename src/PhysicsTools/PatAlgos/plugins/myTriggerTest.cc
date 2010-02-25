@@ -3,7 +3,7 @@
 // Package:    PatAlgos
 // Class:      pat::myTriggerTest
 //
-// $Id: myTriggerTest.cc,v 1.10 2010/01/06 20:35:08 vadler Exp $
+// $Id: myTriggerTest.cc,v 1.13 2010/01/23 17:42:44 vadler Exp $
 //
 /**
   \class myTriggerTest myTriggerTest.cc "PhysicsTools/myTriggerTest/plugins/myTriggerTest.cc"
@@ -12,7 +12,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id: myTriggerTest.cc,v 1.10 2010/01/06 20:35:08 vadler Exp $
+  \version  $Id: myTriggerTest.cc,v 1.13 2010/01/23 17:42:44 vadler Exp $
  */
 
 
@@ -79,6 +79,7 @@ namespace pat {
       bool              testPathModuleTags_;
       bool              displayNumbers_;
       bool              displayObjects_;
+      bool              testObjectsL1_;
       bool              displayObjectsStandAlone_;
       bool              displayFilters_;
       bool              displayPaths_;
@@ -119,6 +120,7 @@ myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   testPathModuleTags_( iConfig.getParameter< bool >( "testPathModuleTags" ) ),
   displayNumbers_( iConfig.getParameter< bool >( "displayNumbers" ) ),
   displayObjects_( iConfig.getParameter< bool >( "displayObjects" ) ),
+  testObjectsL1_( iConfig.getParameter< bool >( "testObjectsL1" ) ),
   displayObjectsStandAlone_( iConfig.getParameter< bool >( "displayObjectsStandAlone" ) ),
   displayFilters_( iConfig.getParameter< bool >( "displayFilters" ) ),
   displayPaths_( iConfig.getParameter< bool >( "displayPaths" ) ),
@@ -181,12 +183,6 @@ void myTriggerTest::beginJob()
   histos1D_[ "filterIds" ] = fileService->make< TH1D >( "filterIds", "Filter IDs per trigger object", 201, -100.5, 100.5 );
   histos1D_[ "filterIds" ]->SetXTitle( "filter ID" );
   histos1D_[ "filterIds" ]->SetYTitle( "entries" );
-  histos1D_[ "goodFilterIds" ] = fileService->make< TH1D >( "goodFilterIds", "Existing filter ID found?", 2, -0.5, 1.5 );
-  histos1D_[ "goodFilterIds" ]->SetXTitle( "found" );
-  histos1D_[ "goodFilterIds" ]->SetYTitle( "entries" );
-  histos1D_[ "badFilterIds" ] = fileService->make< TH1D >( "badFilterIds", "Non-existing filter ID found?", 2, -0.5, 1.5 );
-  histos1D_[ "badFilterIds" ]->SetXTitle( "found" );
-  histos1D_[ "badFilterIds" ]->SetYTitle( "entries" );
   histos1D_[ "objectKeys" ] = fileService->make< TH1D >( "objectKeys", "Object keys per filter", 251, -0.5, 250.5 );
   histos1D_[ "objectKeys" ]->SetXTitle( "object keys" );
   histos1D_[ "objectKeys" ]->SetYTitle( "entries" );
@@ -257,7 +253,7 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       const TriggerFilterRefVector       myModules( handlePatTriggerEvent->pathModules( iPath->name(), true ) );
       const std::vector< std::string > & namesHltConfig( hltConfig_.moduleLabels( iPath->name() ) );
       unsigned lastFilter( iPath->lastActiveFilterSlot() );
-      bool     lastFilterDecision(  );
+      bool     lastFilterDecision();
       unsigned lastModuleTriggerResults( handleTriggerResults->index( handlePatTriggerEvent->indexPath( iPath->name() ) ) );
       if ( testPathModuleTags_ ) {
         const std::vector< std::string > namesModules( iPath->modules() );
@@ -307,8 +303,18 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
     histos1D_[ "nFilterIds" ]->Fill( ids.size() );
     for ( size_t iId = 0; iId < ids.size(); ++iId ) {
       histos1D_[ "filterIds" ]->Fill( ids.at( iId ) );
-      histos1D_[ "goodFilterIds" ]->Fill( iObject->hasFilterId( ids.at( iId ) ) );
-      histos1D_[ "badFilterIds" ]->Fill( iObject->hasFilterId( ids.at( iId ) + 25 ) ); // arbitrarilly set not to interfere with existing IDs
+    }
+  }
+  if ( testObjectsL1_ ) {
+    bool foundL1( false );
+    for ( TriggerObjectCollection::const_iterator iObject = myEventObjects->begin(); iObject != myEventObjects->end(); ++iObject ) {
+      if ( foundL1 && iObject->collection().find( "l1extraParticles" ) == std::string::npos ) {
+        edm::LogError( "objectOrderL1" ) << "    HLT and L1 objects not properly separated" << "\n"
+                                       << "        collection: " << iObject->collection();
+      }
+      if ( ( ! foundL1 ) && iObject->collection().find( "l1extraParticles" ) != std::string::npos ) {
+        foundL1 = true;
+      }
     }
   }
 
@@ -331,6 +337,16 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
       histos1D_[ "objectIds" ]->Fill( ids.at( iId ) );
     }
     histos2D_[ "nObjectIdsKeys" ]->Fill( keys.size(), ids.size() );
+    if ( testObjectsL1_ ) {
+      const TriggerObjectRefVector filterObjectRefs( handlePatTriggerEvent->filterObjects( iFilter->label() ) );
+      for ( TriggerObjectRefVectorIterator iObject = filterObjectRefs.begin(); iObject != filterObjectRefs.end(); ++iObject ) {
+        if ( ( *iObject )->collection().find( "l1extraParticles" ) != std::string::npos ) {
+          edm::LogError( "filterObjectL1" ) << "    Filter points to L1 object" << "\n"
+                                            << "        filter    : " << iFilter->label() << "\n"
+                                            << "        collection: " << ( *iObject )->collection();
+        }
+      }
+    }
   }
 
   // pat::TriggerPath
