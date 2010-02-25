@@ -12,6 +12,7 @@ using namespace pat;
 TriggerObject::TriggerObject() :
   reco::LeafCandidate()
 {
+  filterIds_.clear();
 }
 
 /// constructors from values
@@ -28,6 +29,11 @@ TriggerObject::TriggerObject( const reco::Particle::PolarLorentzVector & vec, in
 }
 TriggerObject::TriggerObject( const trigger::TriggerObject & trigObj ) :
   reco::LeafCandidate( 0, trigObj.particle().p4(), reco::Particle::Point( 0., 0., 0. ), trigObj.id() )
+{
+  filterIds_.clear();
+}
+TriggerObject::TriggerObject( const reco::LeafCandidate & leafCand ) :
+  reco::LeafCandidate( leafCand )
 {
   filterIds_.clear();
 }
