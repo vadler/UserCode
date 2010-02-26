@@ -33,6 +33,9 @@ process.patTrigger.addPathModuleLabels = True
 switchOnTriggerMatchEmbedding( process )
 process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
                               , 'keep *_hltTriggerSummaryAOD_*_*'
+                              , 'keep L1GlobalTriggerReadoutRecord_gtDigis_*_*'
+                              , 'keep *_l1GtRecord_*_*'
+                              , 'keep *_l1extraParticles_*_*'
                               ]
 # ## stand-alone trigger objects only
 # switchOnTriggerStandAlone( process )
