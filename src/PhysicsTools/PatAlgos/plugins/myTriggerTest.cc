@@ -3,7 +3,7 @@
 // Package:    PatAlgos
 // Class:      pat::myTriggerTest
 //
-// $Id: myTriggerTest.cc,v 1.13 2010/01/23 17:42:44 vadler Exp $
+// $Id: myTriggerTest.cc,v 1.14 2010/02/25 15:23:07 vadler Exp $
 //
 /**
   \class myTriggerTest myTriggerTest.cc "PhysicsTools/myTriggerTest/plugins/myTriggerTest.cc"
@@ -12,7 +12,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id: myTriggerTest.cc,v 1.13 2010/01/23 17:42:44 vadler Exp $
+  \version  $Id: myTriggerTest.cc,v 1.14 2010/02/25 15:23:07 vadler Exp $
  */
 
 
@@ -23,6 +23,7 @@
 #include <string>
 #include <map>
 
+#include "FWCore/Framework/interface/Run.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
@@ -61,15 +62,16 @@ namespace pat {
     public:
 
       explicit myTriggerTest( const edm::ParameterSet & iConfig );
-      ~myTriggerTest();
+      ~myTriggerTest() {};
 
     private:
 
       virtual void beginJob();
+      virtual void beginRun( const edm::Run & iRun, const edm::EventSetup & iSetup );
       virtual void analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup );
-      virtual void endJob();
 
       HLTConfigProvider hltConfig_;
+      bool              hltConfigInit_;
       std::string       nameHLTProcess_;
       edm::InputTag     tagTriggerResults_;
       edm::InputTag     tagTriggerEvent_;
@@ -110,6 +112,7 @@ using namespace pat;
 using namespace pat::helper;
 using namespace TMath;
 
+
 myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   nameHLTProcess_( iConfig.getParameter< std::string >( "hltProcessName" ) ),
   tagTriggerResults_( iConfig.getParameter< edm::InputTag >( "triggerResults" ) ),
@@ -142,6 +145,7 @@ myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   histos1D_(),
   histos2D_()
 {
+
   if ( tagTriggerResults_.process().empty() ) {
     tagTriggerResults_ = edm::InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameHLTProcess_ );
   }
@@ -154,14 +158,13 @@ myTriggerTest::myTriggerTest( const edm::ParameterSet & iConfig ) :
   if ( tagPatTriggerEvent_.process().empty() ) {
     tagPatTriggerEvent_ = edm::InputTag( tagPatTriggerEvent_.label(), tagPatTriggerEvent_.instance(), namePATProcess_ );
   }
+
 }
 
-myTriggerTest::~myTriggerTest()
-{
-}
 
 void myTriggerTest::beginJob()
 {
+
   edm::Service< TFileService > fileService;
   histos2D_[ "nPaths" ] = fileService->make< TH2D >( "nPaths", "Number of paths", 201, -0.5, 200.5, 201, -0.5, 200.5 );
   histos2D_[ "nPaths" ]->SetXTitle( "HLTConfigProvider" );
@@ -210,22 +213,33 @@ void myTriggerTest::beginJob()
   histos2D_[ "phiObjCand" ] = fileService->make< TH2D >( "phiObjCand", "Object vs. candidate #phi", 60, -Pi(), Pi(), 60, -Pi(), Pi() );
   histos2D_[ "phiObjCand" ]->SetXTitle( "candidate" );
   histos2D_[ "phiObjCand" ]->SetYTitle( "object" );
+
 }
+
+
+void myTriggerTest::beginRun( const edm::Run & iRun, const edm::EventSetup & iSetup )
+{
+
+  bool changed( true );
+  if ( ! hltConfig_.init( iRun, iSetup, nameHLTProcess_, changed ) ) {
+    edm::LogError( "errorHltConfigExtraction" ) << "HLT config extraction error with process name " << nameHLTProcess_;
+    hltConfigInit_ = false;
+    return;
+  }
+  if ( hltConfig_.size() <= 0 ) {
+    edm::LogError( "hltConfigSize" ) << "HLT config size error";
+    hltConfigInit_ = false;
+    return;
+  }
+  hltConfigInit_ = true;
+
+}
+
 
 void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup )
 {
-  bool changed( true );
-  if ( ! hltConfig_.init( iEvent, nameHLTProcess_, changed ) ) {
-    edm::LogError( "hltConfigExtraction" ) << "HLT config extraction error with process name " << nameHLTProcess_;
-    return;
-  }
-  if ( changed ) {
-    edm::LogWarning( "hltConfigChange" ) << "HLT config changed";
-  }
-  if ( hltConfig_.size() == 0 ) {
-    edm::LogError( "hltConfigSize" ) << "HLT config contains 0 paths for process name " << nameHLTProcess_;
-    return;
-  }
+
+  if ( ! hltConfigInit_ ) return;
 
   edm::Handle< edm::TriggerResults > handleTriggerResults;
   iEvent.getByLabel( tagTriggerResults_, handleTriggerResults );
@@ -846,10 +860,6 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
 
   // External code testing area
 
-}
-
-void myTriggerTest::endJob()
-{
 }
 
 
