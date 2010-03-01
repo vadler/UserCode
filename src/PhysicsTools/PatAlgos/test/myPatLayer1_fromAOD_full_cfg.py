@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 #process.source.fileNames    = [ '/store/relval/CMSSW_3_4_0_pre1/RelValTTbar/GEN-SIM-RECO/STARTUP31X_V8-v1/0007/BAB355DB-DFB4-DE11-AD73-0019B9F72F97.root' ]
 # process.maxEvents.input     = ...
 # process.out.outputCommands  = [ ... ]
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_2/output/myPatLayer1_fromAOD_full.root'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_X_2010-03-01-1700/output/myPatLayer1_fromAOD_full.root'
 # process.options.wantSummary = False
 
 # # memory check
