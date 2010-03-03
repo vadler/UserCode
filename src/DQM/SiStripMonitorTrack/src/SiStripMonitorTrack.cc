@@ -67,6 +67,9 @@ void SiStripMonitorTrack::beginRun(const edm::Run& run,const edm::EventSetup& es
   es.get<SiStripDetCablingRcd>().get( SiStripDetCabling_ );
 
   book();
+
+  bool changed( true );
+  hltConfInit_ = conf_.exists( "andOrHlt" ) ? hltConf_.init( run, es, conf_.getParameter< edm::InputTag >( "hltInputTag" ).process(), changed ) : false;
 }
 
 //------------------------------------------------------------------------
@@ -82,10 +85,10 @@ void SiStripMonitorTrack::endJob(void)
 void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
   TriggerHelper triggerHelper;
-// DEBUG  if ( ! triggerHelper.accept( e, es, conf_ ) ) return;
+// DEBUG  if ( ! triggerHelper.accept( e, es, conf_, hltConf_, hltConfInit_ ) ) return;
   static unsigned count( 0 ); // DEBUG
   std::cout << "* SiStripMonitorTrack *" << std::endl; // DEBUG
-  const bool decision( triggerHelper.accept( e, es, conf_ ) ); // DEBUG
+  const bool decision( triggerHelper.accept( e, es, conf_, hltConf_, hltConfInit_ ) ); // DEBUG
   std::cout << "  SiStripMonitorTrack: -> " << decision << " (count: "; // DEBUG
   if ( ! decision ) { // DEBUG
     std::cout << count << ")" << std::endl; // DEBUG

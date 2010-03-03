@@ -163,6 +163,14 @@ void TrackingMonitor::beginJob(void)
     }
 }
 
+void TrackingMonitor::beginRun( const edm::Run& iRun, const edm::EventSetup& iSetup )
+{
+
+  bool changed( true );
+  hltConfInit_ = conf_.exists( "andOrHlt" ) ? hltConf_.init( iRun, iSetup, conf_.getParameter< edm::InputTag >( "hltInputTag" ).process(), changed ) : false;
+
+}
+
 // -- Analyse
 // ---------------------------------------------------------------------------------//
 void TrackingMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -170,10 +178,10 @@ void TrackingMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     using namespace edm;
 
     TriggerHelper triggerHelper;
-// DEBUG    if ( ! triggerHelper.accept( iEvent, iSetup, conf_ ) ) return;
+// DEBUG    if ( ! triggerHelper.accept( iEvent, iSetup, conf_, hltConf_, hltConfInit_ ) ) return;
     static unsigned count( 0 ); // DEBUG
     std::cout << "* TrackingMonitor *" << std::endl; // DEBUG
-    const bool decision( triggerHelper.accept( iEvent, iSetup, conf_ ) ); // DEBUG
+    const bool decision( triggerHelper.accept( iEvent, iSetup, conf_, hltConf_, hltConfInit_ ) ); // DEBUG
     std::cout << "  TrackingMonitor: -> " << decision << " (count: "; // DEBUG
     if ( ! decision ) { // DEBUG
       std::cout << count << ")" << std::endl; // DEBUG
