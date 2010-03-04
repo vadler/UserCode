@@ -1,5 +1,5 @@
 //
-// $Id: TriggerHelper.cc,v 1.10 2010/02/16 20:17:14 vadler Exp $
+// $Id: TriggerHelper.cc,v 1.11 2010/03/03 12:34:42 vadler Exp $
 //
 
 
@@ -363,20 +363,21 @@ bool TriggerHelper::acceptHlt( const Event & event, const ParameterSet & config,
     return errorReplyHlt_;
   }
 
-  // Accessing the TriggerResults
-  event.getByLabel( hltInputTag_, hltTriggerResults_ );
-  if ( ! hltTriggerResults_.isValid() ) {
-    LogError( "triggerResultsValid" ) << "TriggerResults product with InputTag " << hltInputTag_.encode() << " not in event ==> decision: " << errorReplyHlt_;
-    return errorReplyHlt_;
-  }
-
-  // Getting the HLT configuration from the provenance
+  // Checking the HLT configuration,
+  // initialization already in the calling DQM module (beginRun())
   if ( ! hltConfigInit ) {
     LogError( "hltConfigInit" ) << "HLT config initialization error with process name " << hltInputTag_.process() << " ==> decision: " << errorReplyHlt_;
     return errorReplyHlt_;
   }
   if ( hltConfig.size() <= 0 ) {
     LogError( "hltConfigSize" ) << "HLT config size error ==> decision: " << errorReplyHlt_;
+    return errorReplyHlt_;
+  }
+
+  // Accessing the TriggerResults
+  event.getByLabel( hltInputTag_, hltTriggerResults_ );
+  if ( ! hltTriggerResults_.isValid() ) {
+    LogError( "triggerResultsValid" ) << "TriggerResults product with InputTag " << hltInputTag_.encode() << " not in event ==> decision: " << errorReplyHlt_;
     return errorReplyHlt_;
   }
 

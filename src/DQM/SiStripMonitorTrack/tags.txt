@@ -1,6 +1,6 @@
-Test Release based on: CMSSW_3_5_X_2010-03-02-1700
-Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_ia32_gcc434/tue/3.5-tue-17/CMSSW_3_5_X_2010-03-02-1700
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_X_2010-03-02-1700
+Test Release based on: CMSSW_3_5_3
+Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_5_3
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_3
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DQM/SiStripMonitorClient                         V03-03-79      V03-03-78      
 DQM/SiStripMonitorTrack                          V04-00-11      V04-00-11      
