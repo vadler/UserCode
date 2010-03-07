@@ -21,10 +21,7 @@
 
 #include "DQM/SiStripCommon/interface/SiStripHistoId.h"
 #include "TMath.h"
-
-#include "DQM/TrackerCommon/interface/TriggerHelper.h"
 #include <iostream> // DEBUG
-
 
 static const uint16_t _NUM_SISTRIP_SUBDET_ = 4;
 static TString SubDet[_NUM_SISTRIP_SUBDET_]={"TIB","TID","TOB","TEC"};
@@ -35,7 +32,8 @@ SiStripMonitorTrack::SiStripMonitorTrack(const edm::ParameterSet& conf):
   conf_(conf),
   folder_organizer(),
   tracksCollection_in_EventTree(true),
-  firstEvent(-1)
+  firstEvent(-1),
+  triggerHelper( new TriggerHelper( conf ) )
 {
   Cluster_src_   = conf.getParameter<edm::InputTag>("Cluster_src");
   Mod_On_        = conf.getParameter<bool>("Mod_On");
@@ -56,7 +54,10 @@ SiStripMonitorTrack::SiStripMonitorTrack(const edm::ParameterSet& conf):
 }
 
 //------------------------------------------------------------------------
-SiStripMonitorTrack::~SiStripMonitorTrack() { }
+SiStripMonitorTrack::~SiStripMonitorTrack()
+{
+  delete triggerHelper;
+}
 
 //------------------------------------------------------------------------
 void SiStripMonitorTrack::beginRun(const edm::Run& run,const edm::EventSetup& es)
@@ -68,8 +69,7 @@ void SiStripMonitorTrack::beginRun(const edm::Run& run,const edm::EventSetup& es
 
   book();
 
-  bool changed( true );
-  hltConfInit_ = conf_.exists( "andOrHlt" ) ? hltConf_.init( run, es, conf_.getParameter< edm::InputTag >( "hltInputTag" ).process(), changed ) : false;
+  triggerHelper->initRun( run, es );
 }
 
 //------------------------------------------------------------------------
@@ -84,17 +84,17 @@ void SiStripMonitorTrack::endJob(void)
 // ------------ method called to produce the data  ------------
 void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
-  TriggerHelper triggerHelper;
-// DEBUG  if ( ! triggerHelper.accept( e, es, conf_, hltConf_, hltConfInit_ ) ) return;
-  static unsigned count( 0 ); // DEBUG
-  std::cout << "* SiStripMonitorTrack *" << std::endl; // DEBUG
-  const bool decision( triggerHelper.accept( e, es, conf_, hltConf_, hltConfInit_ ) ); // DEBUG
-  std::cout << "  SiStripMonitorTrack: -> " << decision << " (count: "; // DEBUG
-  if ( ! decision ) { // DEBUG
-    std::cout << count << ")" << std::endl; // DEBUG
-    return; // DEBUG
-  } // DEBUG
-  std::cout << ++count << ")" << std::endl; // DEBUG
+
+// DEBUG    if ( ! triggerHelper->accept( e, es ) ) return;
+    static unsigned count( 0 ); // DEBUG
+    std::cout << "* SiStripMonitorTrack *" << std::endl; // DEBUG
+    const bool decision( triggerHelper->accept( e, es ) ); // DEBUG
+    std::cout << "  SiStripMonitorTrack: -> " << decision << " (count: "; // DEBUG
+    if ( ! decision ) { // DEBUG
+      std::cout << count << ")" << std::endl; // DEBUG
+      return; // DEBUG
+    } // DEBUG
+    std::cout << ++count << ")" << std::endl; // DEBUG
 
   tracksCollection_in_EventTree=true;
   trackAssociatorCollection_in_EventTree=true;

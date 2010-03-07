@@ -9,11 +9,11 @@
 <use name=CalibTracker/Records>
 <use name=DataFormats/TrackingRecHit>
 <use name=DataFormats/TrackerRecHit2D>
-<use name=DataFormats/RecoCandidate>
+<use name="DataFormats/RecoCandidate">
 <use name=RecoLocalTracker/SiStripClusterizer>
 <use name=DataFormats/TrackReco>
 <use name=DQM/TrackerCommon>
-<use name=HLTrigger/HLTcore>
+
 <export>
    <lib name=DQMSiStripMonitorTrack>
 </export>

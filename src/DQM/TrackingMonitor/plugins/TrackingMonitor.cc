@@ -32,8 +32,6 @@
 #include "TrackingTools/PatternTools/interface/TSCPBuilderNoMaterial.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include <string>
-
-#include "DQM/TrackerCommon/interface/TriggerHelper.h"
 #include <iostream> // DEBUG
 
 // TrackingMonitor
@@ -44,6 +42,7 @@ TrackingMonitor::TrackingMonitor(const edm::ParameterSet& iConfig)
     , conf_ ( iConfig )
     , theTrackAnalyzer( new TrackAnalyzer(conf_) )
     , theTrackBuildingAnalyzer( new TrackBuildingAnalyzer(conf_) )
+    , triggerHelper( new TriggerHelper( conf_ ) )
     , NumberOfTracks(NULL)
     , NumberOfMeanRecHitsPerTrack(NULL)
     , NumberOfMeanLayersPerTrack(NULL)
@@ -58,6 +57,7 @@ TrackingMonitor::~TrackingMonitor()
 {
     delete theTrackAnalyzer;
     delete theTrackBuildingAnalyzer;
+    delete triggerHelper;
 }
 
 
@@ -166,8 +166,7 @@ void TrackingMonitor::beginJob(void)
 void TrackingMonitor::beginRun( const edm::Run& iRun, const edm::EventSetup& iSetup )
 {
 
-  bool changed( true );
-  hltConfInit_ = conf_.exists( "andOrHlt" ) ? hltConf_.init( iRun, iSetup, conf_.getParameter< edm::InputTag >( "hltInputTag" ).process(), changed ) : false;
+  triggerHelper->initRun( iRun, iSetup );
 
 }
 
@@ -177,11 +176,10 @@ void TrackingMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 {
     using namespace edm;
 
-    TriggerHelper triggerHelper;
-// DEBUG    if ( ! triggerHelper.accept( iEvent, iSetup, conf_, hltConf_, hltConfInit_ ) ) return;
+// DEBUG    if ( ! triggerHelper->accept( iEvent, iSetup ) ) return;
     static unsigned count( 0 ); // DEBUG
     std::cout << "* TrackingMonitor *" << std::endl; // DEBUG
-    const bool decision( triggerHelper.accept( iEvent, iSetup, conf_, hltConf_, hltConfInit_ ) ); // DEBUG
+    const bool decision( triggerHelper->accept( iEvent, iSetup ) ); // DEBUG
     std::cout << "  TrackingMonitor: -> " << decision << " (count: "; // DEBUG
     if ( ! decision ) { // DEBUG
       std::cout << count << ")" << std::endl; // DEBUG

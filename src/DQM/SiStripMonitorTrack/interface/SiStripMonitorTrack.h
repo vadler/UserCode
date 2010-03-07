@@ -38,12 +38,11 @@
 #include "DQM/SiStripCommon/interface/SiStripFolderOrganizer.h"
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "DQMServices/Core/interface/MonitorElement.h"
+#include "DQM/TrackerCommon/interface/TriggerHelper.h"
 
 #include "DataFormats/TrackerRecHit2D/interface/SiStripRecHit2D.h"
 
 #include "TString.h"
-
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
 //******** Single include for the TkMap *************
 #include "DQM/SiStripCommon/interface/TkHistoMap.h"
@@ -92,15 +91,13 @@ private:
   // ----------member data ---------------------------
 
 private:
-
-  HLTConfigProvider hltConf_;
-  bool              hltConfInit_;
   DQMStore * dbe;
   edm::ParameterSet conf_;
   std::string histname;
   TString name;
   LocalVector LV;
   float iOrbitSec;
+  TriggerHelper * triggerHelper;
 
   //******* TkHistoMaps
   TkHistoMap *tkhisto_StoNCorrOnTrack, *tkhisto_NumOnTrack, *tkhisto_NumOffTrack;

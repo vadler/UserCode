@@ -22,8 +22,7 @@ Monitoring source for general quantities related to tracks.
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "DQMServices/Core/interface/MonitorElement.h"
 #include "TrackingTools/TransientTrackingRecHit/interface/TransientTrackingRecHitBuilder.h"
-
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "DQM/TrackerCommon/interface/TriggerHelper.h"
 
 class DQMStore;
 class TrackAnalyzer;
@@ -47,9 +46,6 @@ class TrackingMonitor : public edm::EDAnalyzer
 
         // ----------member data ---------------------------
 
-        HLTConfigProvider hltConf_;
-        bool              hltConfInit_;
-
         std::string histname;  //for naming the histograms according to algorithm used
 
         DQMStore * dqmStore_;
@@ -60,6 +56,7 @@ class TrackingMonitor : public edm::EDAnalyzer
 
         TrackAnalyzer * theTrackAnalyzer;
         TrackBuildingAnalyzer  * theTrackBuildingAnalyzer;
+        TriggerHelper * triggerHelper;
 
         // Tracks
         MonitorElement * NumberOfTracks;

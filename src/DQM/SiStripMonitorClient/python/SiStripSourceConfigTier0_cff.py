@@ -84,7 +84,7 @@ TrackerCollisionTrackMon.errorReplyGt  = cms.bool( False )
 # TrackerCollisionTrackMon.andOrHlt      = cms.bool( False )
 # TrackerCollisionTrackMon.errorReplyHlt = cms.bool( False )
 
-  # DQM Services
+# DQM Services
 dqmInfoSiStrip = cms.EDFilter("DQMEventInfo",
     subSystemFolder = cms.untracked.string('SiStrip')
 )
