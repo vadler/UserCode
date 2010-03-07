@@ -97,7 +97,6 @@ private:
   TString name;
   LocalVector LV;
   float iOrbitSec;
-  TriggerHelper * triggerHelper;
 
   //******* TkHistoMaps
   TkHistoMap *tkhisto_StoNCorrOnTrack, *tkhisto_NumOnTrack, *tkhisto_NumOffTrack;
@@ -192,5 +191,7 @@ private:
   int runNb, eventNb;
   int firstEvent;
   int countOn, countOff, countAll, NClus[4][3];
+
+  TriggerHelper * triggerHelper;
 };
 #endif

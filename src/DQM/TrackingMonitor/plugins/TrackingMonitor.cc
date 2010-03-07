@@ -42,13 +42,13 @@ TrackingMonitor::TrackingMonitor(const edm::ParameterSet& iConfig)
     , conf_ ( iConfig )
     , theTrackAnalyzer( new TrackAnalyzer(conf_) )
     , theTrackBuildingAnalyzer( new TrackBuildingAnalyzer(conf_) )
-    , triggerHelper( new TriggerHelper( conf_ ) )
     , NumberOfTracks(NULL)
     , NumberOfMeanRecHitsPerTrack(NULL)
     , NumberOfMeanLayersPerTrack(NULL)
     , NumberOfSeeds(NULL)
     , NumberOfTrackCandidates(NULL)
     , builderName( conf_.getParameter<std::string>("TTRHBuilder") )
+    , triggerHelper( new TriggerHelper( conf_ ) )
 {
 }
 

@@ -56,7 +56,6 @@ class TrackingMonitor : public edm::EDAnalyzer
 
         TrackAnalyzer * theTrackAnalyzer;
         TrackBuildingAnalyzer  * theTrackBuildingAnalyzer;
-        TriggerHelper * triggerHelper;
 
         // Tracks
         MonitorElement * NumberOfTracks;
@@ -71,6 +70,8 @@ class TrackingMonitor : public edm::EDAnalyzer
 
         std::string builderName;
         edm::ESHandle<TransientTrackingRecHitBuilder> theTTRHBuilder;
+
+        TriggerHelper * triggerHelper;
 };
 
 #endif //define TrackingMonitor_H
