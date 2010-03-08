@@ -65,10 +65,10 @@ int main(int argc, char* argv[])
 
     // fwlite::Handle to the muon collection
     fwlite::Handle<std::vector<pat::Muon> > muons; // Access the muon collection
-    muons.getByLabel(event, "cleanLayer1Muons");
+    muons.getByLabel(event, "cleanPatMuons");
     // fwlite::Handle to the muon collection
     fwlite::Handle<std::vector<pat::Jet> > jets; // Access the jet collection
-    jets.getByLabel(event, "cleanLayer1Jets");
+    jets.getByLabel(event, "cleanPatJets");
     
     // loop muon collection and fill histograms
     for(unsigned i=0; i<muons->size(); ++i){
