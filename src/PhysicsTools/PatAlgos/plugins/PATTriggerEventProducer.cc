@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerEventProducer.cc,v 1.5 2010/01/12 19:28:36 vadler Exp $
+// $Id: PATTriggerEventProducer.cc,v 1.7 2010/03/08 10:50:24 vadler Exp $
 //
 
 
@@ -7,6 +7,7 @@
 
 #include <cassert>
 
+#include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
@@ -18,7 +19,6 @@ using namespace pat;
 
 
 PATTriggerEventProducer::PATTriggerEventProducer( const edm::ParameterSet & iConfig ) :
-  hltConfigInit_( true ),
   nameProcess_( iConfig.getParameter< std::string >( "processName" ) ),
   tagTriggerResults_( iConfig.getParameter< edm::InputTag >( "triggerResults" ) ),
   tagTriggerProducer_( iConfig.getParameter< edm::InputTag >( "patTriggerProducer" ) ),
