@@ -50,6 +50,7 @@ TrackingMonitor::TrackingMonitor(const edm::ParameterSet& iConfig)
     , builderName( conf_.getParameter<std::string>("TTRHBuilder") )
     , triggerHelper( new TriggerHelper( conf_ ) )
 {
+  std::cout << "  TrackingMonitor: -> TriggerHelper is " << triggerHelper->on() << std::endl; // DEBUG
 }
 
 
@@ -166,7 +167,7 @@ void TrackingMonitor::beginJob(void)
 void TrackingMonitor::beginRun( const edm::Run& iRun, const edm::EventSetup& iSetup )
 {
 
-  triggerHelper->initRun( iRun, iSetup );
+  if ( triggerHelper->on() ) triggerHelper->initRun( iRun, iSetup );
 
 }
 
@@ -176,10 +177,11 @@ void TrackingMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 {
     using namespace edm;
 
-// DEBUG    if ( ! triggerHelper->accept( iEvent, iSetup ) ) return;
+// DEBUG    if ( triggerHelper->on() && ! triggerHelper->accept( iEvent, iSetup ) ) return;
     static unsigned count( 0 ); // DEBUG
     std::cout << "* TrackingMonitor *" << std::endl; // DEBUG
-    const bool decision( triggerHelper->accept( iEvent, iSetup ) ); // DEBUG
+    bool decision( true ); // DEBUG
+    if ( triggerHelper->on() ) decision = triggerHelper->accept( iEvent, iSetup ); // DEBUG
     std::cout << "  TrackingMonitor: -> " << decision << " (count: "; // DEBUG
     if ( ! decision ) { // DEBUG
       std::cout << count << ")" << std::endl; // DEBUG

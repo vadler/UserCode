@@ -41,14 +41,21 @@ process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 # Input
 process.source = cms.Source( "PoolSource",
   fileNames = cms.untracked.vstring(
+    # 123596 RAW
     '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/FA54A056-42E2-DE11-A6DB-001617E30D40.root',
-    '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/E8477DE8-38E2-DE11-9DAB-0016177CA778.root',
-    '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/E2EFCB1E-3FE2-DE11-9378-001D09F2438A.root'
-    #'/store/express/BeamCommissioning09/ExpressPhysics/FEVT/v2/000/123/596/FEE389F2-33E2-DE11-A62E-001617C3B76E.root',
-    #'/store/express/BeamCommissioning09/ExpressPhysics/FEVT/v2/000/123/596/FE90F72C-43E2-DE11-8E89-001D09F2B30B.root',
-    #'/store/express/BeamCommissioning09/ExpressPhysics/FEVT/v2/000/123/596/FE0807BE-48E2-DE11-9A06-001D09F28F25.root'
+    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/E8477DE8-38E2-DE11-9DAB-0016177CA778.root',
+    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/E2EFCB1E-3FE2-DE11-9378-001D09F2438A.root'
+#     # 123596 Express FEVT
+#     '/store/express/BeamCommissioning09/ExpressPhysics/FEVT/v2/000/123/596/FEE389F2-33E2-DE11-A62E-001617C3B76E.root',
+#     '/store/express/BeamCommissioning09/ExpressPhysics/FEVT/v2/000/123/596/FE90F72C-43E2-DE11-8E89-001D09F2B30B.root',
+#     '/store/express/BeamCommissioning09/ExpressPhysics/FEVT/v2/000/123/596/FE0807BE-48E2-DE11-9A06-001D09F28F25.root'
+    # 124120 RAW
+    '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/F6ADE109-6BE8-DE11-9680-000423D991D4.root',
+    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/ECF0E939-68E8-DE11-A59D-003048D2C1C4.root',
+    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/E2071E9D-6EE8-DE11-AD98-0016177CA7A0.root'
+
   ),
-  skipEvents = cms.untracked.uint32( 0 )
+  skipEvents = cms.untracked.uint32( 20000 )
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 100 )
@@ -74,6 +81,16 @@ process.load( 'HLTrigger.HLTfilters.hltHighLevel_cfi' )
 #                                 ]
 # process.hltHighLevel.andOr    = True
 
+import CondCore.DBCommon.CondDBSetup_cfi
+process.dbInput = cms.ESSource( "PoolDBESSource"
+                              , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
+                              , connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_5_4/output/TrackerDQMTriggerBits.db' )
+                              , toGet   = cms.VPSet( cms.PSet( record = cms.string( 'AlCaRecoTriggerBitsRcd' )
+                                                             , tag    = cms.string( 'TrackerDQMTriggerBits_v0_hlt' )
+                                                             )
+                                                   )
+                              )
+process.es_prefer_trackerDqm = cms.ESPrefer( "PoolDBESSource", "dbInput" )
 # process.SiStripMonitorTrack.andOr         = True
 # process.SiStripMonitorTrack.dcsInputTag   = "scalersRawToDigi"
 # process.SiStripMonitorTrack.dcsPartitions = [ 24
@@ -84,18 +101,22 @@ process.load( 'HLTrigger.HLTfilters.hltHighLevel_cfi' )
 # process.SiStripMonitorTrack.andOrDcs      = True
 # process.SiStripMonitorTrack.errorReplyDcs = True
 # process.SiStripMonitorTrack.gtInputTag    = "gtDigis"
+# process.SiStripMonitorTrack.gtDBKey       = "TrackerDQM_Gt"
 # process.SiStripMonitorTrack.gtStatusBits  = [ 'PhysicsDeclared'
 #                                             ]
 # process.SiStripMonitorTrack.andOrGt       = False
 # process.SiStripMonitorTrack.errorReplyGt  = False
+# process.SiStripMonitorTrack.l1DBKey       = cms.string( 'TrackerDqmL1Tracking' )
 # process.SiStripMonitorTrack.l1Algorithms  = cms.vstring()
 # process.SiStripMonitorTrack.andOrL1       = cms.bool( False )
 # process.SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
 process.SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
+process.SiStripMonitorTrack.hltDBKey      = cms.string( '' )
 process.SiStripMonitorTrack.hltPaths      = cms.vstring( 'HLT_ZeroBias1kHz'
                                                        )
 process.SiStripMonitorTrack.andOrHlt      = cms.bool( False )
 process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
+
 # process.TrackerCollisionTrackMon.andOr         = True
 # process.TrackerCollisionTrackMon.dcsInputTag   = "scalersRawToDigi"
 # process.TrackerCollisionTrackMon.dcsPartitions = [ 24
@@ -106,15 +127,18 @@ process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
 # process.TrackerCollisionTrackMon.andOrDcs      = True
 # process.TrackerCollisionTrackMon.errorReplyDcs = True
 # process.TrackerCollisionTrackMon.gtInputTag    = "gtDigis"
+# process.TrackerCollisionTrackMon.gtDBKey       = "TrackerDQM_Gt"
 # process.TrackerCollisionTrackMon.gtStatusBits  = [ 'PhysicsDeclared'
 #                                                  ]
 # process.TrackerCollisionTrackMon.andOrGt       = False
 # process.TrackerCollisionTrackMon.errorReplyGt  = False
-process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring( 'L1Tech_BPTX_plus_AND_minus.v0 AND ( L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0 ) AND NOT ( L1Tech_BSC_halo_beam2_inner.v0 OR L1Tech_BSC_halo_beam2_outer.v0 OR L1Tech_BSC_halo_beam1_inner.v0 OR L1Tech_BSC_halo_beam1_outer.v0 )'
-                                                            )
+process.TrackerCollisionTrackMon.l1DBKey       = cms.string( 'TrackerDQM_L1_Tracking' )
+process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring()
+process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring()
 process.TrackerCollisionTrackMon.andOrL1       = cms.bool( False )
 process.TrackerCollisionTrackMon.errorReplyL1  = cms.bool( False )
 # process.TrackerCollisionTrackMon.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
+# process.TrackerCollisionTrackMon.hltDBKey      = cms.string( '' )
 # process.TrackerCollisionTrackMon.hltPaths      = cms.vstring()
 # process.TrackerCollisionTrackMon.andOrHlt      = cms.bool( False )
 # process.TrackerCollisionTrackMon.errorReplyHlt = cms.bool( False )

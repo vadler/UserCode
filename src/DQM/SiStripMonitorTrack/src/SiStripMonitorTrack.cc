@@ -35,6 +35,7 @@ SiStripMonitorTrack::SiStripMonitorTrack(const edm::ParameterSet& conf):
   firstEvent(-1),
   triggerHelper( new TriggerHelper( conf ) )
 {
+  std::cout << "  SiStripMonitorTrack: -> TriggerHelper is " << triggerHelper->on() << std::endl; // DEBUG
   Cluster_src_   = conf.getParameter<edm::InputTag>("Cluster_src");
   Mod_On_        = conf.getParameter<bool>("Mod_On");
   Trend_On_      = conf.getParameter<bool>("Trend_On");
@@ -69,7 +70,7 @@ void SiStripMonitorTrack::beginRun(const edm::Run& run,const edm::EventSetup& es
 
   book();
 
-  triggerHelper->initRun( run, es );
+  if ( triggerHelper->on() ) triggerHelper->initRun( run, es );
 }
 
 //------------------------------------------------------------------------
@@ -85,10 +86,11 @@ void SiStripMonitorTrack::endJob(void)
 void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
 
-// DEBUG    if ( ! triggerHelper->accept( e, es ) ) return;
+// DEBUG    if ( triggerHelper->on() && ! triggerHelper->accept( e, es ) ) return;
     static unsigned count( 0 ); // DEBUG
     std::cout << "* SiStripMonitorTrack *" << std::endl; // DEBUG
-    const bool decision( triggerHelper->accept( e, es ) ); // DEBUG
+    bool decision( true ); // DEBUG
+    if ( triggerHelper->on() ) decision = triggerHelper->accept( e, es ); // DEBUG
     std::cout << "  SiStripMonitorTrack: -> " << decision << " (count: "; // DEBUG
     if ( ! decision ) { // DEBUG
       std::cout << count << ")" << std::endl; // DEBUG

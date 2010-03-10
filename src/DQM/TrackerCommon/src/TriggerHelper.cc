@@ -1,15 +1,18 @@
 //
-// $Id: TriggerHelper.cc,v 1.13 2010/03/07 18:36:01 vadler Exp $
+// $Id: TriggerHelper.cc,v 1.11 2010/03/03 12:34:42 vadler Exp $
 //
 
 
 #include "DQM/TrackerCommon/interface/TriggerHelper.h"
 
 #include <vector>
-
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include <iostream> // DEBUG
 
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/Utilities/interface/Exception.h"
+
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "CondFormats/HLTObjects/interface/AlCaRecoTriggerBits.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GtLogicParser.h"
 
 
@@ -19,7 +22,11 @@ using namespace edm;
 
 /// To be called from the ED module's c'tor
 TriggerHelper::TriggerHelper( const ParameterSet & config )
-  : on_( true )
+  : watchDB_( 0 )
+  , gtDBKey_( "" )
+  , l1DBKey_( "" )
+  , hltDBKey_( "" )
+  , on_( true )
   , onDcs_( true )
   , onGt_( true )
   , onL1_( true )
@@ -35,45 +42,53 @@ TriggerHelper::TriggerHelper( const ParameterSet & config )
     onL1_  = false;
     onHlt_ = false;
   }
-  if ( config.exists( "andOrDcs" ) ) {
-    andOrDcs_      = config.getParameter< bool >( "andOrDcs" );
-    dcsInputTag_   = config.getParameter< InputTag >( "dcsInputTag" );
-    dcsPartitions_ = config.getParameter< vector< int > >( "dcsPartitions" );
-    errorReplyDcs_ = config.getParameter< bool >( "errorReplyDcs" );
-    // An empty DCS partitions list acts as switch.
-    if ( dcsPartitions_.empty() ) onDcs_ = false;
-  } else {
-    onDcs_ = false;
+  if ( on() ) {
+    if ( config.exists( "andOrDcs" ) ) {
+      andOrDcs_      = config.getParameter< bool >( "andOrDcs" );
+      dcsInputTag_   = config.getParameter< InputTag >( "dcsInputTag" );
+      dcsPartitions_ = config.getParameter< vector< int > >( "dcsPartitions" );
+      errorReplyDcs_ = config.getParameter< bool >( "errorReplyDcs" );
+    } else {
+      onDcs_ = false;
+    }
+    if ( config.exists( "andOrGt" ) ) {
+      andOrGt_              = config.getParameter< bool >( "andOrGt" );
+      gtInputTag_           = config.getParameter< InputTag >( "gtInputTag" );
+      gtLogicalExpressions_ = config.getParameter< vector< string > >( "gtStatusBits" );
+      errorReplyGt_         = config.getParameter< bool >( "errorReplyGt" );
+      if ( config.exists( "gtDBKey" ) ) gtDBKey_ = config.getParameter< string >( "gtDBKey" );
+    } else {
+      onGt_ = false;
+    }
+    if ( config.exists( "andOrL1" ) ) {
+      andOrL1_              = config.getParameter< bool >( "andOrL1" );
+      l1LogicalExpressions_ = config.getParameter< vector< string > >( "l1Algorithms" );
+      errorReplyL1_         = config.getParameter< bool >( "errorReplyL1" );
+      if ( config.exists( "l1DBKey" ) ) l1DBKey_ = config.getParameter< string >( "l1DBKey" );
+    } else {
+      onL1_ = false;
+    }
+    if ( config.exists( "andOrHlt" ) ) {
+      andOrHlt_              = config.getParameter< bool >( "andOrHlt" );
+      hltInputTag_           = config.getParameter< InputTag >( "hltInputTag" );
+      hltLogicalExpressions_ = config.getParameter< vector< string > >( "hltPaths" );
+      errorReplyHlt_         = config.getParameter< bool >( "errorReplyHlt" );
+      if ( config.exists( "hltDBKey" ) ) hltDBKey_ = config.getParameter< string >( "hltDBKey" );
+    } else {
+      onHlt_ = false;
+    }
+    if ( ! onDcs_ && ! onGt_ && ! onL1_ && ! onHlt_ ) on_      = false;
+    else                                              watchDB_ = new edm::ESWatcher< AlCaRecoTriggerBitsRcd> ;
   }
-  if ( config.exists( "andOrGt" ) ) {
-    andOrGt_              = config.getParameter< bool >( "andOrGt" );
-    gtInputTag_           = config.getParameter< InputTag >( "gtInputTag" );
-    gtLogicalExpressions_ = config.getParameter< vector< string > >( "gtStatusBits" );
-    errorReplyGt_         = config.getParameter< bool >( "errorReplyGt" );
-    // An empty GT status bits logical expressions list acts as switch.
-    if ( gtLogicalExpressions_.empty() ) onGt_ = false;
-  } else {
-    onGt_ = false;
-  }
-  if ( config.exists( "andOrL1" ) ) {
-    andOrL1_              = config.getParameter< bool >( "andOrL1" );
-    l1LogicalExpressions_ = config.getParameter< vector< string > >( "l1Algorithms" );
-    errorReplyL1_         = config.getParameter< bool >( "errorReplyL1" );
-    // An empty L1 logical expressions list acts as switch.
-    if ( l1LogicalExpressions_.empty() ) onL1_ = false;
-  } else {
-    onL1_ = false;
-  }
-  if ( config.exists( "andOrHlt" ) ) {
-    andOrHlt_              = config.getParameter< bool >( "andOrHlt" );
-    hltInputTag_           = config.getParameter< InputTag >( "hltInputTag" );
-    hltLogicalExpressions_ = config.getParameter< vector< string > >( "hltPaths" );
-    errorReplyHlt_         = config.getParameter< bool >( "errorReplyHlt" );
-    // An empty HLT logical expressions list acts as switch.
-    if ( hltLogicalExpressions_.empty() ) onHlt_ = false;
-  } else {
-    onHlt_ = false;
-  }
+
+}
+
+
+/// To be called... FIXME ???
+TriggerHelper::~TriggerHelper()
+{
+
+  if ( on() ) delete watchDB_;
 
 }
 
@@ -82,22 +97,38 @@ TriggerHelper::TriggerHelper( const ParameterSet & config )
 void TriggerHelper::initRun( const Run & run, const EventSetup & setup )
 {
 
+  // FIXME Can this stay safely in the run loop, od does it need to go to the event loop?
+  if ( watchDB_->check( setup ) ) {
+    cout << "GT tag  : " << gtDBKey_.data() << endl; // DEBUG
+    if ( onGt_ && gtDBKey_.size() > 0 ) {
+      gtLogicalExpressions_ = expressionsFromDB( gtDBKey_, setup );
+      cout << "GT size : " << gtLogicalExpressions_.size() << endl; // DEBUG
+    }
+    cout << "L1 tag  : " << l1DBKey_.data() << endl; // DEBUG
+    if ( onL1_ && l1DBKey_.size() > 0 ) {
+      l1LogicalExpressions_ = expressionsFromDB( l1DBKey_, setup );
+      cout << "L1 size : " << l1LogicalExpressions_.size() << endl; // DEBUG
+    }
+    cout << "HLT tag : " << hltDBKey_.data() << endl; // DEBUG
+    if ( onHlt_ && hltDBKey_.size() > 0 ) {
+      hltLogicalExpressions_ = expressionsFromDB( hltDBKey_, setup );
+      cout << "HLT size: " << hltLogicalExpressions_.size() << endl; // DEBUG
+    }
+  }
+
   hltConfigInit_ = false;
-  if ( ! onHlt_ ) return;
-  if ( hltInputTag_.process().size() == 0 ) {
-    LogError( "hltProcess" ) << "HLT TriggerResults InputTag \"" << hltInputTag_.encode() << "\" specifies no process";
-    return;
+  if ( onHlt_ ) {
+    if ( hltInputTag_.process().size() == 0 ) {
+      LogError( "hltProcess" ) << "HLT TriggerResults InputTag \"" << hltInputTag_.encode() << "\" specifies no process";
+    } else {
+      bool hltChanged( false );
+      if ( ! hltConfig_.init( run, setup, hltInputTag_.process(), hltChanged ) ) {
+        LogError( "hltConfigInit" ) << "HLT config initialization error with process name \"" << hltInputTag_.process() << "\"";
+      } else if ( hltConfig_.size() <= 0 ) {
+        LogError( "hltConfigSize" ) << "HLT config size error";
+      } else hltConfigInit_ = true;
+    }
   }
-  bool changed( true );
-  if ( ! hltConfig_.init( run, setup, hltInputTag_.process(), changed ) ) {
-    LogError( "hltConfigInit" ) << "HLT config initialization error with process name \"" << hltInputTag_.process() << "\"";
-    return;
-  }
-  if ( hltConfig_.size() <= 0 ) {
-    LogError( "hltConfigSize" ) << "HLT config size error";
-    return;
-  }
-  hltConfigInit_ = true;
 
 }
 
@@ -106,10 +137,7 @@ void TriggerHelper::initRun( const Run & run, const EventSetup & setup )
 bool TriggerHelper::accept( const Event & event, const EventSetup & setup )
 {
 
-  // Getting the and/or switch from the configuration
-  // If it does not exist, the configuration is considered not to be present,
-  // and the filter dos not have any effect.
-  if ( ! on_ ) return true;
+  if ( off() ) return true;
 
   // Determine decision
   if ( andOr_ ) return ( acceptDcs( event ) || acceptGt( event ) || acceptL1( event, setup ) || acceptHlt( event ) );
@@ -121,10 +149,8 @@ bool TriggerHelper::accept( const Event & event, const EventSetup & setup )
 bool TriggerHelper::acceptDcs( const Event & event )
 {
 
-  // Getting the and/or DCS switch from the configuration
-  // If it does not exist, the configuration is considered not to be present,
-  // and the filter dos not have any effect
-  if ( ! onDcs_ ) return ( ! andOr_ ); // logically neutral, depending on base logical connective
+  // An empty DCS partitions list acts as switch.
+  if ( ! onDcs_ || dcsPartitions_.empty() ) return ( ! andOr_ ); // logically neutral, depending on base logical connective
 
   // Accessing the DcsStatusCollection
   Handle< DcsStatusCollection > dcsStatus;
@@ -220,10 +246,8 @@ bool TriggerHelper::acceptDcsPartition( const Handle< DcsStatusCollection > & dc
 bool TriggerHelper::acceptGt( const Event & event )
 {
 
-  // Getting the and/or GT status bits switch from the configuration
-  // If it does not exist, the configuration is considered not to be present,
-  // and the filter dos not have any effect
-  if ( ! onGt_ ) return ( ! andOr_ ); // logically neutral, depending on base logical connective
+  // An empty GT status bits logical expressions list acts as switch.
+  if ( ! onGt_ || gtLogicalExpressions_.empty() ) return ( ! andOr_ ); // logically neutral, depending on base logical connective
 
   // Accessing the L1GlobalTriggerReadoutRecord
   Handle< L1GlobalTriggerReadoutRecord > gtReadoutRecord;
@@ -297,10 +321,8 @@ bool TriggerHelper::acceptGtLogicalExpression( const Handle< L1GlobalTriggerRead
 bool TriggerHelper::acceptL1( const Event & event, const EventSetup & setup )
 {
 
-  // Getting the and/or L1 switch from the configuration
-  // If it does not exist, the configuration is considered not to be present,
-  // and the filter dos not have any effect
-  if ( ! onL1_ ) return ( ! andOr_ ); // logically neutral, depending on base logical connective
+  // An empty L1 logical expressions list acts as switch.
+  if ( ! onL1_ || l1LogicalExpressions_.empty() ) return ( ! andOr_ ); // logically neutral, depending on base logical connective
 
   // Getting the L1 event setup
   l1Gt_.retrieveL1EventSetup( setup ); // FIXME This can possibly go to initRun()
@@ -370,10 +392,8 @@ bool TriggerHelper::acceptL1LogicalExpression( const Event & event, string l1Log
 bool TriggerHelper::acceptHlt( const Event & event )
 {
 
-  // Getting the and/or HLT switch from the configuration
-  // If it does not exist, the configuration is considered not to be present,
-  // and the filter dos not have any effect
-  if ( ! onHlt_ ) return ( ! andOr_ ); // logically neutral, depending on base logical connective
+  // An empty HLT logical expressions list acts as switch.
+  if ( ! onHlt_ || hltLogicalExpressions_.empty() ) return ( ! andOr_ ); // logically neutral, depending on base logical connective
 
   // Checking the HLT configuration,
   if ( ! hltConfigInit_ ) {
@@ -452,6 +472,24 @@ bool TriggerHelper::acceptHltLogicalExpression( const Handle< TriggerResults > &
   return negExpr ? ( ! hltDecision ) : hltDecision;
 
 }
+
+
+
+/// Reads and returns logical expressions from DB
+std::vector< std::string > TriggerHelper::expressionsFromDB( const string & key, const EventSetup & setup )
+{
+
+  ESHandle< AlCaRecoTriggerBits > logicalExpressions;
+  setup.get< AlCaRecoTriggerBitsRcd >().get( logicalExpressions );
+  const map< string, string > & expressionMap = logicalExpressions->m_alcarecoToTrig;
+  map< string, string >::const_iterator listIter = expressionMap.find( key );
+  if ( listIter == expressionMap.end() ) {
+    throw cms::Exception( "Configuration" ) << "No logical expressions found under key " << key << " in 'AlCaRecoTriggerBitsRcd'";
+  }
+  return logicalExpressions->decompose( listIter->second );
+
+}
+
 
 
 /// Checks for negated words
