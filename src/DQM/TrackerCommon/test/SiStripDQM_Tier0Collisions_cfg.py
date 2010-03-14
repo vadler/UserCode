@@ -42,7 +42,7 @@ process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 process.source = cms.Source( "PoolSource",
   fileNames = cms.untracked.vstring(
     # 123596 RAW
-    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/FA54A056-42E2-DE11-A6DB-001617E30D40.root', # 20054 events
+    '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/FA54A056-42E2-DE11-A6DB-001617E30D40.root', # 20054 events
     #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/E8477DE8-38E2-DE11-9DAB-0016177CA778.root',
     #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/E2EFCB1E-3FE2-DE11-9378-001D09F2438A.root'
     # 123591 RAW
@@ -55,7 +55,7 @@ process.source = cms.Source( "PoolSource",
     '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/E2071E9D-6EE8-DE11-AD98-0016177CA7A0.root'
 
   ),
-  #skipEvents    = cms.untracked.uint32( 20000 ),
+  skipEvents    = cms.untracked.uint32( 20000 ),
   inputCommands = cms.untracked.vstring(
     'keep *'
   , 'drop *_hltL1GtObjectMap_*_*'
@@ -114,12 +114,12 @@ process.es_prefer_trackerDqm = cms.ESPrefer( "PoolDBESSource", "dbInput" )
 # process.SiStripMonitorTrack.l1Algorithms  = cms.vstring()
 # process.SiStripMonitorTrack.andOrL1       = cms.bool( False )
 # process.SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
-process.SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
-process.SiStripMonitorTrack.hltDBKey      = cms.string( '' )
-process.SiStripMonitorTrack.hltPaths      = cms.vstring( 'HLT_ZeroBias1kHz'
-                                                       )
-process.SiStripMonitorTrack.andOrHlt      = cms.bool( False )
-process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
+# process.SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
+# process.SiStripMonitorTrack.hltDBKey      = cms.string( '' )
+# process.SiStripMonitorTrack.hltPaths      = cms.vstring( 'HLT_ZeroBias1kHz'
+#                                                        )
+# process.SiStripMonitorTrack.andOrHlt      = cms.bool( False )
+# process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
 
 # process.TrackerCollisionTrackMon.andOr         = True
 # process.TrackerCollisionTrackMon.dcsInputTag   = "scalersRawToDigi"
