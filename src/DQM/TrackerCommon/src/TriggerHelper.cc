@@ -100,23 +100,23 @@ void TriggerHelper::initRun( const Run & run, const EventSetup & setup )
   // FIXME Can this stay safely in the run loop, or does it need to go to the event loop?
   // Means: Are the event setups identical?
   if ( watchDB_->check( setup ) ) {
-    cout << "GT DB tag  : " << gtDBKey_.data() << endl; // DEBUG
+    cout << "  TriggerHelper::initRun(): GT DB tag  : " << gtDBKey_.data() << endl; // DEBUG
     if ( onGt_ && gtDBKey_.size() > 0 ) {
       const vector< string > exprs( expressionsFromDB( gtDBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) gtLogicalExpressions_ = exprs;
-      cout << "GT DB size : " << gtLogicalExpressions_.size() << endl; // DEBUG
+      cout << "  TriggerHelper::initRun(): GT DB size : " << gtLogicalExpressions_.size() << endl; // DEBUG
     }
-    cout << "L1 DB tag  : " << l1DBKey_.data() << endl; // DEBUG
+    cout << "  TriggerHelper::initRun(): L1 DB tag  : " << l1DBKey_.data() << endl; // DEBUG
     if ( onL1_ && l1DBKey_.size() > 0 ) {
       const vector< string > exprs( expressionsFromDB( l1DBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) l1LogicalExpressions_ = exprs;
-      cout << "L1 DB size : " << l1LogicalExpressions_.size() << endl; // DEBUG
+      cout << "  TriggerHelper::initRun(): L1 DB size : " << l1LogicalExpressions_.size() << endl; // DEBUG
     }
-    cout << "HLT DB tag : " << hltDBKey_.data() << endl; // DEBUG
+    cout << "  TriggerHelper::initRun(): HLT DB tag : " << hltDBKey_.data() << endl; // DEBUG
     if ( onHlt_ && hltDBKey_.size() > 0 ) {
       const vector< string > exprs( expressionsFromDB( hltDBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) hltLogicalExpressions_ = exprs;
-      cout << "HLT DB size: " << hltLogicalExpressions_.size() << endl; // DEBUG
+      cout << "  TriggerHelper::initRun(): HLT DB size: " << hltLogicalExpressions_.size() << endl; // DEBUG
     }
   }
 
@@ -131,7 +131,7 @@ void TriggerHelper::initRun( const Run & run, const EventSetup & setup )
       } else if ( hltConfig_.size() <= 0 ) {
         LogError( "TriggerHelper" ) << "HLT config size error";
       } else hltConfigInit_ = true;
-      if ( hltChanged ) cout << "initRun: HLT changed"<< endl; // DEBUG
+      if ( hltChanged ) cout << "  TriggerHelper::initRun(): HLT changed"<< endl; // DEBUG
     }
   }
 
