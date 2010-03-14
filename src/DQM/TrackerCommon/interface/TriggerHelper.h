@@ -65,6 +65,8 @@ class TriggerHelper {
     bool onGt_;
     bool onL1_;
     bool onHlt_;
+    // Member constants
+    const std::string configError_;
 
   public:
 

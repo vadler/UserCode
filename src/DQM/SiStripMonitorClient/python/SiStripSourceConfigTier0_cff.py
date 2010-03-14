@@ -39,16 +39,17 @@ SiStripMonitorTrack.dcsPartitions = cms.vint32( 24
 SiStripMonitorTrack.andOrDcs      = cms.bool( False )
 SiStripMonitorTrack.errorReplyDcs = cms.bool( False )
 SiStripMonitorTrack.gtInputTag    = cms.InputTag( "gtDigis" )
-SiStripMonitorTrack.gtDBKey       = cms.string( "TrackerDQM_Gt" )
-SiStripMonitorTrack.gtStatusBits  = cms.vstring()
+SiStripMonitorTrack.gtDBKey       = cms.string( 'TrackerDQM_Gt' )
+SiStripMonitorTrack.gtStatusBits  = cms.vstring( 'PhysicsDeclared'
+                                               )
 SiStripMonitorTrack.andOrGt       = cms.bool( False )
 SiStripMonitorTrack.errorReplyGt  = cms.bool( False )
-# SiStripMonitorTrack.l1DBKey       = cms.string( "" )
+# SiStripMonitorTrack.l1DBKey       = cms.string( '' )
 # SiStripMonitorTrack.l1Algorithms  = cms.vstring()
 # SiStripMonitorTrack.andOrL1       = cms.bool( False )
 # SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
 # SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
-# SiStripMonitorTrack.hltDBKey      = cms.string( "" )
+# SiStripMonitorTrack.hltDBKey      = cms.string( '' )
 # SiStripMonitorTrack.hltPaths      = cms.vstring()
 # SiStripMonitorTrack.andOrHlt      = cms.bool( False )
 # SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
@@ -74,16 +75,23 @@ TrackerCollisionTrackMon.dcsPartitions = cms.vint32( 24
 TrackerCollisionTrackMon.andOrDcs      = cms.bool( False )
 TrackerCollisionTrackMon.errorReplyDcs = cms.bool( False )
 TrackerCollisionTrackMon.gtInputTag    = cms.InputTag( "gtDigis" )
-TrackerCollisionTrackMon.gtDBKey       = cms.string( "TrackerDQM_Gt" )
-TrackerCollisionTrackMon.gtStatusBits  = cms.vstring()
+TrackerCollisionTrackMon.gtDBKey       = cms.string( 'TrackerDQM_Gt' )
+TrackerCollisionTrackMon.gtStatusBits  = cms.vstring( 'PhysicsDeclared'
+                                                    )
 TrackerCollisionTrackMon.andOrGt       = cms.bool( False )
 TrackerCollisionTrackMon.errorReplyGt  = cms.bool( False )
-# TrackerCollisionTrackMon.l1DBKey       = cms.string( "" )
-# TrackerCollisionTrackMon.l1Algorithms  = cms.vstring()
+# TrackerCollisionTrackMon.l1DBKey       = cms.string( '' )
+# TrackerCollisionTrackMon.l1Algorithms  = cms.vstring( 'L1Tech_BPTX_plus_AND_minus.v0'
+#                                                     , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0'
+#                                                     , '~L1Tech_BSC_halo_beam2_inner.v0'
+#                                                     , '~L1Tech_BSC_halo_beam2_outer.v0'
+#                                                     , '~L1Tech_BSC_halo_beam1_inner.v0'
+#                                                     , '~L1Tech_BSC_halo_beam1_outer.v0'
+#                                                     )
 # TrackerCollisionTrackMon.andOrL1       = cms.bool( False )
 # TrackerCollisionTrackMon.errorReplyL1  = cms.bool( False )
 # TrackerCollisionTrackMon.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
-# TrackerCollisionTrackMon.hltDBKey      = cms.string( "" )
+# TrackerCollisionTrackMon.hltDBKey      = cms.string( '' )
 # TrackerCollisionTrackMon.hltPaths      = cms.vstring()
 # TrackerCollisionTrackMon.andOrHlt      = cms.bool( False )
 # TrackerCollisionTrackMon.errorReplyHlt = cms.bool( False )

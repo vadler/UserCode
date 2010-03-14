@@ -31,8 +31,10 @@ TriggerHelper::TriggerHelper( const ParameterSet & config )
   , onGt_( true )
   , onL1_( true )
   , onHlt_( true )
+  , configError_( "CONFIG_ERROR" )
 {
 
+  // General switch(es)
   if ( config.exists( "andOr" ) ) {
     andOr_ = config.getParameter< bool >( "andOr" );
   } else {
@@ -42,7 +44,8 @@ TriggerHelper::TriggerHelper( const ParameterSet & config )
     onL1_  = false;
     onHlt_ = false;
   }
-  if ( on() ) {
+
+  if ( on_ ) {
     if ( config.exists( "andOrDcs" ) ) {
       andOrDcs_      = config.getParameter< bool >( "andOrDcs" );
       dcsInputTag_   = config.getParameter< InputTag >( "dcsInputTag" );
@@ -84,11 +87,11 @@ TriggerHelper::TriggerHelper( const ParameterSet & config )
 }
 
 
-/// To be called... FIXME ???
+/// To be called from d'tors by 'delete'
 TriggerHelper::~TriggerHelper()
 {
 
-  if ( on() ) delete watchDB_;
+  if ( on_ ) delete watchDB_;
 
 }
 
@@ -99,34 +102,38 @@ void TriggerHelper::initRun( const Run & run, const EventSetup & setup )
 
   // FIXME Can this stay safely in the run loop, od does it need to go to the event loop?
   if ( watchDB_->check( setup ) ) {
-    cout << "GT tag  : " << gtDBKey_.data() << endl; // DEBUG
+    cout << "GT DB tag  : " << gtDBKey_.data() << endl; // DEBUG
     if ( onGt_ && gtDBKey_.size() > 0 ) {
-      gtLogicalExpressions_ = expressionsFromDB( gtDBKey_, setup );
-      cout << "GT size : " << gtLogicalExpressions_.size() << endl; // DEBUG
+      const vector< string > exprs( expressionsFromDB( gtDBKey_, setup ) );
+      if ( exprs.empty() || exprs.at( 0 ) != configError_ ) gtLogicalExpressions_ = exprs;
+      cout << "GT DB size : " << gtLogicalExpressions_.size() << endl; // DEBUG
     }
-    cout << "L1 tag  : " << l1DBKey_.data() << endl; // DEBUG
+    cout << "L1 DB tag  : " << l1DBKey_.data() << endl; // DEBUG
     if ( onL1_ && l1DBKey_.size() > 0 ) {
-      l1LogicalExpressions_ = expressionsFromDB( l1DBKey_, setup );
-      cout << "L1 size : " << l1LogicalExpressions_.size() << endl; // DEBUG
+      const vector< string > exprs( expressionsFromDB( l1DBKey_, setup ) );
+      if ( exprs.empty() || exprs.at( 0 ) != configError_ ) l1LogicalExpressions_ = exprs;
+      cout << "L1 DB size : " << l1LogicalExpressions_.size() << endl; // DEBUG
     }
-    cout << "HLT tag : " << hltDBKey_.data() << endl; // DEBUG
+    cout << "HLT DB tag : " << hltDBKey_.data() << endl; // DEBUG
     if ( onHlt_ && hltDBKey_.size() > 0 ) {
-      hltLogicalExpressions_ = expressionsFromDB( hltDBKey_, setup );
-      cout << "HLT size: " << hltLogicalExpressions_.size() << endl; // DEBUG
+      const vector< string > exprs( expressionsFromDB( hltDBKey_, setup ) );
+      if ( exprs.empty() || exprs.at( 0 ) != configError_ ) hltLogicalExpressions_ = exprs;
+      cout << "HLT DB size: " << hltLogicalExpressions_.size() << endl; // DEBUG
     }
   }
 
   hltConfigInit_ = false;
   if ( onHlt_ ) {
     if ( hltInputTag_.process().size() == 0 ) {
-      LogError( "hltProcess" ) << "HLT TriggerResults InputTag \"" << hltInputTag_.encode() << "\" specifies no process";
+      LogError( "TriggerHelper" ) << "HLT TriggerResults InputTag \"" << hltInputTag_.encode() << "\" specifies no process";
     } else {
       bool hltChanged( false );
       if ( ! hltConfig_.init( run, setup, hltInputTag_.process(), hltChanged ) ) {
-        LogError( "hltConfigInit" ) << "HLT config initialization error with process name \"" << hltInputTag_.process() << "\"";
+        LogError( "TriggerHelper" ) << "HLT config initialization error with process name \"" << hltInputTag_.process() << "\"";
       } else if ( hltConfig_.size() <= 0 ) {
-        LogError( "hltConfigSize" ) << "HLT config size error";
+        LogError( "TriggerHelper" ) << "HLT config size error";
       } else hltConfigInit_ = true;
+      if ( hltChanged ) cout << "initRun: HLT changed"<< endl; // DEBUG
     }
   }
 
@@ -137,7 +144,7 @@ void TriggerHelper::initRun( const Run & run, const EventSetup & setup )
 bool TriggerHelper::accept( const Event & event, const EventSetup & setup )
 {
 
-  if ( off() ) return true;
+  if ( ! on_ ) return true;
 
   // Determine decision
   if ( andOr_ ) return ( acceptDcs( event ) || acceptGt( event ) || acceptL1( event, setup ) || acceptHlt( event ) );
@@ -156,7 +163,7 @@ bool TriggerHelper::acceptDcs( const Event & event )
   Handle< DcsStatusCollection > dcsStatus;
   event.getByLabel( dcsInputTag_, dcsStatus );
   if ( ! dcsStatus.isValid() ) {
-    LogError( "dcsStatusValid" ) << "DcsStatusCollection product with InputTag \"" << dcsInputTag_.encode() << "\" not in event ==> decision: " << errorReplyDcs_;
+    LogError( "TriggerHelper" ) << "DcsStatusCollection product with InputTag \"" << dcsInputTag_.encode() << "\" not in event ==> decision: " << errorReplyDcs_;
     return errorReplyDcs_;
   }
 
@@ -206,7 +213,7 @@ bool TriggerHelper::acceptDcsPartition( const Handle< DcsStatusCollection > & dc
     case DcsStatus::ESm   :
       break;
     default:
-      LogError( "dcsPartition" ) << "DCS partition number \"" << dcsPartition << "\" does not exist ==> decision: " << errorReplyDcs_;
+      LogError( "TriggerHelper" ) << "DCS partition number \"" << dcsPartition << "\" does not exist ==> decision: " << errorReplyDcs_;
       return errorReplyDcs_;
   }
 
@@ -253,7 +260,7 @@ bool TriggerHelper::acceptGt( const Event & event )
   Handle< L1GlobalTriggerReadoutRecord > gtReadoutRecord;
   event.getByLabel( gtInputTag_, gtReadoutRecord );
   if ( ! gtReadoutRecord.isValid() ) {
-    LogError( "gtReadoutRecordValid" ) << "L1GlobalTriggerReadoutRecord product with InputTag \"" << gtInputTag_.encode() << "\" not in event ==> decision: " << errorReplyGt_;
+    LogError( "TriggerHelper" ) << "L1GlobalTriggerReadoutRecord product with InputTag \"" << gtInputTag_.encode() << "\" not in event ==> decision: " << errorReplyGt_;
     return errorReplyGt_;
   }
 
@@ -278,14 +285,14 @@ bool TriggerHelper::acceptGtLogicalExpression( const Handle< L1GlobalTriggerRead
 
   // Check empty strings
   if ( gtLogicalExpression.empty() ) {
-    LogError( "gtLogicalExpression" ) << "Empty logical expression ==> decision: " << errorReplyGt_;
+    LogError( "TriggerHelper" ) << "Empty logical expression ==> decision: " << errorReplyGt_;
     return errorReplyGt_;
   }
 
   // Negated paths
   bool negExpr( negate( gtLogicalExpression ) );
   if ( negExpr && gtLogicalExpression.empty() ) {
-    LogError( "gtLogicalExpression" ) << "Empty (negated) logical expression ==> decision: " << errorReplyGt_;
+    LogError( "TriggerHelper" ) << "Empty (negated) logical expression ==> decision: " << errorReplyGt_;
     return errorReplyGt_;
   }
 
@@ -300,7 +307,7 @@ bool TriggerHelper::acceptGtLogicalExpression( const Handle< L1GlobalTriggerRead
     if ( gtStatusBit == "PhysDecl" || gtStatusBit == "PhysicsDeclared" ) {
       decision = ( gtReadoutRecord->gtFdlWord().physicsDeclared() == 1 );
     } else {
-      LogError( "gtStatusBit" ) << "GT status bit \"" << gtStatusBit << "\" is not defined ==> decision: " << errorReplyGt_;
+      LogError( "TriggerHelper" ) << "GT status bit \"" << gtStatusBit << "\" is not defined ==> decision: " << errorReplyGt_;
       decision = errorReplyDcs_;
     }
     cout << "  TriggerHelper: status bit " << gtStatusBit << " -> " << decision << endl; // DEBUG
@@ -348,14 +355,14 @@ bool TriggerHelper::acceptL1LogicalExpression( const Event & event, string l1Log
 
   // Check empty strings
   if ( l1LogicalExpression.empty() ) {
-    LogError( "l1LogicalExpression" ) << "Empty logical expression ==> decision: " << errorReplyL1_;
+    LogError( "TriggerHelper" ) << "Empty logical expression ==> decision: " << errorReplyL1_;
     return errorReplyL1_;
   }
 
   // Negated logical expression
   bool negExpr( negate( l1LogicalExpression ) );
   if ( negExpr && l1LogicalExpression.empty() ) {
-    LogError( "l1LogicalExpression" ) << "Empty (negated) logical expression ==> decision: " << errorReplyL1_;
+    LogError( "TriggerHelper" ) << "Empty (negated) logical expression ==> decision: " << errorReplyL1_;
     return errorReplyL1_;
   }
 
@@ -368,8 +375,8 @@ bool TriggerHelper::acceptL1LogicalExpression( const Event & event, string l1Log
     const bool decision( l1Gt_.decision( event, l1AlgoName, error ) );
     // Error checks
     if ( error != 0 ) {
-      if ( error == 1 ) LogError( "l1AlgorithmInMenu" ) << "L1 algorithm \"" << l1AlgoName << "\" does not exist in the L1 menu ==> decision: "                                          << errorReplyL1_;
-      else              LogError( "l1AlgorithmError" )  << "L1 algorithm \"" << l1AlgoName << "\" received error code " << error << " from L1GtUtils::decisionBeforeMask ==> decision: " << errorReplyL1_;
+      if ( error == 1 ) LogError( "TriggerHelper" ) << "L1 algorithm \"" << l1AlgoName << "\" does not exist in the L1 menu ==> decision: "                                          << errorReplyL1_;
+      else              LogError( "TriggerHelper" )  << "L1 algorithm \"" << l1AlgoName << "\" received error code " << error << " from L1GtUtils::decisionBeforeMask ==> decision: " << errorReplyL1_;
       l1AlgoLogicParser.operandTokenVector().at( iAlgorithm ).tokenResult = errorReplyL1_;
       continue;
     }
@@ -392,12 +399,27 @@ bool TriggerHelper::acceptL1LogicalExpression( const Event & event, string l1Log
 bool TriggerHelper::acceptHlt( const Event & event )
 {
 
+//   hltConfigInit_ = false; // DEBUG
+//   if ( onHlt_ ) { // DEBUG
+//     if ( hltInputTag_.process().size() == 0 ) { // DEBUG
+//       LogError( "TriggerHelper" ) << "HLT TriggerResults InputTag \"" << hltInputTag_.encode() << "\" specifies no process"; // DEBUG
+//     } else { // DEBUG
+//       bool hltChanged( false ); // DEBUG
+//       if ( ! hltConfig_.init( event, hltInputTag_.process(), hltChanged ) ) { // DEBUG
+//         LogError( "TriggerHelper" ) << "HLT config initialization error with process name \"" << hltInputTag_.process() << "\""; // DEBUG
+//       } else if ( hltConfig_.size() <= 0 ) { // DEBUG
+//         LogError( "TriggerHelper" ) << "HLT config size error"; // DEBUG
+//       } else hltConfigInit_ = true; // DEBUG
+//       if ( hltChanged ) cout << "acceptHLT: HLT changed" << endl; // DEBUG // DEBUG
+//     } // DEBUG
+//   } // DEBUG
+
   // An empty HLT logical expressions list acts as switch.
   if ( ! onHlt_ || hltLogicalExpressions_.empty() ) return ( ! andOr_ ); // logically neutral, depending on base logical connective
 
   // Checking the HLT configuration,
   if ( ! hltConfigInit_ ) {
-    LogError( "hltConfigInit" ) << "HLT config error ==> decision: " << errorReplyHlt_;
+    LogError( "TriggerHelper" ) << "HLT config error ==> decision: " << errorReplyHlt_;
     return errorReplyHlt_;
   }
 
@@ -405,7 +427,7 @@ bool TriggerHelper::acceptHlt( const Event & event )
   Handle< TriggerResults > hltTriggerResults;
   event.getByLabel( hltInputTag_, hltTriggerResults );
   if ( ! hltTriggerResults.isValid() ) {
-    LogError( "triggerResultsValid" ) << "TriggerResults product with InputTag \"" << hltInputTag_.encode() << "\" not in event ==> decision: " << errorReplyHlt_;
+    LogError( "TriggerHelper" ) << "TriggerResults product with InputTag \"" << hltInputTag_.encode() << "\" not in event ==> decision: " << errorReplyHlt_;
     return errorReplyHlt_;
   }
 
@@ -430,14 +452,14 @@ bool TriggerHelper::acceptHltLogicalExpression( const Handle< TriggerResults > &
 
   // Check empty strings
   if ( hltLogicalExpression.empty() ) {
-    LogError( "hltLogicalExpression" ) << "Empty logical expression ==> decision: " << errorReplyHlt_;
+    LogError( "TriggerHelper" ) << "Empty logical expression ==> decision: " << errorReplyHlt_;
     return errorReplyHlt_;
   }
 
   // Negated paths
   bool negExpr( negate( hltLogicalExpression ) );
   if ( negExpr && hltLogicalExpression.empty() ) {
-    LogError( "hltLogicalExpression" ) << "Empty (negated) logical expression ==> decision: " << errorReplyHlt_;
+    LogError( "TriggerHelper" ) << "Empty (negated) logical expression ==> decision: " << errorReplyHlt_;
     return errorReplyHlt_;
   }
 
@@ -449,12 +471,12 @@ bool TriggerHelper::acceptHltLogicalExpression( const Handle< TriggerResults > &
     const unsigned indexPath( hltConfig_.triggerIndex( hltPathName ) );
     // Further error checks
     if ( indexPath == hltConfig_.size() ) {
-      LogError( "hltPathInProcess" ) << "HLT path \"" << hltPathName << "\" is not found in process " << hltInputTag_.process() << " ==> decision: " << errorReplyHlt_;
+      LogError( "TriggerHelper" ) << "HLT path \"" << hltPathName << "\" is not found in process " << hltInputTag_.process() << " ==> decision: " << errorReplyHlt_;
       hltAlgoLogicParser.operandTokenVector().at( iPath ).tokenResult = errorReplyHlt_;
       continue;
     }
     if ( hltTriggerResults->error( indexPath ) ) {
-      LogError( "hltPathError" ) << "HLT path \"" << hltPathName << "\" in error ==> decision: " << errorReplyHlt_;
+      LogError( "TriggerHelper" ) << "HLT path \"" << hltPathName << "\" in error ==> decision: " << errorReplyHlt_;
       hltAlgoLogicParser.operandTokenVector().at( iPath ).tokenResult = errorReplyHlt_;
       continue;
     }
@@ -476,7 +498,7 @@ bool TriggerHelper::acceptHltLogicalExpression( const Handle< TriggerResults > &
 
 
 /// Reads and returns logical expressions from DB
-std::vector< std::string > TriggerHelper::expressionsFromDB( const string & key, const EventSetup & setup )
+vector< string > TriggerHelper::expressionsFromDB( const string & key, const EventSetup & setup )
 {
 
   ESHandle< AlCaRecoTriggerBits > logicalExpressions;
@@ -484,7 +506,8 @@ std::vector< std::string > TriggerHelper::expressionsFromDB( const string & key,
   const map< string, string > & expressionMap = logicalExpressions->m_alcarecoToTrig;
   map< string, string >::const_iterator listIter = expressionMap.find( key );
   if ( listIter == expressionMap.end() ) {
-    throw cms::Exception( "Configuration" ) << "No logical expressions found under key " << key << " in 'AlCaRecoTriggerBitsRcd'";
+    LogError( "TriggerHelper" ) << "No logical expressions found under key " << key << " in 'AlCaRecoTriggerBitsRcd'";
+    return vector< string >( 1, configError_ );
   }
   return logicalExpressions->decompose( listIter->second );
 

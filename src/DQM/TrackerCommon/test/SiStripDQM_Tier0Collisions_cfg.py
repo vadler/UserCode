@@ -42,20 +42,24 @@ process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 process.source = cms.Source( "PoolSource",
   fileNames = cms.untracked.vstring(
     # 123596 RAW
-    '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/FA54A056-42E2-DE11-A6DB-001617E30D40.root',
+    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/FA54A056-42E2-DE11-A6DB-001617E30D40.root', # 20054 events
     #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/E8477DE8-38E2-DE11-9DAB-0016177CA778.root',
     #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/E2EFCB1E-3FE2-DE11-9378-001D09F2438A.root'
-#     # 123596 Express FEVT
-#     '/store/express/BeamCommissioning09/ExpressPhysics/FEVT/v2/000/123/596/FEE389F2-33E2-DE11-A62E-001617C3B76E.root',
-#     '/store/express/BeamCommissioning09/ExpressPhysics/FEVT/v2/000/123/596/FE90F72C-43E2-DE11-8E89-001D09F2B30B.root',
-#     '/store/express/BeamCommissioning09/ExpressPhysics/FEVT/v2/000/123/596/FE0807BE-48E2-DE11-9A06-001D09F28F25.root'
+    # 123591 RAW
+    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/591/E002A67B-2EE2-DE11-A64A-001617C3B77C.root'
+    # 123510 RAW (different trigger key compared to run 123596)
+    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/510/EE215294-CAE0-DE11-87F6-003048D37560.root'
     # 124120 RAW
-    '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/F6ADE109-6BE8-DE11-9680-000423D991D4.root',
+    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/F6ADE109-6BE8-DE11-9680-000423D991D4.root',
     #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/ECF0E939-68E8-DE11-A59D-003048D2C1C4.root',
-    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/E2071E9D-6EE8-DE11-AD98-0016177CA7A0.root'
+    '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/E2071E9D-6EE8-DE11-AD98-0016177CA7A0.root'
 
   ),
-  skipEvents = cms.untracked.uint32( 20000 )
+  #skipEvents    = cms.untracked.uint32( 20000 ),
+  inputCommands = cms.untracked.vstring(
+    'keep *'
+  , 'drop *_hltL1GtObjectMap_*_*'
+  )
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 100 )
@@ -101,7 +105,7 @@ process.es_prefer_trackerDqm = cms.ESPrefer( "PoolDBESSource", "dbInput" )
 # process.SiStripMonitorTrack.andOrDcs      = True
 # process.SiStripMonitorTrack.errorReplyDcs = True
 # process.SiStripMonitorTrack.gtInputTag    = "gtDigis"
-# process.SiStripMonitorTrack.gtDBKey       = "TrackerDQM_Gt"
+# process.SiStripMonitorTrack.gtDBKey       = 'TrackerDQM_Gt'
 # process.SiStripMonitorTrack.gtStatusBits  = [ 'PhysicsDeclared'
 #                                             ]
 # process.SiStripMonitorTrack.andOrGt       = False
@@ -127,14 +131,20 @@ process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
 # process.TrackerCollisionTrackMon.andOrDcs      = True
 # process.TrackerCollisionTrackMon.errorReplyDcs = True
 # process.TrackerCollisionTrackMon.gtInputTag    = "gtDigis"
-# process.TrackerCollisionTrackMon.gtDBKey       = "TrackerDQM_Gt"
+# process.TrackerCollisionTrackMon.gtDBKey       = 'TrackerDQM_Gt'
 # process.TrackerCollisionTrackMon.gtStatusBits  = [ 'PhysicsDeclared'
 #                                                  ]
 # process.TrackerCollisionTrackMon.andOrGt       = False
 # process.TrackerCollisionTrackMon.errorReplyGt  = False
+#process.TrackerCollisionTrackMon.l1DBKey       = cms.string( 'TrackerDQM_L1_Tracking' )
 process.TrackerCollisionTrackMon.l1DBKey       = cms.string( 'TrackerDQM_L1_Tracking' )
-process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring()
-process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring()
+process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring( 'L1Tech_BPTX_plus_AND_minus.v0'
+                                                            , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0'
+                                                            , '~L1Tech_BSC_halo_beam2_inner.v0'
+                                                            , '~L1Tech_BSC_halo_beam2_outer.v0'
+                                                            , '~L1Tech_BSC_halo_beam1_inner.v0'
+                                                            , '~L1Tech_BSC_halo_beam1_outer.v0'
+                                                            )
 process.TrackerCollisionTrackMon.andOrL1       = cms.bool( False )
 process.TrackerCollisionTrackMon.errorReplyL1  = cms.bool( False )
 # process.TrackerCollisionTrackMon.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
