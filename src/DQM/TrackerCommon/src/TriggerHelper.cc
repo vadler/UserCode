@@ -5,11 +5,8 @@
 
 #include "DQM/TrackerCommon/interface/TriggerHelper.h"
 
-#include <vector>
-#include <iostream> // DEBUG
-
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "FWCore/Utilities/interface/Exception.h"
+#include <iostream> // DEBUG
 
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "CondFormats/HLTObjects/interface/AlCaRecoTriggerBits.h"
@@ -100,7 +97,8 @@ TriggerHelper::~TriggerHelper()
 void TriggerHelper::initRun( const Run & run, const EventSetup & setup )
 {
 
-  // FIXME Can this stay safely in the run loop, od does it need to go to the event loop?
+  // FIXME Can this stay safely in the run loop, or does it need to go to the event loop?
+  // Means: Are the event setups identical?
   if ( watchDB_->check( setup ) ) {
     cout << "GT DB tag  : " << gtDBKey_.data() << endl; // DEBUG
     if ( onGt_ && gtDBKey_.size() > 0 ) {
@@ -398,7 +396,6 @@ bool TriggerHelper::acceptL1LogicalExpression( const Event & event, string l1Log
 /// Was this event accepted by the configured HLT logical expression combination?
 bool TriggerHelper::acceptHlt( const Event & event )
 {
-
 //   hltConfigInit_ = false; // DEBUG
 //   if ( onHlt_ ) { // DEBUG
 //     if ( hltInputTag_.process().size() == 0 ) { // DEBUG

@@ -21,6 +21,7 @@
 
 
 #include <string>
+#include <vector>
 
 #include "FWCore/Framework/interface/Run.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -35,6 +36,7 @@
 
 class TriggerHelper {
 
+    // Utility classes
     edm::ESWatcher< AlCaRecoTriggerBitsRcd > * watchDB_;
     L1GtUtils                                  l1Gt_;
     HLTConfigProvider                          hltConfig_;
