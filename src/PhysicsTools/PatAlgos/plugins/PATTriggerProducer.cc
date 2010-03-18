@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <iostream> // DEBUG
 
 #include "DataFormats/L1Trigger/interface/L1EmParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
@@ -22,7 +23,6 @@
 
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
-#include "DataFormats/PatCandidates/interface/TriggerObject.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -45,6 +45,7 @@ PATTriggerProducer::PATTriggerProducer( const edm::ParameterSet & iConfig ) :
   nameProcess_( iConfig.getParameter< std::string >( "processName" ) ),
   tagTriggerResults_( iConfig.getParameter< edm::InputTag >( "triggerResults" ) ),
   tagTriggerEvent_( iConfig.getParameter< edm::InputTag >( "triggerEvent" ) ),
+  hltPrescaleLabel_(),
   addPathModuleLabels_( iConfig.getParameter< bool >( "addPathModuleLabels" ) )
 {
 
@@ -57,6 +58,8 @@ PATTriggerProducer::PATTriggerProducer( const edm::ParameterSet & iConfig ) :
   if ( iConfig.exists( "l1ExtraTauJet" ) )  tagL1ExtraTauJet_  = iConfig.getParameter< edm::InputTag >( "l1ExtraTauJet" );
   if ( iConfig.exists( "l1ExtraETM" ) )     tagL1ExtraETM_     = iConfig.getParameter< edm::InputTag >( "l1ExtraETM" );
   if ( iConfig.exists( "l1ExtraHTM" ) )     tagL1ExtraHTM_     = iConfig.getParameter< edm::InputTag >( "l1ExtraHTM" );
+  if ( iConfig.exists( "hltPrescaleLabel" ) ) hltPrescaleLabel_ = iConfig.getParameter< std::string >( "hltPrescaleLabel" );
+  hltPrescaleInit_ = ( hltPrescaleLabel_.size() > 0 );
 
   if ( tagTriggerResults_.process().empty() ) {
     tagTriggerResults_ = edm::InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
@@ -78,18 +81,54 @@ PATTriggerProducer::PATTriggerProducer( const edm::ParameterSet & iConfig ) :
 void PATTriggerProducer::beginRun( edm::Run & iRun, const edm::EventSetup & iSetup )
 {
 
+  // Initialize
+  hltConfigInit_    = false;
+  hltPrescaleSet_ = -1;
+  if ( ! hltPrescaleInit_ ) hltPrescaleLabel_ = "";
+
+  // Initialize HLTConfigProvider
   bool changed( true );
+  std::cout << "PATTriggerProducer::beginRun() -> initializing process '" << nameProcess_ << "'" << std::endl;
   if ( ! hltConfig_.init( iRun, iSetup, nameProcess_, changed ) ) {
     edm::LogError( "errorHltConfigExtraction" ) << "HLT config extraction error with process name " << nameProcess_;
-    hltConfigInit_ = false;
-    return;
-  }
-  if ( hltConfig_.size() <= 0 ) {
+  } else if ( hltConfig_.size() <= 0 ) {
     edm::LogError( "hltConfigSize" ) << "HLT config size error";
-    hltConfigInit_ = false;
-    return;
+  } else hltConfigInit_ = true;
+
+  // Find prescale set to use
+  if ( hltConfigInit_ ) {
+    std::cout << "Prescale label (init): " << hltPrescaleLabel_ << std::endl; // DEBUG
+    if ( hltPrescaleLabel_.size() == 0 ) {
+//       hltPrescaleSet_ = hltConfig_.prescaleTable().set();
+//     } else {
+      std::string prescaleName( "" );
+      const std::string preS( "PrescaleService" );
+      const std::string preT( "PrescaleTable" );
+      if ( hltConfig_.processPSet().exists( preS ) ) {
+        prescaleName = preS;
+      } else if ( hltConfig_.processPSet().exists( preT ) ) {
+        prescaleName = preT;
+      }
+      std::cout << "Prescale name: " << prescaleName << std::endl; // DEBUG
+      if ( prescaleName.size() > 0 ) {
+        const edm::ParameterSet parameterSet( hltConfig_.processPSet().getParameter< edm::ParameterSet >( prescaleName ) );
+        std::cout << "ParameterSet:" << std::endl << parameterSet << std::endl; // DEBUG
+        hltPrescaleLabel_ = parameterSet.getUntrackedParameter< std::string >( "lvl1DefaultLabel", "" );
+      }
+    }
+    std::cout << "Prescale label: " << hltPrescaleLabel_ << std::endl; // DEBUG
+    if ( hltPrescaleLabel_.size() > 0 ) {
+      for ( unsigned i = 0; i < hltConfig_.prescaleSize(); ++i ) {
+        if ( hltConfig_.prescaleLabels().at( i ) == hltPrescaleLabel_ ) {
+          hltPrescaleSet_ = i;
+          break;
+        }
+      }
+    }
+    if ( hltPrescaleSet_ == -1 ) {
+      edm::LogWarning( "hltPrescale" ) << "No prescales found, all set to 1";
+    }
   }
-  hltConfigInit_ = true;
 
 }
 
@@ -135,6 +174,7 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
     std::map< std::string, int > moduleStates;
     std::multimap< std::string, std::string > filterPaths;
 
+    std::cout << "Prescale index: " << hltPrescaleSet_ << std::endl; // DEBUG
     for ( size_t iP = 0; iP < sizePaths; ++iP ) {
       const std::string namePath( hltConfig_.triggerName( iP ) );
       const unsigned indexPath( hltConfig_.triggerIndex( namePath ) );
@@ -148,7 +188,10 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
       }
       if ( ! onlyStandAlone_ ) {
         const unsigned indexLastFilter( handleTriggerResults->index( indexPath ) );
+//         std::cout << "Prescale " << namePath << ": " << hltConfig_.prescaleValue( iEvent, iSetup, namePath ) << std::endl; // DEBUG
+        if ( hltPrescaleSet_ >= 0 ) std::cout << "Prescale " << namePath << ": " << hltConfig_.prescaleValue( (unsigned)hltPrescaleSet_, namePath ) << std::endl; // DEBUG
         TriggerPath triggerPath( namePath, indexPath, 1, handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), indexLastFilter );
+        if ( hltPrescaleSet_ >= 0 ) triggerPath.setPrescale( hltConfig_.prescaleValue( (unsigned)hltPrescaleSet_, namePath ) );
         // add module names to path and states' map
         assert( indexLastFilter < sizeModules );
         std::map< unsigned, std::string > indicesModules;

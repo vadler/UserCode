@@ -15,6 +15,7 @@ patTrigger = cms.EDProducer( "PATTriggerProducer"
                            , processName    = cms.string( 'HLT' )                    # default; change only, if you know exactly, what you are doing!
                            , triggerResults = cms.InputTag( "TriggerResults" )       # default; change only, if you know exactly, what you are doing!
                            , triggerEvent   = cms.InputTag( "hltTriggerSummaryAOD" ) # default; change only, if you know exactly, what you are doing!
+#                            , hltPrescaleLabel = cms.string( '0' )                    # default; change only, if you know exactly, what you are doing!
                            , addPathModuleLabels = cms.bool( False )                 # setting this 'True' stores the names of all modules as strings (~10kB/ev.)
                            )
 
