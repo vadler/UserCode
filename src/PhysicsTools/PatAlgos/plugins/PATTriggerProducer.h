@@ -43,28 +43,30 @@ namespace pat {
     private:
 
       virtual void beginRun( edm::Run & iRun, const edm::EventSetup & iSetup );
+      virtual void beginLuminosityBlock( edm::LuminosityBlock & iLuminosityBlock, const edm::EventSetup & iSetup );
       virtual void produce( edm::Event & iEvent, const edm::EventSetup & iSetup );
 
-      bool onlyStandAlone_;
+      bool onlyStandAlone_; // configuration
       // L1
-      edm::InputTag tagL1ExtraMu_;
-      edm::InputTag tagL1ExtraNoIsoEG_;
-      edm::InputTag tagL1ExtraIsoEG_;
-      edm::InputTag tagL1ExtraCenJet_;
-      edm::InputTag tagL1ExtraForJet_;
-      edm::InputTag tagL1ExtraTauJet_;
-      edm::InputTag tagL1ExtraETM_;
-      edm::InputTag tagL1ExtraHTM_;
+      edm::InputTag tagL1ExtraMu_;      // configuration (optional)
+      edm::InputTag tagL1ExtraNoIsoEG_; // configuration (optional)
+      edm::InputTag tagL1ExtraIsoEG_;   // configuration (optional)
+      edm::InputTag tagL1ExtraCenJet_;  // configuration (optional)
+      edm::InputTag tagL1ExtraForJet_;  // configuration (optional)
+      edm::InputTag tagL1ExtraTauJet_;  // configuration (optional)
+      edm::InputTag tagL1ExtraETM_;     // configuration (optional)
+      edm::InputTag tagL1ExtraHTM_;     // configuration (optional)
       // HLT
-      HLTConfigProvider hltConfig_;
-      bool              hltConfigInit_;
-      std::string       nameProcess_;
-      edm::InputTag     tagTriggerResults_;
-      edm::InputTag     tagTriggerEvent_;
-      std::string       hltPrescaleLabel_;
-      bool              hltPrescaleInit_;
-      int               hltPrescaleSet_;
-      bool              addPathModuleLabels_;
+      HLTConfigProvider         hltConfig_;
+      bool                      hltConfigInit_;
+      std::string               nameProcess_;           // configuration
+      edm::InputTag             tagTriggerResults_;     // configuration
+      edm::InputTag             tagTriggerEvent_;       // configuration
+      std::string               hltPrescaleLabel_;      // configuration (optional)
+      std::string               labelHltPrescaleTable_; // configuration (optional)
+      trigger::HLTPrescaleTable hltPrescaleTableRun_;
+      trigger::HLTPrescaleTable hltPrescaleTableLumi_;
+      bool                      addPathModuleLabels_;   // configuration
 
   };
 
