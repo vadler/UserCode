@@ -2,8 +2,11 @@ Test Release based on: CMSSW_3_5_4
 Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_5_4
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_4
 -------- Package --------                        --- Tag ---    --- RelTag --- 
+DataFormats/HLTReco                              V02-04-12      V02-04-11      
 DataFormats/PatCandidates                        NoTag          V05-09-10      
+HLTrigger/HLTcore                                V02-10-02      V02-09-00      
+L1Trigger/GlobalTriggerAnalyzer                  V01-03-00      V01-02-00      
 PhysicsTools/PatAlgos                            B3_5_X         V07-11-25      
 PhysicsTools/PatUtils                            NoTag          V03-09-11      
 ---------------------------------------
-total packages: 3 (3 displayed)
+total packages: 6 (6 displayed)
