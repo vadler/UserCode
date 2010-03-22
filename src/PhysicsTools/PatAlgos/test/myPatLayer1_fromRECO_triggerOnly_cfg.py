@@ -32,7 +32,7 @@ process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_c
 process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff")
 process.patTrigger.processName      = 'HLT1E31'
 # process.patTrigger.hltPrescaleLabel = cms.string( '1' )
-process.patTrigger.hltPrescaleTable = cms.string( "hltPrescaleRecorder" )
+process.patTrigger.hltPrescaleTable = cms.string( "hltPrescaleRecorder1" )
 process.p = cms.Path(
     process.patTrigger
   )

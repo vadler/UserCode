@@ -1644,10 +1644,10 @@ process.ModuleWebRegistry = cms.Service( "ModuleWebRegistry",
 )
 process.PrescaleService = cms.Service( "PrescaleService",
     lvl1DefaultLabel = cms.untracked.string( "0" ),
-    lvl1Labels = cms.vstring( '0', '1' ),
+    lvl1Labels = cms.vstring( "0", "1" ),
     prescaleTable = cms.VPSet(
       cms.PSet(  pathName = cms.string( "HLT_IsoMu9" ),
-        prescales = cms.vuint32( 0, 0 )
+        prescales = cms.vuint32( 0, 1 )
       ),
       cms.PSet(  pathName = cms.string( "HLT_Mu5" ),
         prescales = cms.vuint32( 0, 1 )
@@ -1755,19 +1755,19 @@ process.PrescaleService = cms.Service( "PrescaleService",
         prescales = cms.vuint32( 0, 1 )
       ),
       cms.PSet(  pathName = cms.string( "AlCa_RPCMuonNoHits" ),
-        prescales = cms.vuint32( 10, 1 )
+        prescales = cms.vuint32( 10, 11 )
       ),
       cms.PSet(  pathName = cms.string( "AlCa_RPCMuonNormalisation" ),
-        prescales = cms.vuint32( 10, 1 )
+        prescales = cms.vuint32( 10, 11 )
       )
     )
 )
 
-process.PrescaleTable = cms.PSet()
-for pn, pv in process.PrescaleService.parameters_().items():
-  setattr( process.PrescaleTable, pn, pv )
+# process.PrescaleTable = cms.PSet()
+# for pn, pv in process.PrescaleService.parameters_().items():
+#   setattr( process.PrescaleTable, pn, pv )
 process.load( "HLTrigger.HLTcore.hltPrescaleRecorder_cfi" )
-process.hltPrescaleRecorder.run    = False
+process.hltPrescaleRecorder.run    = True
 process.hltPrescaleRecorder.lumi   = True
 process.hltPrescaleRecorder.event  = False
 process.hltPrescaleRecorder.condDB = False
