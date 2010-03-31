@@ -9,5 +9,6 @@ L1Trigger/GlobalTriggerAnalyzer                  V01-03-00      V01-03-00
 PhysicsTools/PatAlgos                            B3_5_X         V07-11-28      
 PhysicsTools/PatExamples                         B3_5_X_Workbook V00-02-10      
 PhysicsTools/PatUtils                            NoTag          V03-09-11      
+PhysicsTools/SelectorUtils                       V00-00-11      V00-00-09      
 ---------------------------------------
-total packages: 7 (7 displayed)
+total packages: 8 (8 displayed)
