@@ -120,8 +120,8 @@ process.datasets = cms.PSet(
 process.source = cms.Source(
     "PoolSource"
   , fileNames = cms.untracked.vstring(
-      # /RelValProdTTbar/CMSSW_3_5_4-MC_3XY_V24-v1/GEN-SIM-RAW
-        'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_5_4/RelValProdTTbar/GEN-SIM-RAW/MC_3XY_V24-v1/0004/A2BA2235-A82B-DF11-8F16-001A92810AB6.root'
+      # /RelValProdTTbar/CMSSW_3_5_6-MC_3XY_V24-v1/GEN-SIM-RAW
+        'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_5_6/RelValProdTTbar/GEN-SIM-RAW/MC_3XY_V24-v1/0004/A2BA2235-A82B-DF11-8F16-001A92810AB6.root'
       )
   )
 
@@ -8544,7 +8544,7 @@ process.hltTrigReport = cms.EDAnalyzer( "HLTrigReport",
 )
 
 process.hltOutputA = cms.OutputModule( "PoolOutputModule",
-    fileName = cms.untracked.string( "/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_4/output/myHlt1E31_fromRAW_triggerOnly.root" ),
+    fileName = cms.untracked.string( "/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_6/output/myHlt1E31_fromRAW_triggerOnly.root" ),
     SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring( 'HLT_DoublePhoton10_L1R',
   'HLT_Photon15_L1R',
   'HLT_Photon10_L1R',
