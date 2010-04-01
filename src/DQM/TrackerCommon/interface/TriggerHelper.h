@@ -7,7 +7,7 @@
 // Package:    DQM/TrackerCommon
 // Class:      TriggerHelper
 //
-// $Id: TriggerHelper.h,v 1.5 2010/03/03 14:37:34 vadler Exp $
+// $Id: TriggerHelper.h,v 1.8 2010/03/27 12:09:10 dutta Exp $
 //
 /**
   \class    TriggerHelper TriggerHelper.h "DQM/TrackerCommon/interface/TriggerHelper.h"
@@ -16,12 +16,9 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id: TriggerHelper.h,v 1.5 2010/03/03 14:37:34 vadler Exp $
+  \version  $Id: TriggerHelper.h,v 1.8 2010/03/27 12:09:10 dutta Exp $
 */
 
-
-#include <string>
-#include <vector>
 
 #include "FWCore/Framework/interface/Run.h"
 #include "FWCore/Framework/interface/Event.h"

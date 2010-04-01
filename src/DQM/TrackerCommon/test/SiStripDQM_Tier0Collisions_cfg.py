@@ -35,7 +35,7 @@ process.DQMStore.referenceFileName = ''
 process.DQMStore.collateHistograms = False
 process.dqmSaver.convention = 'Offline'
 process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_5_X/RECO'
-process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_4/output'
+process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_6/output'
 process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 
 # Input
@@ -88,7 +88,7 @@ process.load( 'HLTrigger.HLTfilters.hltHighLevel_cfi' )
 import CondCore.DBCommon.CondDBSetup_cfi
 process.dbInput = cms.ESSource( "PoolDBESSource"
                               , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-                              , connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_5_4/output/TrackerDQMTriggerBits.db' )
+                              , connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_5_6/output/TrackerDQMTriggerBits.db' )
                               , toGet   = cms.VPSet( cms.PSet( record = cms.string( 'AlCaRecoTriggerBitsRcd' )
                                                              , tag    = cms.string( 'TrackerDQMTriggerBits_v0_hlt' )
                                                              )
@@ -193,7 +193,7 @@ process.path = cms.Path(
 )
 
 process.out = cms.OutputModule( "PoolOutputModule",
-  fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_4/output/SiStripDQM_Tier0Collisions.root' ),
+  fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_6/output/SiStripDQM_Tier0Collisions.root' ),
   SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'path'

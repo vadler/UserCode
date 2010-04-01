@@ -28,6 +28,7 @@ from DQM.SiStripMonitorTrack.SiStripMonitorTrack_cfi import *
 SiStripMonitorTrack.TrackProducer = 'generalTracks'
 SiStripMonitorTrack.Mod_On        = False
 SiStripMonitorTrack.FolderName    = 'Tracking/TrackParameters'
+SiStripMonitorTrack.TH1ClusterStoNCorr.Nbinx = 200
 # Filters
 SiStripMonitorTrack.andOr         = cms.bool( False )
 SiStripMonitorTrack.dcsInputTag   = cms.InputTag( "scalersRawToDigi" )
@@ -62,8 +63,8 @@ MonitorTrackResiduals.Mod_On = False
 
 # TrackingMonitor ####
 from DQM.TrackingMonitor.TrackerCollisionTrackingMonitor_cfi import *
-TrackerCollisionTrackMon.FolderName   = 'Tracking/TrackParameters'
-TrackerCollisionTrackMon.BSFolderName = 'Tracking/TrackParameters/BeamSpotParameters'
+TrackerCollisionTrackMon.FolderName          = 'Tracking/TrackParameters'
+TrackerCollisionTrackMon.BSFolderName        = 'Tracking/TrackParameters/BeamSpotParameters'
 # Filters
 TrackerCollisionTrackMon.andOr         = cms.bool( False )
 TrackerCollisionTrackMon.dcsInputTag   = cms.InputTag( "scalersRawToDigi" )
@@ -97,7 +98,7 @@ TrackerCollisionTrackMon.errorReplyGt  = cms.bool( False )
 # TrackerCollisionTrackMon.errorReplyHlt = cms.bool( False )
 
 # DQM Services
-dqmInfoSiStrip = cms.EDFilter("DQMEventInfo",
+dqmInfoSiStrip = cms.EDAnalyzer("DQMEventInfo",
     subSystemFolder = cms.untracked.string('SiStrip')
 )
 
