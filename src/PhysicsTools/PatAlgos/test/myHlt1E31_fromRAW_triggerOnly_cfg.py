@@ -8540,7 +8540,7 @@ process.hltTrigReport = cms.EDAnalyzer( "HLTrigReport",
 )
 
 process.hltOutputA = cms.OutputModule( "PoolOutputModule",
-    fileName = cms.untracked.string( "/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0_pre3/output/myHlt1E31_fromRAW_triggerOnly.root" ),
+    fileName = cms.untracked.string( "/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0_pre4/output/myHlt1E31_fromRAW_triggerOnly.root" ),
     SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring( 'HLT_DoublePhoton10_L1R',
   'HLT_Photon15_L1R',
   'HLT_Photon10_L1R',
