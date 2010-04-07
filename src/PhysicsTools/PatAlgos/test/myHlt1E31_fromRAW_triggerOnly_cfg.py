@@ -118,7 +118,7 @@ process.datasets = cms.PSet(
 )
 
 process.source = cms.Source( "PoolSource",
-    fileNames = cms.untracked.vstring( 'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_6_0_pre3/RelValProdTTbar/GEN-SIM-RAW/MC_36Y_V2-v2/0001/803A0940-1C31-DF11-98E8-0030487C8E00.root' )
+    fileNames = cms.untracked.vstring( 'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_6_0_pre5/RelValProdTTbar/GEN-SIM-RAW/MC_36Y_V2-v2/0001/803A0940-1C31-DF11-98E8-0030487C8E00.root' )
 )
 
 process.BTagRecord = cms.ESSource( "EmptyESSource",
