@@ -29,7 +29,7 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 # switchOnTrigger( process )
 ## all; default to run myTriggerTest_cfg.py afterwards
 switchOnTriggerAll( process )
-process.patTrigger.addPathModuleLabels = True
+process.patTrigger.addPathModuleLabels = cms.bool( True )
 switchOnTriggerMatchEmbedding( process )
 process.out.outputCommands += [ 'keep edmTriggerResults_TriggerResults_*_HLT'
                               , 'keep *_hltTriggerSummaryAOD_*_*'
