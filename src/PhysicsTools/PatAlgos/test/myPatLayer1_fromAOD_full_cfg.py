@@ -1,9 +1,9 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-#process.GlobalTag.globaltag = 'STARTUP31X_V8::All'
-#process.source.fileNames    = [ '/store/relval/CMSSW_3_4_0_pre1/RelValTTbar/GEN-SIM-RECO/STARTUP31X_V8-v1/0007/BAB355DB-DFB4-DE11-AD73-0019B9F72F97.root' ]
+#process.GlobalTag.globaltag = ...
+#process.source.fileNames    = [ ... ]
 process.maxEvents.input     = 100
 # process.out.outputCommands  = [ ... ]
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0_pre5/output/myPatLayer1_fromAOD_full.root'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0_pre6/output/myPatLayer1_fromAOD_full.root'
 # process.options.wantSummary = False
 
 # # memory check

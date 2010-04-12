@@ -14,7 +14,7 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source(
     "PoolSource"
   , fileNames = cms.untracked.vstring(
-        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0_pre5/output/myHlt1E31_fromRAW_triggerOnly.root'
+        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0_pre6/output/myHlt1E31_fromRAW_triggerOnly.root'
       )
   )
 process.maxEvents = cms.untracked.PSet(
@@ -47,7 +47,7 @@ process.primaryVertexFilter = cms.EDFilter(
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'MC_36Y_V2::All'
+process.GlobalTag.globaltag = 'MC_36Y_V4::All'
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
 ## PAT trigger
@@ -70,7 +70,7 @@ process.p = cms.Path(
 from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
 process.out = cms.OutputModule(
     "PoolOutputModule"
-  , fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0_pre5/output/myPatLayer1_fromRECO_triggerOnly.root' )
+  , fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0_pre6/output/myPatLayer1_fromRECO_triggerOnly.root' )
   , SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring(
             'p'

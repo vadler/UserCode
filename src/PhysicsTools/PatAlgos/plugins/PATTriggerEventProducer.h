@@ -48,10 +48,10 @@ namespace pat {
 
       HLTConfigProvider            hltConfig_;
       bool                         hltConfigInit_;
-      std::string                  nameProcess_;
-      edm::InputTag                tagTriggerResults_;
-      edm::InputTag                tagTriggerProducer_;
-      std::vector< edm::InputTag > tagsTriggerMatcher_;
+      std::string                  nameProcess_;        // configuration
+      edm::InputTag                tagTriggerResults_;  // configuration (optional)
+      edm::InputTag                tagTriggerProducer_; // configuration (optional)
+      std::vector< edm::InputTag > tagsTriggerMatcher_; // configuration (optional)
 
   };
 
