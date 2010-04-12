@@ -42,8 +42,6 @@
 
 #include "DataFormats/TrackerRecHit2D/interface/SiStripRecHit2D.h"
 
-#include "TString.h"
-
 //******** Single include for the TkMap *************
 #include "DQM/SiStripCommon/interface/TkHistoMap.h"
 //***************************************************
@@ -65,9 +63,9 @@ public:
 private:
   //booking
   void book();
-  void bookModMEs(TString, uint32_t);
-  void bookTrendMEs(TString, int32_t,uint32_t,std::string flag);
-  void bookSubDetMEs(TString name,TString flag);
+  void bookModMEs(std::string, uint32_t);
+  void bookTrendMEs(std::string, int32_t,uint32_t,std::string flag);
+  void bookSubDetMEs(std::string& name,std::string& flag);
   MonitorElement * bookME1D(const char*, const char*);
   MonitorElement * bookME2D(const char*, const char*);
   MonitorElement * bookME3D(const char*, const char*);
@@ -81,8 +79,8 @@ private:
   template <class T> void RecHitInfo(const T* tkrecHit, LocalVector LV,reco::TrackRef track_ref, const edm::EventSetup&);
 
   // fill monitorables
-  void fillModMEs(SiStripClusterInfo*,TString,float);
-  void fillMEs(SiStripClusterInfo*,std::string,float,std::string);
+  void fillModMEs(SiStripClusterInfo*,std::string,float);
+  void fillMEs(SiStripClusterInfo*,uint32_t detid,float,std::string);
   inline void fillME(MonitorElement* ME,float value1){if (ME!=0)ME->Fill(value1);}
   inline void fillME(MonitorElement* ME,float value1,float value2){if (ME!=0)ME->Fill(value1,value2);}
   inline void fillME(MonitorElement* ME,float value1,float value2,float value3){if (ME!=0)ME->Fill(value1,value2,value3);}
@@ -94,7 +92,6 @@ private:
   DQMStore * dbe;
   edm::ParameterSet conf_;
   std::string histname;
-  TString name;
   LocalVector LV;
   float iOrbitSec;
 
@@ -156,16 +153,9 @@ private:
     MonitorElement* ClusterPGV;
   };
 
-  std::map<TString, ModMEs> ModMEsMap;
-  std::map<TString, LayerMEs> LayerMEsMap;
-  std::map<TString, MonitorElement*> MEMap;
-
-
-  //  edm::Handle< edmNew::DetSetVector<SiStripCluster> > dsv_SiStripCluster;
-
-  //   edm::Handle<std::vector<Trajectory> > TrajectoryCollection;
-  //  edm::Handle<reco::TrackCollection > trackCollection;
-  //  edm::Handle<TrajTrackAssociationCollection> TItkAssociatorCollection;
+  std::map<std::string, ModMEs> ModMEsMap;
+  std::map<std::string, LayerMEs> LayerMEsMap;
+  std::map<std::string, MonitorElement*> MEMap;
 
   edm::ESHandle<TrackerGeometry> tkgeom;
   edm::ESHandle<SiStripDetCabling> SiStripDetCabling_;
@@ -180,6 +170,9 @@ private:
   bool ring_flag;
   bool TkHistoMap_On_;
 
+  std::string TrackProducer_;
+  std::string TrackLabel_;
+
   int off_Flag;
   std::vector<uint32_t> ModulesToBeExcluded_;
   std::vector<const SiStripCluster*> vPSiStripCluster;
@@ -192,6 +185,13 @@ private:
   int firstEvent;
   int countOn, countOff, countAll, NClus[4][3];
 
+  bool   applyClusterQuality_;
+  double sToNLowerLimit_;
+  double sToNUpperLimit_;
+  double widthLowerLimit_;
+  double widthUpperLimit_;
+
   TriggerHelper * triggerHelper;
+
 };
 #endif
