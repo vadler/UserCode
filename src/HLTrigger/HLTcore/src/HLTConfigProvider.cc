@@ -21,6 +21,7 @@ bool HLTConfigProvider::init(const std::string& processName)
 {
    using namespace std;
    using namespace edm;
+   cout << "--- init(const std::string& processName)" << endl;
 
    LogInfo("HLTConfigProvider") << "Called (N) with processName '"
 				<< processName << "'." << endl;
@@ -121,6 +122,7 @@ bool HLTConfigProvider::init(const std::string& processName)
 bool HLTConfigProvider::init(const edm::Event& iEvent, const std::string& processName, bool& changed) {
    using namespace std;
    using namespace edm;
+   cout << "--- init(const edm::Event& iEvent, const std::string& processName, bool& changed)" << endl;
 
    LogInfo("HLTConfigProvider") << "Called (E) with processName '"
 				<< processName << "'." << endl;
@@ -163,6 +165,7 @@ bool HLTConfigProvider::init(const edm::Event& iEvent, const std::string& proces
 */
 
 bool HLTConfigProvider::init(const edm::ProcessHistory& iHistory, const edm::EventSetup& iSetup, const std::string& processName, bool& changed) {
+  std::cout << "--- init(const edm::ProcessHistory& iHistory, const edm::EventSetup& iSetup, const std::string& processName, bool& changed)" << std::endl;
   const bool result(init(iHistory,processName,changed));
   l1GtUtils_.retrieveL1EventSetup(iSetup);
   return result;
@@ -172,6 +175,7 @@ bool HLTConfigProvider::init(const edm::ProcessHistory& iHistory, const std::str
 
    using namespace std;
    using namespace edm;
+   cout << "--- init(const edm::ProcessHistory& iHistory, const std::string& processName, bool& changed)" << endl;
 
    /// Check uniqueness (uniqueness should [soon] be enforced by Fw)
    const ProcessHistory::const_iterator hb(iHistory.begin());
@@ -179,6 +183,7 @@ bool HLTConfigProvider::init(const edm::ProcessHistory& iHistory, const std::str
    unsigned int n(0);
    for (ProcessHistory::const_iterator hi=hb; hi!=he; ++hi) {
      if (hi->processName()==processName) {n++;}
+     cout << "HLTConfigProvider: ProcessName '" << hi->processName() << "' found" << endl; // DEBUG
    }
    if (n>1) {
      clear();
@@ -236,6 +241,7 @@ bool HLTConfigProvider::init(const edm::Run& iRun, const edm::EventSetup& iSetup
 
    using namespace std;
    using namespace edm;
+   cout << "--- init(const edm::Run& iRun, const edm::EventSetup& iSetup, const std::string& processName, bool& changed)" << endl;
 
    LogInfo("HLTConfigProvider") << "Called (R) with processName '"
 				<< processName << "'." << endl;

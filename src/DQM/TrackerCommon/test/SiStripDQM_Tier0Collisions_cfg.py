@@ -42,7 +42,7 @@ process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 process.source = cms.Source( "PoolSource",
   fileNames = cms.untracked.vstring(
     # 123596 RAW
-    '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/FA54A056-42E2-DE11-A6DB-001617E30D40.root', # 20054 events
+    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/FA54A056-42E2-DE11-A6DB-001617E30D40.root', # 20054 events
     #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/E8477DE8-38E2-DE11-9DAB-0016177CA778.root',
     #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/123/596/E2EFCB1E-3FE2-DE11-9378-001D09F2438A.root'
     # 123591 RAW
@@ -52,10 +52,48 @@ process.source = cms.Source( "PoolSource",
     # 124120 RAW
     #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/F6ADE109-6BE8-DE11-9680-000423D991D4.root',
     #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/ECF0E939-68E8-DE11-A59D-003048D2C1C4.root',
-    '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/E2071E9D-6EE8-DE11-AD98-0016177CA7A0.root'
-
+    #'/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/E2071E9D-6EE8-DE11-AD98-0016177CA7A0.root'
+    # 132440 RAW
+    #'/store/data/Commissioning10/MinimumBias/RAW/v4/000/132/440/EA896425-F93B-DF11-B971-000423D99AAE.root', # 16250 events
+    '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr1Skim_GOODCOLL-v1/0139/FA7B208C-B33E-DF11-A713-003048679010.root', # 7831 events
+    # 132658 RAW
+    #'/store/data/Commissioning10/MinimumBias/RAW/v4/000/132/658/FE5A8C16-7341-DF11-A72A-0015C5FDE067.root' # 18612 events
+    '/store/data/Commissioning10/MinimumBias/RAW-RECO/v8/000/132/658/E8443DDC-AF41-DF11-90D2-003048D4777E.root'
   ),
-  skipEvents    = cms.untracked.uint32( 20000 ),
+  #lumisToProcess = cms.untracked.VLuminosityBlockRange(
+    #'132440:85-132440:138',
+    #'132440:141-132440:401',
+    #'132473:1-132473:29',
+    #'132476:23-132476:28',
+    #'132476:54-132476:57',
+    #'132477:1-132477:5',
+    #'132477:34-132477:35',
+    #'132477:63-132477:64',
+    #'132477:90-132477:93',
+    #'132477:118-132477:121',
+    #'132477:148-132477:149',
+    #'132477:176-132477:179',
+    #'132477:225-132477:236',
+    #'132477:368-132477:384',
+    #'132477:517-132477:520',
+    #'132569:222-132569:224',
+    #'132569:310-132569:310',
+    #'132569:411-132569:419',
+    #'132569:529-132569:582',
+    #'132596:382-132596:383',
+    #'132596:447-132596:453',
+    #'132598:80-132598:82',
+    #'132598:174-132598:188',
+    #'132599:1-132599:74',
+    #'132601:261-132601:1131',
+    #'132602:1-132602:83',
+    #'132605:1-132605:444',
+    #'132605:446-132605:622',
+    #'132605:624-132605:829',
+    #'132605:831-132605:968',
+    #'132606:1-132606:37',
+  #),
+  skipEvents    = cms.untracked.uint32( 7800 ),
   inputCommands = cms.untracked.vstring(
     'keep *'
   , 'drop *_hltL1GtObjectMap_*_*'
@@ -114,12 +152,12 @@ process.es_prefer_trackerDqm = cms.ESPrefer( "PoolDBESSource", "dbInput" )
 # process.SiStripMonitorTrack.l1Algorithms  = cms.vstring()
 # process.SiStripMonitorTrack.andOrL1       = cms.bool( False )
 # process.SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
-# process.SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
-# process.SiStripMonitorTrack.hltDBKey      = cms.string( '' )
-# process.SiStripMonitorTrack.hltPaths      = cms.vstring( 'HLT_ZeroBias1kHz'
-#                                                        )
-# process.SiStripMonitorTrack.andOrHlt      = cms.bool( False )
-# process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
+process.SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
+process.SiStripMonitorTrack.hltDBKey      = cms.string( '' )
+process.SiStripMonitorTrack.hltPaths      = cms.vstring( 'HLT_MinBias'
+                                                       )
+process.SiStripMonitorTrack.andOrHlt      = cms.bool( False )
+process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
 
 # process.TrackerCollisionTrackMon.andOr         = True
 # process.TrackerCollisionTrackMon.dcsInputTag   = "scalersRawToDigi"
