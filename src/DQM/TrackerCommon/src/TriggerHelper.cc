@@ -99,23 +99,23 @@ void TriggerHelper::initRun( const edm::Run & run, const edm::EventSetup & setup
   // FIXME Can this stay safely in the run loop, or does it need to go to the event loop?
   // Means: Are the event setups identical?
   if ( watchDB_->check( setup ) ) {
-    cout << "  TriggerHelper::initRun(): GT DB tag  : " << gtDBKey_.data() << endl; // DEBUG
+    std::cout << "  TriggerHelper::initRun(): GT DB tag  : " << gtDBKey_.data() << std::endl; // DEBUG
     if ( onGt_ && gtDBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( gtDBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) gtLogicalExpressions_ = exprs;
-      cout << "  TriggerHelper::initRun(): GT DB size : " << gtLogicalExpressions_.size() << endl; // DEBUG
+      std::cout << "  TriggerHelper::initRun(): GT DB size : " << gtLogicalExpressions_.size() << std::endl; // DEBUG
     }
-    cout << "  TriggerHelper::initRun(): L1 DB tag  : " << l1DBKey_.data() << endl; // DEBUG
+    std::cout << "  TriggerHelper::initRun(): L1 DB tag  : " << l1DBKey_.data() << std::endl; // DEBUG
     if ( onL1_ && l1DBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( l1DBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) l1LogicalExpressions_ = exprs;
-      cout << "  TriggerHelper::initRun(): L1 DB size : " << l1LogicalExpressions_.size() << endl; // DEBUG
+      std::cout << "  TriggerHelper::initRun(): L1 DB size : " << l1LogicalExpressions_.size() << std::endl; // DEBUG
     }
-    cout << "  TriggerHelper::initRun(): HLT DB tag : " << hltDBKey_.data() << endl; // DEBUG
+    std::cout << "  TriggerHelper::initRun(): HLT DB tag : " << hltDBKey_.data() << std::endl; // DEBUG
     if ( onHlt_ && hltDBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( hltDBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) hltLogicalExpressions_ = exprs;
-      cout << "  TriggerHelper::initRun(): HLT DB size: " << hltLogicalExpressions_.size() << endl; // DEBUG
+      std::cout << "  TriggerHelper::initRun(): HLT DB size: " << hltLogicalExpressions_.size() << std::endl; // DEBUG
     }
   }
 
@@ -130,7 +130,7 @@ void TriggerHelper::initRun( const edm::Run & run, const edm::EventSetup & setup
       } else if ( hltConfig_.size() <= 0 ) {
         edm::LogError( "TriggerHelper" ) << "HLT config size error";
       } else hltConfigInit_ = true;
-      if ( hltChanged ) cout << "  TriggerHelper::initRun(): HLT changed"<< endl; // DEBUG
+      if ( hltChanged ) std::cout << "  TriggerHelper::initRun(): HLT changed"<< std::endl; // DEBUG
     }
   }
 
@@ -214,33 +214,33 @@ bool TriggerHelper::acceptDcsPartition( const edm::Handle< DcsStatusCollection >
       return errorReplyDcs_;
   }
 
-//   cout << "DCS status for " << event.id() << endl; // DEBUG
-//   cout << "partition " << DcsStatus::EBp    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::EBp    ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::EBm    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::EBm    ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::EEp    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::EEp    ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::EEm    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::EEm    ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::HBHEa  << ": " << dcsStatus->at( 0 ).ready( DcsStatus::HBHEa  ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::HBHEb  << ": " << dcsStatus->at( 0 ).ready( DcsStatus::HBHEb  ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::HBHEc  << ": " << dcsStatus->at( 0 ).ready( DcsStatus::HBHEc  ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::HF     << ": " << dcsStatus->at( 0 ).ready( DcsStatus::HF     ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::HO     << ": " << dcsStatus->at( 0 ).ready( DcsStatus::HO     ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::RPC    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::RPC    ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::DT0    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::DT0    ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::DTp    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::DTp    ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::DTm    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::DTm    ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::CSCp   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::CSCp   ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::CSCm   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::CSCm   ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::CASTOR << ": " << dcsStatus->at( 0 ).ready( DcsStatus::CASTOR ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::TIBTID << ": " << dcsStatus->at( 0 ).ready( DcsStatus::TIBTID ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::TOB    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::TOB    ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::TECp   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::TECp   ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::TECm   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::TECm   ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::BPIX   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::BPIX   ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::FPIX   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::FPIX   ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::ESp    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::ESp    ) << endl; // DEBUG
-//   cout << "partition " << DcsStatus::ESm    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::ESm    ) << endl; // DEBUG
+//   std::cout << "DCS status for " << event.id() << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::EBp    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::EBp    ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::EBm    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::EBm    ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::EEp    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::EEp    ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::EEm    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::EEm    ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::HBHEa  << ": " << dcsStatus->at( 0 ).ready( DcsStatus::HBHEa  ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::HBHEb  << ": " << dcsStatus->at( 0 ).ready( DcsStatus::HBHEb  ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::HBHEc  << ": " << dcsStatus->at( 0 ).ready( DcsStatus::HBHEc  ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::HF     << ": " << dcsStatus->at( 0 ).ready( DcsStatus::HF     ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::HO     << ": " << dcsStatus->at( 0 ).ready( DcsStatus::HO     ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::RPC    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::RPC    ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::DT0    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::DT0    ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::DTp    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::DTp    ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::DTm    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::DTm    ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::CSCp   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::CSCp   ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::CSCm   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::CSCm   ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::CASTOR << ": " << dcsStatus->at( 0 ).ready( DcsStatus::CASTOR ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::TIBTID << ": " << dcsStatus->at( 0 ).ready( DcsStatus::TIBTID ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::TOB    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::TOB    ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::TECp   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::TECp   ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::TECm   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::TECm   ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::BPIX   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::BPIX   ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::FPIX   << ": " << dcsStatus->at( 0 ).ready( DcsStatus::FPIX   ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::ESp    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::ESp    ) << std::endl; // DEBUG
+//   std::cout << "partition " << DcsStatus::ESm    << ": " << dcsStatus->at( 0 ).ready( DcsStatus::ESm    ) << std::endl; // DEBUG
   // Determine decision
-  cout << "  TriggerHelper: partition " << dcsPartition << " -> " << dcsStatus->at( 0 ).ready( dcsPartition ) << endl; // DEBUG
+  std::cout << "  TriggerHelper: partition " << dcsPartition << " -> " << dcsStatus->at( 0 ).ready( dcsPartition ) << std::endl; // DEBUG
   return dcsStatus->at( 0 ).ready( dcsPartition );
 
 }
@@ -307,15 +307,15 @@ bool TriggerHelper::acceptGtLogicalExpression( const edm::Handle< L1GlobalTrigge
       edm::LogError( "TriggerHelper" ) << "GT status bit \"" << gtStatusBit << "\" is not defined ==> decision: " << errorReplyGt_;
       decision = errorReplyDcs_;
     }
-    cout << "  TriggerHelper: status bit " << gtStatusBit << " -> " << decision << endl; // DEBUG
+    std::cout << "  TriggerHelper: status bit " << gtStatusBit << " -> " << decision << std::endl; // DEBUG
     gtAlgoLogicParser.operandTokenVector().at( iStatusBit ).tokenResult = decision;
   }
 
   // Determine decision
   const bool gtDecision( gtAlgoLogicParser.expressionResult() );
-  cout << "  TriggerHelper: GT status logical expression "; // DEBUG
-  if ( negExpr ) cout << "~\"" << gtLogicalExpression << "\" -> " << ( ! gtDecision ) << endl; // DEBUG
-  else           cout <<  "\"" << gtLogicalExpression << "\" -> " <<     gtDecision   << endl; // DEBUG
+  std::cout << "  TriggerHelper: GT status logical expression "; // DEBUG
+  if ( negExpr ) std::cout << "~\"" << gtLogicalExpression << "\" -> " << ( ! gtDecision ) << std::endl; // DEBUG
+  else           std::cout <<  "\"" << gtLogicalExpression << "\" -> " <<     gtDecision   << std::endl; // DEBUG
   return negExpr ? ( ! gtDecision ) : gtDecision;
 
 }
@@ -378,15 +378,15 @@ bool TriggerHelper::acceptL1LogicalExpression( const edm::Event & event, std::st
       continue;
     }
     // Manipulate algo decision as stored in the parser
-    cout << "  TriggerHelper: algo name " << l1AlgoName << " -> " << decision << endl; // DEBUG
+    std::cout << "  TriggerHelper: algo name " << l1AlgoName << " -> " << decision << std::endl; // DEBUG
     l1AlgoLogicParser.operandTokenVector().at( iAlgorithm ).tokenResult = decision;
   }
 
   // Return decision
   const bool l1Decision( l1AlgoLogicParser.expressionResult() );
-  cout << "  TriggerHelper: L1 logical expression "; // DEBUG
-  if ( negExpr ) cout << "~\"" << l1LogicalExpression << "\" -> " << ( ! l1Decision ) << endl; // DEBUG
-  else           cout <<  "\"" << l1LogicalExpression << "\" -> " <<     l1Decision   << endl; // DEBUG
+  std::cout << "  TriggerHelper: L1 logical expression "; // DEBUG
+  if ( negExpr ) std::cout << "~\"" << l1LogicalExpression << "\" -> " << ( ! l1Decision ) << std::endl; // DEBUG
+  else           std::cout <<  "\"" << l1LogicalExpression << "\" -> " <<     l1Decision   << std::endl; // DEBUG
   return negExpr ? ( ! l1Decision ) : l1Decision;
 
 }
@@ -406,7 +406,7 @@ bool TriggerHelper::acceptHlt( const edm::Event & event )
 //       } else if ( hltConfig_.size() <= 0 ) { // DEBUG
 //         LogError( "TriggerHelper" ) << "HLT config size error"; // DEBUG
 //       } else hltConfigInit_ = true; // DEBUG
-//       if ( hltChanged ) cout << "acceptHLT: HLT changed" << endl; // DEBUG // DEBUG
+//       if ( hltChanged ) std::cout << "acceptHLT: HLT changed" << std::endl; // DEBUG // DEBUG
 //     } // DEBUG
 //   } // DEBUG
 
@@ -478,15 +478,15 @@ bool TriggerHelper::acceptHltLogicalExpression( const edm::Handle< edm::TriggerR
     }
     // Manipulate algo decision as stored in the parser
     const bool decision( hltTriggerResults->accept( indexPath ) );
-    cout << "  TriggerHelper: path name " << hltPathName << " -> " << decision << endl; // DEBUG
+    std::cout << "  TriggerHelper: path name " << hltPathName << " -> " << decision << std::endl; // DEBUG
     hltAlgoLogicParser.operandTokenVector().at( iPath ).tokenResult = decision;
   }
 
   // Determine decision
   const bool hltDecision( hltAlgoLogicParser.expressionResult() );
-  cout << "  TriggerHelper: HLT logical expression "; // DEBUG
-  if ( negExpr ) cout << "~\"" << hltLogicalExpression << "\" -> " << ( ! hltDecision ) << endl; // DEBUG
-  else           cout <<  "\"" << hltLogicalExpression << "\" -> " <<     hltDecision   << endl; // DEBUG
+  std::cout << "  TriggerHelper: HLT logical expression "; // DEBUG
+  if ( negExpr ) std::cout << "~\"" << hltLogicalExpression << "\" -> " << ( ! hltDecision ) << std::endl; // DEBUG
+  else           std::cout <<  "\"" << hltLogicalExpression << "\" -> " <<     hltDecision   << std::endl; // DEBUG
   return negExpr ? ( ! hltDecision ) : hltDecision;
 
 }
