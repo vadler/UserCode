@@ -60,13 +60,13 @@ namespace pat {
       HLTConfigProvider         hltConfig_;
       bool                      hltConfigInit_;
       std::string               nameProcess_;           // configuration
-      edm::InputTag             tagTriggerResults_;     // configuration (optional)
-      edm::InputTag             tagTriggerEvent_;       // configuration (optional)
+      edm::InputTag             tagTriggerResults_;     // configuration (optional with default)
+      edm::InputTag             tagTriggerEvent_;       // configuration (optional with default)
       std::string               hltPrescaleLabel_;      // configuration (optional)
       std::string               labelHltPrescaleTable_; // configuration (optional)
       trigger::HLTPrescaleTable hltPrescaleTableRun_;
       trigger::HLTPrescaleTable hltPrescaleTableLumi_;
-      bool                      addPathModuleLabels_;   // configuration (optional)
+      bool                      addPathModuleLabels_;   // configuration (optional with default)
 
   };
 

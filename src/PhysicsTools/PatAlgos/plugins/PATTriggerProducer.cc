@@ -34,7 +34,7 @@ using namespace edm;
 
 PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   onlyStandAlone_( iConfig.getParameter< bool >( "onlyStandAlone" ) ), // required
-  // L1 configuration parameters (backwards compatible)
+  // L1 configuration parameters
   tagL1ExtraMu_(),
   tagL1ExtraNoIsoEG_(),
   tagL1ExtraIsoEG_(),
@@ -54,7 +54,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   addPathModuleLabels_( false )                                    // default
 {
 
-  // L1 configuration parameters
+  // L1 configuration parameters (backwards compatible)
   if ( iConfig.exists( "l1ExtraMu" ) )      tagL1ExtraMu_      = iConfig.getParameter< InputTag >( "l1ExtraMu" );
   if ( iConfig.exists( "l1ExtraNoIsoEG" ) ) tagL1ExtraNoIsoEG_ = iConfig.getParameter< InputTag >( "l1ExtraNoIsoEG" );
   if ( iConfig.exists( "l1ExtraIsoEG" ) )   tagL1ExtraIsoEG_   = iConfig.getParameter< InputTag >( "l1ExtraIsoEG" );
