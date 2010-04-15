@@ -81,7 +81,7 @@ void PATTriggerEventProducer::produce( Event& iEvent, const EventSetup& iSetup )
   assert( handleTriggerObjects->size() == handleTriggerObjectsStandAlone->size() );
 
   bool physDecl( false );
-//   if ( iEvent.isRealData() ) {
+  if ( iEvent.isRealData() ) {
     Handle< L1GlobalTriggerReadoutRecord > handleL1GlobalTriggerReadoutRecord;
     iEvent.getByLabel( tagL1Gt_, handleL1GlobalTriggerReadoutRecord );
     if ( handleL1GlobalTriggerReadoutRecord.isValid() ) {
@@ -92,9 +92,9 @@ void PATTriggerEventProducer::produce( Event& iEvent, const EventSetup& iSetup )
     } else {
       LogError( "l1GlobalTriggerReadoutRecordValid" ) << "L1GlobalTriggerReadoutRecord product with InputTag " << tagL1Gt_.encode() << " not in event";
     }
-//   } else {
-//     physDecl = true;
-//   }
+  } else {
+    physDecl = true;
+  }
 
   // produce trigger event
 
