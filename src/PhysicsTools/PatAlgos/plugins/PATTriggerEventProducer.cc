@@ -8,6 +8,7 @@
 #include <cassert>
 
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
@@ -23,12 +24,14 @@ PATTriggerEventProducer::PATTriggerEventProducer( const ParameterSet & iConfig )
   nameProcess_( iConfig.getParameter< std::string >( "processName" ) ), // required
   tagTriggerResults_( "TriggerResults" ),                               // default
   tagTriggerProducer_( "patTrigger" ),                                  // default
-  tagsTriggerMatcher_()                                                 // default
+  tagL1Gt_( "gtDigis" ),                                                // default
+  tagsTriggerMatcher_()
 {
 
   if ( iConfig.exists( "triggerResults" ) )     tagTriggerResults_  = iConfig.getParameter< InputTag >( "triggerResults" );
   if ( tagTriggerResults_.process().empty() )   tagTriggerResults_  = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
   if ( iConfig.exists( "patTriggerProducer" ) ) tagTriggerProducer_ = iConfig.getParameter< InputTag >( "patTriggerProducer" );
+  if ( iConfig.exists( "l1GtTag" ) )            tagL1Gt_            = iConfig.getParameter< InputTag >( "l1GtTag" );
   if ( iConfig.exists( "patTriggerMatches" ) )  tagsTriggerMatcher_ = iConfig.getParameter< std::vector< InputTag > >( "patTriggerMatches" );
 
   for ( size_t iMatch = 0; iMatch < tagsTriggerMatcher_.size(); ++iMatch ) {
@@ -77,9 +80,25 @@ void PATTriggerEventProducer::produce( Event& iEvent, const EventSetup& iSetup )
   iEvent.getByLabel( tagTriggerProducer_, handleTriggerObjectsStandAlone );
   assert( handleTriggerObjects->size() == handleTriggerObjectsStandAlone->size() );
 
+  bool physDecl( false );
+//   if ( iEvent.isRealData() ) {
+    Handle< L1GlobalTriggerReadoutRecord > handleL1GlobalTriggerReadoutRecord;
+    iEvent.getByLabel( tagL1Gt_, handleL1GlobalTriggerReadoutRecord );
+    if ( handleL1GlobalTriggerReadoutRecord.isValid() ) {
+      L1GtFdlWord fdlWord = handleL1GlobalTriggerReadoutRecord->gtFdlWord();
+      if ( fdlWord.physicsDeclared() == 1 ) {
+        physDecl = true;
+      }
+    } else {
+      LogError( "l1GlobalTriggerReadoutRecordValid" ) << "L1GlobalTriggerReadoutRecord product with InputTag " << tagL1Gt_.encode() << " not in event";
+    }
+//   } else {
+//     physDecl = true;
+//   }
+
   // produce trigger event
 
-  std::auto_ptr< TriggerEvent > triggerEvent( new TriggerEvent( std::string( hltConfig_.tableName() ), handleTriggerResults->wasrun(), handleTriggerResults->accept(), handleTriggerResults->error() ) );
+  std::auto_ptr< TriggerEvent > triggerEvent( new TriggerEvent( std::string( hltConfig_.tableName() ), handleTriggerResults->wasrun(), handleTriggerResults->accept(), handleTriggerResults->error(), physDecl ) );
   // set product references to trigger collections
   if ( handleTriggerPaths.isValid() ) {
     triggerEvent->setPaths( handleTriggerPaths );

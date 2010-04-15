@@ -10,11 +10,12 @@ using namespace pat;
 
 
 /// constructor from values
-TriggerEvent::TriggerEvent( const std::string & nameHltTable, bool run, bool accept, bool error ) :
+TriggerEvent::TriggerEvent( const std::string & nameHltTable, bool run, bool accept, bool error, bool physDecl ) :
   nameHltTable_( nameHltTable ),
   run_( run ),
   accept_( accept ),
-  error_( error )
+  error_( error ),
+  physDecl_( physDecl )
 {
   objectMatchResults_.clear();
 }
@@ -54,7 +55,7 @@ TriggerPathRefVector TriggerEvent::acceptedPaths() const
   }
   return theAcceptedPaths;
 }
-      
+
 /// filters related
 
 /// returns a NULL pointer, if the PAT trigger filter is not in the event
@@ -121,7 +122,7 @@ TriggerObjectRefVector TriggerEvent::objects( unsigned filterId ) const
   }
   return theObjects;
 }
- 
+
 /// x-collection related
 
 TriggerFilterRefVector TriggerEvent::pathModules( const std::string & namePath, bool all ) const
@@ -217,7 +218,7 @@ bool TriggerEvent::objectInFilter( const TriggerObjectRef & objectRef, const std
   if ( filter( labelFilter ) ) return filter( labelFilter )->hasObjectKey( objectRef.key() );
   return false;
 }
-                                                 
+
 TriggerFilterRefVector TriggerEvent::objectFilters( const TriggerObjectRef & objectRef ) const
 {
   TriggerFilterRefVector theObjectFilters;
