@@ -11,7 +11,7 @@ process.MessageLogger.cout = cms.untracked.PSet( INFO = cms.untracked.PSet( repo
 
 process.TrackerDQMTriggerBitsRcdCreateNewRead = cms.EDAnalyzer( "AlCaRecoTriggerBitsRcdRead"
                                                               , outputType = cms.untracked.string( 'text' )
-                                                              , rawFileName = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_6/output/TrackerDQMTriggerBits' )
+                                                              , rawFileName = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_7/output/TrackerDQMTriggerBits' )
                                                               )
 
 process.source = cms.Source( "EmptySource"

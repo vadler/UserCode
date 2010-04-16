@@ -41,7 +41,7 @@ import CondCore.DBCommon.CondDBSetup_cfi
 process.PoolDBOutputService = cms.Service( "PoolDBOutputService"
                                          , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
                                          , timetype = cms.untracked.string( 'runnumber' )
-                                         , connect  = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_6/output/TrackerDQMTriggerBits.db' )
+                                         , connect  = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_7/output/TrackerDQMTriggerBits.db' )
                                          , toPut    = cms.VPSet( cms.PSet( record = cms.string( 'AlCaRecoTriggerBitsRcd' )
                                                                          , tag    = cms.string( 'TrackerDQMTriggerBits_v0_hlt' )
                                                                          )

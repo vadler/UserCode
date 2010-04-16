@@ -2,8 +2,8 @@
  *
  * See header file for documentation
  *
- *  $Date: 2010/03/17 07:15:17 $
- *  $Revision: 1.45 $
+ *  $Date: 2010/03/31 07:44:25 $
+ *  $Revision: 1.46 $
  *
  *  \author Martin Grunewald
  *
@@ -21,7 +21,7 @@ bool HLTConfigProvider::init(const std::string& processName)
 {
    using namespace std;
    using namespace edm;
-   cout << "--- init(const std::string& processName)" << endl;
+   cout << "--- init(const std::string& processName)" << endl; // DEBUG
 
    LogInfo("HLTConfigProvider") << "Called (N) with processName '"
 				<< processName << "'." << endl;
@@ -122,7 +122,7 @@ bool HLTConfigProvider::init(const std::string& processName)
 bool HLTConfigProvider::init(const edm::Event& iEvent, const std::string& processName, bool& changed) {
    using namespace std;
    using namespace edm;
-   cout << "--- init(const edm::Event& iEvent, const std::string& processName, bool& changed)" << endl;
+   cout << "--- init(const edm::Event& iEvent, const std::string& processName, bool& changed)" << endl; // DEBUG
 
    LogInfo("HLTConfigProvider") << "Called (E) with processName '"
 				<< processName << "'." << endl;
@@ -165,9 +165,10 @@ bool HLTConfigProvider::init(const edm::Event& iEvent, const std::string& proces
 */
 
 bool HLTConfigProvider::init(const edm::ProcessHistory& iHistory, const edm::EventSetup& iSetup, const std::string& processName, bool& changed) {
-  std::cout << "--- init(const edm::ProcessHistory& iHistory, const edm::EventSetup& iSetup, const std::string& processName, bool& changed)" << std::endl;
+  std::cout << "--- init(const edm::ProcessHistory& iHistory, const edm::EventSetup& iSetup, const std::string& processName, bool& changed)" << std::endl; // DEBUG
   const bool result(init(iHistory,processName,changed));
-  l1GtUtils_.retrieveL1EventSetup(iSetup);
+  /// defer iSetup access to when actually needed:
+  /// l1GtUtils_->retrieveL1EventSetup(iSetup);
   return result;
 }
 
@@ -175,7 +176,7 @@ bool HLTConfigProvider::init(const edm::ProcessHistory& iHistory, const std::str
 
    using namespace std;
    using namespace edm;
-   cout << "--- init(const edm::ProcessHistory& iHistory, const std::string& processName, bool& changed)" << endl;
+   cout << "--- init(const edm::ProcessHistory& iHistory, const std::string& processName, bool& changed)" << endl; // DEBUG
 
    /// Check uniqueness (uniqueness should [soon] be enforced by Fw)
    const ProcessHistory::const_iterator hb(iHistory.begin());
@@ -241,7 +242,7 @@ bool HLTConfigProvider::init(const edm::Run& iRun, const edm::EventSetup& iSetup
 
    using namespace std;
    using namespace edm;
-   cout << "--- init(const edm::Run& iRun, const edm::EventSetup& iSetup, const std::string& processName, bool& changed)" << endl;
+   cout << "--- init(const edm::Run& iRun, const edm::EventSetup& iSetup, const std::string& processName, bool& changed)" << endl; // DEBUG
 
    LogInfo("HLTConfigProvider") << "Called (R) with processName '"
 				<< processName << "'." << endl;
@@ -280,7 +281,7 @@ void HLTConfigProvider::clear()
    datasetIndex_.clear();
 
    hltPrescaleTable_ = HLTPrescaleTable();
-   l1GtUtils_        = L1GtUtils();
+   *l1GtUtils_       = L1GtUtils();
 
    return;
 }
@@ -682,11 +683,11 @@ const std::map<std::string,std::vector<unsigned int> >& HLTConfigProvider::presc
 
 int HLTConfigProvider::prescaleSet(const edm::Event& iEvent, const edm::EventSetup& iSetup) const {
   // return hltPrescaleTable_.set();
-  // l1GtUtils_.retrieveL1EventSetup(iSetup);
+  l1GtUtils_->retrieveL1EventSetup(iSetup);
   int errorTech(0);
-  const int psfsiTech(l1GtUtils_.prescaleFactorSetIndex(iEvent,"TechnicalTriggers",errorTech));
+  const int psfsiTech(l1GtUtils_->prescaleFactorSetIndex(iEvent,"TechnicalTriggers",errorTech));
   int errorPhys(0);
-  const int psfsiPhys(l1GtUtils_.prescaleFactorSetIndex(iEvent,"PhysicsAlgorithms",errorPhys));
+  const int psfsiPhys(l1GtUtils_->prescaleFactorSetIndex(iEvent,"PhysicsAlgorithms",errorPhys));
   assert(psfsiTech==psfsiPhys);
   if ( (errorTech==0) && (errorPhys==0) &&
        (psfsiTech>=0) && (psfsiPhys>=0) && (psfsiTech==psfsiPhys) ) {
