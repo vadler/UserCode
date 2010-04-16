@@ -21,6 +21,94 @@ TriggerEvent::TriggerEvent( const std::string & nameHltTable, bool run, bool acc
 }
 
 
+/// algorithms related
+
+/// returns a NULL pointer, if the PAT trigger algorithm is not in the event
+const TriggerAlgorithm * TriggerEvent::algorithm( const std::string & nameAlgorithm ) const
+{
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    if ( nameAlgorithm == iAlgorithm->name() ) {
+      return &*iAlgorithm;
+    }
+  }
+  return 0;
+}
+
+unsigned TriggerEvent::indexAlgorithm( const std::string & nameAlgorithm ) const
+{
+  unsigned iAlgorithm = 0;
+  while ( iAlgorithm < algorithms()->size() && algorithms()->at( iAlgorithm ).name() != nameAlgorithm ) {
+    ++iAlgorithm;
+  }
+  return iAlgorithm;
+}
+
+TriggerAlgorithmRefVector TriggerEvent::acceptedAlgorithms() const
+{
+  TriggerAlgorithmRefVector theAcceptedAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    if ( iAlgorithm->wasAccept() ) {
+      const std::string nameAlgorithm( iAlgorithm->name() );
+      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
+      theAcceptedAlgorithms.push_back( algorithmRef );
+    }
+  }
+  return theAcceptedAlgorithms;
+}
+
+TriggerAlgorithmRefVector TriggerEvent::techAlgorithms() const
+{
+  TriggerAlgorithmRefVector theTechAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    if ( iAlgorithm->isTechTrigger() ) {
+      const std::string nameAlgorithm( iAlgorithm->name() );
+      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
+      theTechAlgorithms.push_back( algorithmRef );
+    }
+  }
+  return theTechAlgorithms;
+}
+
+TriggerAlgorithmRefVector TriggerEvent::acceptedTechAlgorithms() const
+{
+  TriggerAlgorithmRefVector theAcceptedTechAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    if ( iAlgorithm->isTechTrigger() && iAlgorithm->wasAccept() ) {
+      const std::string nameAlgorithm( iAlgorithm->name() );
+      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
+      theAcceptedTechAlgorithms.push_back( algorithmRef );
+    }
+  }
+  return theAcceptedTechAlgorithms;
+}
+
+TriggerAlgorithmRefVector TriggerEvent::physAlgorithms() const
+{
+  TriggerAlgorithmRefVector thePhysAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    if ( ! iAlgorithm->isTechTrigger() ) {
+      const std::string nameAlgorithm( iAlgorithm->name() );
+      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
+      thePhysAlgorithms.push_back( algorithmRef );
+    }
+  }
+  return thePhysAlgorithms;
+}
+
+TriggerAlgorithmRefVector TriggerEvent::acceptedPhysAlgorithms() const
+{
+  TriggerAlgorithmRefVector theAcceptedPhysAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    if ( ! iAlgorithm->isTechTrigger() && iAlgorithm->wasAccept() ) {
+      const std::string nameAlgorithm( iAlgorithm->name() );
+      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
+      theAcceptedPhysAlgorithms.push_back( algorithmRef );
+    }
+  }
+  return theAcceptedPhysAlgorithms;
+}
+
+
 /// paths related
 
 /// returns a NULL pointer, if the PAT trigger path is not in the event

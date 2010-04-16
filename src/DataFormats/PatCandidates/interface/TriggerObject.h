@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerObject
 //
-// $Id: TriggerObject.h,v 1.5 2009/06/24 15:49:28 vadler Exp $
+// $Id: TriggerObject.h,v 1.6 2010/02/25 16:15:32 vadler Exp $
 //
 /**
   \class    pat::TriggerObject TriggerObject.h "DataFormats/PatCandidates/interface/TriggerObject.h"
@@ -20,7 +20,7 @@
    to store the trigger object id from trigger::TriggerObject::id_.
 
   \author   Volker Adler
-  \version  $Id: TriggerObject.h,v 1.5 2009/06/24 15:49:28 vadler Exp $
+  \version  $Id: TriggerObject.h,v 1.6 2010/02/25 16:15:32 vadler Exp $
 */
 
 

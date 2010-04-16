@@ -11,7 +11,7 @@
 //
 /**
   \class    pat::TriggerEvent TriggerEvent.h "DataFormats/PatCandidates/interface/TriggerEvent.h"
-  \brief    Analysis-level trigger object class
+  \brief    Analysis-level trigger event class
 
    TriggerEvent implements a container for trigger event's information within the 'pat' namespace.
    It has the following data members:
@@ -22,6 +22,7 @@
 */
 
 
+#include "DataFormats/PatCandidates/interface/TriggerAlgorithm.h"
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
@@ -46,10 +47,13 @@ namespace pat {
       bool        error_;
       bool        physDecl_;
 
-      /// paths related data members
+      /// L1 algorithm related data members
+      TriggerAlgorithmRefProd algorithms_;
+
+      /// HLT paths related data members
       TriggerPathRefProd paths_;
 
-      /// filters related data members
+      /// HLT filters related data members
       TriggerFilterRefProd filters_;
 
       /// objects related data members
@@ -75,14 +79,25 @@ namespace pat {
       bool        wasError() const     { return error_; };
       bool        wasPhysDecl() const  { return physDecl_; };
 
-      /// paths related
+      /// L1 algorithms related
+      void setAlgoriths( const edm::Handle< TriggerAlgorithmCollection > & handleTriggerAlgorithms ) { algorithms_ = TriggerAlgorithmRefProd( handleTriggerAlgorithms ); };
+      const TriggerAlgorithmCollection * algorithms() const { return algorithms_.get(); };          // returns 0 if RefProd is null
+      const TriggerAlgorithm           * algorithm( const std::string & nameAlgorithm ) const;      // returns 0 if algorithm is not found
+      unsigned                           indexAlgorithm( const std::string & nameAlgorithm ) const; // returns size of algorithm collection if algorithm is not found
+      TriggerAlgorithmRefVector          acceptedAlgorithms() const;                                // transient
+      TriggerAlgorithmRefVector          techAlgorithms() const;                                    // transient
+      TriggerAlgorithmRefVector          acceptedTechAlgorithms() const;                            // transient
+      TriggerAlgorithmRefVector          physAlgorithms() const;                                    // transient
+      TriggerAlgorithmRefVector          acceptedPhysAlgorithms() const;                            // transient
+
+      /// HLT paths related
       void setPaths( const edm::Handle< TriggerPathCollection > & handleTriggerPaths ) { paths_ = TriggerPathRefProd( handleTriggerPaths ); };
       const TriggerPathCollection * paths() const { return paths_.get(); };          // returns 0 if RefProd is null
       const TriggerPath           * path( const std::string & namePath ) const;      // returns 0 if path is not found
       unsigned                      indexPath( const std::string & namePath ) const; // returns size of path collection if path is not found
       TriggerPathRefVector          acceptedPaths() const;                           // transient
 
-      /// filters related
+      /// HLT filters related
       void setFilters( const edm::Handle< TriggerFilterCollection > & handleTriggerFilters ) { filters_ = TriggerFilterRefProd( handleTriggerFilters ); };
       const TriggerFilterCollection * filters() const { return filters_.get(); };           // returns 0 if RefProd is null
       const TriggerFilter           * filter( const std::string & labelFilter ) const;      // returns 0 if filter is not found
