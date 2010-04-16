@@ -240,9 +240,14 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       if ( ! labelHltPrescaleTable_.empty() ) {
         LogWarning( "hltPrescaleInputTag" ) << "HLTPrescaleTable product with label '" << labelHltPrescaleTable_ << "' not found in process '" << nameProcess_ << "'; using default from event setup";
       }
+      std::cout << "produce(): HLTConfig has pre-scale size " << hltConfig_.prescaleSize() << std::endl; // DEBUG
       if ( hltConfig_.prescaleSize() > 0 ) {
-        hltPrescaleTable = trigger::HLTPrescaleTable( hltConfig_.prescaleSet( iEvent, iSetup ), hltConfig_.prescaleLabels(), hltConfig_.prescaleTable() );
-        std::cout << "produce(): HLTPrescaleTable found in event setup with set " << hltPrescaleTable.set() << " and label size " << hltPrescaleTable.labels().size() << std::endl; // DEBUG
+        std::cout << "produce(): HLTPrescaleTable found in event setup with set " << hltConfig_.prescaleSet( iEvent, iSetup ) << " and label size " << hltConfig_.prescaleLabels().size() << std::endl; // DEBUG
+        if ( hltConfig_.prescaleSet( iEvent, iSetup ) != -1 ) {
+          hltPrescaleTable = trigger::HLTPrescaleTable( hltConfig_.prescaleSet( iEvent, iSetup ), hltConfig_.prescaleLabels(), hltConfig_.prescaleTable() );
+        } else { // DEBUG
+          std::cout << "HLTPrescaleTable from event setup has error" << std::endl; // DEBUG
+        }
       } else { // DEBUG
         std::cout << "produce(): HLTPrescaleTable not found in event setup" << std::endl; // DEBUG
       }
