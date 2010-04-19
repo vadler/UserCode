@@ -41,6 +41,7 @@ namespace pat {
   class TriggerEvent {
 
       /// event related data members
+      std::string nameL1Menu_;
       std::string nameHltTable_;
       bool        run_;
       bool        accept_;
@@ -64,15 +65,18 @@ namespace pat {
 
       /// constructors and desctructor
       TriggerEvent() { objectMatchResults_.clear(); };
-      TriggerEvent( const std::string & nameHltTable, bool run, bool accept, bool error, bool physDecl );
+      TriggerEvent( const std::string & nameHltTable, bool run = true, bool accept = true, bool error = false, bool physDecl = true );
+      TriggerEvent( const std::string & nameL1Menu, const std::string & nameHltTable, bool run = true, bool accept = true, bool error = false, bool physDecl = true );
       virtual ~TriggerEvent() {};
 
       /// event related
+      void setNameL1Menu( const std::string & name )   { nameL1Menu_   = name; };
       void setNameHltTable( const std::string & name ) { nameHltTable_ = name; };
       void setRun( bool run )                          { run_          = run; };
       void setAccept( bool accept )                    { accept_       = accept; };
       void setError( bool error )                      { error         = error; };
       void setPhysDecl( bool physDecl )                { physDecl_     = physDecl; };
+      std::string nameL1Menu() const   { return nameL1Menu_; };
       std::string nameHltTable() const { return nameHltTable_; };
       bool        wasRun() const       { return run_; };
       bool        wasAccept() const    { return accept_; };

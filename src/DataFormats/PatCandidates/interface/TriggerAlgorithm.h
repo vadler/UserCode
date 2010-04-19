@@ -37,36 +37,40 @@ namespace pat {
 
       /// data members
       std::string name_;
+      std::string alias_;
       bool        tech_;
-      unsigned    bit_;    // in trigger table
+      unsigned    bit_;
       unsigned    prescale_;
-      bool        run_;
-      bool        accept_;
-      bool        error_;
+      bool        mask_;
+      bool        decisionBeforeMask_;
+      bool        decisionAfterMask_;
 
     public:
 
       /// constructors and desctructor
       TriggerAlgorithm();
       TriggerAlgorithm( const std::string & name );
-      TriggerAlgorithm( const std::string & name, bool tech, unsigned bit, unsigned prescale, bool run, bool accept, bool error );
+      TriggerAlgorithm( const std::string & name, const std::string & alias, bool tech, unsigned bit, unsigned prescale, bool mask, bool decisionBeforeMask, bool decisionAfterMask );
       virtual ~TriggerAlgorithm() {};
 
       /// setters & getters
-      void setName( const std::string & name ) { name_     = name; };
-      void setTechTrigger( bool tech )         { tech_     = tech; };
-      void setBit( unsigned bit )              { bit_    = bit; };
-      void setPrescale( unsigned prescale )    { prescale_ = prescale; };
-      void setRun( bool run )                  { run_      = run; };
-      void setAccept( bool accept )            { accept_   = accept; };
-      void setError( bool error )              { error_    = error; };
-      std::string name() const          { return name_; };
-      bool        isTechTrigger() const { return tech_; };
-      unsigned    bit() const           { return bit_; };
-      unsigned    prescale() const      { return prescale_; };
-      bool        wasRun() const        { return run_; };
-      bool        wasAccept() const     { return accept_; };
-      bool        wasError() const      { return error_; };
+      void setName( const std::string & name )              { name_               = name; };
+      void setAlias( const std::string & alias )            { alias_              = alias; };
+      void setTechTrigger( bool tech )                      { tech_               = tech; };
+      void setBit( unsigned bit )                           { bit_                = bit; };
+      void setPrescale( unsigned prescale )                 { prescale_           = prescale; };
+      void setMask( bool mask )                             { mask_               = mask; };
+      void setDecisionBeforeMask( bool decisionBeforeMask ) { decisionBeforeMask_ = decisionBeforeMask; };
+      void setDecisionAfterMas( bool decisionAfterMask )    { decisionAfterMask_  = decisionAfterMask; };
+      std::string name() const               { return name_; };
+      std::string alias() const              { return alias_; };
+      bool        techTrigger() const        { return tech_; };
+      unsigned    bit() const                { return bit_; };
+      unsigned    prescale() const           { return prescale_; };
+      bool        mask() const               { return mask_; };
+      bool        decisionBeforeMask() const { return decisionBeforeMask_; };
+      bool        decisionAfterMask() const  { return decisionAfterMask_; };
+      bool        decision() const           { return decisionAfterMask(); };
 
   };
 

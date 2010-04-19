@@ -20,6 +20,17 @@ TriggerEvent::TriggerEvent( const std::string & nameHltTable, bool run, bool acc
   objectMatchResults_.clear();
 }
 
+TriggerEvent::TriggerEvent( const std::string & nameL1Menu, const std::string & nameHltTable, bool run, bool accept, bool error, bool physDecl ) :
+  nameL1Menu_( nameL1Menu ),
+  nameHltTable_( nameHltTable ),
+  run_( run ),
+  accept_( accept ),
+  error_( error ),
+  physDecl_( physDecl )
+{
+  objectMatchResults_.clear();
+}
+
 
 /// algorithms related
 
@@ -47,7 +58,7 @@ TriggerAlgorithmRefVector TriggerEvent::acceptedAlgorithms() const
 {
   TriggerAlgorithmRefVector theAcceptedAlgorithms;
   for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
-    if ( iAlgorithm->wasAccept() ) {
+    if ( iAlgorithm->decision() ) {
       const std::string nameAlgorithm( iAlgorithm->name() );
       const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
       theAcceptedAlgorithms.push_back( algorithmRef );
@@ -60,7 +71,7 @@ TriggerAlgorithmRefVector TriggerEvent::techAlgorithms() const
 {
   TriggerAlgorithmRefVector theTechAlgorithms;
   for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
-    if ( iAlgorithm->isTechTrigger() ) {
+    if ( iAlgorithm->decision() ) {
       const std::string nameAlgorithm( iAlgorithm->name() );
       const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
       theTechAlgorithms.push_back( algorithmRef );
@@ -73,7 +84,7 @@ TriggerAlgorithmRefVector TriggerEvent::acceptedTechAlgorithms() const
 {
   TriggerAlgorithmRefVector theAcceptedTechAlgorithms;
   for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
-    if ( iAlgorithm->isTechTrigger() && iAlgorithm->wasAccept() ) {
+    if ( iAlgorithm->techTrigger() && iAlgorithm->decision() ) {
       const std::string nameAlgorithm( iAlgorithm->name() );
       const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
       theAcceptedTechAlgorithms.push_back( algorithmRef );
@@ -86,7 +97,7 @@ TriggerAlgorithmRefVector TriggerEvent::physAlgorithms() const
 {
   TriggerAlgorithmRefVector thePhysAlgorithms;
   for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
-    if ( ! iAlgorithm->isTechTrigger() ) {
+    if ( ! iAlgorithm->techTrigger() ) {
       const std::string nameAlgorithm( iAlgorithm->name() );
       const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
       thePhysAlgorithms.push_back( algorithmRef );
@@ -99,7 +110,7 @@ TriggerAlgorithmRefVector TriggerEvent::acceptedPhysAlgorithms() const
 {
   TriggerAlgorithmRefVector theAcceptedPhysAlgorithms;
   for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
-    if ( ! iAlgorithm->isTechTrigger() && iAlgorithm->wasAccept() ) {
+    if ( ! iAlgorithm->techTrigger() && iAlgorithm->decision() ) {
       const std::string nameAlgorithm( iAlgorithm->name() );
       const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
       theAcceptedPhysAlgorithms.push_back( algorithmRef );
@@ -220,7 +231,7 @@ TriggerFilterRefVector TriggerEvent::pathModules( const std::string & namePath, 
     const unsigned onePastLastFilter = all ? path( namePath )->modules().size() : path( namePath )->lastActiveFilterSlot() + 1;
     for ( unsigned iM = 0; iM < onePastLastFilter; ++iM ) {
       const std::string labelFilter( path( namePath )->modules().at( iM ) );
-     const TriggerFilterRef filterRef( filters(), indexFilter( labelFilter ) ); // NULL, if filter was not in trigger::TriggerEvent
+      const TriggerFilterRef filterRef( filters(), indexFilter( labelFilter ) ); // NULL, if filter was not in trigger::TriggerEvent
       thePathFilters.push_back( filterRef );
     }
   }
