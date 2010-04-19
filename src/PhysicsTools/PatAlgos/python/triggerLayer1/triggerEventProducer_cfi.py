@@ -2,9 +2,9 @@ import FWCore.ParameterSet.Config as cms
 
 patTriggerEvent = cms.EDProducer( "PATTriggerEventProducer",
     processName        = cms.string( 'HLT' ),
-#     triggerResults     = cms.InputTag( "TriggerResults" ),
-#     patTriggerProducer = cms.InputTag( "patTrigger" ),
-#     l1GtTag            = cms.InputTag( 'gtDigis' ),
+#     triggerResults     = cms.InputTag( "TriggerResults" ), # default; change only, if you know exactly, what you are doing!
+#     patTriggerProducer = cms.InputTag( "patTrigger" ),     # default; change only, if you know exactly, what you are doing!
+#     l1GtTag            = cms.InputTag( 'gtDigis' ),        # default; change only, if you know exactly, what you are doing!
     patTriggerMatches  = cms.VInputTag( "electronTriggerMatchHLTEle15LWL1R"
                                       , "electronTriggerMatchHLTDoubleEle5SWL1R"
                                       , "muonTriggerMatchL1Muon"

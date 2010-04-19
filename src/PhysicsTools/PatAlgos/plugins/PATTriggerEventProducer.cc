@@ -9,10 +9,13 @@
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
+#include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h" // new
+#include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h" // new
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
 #include "DataFormats/Common/interface/AssociativeIterator.h"
+#include "FWCore/Framework/interface/ESHandle.h" // new
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 
@@ -64,6 +67,8 @@ void PATTriggerEventProducer::produce( Event& iEvent, const EventSetup& iSetup )
 
   if ( ! hltConfigInit_ ) return;
 
+  ESHandle< L1GtTriggerMenu > handleL1GtTriggerMenu;
+  iSetup.get< L1GtTriggerMenuRcd >().get( handleL1GtTriggerMenu );
   Handle< TriggerResults > handleTriggerResults;
   iEvent.getByLabel( tagTriggerResults_, handleTriggerResults );
   if ( ! handleTriggerResults.isValid() ) {
@@ -98,7 +103,7 @@ void PATTriggerEventProducer::produce( Event& iEvent, const EventSetup& iSetup )
 
   // produce trigger event
 
-  std::auto_ptr< TriggerEvent > triggerEvent( new TriggerEvent( std::string( hltConfig_.tableName() ), handleTriggerResults->wasrun(), handleTriggerResults->accept(), handleTriggerResults->error(), physDecl ) );
+  std::auto_ptr< TriggerEvent > triggerEvent( new TriggerEvent( handleL1GtTriggerMenu->gtTriggerMenuName(), std::string( hltConfig_.tableName() ), handleTriggerResults->wasrun(), handleTriggerResults->accept(), handleTriggerResults->error(), physDecl ) );
   // set product references to trigger collections
   if ( handleTriggerPaths.isValid() ) {
     triggerEvent->setPaths( handleTriggerPaths );

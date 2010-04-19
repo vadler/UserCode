@@ -48,6 +48,7 @@ namespace pat {
 
       bool onlyStandAlone_; // configuration
       // L1
+      edm::InputTag tagL1Gt_;           // configuration (optional)
       edm::InputTag tagL1ExtraMu_;      // configuration (optional)
       edm::InputTag tagL1ExtraNoIsoEG_; // configuration (optional)
       edm::InputTag tagL1ExtraIsoEG_;   // configuration (optional)

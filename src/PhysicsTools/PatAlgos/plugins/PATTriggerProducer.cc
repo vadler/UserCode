@@ -18,14 +18,21 @@
 #include "DataFormats/L1Trigger/interface/L1MuonParticleFwd.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticleFwd.h"
+#include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h" // new
+#include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h" // new
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 
+#include "DataFormats/PatCandidates/interface/TriggerAlgorithm.h" // new
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
+#include "FWCore/Framework/interface/ESHandle.h" // new
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+
+#include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h" // new
 
 
 using namespace pat;
@@ -35,6 +42,7 @@ using namespace edm;
 PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   onlyStandAlone_( iConfig.getParameter< bool >( "onlyStandAlone" ) ), // required
   // L1 configuration parameters
+  tagL1Gt_( "gtDigis" ),                                               // default
   tagL1ExtraMu_(),
   tagL1ExtraNoIsoEG_(),
   tagL1ExtraIsoEG_(),
@@ -45,24 +53,34 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   tagL1ExtraHTM_(),
   // HLT configuration parameters
   nameProcess_( iConfig.getParameter< std::string >( "processName" ) ), // required
-  tagTriggerResults_( "TriggerResults" ),                          // default
-  tagTriggerEvent_( "hltTriggerSummaryAOD" ),                      // default
+  tagTriggerResults_( "TriggerResults" ),                               // default
+  tagTriggerEvent_( "hltTriggerSummaryAOD" ),                           // default
   hltPrescaleLabel_(),
   labelHltPrescaleTable_(),
   hltPrescaleTableRun_(),
   hltPrescaleTableLumi_(),
-  addPathModuleLabels_( false )                                    // default
+  addPathModuleLabels_( false )                                         // default
 {
 
   // L1 configuration parameters (backwards compatible)
-  if ( iConfig.exists( "l1ExtraMu" ) )      tagL1ExtraMu_      = iConfig.getParameter< InputTag >( "l1ExtraMu" );
-  if ( iConfig.exists( "l1ExtraNoIsoEG" ) ) tagL1ExtraNoIsoEG_ = iConfig.getParameter< InputTag >( "l1ExtraNoIsoEG" );
-  if ( iConfig.exists( "l1ExtraIsoEG" ) )   tagL1ExtraIsoEG_   = iConfig.getParameter< InputTag >( "l1ExtraIsoEG" );
-  if ( iConfig.exists( "l1ExtraCenJet" ) )  tagL1ExtraCenJet_  = iConfig.getParameter< InputTag >( "l1ExtraCenJet" );
-  if ( iConfig.exists( "l1ExtraForJet" ) )  tagL1ExtraForJet_  = iConfig.getParameter< InputTag >( "l1ExtraForJet" );
-  if ( iConfig.exists( "l1ExtraTauJet" ) )  tagL1ExtraTauJet_  = iConfig.getParameter< InputTag >( "l1ExtraTauJet" );
-  if ( iConfig.exists( "l1ExtraETM" ) )     tagL1ExtraETM_     = iConfig.getParameter< InputTag >( "l1ExtraETM" );
-  if ( iConfig.exists( "l1ExtraHTM" ) )     tagL1ExtraHTM_     = iConfig.getParameter< InputTag >( "l1ExtraHTM" );
+  if ( iConfig.exists( "l1Gt" ) )             tagL1Gt_           = iConfig.getParameter< InputTag >( "l1Gt" );
+  if ( tagL1Gt_.process().empty() )           tagL1Gt_           = InputTag( tagL1Gt_.label(), tagL1Gt_.instance(), nameProcess_ );
+  if ( iConfig.exists( "l1ExtraMu" ) )        tagL1ExtraMu_      = iConfig.getParameter< InputTag >( "l1ExtraMu" );
+  if ( tagL1ExtraMu_.process().empty() )      tagL1ExtraMu_      = InputTag( tagL1ExtraMu_.label(), tagL1ExtraMu_.instance(), nameProcess_ );
+  if ( iConfig.exists( "l1ExtraNoIsoEG" ) )   tagL1ExtraNoIsoEG_ = iConfig.getParameter< InputTag >( "l1ExtraNoIsoEG" );
+  if ( tagL1ExtraNoIsoEG_.process().empty() ) tagL1ExtraNoIsoEG_ = InputTag( tagL1ExtraNoIsoEG_.label(), tagL1ExtraNoIsoEG_.instance(), nameProcess_ );
+  if ( iConfig.exists( "l1ExtraIsoEG" ) )     tagL1ExtraIsoEG_   = iConfig.getParameter< InputTag >( "l1ExtraIsoEG" );
+  if ( tagL1ExtraIsoEG_.process().empty() )   tagL1ExtraIsoEG_   = InputTag( tagL1ExtraIsoEG_.label(), tagL1ExtraIsoEG_.instance(), nameProcess_ );
+  if ( iConfig.exists( "l1ExtraCenJet" ) )    tagL1ExtraCenJet_  = iConfig.getParameter< InputTag >( "l1ExtraCenJet" );
+  if ( tagL1ExtraCenJet_.process().empty() )  tagL1ExtraCenJet_  = InputTag( tagL1ExtraCenJet_.label(), tagL1ExtraCenJet_.instance(), nameProcess_ );
+  if ( iConfig.exists( "l1ExtraForJet" ) )    tagL1ExtraForJet_  = iConfig.getParameter< InputTag >( "l1ExtraForJet" );
+  if ( tagL1ExtraForJet_.process().empty() )  tagL1ExtraForJet_  = InputTag( tagL1ExtraForJet_.label(), tagL1ExtraForJet_.instance(), nameProcess_ );
+  if ( iConfig.exists( "l1ExtraTauJet" ) )    tagL1ExtraTauJet_  = iConfig.getParameter< InputTag >( "l1ExtraTauJet" );
+  if ( tagL1ExtraTauJet_.process().empty() )  tagL1ExtraTauJet_  = InputTag( tagL1ExtraTauJet_.label(), tagL1ExtraTauJet_.instance(), nameProcess_ );
+  if ( iConfig.exists( "l1ExtraETM" ) )       tagL1ExtraETM_     = iConfig.getParameter< InputTag >( "l1ExtraETM" );
+  if ( tagL1ExtraETM_.process().empty() )     tagL1ExtraETM_     = InputTag( tagL1ExtraETM_.label(), tagL1ExtraETM_.instance(), nameProcess_ );
+  if ( iConfig.exists( "l1ExtraHTM" ) )       tagL1ExtraHTM_     = iConfig.getParameter< InputTag >( "l1ExtraHTM" );
+  if ( tagL1ExtraHTM_.process().empty() )     tagL1ExtraHTM_     = InputTag( tagL1ExtraHTM_.label(), tagL1ExtraHTM_.instance(), nameProcess_ );
   // HLT configuration parameters
   if ( iConfig.exists( "triggerResults" ) )      tagTriggerResults_      = iConfig.getParameter< InputTag >( "triggerResults" );
   if ( tagTriggerResults_.process().empty() )    tagTriggerResults_      = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
@@ -73,6 +91,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   if ( iConfig.exists( "addPathModuleLabels" ) ) addPathModuleLabels_    = iConfig.getParameter< bool >( "addPathModuleLabels" );
 
   if ( ! onlyStandAlone_ ) {
+    produces< TriggerAlgorithmCollection >(); // new
     produces< TriggerPathCollection >();
     produces< TriggerFilterCollection >();
     produces< TriggerObjectCollection >();
@@ -116,41 +135,6 @@ void PATTriggerProducer::beginRun( Run & iRun, const EventSetup & iSetup )
         std::cout << "beginRun(): HLTPrescaleTable product not found" << std::endl; // DEBUG
       }
     }
-//     // Try parameter set, if no run product (products preferred, if configured explicitly)
-//     // FIXME This option is to be depricated
-//     if ( hltPrescaleTableRun_.size() == 0 ) {
-//       std::cout << "beginRun(): HLTPrescaleTable from parameter set tried" << std::endl; // DEBUG
-//       std::string prescaleName( "" );
-//       const std::string preS( "PrescaleService" ); // FIXME hard-coding
-//       const std::string preT( "PrescaleTable" );   // FIXME hard-coding
-//       if ( hltConfig_.processPSet().exists( preS ) ) {
-//         prescaleName = preS;
-//       } else if ( hltConfig_.processPSet().exists( preT ) ) {
-//         prescaleName = preT;
-//       }
-//       if ( prescaleName.size() > 0 ) {
-//         std::cout << "beginRun(): HLTPrescaleTable parameter set with name " << prescaleName << " found" << std::endl; // DEBUG
-//         const ParameterSet parameterSet( hltConfig_.processPSet().getParameter< ParameterSet >( prescaleName ) );
-//         const std::string hltPrescaleLabel( parameterSet.getUntrackedParameter< std::string >( "lvl1DefaultLabel", "" ) ); // FIXME Is the untracked parameter available?
-//         std::cout << "beginRun(): default prescale label in parameter set: '" << parameterSet.getUntrackedParameter< std::string >( "lvl1DefaultLabel", "" ) << "'" << std::endl; // DEBUG
-//         const std::vector< std::string > prescaleLabels( parameterSet.getParameter< std::vector< std::string > >( "lvl1Labels" ) );
-//         unsigned set( 0 );
-//         for ( unsigned iLabel = 0; iLabel < prescaleLabels.size(); ++iLabel ) {
-//           if ( prescaleLabels.at( iLabel ) == hltPrescaleLabel ) {
-//             set = iLabel;
-//             break;
-//           }
-//         }
-//         std::map< std::string, std::vector< unsigned > > prescaleTable;
-//         const std::vector< ParameterSet > prescaleParameters( parameterSet.getParameter< std::vector< ParameterSet > >( "prescaleTable" ) );
-//         for ( std::vector< ParameterSet >::const_iterator iPSet = prescaleParameters.begin(); iPSet != prescaleParameters.end(); ++iPSet ) {
-//           prescaleTable.insert( make_pair( iPSet->getParameter< std::string >( "pathName" ), iPSet->getParameter< std::vector< unsigned > >( "prescales" ) ) );
-//         }
-//         hltPrescaleTableRun_ = trigger::HLTPrescaleTable( set, prescaleLabels, prescaleTable );
-//       } else { // DEBUG
-//         std::cout << "beginRun(): HLTPrescaleTable parameter set not found" << std::endl; // DEBUG
-//       }
-//     }
   }
 
 }
@@ -545,6 +529,71 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
   // Put HLT & L1 objects to event
   if ( ! onlyStandAlone_ ) iEvent.put( triggerObjects );
   iEvent.put( triggerObjectsStandAlone );
+
+  // L1 algorithms
+  if ( ! onlyStandAlone_ ) {
+    L1GtUtils l1GtUtils;
+    l1GtUtils.retrieveL1EventSetup( iSetup );
+    ESHandle< L1GtTriggerMenu > handleL1GtTriggerMenu;
+    iSetup.get< L1GtTriggerMenuRcd >().get( handleL1GtTriggerMenu );
+    const AlgorithmMap l1GtAlgorithms( handleL1GtTriggerMenu->gtAlgorithmMap() );
+    const AlgorithmMap l1GtTechTriggers( handleL1GtTriggerMenu->gtTechnicalTriggerMap() );
+
+    std::auto_ptr< TriggerAlgorithmCollection > triggerAlgos( new TriggerAlgorithmCollection() );
+    triggerAlgos->reserve( l1GtAlgorithms.size() + l1GtTechTriggers.size() );
+    // physics algorithms
+    for ( AlgorithmMap::const_iterator iAlgo = l1GtAlgorithms.begin(); iAlgo != l1GtAlgorithms.end(); ++iAlgo ) {
+      if ( iAlgo->second.algoBitNumber() > 127 ) {
+        LogError( "errorL1AlgoBit" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' has bit number " << iAlgo->second.algoBitNumber() << " > 127; skipping";
+        continue;
+      }
+      int tech;
+      int bit;
+      if ( ! l1GtUtils.l1AlgTechTrigBitNumber( iAlgo->second.algoName(), tech, bit ) ) {
+        LogError( "errorL1AlgoName" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' not found in the L1 menu; skipping";
+        continue;
+      }
+      bool decisionBeforeMask;
+      bool decisionAfterMask;
+      int  prescale;
+      int  mask;
+      int  error( l1GtUtils.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
+      if ( error != 0 ) {
+        LogError( "errorL1AlgoDecision" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' decision has error code " << error << "; skipping";
+        continue;
+      }
+      TriggerAlgorithm triggerAlgo( iAlgo->second.algoName(), iAlgo->second.algoAlias(), (bool)tech, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
+      triggerAlgos->push_back( triggerAlgo );
+    }
+    // technical triggers
+    for ( AlgorithmMap::const_iterator iAlgo = l1GtTechTriggers.begin(); iAlgo != l1GtTechTriggers.end(); ++iAlgo ) {
+      if ( iAlgo->second.algoBitNumber() > 127 ) {
+        LogError( "errorL1AlgoBit" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' has bit number " << iAlgo->second.algoBitNumber() << " > 127; skipping";
+        continue;
+      }
+      int tech;
+      int bit;
+      if ( ! l1GtUtils.l1AlgTechTrigBitNumber( iAlgo->second.algoName(), tech, bit ) ) {
+        LogError( "errorL1AlgoName" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' not found in the L1 menu; skipping";
+        continue;
+      }
+      bool decisionBeforeMask;
+      bool decisionAfterMask;
+      int  prescale;
+      int  mask;
+      int  error( l1GtUtils.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
+      if ( error != 0 ) {
+        LogError( "errorL1AlgoDecision" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' decision has error code " << error << "; skipping";
+        continue;
+      }
+      TriggerAlgorithm triggerAlgo( iAlgo->second.algoName(), iAlgo->second.algoAlias(), (bool)tech, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
+      triggerAlgos->push_back( triggerAlgo );
+    }
+
+
+    // Put L1 algorithms to event
+    iEvent.put( triggerAlgos );
+  }
 
 }
 
