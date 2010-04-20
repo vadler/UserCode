@@ -95,17 +95,13 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
     if ( tagL1ExtraHTM_.process().empty() ) tagL1ExtraHTM_ = InputTag( tagL1ExtraHTM_.label(), tagL1ExtraHTM_.instance(), nameProcess_ );
   }
   // HLT configuration parameters
-  if ( iConfig.exists( "triggerResults" ) ) {
-    tagTriggerResults_   = iConfig.getParameter< InputTag >( "triggerResults" );
-    if ( tagTriggerResults_.process().empty() ) tagTriggerResults_ = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
-  }
-  if ( iConfig.exists( "triggerEvent" ) ) {
-    tagTriggerEvent_  = iConfig.getParameter< InputTag >( "triggerEvent" );
-    if ( tagTriggerEvent_.process().empty() ) tagTriggerEvent_ = InputTag( tagTriggerEvent_.label(), tagTriggerEvent_.instance(), nameProcess_ );
-  }
+  if ( iConfig.exists( "triggerResults" ) )      tagTriggerResults_      = iConfig.getParameter< InputTag >( "triggerResults" );
+  if ( iConfig.exists( "triggerEvent" ) )        tagTriggerEvent_        = iConfig.getParameter< InputTag >( "triggerEvent" );
   if ( iConfig.exists( "hltPrescaleLabel" ) )    hltPrescaleLabel_       = iConfig.getParameter< std::string >( "hltPrescaleLabel" );
   if ( iConfig.exists( "hltPrescaleTable" ) )    labelHltPrescaleTable_  = iConfig.getParameter< std::string >( "hltPrescaleTable" );
   if ( iConfig.exists( "addPathModuleLabels" ) ) addPathModuleLabels_    = iConfig.getParameter< bool >( "addPathModuleLabels" );
+  if ( tagTriggerResults_.process().empty() ) tagTriggerResults_ = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
+  if ( tagTriggerEvent_.process().empty() )   tagTriggerEvent_   = InputTag( tagTriggerEvent_.label(), tagTriggerEvent_.instance(), nameProcess_ );
 
   if ( ! onlyStandAlone_ ) {
     produces< TriggerAlgorithmCollection >(); // new
@@ -299,6 +295,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           std::cout << "           from HLTPrescaleTable  (conf) : " << hltPrescaleTable.prescale( set, namePath ) << std::endl; // DEBUG
         } // DEBUG
         // add module names to path and states' map
+        std::cout << "produce(): index last filter " << indexLastFilter << std::endl;
+        std::cout << "           size modules      " << sizeModules     << std::endl;
         assert( indexLastFilter < sizeModules );
         std::map< unsigned, std::string > indicesModules;
         for ( size_t iM = 0; iM < sizeModules; ++iM ) {
