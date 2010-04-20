@@ -2,11 +2,13 @@ Test Release based on: CMSSW_3_6_0
 Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_6_0
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0
 -------- Package --------                        --- Tag ---    --- RelTag --- 
+CondFormats/JetMETObjects                        V01-09-01-04   V01-09-01      
 DataFormats/PatCandidates                        NoTag          V05-09-11      
-PhysicsTools/FWLite                              V02-02-01      V02-00-18      
+JetMETCorrections/Modules                        V03-00-10-01   V03-00-10      
+PhysicsTools/FWLite                              V02-03-01      V02-00-18      
 PhysicsTools/PatAlgos                            NoTag          V07-13-00-00   
 PhysicsTools/PatExamples                         NoTag          V00-03-00      
 PhysicsTools/PatUtils                            NoTag          V03-09-12      
-PhysicsTools/SelectorUtils                       V00-00-16      V00-00-13      
+PhysicsTools/SelectorUtils                       V00-00-22      V00-00-13      
 ---------------------------------------
-total packages: 6 (6 displayed)
+total packages: 8 (8 displayed)
