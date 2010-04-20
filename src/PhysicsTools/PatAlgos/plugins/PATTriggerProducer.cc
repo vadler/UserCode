@@ -42,7 +42,6 @@ using namespace edm;
 PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   onlyStandAlone_( iConfig.getParameter< bool >( "onlyStandAlone" ) ), // required
   // L1 configuration parameters
-  tagL1Gt_( "gtDigis" ),                                               // default
   tagL1ExtraMu_(),
   tagL1ExtraNoIsoEG_(),
   tagL1ExtraIsoEG_(),
@@ -63,29 +62,47 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
 {
 
   // L1 configuration parameters (backwards compatible)
-  if ( iConfig.exists( "l1Gt" ) )             tagL1Gt_           = iConfig.getParameter< InputTag >( "l1Gt" );
-  if ( tagL1Gt_.process().empty() )           tagL1Gt_           = InputTag( tagL1Gt_.label(), tagL1Gt_.instance(), nameProcess_ );
-  if ( iConfig.exists( "l1ExtraMu" ) )        tagL1ExtraMu_      = iConfig.getParameter< InputTag >( "l1ExtraMu" );
-  if ( tagL1ExtraMu_.process().empty() )      tagL1ExtraMu_      = InputTag( tagL1ExtraMu_.label(), tagL1ExtraMu_.instance(), nameProcess_ );
-  if ( iConfig.exists( "l1ExtraNoIsoEG" ) )   tagL1ExtraNoIsoEG_ = iConfig.getParameter< InputTag >( "l1ExtraNoIsoEG" );
-  if ( tagL1ExtraNoIsoEG_.process().empty() ) tagL1ExtraNoIsoEG_ = InputTag( tagL1ExtraNoIsoEG_.label(), tagL1ExtraNoIsoEG_.instance(), nameProcess_ );
-  if ( iConfig.exists( "l1ExtraIsoEG" ) )     tagL1ExtraIsoEG_   = iConfig.getParameter< InputTag >( "l1ExtraIsoEG" );
-  if ( tagL1ExtraIsoEG_.process().empty() )   tagL1ExtraIsoEG_   = InputTag( tagL1ExtraIsoEG_.label(), tagL1ExtraIsoEG_.instance(), nameProcess_ );
-  if ( iConfig.exists( "l1ExtraCenJet" ) )    tagL1ExtraCenJet_  = iConfig.getParameter< InputTag >( "l1ExtraCenJet" );
-  if ( tagL1ExtraCenJet_.process().empty() )  tagL1ExtraCenJet_  = InputTag( tagL1ExtraCenJet_.label(), tagL1ExtraCenJet_.instance(), nameProcess_ );
-  if ( iConfig.exists( "l1ExtraForJet" ) )    tagL1ExtraForJet_  = iConfig.getParameter< InputTag >( "l1ExtraForJet" );
-  if ( tagL1ExtraForJet_.process().empty() )  tagL1ExtraForJet_  = InputTag( tagL1ExtraForJet_.label(), tagL1ExtraForJet_.instance(), nameProcess_ );
-  if ( iConfig.exists( "l1ExtraTauJet" ) )    tagL1ExtraTauJet_  = iConfig.getParameter< InputTag >( "l1ExtraTauJet" );
-  if ( tagL1ExtraTauJet_.process().empty() )  tagL1ExtraTauJet_  = InputTag( tagL1ExtraTauJet_.label(), tagL1ExtraTauJet_.instance(), nameProcess_ );
-  if ( iConfig.exists( "l1ExtraETM" ) )       tagL1ExtraETM_     = iConfig.getParameter< InputTag >( "l1ExtraETM" );
-  if ( tagL1ExtraETM_.process().empty() )     tagL1ExtraETM_     = InputTag( tagL1ExtraETM_.label(), tagL1ExtraETM_.instance(), nameProcess_ );
-  if ( iConfig.exists( "l1ExtraHTM" ) )       tagL1ExtraHTM_     = iConfig.getParameter< InputTag >( "l1ExtraHTM" );
-  if ( tagL1ExtraHTM_.process().empty() )     tagL1ExtraHTM_     = InputTag( tagL1ExtraHTM_.label(), tagL1ExtraHTM_.instance(), nameProcess_ );
+  if ( iConfig.exists( "l1ExtraMu" ) ) {
+    tagL1ExtraMu_ = iConfig.getParameter< InputTag >( "l1ExtraMu" );
+    if ( tagL1ExtraMu_.process().empty() ) tagL1ExtraMu_ = InputTag( tagL1ExtraMu_.label(), tagL1ExtraMu_.instance(), nameProcess_ );
+  }
+  if ( iConfig.exists( "l1ExtraNoIsoEG" ) ) {
+    tagL1ExtraNoIsoEG_ = iConfig.getParameter< InputTag >( "l1ExtraNoIsoEG" );
+    if ( tagL1ExtraNoIsoEG_.process().empty() ) tagL1ExtraNoIsoEG_ = InputTag( tagL1ExtraNoIsoEG_.label(), tagL1ExtraNoIsoEG_.instance(), nameProcess_ );
+  }
+  if ( iConfig.exists( "l1ExtraIsoEG" ) ) {
+    tagL1ExtraIsoEG_ = iConfig.getParameter< InputTag >( "l1ExtraIsoEG" );
+    if ( tagL1ExtraIsoEG_.process().empty() ) tagL1ExtraIsoEG_ = InputTag( tagL1ExtraIsoEG_.label(), tagL1ExtraIsoEG_.instance(), nameProcess_ );
+  }
+  if ( iConfig.exists( "l1ExtraCenJet" ) ) {
+    tagL1ExtraCenJet_ = iConfig.getParameter< InputTag >( "l1ExtraCenJet" );
+    if ( tagL1ExtraCenJet_.process().empty() ) tagL1ExtraCenJet_ = InputTag( tagL1ExtraCenJet_.label(), tagL1ExtraCenJet_.instance(), nameProcess_ );
+  }
+  if ( iConfig.exists( "l1ExtraForJet" ) ) {
+    tagL1ExtraForJet_ = iConfig.getParameter< InputTag >( "l1ExtraForJet" );
+    if ( tagL1ExtraForJet_.process().empty() ) tagL1ExtraForJet_ = InputTag( tagL1ExtraForJet_.label(), tagL1ExtraForJet_.instance(), nameProcess_ );
+  }
+  if ( iConfig.exists( "l1ExtraTauJet" ) ) {
+    tagL1ExtraTauJet_ = iConfig.getParameter< InputTag >( "l1ExtraTauJet" );
+    if ( tagL1ExtraTauJet_.process().empty() ) tagL1ExtraTauJet_ = InputTag( tagL1ExtraTauJet_.label(), tagL1ExtraTauJet_.instance(), nameProcess_ );
+  }
+  if ( iConfig.exists( "l1ExtraETM" ) ) {
+    tagL1ExtraETM_ = iConfig.getParameter< InputTag >( "l1ExtraETM" );
+    if ( tagL1ExtraETM_.process().empty() ) tagL1ExtraETM_ = InputTag( tagL1ExtraETM_.label(), tagL1ExtraETM_.instance(), nameProcess_ );
+  }
+  if ( iConfig.exists( "l1ExtraHTM" ) ) {
+    tagL1ExtraHTM_ = iConfig.getParameter< InputTag >( "l1ExtraHTM" );
+    if ( tagL1ExtraHTM_.process().empty() ) tagL1ExtraHTM_ = InputTag( tagL1ExtraHTM_.label(), tagL1ExtraHTM_.instance(), nameProcess_ );
+  }
   // HLT configuration parameters
-  if ( iConfig.exists( "triggerResults" ) )      tagTriggerResults_      = iConfig.getParameter< InputTag >( "triggerResults" );
-  if ( tagTriggerResults_.process().empty() )    tagTriggerResults_      = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
-  if ( iConfig.exists( "triggerEvent" ) )        tagTriggerEvent_        = iConfig.getParameter< InputTag >( "triggerEvent" );
-  if ( tagTriggerEvent_.process().empty() )      tagTriggerEvent_        = InputTag( tagTriggerEvent_.label(), tagTriggerEvent_.instance(), nameProcess_ );
+  if ( iConfig.exists( "triggerResults" ) ) {
+    tagTriggerResults_   = iConfig.getParameter< InputTag >( "triggerResults" );
+    if ( tagTriggerResults_.process().empty() ) tagTriggerResults_ = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
+  }
+  if ( iConfig.exists( "triggerEvent" ) ) {
+    tagTriggerEvent_  = iConfig.getParameter< InputTag >( "triggerEvent" );
+    if ( tagTriggerEvent_.process().empty() ) tagTriggerEvent_ = InputTag( tagTriggerEvent_.label(), tagTriggerEvent_.instance(), nameProcess_ );
+  }
   if ( iConfig.exists( "hltPrescaleLabel" ) )    hltPrescaleLabel_       = iConfig.getParameter< std::string >( "hltPrescaleLabel" );
   if ( iConfig.exists( "hltPrescaleTable" ) )    labelHltPrescaleTable_  = iConfig.getParameter< std::string >( "hltPrescaleTable" );
   if ( iConfig.exists( "addPathModuleLabels" ) ) addPathModuleLabels_    = iConfig.getParameter< bool >( "addPathModuleLabels" );

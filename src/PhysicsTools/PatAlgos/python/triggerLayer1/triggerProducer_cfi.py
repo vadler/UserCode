@@ -3,7 +3,6 @@ import FWCore.ParameterSet.Config as cms
 patTrigger = cms.EDProducer( "PATTriggerProducer"
                            , onlyStandAlone = cms.bool( False )
 #                            ## L1
-#                            , l1Gt           = cms.InputTag( "gtDigis"                         ) # default; change only, if you know exactly, what you are doing!
 #                            , l1ExtraMu      = cms.InputTag( "l1extraParticles", ""            ) # default; change only, if you know exactly, what you are doing!
 #                            , l1ExtraNoIsoEG = cms.InputTag( "l1extraParticles", "NonIsolated" ) # default; change only, if you know exactly, what you are doing!
 #                            , l1ExtraIsoEG   = cms.InputTag( "l1extraParticles", "Isolated"    ) # default; change only, if you know exactly, what you are doing!
