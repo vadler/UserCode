@@ -580,8 +580,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     }
     // technical triggers
     for ( AlgorithmMap::const_iterator iAlgo = l1GtTechTriggers.begin(); iAlgo != l1GtTechTriggers.end(); ++iAlgo ) {
-      if ( iAlgo->second.algoBitNumber() > 127 ) {
-        LogError( "errorL1AlgoBit" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' has bit number " << iAlgo->second.algoBitNumber() << " > 127; skipping";
+      if ( iAlgo->second.algoBitNumber() > 63 ) {
+        LogError( "errorL1AlgoBit" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' has bit number " << iAlgo->second.algoBitNumber() << " > 63; skipping";
         continue;
       }
       int tech;
