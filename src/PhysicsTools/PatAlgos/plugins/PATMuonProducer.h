@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.h,v 1.24 2010/02/20 21:00:25 wmtan Exp $
+// $Id: PATMuonProducer.h,v 1.25 2010/04/20 16:09:29 srappocc Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATMuonProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of reco::Muon.
 
   \author   Steven Lowette, Roger Wolf
-  \version  $Id: PATMuonProducer.h,v 1.24 2010/02/20 21:00:25 wmtan Exp $
+  \version  $Id: PATMuonProducer.h,v 1.25 2010/04/20 16:09:29 srappocc Exp $
 */
 
 
@@ -30,6 +30,7 @@
 #include "PhysicsTools/PatAlgos/interface/MultiIsolator.h"
 #include "PhysicsTools/PatAlgos/interface/EfficiencyLoader.h"
 #include "PhysicsTools/PatAlgos/interface/KinResolutionsLoader.h"
+#include "TrackingTools/IPTools/interface/IPTools.h"
 
 #include "DataFormats/PatCandidates/interface/UserData.h"
 #include "PhysicsTools/PatAlgos/interface/PATUserDataHelper.h"
@@ -91,6 +92,8 @@ namespace pat {
       /// embed high level selection variables?
       bool          embedHighLevelSelection_;
       edm::InputTag beamLineSrc_;
+      bool          usePV_;
+      edm::InputTag pvSrc_;
 
 
       typedef std::vector<edm::Handle<edm::Association<reco::GenParticleCollection> > > GenAssociations;
