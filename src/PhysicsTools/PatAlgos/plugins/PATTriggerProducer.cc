@@ -295,8 +295,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           std::cout << "           from HLTPrescaleTable  (conf) : " << hltPrescaleTable.prescale( set, namePath ) << std::endl; // DEBUG
         } // DEBUG
         // add module names to path and states' map
-        std::cout << "produce(): index last filter " << indexLastFilter << std::endl;
-        std::cout << "           size modules      " << sizeModules     << std::endl;
         assert( indexLastFilter < sizeModules );
         std::map< unsigned, std::string > indicesModules;
         for ( size_t iM = 0; iM < sizeModules; ++iM ) {
