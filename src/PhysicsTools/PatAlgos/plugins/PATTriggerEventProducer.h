@@ -11,7 +11,7 @@
 //
 /**
   \class    pat::PATTriggerEventProducer PATTriggerEventProducer.h "PhysicsTools/PatAlgos/plugins/PATTriggerEventProducer.h"
-  \brief    Produces the pat::TriggerEvent in PAT layer 1.
+  \brief    Produces the pat::TriggerEvent.
 
    [...]
 
