@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.14 2010/03/18 22:49:16 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.24 2010/04/20 21:11:11 vadler Exp $
 //
 
 
@@ -18,21 +18,21 @@
 #include "DataFormats/L1Trigger/interface/L1MuonParticleFwd.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticleFwd.h"
-#include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h" // new
-#include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h" // new
+#include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
+#include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 
-#include "DataFormats/PatCandidates/interface/TriggerAlgorithm.h" // new
+#include "DataFormats/PatCandidates/interface/TriggerAlgorithm.h"
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
-#include "FWCore/Framework/interface/ESHandle.h" // new
+#include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
-#include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h" // new
+#include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h"
 
 
 using namespace pat;
@@ -40,7 +40,7 @@ using namespace edm;
 
 
 PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
-  onlyStandAlone_( iConfig.getParameter< bool >( "onlyStandAlone" ) ), // required
+  onlyStandAlone_( iConfig.getParameter< bool >( "onlyStandAlone" ) ),
   // L1 configuration parameters
   tagL1ExtraMu_(),
   tagL1ExtraNoIsoEG_(),
@@ -51,14 +51,14 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   tagL1ExtraETM_(),
   tagL1ExtraHTM_(),
   // HLT configuration parameters
-  nameProcess_( iConfig.getParameter< std::string >( "processName" ) ), // required
-  tagTriggerResults_( "TriggerResults" ),                               // default
-  tagTriggerEvent_( "hltTriggerSummaryAOD" ),                           // default
+  nameProcess_( iConfig.getParameter< std::string >( "processName" ) ),
+  tagTriggerResults_( "TriggerResults" ),
+  tagTriggerEvent_( "hltTriggerSummaryAOD" ),
   hltPrescaleLabel_(),
   labelHltPrescaleTable_(),
   hltPrescaleTableRun_(),
   hltPrescaleTableLumi_(),
-  addPathModuleLabels_( false )                                         // default
+  addPathModuleLabels_( false )
 {
 
   // L1 configuration parameters (backwards compatible)
@@ -104,7 +104,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   if ( tagTriggerEvent_.process().empty() )   tagTriggerEvent_   = InputTag( tagTriggerEvent_.label(), tagTriggerEvent_.instance(), nameProcess_ );
 
   if ( ! onlyStandAlone_ ) {
-    produces< TriggerAlgorithmCollection >(); // new
+    produces< TriggerAlgorithmCollection >();
     produces< TriggerPathCollection >();
     produces< TriggerFilterCollection >();
     produces< TriggerObjectCollection >();

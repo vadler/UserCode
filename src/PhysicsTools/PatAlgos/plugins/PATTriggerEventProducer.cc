@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerEventProducer.cc,v 1.7 2010/03/08 10:50:24 vadler Exp $
+// $Id: PATTriggerEventProducer.cc,v 1.11 2010/04/19 18:01:56 vadler Exp $
 //
 
 
@@ -9,13 +9,13 @@
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
-#include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h" // new
-#include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h" // new
+#include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
+#include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
 #include "DataFormats/Common/interface/AssociativeIterator.h"
-#include "FWCore/Framework/interface/ESHandle.h" // new
+#include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 
@@ -24,10 +24,10 @@ using namespace edm;
 
 
 PATTriggerEventProducer::PATTriggerEventProducer( const ParameterSet & iConfig ) :
-  nameProcess_( iConfig.getParameter< std::string >( "processName" ) ), // required
-  tagTriggerResults_( "TriggerResults" ),                               // default
-  tagTriggerProducer_( "patTrigger" ),                                  // default
-  tagL1Gt_( "gtDigis" ),                                                // default
+  nameProcess_( iConfig.getParameter< std::string >( "processName" ) ),
+  tagTriggerResults_( "TriggerResults" ),
+  tagTriggerProducer_( "patTrigger" ),
+  tagL1Gt_( "gtDigis" ),
   tagsTriggerMatcher_()
 {
 
@@ -75,6 +75,8 @@ void PATTriggerEventProducer::produce( Event& iEvent, const EventSetup& iSetup )
     LogError( "triggerResultsValid" ) << "TriggerResults product with InputTag " << tagTriggerResults_.encode() << " not in event";
     return;
   }
+  Handle< TriggerAlgorithmCollection > handleTriggerAlgorithms;
+  iEvent.getByLabel( tagTriggerProducer_, handleTriggerAlgorithms );
   Handle< TriggerPathCollection > handleTriggerPaths;
   iEvent.getByLabel( tagTriggerProducer_, handleTriggerPaths );
   Handle< TriggerFilterCollection > handleTriggerFilters;
@@ -105,6 +107,11 @@ void PATTriggerEventProducer::produce( Event& iEvent, const EventSetup& iSetup )
 
   std::auto_ptr< TriggerEvent > triggerEvent( new TriggerEvent( handleL1GtTriggerMenu->gtTriggerMenuName(), std::string( hltConfig_.tableName() ), handleTriggerResults->wasrun(), handleTriggerResults->accept(), handleTriggerResults->error(), physDecl ) );
   // set product references to trigger collections
+  if ( handleTriggerAlgorithms.isValid() ) {
+    triggerEvent->setAlgorithms( handleTriggerAlgorithms );
+  } else {
+    LogError( "triggerAlgorithmsValid" ) << "pat::TriggerAlgorithmCollection product with InputTag " << tagTriggerProducer_.encode() << " not in event";
+  }
   if ( handleTriggerPaths.isValid() ) {
     triggerEvent->setPaths( handleTriggerPaths );
   } else {
