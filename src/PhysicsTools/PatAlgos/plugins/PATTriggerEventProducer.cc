@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerEventProducer.cc,v 1.11 2010/04/19 18:01:56 vadler Exp $
+// $Id: PATTriggerEventProducer.cc,v 1.9 2010/04/21 10:04:14 vadler Exp $
 //
 
 
@@ -32,10 +32,10 @@ PATTriggerEventProducer::PATTriggerEventProducer( const ParameterSet & iConfig )
 {
 
   if ( iConfig.exists( "triggerResults" ) )     tagTriggerResults_  = iConfig.getParameter< InputTag >( "triggerResults" );
-  if ( tagTriggerResults_.process().empty() )   tagTriggerResults_  = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
   if ( iConfig.exists( "patTriggerProducer" ) ) tagTriggerProducer_ = iConfig.getParameter< InputTag >( "patTriggerProducer" );
   if ( iConfig.exists( "l1GtTag" ) )            tagL1Gt_            = iConfig.getParameter< InputTag >( "l1GtTag" );
   if ( iConfig.exists( "patTriggerMatches" ) )  tagsTriggerMatcher_ = iConfig.getParameter< std::vector< InputTag > >( "patTriggerMatches" );
+  if ( tagTriggerResults_.process().empty() ) tagTriggerResults_ = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
 
   for ( size_t iMatch = 0; iMatch < tagsTriggerMatcher_.size(); ++iMatch ) {
     produces< TriggerObjectMatch >( tagsTriggerMatcher_.at( iMatch ).label() );
