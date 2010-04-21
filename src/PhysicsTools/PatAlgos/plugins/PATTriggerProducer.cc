@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.24 2010/04/20 21:11:11 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.25 2010/04/21 09:58:03 vadler Exp $
 //
 
 
@@ -61,7 +61,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   addPathModuleLabels_( false )
 {
 
-  // L1 configuration parameters (backwards compatible)
+  // L1 configuration parameters
   if ( iConfig.exists( "l1ExtraMu" ) ) {
     tagL1ExtraMu_ = iConfig.getParameter< InputTag >( "l1ExtraMu" );
     if ( tagL1ExtraMu_.process().empty() ) tagL1ExtraMu_ = InputTag( tagL1ExtraMu_.label(), tagL1ExtraMu_.instance(), nameProcess_ );

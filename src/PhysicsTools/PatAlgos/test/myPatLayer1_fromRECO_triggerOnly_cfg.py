@@ -14,7 +14,7 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source(
     "PoolSource"
   , fileNames = cms.untracked.vstring(
-        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0/output/myHlt1E31_fromRAW_triggerOnly.root'
+        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_X_2010-04-21-0200/output/myHlt1E31_fromRAW_triggerOnly.root'
       )
   )
 process.maxEvents = cms.untracked.PSet(
@@ -70,7 +70,7 @@ process.p = cms.Path(
 from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
 process.out = cms.OutputModule(
     "PoolOutputModule"
-  , fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_0/output/myPatLayer1_fromRECO_triggerOnly.root' )
+  , fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_X_2010-04-21-0200/output/myPatLayer1_fromRECO_triggerOnly.root' )
   , SelectEvents   = cms.untracked.PSet(
         SelectEvents = cms.vstring(
             'p'
