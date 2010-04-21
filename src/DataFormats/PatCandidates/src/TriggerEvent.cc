@@ -1,5 +1,5 @@
 //
-// $Id: TriggerEvent.cc,v 1.8 2009/10/06 19:56:18 vadler Exp $
+// $Id: TriggerEvent.cc,v 1.9 2010/04/20 21:39:46 vadler Exp $
 //
 
 
@@ -45,6 +45,7 @@ const TriggerAlgorithm * TriggerEvent::algorithm( const std::string & nameAlgori
   return 0;
 }
 
+/// returns the size of the PAT trigger algorithm collection, if the algorithm is not in the event
 unsigned TriggerEvent::indexAlgorithm( const std::string & nameAlgorithm ) const
 {
   unsigned iAlgorithm = 0;
@@ -133,6 +134,7 @@ const TriggerPath * TriggerEvent::path( const std::string & namePath ) const
   return 0;
 }
 
+/// returns the size of the PAT trigger path collection, if the path is not in the event
 unsigned TriggerEvent::indexPath( const std::string & namePath ) const
 {
   unsigned iPath = 0;
@@ -168,6 +170,7 @@ const TriggerFilter * TriggerEvent::filter( const std::string & labelFilter ) co
   return 0;
 }
 
+/// returns the size of the PAT trigger filter collection, if the filter is not in the event
 unsigned TriggerEvent::indexFilter( const std::string & labelFilter ) const
 {
   unsigned iFilter = 0;
