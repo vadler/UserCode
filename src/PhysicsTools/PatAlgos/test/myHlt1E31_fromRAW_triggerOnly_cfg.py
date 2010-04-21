@@ -1930,14 +1930,14 @@ process.hltTriggerType = cms.EDFilter( "HLTTriggerTypeFilter",
     SelectedTriggerType = cms.int32( 1 )
 )
 process.hltGtDigis = cms.EDProducer( "L1GlobalTriggerRawToDigi",
-    DaqGtInputTag = cms.InputTag( "rawDataCollector" ) # DEBUG,
+    DaqGtInputTag = cms.InputTag( "rawDataCollector" ), # DEBUG
     DaqGtFedId = cms.untracked.int32( 813 ),
     ActiveBoardsMask = cms.uint32( 0xffff ),
     UnpackBxInEvent = cms.int32( 5 ),
     Verbosity = cms.untracked.int32( 0 )
 )
 process.hltGctDigis = cms.EDProducer( "GctRawToDigi",
-    inputLabel = cms.InputTag( "rawDataCollector" ) # DEBUG,
+    inputLabel = cms.InputTag( "rawDataCollector" ), # DEBUG
     gctFedId = cms.untracked.int32( 745 ),
     hltMode = cms.bool( True ),
     numberOfGctSamplesToUnpack = cms.uint32( 1 ),
@@ -2021,7 +2021,7 @@ process.hltL1sJet30 = cms.EDFilter( "HLTLevel1GTSeed",
 )
 process.hltPreJet30 = cms.EDFilter( "HLTPrescaler" )
 process.hltEcalRawToRecHitFacility = cms.EDProducer( "EcalRawToRecHitFacility",
-    sourceTag = cms.InputTag( "rawDataCollector" ) # DEBUG,
+    sourceTag = cms.InputTag( "rawDataCollector" ), # DEBUG
     workerName = cms.string( "" )
 )
 process.hltEcalRegionalRestFEDs = cms.EDProducer( "EcalRawToRecHitRoI",
@@ -2046,7 +2046,7 @@ process.hltEcalRecHitAll = cms.EDProducer( "EcalRawToRecHitProducer",
     rechitCollection = cms.string( "NotNeededsplitOutputTrue" )
 )
 process.hltHcalDigis = cms.EDProducer( "HcalRawToDigi",
-    InputLabel = cms.InputTag( "rawDataCollector" ) # DEBUG,
+    InputLabel = cms.InputTag( "rawDataCollector" ), # DEBUG
     UnpackCalib = cms.untracked.bool( True ),
     UnpackZDC = cms.untracked.bool( True ),
     firstSample = cms.int32( 0 ),
@@ -2854,7 +2854,7 @@ process.hltL1SingleMu7L1Filtered0 = cms.EDFilter( "HLTMuonL1Filter",
 process.hltMuonDTDigis = cms.EDProducer( "DTUnpackingModule",
     dataType = cms.string( "DDU" ),
     fedbyType = cms.bool( False ),
-    inputLabel = cms.InputTag( "rawDataCollector" ) # DEBUG,
+    inputLabel = cms.InputTag( "rawDataCollector" ), # DEBUG
     useStandardFEDid = cms.bool( True ),
     dqmOnly = cms.bool( False ),
     rosParameters = cms.PSet(
@@ -2958,7 +2958,7 @@ process.hltDt4DSegments = cms.EDProducer( "DTRecSegment4DProducer",
     )
 )
 process.hltMuonCSCDigis = cms.EDProducer( "CSCDCCUnpacker",
-    InputObjects = cms.InputTag( "rawDataCollector" ) # DEBUG,
+    InputObjects = cms.InputTag( "rawDataCollector" ), # DEBUG
     UseExaminer = cms.bool( True ),
     ExaminerMask = cms.uint32( 0x1febf3f6 ),
     UseSelectiveUnpacking = cms.bool( True ),
@@ -3107,7 +3107,7 @@ process.hltCscSegments = cms.EDProducer( "CSCSegmentProducer",
     )
 )
 process.hltMuonRPCDigis = cms.EDProducer( "RPCUnpackingModule",
-    InputLabel = cms.InputTag( "rawDataCollector" ) # DEBUG,
+    InputLabel = cms.InputTag( "rawDataCollector" ), # DEBUG
     doSynchro = cms.bool( False )
 )
 process.hltRpcRecHits = cms.EDProducer( "RPCRecHitProducer",
@@ -3422,7 +3422,7 @@ process.hltSiPixelRecHits = cms.EDProducer( "SiPixelRecHitConverter",
     CPE = cms.string( "PixelCPEGeneric" )
 )
 process.hltSiStripRawToClustersFacility = cms.EDProducer( "SiStripRawToClusters",
-    ProductLabel = cms.InputTag( "rawDataCollector" ) # DEBUG,
+    ProductLabel = cms.InputTag( "rawDataCollector" ), # DEBUG
     Clusterizer = cms.PSet(
       ChannelThreshold = cms.double( 2.0 ),
       MaxSequentialBad = cms.uint32( 1 ),
@@ -4431,7 +4431,7 @@ process.hltL1sL1SingleEG5 = cms.EDFilter( "HLTLevel1GTSeed",
 process.hltPreL1SingleEG5 = cms.EDFilter( "HLTPrescaler" )
 process.hltPreEle10SWL1R = cms.EDFilter( "HLTPrescaler" )
 process.hltESRawToRecHitFacility = cms.EDProducer( "EcalRawToRecHitFacility",
-    sourceTag = cms.InputTag( "rawDataCollector" ) # DEBUG,
+    sourceTag = cms.InputTag( "rawDataCollector" ), # DEBUG
     workerName = cms.string( "esRawToRecHit" )
 )
 process.hltEcalRegionalEgammaFEDs = cms.EDProducer( "EcalRawToRecHitRoI",
@@ -8939,7 +8939,7 @@ process.hltIsolPixelTrackL3FilterHB1E31 = cms.EDFilter( "HLTPixelIsolTrackFilter
     DropMultiL2Event = cms.bool( False )
 )
 process.hltL1EventNumberNZS = cms.EDFilter( "HLTL1NumberFilter",
-    rawInput = cms.InputTag( "rawDataCollector" ) # DEBUG,
+    rawInput = cms.InputTag( "rawDataCollector" ), # DEBUG
     period = cms.uint32( 4096 ),
     invert = cms.bool( False )
 )
