@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.24 2010/04/20 21:11:11 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.15 2010/04/20 21:39:47 vadler Exp $
 //
 
 
@@ -8,7 +8,6 @@
 #include <vector>
 #include <map>
 #include <cassert>
-#include <iostream> // DEBUG
 
 #include "DataFormats/L1Trigger/interface/L1EmParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
@@ -61,7 +60,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   addPathModuleLabels_( false )
 {
 
-  // L1 configuration parameters (backwards compatible)
+  // L1 configuration parameters
   if ( iConfig.exists( "l1ExtraMu" ) ) {
     tagL1ExtraMu_ = iConfig.getParameter< InputTag >( "l1ExtraMu" );
     if ( tagL1ExtraMu_.process().empty() ) tagL1ExtraMu_ = InputTag( tagL1ExtraMu_.label(), tagL1ExtraMu_.instance(), nameProcess_ );
@@ -131,21 +130,42 @@ void PATTriggerProducer::beginRun( Run & iRun, const EventSetup & iSetup )
   // Extract pre-scales
   if ( hltConfigInit_ ) {
     // Start empty
-    std::cout << "beginRun(): HLT prescale size: " << hltConfig_.prescaleSize() << std::endl; // DEBUG
     hltPrescaleTableRun_ = trigger::HLTPrescaleTable();
-    std::cout << "beginRun(): empty trigger::HLTPrescaleTable"                  << std::endl  // DEBUG
-         << "            set       : " << hltPrescaleTableRun_.set()            << std::endl  // DEBUG
-         << "            labels    : " << hltPrescaleTableRun_.labels().size()  << std::endl  // DEBUG
-         << "            table size: " << hltPrescaleTableRun_.table().size()   << std::endl; // DEBUG
     // Try run product, if configured
     if ( ! labelHltPrescaleTable_.empty() ) {
       Handle< trigger::HLTPrescaleTable > handleHltPrescaleTable;
       iRun.getByLabel( InputTag( labelHltPrescaleTable_, "Run", nameProcess_ ), handleHltPrescaleTable );
       if ( handleHltPrescaleTable.isValid() ) {
         hltPrescaleTableRun_ = trigger::HLTPrescaleTable( handleHltPrescaleTable->set(), handleHltPrescaleTable->labels(), handleHltPrescaleTable->table() );
-        std::cout << "beginRun(): HLTPrescaleTable product found with set " << hltPrescaleTableRun_.set() << " and label size " << hltPrescaleTableRun_.labels().size() << " found" << std::endl; // DEBUG
-      } else { // DEBUG
-        std::cout << "beginRun(): HLTPrescaleTable product not found" << std::endl; // DEBUG
+      }
+    }
+    // Try parameter set, if no run product (products preferred, if configured explicitly)
+    if ( hltPrescaleTableRun_.size() == 0 ) {
+      std::string prescaleName( "" );
+      const std::string preS( "PrescaleService" ); // FIXME hard-coding
+      const std::string preT( "PrescaleTable" );   // FIXME hard-coding
+      if ( hltConfig_.processPSet().exists( preS ) ) {
+        prescaleName = preS;
+      } else if ( hltConfig_.processPSet().exists( preT ) ) {
+        prescaleName = preT;
+      }
+      if ( prescaleName.size() > 0 ) {
+        const ParameterSet parameterSet( hltConfig_.processPSet().getParameter< ParameterSet >( prescaleName ) );
+        const std::string hltPrescaleLabel( parameterSet.getUntrackedParameter< std::string >( "lvl1DefaultLabel", "" ) ); // FIXME Is the untracked parameter available?
+        const std::vector< std::string > prescaleLabels( parameterSet.getParameter< std::vector< std::string > >( "lvl1Labels" ) );
+        unsigned set( 0 );
+        for ( unsigned iLabel = 0; iLabel < prescaleLabels.size(); ++iLabel ) {
+          if ( prescaleLabels.at( iLabel ) == hltPrescaleLabel ) {
+            set = iLabel;
+            break;
+          }
+        }
+        std::map< std::string, std::vector< unsigned > > prescaleTable;
+        const std::vector< ParameterSet > prescaleParameters( parameterSet.getParameter< std::vector< ParameterSet > >( "prescaleTable" ) );
+        for ( std::vector< ParameterSet >::const_iterator iPSet = prescaleParameters.begin(); iPSet != prescaleParameters.end(); ++iPSet ) {
+          prescaleTable.insert( make_pair( iPSet->getParameter< std::string >( "pathName" ), iPSet->getParameter< std::vector< unsigned > >( "prescales" ) ) );
+        }
+        hltPrescaleTableRun_ = trigger::HLTPrescaleTable( set, prescaleLabels, prescaleTable );
       }
     }
   }
@@ -166,9 +186,6 @@ void PATTriggerProducer::beginLuminosityBlock( LuminosityBlock & iLuminosityBloc
       iLuminosityBlock.getByLabel( InputTag( labelHltPrescaleTable_, "Lumi", nameProcess_ ), handleHltPrescaleTable );
       if ( handleHltPrescaleTable.isValid() ) {
         hltPrescaleTableLumi_ = trigger::HLTPrescaleTable( handleHltPrescaleTable->set(), handleHltPrescaleTable->labels(), handleHltPrescaleTable->table() );
-        std::cout << "beginLuminosityBlock(): HLTPrescaleTable product found with set " << hltPrescaleTableLumi_.set() << " and label size " << hltPrescaleTableLumi_.labels().size() << " found" << std::endl; // DEBUG
-      } else { // DEBUG
-        std::cout << "beginLuminosityBlock(): HLTPrescaleTable product not found" << std::endl; // DEBUG
       }
     }
   }
@@ -195,11 +212,11 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
   if ( goodHlt ) {
     if( ! handleTriggerResults.isValid() ) {
       LogError( "errorTriggerResultsValid" ) << "TriggerResults product with InputTag " << tagTriggerResults_.encode() << " not in event" << std::endl
-                                             << "No HLT information produced.";
+                                                  << "No HLT information produced.";
       goodHlt = false;
     } else if ( ! handleTriggerEvent.isValid() ) {
       LogError( "errorTriggerEventValid" ) << "trigger::TriggerEvent product with InputTag " << tagTriggerEvent_.encode() << " not in event" << std::endl
-                                           << "No HLT information produced.";
+                                                << "No HLT information produced.";
       goodHlt = false;
     }
   }
@@ -226,51 +243,24 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       iEvent.getByLabel( InputTag( labelHltPrescaleTable_, "Event", nameProcess_ ), handleHltPrescaleTable );
       if ( handleHltPrescaleTable.isValid() ) {
         hltPrescaleTable = trigger::HLTPrescaleTable( handleHltPrescaleTable->set(), handleHltPrescaleTable->labels(), handleHltPrescaleTable->table() );
-        std::cout << "produce(): HLTPrescaleTable product found with set " << hltPrescaleTable.set() << " and label size " << hltPrescaleTable.labels().size() << " found" << std::endl; // DEBUG
-      } else { // DEBUG
-        std::cout << "produce(): HLTPrescaleTable product not found" << std::endl; // DEBUG
       }
     }
-    // Try event setup, if no product
-    if ( hltPrescaleTable.size() == 0 ) {
-      std::cout << "produce(): HLTPrescaleTable from event setup tried" << std::endl; // DEBUG
-      if ( ! labelHltPrescaleTable_.empty() ) {
-        LogWarning( "hltPrescaleInputTag" ) << "HLTPrescaleTable product with label '" << labelHltPrescaleTable_ << "' not found in process '" << nameProcess_ << "'; using default from event setup";
-      }
-      std::cout << "produce(): HLTConfig has pre-scale size " << hltConfig_.prescaleSize() << std::endl; // DEBUG
-      if ( hltConfig_.prescaleSize() > 0 ) {
-        std::cout << "produce(): HLTPrescaleTable found in event setup with set " << hltConfig_.prescaleSet( iEvent, iSetup ) << " and label size " << hltConfig_.prescaleLabels().size() << std::endl; // DEBUG
-        if ( hltConfig_.prescaleSet( iEvent, iSetup ) != -1 ) {
-          hltPrescaleTable = trigger::HLTPrescaleTable( hltConfig_.prescaleSet( iEvent, iSetup ), hltConfig_.prescaleLabels(), hltConfig_.prescaleTable() );
-        } else { // DEBUG
-          std::cout << "HLTPrescaleTable from event setup has error" << std::endl; // DEBUG
+    unsigned set( 0 );
+    bool foundPrescaleLabel( false );
+    if ( hltPrescaleLabel_.size() > 0 ) {
+      const std::vector< std::string > prescaleLabels( hltPrescaleTable.labels() );
+      for ( unsigned iLabel = 0; iLabel <  prescaleLabels.size(); ++iLabel ) {
+        if ( prescaleLabels.at( iLabel ) == hltPrescaleLabel_ ) {
+          set   = iLabel;
+          foundPrescaleLabel = true;
+          break;
         }
-      } else { // DEBUG
-        std::cout << "produce(): HLTPrescaleTable not found in event setup" << std::endl; // DEBUG
+      }
+      if ( ! foundPrescaleLabel ) {
+        LogWarning( "hltPrescaleLabel" ) << "HLT prescale label '" << hltPrescaleLabel_ << "' not in prescale table; using default";
       }
     }
-    unsigned set( hltPrescaleTable.set() );
-    bool foundPrescaleLabel( false ); // DEBUG
-    if ( hltPrescaleTable.size() > 0 ) {
-      if ( hltPrescaleLabel_.size() > 0 ) {
- // DEBUG        bool foundPrescaleLabel( false );
-        for ( unsigned iLabel = 0; iLabel <  hltPrescaleTable.labels().size(); ++iLabel ) {
-          if ( hltPrescaleTable.labels().at( iLabel ) == hltPrescaleLabel_ ) {
-            set                = iLabel;
-            foundPrescaleLabel = true;
-            break;
-          }
-        }
-        if ( ! foundPrescaleLabel ) {
-          LogWarning( "hltPrescaleLabel" ) << "HLT prescale label '" << hltPrescaleLabel_ << "' not in prescale table; using default";
-        } else { // DEBUG
-          std::cout << "produce(): HLT prescale label '" << hltPrescaleLabel_ << "' found" << std::endl; // DEBUG
-        }
-      }
-    } else {
-      LogWarning( "hltPrescaleTable" ) << "No HLT prescale table found; using default empty table with all prescales 1";
-    }
-    std::cout << "produce(): HLT prescale label index: " << set << std::endl; // DEBUG
+    if ( ! foundPrescaleLabel ) set = hltPrescaleTable.set();
 
     for ( size_t iP = 0; iP < sizePaths; ++iP ) {
       const std::string namePath( hltConfig_.triggerName( iP ) );
@@ -286,14 +276,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       if ( ! onlyStandAlone_ ) {
         const unsigned indexLastFilter( handleTriggerResults->index( indexPath ) );
         TriggerPath triggerPath( namePath, indexPath, hltConfig_.prescaleValue( set, namePath ), handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), indexLastFilter );
-        std::cout << "produce(): path " << namePath << " has prescales:" << std::endl; // DEBUG
-        std::cout << "           from HLTConfigProvider (event): " << hltConfig_.prescaleValue( iEvent, iSetup, namePath ) << std::endl; // DEBUG
-        std::cout << "           from HLTConfigProvider        : " << hltConfig_.prescaleValue( hltPrescaleTable.set(), namePath ) << " (set: " << hltPrescaleTable.set() << ")" << std::endl; // DEBUG
-        std::cout << "           from HLTPrescaleTable         : " << hltPrescaleTable.prescale( namePath ) << std::endl; // DEBUG
-        if ( foundPrescaleLabel ) { // DEBUG
-          std::cout << "           from HLTConfigProvider (conf) : " << hltConfig_.prescaleValue( set, namePath ) << " (set: " << set << ")" << std::endl; // DEBUG
-          std::cout << "           from HLTPrescaleTable  (conf) : " << hltPrescaleTable.prescale( set, namePath ) << std::endl; // DEBUG
-        } // DEBUG
         // add module names to path and states' map
         assert( indexLastFilter < sizeModules );
         std::map< unsigned, std::string > indicesModules;
