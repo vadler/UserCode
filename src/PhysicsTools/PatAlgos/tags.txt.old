@@ -1,14 +1,16 @@
-Test Release based on: CMSSW_3_5_6
-Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_5_6
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_6
+Test Release based on: CMSSW_3_5_7
+Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_5_7
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_5_7
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/HLTReco                              V02-04-12      V02-04-12      
-DataFormats/PatCandidates                        NoTag          V05-09-10      
-HLTrigger/HLTcore                                V02-10-02      V02-10-02      
-L1Trigger/GlobalTriggerAnalyzer                  V01-03-00      V01-03-00      
-PhysicsTools/PatAlgos                            B3_5_X         V07-11-28      
-PhysicsTools/PatExamples                         B3_5_X_Workbook V00-02-10      
+DataFormats/PatCandidates                        B3_5_X         V05-09-11      
+PhysicsTools/PatAlgos                            B3_5_X         V07-11-31      
+PhysicsTools/PatExamples                         B3_5_X_Workbook V00-02-18      
 PhysicsTools/PatUtils                            NoTag          V03-09-11      
-PhysicsTools/SelectorUtils                       V00-00-11      V00-00-09      
+PhysicsTools/SelectorUtils                       V00-00-13-07   V00-00-13      
+RecoBTag/ImpactParameter                         V01-03-06-01   V01-03-06-01   
+RecoBTag/SoftLepton                              V05-06-09      V05-06-09      
+RecoTauTag/RecoTau                               V00-18-09      V00-18-09      
+SimTracker/TrackHistory                          V04-05-03      V04-05-03      
+TrackingTools/IPTools                            V00-01-05      V00-00-06      
 ---------------------------------------
-total packages: 8 (8 displayed)
+total packages: 10 (10 displayed)
