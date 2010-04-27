@@ -24,7 +24,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 2000 )
 import CondCore.DBCommon.CondDBSetup_cfi
 process.dbInput = cms.ESSource( "PoolDBESSource"
                               , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-                              , connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_5_6/output/TrackerDQMTriggerBits.db' )
+                              , connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_5_7/output/TrackerDQMTriggerBits.db' )
                               , toGet   = cms.VPSet( cms.PSet( record = cms.string( 'AlCaRecoTriggerBitsRcd' )
                                                              , tag    = cms.string( 'TrackerDQMTriggerBits_v0_hlt' )
                                                              )
