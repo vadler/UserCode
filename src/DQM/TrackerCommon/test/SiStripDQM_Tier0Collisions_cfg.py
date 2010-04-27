@@ -7,7 +7,7 @@ process.load( "FWCore.MessageService.MessageLogger_cfi" )
 
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'GR_R_35X_V7::All'
+process.GlobalTag.globaltag = 'GR_R_36X_V6::All'
 process.load( "Configuration.StandardSequences.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
@@ -19,23 +19,24 @@ process.fifthSeeds.ClusterCheckPSet.MaxNumberOfCosmicClusters    =  5000
 # PV overrides
 process.offlinePrimaryVerticesWithBS.PVSelParameters.maxDistanceToBeam    =   2
 process.offlinePrimaryVerticesWithBS.TkFilterParameters.maxNormalizedChi2 =  20
-process.offlinePrimaryVerticesWithBS.TkFilterParameters.minSiliconHits    =   6
+process.offlinePrimaryVerticesWithBS.TkFilterParameters.minSiliconHits    = cms.int32( 6 )
 process.offlinePrimaryVerticesWithBS.TkFilterParameters.maxD0Significance = 100
-process.offlinePrimaryVerticesWithBS.TkFilterParameters.minPixelHits      =   1
-process.offlinePrimaryVerticesWithBS.TkClusParameters.zSeparation         =  10
+process.offlinePrimaryVerticesWithBS.TkFilterParameters.minPixelHits      = cms.int32( 1 )
+process.offlinePrimaryVerticesWithBS.TkClusParameters.zSeparation         = cms.double( 10. )
 process.offlinePrimaryVertices.PVSelParameters.maxDistanceToBeam          =   2
 process.offlinePrimaryVertices.TkFilterParameters.maxNormalizedChi2       =  20
-process.offlinePrimaryVertices.TkFilterParameters.minSiliconHits          =   6
+process.offlinePrimaryVertices.TkFilterParameters.minSiliconHits          = cms.int32( 6 )
 process.offlinePrimaryVertices.TkFilterParameters.maxD0Significance       = 100
-process.offlinePrimaryVertices.TkFilterParameters.minPixelHits            =   1
-process.offlinePrimaryVertices.TkClusParameters.zSeparation               =  10
+process.offlinePrimaryVertices.TkFilterParameters.minPixelHits            = cms.int32( 1 )
+process.offlinePrimaryVertices.TkClusParameters.zSeparation               = cms.double( 10. )
 process.load( "DQMOffline.Configuration.DQMOffline_cff" )
 process.load( "DQMOffline.Configuration.DQMOffline_SecondStep_cff" )
 process.DQMStore.referenceFileName = ''
 process.DQMStore.collateHistograms = False
+process.load( "DQMServices.Components.DQMEnvironment_cfi" )
 process.dqmSaver.convention = 'Offline'
 process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_5_X/RECO'
-process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_7/output'
+process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_X_2010-04-26-1100/output'
 process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 
 # Input
@@ -231,7 +232,7 @@ process.path = cms.Path(
 )
 
 process.out = cms.OutputModule( "PoolOutputModule",
-  fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_7/output/SiStripDQM_Tier0Collisions.root' ),
+  fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_X_2010-04-26-1100/output/SiStripDQM_Tier0Collisions.root' ),
   SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'path'

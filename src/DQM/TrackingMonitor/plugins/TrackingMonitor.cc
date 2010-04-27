@@ -1,8 +1,8 @@
 /*
  *  See header file for a description of this class.
  *
- *  $Date: 2010/02/11 00:11:02 $
- *  $Revision: 1.11 $
+ *  $Date: 2010/04/19 21:54:40 $
+ *  $Revision: 1.13 $
  *  \author Suchandra Dutta , Giorgia Mila
  */
 
@@ -47,7 +47,8 @@ TrackingMonitor::TrackingMonitor(const edm::ParameterSet& iConfig)
     , NumberOfMeanLayersPerTrack(NULL)
     , NumberOfSeeds(NULL)
     , NumberOfTrackCandidates(NULL)
-    , builderName( conf_.getParameter<std::string>("TTRHBuilder") )
+    , builderName( conf_.getParameter<std::string>("TTRHBuilder"))
+    , doLumiAnalysis( conf_.getParameter<bool>("doLumiAnalysis"))
     , triggerHelper( new TriggerHelper( conf_ ) )
 {
   std::cout << "  TrackingMonitor: -> TriggerHelper is " << triggerHelper->on() << std::endl; // DEBUG
@@ -159,6 +160,11 @@ void TrackingMonitor::beginJob(void)
 
         theTrackBuildingAnalyzer->beginJob(dqmStore_);
     }
+    if (doLumiAnalysis) {
+      if (NumberOfTracks) NumberOfTracks->setLumiFlag();
+      theTrackAnalyzer->setLumiFlag();
+  }
+
 }
 
 void TrackingMonitor::beginRun( const edm::Run& iRun, const edm::EventSetup& iSetup )
@@ -166,6 +172,15 @@ void TrackingMonitor::beginRun( const edm::Run& iRun, const edm::EventSetup& iSe
 
   if ( triggerHelper->on() ) triggerHelper->initRun( iRun, iSetup );
 
+}
+
+// - BeginLumi
+// ---------------------------------------------------------------------------------//
+void TrackingMonitor::beginLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup&  eSetup) {
+  if (doLumiAnalysis) {
+    dqmStore_->softReset(NumberOfTracks);
+    theTrackAnalyzer->doSoftReset(dqmStore_);
+  }
 }
 
 // -- Analyse
@@ -313,6 +328,10 @@ void TrackingMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
 void TrackingMonitor::endJob(void)
 {
+    if (doLumiAnalysis) {
+      dqmStore_->disableSoftReset(NumberOfTracks);
+      theTrackAnalyzer->undoSoftReset(dqmStore_);
+    }
     bool outputMEsInRootFile   = conf_.getParameter<bool>("OutputMEsInRootFile");
     std::string outputFileName = conf_.getParameter<std::string>("OutputFileName");
     if(outputMEsInRootFile)
