@@ -9291,7 +9291,7 @@ process.hltTrigReport = cms.EDAnalyzer( "HLTrigReport",
 
 process.hltOutputA = cms.OutputModule( "PoolOutputModule",
 # DEBUG     fileName = cms.untracked.string( "outputA.root" ),
-    fileName = cms.untracked.string( "/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_X_2010-04-21-0200/output/myHlt1E31_fromRAW_triggerOnly.root" ), # DEBUG
+    fileName = cms.untracked.string( "/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_X_2010-04-28-1100/output/myHlt1E31_fromRAW_triggerOnly.root" ), # DEBUG
     SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring( 'HLT_L1Mu14_L1SingleJet20',
   'HLT_L1Mu20HQ',
   'HLT_L1Mu30',

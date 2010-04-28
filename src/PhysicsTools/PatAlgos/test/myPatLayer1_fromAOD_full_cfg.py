@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 #process.source.fileNames    = [ ... ]
 process.maxEvents.input     = 100
 # process.out.outputCommands  = [ ... ]
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_X_2010-04-21-0200/output/myPatLayer1_fromAOD_full.root'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_X_2010-04-28-1100/output/myPatLayer1_fromAOD_full.root'
 # process.options.wantSummary = False
 
 # # memory check
