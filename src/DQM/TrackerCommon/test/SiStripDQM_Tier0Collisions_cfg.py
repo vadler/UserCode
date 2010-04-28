@@ -7,7 +7,7 @@ process.load( "FWCore.MessageService.MessageLogger_cfi" )
 
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'GR_R_36X_V6::All'
+process.GlobalTag.globaltag = 'GR_R_35X_V7::All'
 process.load( "Configuration.StandardSequences.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
@@ -19,24 +19,23 @@ process.fifthSeeds.ClusterCheckPSet.MaxNumberOfCosmicClusters    =  5000
 # PV overrides
 process.offlinePrimaryVerticesWithBS.PVSelParameters.maxDistanceToBeam    =   2
 process.offlinePrimaryVerticesWithBS.TkFilterParameters.maxNormalizedChi2 =  20
-process.offlinePrimaryVerticesWithBS.TkFilterParameters.minSiliconHits    = cms.int32( 6 )
+process.offlinePrimaryVerticesWithBS.TkFilterParameters.minSiliconHits    =   6
 process.offlinePrimaryVerticesWithBS.TkFilterParameters.maxD0Significance = 100
-process.offlinePrimaryVerticesWithBS.TkFilterParameters.minPixelHits      = cms.int32( 1 )
-process.offlinePrimaryVerticesWithBS.TkClusParameters.zSeparation         = cms.double( 10. )
+process.offlinePrimaryVerticesWithBS.TkFilterParameters.minPixelHits      =   1
+process.offlinePrimaryVerticesWithBS.TkClusParameters.zSeparation         =  10
 process.offlinePrimaryVertices.PVSelParameters.maxDistanceToBeam          =   2
 process.offlinePrimaryVertices.TkFilterParameters.maxNormalizedChi2       =  20
-process.offlinePrimaryVertices.TkFilterParameters.minSiliconHits          = cms.int32( 6 )
+process.offlinePrimaryVertices.TkFilterParameters.minSiliconHits          =   6
 process.offlinePrimaryVertices.TkFilterParameters.maxD0Significance       = 100
-process.offlinePrimaryVertices.TkFilterParameters.minPixelHits            = cms.int32( 1 )
-process.offlinePrimaryVertices.TkClusParameters.zSeparation               = cms.double( 10. )
+process.offlinePrimaryVertices.TkFilterParameters.minPixelHits            =   1
+process.offlinePrimaryVertices.TkClusParameters.zSeparation               =  10
 process.load( "DQMOffline.Configuration.DQMOffline_cff" )
 process.load( "DQMOffline.Configuration.DQMOffline_SecondStep_cff" )
 process.DQMStore.referenceFileName = ''
 process.DQMStore.collateHistograms = False
-process.load( "DQMServices.Components.DQMEnvironment_cfi" )
 process.dqmSaver.convention = 'Offline'
 process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_5_X/RECO'
-process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_X_2010-04-26-1100/output'
+process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_8/output'
 process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 
 # Input
@@ -127,7 +126,7 @@ process.load( 'HLTrigger.HLTfilters.hltHighLevel_cfi' )
 import CondCore.DBCommon.CondDBSetup_cfi
 process.dbInput = cms.ESSource( "PoolDBESSource"
                               , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-                              , connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_5_6/output/TrackerDQMTriggerBits.db' )
+                              , connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_5_8/output/TrackerDQMTriggerBits.db' )
                               , toGet   = cms.VPSet( cms.PSet( record = cms.string( 'AlCaRecoTriggerBitsRcd' )
                                                              , tag    = cms.string( 'TrackerDQMTriggerBits_v0_hlt' )
                                                              )
@@ -155,7 +154,7 @@ process.es_prefer_trackerDqm = cms.ESPrefer( "PoolDBESSource", "dbInput" )
 # process.SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
 process.SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
 process.SiStripMonitorTrack.hltDBKey      = cms.string( '' )
-process.SiStripMonitorTrack.hltPaths      = cms.vstring( 'HLT_MinBias'
+process.SiStripMonitorTrack.hltPaths      = cms.vstring( 'HLT_L1SingleTauJet'
                                                        )
 process.SiStripMonitorTrack.andOrHlt      = cms.bool( False )
 process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
@@ -232,7 +231,7 @@ process.path = cms.Path(
 )
 
 process.out = cms.OutputModule( "PoolOutputModule",
-  fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_X_2010-04-26-1100/output/SiStripDQM_Tier0Collisions.root' ),
+  fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_8/output/SiStripDQM_Tier0Collisions.root' ),
   SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'path'

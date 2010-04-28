@@ -37,7 +37,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 1 )
 import CondCore.DBCommon.CondDBSetup_cfi
 process.PoolDBESSource = cms.ESSource( "PoolDBESSource"
                                      , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-                                     , connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_7/output/TrackerDQMTriggerBits.db' )
+                                     , connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_8/output/TrackerDQMTriggerBits.db' )
 #                                      , connect = cms.string( 'frontier://FrontierProd/CMS_COND_31X_HLT' )
                                      , toGet   = cms.VPSet( cms.PSet( record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
                                                                     , tag     = cms.string( 'TrackerDQMTriggerBits_v0_hlt' )
@@ -47,7 +47,7 @@ process.PoolDBESSource = cms.ESSource( "PoolDBESSource"
 process.PoolDBOutputService = cms.Service( "PoolDBOutputService"
                                          , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
                                          , timetype = cms.untracked.string( 'runnumber' )
-                                         , connect  = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_7/output/TrackerDQMTriggerBits.db' )
+                                         , connect  = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_5_8/output/TrackerDQMTriggerBits.db' )
                                          , toPut    = cms.VPSet( cms.PSet( record = cms.string( 'AlCaRecoTriggerBitsRcd' )
                                                                          , tag    = cms.string( 'TrackerDQMTriggerBits_v0_hlt' )
                                                                          )
