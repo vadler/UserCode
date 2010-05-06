@@ -16,6 +16,7 @@
 #include "DataFormats/TrackerRecHit2D/interface/ProjectedSiStripRecHit2D.h"
 #include "DataFormats/TrackerRecHit2D/interface/SiStripMatchedRecHit2D.h"
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateTransform.h"
+#include "CalibTracker/SiStripCommon/interface/SiStripDCSStatus.h"
 
 #include "DQM/SiStripMonitorTrack/interface/SiStripMonitorTrack.h"
 
@@ -33,9 +34,9 @@ SiStripMonitorTrack::SiStripMonitorTrack(const edm::ParameterSet& conf):
   folder_organizer(),
   tracksCollection_in_EventTree(true),
   firstEvent(-1),
-  triggerHelper( new TriggerHelper( conf ) )
+  eventFlag( new GenericTriggerEventFlag( conf ) )
 {
-  std::cout << "  SiStripMonitorTrack: -> TriggerHelper is " << triggerHelper->on() << std::endl; // DEBUG
+  std::cout << "  SiStripMonitorTrack: -> GenericTriggerEventFlag is " << eventFlag->on() << std::endl; // DEBUG
   Cluster_src_   = conf.getParameter<edm::InputTag>("Cluster_src");
   Mod_On_        = conf.getParameter<bool>("Mod_On");
   Trend_On_      = conf.getParameter<bool>("Trend_On");
@@ -63,12 +64,17 @@ SiStripMonitorTrack::SiStripMonitorTrack(const edm::ParameterSet& conf):
   }else{
     off_Flag = 1;
   }
+
+  // Create DCS Status
+  bool checkDCS    = conf_.getParameter<bool>("UseDCSFiltering");
+  if (checkDCS) dcsStatus_ = new SiStripDCSStatus();
+  else dcsStatus_ = 0;
 }
 
 //------------------------------------------------------------------------
-SiStripMonitorTrack::~SiStripMonitorTrack()
-{
-  delete triggerHelper;
+SiStripMonitorTrack::~SiStripMonitorTrack() {
+  if (dcsStatus_) delete dcsStatus_;
+  delete eventFlag;
 }
 
 //------------------------------------------------------------------------
@@ -81,7 +87,7 @@ void SiStripMonitorTrack::beginRun(const edm::Run& run,const edm::EventSetup& es
 
   book();
 
-  if ( triggerHelper->on() ) triggerHelper->initRun( run, es );
+  if ( eventFlag->on() ) eventFlag->initRun( run, es );
 }
 
 //------------------------------------------------------------------------
@@ -96,12 +102,14 @@ void SiStripMonitorTrack::endJob(void)
 // ------------ method called to produce the data  ------------
 void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
+  // Filter out events if DCS Event if requested
+  if (dcsStatus_ && !dcsStatus_->getStatus(e,es)) return;
 
-// DEBUG    if ( triggerHelper->on() && ! triggerHelper->accept( e, es ) ) return;
+// DEBUG    if ( eventFlag->on() && ! eventFlag->accept( e, es ) ) return;
   static unsigned count( 0 ); // DEBUG
   std::cout << "* SiStripMonitorTrack *" << std::endl; // DEBUG
   bool decision( true ); // DEBUG
-  if ( triggerHelper->on() ) decision = triggerHelper->accept( e, es ); // DEBUG
+  if ( eventFlag->on() ) decision = eventFlag->accept( e, es ); // DEBUG
   std::cout << "  SiStripMonitorTrack: -> " << decision << " (count: "; // DEBUG
   if ( ! decision ) { // DEBUG
     std::cout << count << ")" << std::endl; // DEBUG

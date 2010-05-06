@@ -49,9 +49,9 @@ TrackingMonitor::TrackingMonitor(const edm::ParameterSet& iConfig)
     , NumberOfTrackCandidates(NULL)
     , builderName( conf_.getParameter<std::string>("TTRHBuilder"))
     , doLumiAnalysis( conf_.getParameter<bool>("doLumiAnalysis"))
-    , triggerHelper( new TriggerHelper( conf_ ) )
+    , eventFlag( new GenericTriggerEventFlag( conf_ ) )
 {
-  std::cout << "  TrackingMonitor: -> TriggerHelper is " << triggerHelper->on() << std::endl; // DEBUG
+  std::cout << "  TrackingMonitor: -> GenericTriggerEventFlag is " << eventFlag->on() << std::endl; // DEBUG
 }
 
 
@@ -59,7 +59,7 @@ TrackingMonitor::~TrackingMonitor()
 {
     delete theTrackAnalyzer;
     delete theTrackBuildingAnalyzer;
-    delete triggerHelper;
+    delete eventFlag;
 }
 
 
@@ -167,10 +167,12 @@ void TrackingMonitor::beginJob(void)
 
 }
 
+// - BeginRun
+// ---------------------------------------------------------------------------------//
 void TrackingMonitor::beginRun( const edm::Run& iRun, const edm::EventSetup& iSetup )
 {
 
-  if ( triggerHelper->on() ) triggerHelper->initRun( iRun, iSetup );
+  if ( eventFlag->on() ) eventFlag->initRun( iRun, iSetup );
 
 }
 
@@ -188,11 +190,11 @@ void TrackingMonitor::beginLuminosityBlock(const edm::LuminosityBlock& lumi, con
 void TrackingMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
-// DEBUG    if ( triggerHelper->on() && ! triggerHelper->accept( iEvent, iSetup ) ) return;
+// DEBUG    if ( eventFlag->on() && ! eventFlag->accept( iEvent, iSetup ) ) return;
     static unsigned count( 0 ); // DEBUG
     std::cout << "* TrackingMonitor *" << std::endl; // DEBUG
     bool decision( true ); // DEBUG
-    if ( triggerHelper->on() ) decision = triggerHelper->accept( iEvent, iSetup ); // DEBUG
+    if ( eventFlag->on() ) decision = eventFlag->accept( iEvent, iSetup ); // DEBUG
     std::cout << "  TrackingMonitor: -> " << decision << " (count: "; // DEBUG
     if ( ! decision ) { // DEBUG
       std::cout << count << ")" << std::endl; // DEBUG

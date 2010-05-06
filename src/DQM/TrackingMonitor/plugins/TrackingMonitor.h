@@ -22,7 +22,7 @@ Monitoring source for general quantities related to tracks.
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "DQMServices/Core/interface/MonitorElement.h"
 #include "TrackingTools/TransientTrackingRecHit/interface/TransientTrackingRecHitBuilder.h"
-#include "DQM/TrackerCommon/interface/TriggerHelper.h"
+#include "CommonTools/RecoUtils/interface/GenericTriggerEventFlag.h"
 
 class DQMStore;
 class TrackAnalyzer;
@@ -35,10 +35,11 @@ class TrackingMonitor : public edm::EDAnalyzer
         explicit TrackingMonitor(const edm::ParameterSet&);
         ~TrackingMonitor();
         virtual void beginJob(void);
+        virtual void endJob(void);
+
         virtual void beginRun( const edm::Run&, const edm::EventSetup& );
         virtual void beginLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup&  eSetup);
         virtual void analyze(const edm::Event&, const edm::EventSetup&);
-        virtual void endJob(void);
 
     private:
         void doProfileX(TH2 * th2, MonitorElement* me);
@@ -74,7 +75,7 @@ class TrackingMonitor : public edm::EDAnalyzer
 
         bool doLumiAnalysis;
 
-        TriggerHelper * triggerHelper;
+        GenericTriggerEventFlag * eventFlag;
 };
 
 #endif //define TrackingMonitor_H

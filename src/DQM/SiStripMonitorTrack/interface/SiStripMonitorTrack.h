@@ -38,14 +38,16 @@
 #include "DQM/SiStripCommon/interface/SiStripFolderOrganizer.h"
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "DQMServices/Core/interface/MonitorElement.h"
-#include "DQM/TrackerCommon/interface/TriggerHelper.h"
 
 #include "DataFormats/TrackerRecHit2D/interface/SiStripRecHit2D.h"
+
+#include "CommonTools/RecoUtils/interface/GenericTriggerEventFlag.h"
 
 //******** Single include for the TkMap *************
 #include "DQM/SiStripCommon/interface/TkHistoMap.h"
 //***************************************************
 
+class SiStripDCSStatus;
 //
 // class declaration
 //
@@ -191,7 +193,8 @@ private:
   double widthLowerLimit_;
   double widthUpperLimit_;
 
-  TriggerHelper * triggerHelper;
+  SiStripDCSStatus* dcsStatus_;
 
+  GenericTriggerEventFlag * eventFlag;
 };
 #endif
