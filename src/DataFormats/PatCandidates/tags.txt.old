@@ -1,8 +1,12 @@
-Test Release based on: CMSSW_3_6_X_2010-04-28-1100
-Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_ia32_gcc434/wed/3.6-wed-11/CMSSW_3_6_X_2010-04-28-1100
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_X_2010-04-28-1100
+Test Release based on: CMSSW_3_6_1
+Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_6_1
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_1
 -------- Package --------                        --- Tag ---    --- RelTag --- 
+DataFormats/JetReco                              V03-28-04      V03-28-01      
 DataFormats/PatCandidates                        NoTag          V05-09-14      
-PhysicsTools/PatAlgos                            NoTag          V07-13-13      
+L1Trigger/GlobalTriggerAnalyzer                  V01-03-02      V01-03-02      
+PhysicsTools/PatAlgos                            NoTag          V07-13-15      
+PhysicsTools/SelectorUtils                       V00-01-07      V00-01-05      
+RecoMET/METAlgorithms                            V03-01-12      V03-01-09-01   
 ---------------------------------------
-total packages: 2 (2 displayed)
+total packages: 6 (6 displayed)
