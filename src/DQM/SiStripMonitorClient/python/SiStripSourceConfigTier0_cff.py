@@ -38,7 +38,7 @@ SiStripMonitorTrack.dcsPartitions = cms.vint32( 24
 SiStripMonitorTrack.andOrDcs      = cms.bool( False )
 SiStripMonitorTrack.errorReplyDcs = cms.bool( False )
 SiStripMonitorTrack.gtInputTag    = cms.InputTag( "gtDigis" )
-SiStripMonitorTrack.gtDBKey       = cms.string( 'TrackerDQM_Gt' )
+SiStripMonitorTrack.gtDBKey       = cms.string( 'SiStirpDQM_Gt' )
 SiStripMonitorTrack.gtStatusBits  = cms.vstring( 'PhysicsDeclared'
                                                )
 SiStripMonitorTrack.andOrGt       = cms.bool( False )
@@ -74,7 +74,7 @@ TrackerCollisionTrackMon.dcsPartitions = cms.vint32( 24
 TrackerCollisionTrackMon.andOrDcs      = cms.bool( False )
 TrackerCollisionTrackMon.errorReplyDcs = cms.bool( False )
 TrackerCollisionTrackMon.gtInputTag    = cms.InputTag( "gtDigis" )
-TrackerCollisionTrackMon.gtDBKey       = cms.string( 'TrackerDQM_Gt' )
+TrackerCollisionTrackMon.gtDBKey       = cms.string( 'SiStripDQM_Gt' )
 TrackerCollisionTrackMon.gtStatusBits  = cms.vstring( 'PhysicsDeclared'
                                                     )
 TrackerCollisionTrackMon.andOrGt       = cms.bool( False )
