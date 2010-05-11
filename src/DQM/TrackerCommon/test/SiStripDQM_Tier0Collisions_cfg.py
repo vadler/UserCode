@@ -36,7 +36,7 @@ process.DQMStore.collateHistograms = False
 process.load( "DQMServices.Components.DQMEnvironment_cfi" )
 process.dqmSaver.convention = 'Offline'
 process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_6_X/RECO'
-process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_X_2010-05-05-1100/output'
+process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_1/output'
 process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 process.load( 'L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff' )
 
@@ -124,8 +124,8 @@ process.TrackerCollisionTrackMon.errorReplyL1  = cms.bool( False )
 import CondCore.DBCommon.CondDBSetup_cfi
 process.dbSiStripTriggerBits = cms.ESSource( "PoolDBESSource"
 , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-# , connect = cms.string( 'sqlite_file:AlCaRecoTriggerBits_SiStripDQM.db' )
-, connect = cms.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
+, connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_1/output/AlCaRecoTriggerBits_SiStripDQM.db' )
+# , connect = cms.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
 # , connect = cms.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
 , toGet   = cms.VPSet(
     cms.PSet(
@@ -138,8 +138,8 @@ process.es_prefer_trackerDqmTriggerBits = cms.ESPrefer( "PoolDBESSource", "dbSiS
 
 process.dbSiStripQTests = cms.ESSource( "PoolDBESSource"
 , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-# , connect = cms.string( 'sqlite_file:DQMXMLFile_SiStripDQM.db' )
-, connect = cms.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
+, connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_1/output/DQMXMLFile_SiStripDQM.db' )
+# , connect = cms.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
 # , connect = cms.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
 , toGet   = cms.VPSet(
     cms.PSet(
@@ -153,8 +153,8 @@ process.siStripQTester.getQualityTestsFromFile = False
 
 process.dbSiPixelQTests = cms.ESSource( "PoolDBESSource"
 , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-# , connect = cms.string( 'sqlite_file:DQMXMLFile_SiStripDQM.db' )
-, connect = cms.string( 'frontier://FrontierPrep/CMS_COND_PIXEL' )
+, connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_1/output/DQMXMLFile_SiPixelDQM.db' )
+# , connect = cms.string( 'frontier://FrontierPrep/CMS_COND_PIXEL' )
 # , connect = cms.string( 'frontier://FrontierProd/CMS_COND_31X_PIXEL' )
 , toGet   = cms.VPSet(
     cms.PSet(
@@ -202,7 +202,7 @@ process.path = cms.Path(
 )
 
 process.out = cms.OutputModule( "PoolOutputModule",
-  fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_X_2010-05-05-1100/output/SiStripDQM_Tier0Collisions.root' ),
+  fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_1/output/SiStripDQM_Tier0Collisions.root' ),
   SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'path'

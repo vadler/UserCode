@@ -1,8 +1,8 @@
 /*
  *  See header file for a description of this class.
  *
- *  $Date: 2010/04/19 21:54:40 $
- *  $Revision: 1.13 $
+ *  $Date: 2010/05/10 09:50:48 $
+ *  $Revision: 1.15 $
  *  \author Suchandra Dutta , Giorgia Mila
  */
 
@@ -167,6 +167,7 @@ void TrackingMonitor::beginJob(void)
 
 }
 
+
 // - BeginRun
 // ---------------------------------------------------------------------------------//
 void TrackingMonitor::beginRun( const edm::Run& iRun, const edm::EventSetup& iSetup )
@@ -227,8 +228,6 @@ void TrackingMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
         for (reco::TrackCollection::const_iterator track = trackCollection.begin(); track!=trackCollection.end(); ++track)
         {
-            // kludge --> do better
-            if( trackCollection.size() > 100) continue;
 
             if( Quality == "highPurity")
             {
@@ -326,14 +325,17 @@ void TrackingMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& i
         return;
     }
 }
+void TrackingMonitor::endRun(const edm::Run&, const edm::EventSetup&)
+{
+  if (doLumiAnalysis) {
+    dqmStore_->disableSoftReset(NumberOfTracks);
+    theTrackAnalyzer->undoSoftReset(dqmStore_);
+  }
 
+}
 
 void TrackingMonitor::endJob(void)
 {
-    if (doLumiAnalysis) {
-      dqmStore_->disableSoftReset(NumberOfTracks);
-      theTrackAnalyzer->undoSoftReset(dqmStore_);
-    }
     bool outputMEsInRootFile   = conf_.getParameter<bool>("OutputMEsInRootFile");
     std::string outputFileName = conf_.getParameter<std::string>("OutputFileName");
     if(outputMEsInRootFile)

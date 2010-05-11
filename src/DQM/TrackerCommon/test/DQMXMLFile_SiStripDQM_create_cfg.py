@@ -23,7 +23,7 @@ process.dqmXmlFileTest = cms.EDAnalyzer( "DQMXMLFilePopConAnalyzer"
 , loggingOn       = cms.untracked.bool( True )
 , SinceAppendMode = cms.bool( False )
 , Source          = cms.PSet(
-    XMLFile    = cms.untracked.string( '/afs/cern.ch/cms/sw/ReleaseCandidates/slc5_ia32_gcc434/wed/3.6-wed-11/CMSSW_3_6_X_2010-05-05-1100/src/DQM/SiStripMonitorClient/data/sistrip_qualitytest_config_tier0.xml' )
+    XMLFile    = cms.untracked.string( '/afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_6_1/src/DQM/SiStripMonitorClient/data/sistrip_qualitytest_config_tier0.xml' )
   , firstSince = cms.untracked.uint64( 1 )
   , debug      = cms.untracked.bool( False )
   , zip        = cms.untracked.bool( False )
@@ -31,14 +31,14 @@ process.dqmXmlFileTest = cms.EDAnalyzer( "DQMXMLFilePopConAnalyzer"
 )
 
 process.load( "CondCore.DBCommon.CondDBCommon_cfi" )
-process.CondDBCommon.connect          = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_6_X_2010-05-05-1100/output/DQMXMLFile_SiStripDQM.db' )
+process.CondDBCommon.connect          = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_6_1/output/DQMXMLFile_SiStripDQM.db' )
 process.CondDBCommon.BlobStreamerName = cms.untracked.string( 'TBufferBlobStreamingService' )
 process.CondDBCommon.DBParameters.authenticationPath = cms.untracked.string( '' )
 # process.CondDBCommon.DBParameters.messageLevel       = cms.untracked.int32( 3 )
 
 process.PoolDBOutputService = cms.Service( "PoolDBOutputService"
 , process.CondDBCommon
-, logconnect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_6_X_2010-05-05-1100/output/DQMXMLFile_SiStripDQM_create_log.db' )
+, logconnect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_6_1/output/DQMXMLFile_SiStripDQM_create_log.db' )
 , timetype   = cms.untracked.string( 'runnumber' )
 , toPut      = cms.VPSet(
     cms.PSet(
