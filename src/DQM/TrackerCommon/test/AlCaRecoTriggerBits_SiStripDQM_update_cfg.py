@@ -23,7 +23,7 @@ process.SiStripDQMUpdate = cms.EDAnalyzer( "AlCaRecoTriggerBitsRcdUpdate"
     cms.PSet(
       listName = cms.string( 'SiStripDQM_L1' )
     , hltPaths = cms.vstring(
-        'L1Tech_BPTX_plus_AND_minus.v0'                                        # 0
+#         'L1Tech_BPTX_plus_AND_minus.v0'                                        # 0
 #       , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0' # 40 OR 41
       , 'L1Tech_BSC_minBias_threshold2.v0'                                     # 41
       , 'NOT L1Tech_BSC_halo_beam2_inner.v0'                                   # NOT 36
@@ -51,7 +51,7 @@ process.PoolDBESSource = cms.ESSource( "PoolDBESSource"
 , toGet   = cms.VPSet(
     cms.PSet(
       record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_express' )
+    , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v1_express' )
     )
   )
 )
@@ -63,7 +63,7 @@ process.PoolDBOutputService = cms.Service( "PoolDBOutputService"
 , toPut      = cms.VPSet(
     cms.PSet(
       record = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_express' )
+    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v1_express' )
     )
   )
 )

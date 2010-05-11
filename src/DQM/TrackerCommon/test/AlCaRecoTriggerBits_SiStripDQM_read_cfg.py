@@ -32,7 +32,7 @@ process.dbInput = cms.ESSource( "PoolDBESSource"
 , toGet   = cms.VPSet(
     cms.PSet(
       record = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_express' )
+    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v1_express' )
     )
   )
 )
