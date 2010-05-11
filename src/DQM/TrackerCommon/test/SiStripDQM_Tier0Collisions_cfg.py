@@ -73,12 +73,12 @@ process.options = cms.untracked.PSet(
 # process.SiStripMonitorTrack.andOrDcs      = True
 # process.SiStripMonitorTrack.errorReplyDcs = True
 # process.SiStripMonitorTrack.gtInputTag    = "gtDigis"
-# process.SiStripMonitorTrack.gtDBKey       = 'TrackerDQM_Gt'
+# process.SiStripMonitorTrack.gtDBKey       = 'SiStripDQM_Gt'
 # process.SiStripMonitorTrack.gtStatusBits  = [ 'PhysicsDeclared'
 #                                             ]
 # process.SiStripMonitorTrack.andOrGt       = False
 # process.SiStripMonitorTrack.errorReplyGt  = False
-# process.SiStripMonitorTrack.l1DBKey       = cms.string( 'TrackerDQM_L1' )
+# process.SiStripMonitorTrack.l1DBKey       = cms.string( 'SiStripDQM_L1' )
 # process.SiStripMonitorTrack.l1Algorithms  = cms.vstring()
 # process.SiStripMonitorTrack.andOrL1       = cms.bool( False )
 # process.SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
@@ -99,13 +99,12 @@ process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
 # process.TrackerCollisionTrackMon.andOrDcs      = True
 # process.TrackerCollisionTrackMon.errorReplyDcs = True
 # process.TrackerCollisionTrackMon.gtInputTag    = "gtDigis"
-# process.TrackerCollisionTrackMon.gtDBKey       = 'TrackerDQM_Gt'
+# process.TrackerCollisionTrackMon.gtDBKey       = 'SiStripDQM_Gt'
 # process.TrackerCollisionTrackMon.gtStatusBits  = [ 'PhysicsDeclared'
 #                                                  ]
 # process.TrackerCollisionTrackMon.andOrGt       = False
 # process.TrackerCollisionTrackMon.errorReplyGt  = False
-#process.TrackerCollisionTrackMon.l1DBKey       = cms.string( 'TrackerDQM_L1_Tracking' )
-process.TrackerCollisionTrackMon.l1DBKey       = cms.string( 'TrackerDQM_L1' )
+process.TrackerCollisionTrackMon.l1DBKey       = cms.string( 'SiStripDQM_L1' )
 process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring( 'L1Tech_BPTX_plus_AND_minus.v0'
                                                             , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0'
                                                             , '~L1Tech_BSC_halo_beam2_inner.v0'
