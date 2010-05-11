@@ -65,17 +65,19 @@ process.options = cms.untracked.PSet(
 
 # process.SiStripMonitorTrack.andOr         = True
 # process.SiStripMonitorTrack.dcsInputTag   = "scalersRawToDigi"
-# process.SiStripMonitorTrack.dcsPartitions = [ 24
-#                                             , 25
-#                                             , 26
-#                                             , 27
-#                                             ]
+# process.SiStripMonitorTrack.dcsPartitions = [
+#   24
+# , 25
+# , 26
+# , 27
+# ]
 # process.SiStripMonitorTrack.andOrDcs      = True
 # process.SiStripMonitorTrack.errorReplyDcs = True
 # process.SiStripMonitorTrack.gtInputTag    = "gtDigis"
 # process.SiStripMonitorTrack.gtDBKey       = 'SiStripDQM_Gt'
-# process.SiStripMonitorTrack.gtStatusBits  = [ 'PhysicsDeclared'
-#                                             ]
+# process.SiStripMonitorTrack.gtStatusBits  = [
+#   'PhysicsDeclared'
+# ]
 # process.SiStripMonitorTrack.andOrGt       = False
 # process.SiStripMonitorTrack.errorReplyGt  = False
 # process.SiStripMonitorTrack.l1DBKey       = cms.string( 'SiStripDQM_L1' )
@@ -84,34 +86,41 @@ process.options = cms.untracked.PSet(
 # process.SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
 process.SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
 process.SiStripMonitorTrack.hltDBKey      = cms.string( '' )
-process.SiStripMonitorTrack.hltPaths      = cms.vstring( 'HLT_L1SingleTauJet'
-                                                       )
+process.SiStripMonitorTrack.hltPaths      = cms.vstring(
+  'HLT_L1SingleTauJet'
+)
 process.SiStripMonitorTrack.andOrHlt      = cms.bool( False )
 process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
 
 # process.TrackerCollisionTrackMon.andOr         = True
 # process.TrackerCollisionTrackMon.dcsInputTag   = "scalersRawToDigi"
-# process.TrackerCollisionTrackMon.dcsPartitions = [ 24
-#                                                  , 25
-#                                                  , 26
-#                                                  , 27
-#                                                  ]
+# process.TrackerCollisionTrackMon.dcsPartitions = [
+#   24
+# , 25
+# , 26
+# , 27
+# ]
 # process.TrackerCollisionTrackMon.andOrDcs      = True
 # process.TrackerCollisionTrackMon.errorReplyDcs = True
 # process.TrackerCollisionTrackMon.gtInputTag    = "gtDigis"
 # process.TrackerCollisionTrackMon.gtDBKey       = 'SiStripDQM_Gt'
-# process.TrackerCollisionTrackMon.gtStatusBits  = [ 'PhysicsDeclared'
-#                                                  ]
+# process.TrackerCollisionTrackMon.gtStatusBits  = [
+#   'PhysicsDeclared'
+# ]
 # process.TrackerCollisionTrackMon.andOrGt       = False
 # process.TrackerCollisionTrackMon.errorReplyGt  = False
 process.TrackerCollisionTrackMon.l1DBKey       = cms.string( 'SiStripDQM_L1' )
-process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring( 'L1Tech_BPTX_plus_AND_minus.v0'
-                                                            , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0'
-                                                            , '~L1Tech_BSC_halo_beam2_inner.v0'
-                                                            , '~L1Tech_BSC_halo_beam2_outer.v0'
-                                                            , '~L1Tech_BSC_halo_beam1_inner.v0'
-                                                            , '~L1Tech_BSC_halo_beam1_outer.v0'
-                                                            )
+process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring(
+#   'L1Tech_BPTX_plus_AND_minus.v0'                                        # 0
+# , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0' # 40 OR 41
+, 'L1Tech_BSC_minBias_threshold2.v0'                                     # 41
+, 'NOT L1Tech_BSC_halo_beam2_inner.v0'                                   # NOT 36
+, 'NOT L1Tech_BSC_halo_beam2_outer.v0'                                   # NOT 37
+, 'NOT L1Tech_BSC_halo_beam1_inner.v0'                                   # NOT 38
+, 'NOT L1Tech_BSC_halo_beam1_outer.v0'                                   # NOT 39
+, 'NOT (L1Tech_BSC_splash_beam1.v0 AND NOT L1Tech_BSC_splash_beam2.v0)'  # NOT (42 AND NOT 43)
+, 'NOT (L1Tech_BSC_splash_beam2.v0 AND NOT L1Tech_BSC_splash_beam1.v0)'  # NOT (43 AND NOT 42)
+)
 process.TrackerCollisionTrackMon.andOrL1       = cms.bool( False )
 process.TrackerCollisionTrackMon.errorReplyL1  = cms.bool( False )
 # process.TrackerCollisionTrackMon.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
@@ -165,39 +174,39 @@ process.dbSiPixelQTests = cms.ESSource( "PoolDBESSource"
 process.es_prefer_trackerDqmQTests = cms.ESPrefer( "PoolDBESSource", "dbSiPixelQTests" )
 
 process.raw2Digi = cms.Sequence(
-  process.scalersRawToDigi +
-  process.siPixelDigis     +
-  process.siStripDigis
+  process.scalersRawToDigi
++ process.siPixelDigis
++ process.siStripDigis
 )
 process.reco = cms.Sequence(
-  process.trackerlocalreco   *
-  process.offlineBeamSpot    *
-  process.recopixelvertexing *
-  process.ckftracks          *
-  process.vertexreco         *
-  process.ctfTracksPixelLess *
-  process.logErrorHarvester
+  process.trackerlocalreco
+* process.offlineBeamSpot
+* process.recopixelvertexing
+* process.ckftracks
+* process.vertexreco
+* process.ctfTracksPixelLess
+* process.logErrorHarvester
 )
 process.dqm = cms.Sequence(
-  process.SiStripDQMTier0  *
-  process.DQMMessageLogger
+  process.SiStripDQMTier0
+* process.DQMMessageLogger
 )
 
 process.path = cms.Path(
   # preparation
-  process.gtDigis                   *
-  process.raw2Digi                  *
-  process.reco                      *
+  process.gtDigis
+* process.raw2Digi
+* process.reco
   # DQM sources
-  process.dqm                       *
+* process.dqm
   # DQM client
-  process.dqmRefHistoRootFileGetter *
-  process.SiStripOfflineDQMClient   *
-  process.DQMMessageLoggerClient    *
-  process.siStripDaqInfo            *
-  process.siStripDcsInfo            *
-  process.siStripCertificationInfo  *
-  process.dqmSaver
+* process.dqmRefHistoRootFileGetter
+* process.SiStripOfflineDQMClient
+* process.DQMMessageLoggerClient
+* process.siStripDaqInfo
+* process.siStripDcsInfo
+* process.siStripCertificationInfo
+* process.dqmSaver
 )
 
 process.out = cms.OutputModule( "PoolOutputModule",
