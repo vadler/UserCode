@@ -142,7 +142,7 @@ process.datasets = cms.PSet(
 
 process.source = cms.Source( "PoolSource",
 # DEBUG     fileNames = cms.untracked.vstring( '/store/data/BeamCommissioning09/MinimumBias/RAW/v1/000/124/120/F6ADE109-6BE8-DE11-9680-000423D991D4.root' )
-    fileNames = cms.untracked.vstring( '/store/relval/CMSSW_3_6_0_pre6/RelValProdTTbar/GEN-SIM-RAW/MC_36Y_V4-v1/0011/0E7866B2-B844-DF11-99A0-0026189438D7.root' ) # DEBUG
+    fileNames = cms.untracked.vstring( '/store/relval/CMSSW_3_6_0/RelValTTbar/GEN-SIM-RECO/START36_V4-v1/0013/306F945C-9A49-DF11-85F8-0018F3D0965A.root' ) # DEBUG
 )
 
 process.BTagRecord = cms.ESSource( "EmptyESSource",
