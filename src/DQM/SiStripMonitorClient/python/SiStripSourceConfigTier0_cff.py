@@ -38,7 +38,7 @@ SiStripMonitorTrack.dcsPartitions = cms.vint32( 24
 SiStripMonitorTrack.andOrDcs      = cms.bool( False )
 SiStripMonitorTrack.errorReplyDcs = cms.bool( False )
 SiStripMonitorTrack.gtInputTag    = cms.InputTag( "gtDigis" )
-SiStripMonitorTrack.gtDBKey       = cms.string( 'SiStirpDQM_Gt' )
+SiStripMonitorTrack.gtDBKey       = cms.string( 'SiStripDQM_Gt' )
 SiStripMonitorTrack.gtStatusBits  = cms.vstring( 'PhysicsDeclared'
                                                )
 SiStripMonitorTrack.andOrGt       = cms.bool( False )
