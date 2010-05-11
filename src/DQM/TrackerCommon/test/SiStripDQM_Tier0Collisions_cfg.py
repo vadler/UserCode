@@ -7,7 +7,7 @@ process.load( "FWCore.MessageService.MessageLogger_cfi" )
 
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'GR_R_36X_V6::All'
+process.GlobalTag.globaltag = 'GR_R_36X_V9::All'
 process.load( "Configuration.StandardSequences.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
