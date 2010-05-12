@@ -63,69 +63,125 @@ process.options = cms.untracked.PSet(
 , wantSummary = cms.untracked.bool( True )
 )
 
-# process.SiStripMonitorTrack.andOr         = True
-# process.SiStripMonitorTrack.dcsInputTag   = "scalersRawToDigi"
-# process.SiStripMonitorTrack.dcsPartitions = [
+# process.SiStripMonitorTrack.andOr          = False
+process.SiStripMonitorTrack.verbosityLevel = cms.uint32( 2 )
+# process.SiStripMonitorTrack.dcsInputTag   = cms.InputTag( "scalersRawToDigi" )
+# process.SiStripMonitorTrack.dcsPartitions = cms.vint32 (
 #   24
 # , 25
 # , 26
 # , 27
-# ]
-# process.SiStripMonitorTrack.andOrDcs      = True
-# process.SiStripMonitorTrack.errorReplyDcs = True
-# process.SiStripMonitorTrack.gtInputTag    = "gtDigis"
-# process.SiStripMonitorTrack.gtDBKey       = 'SiStripDQM_Gt'
-# process.SiStripMonitorTrack.gtStatusBits  = [
+# )
+# process.SiStripMonitorTrack.andOrDcs      = cms.bool( False )
+# process.SiStripMonitorTrack.errorReplyDcs = cms.bool( True )
+# process.SiStripMonitorTrack.gtInputTag    = cms.InputTag( "gtDigis" )
+# process.SiStripMonitorTrack.gtDBKey       = cms.string( 'SiStripDQM_Gt' )
+# process.SiStripMonitorTrack.gtStatusBits  = cms.vstring(
 #   'PhysicsDeclared'
+# )
+# process.SiStripMonitorTrack.andOrGt       = cms.bool( False )
+# process.SiStripMonitorTrack.errorReplyGt  = cms.bool( False )
+# process.SiStripMonitorTrack.l1DBKey       = 'SiStripDQM_L1'
+# process.SiStripMonitorTrack.l1Algorithms  = [
+# #   'L1Tech_BPTX_plus_AND_minus.v0'                                        # 0
+# # , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0' # 40 OR 41
+#   'L1Tech_BSC_minBias_threshold2.v0'                                     # 41
+# , 'NOT L1Tech_BSC_halo_beam2_inner.v0'                                   # NOT 36
+# , 'NOT L1Tech_BSC_halo_beam2_outer.v0'                                   # NOT 37
+# , 'NOT L1Tech_BSC_halo_beam1_inner.v0'                                   # NOT 38
+# , 'NOT L1Tech_BSC_halo_beam1_outer.v0'                                   # NOT 39
+# , 'NOT (L1Tech_BSC_splash_beam1.v0 AND NOT L1Tech_BSC_splash_beam2.v0)'  # NOT (42 AND NOT 43)
+# , 'NOT (L1Tech_BSC_splash_beam2.v0 AND NOT L1Tech_BSC_splash_beam1.v0)'  # NOT (43 AND NOT 42)
 # ]
-# process.SiStripMonitorTrack.andOrGt       = False
-# process.SiStripMonitorTrack.errorReplyGt  = False
-# process.SiStripMonitorTrack.l1DBKey       = cms.string( 'SiStripDQM_L1' )
-# process.SiStripMonitorTrack.l1Algorithms  = cms.vstring()
-# process.SiStripMonitorTrack.andOrL1       = cms.bool( False )
-# process.SiStripMonitorTrack.errorReplyL1  = cms.bool( False )
-process.SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
-process.SiStripMonitorTrack.hltDBKey      = cms.string( '' )
-process.SiStripMonitorTrack.hltPaths      = cms.vstring(
+# process.SiStripMonitorTrack.andOrL1       = False
+# process.SiStripMonitorTrack.errorReplyL1  = True
+# process.SiStripMonitorTrack.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
+# process.SiStripMonitorTrack.hltDBKey      = cms.string( '' )
+# process.SiStripMonitorTrack.hltPaths      = cms.vstring(
+#   'HLT_L1SingleTauJet'
+# )
+# process.SiStripMonitorTrack.andOrHlt      = cms.bool( False )
+# process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
+
+# process.MonitorTrackResiduals.andOr          = False
+process.MonitorTrackResiduals.verbosityLevel = cms.uint32( 2 )
+# process.MonitorTrackResiduals.dcsInputTag   = cms.InputTag( "scalersRawToDigi" )
+# process.MonitorTrackResiduals.dcsPartitions = cms.vint32 (
+#   24
+# , 25
+# , 26
+# , 27
+# )
+# process.MonitorTrackResiduals.andOrDcs      = cms.bool( False )
+# process.MonitorTrackResiduals.errorReplyDcs = cms.bool( True )
+# process.MonitorTrackResiduals.gtInputTag    = cms.InputTag( "gtDigis" )
+# process.MonitorTrackResiduals.gtDBKey       = cms.string( 'SiStripDQM_Gt' )
+# process.MonitorTrackResiduals.gtStatusBits  = cms.vstring(
+#   'PhysicsDeclared'
+# )
+# process.MonitorTrackResiduals.andOrGt       = cms.bool( False )
+# process.MonitorTrackResiduals.errorReplyGt  = cms.bool( False )
+# process.MonitorTrackResiduals.l1DBKey       = 'SiStripDQM_L1'
+# process.MonitorTrackResiduals.l1Algorithms  = [
+# #   'L1Tech_BPTX_plus_AND_minus.v0'                                        # 0
+# # , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0' # 40 OR 41
+#   'L1Tech_BSC_minBias_threshold2.v0'                                     # 41
+# , 'NOT L1Tech_BSC_halo_beam2_inner.v0'                                   # NOT 36
+# , 'NOT L1Tech_BSC_halo_beam2_outer.v0'                                   # NOT 37
+# , 'NOT L1Tech_BSC_halo_beam1_inner.v0'                                   # NOT 38
+# , 'NOT L1Tech_BSC_halo_beam1_outer.v0'                                   # NOT 39
+# , 'NOT (L1Tech_BSC_splash_beam1.v0 AND NOT L1Tech_BSC_splash_beam2.v0)'  # NOT (42 AND NOT 43)
+# , 'NOT (L1Tech_BSC_splash_beam2.v0 AND NOT L1Tech_BSC_splash_beam1.v0)'  # NOT (43 AND NOT 42)
+# ]
+# process.MonitorTrackResiduals.andOrL1       = False
+# process.MonitorTrackResiduals.errorReplyL1  = True
+process.MonitorTrackResiduals.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
+process.MonitorTrackResiduals.hltDBKey      = cms.string( '' )
+process.MonitorTrackResiduals.hltPaths      = cms.vstring(
   'HLT_L1SingleTauJet'
 )
-process.SiStripMonitorTrack.andOrHlt      = cms.bool( False )
-process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
+process.MonitorTrackResiduals.andOrHlt      = cms.bool( False )
+process.MonitorTrackResiduals.errorReplyHlt = cms.bool( False )
 
-# process.TrackerCollisionTrackMon.andOr         = True
+# process.TrackerCollisionTrackMon.andOr         = false
+process.TrackerCollisionTrackMon.verbosityLevel = cms.uint32( 2 )
 # process.TrackerCollisionTrackMon.dcsInputTag   = "scalersRawToDigi"
 # process.TrackerCollisionTrackMon.dcsPartitions = [
 #   24
 # , 25
 # , 26
 # , 27
+# , 28
+# , 29
 # ]
-# process.TrackerCollisionTrackMon.andOrDcs      = True
+# process.TrackerCollisionTrackMon.andOrDcs      = False
 # process.TrackerCollisionTrackMon.errorReplyDcs = True
-# process.TrackerCollisionTrackMon.gtInputTag    = "gtDigis"
-# process.TrackerCollisionTrackMon.gtDBKey       = 'SiStripDQM_Gt'
-# process.TrackerCollisionTrackMon.gtStatusBits  = [
+# process.TrackerCollisionTrackMon.gtInputTag    = cms.InputTag( "gtDigis" )
+# process.TrackerCollisionTrackMon.gtDBKey       = cms.string( 'SiStripDQM_Gt' )
+# process.TrackerCollisionTrackMon.gtStatusBits  = cms.vstring(
 #   'PhysicsDeclared'
+# )
+# process.TrackerCollisionTrackMon.andOrGt       = cms.bool( False )
+# process.TrackerCollisionTrackMon.errorReplyGt  = cms.bool( True )
+# process.TrackerCollisionTrackMon.l1DBKey       = 'SiStripDQM_L1'
+# process.TrackerCollisionTrackMon.l1Algorithms  = [
+# #   'L1Tech_BPTX_plus_AND_minus.v0'                                        # 0
+# # , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0' # 40 OR 41
+#   'L1Tech_BSC_minBias_threshold2.v0'                                     # 41
+# , 'NOT L1Tech_BSC_halo_beam2_inner.v0'                                   # NOT 36
+# , 'NOT L1Tech_BSC_halo_beam2_outer.v0'                                   # NOT 37
+# , 'NOT L1Tech_BSC_halo_beam1_inner.v0'                                   # NOT 38
+# , 'NOT L1Tech_BSC_halo_beam1_outer.v0'                                   # NOT 39
+# , 'NOT (L1Tech_BSC_splash_beam1.v0 AND NOT L1Tech_BSC_splash_beam2.v0)'  # NOT (42 AND NOT 43)
+# , 'NOT (L1Tech_BSC_splash_beam2.v0 AND NOT L1Tech_BSC_splash_beam1.v0)'  # NOT (43 AND NOT 42)
 # ]
-# process.TrackerCollisionTrackMon.andOrGt       = False
-# process.TrackerCollisionTrackMon.errorReplyGt  = False
-process.TrackerCollisionTrackMon.l1DBKey       = cms.string( 'SiStripDQM_L1' )
-process.TrackerCollisionTrackMon.l1Algorithms  = cms.vstring(
-#   'L1Tech_BPTX_plus_AND_minus.v0'                                        # 0
-# , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0' # 40 OR 41
-  'L1Tech_BSC_minBias_threshold2.v0'                                     # 41
-, 'NOT L1Tech_BSC_halo_beam2_inner.v0'                                   # NOT 36
-, 'NOT L1Tech_BSC_halo_beam2_outer.v0'                                   # NOT 37
-, 'NOT L1Tech_BSC_halo_beam1_inner.v0'                                   # NOT 38
-, 'NOT L1Tech_BSC_halo_beam1_outer.v0'                                   # NOT 39
-, 'NOT (L1Tech_BSC_splash_beam1.v0 AND NOT L1Tech_BSC_splash_beam2.v0)'  # NOT (42 AND NOT 43)
-, 'NOT (L1Tech_BSC_splash_beam2.v0 AND NOT L1Tech_BSC_splash_beam1.v0)'  # NOT (43 AND NOT 42)
-)
-process.TrackerCollisionTrackMon.andOrL1       = cms.bool( False )
-process.TrackerCollisionTrackMon.errorReplyL1  = cms.bool( False )
+# process.TrackerCollisionTrackMon.andOrL1       = False
+# process.TrackerCollisionTrackMon.errorReplyL1  = True
 # process.TrackerCollisionTrackMon.hltInputTag   = cms.InputTag( "TriggerResults::HLT" )
 # process.TrackerCollisionTrackMon.hltDBKey      = cms.string( '' )
-# process.TrackerCollisionTrackMon.hltPaths      = cms.vstring()
+# process.TrackerCollisionTrackMon.hltPaths      = cms.vstring(
+#   'HLT_L1SingleTauJet'
+# )
 # process.TrackerCollisionTrackMon.andOrHlt      = cms.bool( False )
 # process.TrackerCollisionTrackMon.errorReplyHlt = cms.bool( False )
 
