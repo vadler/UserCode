@@ -23,7 +23,7 @@ process.maxEvents = cms.untracked.PSet(
 import CondCore.DBCommon.CondDBSetup_cfi
 process.dbInput = cms.ESSource( "PoolDBESSource"
 , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-, connect = cms.string( 'sqlite_file:AlCaRecoTriggerBits.db' )
+, connect = cms.string( 'sqlite_file:GenericTriggerEventFlag_AlCaRecoTriggerBits.db' )
 , toGet   = cms.VPSet(
     cms.PSet(
       record = cms.string( 'AlCaRecoTriggerBitsRcd' )
@@ -34,7 +34,7 @@ process.dbInput = cms.ESSource( "PoolDBESSource"
 
 process.AlCaRecoTriggerBitsRcdRead = cms.EDAnalyzer( "AlCaRecoTriggerBitsRcdRead"
 , outputType  = cms.untracked.string( 'text' )
-, rawFileName = cms.untracked.string( 'AlCaRecoTriggerBits' )
+, rawFileName = cms.untracked.string( 'GenericTriggerEventFlag_AlCaRecoTriggerBits' )
 )
 
 process.p = cms.Path(
