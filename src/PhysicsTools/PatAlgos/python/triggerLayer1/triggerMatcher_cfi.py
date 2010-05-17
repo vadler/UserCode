@@ -13,7 +13,8 @@ import FWCore.ParameterSet.Config as cms
 ## L1 ##
 
 # matches to HLT_IsoMu3
-muonTriggerMatchL1Muon = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR",
+# muonTriggerMatchL1Muon = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR",
+muonTriggerMatchL1Muon = cms.EDProducer( "PATTriggerMatcherDEtaLessByDR",
     src     = cms.InputTag( "cleanPatMuons" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
@@ -22,8 +23,9 @@ muonTriggerMatchL1Muon = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR",
     filterLabels   = cms.vstring( '*' ),
     pathNames      = cms.vstring( '*' ),
     collectionTags = cms.vstring( '*' ),
-    maxDPtRel = cms.double( 0.5 ),
-    maxDeltaR = cms.double( 0.5 ),
+#     maxDPtRel = cms.double( 0.5 ),
+#     maxDeltaR = cms.double( 0.5 ),
+    maxDeltaEta = cms.double( 0.5 ),
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
 )
