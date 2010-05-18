@@ -14,7 +14,7 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source(
     "PoolSource"
   , fileNames = cms.untracked.vstring(
-        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_0_pre4/output/myHlt1E31_fromRAW_triggerOnly.root'
+        'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_0_pre4/output/myHlt_triggerOnly.root'
       )
   )
 process.maxEvents = cms.untracked.PSet(
@@ -47,14 +47,17 @@ process.primaryVertexFilter = cms.EDFilter(
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'MC_36Y_V4::All'
+process.GlobalTag.globaltag = 'GR_R_37X_V3::All'
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
 ## PAT trigger
 process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff")
 process.patTrigger.processName      = 'HLT1E31'
-# process.patTrigger.hltPrescaleLabel = cms.string( '1' )
-process.patTrigger.hltPrescaleTable = cms.string( "hltPrescaleRecorder1" )
+# process.patTrigger.hltPrescaleLabel = cms.string( '1E29' )
+process.patTrigger.hltPrescaleLabel = cms.string( '1E28' )
+# process.patTrigger.hltPrescaleLabel = cms.string( 'Cosmics' )
+process.patTrigger.hltPrescaleTable = cms.string( "hltPrescaleRecorder" )
+process.patTriggerEvent.processName       = 'HLT1E31'
 process.patTriggerEvent.patTriggerMatches = []
 process.p = cms.Path(
 #     process.hltLevel1GTSeed
