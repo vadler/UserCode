@@ -32,8 +32,6 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
-#include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h"
-
 
 using namespace pat;
 using namespace edm;
@@ -545,8 +543,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
 
   // L1 algorithms
   if ( ! onlyStandAlone_ ) {
-    L1GtUtils l1GtUtils;
-    l1GtUtils.retrieveL1EventSetup( iSetup );
+    l1GtUtils_.retrieveL1EventSetup( iSetup );
     ESHandle< L1GtTriggerMenu > handleL1GtTriggerMenu;
     iSetup.get< L1GtTriggerMenuRcd >().get( handleL1GtTriggerMenu );
     const AlgorithmMap l1GtAlgorithms( handleL1GtTriggerMenu->gtAlgorithmMap() );
@@ -562,7 +559,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       }
       int tech;
       int bit;
-      if ( ! l1GtUtils.l1AlgTechTrigBitNumber( iAlgo->second.algoName(), tech, bit ) ) {
+      if ( ! l1GtUtils_.l1AlgTechTrigBitNumber( iAlgo->second.algoName(), tech, bit ) ) {
         LogError( "errorL1AlgoName" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' not found in the L1 menu; skipping";
         continue;
       }
@@ -570,7 +567,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       bool decisionAfterMask;
       int  prescale;
       int  mask;
-      int  error( l1GtUtils.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
+      int  error( l1GtUtils_.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
       if ( error != 0 ) {
         LogError( "errorL1AlgoDecision" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' decision has error code " << error << "; skipping";
         continue;
@@ -586,7 +583,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       }
       int tech;
       int bit;
-      if ( ! l1GtUtils.l1AlgTechTrigBitNumber( iAlgo->second.algoName(), tech, bit ) ) {
+      if ( ! l1GtUtils_.l1AlgTechTrigBitNumber( iAlgo->second.algoName(), tech, bit ) ) {
         LogError( "errorL1AlgoName" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' not found in the L1 menu; skipping";
         continue;
       }
@@ -594,7 +591,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       bool decisionAfterMask;
       int  prescale;
       int  mask;
-      int  error( l1GtUtils.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
+      int  error( l1GtUtils_.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
       if ( error != 0 ) {
         LogError( "errorL1AlgoDecision" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' decision has error code " << error << "; skipping";
         continue;
