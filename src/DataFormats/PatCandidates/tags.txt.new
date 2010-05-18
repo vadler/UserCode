@@ -9,7 +9,8 @@ L1Trigger/GlobalTriggerAnalyzer                  V01-03-02      V01-03-02
 PhysicsTools/PatAlgos                            NoTag          V07-13-15      
 PhysicsTools/PatExamples                         NoTag          V00-03-02      
 PhysicsTools/SelectorUtils                       V00-01-07      V00-01-05      
-RecoMET/METAlgorithms                            V03-01-12      V03-01-09-01   
-RecoMET/METProducers                             V03-01-25      V03-01-24      
+RecoMET/Configuration                            V00-06-25      V00-06-21      
+RecoMET/METAlgorithms                            V03-01-17      V03-01-09-01   
+RecoMET/METProducers                             V03-01-33      V03-01-24      
 ---------------------------------------
-total packages: 9 (9 displayed)
+total packages: 10 (10 displayed)
