@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 #process.source.fileNames    = [ ... ]
 # process.maxEvents.input     = ...
 # process.out.outputCommands  = [ ... ]
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_6_1/output/myPatTuple_test_addTriggerInfo.root'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_0_pre4/output/myPatTuple_test_addTriggerInfo.root'
 # process.options.wantSummary = False
 
 # # memory check
@@ -41,7 +41,7 @@ process.patTrigger = cms.EDProducer( "PATTriggerProducer"
                                    # trigger paths
                                    , addPathModuleLabels = cms.bool( False ) # setting this 'True' stores the names of all modules as strings (~8kB/ev.)
                                    )
-process.electronTriggerTestMatchHLTElectrons = cms.EDFilter( "PATTriggerMatcherDRLessByR",
+process.electronTriggerTestMatchHLTElectrons = cms.EDProducer( "PATTriggerMatcherDRLessByR",
     src     = cms.InputTag( "cleanPatElectrons" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
@@ -55,7 +55,7 @@ process.electronTriggerTestMatchHLTElectrons = cms.EDFilter( "PATTriggerMatcherD
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
 )
-process.electronTriggerTestMatchHLTFilterEGammas = cms.EDFilter( "PATTriggerMatcherDRLessByR",
+process.electronTriggerTestMatchHLTFilterEGammas = cms.EDProducer( "PATTriggerMatcherDRLessByR",
     src     = cms.InputTag( "cleanPatElectrons" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
@@ -69,7 +69,7 @@ process.electronTriggerTestMatchHLTFilterEGammas = cms.EDFilter( "PATTriggerMatc
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
 )
-process.muonTriggerTestMatchL1Muons = cms.EDFilter( "PATTriggerMatcherDRLessByR",
+process.muonTriggerTestMatchL1Muons = cms.EDProducer( "PATTriggerMatcherDRLessByR",
     src     = cms.InputTag( "cleanPatMuons" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
@@ -83,7 +83,7 @@ process.muonTriggerTestMatchL1Muons = cms.EDFilter( "PATTriggerMatcherDRLessByR"
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
 )
-process.muonTriggerTestMatchL1CollectionMuons = cms.EDFilter( "PATTriggerMatcherDRLessByR",
+process.muonTriggerTestMatchL1CollectionMuons = cms.EDProducer( "PATTriggerMatcherDRLessByR",
     src     = cms.InputTag( "cleanPatMuons" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( True ),
@@ -97,7 +97,7 @@ process.muonTriggerTestMatchL1CollectionMuons = cms.EDFilter( "PATTriggerMatcher
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
 )
-process.muonTriggerTestMatchNoMuons = cms.EDFilter( "PATTriggerMatcherDRLessByR",
+process.muonTriggerTestMatchNoMuons = cms.EDProducer( "PATTriggerMatcherDRLessByR",
     src     = cms.InputTag( "cleanPatMuons" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
@@ -111,7 +111,7 @@ process.muonTriggerTestMatchNoMuons = cms.EDFilter( "PATTriggerMatcherDRLessByR"
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
 )
-process.jetTriggerTestMatchHLTJet15U = cms.EDFilter( "PATTriggerMatcherDRLessByR",
+process.jetTriggerTestMatchHLTJet15U = cms.EDProducer( "PATTriggerMatcherDRLessByR",
     src     = cms.InputTag( "cleanPatJets" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
@@ -125,7 +125,7 @@ process.jetTriggerTestMatchHLTJet15U = cms.EDFilter( "PATTriggerMatcherDRLessByR
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
 )
-process.metTriggerTestMatchHLTMET45 = cms.EDFilter( "PATTriggerMatcherDRLessByR",
+process.metTriggerTestMatchHLTMET45 = cms.EDProducer( "PATTriggerMatcherDRLessByR",
     src     = cms.InputTag( "patMETs" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
@@ -139,7 +139,7 @@ process.metTriggerTestMatchHLTMET45 = cms.EDFilter( "PATTriggerMatcherDRLessByR"
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
 )
-process.metTriggerTestMatchHLTMu3 = cms.EDFilter( "PATTriggerMatcherDRLessByR",
+process.metTriggerTestMatchHLTMu3 = cms.EDProducer( "PATTriggerMatcherDRLessByR",
     src     = cms.InputTag( "patMETs" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
