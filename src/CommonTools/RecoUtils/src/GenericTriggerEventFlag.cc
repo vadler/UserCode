@@ -357,7 +357,7 @@ bool GenericTriggerEventFlag::acceptL1LogicalExpression( const edm::Event & even
     std::cout << "  GenericTriggerEventFlag: " << choice << " used" << std::endl; // DEBUG
     std::cout << "  GenericTriggerEventFlag: before/after " << l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) << "/" << l1Gt_.decisionAfterMask( event, l1AlgoName, error ) << std::endl; // DEBUG
     if ( l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) != l1Gt_.decisionAfterMask( event, l1AlgoName, error ) ) // DEBUG
-      std:: cout << "                           THEY DIFFER!!!" << std::endl; // DEBUG
+      std::cout << "                           THEY DIFFER!!!" << std::endl; // DEBUG
     // Error checks
     if ( error != 0 ) {
       if ( verbose_ > 2 ) {
