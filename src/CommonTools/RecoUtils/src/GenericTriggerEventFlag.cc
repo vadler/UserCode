@@ -21,6 +21,7 @@ GenericTriggerEventFlag::GenericTriggerEventFlag( const edm::ParameterSet & conf
   : watchDB_( 0 )
   , verbose_( 0 )
   , gtDBKey_( "" )
+  , l1BeforeMask_( true )
   , l1DBKey_( "" )
   , hltDBKey_( "" )
   , on_( true )
@@ -65,7 +66,8 @@ GenericTriggerEventFlag::GenericTriggerEventFlag( const edm::ParameterSet & conf
       andOrL1_              = config.getParameter< bool >( "andOrL1" );
       l1LogicalExpressions_ = config.getParameter< std::vector< std::string > >( "l1Algorithms" );
       errorReplyL1_         = config.getParameter< bool >( "errorReplyL1" );
-      if ( config.exists( "l1DBKey" ) ) l1DBKey_ = config.getParameter< std::string >( "l1DBKey" );
+      if ( config.exists( "l1DBKey" ) )      l1DBKey_      = config.getParameter< std::string >( "l1DBKey" );
+      if ( config.exists( "l1BeforeMask" ) ) l1BeforeMask_ = config.getParameter< bool >( "l1BeforeMask" );
     } else {
       onL1_ = false;
     }
@@ -350,7 +352,12 @@ bool GenericTriggerEventFlag::acceptL1LogicalExpression( const edm::Event & even
   for ( size_t iAlgorithm = 0; iAlgorithm < l1AlgoLogicParser.operandTokenVector().size(); ++iAlgorithm ) {
     const std::string l1AlgoName( l1AlgoLogicParser.operandTokenVector().at( iAlgorithm ).tokenName );
     int error( -1 );
-    const bool decision( l1Gt_.decision( event, l1AlgoName, error ) );
+    const bool decision( l1BeforeMask_ ? l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) : l1Gt_.decisionAfterMask( event, l1AlgoName, error ) );
+    const std::string choice( l1BeforeMask_ ? "before mask" : "after mask" ); // DEBUG
+    std::cout << "  GenericTriggerEventFlag: " << choice << " used" << std::endl; // DEBUG
+    std::cout << "  GenericTriggerEventFlag: before/after " << l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) << "/" << l1Gt_.decisionAfterMask( event, l1AlgoName, error ) << std::endl; // DEBUG
+    if ( l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) != l1Gt_.decisionAfterMask( event, l1AlgoName, error ) ) // DEBUG
+      std:: cout << "                           THEY DIFFER!!!" << std::endl; // DEBUG
     // Error checks
     if ( error != 0 ) {
       if ( verbose_ > 2 ) {
