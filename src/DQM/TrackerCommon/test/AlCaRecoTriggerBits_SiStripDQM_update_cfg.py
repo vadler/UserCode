@@ -47,7 +47,7 @@ process.maxEvents = cms.untracked.PSet(
 import CondCore.DBCommon.CondDBSetup_cfi
 process.PoolDBESSource = cms.ESSource( "PoolDBESSource"
 , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-, connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_1/output/AlCaRecoTriggerBits_SiStripDQM.db' )
+, connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/AlCaRecoTriggerBits_SiStripDQM.db' )
 , toGet   = cms.VPSet(
     cms.PSet(
       record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
@@ -57,9 +57,9 @@ process.PoolDBESSource = cms.ESSource( "PoolDBESSource"
 )
 process.PoolDBOutputService = cms.Service( "PoolDBOutputService"
 , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-, logconnect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_1/output/AlCaRecoTriggerBits_SiStripDQM_update_log.db' )
+, logconnect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/AlCaRecoTriggerBits_SiStripDQM_update_log.db' )
 , timetype   = cms.untracked.string( 'runnumber' )
-, connect    = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_6_1/output/AlCaRecoTriggerBits_SiStripDQM.db' )
+, connect    = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/AlCaRecoTriggerBits_SiStripDQM.db' )
 , toPut      = cms.VPSet(
     cms.PSet(
       record = cms.string( 'AlCaRecoTriggerBitsRcd' )
