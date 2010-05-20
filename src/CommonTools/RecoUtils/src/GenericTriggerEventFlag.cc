@@ -351,13 +351,14 @@ bool GenericTriggerEventFlag::acceptL1LogicalExpression( const edm::Event & even
   // Loop over algorithms
   for ( size_t iAlgorithm = 0; iAlgorithm < l1AlgoLogicParser.operandTokenVector().size(); ++iAlgorithm ) {
     const std::string l1AlgoName( l1AlgoLogicParser.operandTokenVector().at( iAlgorithm ).tokenName );
+    std::cout << "  GenericTriggerEventFlag: algo name " << l1AlgoName << std::endl; // DEBUG
     int error( -1 );
     const bool decision( l1BeforeMask_ ? l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) : l1Gt_.decisionAfterMask( event, l1AlgoName, error ) );
     const std::string choice( l1BeforeMask_ ? "before mask" : "after mask" ); // DEBUG
-    std::cout << "  GenericTriggerEventFlag: " << choice << " used" << std::endl; // DEBUG
-    std::cout << "  GenericTriggerEventFlag: before/after " << l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) << "/" << l1Gt_.decisionAfterMask( event, l1AlgoName, error ) << std::endl; // DEBUG
-    if ( l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) != l1Gt_.decisionAfterMask( event, l1AlgoName, error ) ) // DEBUG
-      std::cout << "                           THEY DIFFER!!!" << std::endl; // DEBUG
+    std::cout << "  GenericTriggerEventFlag: " << choice << std::endl; // DEBUG
+    if ( l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) != l1Gt_.decisionAfterMask( event, l1AlgoName, error ) ) { // DEBUG
+      std::cout << "  GenericTriggerEventFlag: before/after " << l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) << "/" << l1Gt_.decisionAfterMask( event, l1AlgoName, error ) << " differ" << std::endl; // DEBUG
+    } // DEBUG
     // Error checks
     if ( error != 0 ) {
       if ( verbose_ > 2 ) {
@@ -368,7 +369,7 @@ bool GenericTriggerEventFlag::acceptL1LogicalExpression( const edm::Event & even
       continue;
     }
     // Manipulate algo decision as stored in the parser
-    std::cout << "  GenericTriggerEventFlag: algo name " << l1AlgoName << " -> " << decision << std::endl; // DEBUG
+    std::cout << "  GenericTriggerEventFlag: decision " << decision << std::endl; // DEBUG
     l1AlgoLogicParser.operandTokenVector().at( iAlgorithm ).tokenResult = decision;
   }
 
