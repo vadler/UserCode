@@ -46,13 +46,13 @@ import CondCore.DBCommon.CondDBSetup_cfi
 # CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup.DBParameters.messageLevel = cms.untracked.int32( 3 )
 process.PoolDBOutputService = cms.Service( "PoolDBOutputService"
 , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-, logconnect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/AlCaRecoTriggerBits_SiStripDQM_create_log.db' )
+# , logconnect = cms.untracked.string( 'sqlite_file:AlCaRecoTriggerBits_SiStripDQM_create_log.db' )
 , timetype = cms.untracked.string( 'runnumber' )
-, connect  = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/AlCaRecoTriggerBits_SiStripDQM.db' )
+, connect  = cms.string( 'sqlite_file:AlCaRecoTriggerBits_SiStripDQM.db' )
 , toPut    = cms.VPSet(
     cms.PSet(
       record = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v1_express' )
+    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_test' )
     )
   )
 )

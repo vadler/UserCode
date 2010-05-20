@@ -31,19 +31,19 @@ process.dqmXmlFileTest = cms.EDAnalyzer( "DQMXMLFilePopConAnalyzer"
 )
 
 process.load( "CondCore.DBCommon.CondDBCommon_cfi" )
-process.CondDBCommon.connect          = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/DQMXMLFile_SiStripDQM.db' )
+process.CondDBCommon.connect          = cms.string( 'sqlite_file:DQMXMLFile_SiStripDQM.db' )
 process.CondDBCommon.BlobStreamerName = cms.untracked.string( 'TBufferBlobStreamingService' )
 process.CondDBCommon.DBParameters.authenticationPath = cms.untracked.string( '' )
 # process.CondDBCommon.DBParameters.messageLevel       = cms.untracked.int32( 3 )
 
 process.PoolDBOutputService = cms.Service( "PoolDBOutputService"
 , process.CondDBCommon
-, logconnect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/DQMXMLFile_SiStripDQM_create_log.db' )
+, logconnect = cms.untracked.string( 'sqlite_file:DQMXMLFile_SiStripDQM_create_log.db' )
 , timetype   = cms.untracked.string( 'runnumber' )
 , toPut      = cms.VPSet(
     cms.PSet(
       record = cms.string( 'FileBlob' )
-    , tag    = cms.string( 'DQMXMLFile_SiStripDQM_v0_express' )
+    , tag    = cms.string( 'DQMXMLFile_SiStripDQM_v0_test' )
     )
   )
 )
