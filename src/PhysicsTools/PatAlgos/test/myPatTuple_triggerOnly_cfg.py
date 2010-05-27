@@ -54,7 +54,7 @@ process.patTrigger.hltPrescaleLabel = cms.string( '1E28' )
 # process.patTrigger.hltPrescaleLabel = cms.string( 'Cosmics' )
 process.patTrigger.hltPrescaleTable = cms.string( 'hltPrescaleRecorder' )
 process.patTriggerEvent.processName       = 'HLT1E31'
-# process.patTriggerEvent.l1GtTag           = cms.InputTag( 'hltGtDigis' )
+process.patTriggerEvent.l1GtTag           = cms.InputTag( 'hltGtDigis' )
 process.patTriggerEvent.patTriggerMatches = []
 process.p = cms.Path(
 #   process.hltLevel1GTSeed
