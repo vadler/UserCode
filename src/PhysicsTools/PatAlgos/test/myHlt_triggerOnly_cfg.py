@@ -1500,7 +1500,8 @@ process.trajFilterL3 = cms.ESProducer( "TrajectoryFilterESProducer",
 process.trajectoryCleanerBySharedHits = cms.ESProducer( "TrajectoryCleanerESProducer",
   ComponentName = cms.string( "TrajectoryCleanerBySharedHits" ),
   appendToDataLabel = cms.string( "" ),
-  fractionShared = cms.double( 0.5 )
+  fractionShared = cms.double( 0.5 ),
+  allowSharedFirstHit = cms.bool( False )
 )
 
 # DEBUG process.DQM = cms.Service( "DQM",
@@ -9036,7 +9037,7 @@ process.hltTrigReport = cms.EDAnalyzer( "HLTrigReport",
 
 process.hltOutputA = cms.OutputModule( "PoolOutputModule",
 # DEBUG     fileName = cms.untracked.string( "outputA.root" ),
-    fileName = cms.untracked.string( "/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_0_pre4/output/myHlt_triggerOnly.root" ), # DEBUG
+    fileName = cms.untracked.string( "/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_0_pre5/output/myHlt_triggerOnly.root" ), # DEBUG
     SelectEvents = cms.untracked.PSet(  SelectEvents = cms.vstring( 'HLT_MET60',
   'HLT_Mu11',
   'HLT_Mu15',
@@ -9144,6 +9145,7 @@ process.hltOutputA = cms.OutputModule( "PoolOutputModule",
       'keep edmTriggerResults_*_*_*',
       'keep triggerTriggerEvent_*_*_*',
       'keep *_hltPrescaleRecorder_*_*', # DEBUG
+      'keep L1GlobalTriggerReadoutRecord_*_*_*', # DEBUG
       'keep *_hltL1GtObjectMap_*_*' )
 )
 process.hltOutputCalibration = cms.OutputModule( "PoolOutputModule",
