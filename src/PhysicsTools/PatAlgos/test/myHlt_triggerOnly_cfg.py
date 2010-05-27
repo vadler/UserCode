@@ -275,7 +275,7 @@ process.GlobalTag = cms.ESSource( "PoolDBESSource",
     connect = cms.string( "frontier://(proxyurl=http://localhost:3128)(serverurl=http://localhost:8000/FrontierOnProd)(serverurl=http://localhost:8000/FrontierOnProd)(retrieve-ziplevel=0)/CMS_COND_31X_GLOBALTAG" ),
     DumpStat = cms.untracked.bool( False ),
     BlobStreamerName = cms.untracked.string( "TBufferBlobStreamingService" ),
-    globaltag = cms.string( "GR10_36XH_V5::All" ),
+    globaltag = cms.string( "GR10_36XH_V6A::All" ),
     DBParameters = cms.PSet(
       authenticationPath = cms.untracked.string( "." ),
       connectionRetrialPeriod = cms.untracked.int32( 10 ),
@@ -5251,11 +5251,57 @@ process.hltL1NonIsoHLTNonIsoSingleElectronSiStripEt15HcalIsolFilter = cms.EDFilt
 )
 process.hltL1IsoSiStripElectronPixelSeeds = cms.EDProducer( "SiStripElectronSeedProducer",
     barrelSuperClusters = cms.InputTag( "hltCorrectedHybridSuperClustersL1Isolated" ),
-    endcapSuperClusters = cms.InputTag( "hltCorrectedMulti5x5EndcapSuperClustersWithPreshowerL1Isolated" )
+    endcapSuperClusters = cms.InputTag( "hltCorrectedMulti5x5EndcapSuperClustersWithPreshowerL1Isolated" ),
+    SeedConfiguration = cms.PSet(
+      beamSpot = cms.InputTag( "hltOfflineBeamSpot" ),
+      tibOriginZCut = cms.double( 20.0 ),
+      tidOriginZCut = cms.double( 20.0 ),
+      tecOriginZCut = cms.double( 20.0 ),
+      monoOriginZCut = cms.double( 20.0 ),
+      tibDeltaPsiCut = cms.double( 0.1 ),
+      tidDeltaPsiCut = cms.double( 0.1 ),
+      tecDeltaPsiCut = cms.double( 0.1 ),
+      monoDeltaPsiCut = cms.double( 0.1 ),
+      tibPhiMissHit2Cut = cms.double( 0.0060 ),
+      tidPhiMissHit2Cut = cms.double( 0.0060 ),
+      tecPhiMissHit2Cut = cms.double( 0.0070 ),
+      monoPhiMissHit2Cut = cms.double( 0.02 ),
+      tibZMissHit2Cut = cms.double( 0.35 ),
+      tidRMissHit2Cut = cms.double( 0.3 ),
+      tecRMissHit2Cut = cms.double( 0.3 ),
+      tidEtaUsage = cms.double( 1.2 ),
+      tidMaxHits = cms.int32( 4 ),
+      tecMaxHits = cms.int32( 2 ),
+      monoMaxHits = cms.int32( 4 ),
+      maxSeeds = cms.int32( 5 )
+    )
 )
 process.hltL1NonIsoSiStripElectronPixelSeeds = cms.EDProducer( "SiStripElectronSeedProducer",
     barrelSuperClusters = cms.InputTag( "hltCorrectedHybridSuperClustersL1NonIsolated" ),
-    endcapSuperClusters = cms.InputTag( "hltCorrectedMulti5x5EndcapSuperClustersWithPreshowerL1NonIsolated" )
+    endcapSuperClusters = cms.InputTag( "hltCorrectedMulti5x5EndcapSuperClustersWithPreshowerL1NonIsolated" ),
+    SeedConfiguration = cms.PSet(
+      beamSpot = cms.InputTag( "hltOfflineBeamSpot" ),
+      tibOriginZCut = cms.double( 20.0 ),
+      tidOriginZCut = cms.double( 20.0 ),
+      tecOriginZCut = cms.double( 20.0 ),
+      monoOriginZCut = cms.double( 20.0 ),
+      tibDeltaPsiCut = cms.double( 0.1 ),
+      tidDeltaPsiCut = cms.double( 0.1 ),
+      tecDeltaPsiCut = cms.double( 0.1 ),
+      monoDeltaPsiCut = cms.double( 0.1 ),
+      tibPhiMissHit2Cut = cms.double( 0.0060 ),
+      tidPhiMissHit2Cut = cms.double( 0.0060 ),
+      tecPhiMissHit2Cut = cms.double( 0.0070 ),
+      monoPhiMissHit2Cut = cms.double( 0.02 ),
+      tibZMissHit2Cut = cms.double( 0.35 ),
+      tidRMissHit2Cut = cms.double( 0.3 ),
+      tecRMissHit2Cut = cms.double( 0.3 ),
+      tidEtaUsage = cms.double( 1.2 ),
+      tidMaxHits = cms.int32( 4 ),
+      tecMaxHits = cms.int32( 2 ),
+      monoMaxHits = cms.int32( 4 ),
+      maxSeeds = cms.int32( 5 )
+    )
 )
 process.hltL1NonIsoHLTNonIsoSingleElectronSiStripEt15PixelMatchFilter = cms.EDFilter( "HLTElectronPixelMatchFilter",
     candTag = cms.InputTag( "hltL1NonIsoHLTNonIsoSingleElectronSiStripEt15HcalIsolFilter" ),
@@ -5643,6 +5689,7 @@ process.hltL1NonIsoDoubleElectronEt5JpsiPixelMatchFilter = cms.EDFilter( "HLTEle
 )
 process.hltL1NonIsoDoubleElectronEt5JpsiPMMassFilter = cms.EDFilter( "HLTPMMassFilter",
     candTag = cms.InputTag( "hltL1NonIsoDoubleElectronEt5JpsiPixelMatchFilter" ),
+    beamSpot = cms.InputTag( "hltOfflineBeamSpot" ),
     lowerMassCut = cms.double( 2.0 ),
     upperMassCut = cms.double( 4.6 ),
     nZcandcut = cms.int32( 1 ),
@@ -5739,6 +5786,7 @@ process.hltL1NonIsoDoubleElectronEt5UpsPixelMatchFilter = cms.EDFilter( "HLTElec
 )
 process.hltL1NonIsoDoubleElectronEt5UpsPMMassFilter = cms.EDFilter( "HLTPMMassFilter",
     candTag = cms.InputTag( "hltL1NonIsoDoubleElectronEt5UpsPixelMatchFilter" ),
+    beamSpot = cms.InputTag( "hltOfflineBeamSpot" ),
     lowerMassCut = cms.double( 8.0 ),
     upperMassCut = cms.double( 11.0 ),
     nZcandcut = cms.int32( 1 ),
