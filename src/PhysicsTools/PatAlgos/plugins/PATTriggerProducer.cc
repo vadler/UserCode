@@ -243,8 +243,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if ( hltConfig_.prescaleSet( iEvent, iSetup ) != -1 ) {
           hltPrescaleTable = trigger::HLTPrescaleTable( hltConfig_.prescaleSet( iEvent, iSetup ), hltConfig_.prescaleLabels(), hltConfig_.prescaleTable() );
           tableFromSetup = true; // DEBUG
-        } else { // DEBUG
-          std::cout << "HLTPrescaleTable from event setup has error" << std::endl; // DEBUG
+        } else {
+          LogWarning( "hltPrescaleSet" ) << "HLTPrescaleTable from event setup has error";
         }
       } else { // DEBUG
         std::cout << "produce(): HLTPrescaleTable not found in event setup" << std::endl; // DEBUG
