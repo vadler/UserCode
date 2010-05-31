@@ -25,7 +25,7 @@ process.SiStripDQMUpdate = cms.EDAnalyzer( "AlCaRecoTriggerBitsRcdUpdate"
     , hltPaths = cms.vstring(
 #         'L1Tech_BPTX_plus_AND_minus.v0'                                        # 0
 #       , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0' # 40 OR 41
-      , 'L1Tech_BSC_minBias_threshold2.v0'                                     # 41
+        'L1Tech_BSC_minBias_threshold2.v0'                                     # 41
       , 'NOT L1Tech_BSC_halo_beam2_inner.v0'                                   # NOT 36
       , 'NOT L1Tech_BSC_halo_beam2_outer.v0'                                   # NOT 37
       , 'NOT L1Tech_BSC_halo_beam1_inner.v0'                                   # NOT 38
@@ -45,25 +45,26 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 import CondCore.DBCommon.CondDBSetup_cfi
+# CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup.DBParameters.messageLevel = cms.untracked.int32( 3 )
 process.PoolDBESSource = cms.ESSource( "PoolDBESSource"
 , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-, connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/AlCaRecoTriggerBits_SiStripDQM.db' )
+, connect = cms.string( 'sqlite_file:AlCaRecoTriggerBits_SiStripDQM.db' )
 , toGet   = cms.VPSet(
     cms.PSet(
       record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v1_express' )
+    , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_test' )
     )
   )
 )
 process.PoolDBOutputService = cms.Service( "PoolDBOutputService"
 , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-, logconnect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/AlCaRecoTriggerBits_SiStripDQM_update_log.db' )
+# , logconnect = cms.untracked.string( 'sqlite_file:AlCaRecoTriggerBits_SiStripDQM_update_log.db' )
 , timetype   = cms.untracked.string( 'runnumber' )
-, connect    = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/AlCaRecoTriggerBits_SiStripDQM.db' )
+, connect    = cms.string( 'sqlite_file:AlCaRecoTriggerBits_SiStripDQM.db' )
 , toPut      = cms.VPSet(
     cms.PSet(
       record = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v1_express' )
+    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_test' )
     )
   )
 )

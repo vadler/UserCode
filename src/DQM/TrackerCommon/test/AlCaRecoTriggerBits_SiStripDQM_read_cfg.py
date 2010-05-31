@@ -14,7 +14,7 @@ process.MessageLogger.cout = cms.untracked.PSet(
 
 process.SiStripDQMRead = cms.EDAnalyzer( "AlCaRecoTriggerBitsRcdRead"
 , outputType  = cms.untracked.string( 'text' )
-, rawFileName = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/AlCaRecoTriggerBits_SiStripDQM' )
+, rawFileName = cms.untracked.string( 'AlCaRecoTriggerBits_SiStripDQM' )
 )
 
 process.source = cms.Source( "EmptySource"
@@ -28,11 +28,11 @@ process.maxEvents = cms.untracked.PSet(
 import CondCore.DBCommon.CondDBSetup_cfi
 process.dbInput = cms.ESSource( "PoolDBESSource"
 , CondCore.DBCommon.CondDBSetup_cfi.CondDBSetup
-, connect = cms.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/scratch0/cms/SiStripDQM/CMSSW_3_7_0_pre5/output/AlCaRecoTriggerBits_SiStripDQM.db' )
+, connect = cms.string( 'sqlite_file:AlCaRecoTriggerBits_SiStripDQM.db' )
 , toGet   = cms.VPSet(
     cms.PSet(
       record = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v1_express' )
+    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_test' )
     )
   )
 )
