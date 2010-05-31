@@ -22,6 +22,7 @@ process.maxEvents = cms.untracked.PSet(
 process.physDecl = cms.EDFilter( "PhysDecl"
 , applyfilter = cms.untracked.bool( True )
 )
+process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskAlgoTrigConfig_cff" )
 process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff" )
 process.load( "HLTrigger.HLTfilters.hltLevel1GTSeed_cfi" )
 process.hltLevel1GTSeed.L1TechTriggerSeeding     = cms.bool( True )
