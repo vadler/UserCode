@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.16 2010/05/18 12:33:28 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.29 2010/05/31 18:40:42 vadler Exp $
 //
 
 
@@ -218,7 +218,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     // Extract pre-scales
     // Start from lumi
     trigger::HLTPrescaleTable hltPrescaleTable( hltPrescaleTableLumi_.set(), hltPrescaleTableLumi_.labels(), hltPrescaleTableLumi_.table() );
-    bool tableUpdated( false );
     // Try event product, if configured and available
     if ( ! labelHltPrescaleTable_.empty() ) {
       Handle< trigger::HLTPrescaleTable > handleHltPrescaleTable;
