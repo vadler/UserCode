@@ -233,7 +233,8 @@ process.patTriggerTestSequence = cms.Sequence(
 )
 process.patDefaultSequence += process.patTriggerTestSequence
 process.out.outputCommands += [
-  'keep patTriggerObjects_patTrigger_*_*'
+  'keep patTriggerAlgorithms_patTrigger_*_*'
+, 'keep patTriggerObjects_patTrigger_*_*'
 , 'keep patTriggerFilters_patTrigger_*_*'
 , 'keep patTriggerPaths_patTrigger_*_*'
 , 'keep patTriggerEvent_patTriggerEventTest_*_*'
