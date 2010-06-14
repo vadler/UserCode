@@ -55,7 +55,7 @@ typedef reco::PhysObjectMatcher<
                         pat::TriggerObjectStandAloneCollection >
 > PATTriggerMatcherDRDPtLessByPt;
 
-/// Match by deltaR, ranking by deltaR (default)                                                                                                                                                               
+/// Match by deltaEta, ranking by deltaR
 typedef reco::PhysObjectMatcher<
   reco::CandidateView,
   pat::TriggerObjectStandAloneCollection,
@@ -65,17 +65,16 @@ typedef reco::PhysObjectMatcher<
                       pat::TriggerObjectStandAloneCollection::value_type >
 > PATTriggerMatcherDEtaLessByDR;
 
-
-/// Match by deltaEta
+/// Match by deltaEta, ranking by deltaEta
 typedef reco::PhysObjectMatcher<
   reco::CandidateView,
   pat::TriggerObjectStandAloneCollection,
-  pat::PATTriggerMatchSelector<reco::CandidateView::value_type,
-                               pat::TriggerObjectStandAloneCollection::value_type >,
+  pat::PATTriggerMatchSelector< reco::CandidateView::value_type,
+                                pat::TriggerObjectStandAloneCollection::value_type >,
   reco::MatchByDEta< reco::CandidateView::value_type,
-                      pat::TriggerObjectStandAloneCollection::value_type  >,
+                     pat::TriggerObjectStandAloneCollection::value_type >,
   reco::MatchLessByDEta< reco::CandidateView,
-                        pat::TriggerObjectStandAloneCollection >
+                         pat::TriggerObjectStandAloneCollection >
 > PATTriggerMatcherDEtaLessByDEta;
 
 

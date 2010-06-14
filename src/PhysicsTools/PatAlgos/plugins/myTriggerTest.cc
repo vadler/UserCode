@@ -3,7 +3,7 @@
 // Package:    PatAlgos
 // Class:      pat::myTriggerTest
 //
-// $Id: myTriggerTest.cc,v 1.14 2010/02/25 15:23:07 vadler Exp $
+// $Id: myTriggerTest.cc,v 1.15 2010/02/28 13:37:09 vadler Exp $
 //
 /**
   \class myTriggerTest myTriggerTest.cc "PhysicsTools/myTriggerTest/plugins/myTriggerTest.cc"
@@ -12,7 +12,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id: myTriggerTest.cc,v 1.14 2010/02/25 15:23:07 vadler Exp $
+  \version  $Id: myTriggerTest.cc,v 1.15 2010/02/28 13:37:09 vadler Exp $
  */
 
 
@@ -192,6 +192,9 @@ void myTriggerTest::beginJob()
   histos1D_[ "objectIds" ] = fileService->make< TH1D >( "objectIds", "Object IDs per filter", 201, -100.5, 100.5 );
   histos1D_[ "objectIds" ]->SetXTitle( "object IDs" );
   histos1D_[ "objectIds" ]->SetYTitle( "entries" );
+  histos1D_[ "objectHasLastFilters" ] = fileService->make< TH1D >( "objectHasLastFilters", "Object has last filter info", 2, -0.5, 1.5 );
+  histos1D_[ "objectHasLastFilters" ]->SetXTitle( "last filters available" );
+  histos1D_[ "objectHasLastFilters" ]->SetYTitle( "entries" );
   histos2D_[ "nObjectIdsKeys" ] = fileService->make< TH2D >( "nObjectIdsKeys", "Number of trigger object IDs vs. number of trigger object keys per trigger filter", 6, -0.5, 5.5, 6, -0.5, 5.5 );
   histos2D_[ "nObjectIdsKeys" ]->SetXTitle( "object keys" );
   histos2D_[ "nObjectIdsKeys" ]->SetYTitle( "object IDs" );
@@ -333,6 +336,10 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
   }
 
   // pat::TriggerObjectStandAlone
+
+  for ( TriggerObjectStandAloneCollection::const_iterator iObject = handlePatTriggerObjectsStandAlone->begin(); iObject != handlePatTriggerObjectsStandAlone->end(); ++iObject ) {
+    histos1D_[ "objectHasLastFilters" ]->Fill( iObject->hasPathLastFilterAccepted() );
+  }
 
   // pat::TriggerFilter
 
