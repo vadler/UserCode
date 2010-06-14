@@ -235,7 +235,6 @@ patTriggerMatcherElectron = cms.Sequence(
 )
 patTriggerMatcherMuon = cms.Sequence(
   muonTriggerMatchL1Muon
-+ muonTriggerMatchL1MuonNotSel
 + muonTriggerMatchHLTIsoMu3
 + muonTriggerMatchHLTMu3
 + muonTriggerMatchHLTDoubleMu3
