@@ -30,24 +30,6 @@ muonTriggerMatchL1Muon = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR"
 , resolveAmbiguities    = cms.bool( True )
 , resolveByMatchQuality = cms.bool( False )
 )
-muonTriggerMatchL1MuonNotSel = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR"
-, src     = cms.InputTag( "cleanPatMuons" )
-, matched = cms.InputTag( "patTrigger" )
-, andOr          = cms.bool( False )
-, filterIdsEnum  = cms.vstring(
-    'TriggerL1Mu'
-  , 'TriggerMuon'
-  )
-, filterIds      = cms.vint32( 0 )
-, filterLabels   = cms.vstring( '*' )
-, pathNames      = cms.vstring( '*' )
-, pathLastFilterAcceptedOnly = cms.bool( False )
-, collectionTags = cms.vstring( '*' )
-, maxDPtRel = cms.double( 0.5 )
-, maxDeltaR = cms.double( 0.5 )
-, resolveAmbiguities    = cms.bool( True )
-, resolveByMatchQuality = cms.bool( False )
-)
 
 
 ## PAT Tuple (modified), HLT 8E29 (start-up) ##
@@ -63,6 +45,7 @@ muonTriggerMatchHLTIsoMu3 = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR"
 , pathNames      = cms.vstring(
     'HLT_IsoMu3'
   )
+# , pathLastFilterAcceptedOnly = cms.bool( True )
 , collectionTags = cms.vstring( '*' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
@@ -81,6 +64,7 @@ muonTriggerMatchHLTMu3 = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR"
 , pathNames      = cms.vstring(
     'HLT_Mu3'
   )
+# , pathLastFilterAcceptedOnly = cms.bool( True )
 , collectionTags = cms.vstring( '*' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
@@ -99,6 +83,7 @@ muonTriggerMatchHLTMu3 = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR"
 # , pathNames      = cms.vstring(
 #     'HLT_DoubleIsoMu3'
 #   )
+# # , pathLastFilterAcceptedOnly = cms.bool( True )
 # , collectionTags = cms.vstring( '*' )
 # , maxDPtRel = cms.double( 0.5 )
 # , maxDeltaR = cms.double( 0.5 )
@@ -117,6 +102,7 @@ muonTriggerMatchHLTDoubleMu3 = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR"
 , pathNames      = cms.vstring(
     'HLT_DoubleMu3'
   )
+# , pathLastFilterAcceptedOnly = cms.bool( True )
 , collectionTags = cms.vstring( '*' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
@@ -135,6 +121,7 @@ muonTriggerMatchHLTDoubleMu3 = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR"
 # , pathNames      = cms.vstring(
 #     'HLT_IsoEle15_LW_L1I'
 #   )
+# # , pathLastFilterAcceptedOnly = cms.bool( True )
 # , collectionTags = cms.vstring( '*' )
 # , maxDPtRel = cms.double( 0.5 )
 # , maxDeltaR = cms.double( 0.5 )
@@ -153,6 +140,7 @@ electronTriggerMatchHLTEle15LWL1R = cms.EDProducer( "PATTriggerMatcherDRDPtLessB
 , pathNames      = cms.vstring(
     'HLT_Ele15_LW_L1R'
   )
+# , pathLastFilterAcceptedOnly = cms.bool( True )
 , collectionTags = cms.vstring( '*' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
@@ -171,6 +159,7 @@ electronTriggerMatchHLTEle15LWL1R = cms.EDProducer( "PATTriggerMatcherDRDPtLessB
 # , pathNames      = cms.vstring(
 #     'HLT_DoubleIsoEle10_LW_L1I'
 #   )
+# # , pathLastFilterAcceptedOnly = cms.bool( True )
 # , collectionTags = cms.vstring( '*' )
 # , maxDPtRel = cms.double( 0.5 )
 # , maxDeltaR = cms.double( 0.5 )
@@ -189,6 +178,7 @@ electronTriggerMatchHLTDoubleEle5SWL1R = cms.EDProducer( "PATTriggerMatcherDRDPt
 , pathNames      = cms.vstring(
     'HLT_DoubleEle5_SW_L1R'
   )
+# , pathLastFilterAcceptedOnly = cms.bool( True )
 , collectionTags = cms.vstring( '*' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
@@ -207,6 +197,7 @@ electronTriggerMatchHLTDoubleEle5SWL1R = cms.EDProducer( "PATTriggerMatcherDRDPt
 # , pathNames      = cms.vstring(
 #     'HLT_LooseIsoTau_MET30_L1MET'
 #   )
+# # , pathLastFilterAcceptedOnly = cms.bool( True )
 # , collectionTags = cms.vstring( '*' )
 # , maxDPtRel = cms.double( 0.5 )
 # , maxDeltaR = cms.double( 0.5 )
@@ -225,6 +216,7 @@ tauTriggerMatchHLTDoubleLooseIsoTau15 = cms.EDProducer( "PATTriggerMatcherDRDPtL
 , pathNames      = cms.vstring(
     'HLT_DoubleLooseIsoTau15'
   )
+# , pathLastFilterAcceptedOnly = cms.bool( True )
 , collectionTags = cms.vstring( '*' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
