@@ -21,7 +21,6 @@ cleanPatMuonsTriggerMatch = cms.EDProducer( "PATTriggerMatchMuonEmbedder"
 , src     = cms.InputTag( "cleanPatMuons" )
 , matches = cms.VInputTag(
     "muonTriggerMatchL1Muon"
-  , "muonTriggerMatchL1MuonNotSel"
   , "muonTriggerMatchHLTIsoMu3"
   , "muonTriggerMatchHLTMu3"
   , "muonTriggerMatchHLTDoubleMu3"
