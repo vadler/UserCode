@@ -17,7 +17,11 @@ process.source = cms.Source( "PoolSource"
     '/store/data/Run2010A/MinimumBias/RECO/v2/000/136/441/48CD034A-2D6B-DF11-9CFE-0030487CD718.root'
 #     # RAW (needs process.gtDigis in the path)
 #     '/store/data/Run2010A/MinimumBias/RAW/v1/000/136/441/3CC638F4-1F6B-DF11-8067-00304879BAB2.root'
+#     # from pre-scale flip test
+#     '/store/data/Run2010A/HeavyIonTest/RAW/v1/000/137/572/925B3DB3-5C75-DF11-ADCD-001D09F25456.root'
+#   , '/store/data/Run2010A/HeavyIonTest/RAW/v1/000/137/572/7C02241A-6A75-DF11-9921-0030487C635A.root'
   )
+# , skipEvents = cms.untracked.uint32( 70000 )
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 1 )

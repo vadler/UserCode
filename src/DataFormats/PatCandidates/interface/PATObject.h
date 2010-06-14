@@ -76,10 +76,10 @@ namespace pat {
       const TriggerObjectStandAloneCollection   triggerObjectMatchesByFilter( const char        * labelFilter ) const;
       const TriggerObjectStandAlone           * triggerObjectMatchByFilter( const std::string & labelFilter, const size_t idx = 0 ) const;
       const TriggerObjectStandAlone           * triggerObjectMatchByFilter( const char        * labelFilter, const size_t idx = 0 ) const;
-      const TriggerObjectStandAloneCollection   triggerObjectMatchesByPath( const std::string & namePath ) const;
-      const TriggerObjectStandAloneCollection   triggerObjectMatchesByPath( const char        * namePath ) const;
-      const TriggerObjectStandAlone           * triggerObjectMatchByPath( const std::string & namePath, const size_t idx = 0 ) const;
-      const TriggerObjectStandAlone           * triggerObjectMatchByPath( const char        * namePath, const size_t idx = 0 ) const;
+      const TriggerObjectStandAloneCollection   triggerObjectMatchesByPath( const std::string & namePath, const bool pathLastFilterAccepted = true ) const;
+      const TriggerObjectStandAloneCollection   triggerObjectMatchesByPath( const char        * namePath, const bool pathLastFilterAccepted = true ) const;
+      const TriggerObjectStandAlone           * triggerObjectMatchByPath( const std::string & namePath, const bool pathLastFilterAccepted = true, const size_t idx = 0 ) const;
+      const TriggerObjectStandAlone           * triggerObjectMatchByPath( const char        * namePath, const bool pathLastFilterAccepted = true, const size_t idx = 0 ) const;
       /// add a trigger match
       void addTriggerObjectMatch( const TriggerObjectStandAlone & trigObj );
 
@@ -449,31 +449,31 @@ namespace pat {
   }
 
   template <class ObjectType>
-  const TriggerObjectStandAloneCollection PATObject<ObjectType>::triggerObjectMatchesByPath( const std::string & namePath ) const {
+  const TriggerObjectStandAloneCollection PATObject<ObjectType>::triggerObjectMatchesByPath( const std::string & namePath, const bool pathLastFilterAccepted ) const {
     TriggerObjectStandAloneCollection matches;
     for ( size_t i = 0; i < triggerObjectMatches().size(); ++i ) {
-      if ( triggerObjectMatch( i ) != 0 && triggerObjectMatch( i )->hasPathName( namePath ) ) matches.push_back( *( triggerObjectMatch( i ) ) );
+      if ( triggerObjectMatch( i ) != 0 && triggerObjectMatch( i )->hasPathName( namePath, pathLastFilterAccepted ) ) matches.push_back( *( triggerObjectMatch( i ) ) );
     }
     return matches;
   }
   template <class ObjectType>
-  const TriggerObjectStandAloneCollection PATObject<ObjectType>::triggerObjectMatchesByPath( const char * namePath ) const {
-    return triggerObjectMatchesByPath( std::string( namePath ) );
+  const TriggerObjectStandAloneCollection PATObject<ObjectType>::triggerObjectMatchesByPath( const char * namePath, const bool pathLastFilterAccepted ) const {
+    return triggerObjectMatchesByPath( std::string( namePath, pathLastFilterAccepted ) );
   }
 
   template <class ObjectType>
-  const TriggerObjectStandAlone * PATObject<ObjectType>::triggerObjectMatchByPath( const std::string & namePath, const size_t idx ) const {
+  const TriggerObjectStandAlone * PATObject<ObjectType>::triggerObjectMatchByPath( const std::string & namePath, const bool pathLastFilterAccepted, const size_t idx ) const {
     std::vector< size_t > refs;
     for ( size_t i = 0; i < triggerObjectMatches().size(); ++i ) {
-      if ( triggerObjectMatch( i ) != 0 && triggerObjectMatch( i )->hasPathName( namePath ) ) refs.push_back( i );
+      if ( triggerObjectMatch( i ) != 0 && triggerObjectMatch( i )->hasPathName( namePath, pathLastFilterAccepted ) ) refs.push_back( i );
     }
     if ( idx >= refs.size() ) return 0;
     TriggerObjectStandAloneRef ref( &triggerObjectMatchesEmbedded_, refs.at( idx ) );
     return ref.isNonnull() ? ref.get() : 0;
   }
   template <class ObjectType>
-  const TriggerObjectStandAlone * PATObject<ObjectType>::triggerObjectMatchByPath( const char * namePath, const size_t idx ) const {
-    return triggerObjectMatchByPath( std::string( namePath ), idx );
+  const TriggerObjectStandAlone * PATObject<ObjectType>::triggerObjectMatchByPath( const char * namePath, const bool pathLastFilterAccepted, const size_t idx ) const {
+    return triggerObjectMatchByPath( std::string( namePath, pathLastFilterAccepted ), idx );
   }
 
   template <class ObjectType>
