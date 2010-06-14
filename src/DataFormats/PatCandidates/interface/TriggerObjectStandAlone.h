@@ -54,6 +54,7 @@ namespace pat {
       std::vector< std::string > pathNames( bool pathLastFilterAccepted = false ) const;
       bool                       hasFilterLabel( const std::string & filterLabel ) const;
       bool                       hasPathName( const std::string & pathName, bool pathLastFilterAccepted = false ) const;
+      bool                       hasPathLastFilterAccepted() const { return ( pathLastFilterAccepted_.size() > 0 && pathLastFilterAccepted_.size() == pathNames_.size() );  };
       TriggerObject              triggerObject(); // returns "pure" pat::TriggerObject w/o add-on
 
   };

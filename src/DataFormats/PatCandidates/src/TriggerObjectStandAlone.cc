@@ -20,7 +20,7 @@ void TriggerObjectStandAlone::addPathName( const std::string & pathName, bool pa
 
 std::vector< std::string > TriggerObjectStandAlone::pathNames( bool pathLastFilterAccepted ) const
 {
-  if ( ! pathLastFilterAccepted ) return pathNames_;
+  if ( ! pathLastFilterAccepted || ! hasPathLastFilterAccepted() ) return pathNames_;
   std::vector< std::string > paths;
   for ( unsigned iPath = 0; iPath < pathNames_.size(); ++iPath ) {
     if ( pathLastFilterAccepted_.at( iPath ) ) paths.push_back( pathNames_.at( iPath ) );
