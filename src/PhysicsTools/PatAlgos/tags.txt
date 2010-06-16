@@ -3,10 +3,11 @@ Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw-patch/CMSSW_3_7_
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_0_patch1
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        B3_7_X         V05-09-18      
-PhysicsTools/PatAlgos                            B3_7_X         V07-13-23      
+PhysicsTools/PatAlgos                            NoTag          V07-13-23      
 PhysicsTools/PatExamples                         NoTag          V00-03-09-00   
+RecoJets/JetProducers                            V05-01-00      V04-03-05      
 RecoMET/Configuration                            V00-06-25      V00-06-23      
 RecoMET/METAlgorithms                            V03-01-17      V03-01-15      
 RecoMET/METProducers                             V03-01-33      V03-01-31      
 ---------------------------------------
-total packages: 6 (6 displayed)
+total packages: 7 (7 displayed)
