@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerEventProducer.cc,v 1.9 2010/04/21 10:04:14 vadler Exp $
+// $Id: PATTriggerEventProducer.cc,v 1.10 2010/06/16 15:40:53 vadler Exp $
 //
 
 
@@ -142,11 +142,9 @@ void PATTriggerEventProducer::produce( Event& iEvent, const EventSetup& iSetup )
       }
       AssociativeIterator< reco::CandidateBaseRef, TriggerObjectStandAloneMatch > it( *handleTriggerObjectStandAloneMatch, EdmEventItemGetter< reco::CandidateBaseRef >( iEvent ) ), itEnd( it.end() );
       Handle< reco::CandidateView > handleCands;
+      if ( it != itEnd ) iEvent.get( it->first.id(), handleCands );
       std::vector< int > indices;
       while ( it != itEnd ) {
-        if ( indices.size() == 0 ) {
-          iEvent.get( it->first.id(), handleCands );
-        }
         indices.push_back( it->second.key() );
         ++it;
       }

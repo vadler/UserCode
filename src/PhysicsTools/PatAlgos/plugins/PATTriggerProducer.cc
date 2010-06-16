@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.29 2010/05/31 18:40:42 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.31 2010/06/14 17:49:40 vadler Exp $
 //
 
 
@@ -213,15 +213,15 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         LogWarning( "hltPrescaleInputTag" ) << "HLTPrescaleTable product with label '" << labelHltPrescaleTable_ << "' not found in process '" << nameProcess_ << "'; using default from event setup";
       }
       if ( hltConfig_.prescaleSize() > 0 ) {
-        std::cout << "produce(): HLTPrescaleTable found in event setup with set " << hltConfig_.prescaleSet( iEvent, iSetup ) << " and label size " << hltConfig_.prescaleLabels().size() << std::endl; // DEBUG
+//         std::cout << "produce(): HLTPrescaleTable found in event setup with set " << hltConfig_.prescaleSet( iEvent, iSetup ) << " and label size " << hltConfig_.prescaleLabels().size() << std::endl; // DEBUG
         if ( hltConfig_.prescaleSet( iEvent, iSetup ) != -1 ) {
           hltPrescaleTable = trigger::HLTPrescaleTable( hltConfig_.prescaleSet( iEvent, iSetup ), hltConfig_.prescaleLabels(), hltConfig_.prescaleTable() );
           tableFromSetup = true; // DEBUG
         } else {
           LogWarning( "hltPrescaleSet" ) << "HLTPrescaleTable from event setup has error";
         }
-      } else { // DEBUG
-        std::cout << "produce(): HLTPrescaleTable not found in event setup" << std::endl; // DEBUG
+//       } else { // DEBUG
+//         std::cout << "produce(): HLTPrescaleTable not found in event setup" << std::endl; // DEBUG
       }
     }
     unsigned set( hltPrescaleTable.set() );
@@ -238,8 +238,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         }
         if ( ! foundPrescaleLabel ) {
           LogWarning( "hltPrescaleLabel" ) << "HLT prescale label '" << hltPrescaleLabel_ << "' not in prescale table; using default";
-        } else { // DEBUG
-          std::cout << "produce(): HLT prescale label '" << hltPrescaleLabel_ << "' found" << std::endl; // DEBUG
+//         } else { // DEBUG
+//           std::cout << "produce(): HLT prescale label '" << hltPrescaleLabel_ << "' found" << std::endl; // DEBUG
         }
       }
     } else {
@@ -278,16 +278,16 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       }
       if ( ! onlyStandAlone_ ) {
         TriggerPath triggerPath( namePath, indexPath, hltConfig_.prescaleValue( set, namePath ), handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), indexLastFilterPath );
-        std::cout << "produce(): path " << namePath << " has prescales:" << std::endl; // DEBUG
-        std::cout << "           from HLTPrescaleTable         : " << hltPrescaleTable.prescale( namePath ) << std::endl; // DEBUG
-        std::cout << "           from HLTConfigProvider (event): " << hltConfig_.prescaleValue( iEvent, iSetup, namePath ) << std::endl; // DEBUG
-        std::cout << "           from HLTConfigProvider        : " << hltConfig_.prescaleValue( hltPrescaleTable.set(), namePath ) << " (set: " << hltPrescaleTable.set(); // DEBUG
-        if ( ! tableFromSetup ) std::cout << " old"; // DEBUG
-        std::cout << ")" << std::endl; // DEBUG
-        if ( foundPrescaleLabel ) { // DEBUG
-          std::cout << "           from HLTPrescaleTable  (conf) : " << hltPrescaleTable.prescale( set, namePath ) << std::endl; // DEBUG
-          std::cout << "           from HLTConfigProvider (conf) : " << hltConfig_.prescaleValue( set, namePath ) << " (set: " << set << ")" << std::endl; // DEBUG
-        } // DEBUG
+//         std::cout << "produce(): path " << namePath << " has prescales:" << std::endl; // DEBUG
+//         std::cout << "           from HLTPrescaleTable         : " << hltPrescaleTable.prescale( namePath ) << std::endl; // DEBUG
+//         std::cout << "           from HLTConfigProvider (event): " << hltConfig_.prescaleValue( iEvent, iSetup, namePath ) << std::endl; // DEBUG
+//         std::cout << "           from HLTConfigProvider        : " << hltConfig_.prescaleValue( hltPrescaleTable.set(), namePath ) << " (set: " << hltPrescaleTable.set(); // DEBUG
+//         if ( ! tableFromSetup ) std::cout << " old"; // DEBUG
+//         std::cout << ")" << std::endl; // DEBUG
+//         if ( foundPrescaleLabel ) { // DEBUG
+//           std::cout << "           from HLTPrescaleTable  (conf) : " << hltPrescaleTable.prescale( set, namePath ) << std::endl; // DEBUG
+//           std::cout << "           from HLTConfigProvider (conf) : " << hltConfig_.prescaleValue( set, namePath ) << " (set: " << set << ")" << std::endl; // DEBUG
+//         } // DEBUG
         // add module names to path and states' map
         assert( indexLastFilterPath < sizeModulesPath );
         std::map< unsigned, std::string > indicesModules;
@@ -375,7 +375,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       TriggerObject triggerObject( handleTriggerEvent->getObjects().at( iO ) );
       // set collection
       while ( iO >= collectionKeys[ iC ] ) ++iC; // relies on well ordering of trigger objects with respect to the collections
-      triggerObject.setCollection( handleTriggerEvent->collectionTag( iC ).encode() );
+      triggerObject.setCollection( handleTriggerEvent->collectionTag( iC ) );
       // set filter ID
       for ( std::multimap< trigger::size_type, int >::iterator iM = filterIds.begin(); iM != filterIds.end(); ++iM ) {
         if ( iM->first == iO && ! triggerObject.hasFilterId( iM->second ) ) {
@@ -413,7 +413,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       for ( size_t l1Mu = 0; l1Mu < handleL1ExtraMu->size(); ++l1Mu ) {
         const reco::LeafCandidate * leafCandidate( handleL1ExtraMu->at( l1Mu ).reco::LeafCandidate::clone() );
         TriggerObject triggerObject( *leafCandidate );
-        triggerObject.setCollection( tagL1ExtraMu_.encode() );
+        triggerObject.setCollection( tagL1ExtraMu_ );
         triggerObject.addFilterId( trigger::TriggerL1Mu );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
@@ -429,7 +429,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       for ( size_t l1NoIsoEG = 0; l1NoIsoEG < handleL1ExtraNoIsoEG->size(); ++l1NoIsoEG ) {
         const reco::LeafCandidate * leafCandidate( handleL1ExtraNoIsoEG->at( l1NoIsoEG ).reco::LeafCandidate::clone() );
         TriggerObject triggerObject( *leafCandidate );
-        triggerObject.setCollection( tagL1ExtraNoIsoEG_.encode() );
+        triggerObject.setCollection( tagL1ExtraNoIsoEG_ );
         triggerObject.addFilterId( trigger::TriggerL1NoIsoEG );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
@@ -445,7 +445,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       for ( size_t l1IsoEG = 0; l1IsoEG < handleL1ExtraIsoEG->size(); ++l1IsoEG ) {
         const reco::LeafCandidate * leafCandidate( handleL1ExtraIsoEG->at( l1IsoEG ).reco::LeafCandidate::clone() );
         TriggerObject triggerObject( *leafCandidate );
-        triggerObject.setCollection( tagL1ExtraIsoEG_.encode() );
+        triggerObject.setCollection( tagL1ExtraIsoEG_ );
         triggerObject.addFilterId( trigger::TriggerL1IsoEG );
         if ( ! onlyStandAlone_ )triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
@@ -461,7 +461,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       for ( size_t l1CenJet = 0; l1CenJet < handleL1ExtraCenJet->size(); ++l1CenJet ) {
         const reco::LeafCandidate * leafCandidate( handleL1ExtraCenJet->at( l1CenJet ).reco::LeafCandidate::clone() );
         TriggerObject triggerObject( *leafCandidate );
-        triggerObject.setCollection( tagL1ExtraCenJet_.encode() );
+        triggerObject.setCollection( tagL1ExtraCenJet_ );
         triggerObject.addFilterId( trigger::TriggerL1CenJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
@@ -477,7 +477,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       for ( size_t l1ForJet = 0; l1ForJet < handleL1ExtraForJet->size(); ++l1ForJet ) {
         const reco::LeafCandidate * leafCandidate( handleL1ExtraForJet->at( l1ForJet ).reco::LeafCandidate::clone() );
         TriggerObject triggerObject( *leafCandidate );
-        triggerObject.setCollection( tagL1ExtraForJet_.encode() );
+        triggerObject.setCollection( tagL1ExtraForJet_ );
         triggerObject.addFilterId( trigger::TriggerL1ForJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
@@ -493,7 +493,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       for ( size_t l1TauJet = 0; l1TauJet < handleL1ExtraTauJet->size(); ++l1TauJet ) {
         const reco::LeafCandidate * leafCandidate( handleL1ExtraTauJet->at( l1TauJet ).reco::LeafCandidate::clone() );
         TriggerObject triggerObject( *leafCandidate );
-        triggerObject.setCollection( tagL1ExtraTauJet_.encode() );
+        triggerObject.setCollection( tagL1ExtraTauJet_ );
         triggerObject.addFilterId( trigger::TriggerL1TauJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
@@ -509,7 +509,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       for ( size_t l1ETM = 0; l1ETM < handleL1ExtraETM->size(); ++l1ETM ) {
         const reco::LeafCandidate * leafCandidate( handleL1ExtraETM->at( l1ETM ).reco::LeafCandidate::clone() );
         TriggerObject triggerObject( *leafCandidate );
-        triggerObject.setCollection( tagL1ExtraETM_.encode() );
+        triggerObject.setCollection( tagL1ExtraETM_ );
         triggerObject.addFilterId( trigger::TriggerL1ETM );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
@@ -525,7 +525,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       for ( size_t l1HTM = 0; l1HTM < handleL1ExtraHTM->size(); ++l1HTM ) {
         const reco::LeafCandidate * leafCandidate( handleL1ExtraHTM->at( l1HTM ).reco::LeafCandidate::clone() );
         TriggerObject triggerObject( *leafCandidate );
-        triggerObject.setCollection( tagL1ExtraHTM_.encode() );
+        triggerObject.setCollection( tagL1ExtraHTM_ );
         triggerObject.addFilterId( trigger::TriggerL1HTM );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );

@@ -1,25 +1,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-# process.GlobalTag.globaltag = ...
-# process.source.fileNames    = [ ... ]
-# process.maxEvents.input     = ...
-# process.out.outputCommands  = [ ... ]
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre3/output/myPatTuple_test_addTriggerInfo.root'
-# process.options.wantSummary = False
-
-# # memory check
-# process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck"
-# # , oncePerEventMode = cms.untracked.bool( True )
-# , ignoreTotal      = cms.untracked.int32( 0 )
-# )
-
-# # HLT analyzers
-# process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
-# process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
+process.out.fileName = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre3/output/myPatTuple_test_addTriggerInfo.root'
 
 process.p = cms.Path(
-#   process.hltEventAnalyzerAOD
-# + process.triggerSummaryAnalyzerAOD
-# + process.patDefaultSequence
   process.patDefaultSequence
 )
 
@@ -74,17 +56,17 @@ process.muonTriggerTestMatchL1Muons = cms.EDProducer( "PATTriggerMatcherDRLessBy
 , src     = cms.InputTag( "cleanPatMuons" )
 , matched = cms.InputTag( "patTrigger" )
 , andOr          = cms.bool( False )
-, filterIdsEnum  = cms.vstring( 'TriggerL1Mu' )
-, filterIds      = cms.vint32( -81 )
+, filterIdsEnum  = cms.vstring( '*' )
+, filterIds      = cms.vint32( 0 )
 , filterLabels   = cms.vstring( '*' )
 , pathNames      = cms.vstring( '*' )
-, collectionTags = cms.vstring( '*' )
+, collectionTags = cms.vstring( 'l1extraParticles' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True )
 , resolveByMatchQuality = cms.bool( False )
 )
-process.muonTriggerTestMatchL1CollectionMuons = cms.EDProducer( "PATTriggerMatcherDRLessByR"
+process.muonTriggerTestMatchL1FilterLabelMuons = cms.EDProducer( "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "cleanPatMuons" )
 , matched = cms.InputTag( "patTrigger" )
 , andOr          = cms.bool( True )
@@ -158,7 +140,7 @@ process.patTriggerTestMatcher = cms.Sequence(
   process.electronTriggerTestMatchHLTElectrons
 + process.electronTriggerTestMatchHLTFilterEGammas
 + process.muonTriggerTestMatchL1Muons
-+ process.muonTriggerTestMatchL1CollectionMuons
++ process.muonTriggerTestMatchL1FilterLabelMuons
 + process.muonTriggerTestMatchNoMuons
 + process.jetTriggerTestMatchHLTJet15U
 + process.metTriggerTestMatchHLTMET45
@@ -180,7 +162,7 @@ process.cleanPatMuonsTriggerTestMatch = cms.EDProducer( "PATTriggerMatchMuonEmbe
 , src     = cms.InputTag( "cleanPatMuons" )
 , matches = cms.VInputTag(
     "muonTriggerTestMatchL1Muons"
-  , "muonTriggerTestMatchL1CollectionMuons"
+  , "muonTriggerTestMatchL1FilterLabelMuons"
   , "muonTriggerTestMatchNoMuons"
   )
 )
@@ -218,7 +200,7 @@ process.patTriggerEventTest = cms.EDProducer( "PATTriggerEventProducer"
     "electronTriggerTestMatchHLTElectrons"
   , "electronTriggerTestMatchHLTFilterEGammas"
   , "muonTriggerTestMatchL1Muons"
-  , "muonTriggerTestMatchL1CollectionMuons"
+  , "muonTriggerTestMatchL1FilterLabelMuons"
   , "muonTriggerTestMatchNoMuons"
   , "jetTriggerTestMatchHLTJet15U"
   , "metTriggerTestMatchHLTMET45"
