@@ -13,55 +13,32 @@ process.options = cms.untracked.PSet(
 ## Source
 process.source = cms.Source( "PoolSource"
 , fileNames = cms.untracked.vstring(
-    'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_0_patch1/output/myHlt_triggerOnly.root'
+    # Prompt RECO
+    '/store/data/Run2010A/MinimumBias/RECO/v2/000/136/441/48CD034A-2D6B-DF11-9CFE-0030487CD718.root'
+#     # RAW (needs process.gtDigis in the path)
+#     '/store/data/Run2010A/MinimumBias/RAW/v1/000/136/441/3CC638F4-1F6B-DF11-8067-00304879BAB2.root'
   )
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 1 )
 )
-process.physDecl = cms.EDFilter( "PhysDecl"
-, applyfilter = cms.untracked.bool( True )
-)
 process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskAlgoTrigConfig_cff" )
 process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff" )
-process.load( "HLTrigger.HLTfilters.hltLevel1GTSeed_cfi" )
-process.hltLevel1GTSeed.L1TechTriggerSeeding     = cms.bool( True )
-process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string( '0 AND (40 OR 41) AND NOT (36 OR 37 OR 38 OR 39)' )
-process.scrapingVeto = cms.EDFilter( "FilterOutScraping"
-, applyfilter = cms.untracked.bool( True )
-, debugOn     = cms.untracked.bool( False )
-, numtrack    = cms.untracked.uint32( 10 )
-, thresh      = cms.untracked.double( 0.2 )
-)
-process.primaryVertexFilter = cms.EDFilter( "GoodVertexFilter"
-, vertexCollection = cms.InputTag( 'offlinePrimaryVertices' )
-, minimumNDOF      = cms.uint32( 4 )
-, maxAbsZ          = cms.double( 15 )
-, maxd0            = cms.double( 2 )
-)
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'GR_R_37X_V3::All'
+# process.GlobalTag.globaltag = 'GR_R_37X_V3::All'
+process.GlobalTag.globaltag = 'GR10_P_V5::All'
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
+# process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )
 
 ## PAT trigger
-process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff")
-process.patTrigger.processName      = 'HLT1E31'
-# process.patTrigger.hltPrescaleLabel = cms.string( '1E29' )
-process.patTrigger.hltPrescaleLabel = cms.string( '1E28' )
-# process.patTrigger.hltPrescaleLabel = cms.string( 'Cosmics' )
-process.patTrigger.hltPrescaleTable = cms.string( 'hltPrescaleRecorder' )
-process.patTriggerEvent.processName       = 'HLT1E31'
-process.patTriggerEvent.l1GtTag           = cms.InputTag( 'hltGtDigis' )
+process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
 process.patTriggerEvent.patTriggerMatches = []
 process.p = cms.Path(
-#   process.hltLevel1GTSeed
-# * process.scrapingVeto
-# * process.physDecl
-# * process.primaryVertexFilter
+#   process.gtDigis
 # * process.patTrigger
   process.patTrigger
 * process.patTriggerEvent

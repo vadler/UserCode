@@ -28,6 +28,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
+#include "FWCore/Utilities/interface/InputTag.h"
+#include <iostream> // DEBUG
 
 
 namespace pat {
@@ -41,7 +43,7 @@ namespace pat {
       std::vector< std::string > filterLabels_;
       std::vector< std::string > pathNames_;
       bool                       pathLastFilterAcceptedOnly_;
-      std::vector< std::string > collectionTags_; // needs full tag strings (as from edm::InputTag::encode()), not only labels
+      std::vector< std::string > collectionTags_; // full tag strings (as from edm::InputTag::encode()) recommended, but also only labels allowed
 
     public:
 
@@ -105,7 +107,7 @@ namespace pat {
             if ( pathNames_.at( k ) == "*" || pathNames_.at( k ) == "@" || trigObj.hasPathName( pathNames_.at( k ), pathLastFilterAcceptedOnly_ ) ) return true;
           }
           for ( size_t l = 0; l < collectionTags_.size(); ++l ) {
-            if ( collectionTags_.at( l ) == "*" || collectionTags_.at( l ) == "@" || collectionTags_.at( l ) == trigObj.collection() ) return true;
+            if ( collectionTags_.at( l ) == "*" || collectionTags_.at( l ) == "@" || trigObj.hasCollection( collectionTags_.at( l ) ) ) return true;
           }
           for ( size_t m = 0; m < filterIdsEnum_.size(); ++m ) {
             if ( filterIdsEnum_.at( m ) == "*" || filterIdsEnum_.at( m ) == "@" ) return true;
@@ -121,7 +123,8 @@ namespace pat {
                   for ( size_t k = 0; k < pathNames_.size(); ++k ) {
                     if ( pathNames_.at( k ) == "*" || pathNames_.at( k ) == "@" || trigObj.hasPathName( pathNames_.at( k ), pathLastFilterAcceptedOnly_ ) ) {
                       for ( size_t l = 0; l < collectionTags_.size(); ++l ) {
-                        if ( collectionTags_.at( l ) == "*" || collectionTags_.at( l ) == "@" || collectionTags_.at( l ) == trigObj.collection() ) {
+                        if ( collectionTags_.at( l ) == "*" || collectionTags_.at( l ) == "@" || trigObj.hasCollection( collectionTags_.at( l ) ) ) {
+                          std::cout << "operator(): collection " << trigObj.collection() << std::endl; // DEBUG
                           for ( size_t m = 0; m < filterIdsEnum_.size(); ++m ) {
                             if ( filterIdsEnum_.at( m ) == "*" || filterIdsEnum_.at( m ) == "@" ) return true;
                             std::map< std::string, trigger::TriggerObjectType >::const_iterator iter( filterIdsEnumMap.find( filterIdsEnum_.at( m ) ) );
