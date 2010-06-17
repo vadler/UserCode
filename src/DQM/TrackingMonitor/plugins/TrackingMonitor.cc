@@ -1,8 +1,8 @@
 /*
  *  See header file for a description of this class.
  *
- *  $Date: 2010/05/12 07:14:47 $
- *  $Revision: 1.16 $
+ *  $Date: 2010/06/17 06:01:01 $
+ *  $Revision: 1.17 $
  *  \author Suchandra Dutta , Giorgia Mila
  */
 
@@ -31,7 +31,7 @@
 #include "TrackingTools/PatternTools/interface/TSCBLBuilderNoMaterial.h"
 #include "TrackingTools/PatternTools/interface/TSCPBuilderNoMaterial.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
-#include "CommonTools/RecoUtils/interface/GenericTriggerEventFlag.h"
+#include "CommonTools/TriggerUtils/interface/GenericTriggerEventFlag.h"
 #include "DataFormats/Common/interface/DetSetVectorNew.h"
 #include "DataFormats/SiStripCluster/interface/SiStripCluster.h"
 #include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
@@ -56,7 +56,6 @@ TrackingMonitor::TrackingMonitor(const edm::ParameterSet& iConfig)
     , doLumiAnalysis( conf_.getParameter<bool>("doLumiAnalysis"))
     , genTriggerEventFlag_(new GenericTriggerEventFlag(iConfig))
 {
-  std::cout << "  TrackingMonitor: -> GenericTriggerEventFlag is " << genTriggerEventFlag_->on() << std::endl; // DEBUG
 }
 
 

@@ -2,11 +2,11 @@ Test Release based on: CMSSW_3_7_0_patch2
 Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw-patch/CMSSW_3_7_0_patch2
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_patch2
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CommonTools/RecoUtils                            V00-00-05      V00-00-03      
 CommonTools/TriggerUtils                         NoTag                         
-DQM/SiStripMonitorTrack                          V04-00-22      V04-00-22      
+DQM/SiPixelCommon                                V03-02-07      V03-02-06      
+DQM/SiStripMonitorTrack                          V04-00-24      V04-00-22      
 DQM/TrackerCommon                                NoTag          V03-02-07      
-DQM/TrackerMonitorTrack                          V04-01-17      V04-01-17      
-DQM/TrackingMonitor                              V03-02-09      V03-02-09      
+DQM/TrackerMonitorTrack                          V04-01-19      V04-01-17      
+DQM/TrackingMonitor                              V03-02-11      V03-02-09      
 ---------------------------------------
 total packages: 6 (6 displayed)

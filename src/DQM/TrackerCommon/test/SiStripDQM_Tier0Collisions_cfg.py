@@ -212,6 +212,7 @@ process.dbTrackerTriggerBits = cms.ESSource( "PoolDBESSource"
       connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
     , record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
     , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_express' )
+#     , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v1_express' ) # only in preparation DB so far
 #     , label   = cms.untracked.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_express' )
     )
   )
@@ -222,17 +223,8 @@ process.es_prefer_trackerDqmTriggerBits = cms.ESPrefer( "PoolDBESSource", "dbTra
 process.dbTrackerQTests = cms.ESSource( "PoolDBESSource"
 , CondCore.DBCommon.CondDBCommon_cfi.CondDBCommon
 , toGet   = cms.VPSet(
-    # SiStrip
-    cms.PSet(
-#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_patch2/output/DQMXMLFile_SiStripDQM.db' )
-#       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
-      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
-    , record  = cms.string( 'DQMXMLFileRcd' )
-    , tag     = cms.string( 'DQMXMLFile_SiStripDQM_v0_express' )
-#     , label   = cms.untracked.string( 'DQMXMLFile_SiStripDQM_v0_express' )
-    )
     # SiPixel
-  , cms.PSet(
+    cms.PSet(
 #       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_patch2/output/DQMXMLFile_SiPixelDQM.db' )
 #       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_PIXEL' )
       connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_PIXEL' )
@@ -240,11 +232,24 @@ process.dbTrackerQTests = cms.ESSource( "PoolDBESSource"
     , tag     = cms.string( 'DQMXMLFile_SiPixelDQM_v0_express' )
 #     , label   = cms.untracked.string( 'DQMXMLFile_SiPixelDQM_v0_express' )
     )
+    # SiStrip
+  , cms.PSet(
+#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_patch2/output/DQMXMLFile_SiStripDQM.db' )
+#       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
+      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
+    , record  = cms.string( 'DQMXMLFileRcd' )
+    , tag     = cms.string( 'DQMXMLFile_SiStripDQM_v0_express' )
+#     , label   = cms.untracked.string( 'DQMXMLFile_SiStripDQM_v0_express' )
+    )
   )
 )
 # process.es_prefer_trackerDqmQTests = cms.ESPrefer( "PoolDBESSource", "dbTrackerQTests" )
 process.siStripQTester.getQualityTestsFromFile = False
-#process.siStripQTester.label                   = cms.untracked.string( 'DQMXMLFile_SiStripDQM_v0_express' )
+process.siStripQTester.verboseQT               = cms.untracked.bool( True )
+process.siStripQTester.label                   = cms.untracked.string( 'DQMXMLFile_SiStripDQM_v0_express' )
+process.sipixelQTester.getQualityTestsFromFile = False
+process.sipixelQTester.verboseQT               = True
+process.sipixelQTester.label                   = cms.untracked.string( 'DQMXMLFile_SiPixelDQM_v0_express' )
 
 # Scheduling
 
@@ -264,11 +269,13 @@ process.reco = cms.Sequence(
 * process.logErrorHarvester
 )
 process.dqm = cms.Sequence(
-  process.SiStripDQMTier0
+  process.siPixelOfflineDQM_source
++ process.SiStripDQMTier0
 * process.DQMMessageLogger
 )
 
 # Paths
+# process.PixelOfflineDQMClientWithDataCertification.remove( "process.sipixelQTester" )
 process.path = cms.Path(
   # preparation
   process.gtDigis
@@ -279,10 +286,11 @@ process.path = cms.Path(
   # DQM client
 * process.dqmRefHistoRootFileGetter
 * process.SiStripOfflineDQMClient
-* process.DQMMessageLoggerClient
 * process.siStripDaqInfo
 * process.siStripDcsInfo
 * process.siStripCertificationInfo
+* process.PixelOfflineDQMClientWithDataCertification
+* process.DQMMessageLoggerClient
 * process.dqmSaver
 )
 

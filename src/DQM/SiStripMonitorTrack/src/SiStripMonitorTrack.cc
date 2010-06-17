@@ -17,7 +17,7 @@
 #include "DataFormats/TrackerRecHit2D/interface/SiStripMatchedRecHit2D.h"
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateTransform.h"
 #include "CalibTracker/SiStripCommon/interface/SiStripDCSStatus.h"
-#include "CommonTools/RecoUtils/interface/GenericTriggerEventFlag.h"
+#include "CommonTools/TriggerUtils/interface/GenericTriggerEventFlag.h"
 
 #include "DQM/SiStripMonitorTrack/interface/SiStripMonitorTrack.h"
 
@@ -32,7 +32,6 @@ SiStripMonitorTrack::SiStripMonitorTrack(const edm::ParameterSet& conf):
   firstEvent(-1),
   genTriggerEventFlag_(new GenericTriggerEventFlag(conf))
 {
-  std::cout << "  SiStripMonitorTrack: -> GenericTriggerEventFlag is " << genTriggerEventFlag_->on() << std::endl; // DEBUG
   Cluster_src_   = conf.getParameter<edm::InputTag>("Cluster_src");
   Mod_On_        = conf.getParameter<bool>("Mod_On");
   Trend_On_      = conf.getParameter<bool>("Trend_On");
@@ -93,7 +92,7 @@ void SiStripMonitorTrack::analyze(const edm::Event& e, const edm::EventSetup& es
   if (dcsStatus_ && !dcsStatus_->getStatus(e,es)) return;
 
   // Filter out events if Trigger Filtering is requested
-// DEBUG   if (genTriggerEventFlag_->on()&& ! genTriggerEventFlag_->accept( e, es) ) return;
+// DEBUG  if (genTriggerEventFlag_->on()&& ! genTriggerEventFlag_->accept( e, es) ) return;
   static unsigned count( 0 ); // DEBUG
   std::cout << "* SiStripMonitorTrack *" << std::endl; // DEBUG
   bool decision( true ); // DEBUG

@@ -23,14 +23,13 @@
 #include "Alignment/TrackerAlignment/interface/TrackerAlignableId.h"
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "DQMServices/Core/interface/MonitorElement.h"
-#include "CommonTools/RecoUtils/interface/GenericTriggerEventFlag.h"
+#include "CommonTools/TriggerUtils/interface/GenericTriggerEventFlag.h"
 #include <iostream> // DEBUG
 
 MonitorTrackResiduals::MonitorTrackResiduals(const edm::ParameterSet& iConfig)
    : dqmStore_( edm::Service<DQMStore>().operator->() )
    , conf_(iConfig), m_cacheID_(0)
    , genTriggerEventFlag_(new GenericTriggerEventFlag(iConfig)) {
-  std::cout << "  MonitorTrackResiduals: -> GenericTriggerEventFlag is " << genTriggerEventFlag_->on() << std::endl; // DEBUG
 }
 
 MonitorTrackResiduals::~MonitorTrackResiduals() {
