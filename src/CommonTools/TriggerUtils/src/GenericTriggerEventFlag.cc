@@ -1,5 +1,5 @@
 //
-// $Id: GenericTriggerEventFlag.cc,v 1.1 2010/06/08 10:39:13 vadler Exp $
+// $Id$
 //
 
 
@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include <iostream> // DEBUG
 
 
 /// To be called from the ED module's c'tor
@@ -80,7 +81,7 @@ GenericTriggerEventFlag::GenericTriggerEventFlag( const edm::ParameterSet & conf
       onHlt_ = false;
     }
     if ( ! onDcs_ && ! onGt_ && ! onL1_ && ! onHlt_ ) on_      = false;
-    else                                              watchDB_ = new edm::ESWatcher< AlCaRecoTriggerBitsRcd> ;
+    else                                              watchDB_ = new edm::ESWatcher< AlCaRecoTriggerBitsRcd > ;
   }
 
 }
@@ -102,17 +103,23 @@ void GenericTriggerEventFlag::initRun( const edm::Run & run, const edm::EventSet
   // FIXME Can this stay safely in the run loop, or does it need to go to the event loop?
   // Means: Are the event setups identical?
   if ( watchDB_->check( setup ) ) {
+    std::cout << "  GenericTriggerEventFlag::initRun(): GT DB tag  : " << gtDBKey_.data() << std::endl; // DEBUG
     if ( onGt_ && gtDBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( gtDBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) gtLogicalExpressions_ = exprs;
+      std::cout << "  GenericTriggerEventFlag::initRun(): GT DB size : " << gtLogicalExpressions_.size() << std::endl; // DEBUG
     }
+    std::cout << "  GenericTriggerEventFlag::initRun(): L1 DB tag  : " << l1DBKey_.data() << std::endl; // DEBUG
     if ( onL1_ && l1DBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( l1DBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) l1LogicalExpressions_ = exprs;
+      std::cout << "  GenericTriggerEventFlag::initRun(): L1 DB size : " << l1LogicalExpressions_.size() << std::endl; // DEBUG
     }
+    std::cout << "  GenericTriggerEventFlag::initRun(): HLT DB tag : " << hltDBKey_.data() << std::endl; // DEBUG
     if ( onHlt_ && hltDBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( hltDBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) hltLogicalExpressions_ = exprs;
+      std::cout << "  GenericTriggerEventFlag::initRun(): HLT DB size: " << hltLogicalExpressions_.size() << std::endl; // DEBUG
     }
   }
 
@@ -127,6 +134,7 @@ void GenericTriggerEventFlag::initRun( const edm::Run & run, const edm::EventSet
       } else if ( hltConfig_.size() <= 0 ) {
         if ( verbose_ > 0 ) edm::LogError( "GenericTriggerEventFlag" ) << "HLT config size error";
       } else hltConfigInit_ = true;
+      if ( hltChanged ) std::cout << "  GenericTriggerEventFlag::initRun(): HLT changed"<< std::endl; // DEBUG
     }
   }
 
@@ -215,6 +223,7 @@ bool GenericTriggerEventFlag::acceptDcsPartition( const edm::Handle< DcsStatusCo
   }
 
   // Determine decision
+  std::cout << "  GenericTriggerEventFlag: partition " << dcsPartition << " -> " << dcsStatus->at( 0 ).ready( dcsPartition ) << std::endl; // DEBUG
   return dcsStatus->at( 0 ).ready( dcsPartition );
 
 }
@@ -281,11 +290,15 @@ bool GenericTriggerEventFlag::acceptGtLogicalExpression( const edm::Handle< L1Gl
       if ( verbose_ > 2 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "GT status bit \"" << gtStatusBit << "\" is not defined ==> decision: " << errorReplyGt_;
       decision = errorReplyDcs_;
     }
+    std::cout << "  GenericTriggerEventFlag: status bit " << gtStatusBit << " -> " << decision << std::endl; // DEBUG
     gtAlgoLogicParser.operandTokenVector().at( iStatusBit ).tokenResult = decision;
   }
 
   // Determine decision
   const bool gtDecision( gtAlgoLogicParser.expressionResult() );
+  std::cout << "  GenericTriggerEventFlag: GT status logical expression "; // DEBUG
+  if ( negExpr ) std::cout << "~\"" << gtLogicalExpression << "\" -> " << ( ! gtDecision ) << std::endl; // DEBUG
+  else           std::cout <<  "\"" << gtLogicalExpression << "\" -> " <<     gtDecision   << std::endl; // DEBUG
   return negExpr ? ( ! gtDecision ) : gtDecision;
 
 }
@@ -338,8 +351,14 @@ bool GenericTriggerEventFlag::acceptL1LogicalExpression( const edm::Event & even
   // Loop over algorithms
   for ( size_t iAlgorithm = 0; iAlgorithm < l1AlgoLogicParser.operandTokenVector().size(); ++iAlgorithm ) {
     const std::string l1AlgoName( l1AlgoLogicParser.operandTokenVector().at( iAlgorithm ).tokenName );
+    std::cout << "  GenericTriggerEventFlag: algo name " << l1AlgoName << std::endl; // DEBUG
     int error( -1 );
     const bool decision( l1BeforeMask_ ? l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) : l1Gt_.decisionAfterMask( event, l1AlgoName, error ) );
+    const std::string choice( l1BeforeMask_ ? "before mask" : "after mask" ); // DEBUG
+    std::cout << "  GenericTriggerEventFlag: " << choice << std::endl; // DEBUG
+    if ( l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) != l1Gt_.decisionAfterMask( event, l1AlgoName, error ) ) { // DEBUG
+      std::cout << "  GenericTriggerEventFlag: before/after " << l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) << "/" << l1Gt_.decisionAfterMask( event, l1AlgoName, error ) << " differ" << std::endl; // DEBUG
+    } // DEBUG
     // Error checks
     if ( error != 0 ) {
       if ( verbose_ > 2 ) {
@@ -350,11 +369,15 @@ bool GenericTriggerEventFlag::acceptL1LogicalExpression( const edm::Event & even
       continue;
     }
     // Manipulate algo decision as stored in the parser
+    std::cout << "  GenericTriggerEventFlag: decision " << decision << std::endl; // DEBUG
     l1AlgoLogicParser.operandTokenVector().at( iAlgorithm ).tokenResult = decision;
   }
 
   // Return decision
   const bool l1Decision( l1AlgoLogicParser.expressionResult() );
+  std::cout << "  GenericTriggerEventFlag: L1 logical expression "; // DEBUG
+  if ( negExpr ) std::cout << "~\"" << l1LogicalExpression << "\" -> " << ( ! l1Decision ) << std::endl; // DEBUG
+  else           std::cout <<  "\"" << l1LogicalExpression << "\" -> " <<     l1Decision   << std::endl; // DEBUG
   return negExpr ? ( ! l1Decision ) : l1Decision;
 
 }
@@ -436,11 +459,15 @@ bool GenericTriggerEventFlag::acceptHltLogicalExpression( const edm::Handle< edm
     }
     // Manipulate algo decision as stored in the parser
     const bool decision( hltTriggerResults->accept( indexPath ) );
+    std::cout << "  GenericTriggerEventFlag: path name " << hltPathName << " -> " << decision << std::endl; // DEBUG
     hltAlgoLogicParser.operandTokenVector().at( iPath ).tokenResult = decision;
   }
 
   // Determine decision
   const bool hltDecision( hltAlgoLogicParser.expressionResult() );
+  std::cout << "  GenericTriggerEventFlag: HLT logical expression "; // DEBUG
+  if ( negExpr ) std::cout << "~\"" << hltLogicalExpression << "\" -> " << ( ! hltDecision ) << std::endl; // DEBUG
+  else           std::cout <<  "\"" << hltLogicalExpression << "\" -> " <<     hltDecision   << std::endl; // DEBUG
   return negExpr ? ( ! hltDecision ) : hltDecision;
 
 }
