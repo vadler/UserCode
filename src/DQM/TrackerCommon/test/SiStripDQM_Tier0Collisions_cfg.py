@@ -247,7 +247,7 @@ process.dbTrackerQTests = cms.ESSource( "PoolDBESSource"
 process.siStripQTester.getQualityTestsFromFile = False
 process.siStripQTester.label                   = cms.untracked.string( 'SiStripDQM' )
 process.sipixelQTester.getQualityTestsFromFile = False
-process.sipixelQTester.label                   = cms.untracked.string( 'SiPixelDQM_' )
+process.sipixelQTester.label                   = cms.untracked.string( 'SiPixelDQM' )
 
 # Scheduling
 
