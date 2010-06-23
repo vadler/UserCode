@@ -19,6 +19,7 @@
 /// To be called from the ED module's c'tor
 GenericTriggerEventFlag::GenericTriggerEventFlag( const edm::ParameterSet & config )
   : watchDB_( 0 )
+  , dbLabel_( "" )
   , verbose_( 0 )
   , gtDBKey_( "" )
   , l1BeforeMask_( true )
@@ -81,7 +82,10 @@ GenericTriggerEventFlag::GenericTriggerEventFlag( const edm::ParameterSet & conf
       onHlt_ = false;
     }
     if ( ! onDcs_ && ! onGt_ && ! onL1_ && ! onHlt_ ) on_      = false;
-    else                                              watchDB_ = new edm::ESWatcher< AlCaRecoTriggerBitsRcd > ;
+    else {
+      if ( config.exists( "dbLabel" ) ) dbLabel_ = config.getParameter< std::string >( "dbLabel" );
+      watchDB_ = new edm::ESWatcher< AlCaRecoTriggerBitsRcd >;
+    }
   }
 
 }
@@ -108,18 +112,27 @@ void GenericTriggerEventFlag::initRun( const edm::Run & run, const edm::EventSet
       const std::vector< std::string > exprs( expressionsFromDB( gtDBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) gtLogicalExpressions_ = exprs;
       std::cout << "  GenericTriggerEventFlag::initRun(): GT DB size : " << gtLogicalExpressions_.size() << std::endl; // DEBUG
+      for ( size_t iE( 0 ); iE < gtLogicalExpressions_.size(); ++iE ) { // DEBUG
+        std::cout << "                                     " << gtLogicalExpressions_.at( iE ) << std::endl; // DEBUG
+      } // DEBUG
     }
     std::cout << "  GenericTriggerEventFlag::initRun(): L1 DB tag  : " << l1DBKey_.data() << std::endl; // DEBUG
     if ( onL1_ && l1DBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( l1DBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) l1LogicalExpressions_ = exprs;
       std::cout << "  GenericTriggerEventFlag::initRun(): L1 DB size : " << l1LogicalExpressions_.size() << std::endl; // DEBUG
+      for ( size_t iE( 0 ); iE < l1LogicalExpressions_.size(); ++iE ) { // DEBUG
+        std::cout << "                                     " << l1LogicalExpressions_.at( iE ) << std::endl; // DEBUG
+      } // DEBUG
     }
     std::cout << "  GenericTriggerEventFlag::initRun(): HLT DB tag : " << hltDBKey_.data() << std::endl; // DEBUG
     if ( onHlt_ && hltDBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( hltDBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) hltLogicalExpressions_ = exprs;
       std::cout << "  GenericTriggerEventFlag::initRun(): HLT DB size: " << hltLogicalExpressions_.size() << std::endl; // DEBUG
+      for ( size_t iE( 0 ); iE < hltLogicalExpressions_.size(); ++iE ) { // DEBUG
+        std::cout << "                                     " << hltLogicalExpressions_.at( iE ) << std::endl; // DEBUG
+      } // DEBUG
     }
   }
 
@@ -479,7 +492,7 @@ std::vector< std::string > GenericTriggerEventFlag::expressionsFromDB( const std
 {
 
   edm::ESHandle< AlCaRecoTriggerBits > logicalExpressions;
-  setup.get< AlCaRecoTriggerBitsRcd >().get( logicalExpressions );
+  setup.get< AlCaRecoTriggerBitsRcd >().get( dbLabel_, logicalExpressions );
   const std::map< std::string, std::string > & expressionMap = logicalExpressions->m_alcarecoToTrig;
   std::map< std::string, std::string >::const_iterator listIter = expressionMap.find( key );
   if ( listIter == expressionMap.end() ) {

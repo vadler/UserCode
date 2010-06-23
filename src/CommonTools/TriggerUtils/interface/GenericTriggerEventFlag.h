@@ -40,8 +40,9 @@ class GenericTriggerEventFlag {
     HLTConfigProvider                          hltConfig_;
     bool                                       hltConfigInit_;
     // Configuration parameters
-    bool     andOr_;
-    unsigned verbose_;
+    bool        andOr_;
+    std::string dbLabel_;
+    unsigned    verbose_;
     bool               andOrDcs_;
     edm::InputTag      dcsInputTag_;
     std::vector< int > dcsPartitions_;

@@ -71,7 +71,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 # process.SiStripMonitorTrack.andOr          = False
-# process.SiStripMonitorTrack.dbLabel        = cms.string( "test" )
+process.SiStripMonitorTrack.dbLabel        = cms.string( 'SiStripDQM' )
 process.SiStripMonitorTrack.verbosityLevel = cms.uint32( 2 )
 # process.SiStripMonitorTrack.dcsInputTag   = cms.InputTag( "scalersRawToDigi" )
 # process.SiStripMonitorTrack.dcsPartitions = cms.vint32 (
@@ -113,7 +113,7 @@ process.SiStripMonitorTrack.verbosityLevel = cms.uint32( 2 )
 # process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
 
 # process.MonitorTrackResiduals.andOr          = False
-# process.MonitorTrackResiduals.dbLabel        = cms.string( "" )
+process.MonitorTrackResiduals.dbLabel        = cms.string( 'SiStripDQM' )
 process.MonitorTrackResiduals.verbosityLevel = cms.uint32( 2 )
 # process.MonitorTrackResiduals.dcsInputTag   = cms.InputTag( "scalersRawToDigi" )
 # process.MonitorTrackResiduals.dcsPartitions = cms.vint32 (
@@ -155,7 +155,7 @@ process.MonitorTrackResiduals.andOrHlt      = cms.bool( False )
 process.MonitorTrackResiduals.errorReplyHlt = cms.bool( False )
 
 # process.TrackerCollisionTrackMon.andOr         = false
-# process.TrackerCollisionTrackMon.dbLabel        = cms.string( "" )
+process.TrackerCollisionTrackMon.dbLabel        = cms.string( 'SiStripDQM' )
 process.TrackerCollisionTrackMon.verbosityLevel = cms.uint32( 2 )
 # process.TrackerCollisionTrackMon.dcsInputTag   = "scalersRawToDigi"
 # process.TrackerCollisionTrackMon.dcsPartitions = [
@@ -213,11 +213,10 @@ process.dbTrackerTriggerBits = cms.ESSource( "PoolDBESSource"
     , record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
     , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_express' )
 #     , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v1_express' ) # only in preparation DB so far
-#     , label   = cms.untracked.string( 'SiStripDQM' )
+    , label   = cms.untracked.string( 'SiStripDQM' )
     )
   )
 )
-process.es_prefer_trackerDqmTriggerBits = cms.ESPrefer( "PoolDBESSource", "dbTrackerTriggerBits" )
 
 # SiStrip DQMXMLFile for quality tests
 process.dbTrackerQTests = cms.ESSource( "PoolDBESSource"
@@ -243,7 +242,7 @@ process.dbTrackerQTests = cms.ESSource( "PoolDBESSource"
     )
   )
 )
-# process.es_prefer_trackerDqmQTests = cms.ESPrefer( "PoolDBESSource", "dbTrackerQTests" )
+
 process.siStripQTester.getQualityTestsFromFile = False
 process.siStripQTester.label                   = cms.untracked.string( 'SiStripDQM' )
 process.sipixelQTester.getQualityTestsFromFile = False
@@ -273,7 +272,6 @@ process.dqm = cms.Sequence(
 )
 
 # Paths
-# process.PixelOfflineDQMClientWithDataCertification.remove( "process.sipixelQTester" )
 process.path = cms.Path(
   # preparation
   process.gtDigis
