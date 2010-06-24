@@ -1,13 +1,10 @@
-Test Release based on: CMSSW_3_8_0_pre3
-Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_8_0_pre3
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre3
+Test Release based on: CMSSW_3_8_0_pre5
+Base Release in: /afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_8_0_pre5
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/BTauReco                             V00-16-10      V00-16-09      
-DataFormats/CaloTowers                           V02-05-07      V02-05-06      
-DataFormats/ParticleFlowReco                     V12-07-04      V12-07-04      
 DataFormats/PatCandidates                        NoTag          V05-09-22      
 PhysicsTools/PatAlgos                            NoTag          V07-13-24-01   
 PhysicsTools/PatExamples                         NoTag          V00-03-12      
 PhysicsTools/PatUtils                            NoTag          V03-09-12      
 ---------------------------------------
-total packages: 7 (7 displayed)
+total packages: 4 (4 displayed)

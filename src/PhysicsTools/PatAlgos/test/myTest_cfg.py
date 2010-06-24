@@ -9,7 +9,7 @@ process.options = cms.untracked.PSet(
 
 process.source = cms.Source( "PoolSource"
 , fileNames = cms.untracked.vstring(
-    'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre3/output/myPatTuple_addTriggerInfo.root'
+    'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre5/output/myPatTuple_addTriggerInfo.root'
   )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -17,7 +17,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 process.TFileService = cms.Service( "TFileService"
-, fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre3/output/myTest.root' )
+, fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre5/output/myTest.root' )
 )
 
 process.triggerTest = cms.EDAnalyzer( "myTriggerTest"
@@ -43,7 +43,7 @@ process.triggerTest = cms.EDAnalyzer( "myTriggerTest"
 , displayEvent = cms.bool( True )
   # matching
 , displayMatches = cms.bool( True )
-  # embedding
+  # embedding                               CMSSW_3_8_0_pre3
 , displayEmbedding      = cms.bool( True )
 , patPhotons            = cms.InputTag( "cleanPatPhotons" )
 , patElectrons          = cms.InputTag( "cleanPatElectrons" )

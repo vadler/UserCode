@@ -29,8 +29,8 @@ process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-# process.GlobalTag.globaltag = 'GR_R_37X_V3::All'
-process.GlobalTag.globaltag = 'GR10_P_V5::All'
+# process.GlobalTag.globaltag = 'GR_R_38X_V3::All'
+process.GlobalTag.globaltag = 'GR10_P_V6::All'
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 # process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )
 
@@ -48,7 +48,7 @@ process.p = cms.Path(
 from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre3/output/myPatTuple_triggerOnly.root' )
+, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre5/output/myPatTuple_triggerOnly.root' )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'p'
