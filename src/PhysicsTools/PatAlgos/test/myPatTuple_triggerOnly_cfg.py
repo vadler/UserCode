@@ -36,6 +36,15 @@ process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_c
 
 ## PAT trigger
 process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
+process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'RECO' )
+process.patTrigger.l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', 'RECO' )
+process.patTrigger.l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , 'RECO' )
+process.patTrigger.l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central'    , 'RECO' )
+process.patTrigger.l1ExtraForJet  = cms.InputTag( 'l1extraParticles', 'Forward'    , 'RECO' )
+process.patTrigger.l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'        , 'RECO' )
+process.patTrigger.l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'        , 'RECO' )
+process.patTrigger.l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'        , 'RECO' )
+process.patTrigger.saveL1Refs     = cms.bool( True )
 process.patTriggerEvent.patTriggerMatches = []
 process.p = cms.Path(
 #   process.gtDigis
@@ -56,6 +65,8 @@ process.out = cms.OutputModule(
   )
 , outputCommands = cms.untracked.vstring(
     'drop *'
+  , 'keep *_l1extraParticles_*_RECO'
+  , 'keep *_gctDigis_*_RECO'
   , *patTriggerEventContent
   )
 )

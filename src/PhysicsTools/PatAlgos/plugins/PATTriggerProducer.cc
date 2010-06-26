@@ -201,28 +201,22 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       }
     }
     // Try event setup, if no product
-    bool tableFromSetup( false ); // DEBUG
     if ( hltPrescaleTable.size() == 0 ) {
       if ( ! labelHltPrescaleTable_.empty() ) {
         LogWarning( "hltPrescaleInputTag" ) << "HLTPrescaleTable product with label '" << labelHltPrescaleTable_ << "' not found in process '" << nameProcess_ << "'; using default from event setup";
       }
       if ( hltConfig_.prescaleSize() > 0 ) {
-//         std::cout << "produce(): HLTPrescaleTable found in event setup with set " << hltConfig_.prescaleSet( iEvent, iSetup ) << " and label size " << hltConfig_.prescaleLabels().size() << std::endl; // DEBUG
         if ( hltConfig_.prescaleSet( iEvent, iSetup ) != -1 ) {
           hltPrescaleTable = trigger::HLTPrescaleTable( hltConfig_.prescaleSet( iEvent, iSetup ), hltConfig_.prescaleLabels(), hltConfig_.prescaleTable() );
-          tableFromSetup = true; // DEBUG
         } else {
           LogWarning( "hltPrescaleSet" ) << "HLTPrescaleTable from event setup has error";
         }
-//       } else { // DEBUG
-//         std::cout << "produce(): HLTPrescaleTable not found in event setup" << std::endl; // DEBUG
       }
     }
     unsigned set( hltPrescaleTable.set() );
-    bool foundPrescaleLabel( false ); // DEBUG
     if ( hltPrescaleTable.size() > 0 ) {
       if ( hltPrescaleLabel_.size() > 0 ) {
-// DEBUG         bool foundPrescaleLabel( false );
+        bool foundPrescaleLabel( false );
         for ( unsigned iLabel = 0; iLabel <  hltPrescaleTable.labels().size(); ++iLabel ) {
           if ( hltPrescaleTable.labels().at( iLabel ) == hltPrescaleLabel_ ) {
             set                = iLabel;
@@ -232,8 +226,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         }
         if ( ! foundPrescaleLabel ) {
           LogWarning( "hltPrescaleLabel" ) << "HLT prescale label '" << hltPrescaleLabel_ << "' not in prescale table; using default";
-//         } else { // DEBUG
-//           std::cout << "produce(): HLT prescale label '" << hltPrescaleLabel_ << "' found" << std::endl; // DEBUG
         }
       }
     } else {
@@ -272,16 +264,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       }
       if ( ! onlyStandAlone_ ) {
         TriggerPath triggerPath( namePath, indexPath, hltConfig_.prescaleValue( set, namePath ), handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), indexLastFilterPath );
-//         std::cout << "produce(): path " << namePath << " has prescales:" << std::endl; // DEBUG
-//         std::cout << "           from HLTPrescaleTable         : " << hltPrescaleTable.prescale( namePath ) << std::endl; // DEBUG
-//         std::cout << "           from HLTConfigProvider (event): " << hltConfig_.prescaleValue( iEvent, iSetup, namePath ) << std::endl; // DEBUG
-//         std::cout << "           from HLTConfigProvider        : " << hltConfig_.prescaleValue( hltPrescaleTable.set(), namePath ) << " (set: " << hltPrescaleTable.set(); // DEBUG
-//         if ( ! tableFromSetup ) std::cout << " old"; // DEBUG
-//         std::cout << ")" << std::endl; // DEBUG
-//         if ( foundPrescaleLabel ) { // DEBUG
-//           std::cout << "           from HLTPrescaleTable  (conf) : " << hltPrescaleTable.prescale( set, namePath ) << std::endl; // DEBUG
-//           std::cout << "           from HLTConfigProvider (conf) : " << hltConfig_.prescaleValue( set, namePath ) << " (set: " << set << ")" << std::endl; // DEBUG
-//         } // DEBUG
         // add module names to path and states' map
         assert( indexLastFilterPath < sizeModulesPath );
         std::map< unsigned, std::string > indicesModules;
@@ -574,7 +556,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           const reco::LeafCandidate * leafCandidate( handleL1ExtraETM->at( l1ETM ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
         }
-        std::cout << "produce():      L1 etm pt      " << triggerObject.pt() << std::endl; // DEBUG
+        std::cout << "produce():      L1 etm pt    " << triggerObject.pt() << std::endl; // DEBUG
         if ( triggerObject.origObjRef().isNonnull() ) { // DEBUG
           std::cout << "           orig L1 etm pt    " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
           if ( triggerObject.origL1EtMissRef().isNonnull() ) { // DEBUG
@@ -627,7 +609,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           const reco::LeafCandidate * leafCandidate( handleL1ExtraHTM->at( l1HTM ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
         }
-        std::cout << "produce():      L1 htm pt      " << triggerObject.pt() << std::endl; // DEBUG
+        std::cout << "produce():      L1 htm pt    " << triggerObject.pt() << std::endl; // DEBUG
         if ( triggerObject.origObjRef().isNonnull() ) { // DEBUG
           std::cout << "           orig L1 htm pt    " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
           if ( triggerObject.origL1EtMissRef().isNonnull() ) { // DEBUG
