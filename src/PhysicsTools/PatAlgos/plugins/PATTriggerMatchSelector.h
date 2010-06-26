@@ -14,10 +14,10 @@
    .
 
   \author   Volker Adler
-  \version  $Id: PATTriggerMatchSelector.h,v 1.4 2009/12/10 10:44:37 vadler Exp $
+  \version  $Id: PATTriggerMatchSelector.h,v 1.5 2010/06/16 15:40:58 vadler Exp $
 */
 //
-// $Id: PATTriggerMatchSelector.h,v 1.4 2009/12/10 10:44:37 vadler Exp $
+// $Id: PATTriggerMatchSelector.h,v 1.5 2010/06/16 15:40:58 vadler Exp $
 //
 
 
@@ -29,7 +29,6 @@
 
 #include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
 #include "FWCore/Utilities/interface/InputTag.h"
-#include <iostream> // DEBUG
 
 
 namespace pat {
@@ -124,7 +123,6 @@ namespace pat {
                     if ( pathNames_.at( k ) == "*" || pathNames_.at( k ) == "@" || trigObj.hasPathName( pathNames_.at( k ), pathLastFilterAcceptedOnly_ ) ) {
                       for ( size_t l = 0; l < collectionTags_.size(); ++l ) {
                         if ( collectionTags_.at( l ) == "*" || collectionTags_.at( l ) == "@" || trigObj.hasCollection( collectionTags_.at( l ) ) ) {
-                          std::cout << "operator(): collection " << trigObj.collection() << std::endl; // DEBUG
                           for ( size_t m = 0; m < filterIdsEnum_.size(); ++m ) {
                             if ( filterIdsEnum_.at( m ) == "*" || filterIdsEnum_.at( m ) == "@" ) return true;
                             std::map< std::string, trigger::TriggerObjectType >::const_iterator iter( filterIdsEnumMap.find( filterIdsEnum_.at( m ) ) );

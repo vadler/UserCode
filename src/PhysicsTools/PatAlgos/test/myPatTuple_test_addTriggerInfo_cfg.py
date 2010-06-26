@@ -8,14 +8,15 @@ process.p = cms.Path(
 # Trigger Test
 process.patTrigger = cms.EDProducer( "PATTriggerProducer"
   ## L1
-, l1ExtraMu      = cms.InputTag( "l1extraParticles", ""           , "RECO" )
-, l1ExtraNoIsoEG = cms.InputTag( "l1extraParticles", "NonIsolated", "RECO" )
-, l1ExtraIsoEG   = cms.InputTag( "l1extraParticles", "Isolated"   , "RECO" )
-, l1ExtraCenJet  = cms.InputTag( "l1extraParticles", "Central"    , "RECO" )
-, l1ExtraForJet  = cms.InputTag( "l1extraParticles", "Forward"    , "RECO" )
-, l1ExtraTauJet  = cms.InputTag( "l1extraParticles", "Tau"        , "RECO" )
-, l1ExtraETM     = cms.InputTag( "l1extraParticles", "MET"        , "RECO" )
-, l1ExtraHTM     = cms.InputTag( "l1extraParticles", "MHT"        , "RECO" )
+, l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'HLT' )
+, l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', 'HLT' )
+, l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , 'HLT' )
+, l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central'    , 'HLT' )
+, l1ExtraForJet  = cms.InputTag( 'l1extraParticles', 'Forward'    , 'HLT' )
+, l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'        , 'HLT' )
+, l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'        , 'HLT' )
+, l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'        , 'HLT' )
+, saveL1Refs     = cms.bool( True )
   ## HLT (L3)
 , processName    = cms.string( 'HLT' )
 , triggerResults = cms.InputTag( "TriggerResults" )
@@ -215,23 +216,12 @@ process.patTriggerTestSequence = cms.Sequence(
 )
 process.patDefaultSequence += process.patTriggerTestSequence
 process.out.outputCommands += [
-  'keep patTriggerAlgorithms_patTrigger_*_*'
-, 'keep patTriggerObjects_patTrigger_*_*'
-, 'keep patTriggerFilters_patTrigger_*_*'
-, 'keep patTriggerPaths_patTrigger_*_*'
-, 'keep patTriggerEvent_patTriggerEventTest_*_*'
-, 'keep patTriggerObjectsedmAssociation_patTriggerEventTest_*_*'
-, 'keep *_cleanPatPhotonsTriggerTestMatch_*_*'
-, 'keep *_cleanPatElectronsTriggerTestMatch_*_*'
-, 'keep *_cleanPatMuonsTriggerTestMatch_*_*'
-, 'keep *_cleanPatTausTriggerTestMatch_*_*'
-, 'keep *_cleanPatJetsTriggerTestMatch_*_*'
-, 'keep *_patMETsTriggerTestMatch_*_*'
-, 'keep patTriggerObjectStandAlones_patTrigger_*_*'
+  'keep *_patTrigger_*_*'
+, 'keep *_patTriggerEventTest_*_*'
+, 'keep *_*TriggerTestMatch_*_*'
 , 'keep patTriggerObjectStandAlonesedmAssociation_*_*_*'
 , 'keep edmTriggerResults_TriggerResults_*_HLT'
 , 'keep *_hltTriggerSummaryAOD_*_*'
-, 'keep L1GlobalTriggerReadoutRecord_gtDigis_*_*'
-, 'keep *_l1GtRecord_*_*'
-, 'keep *_l1extraParticles_*_*'
+, 'keep *_l1extraParticles_*_HLT'
+, 'keep *_gctDigis_*_HLT'
 ]

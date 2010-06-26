@@ -58,6 +58,7 @@ namespace pat {
       edm::InputTag tagL1ExtraTauJet_;  // configuration (optional)
       edm::InputTag tagL1ExtraETM_;     // configuration (optional)
       edm::InputTag tagL1ExtraHTM_;     // configuration (optional)
+      bool          saveL1Refs_;        // configuration (optional with default)
       // HLT
       HLTConfigProvider         hltConfig_;
       bool                      hltConfigInit_;
