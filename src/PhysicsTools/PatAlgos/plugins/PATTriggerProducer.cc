@@ -40,6 +40,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   tagL1ExtraTauJet_(),
   tagL1ExtraETM_(),
   tagL1ExtraHTM_(),
+  saveL1Refs_( false ),
   // HLT configuration parameters
   nameProcess_( iConfig.getParameter< std::string >( "processName" ) ),
   tagTriggerResults_( "TriggerResults" ),
@@ -84,6 +85,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
     tagL1ExtraHTM_ = iConfig.getParameter< InputTag >( "l1ExtraHTM" );
     if ( tagL1ExtraHTM_.process().empty() ) tagL1ExtraHTM_ = InputTag( tagL1ExtraHTM_.label(), tagL1ExtraHTM_.instance(), nameProcess_ );
   }
+  if ( iConfig.exists( "saveL1Refs" ) ) saveL1Refs_ = iConfig.getParameter< bool >( "saveL1Refs" );
   // HLT configuration parameters
   if ( iConfig.exists( "triggerResults" ) )      tagTriggerResults_      = iConfig.getParameter< InputTag >( "triggerResults" );
   if ( iConfig.exists( "triggerEvent" ) )        tagTriggerEvent_        = iConfig.getParameter< InputTag >( "triggerEvent" );
@@ -403,10 +405,17 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       LogError( "errorL1ExtraMuValid" ) << "l1extra::L1MuonParticleCollection product with InputTag " << tagL1ExtraMu_.encode() << " not in event";
     } else {
       for ( size_t l1Mu = 0; l1Mu < handleL1ExtraMu->size(); ++l1Mu ) {
-        const reco::CandidateBaseRef leafCandRef( l1extra::L1MuonParticleRef( handleL1ExtraMu, l1Mu ) );
-        TriggerObject triggerObject( leafCandRef );
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1MuonParticleRef( handleL1ExtraMu, l1Mu ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraMu->at( l1Mu ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        std::cout << "produce():      L1 muon pt      " << triggerObject.pt() << std::endl; // DEBUG
         if ( triggerObject.origObjRef().isNonnull() ) { // DEBUG
-          std::cout << "produce(): orig L1 muon pt      " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
+          std::cout << "           orig L1 muon pt      " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
           std::cout << "           orig L1 muon isIso   " << triggerObject.origL1MuonRef()->isIsolated() << std::endl; // DEBUG
           std::cout << "           orig L1 muon quality " << triggerObject.origL1GmtMuonCand()->quality() << std::endl; // DEBUG
           if ( triggerObject.origL1EmRef().isNonnull() ) { // DEBUG
@@ -415,7 +424,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
             std::cout << "           orig L1 muon/em ref is NULL" << std::endl; // DEBUG
           } // DEBUG
         } else { // DEBUG
-          std::cout << "produce(): orig L1 muon ref is NULL" << std::endl; // DEBUG
+          std::cout << "           orig L1 muon ref is NULL" << std::endl; // DEBUG
         } // DEBUG
         triggerObject.setCollection( tagL1ExtraMu_ );
         triggerObject.addFilterId( trigger::TriggerL1Mu );
@@ -431,14 +440,29 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       LogError( "errorL1ExtraNoIsoEGValid" ) << "l1extra::L1EmParticleCollection product with InputTag " << tagL1ExtraNoIsoEG_.encode() << " not in event";
     } else {
       for ( size_t l1NoIsoEG = 0; l1NoIsoEG < handleL1ExtraNoIsoEG->size(); ++l1NoIsoEG ) {
-        const reco::CandidateBaseRef leafCandRef( l1extra::L1EmParticleRef( handleL1ExtraNoIsoEG, l1NoIsoEG ) );
-        TriggerObject triggerObject( leafCandRef );
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1EmParticleRef( handleL1ExtraNoIsoEG, l1NoIsoEG ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraNoIsoEG->at( l1NoIsoEG ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        std::cout << "produce():      L1 em pt      " << triggerObject.pt() << std::endl; // DEBUG
         if ( triggerObject.origObjRef().isNonnull() ) { // DEBUG
-          std::cout << "produce(): orig L1 em pt   " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
-          std::cout << "           orig L1 em type " << triggerObject.origL1EmRef()->type() << std::endl; // DEBUG
-          std::cout << "           orig L1 em iso  " << triggerObject.origL1GctEmCand()->isolated() << std::endl; // DEBUG
+          std::cout << "           orig L1 em pt    " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
+          if ( triggerObject.origL1EmRef().isNonnull() ) { // DEBUG
+            std::cout << "           orig L1 em type  " << triggerObject.origL1EmRef()->type() << std::endl; // DEBUG
+            if ( triggerObject.origL1GctEmCand() != 0 ) { // DEBUG
+              std::cout << "           orig L1 em isIso " << triggerObject.origL1GctEmCand()->isolated() << std::endl; // DEBUG
+            } else { // DEBUG
+              std::cout << "           orig L1 em GCT is NULL" << std::endl; // DEBUG
+            } // DEBUG
+          } else { // DEBUG
+            std::cout << "           orig L1 em cast is NULL" << std::endl; // DEBUG
+          } // DEBUG
         } else { // DEBUG
-          std::cout << "produce(): orig L1 em ref is NULL" << std::endl; // DEBUG
+          std::cout << "           orig L1 em ref is NULL" << std::endl; // DEBUG
         } // DEBUG
         triggerObject.setCollection( tagL1ExtraNoIsoEG_ );
         triggerObject.addFilterId( trigger::TriggerL1NoIsoEG );
@@ -454,15 +478,14 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       LogError( "errorL1ExtraisoEGValid" ) << "l1extra::L1EmParticleCollection product with InputTag " << tagL1ExtraIsoEG_.encode() << " not in event";
     } else {
       for ( size_t l1IsoEG = 0; l1IsoEG < handleL1ExtraIsoEG->size(); ++l1IsoEG ) {
-        const reco::CandidateBaseRef leafCandRef( l1extra::L1EmParticleRef( handleL1ExtraIsoEG, l1IsoEG ) );
-        TriggerObject triggerObject( leafCandRef );
-        if ( triggerObject.origObjRef().isNonnull() ) { // DEBUG
-          std::cout << "produce(): orig L1 em pt   " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
-          std::cout << "           orig L1 em type " << triggerObject.origL1EmRef()->type() << std::endl; // DEBUG
-          std::cout << "           orig L1 em iso  " << triggerObject.origL1GctEmCand()->isolated() << std::endl; // DEBUG
-        } else { // DEBUG
-          std::cout << "produce(): orig L1 em ref is NULL" << std::endl; // DEBUG
-        } // DEBUG
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1EmParticleRef( handleL1ExtraIsoEG, l1IsoEG ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraIsoEG->at( l1IsoEG ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
         triggerObject.setCollection( tagL1ExtraIsoEG_ );
         triggerObject.addFilterId( trigger::TriggerL1IsoEG );
         if ( ! onlyStandAlone_ )triggerObjects->push_back( triggerObject );
@@ -477,17 +500,14 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       LogError( "errorL1ExtraCenJetValid" ) << "l1extra::L1JetParticleCollection product with InputTag " << tagL1ExtraCenJet_.encode() << " not in event";
     } else {
       for ( size_t l1CenJet = 0; l1CenJet < handleL1ExtraCenJet->size(); ++l1CenJet ) {
-        const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraCenJet, l1CenJet ) );
-        TriggerObject triggerObject( leafCandRef );
-        if ( triggerObject.origObjRef().isNonnull() ) { // DEBUG
-          std::cout << "produce(): orig L1 jet pt      " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet type    " << triggerObject.origL1JetRef()->type() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet central " << triggerObject.origL1GctJetCand()->isCentral() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet forward " << triggerObject.origL1GctJetCand()->isForward() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet tau     " << triggerObject.origL1GctJetCand()->isTau() << std::endl; // DEBUG
-        } else { // DEBUG
-          std::cout << "produce(): orig L1 jet ref is NULL" << std::endl; // DEBUG
-        } // DEBUG
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraCenJet, l1CenJet ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraCenJet->at( l1CenJet ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
         triggerObject.setCollection( tagL1ExtraCenJet_ );
         triggerObject.addFilterId( trigger::TriggerL1CenJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
@@ -502,17 +522,14 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       LogError( "errorL1ExtraForJetValid" ) << "l1extra::L1JetParticleCollection product with InputTag " << tagL1ExtraForJet_.encode() << " not in event";
     } else {
       for ( size_t l1ForJet = 0; l1ForJet < handleL1ExtraForJet->size(); ++l1ForJet ) {
-        const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraForJet, l1ForJet ) );
-        TriggerObject triggerObject( leafCandRef );
-        if ( triggerObject.origObjRef().isNonnull() ) { // DEBUG
-          std::cout << "produce(): orig L1 jet pt      " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet type    " << triggerObject.origL1JetRef()->type() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet central " << triggerObject.origL1GctJetCand()->isCentral() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet forward " << triggerObject.origL1GctJetCand()->isForward() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet tau     " << triggerObject.origL1GctJetCand()->isTau() << std::endl; // DEBUG
-        } else { // DEBUG
-          std::cout << "produce(): orig L1 jet ref is NULL" << std::endl; // DEBUG
-        } // DEBUG
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraForJet, l1ForJet ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraForJet->at( l1ForJet ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
         triggerObject.setCollection( tagL1ExtraForJet_ );
         triggerObject.addFilterId( trigger::TriggerL1ForJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
@@ -527,17 +544,14 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       LogError( "errorL1ExtraTauJetValid" ) << "l1extra::L1JetParticleCollection product with InputTag " << tagL1ExtraTauJet_.encode() << " not in event";
     } else {
       for ( size_t l1TauJet = 0; l1TauJet < handleL1ExtraTauJet->size(); ++l1TauJet ) {
-        const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraTauJet, l1TauJet ) );
-        TriggerObject triggerObject( leafCandRef );
-        if ( triggerObject.origObjRef().isNonnull() ) { // DEBUG
-          std::cout << "produce(): orig L1 jet pt      " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet type    " << triggerObject.origL1JetRef()->type() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet central " << triggerObject.origL1GctJetCand()->isCentral() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet forward " << triggerObject.origL1GctJetCand()->isForward() << std::endl; // DEBUG
-          std::cout << "           orig L1 jet tau     " << triggerObject.origL1GctJetCand()->isTau() << std::endl; // DEBUG
-        } else { // DEBUG
-          std::cout << "produce(): orig L1 jet ref is NULL" << std::endl; // DEBUG
-        } // DEBUG
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraTauJet, l1TauJet ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraTauJet->at( l1TauJet ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
         triggerObject.setCollection( tagL1ExtraTauJet_ );
         triggerObject.addFilterId( trigger::TriggerL1TauJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
@@ -552,14 +566,44 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       LogError( "errorL1ExtraETMValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag " << tagL1ExtraETM_.encode() << " not in event";
     } else {
       for ( size_t l1ETM = 0; l1ETM < handleL1ExtraETM->size(); ++l1ETM ) {
-        const reco::CandidateBaseRef leafCandRef( l1extra::L1EtMissParticleRef( handleL1ExtraETM, l1ETM ) );
-        TriggerObject triggerObject( leafCandRef );
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1EtMissParticleRef( handleL1ExtraETM, l1ETM ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraETM->at( l1ETM ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        std::cout << "produce():      L1 etm pt      " << triggerObject.pt() << std::endl; // DEBUG
         if ( triggerObject.origObjRef().isNonnull() ) { // DEBUG
-          std::cout << "produce(): orig L1 etm pt   " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
-          std::cout << "           orig L1 etm type " << triggerObject.origL1EtMissRef()->type() << std::endl; // DEBUG
-          std::cout << "           orig L1 etm et   " << triggerObject.origL1GctEtMiss()->et() << std::endl; // DEBUG
+          std::cout << "           orig L1 etm pt    " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
+          if ( triggerObject.origL1EtMissRef().isNonnull() ) { // DEBUG
+            std::cout << "           orig L1 etm type  " << triggerObject.origL1EtMissRef()->type() << std::endl; // DEBUG
+            if ( triggerObject.origL1GctEtMiss() != 0 ) { // DEBUG
+              std::cout << "           orig L1 etm name " << triggerObject.origL1GctEtMiss()->name() << std::endl; // DEBUG
+            } else { // DEBUG
+              std::cout << "           orig L1 etm GCT EtMiss is NULL" << std::endl; // DEBUG
+            } // DEBUG
+            if ( triggerObject.origL1GctEtTotal() != 0 ) { // DEBUG
+              std::cout << "           orig L1 etm name " << triggerObject.origL1GctEtTotal()->name() << std::endl; // DEBUG
+            } else { // DEBUG
+              std::cout << "           orig L1 etm GCT EtTotal is NULL" << std::endl; // DEBUG
+            } // DEBUG
+            if ( triggerObject.origL1GctHtMiss() != 0 ) { // DEBUG
+              std::cout << "           orig L1 etm name " << triggerObject.origL1GctHtMiss()->name() << std::endl; // DEBUG
+            } else { // DEBUG
+              std::cout << "           orig L1 etm GCT HtMiss is NULL" << std::endl; // DEBUG
+            } // DEBUG
+            if ( triggerObject.origL1GctEtHad() != 0 ) { // DEBUG
+              std::cout << "           orig L1 etm name " << triggerObject.origL1GctEtHad()->name() << std::endl; // DEBUG
+            } else { // DEBUG
+              std::cout << "           orig L1 etm GCT EtHad is NULL" << std::endl; // DEBUG
+            } // DEBUG
+          } else { // DEBUG
+            std::cout << "           orig L1 etm cast is NULL" << std::endl; // DEBUG
+          } // DEBUG
         } else { // DEBUG
-          std::cout << "produce(): orig L1 etm ref is NULL" << std::endl; // DEBUG
+          std::cout << "           orig L1 etm ref is NULL" << std::endl; // DEBUG
         } // DEBUG
         triggerObject.setCollection( tagL1ExtraETM_ );
         triggerObject.addFilterId( trigger::TriggerL1ETM );
@@ -575,14 +619,44 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       LogError( "errorL1ExtraHTMValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag " << tagL1ExtraHTM_.encode() << " not in event";
     } else {
       for ( size_t l1HTM = 0; l1HTM < handleL1ExtraHTM->size(); ++l1HTM ) {
-        const reco::CandidateBaseRef leafCandRef( l1extra::L1EtMissParticleRef( handleL1ExtraHTM, l1HTM ) );
-        TriggerObject triggerObject( leafCandRef );
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1EtMissParticleRef( handleL1ExtraHTM, l1HTM ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraHTM->at( l1HTM ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        std::cout << "produce():      L1 htm pt      " << triggerObject.pt() << std::endl; // DEBUG
         if ( triggerObject.origObjRef().isNonnull() ) { // DEBUG
-          std::cout << "produce(): orig L1 htm pt   " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
-          std::cout << "           orig L1 htm type " << triggerObject.origL1EtMissRef()->type() << std::endl; // DEBUG
-          std::cout << "           orig L1 htm et   " << triggerObject.origL1GctHtMiss()->et() << std::endl; // DEBUG
+          std::cout << "           orig L1 htm pt    " << triggerObject.origObjRef()->pt() << std::endl; // DEBUG
+          if ( triggerObject.origL1EtMissRef().isNonnull() ) { // DEBUG
+            std::cout << "           orig L1 htm type  " << triggerObject.origL1EtMissRef()->type() << std::endl; // DEBUG
+            if ( triggerObject.origL1GctEtMiss() != 0 ) { // DEBUG
+              std::cout << "           orig L1 htm name " << triggerObject.origL1GctEtMiss()->name() << std::endl; // DEBUG
+            } else { // DEBUG
+              std::cout << "           orig L1 htm GCT EtMiss is NULL" << std::endl; // DEBUG
+            } // DEBUG
+            if ( triggerObject.origL1GctEtTotal() != 0 ) { // DEBUG
+              std::cout << "           orig L1 htm name " << triggerObject.origL1GctEtTotal()->name() << std::endl; // DEBUG
+            } else { // DEBUG
+              std::cout << "           orig L1 htm GCT EtTotal is NULL" << std::endl; // DEBUG
+            } // DEBUG
+            if ( triggerObject.origL1GctHtMiss() != 0 ) { // DEBUG
+              std::cout << "           orig L1 htm name " << triggerObject.origL1GctHtMiss()->name() << std::endl; // DEBUG
+            } else { // DEBUG
+              std::cout << "           orig L1 htm GCT HtMiss is NULL" << std::endl; // DEBUG
+            } // DEBUG
+            if ( triggerObject.origL1GctEtHad() != 0 ) { // DEBUG
+              std::cout << "           orig L1 htm name " << triggerObject.origL1GctEtHad()->name() << std::endl; // DEBUG
+            } else { // DEBUG
+              std::cout << "           orig L1 htm GCT EtHad is NULL" << std::endl; // DEBUG
+            } // DEBUG
+          } else { // DEBUG
+            std::cout << "           orig L1 htm cast is NULL" << std::endl; // DEBUG
+          } // DEBUG
         } else { // DEBUG
-          std::cout << "produce(): orig L1 htm ref is NULL" << std::endl; // DEBUG
+          std::cout << "           orig L1 htm ref is NULL" << std::endl; // DEBUG
         } // DEBUG
         triggerObject.setCollection( tagL1ExtraHTM_ );
         triggerObject.addFilterId( trigger::TriggerL1HTM );

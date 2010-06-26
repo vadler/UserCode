@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <map>
+#include <iostream>
 
 #include "FWCore/Framework/interface/Run.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -321,13 +322,111 @@ void myTriggerTest::analyze( const edm::Event & iEvent, const edm::EventSetup & 
     for ( size_t iId = 0; iId < ids.size(); ++iId ) {
       histos1D_[ "filterIds" ]->Fill( ids.at( iId ) );
     }
+    if ( iObject->collection().find( "l1extraParticles" ) != std::string::npos ) {
+      if ( iObject->hasFilterId( trigger::TriggerL1Mu ) ) {
+        std::cout << "L1 refs:      L1 muon pt      " << iObject->pt() << std::endl;
+        if ( iObject->origObjRef().isNonnull() ) {
+          std::cout << "         orig L1 muon pt      " << iObject->origObjRef()->pt() << std::endl;
+          std::cout << "         orig L1 muon isIso   " << iObject->origL1MuonRef()->isIsolated() << std::endl;
+          std::cout << "         orig L1 muon quality " << iObject->origL1GmtMuonCand()->quality() << std::endl;
+          if ( iObject->origL1EmRef().isNonnull() ) {
+            std::cout << "         orig L1 muon/em type " << iObject->origL1EmRef()->type() << std::endl;
+          } else {
+            std::cout << "         orig L1 muon/em ref is NULL" << std::endl;
+          }
+        } else {
+          std::cout << "         orig L1 muon ref is NULL" << std::endl;
+        }
+      } else if ( iObject->hasFilterId( trigger::TriggerL1NoIsoEG ) ) {
+        std::cout << "L1 refs:      L1 em pt    " << iObject->pt() << std::endl;
+        if ( iObject->origObjRef().isNonnull() ) {
+          std::cout << "         orig L1 em pt    " << iObject->origObjRef()->pt() << std::endl;
+          if ( iObject->origL1EmRef().isNonnull() ) {
+            std::cout << "         orig L1 em type  " << iObject->origL1EmRef()->type() << std::endl;
+            if ( iObject->origL1GctEmCand() != 0 ) {
+              std::cout << "         orig L1 em isIso " << iObject->origL1GctEmCand()->isolated() << std::endl;
+            } else {
+              std::cout << "         orig L1 em GCT is NULL" << std::endl;
+            }
+          } else {
+            std::cout << "         orig L1 em cast is NULL" << std::endl;
+          }
+        } else {
+          std::cout << "         orig L1 em ref is NULL" << std::endl;
+        }
+      } else if ( iObject->hasFilterId( trigger::TriggerL1ETM ) ) {
+        std::cout << "L1 refs:      L1 etm pt    " << iObject->pt() << std::endl;
+        if ( iObject->origObjRef().isNonnull() ) {
+          std::cout << "         orig L1 etm pt    " << iObject->origObjRef()->pt() << std::endl;
+          if ( iObject->origL1EtMissRef().isNonnull() ) {
+            std::cout << "         orig L1 etm type  " << iObject->origL1EtMissRef()->type() << std::endl;
+            if ( iObject->origL1GctEtMiss() != 0 ) {
+              std::cout << "         orig L1 etm name " << iObject->origL1GctEtMiss()->name() << std::endl;
+            } else {
+              std::cout << "         orig L1 etm GCT EtMiss is NULL" << std::endl;
+            }
+            if ( iObject->origL1GctEtTotal() != 0 ) {
+              std::cout << "         orig L1 etm name " << iObject->origL1GctEtTotal()->name() << std::endl;
+            } else {
+              std::cout << "         orig L1 etm GCT EtTotal is NULL" << std::endl;
+            }
+            if ( iObject->origL1GctHtMiss() != 0 ) {
+              std::cout << "         orig L1 etm name " << iObject->origL1GctHtMiss()->name() << std::endl;
+            } else {
+              std::cout << "         orig L1 etm GCT HtMiss is NULL" << std::endl;
+            }
+            if ( iObject->origL1GctEtHad() != 0 ) {
+              std::cout << "         orig L1 etm name " << iObject->origL1GctEtHad()->name() << std::endl;
+            } else {
+              std::cout << "         orig L1 etm GCT EtHad is NULL" << std::endl;
+            }
+          } else {
+            std::cout << "         orig L1 etm cast is NULL" << std::endl;
+          }
+        } else {
+          std::cout << "         orig L1 etm ref is NULL" << std::endl;
+        }
+      } else if ( iObject->hasFilterId( trigger::TriggerL1HTM ) ) {
+        std::cout << "L1 refs:      L1 htm pt    " << iObject->pt() << std::endl;
+        if ( iObject->origObjRef().isNonnull() ) {
+          std::cout << "         orig L1 htm pt    " << iObject->origObjRef()->pt() << std::endl;
+          if ( iObject->origL1EtMissRef().isNonnull() ) {
+            std::cout << "         orig L1 htm type  " << iObject->origL1EtMissRef()->type() << std::endl;
+            if ( iObject->origL1GctEtMiss() != 0 ) {
+              std::cout << "         orig L1 htm name " << iObject->origL1GctEtMiss()->name() << std::endl;
+            } else {
+              std::cout << "         orig L1 htm GCT EtMiss is NULL" << std::endl;
+            }
+            if ( iObject->origL1GctEtTotal() != 0 ) {
+              std::cout << "         orig L1 htm name " << iObject->origL1GctEtTotal()->name() << std::endl;
+            } else {
+              std::cout << "         orig L1 htm GCT EtTotal is NULL" << std::endl;
+            }
+            if ( iObject->origL1GctHtMiss() != 0 ) {
+              std::cout << "         orig L1 htm name " << iObject->origL1GctHtMiss()->name() << std::endl;
+            } else {
+              std::cout << "         orig L1 htm GCT HtMiss is NULL" << std::endl;
+            }
+            if ( iObject->origL1GctEtHad() != 0 ) {
+              std::cout << "         orig L1 htm name " << iObject->origL1GctEtHad()->name() << std::endl;
+            } else {
+              std::cout << "         orig L1 htm GCT EtHad is NULL" << std::endl;
+            }
+          } else {
+            std::cout << "         orig L1 htm cast is NULL" << std::endl;
+          }
+        } else {
+          std::cout << "         orig L1 htm ref is NULL" << std::endl;
+        }
+      }
+    }
   }
   if ( testObjectsL1_ ) {
     bool foundL1( false );
     for ( TriggerObjectCollection::const_iterator iObject = myEventObjects->begin(); iObject != myEventObjects->end(); ++iObject ) {
       if ( foundL1 && iObject->collection().find( "l1extraParticles" ) == std::string::npos ) {
         edm::LogError( "objectOrderL1" ) << "    HLT and L1 objects not properly separated" << "\n"
-                                       << "        collection: " << iObject->collection();
+                                         << "        collection: " << iObject->collection();
       }
       if ( ( ! foundL1 ) && iObject->collection().find( "l1extraParticles" ) != std::string::npos ) {
         foundL1 = true;

@@ -20,7 +20,7 @@ process.source = cms.Source( "PoolSource"
   )
 )
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( 1 )
+  input = cms.untracked.int32( 100 )
 )
 process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskAlgoTrigConfig_cff" )
 process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff" )
