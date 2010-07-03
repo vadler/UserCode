@@ -1,5 +1,5 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.out.fileName = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre5/output/myPatTuple_test_addTriggerInfo.root'
+process.out.fileName = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre6/output/myPatTuple_test_addTriggerInfo.root'
 
 process.p = cms.Path(
   process.patDefaultSequence
@@ -11,7 +11,8 @@ process.patTrigger = cms.EDProducer( "PATTriggerProducer"
 , l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'HLT' )
 , l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', 'HLT' )
 , l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , 'HLT' )
-, l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central'    , 'HLT' )
+# , l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central'    , 'HLT' )
+, l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Cent'    , 'HLT' )
 , l1ExtraForJet  = cms.InputTag( 'l1extraParticles', 'Forward'    , 'HLT' )
 , l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'        , 'HLT' )
 , l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'        , 'HLT' )
