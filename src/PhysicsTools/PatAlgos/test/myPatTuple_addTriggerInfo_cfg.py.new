@@ -30,7 +30,9 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 # switchOnTrigger( process )
 ## all; default to run myTriggerTest_cfg.py afterwards
 switchOnTriggerAll( process )
+process.patTrigger.addL1Algos          = cms.bool( True )
 process.patTrigger.addPathModuleLabels = cms.bool( True )
+process.patTrigger.saveL1Refs          = cms.bool( True )
 switchOnTriggerMatchEmbedding( process )
 process.out.outputCommands += [
   'keep edmTriggerResults_TriggerResults_*_HLT'

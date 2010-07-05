@@ -8,6 +8,7 @@ process.p = cms.Path(
 # Trigger Test
 process.patTrigger = cms.EDProducer( "PATTriggerProducer"
   ## L1
+, addL1Algos     = cms.bool( True )
 , l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'HLT' )
 , l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', 'HLT' )
 , l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , 'HLT' )
