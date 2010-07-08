@@ -4,9 +4,10 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_7_0_patc
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 CommonTools/TriggerUtils                         NoTag                         
 DQM/SiPixelCommon                                V03-02-07      V03-02-06      
+DQM/SiPixelMonitorClient                         V03-12-03      V03-11-07      
 DQM/SiStripMonitorTrack                          V04-00-24      V04-00-22      
 DQM/TrackerCommon                                NoTag          V03-02-07      
 DQM/TrackerMonitorTrack                          V04-01-19      V04-01-17      
 DQM/TrackingMonitor                              V03-02-11      V03-02-09      
 ---------------------------------------
-total packages: 6 (6 displayed)
+total packages: 7 (7 displayed)

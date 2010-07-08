@@ -13,7 +13,7 @@ process.load( "FWCore.MessageService.MessageLogger_cfi" )
 # Conditions and services
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'GR_R_36X_V9::All'
+process.GlobalTag.globaltag = 'GR_R_37X_V6::All'
 process.load( "Configuration.StandardSequences.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
@@ -60,18 +60,18 @@ process.source = cms.Source( "PoolSource"
     ## 133483
     #'/store/data/Commissioning10/MinimumBias/RAW/v4/000/133/483/FE6CB7B6-E14A-DF11-BF6D-000423D98E54.root',
   )
-, skipEvents    = cms.untracked.uint32( 7825 )
+, skipEvents    = cms.untracked.uint32( 7800 )
 , inputCommands = cms.untracked.vstring(
     'keep *'
   , 'drop *_hltL1GtObjectMap_*_*'
   )
 )
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( 10 )
+  input = cms.untracked.int32( 100 )
 )
 
 # process.SiStripMonitorTrack.andOr          = False
-process.SiStripMonitorTrack.dbLabel        = cms.string( 'SiStripDQM' )
+process.SiStripMonitorTrack.dbLabel        = cms.string( 'SiStripDQMTrigger' )
 process.SiStripMonitorTrack.verbosityLevel = cms.uint32( 2 )
 # process.SiStripMonitorTrack.dcsInputTag   = cms.InputTag( "scalersRawToDigi" )
 # process.SiStripMonitorTrack.dcsPartitions = cms.vint32 (
@@ -113,7 +113,7 @@ process.SiStripMonitorTrack.verbosityLevel = cms.uint32( 2 )
 # process.SiStripMonitorTrack.errorReplyHlt = cms.bool( False )
 
 # process.MonitorTrackResiduals.andOr          = False
-process.MonitorTrackResiduals.dbLabel        = cms.string( 'SiStripDQM' )
+process.MonitorTrackResiduals.dbLabel        = cms.string( 'SiStripDQMTrigger' )
 process.MonitorTrackResiduals.verbosityLevel = cms.uint32( 2 )
 # process.MonitorTrackResiduals.dcsInputTag   = cms.InputTag( "scalersRawToDigi" )
 # process.MonitorTrackResiduals.dcsPartitions = cms.vint32 (
@@ -155,7 +155,7 @@ process.MonitorTrackResiduals.andOrHlt      = cms.bool( False )
 process.MonitorTrackResiduals.errorReplyHlt = cms.bool( False )
 
 # process.TrackerCollisionTrackMon.andOr         = false
-process.TrackerCollisionTrackMon.dbLabel        = cms.string( 'SiStripDQM' )
+process.TrackerCollisionTrackMon.dbLabel        = cms.string( 'SiStripDQMTrigger' )
 process.TrackerCollisionTrackMon.verbosityLevel = cms.uint32( 2 )
 # process.TrackerCollisionTrackMon.dcsInputTag   = "scalersRawToDigi"
 # process.TrackerCollisionTrackMon.dcsPartitions = [
@@ -199,8 +199,8 @@ process.TrackerCollisionTrackMon.verbosityLevel = cms.uint32( 2 )
 # process.TrackerCollisionTrackMon.errorReplyHlt = cms.bool( False )
 
 # DB accesses
+# check tags on https://twiki.cern.ch/twiki/bin/view/CMS/TrackerDQMCondDB
 
-# SiStrip AlCaRecoTriggerBits for logical expressions in GenericTriggerEventFlag
 import CondCore.DBCommon.CondDBCommon_cfi
 process.dbTrackerTriggerBits = cms.ESSource( "PoolDBESSource"
 , CondCore.DBCommon.CondDBCommon_cfi.CondDBCommon
@@ -211,42 +211,33 @@ process.dbTrackerTriggerBits = cms.ESSource( "PoolDBESSource"
 #       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
       connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
     , record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_express' )
-#     , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v1_express' ) # only in preparation DB so far
-    , label   = cms.untracked.string( 'SiStripDQM' )
+    , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v2_mc' )
+    , label   = cms.untracked.string( 'SiStripDQMTrigger' )
     )
-  )
-)
-
-# SiStrip DQMXMLFile for quality tests
-process.dbTrackerQTests = cms.ESSource( "PoolDBESSource"
-, CondCore.DBCommon.CondDBCommon_cfi.CondDBCommon
-, toGet   = cms.VPSet(
-    # SiStrip
-    cms.PSet(
+  , cms.PSet(
 #       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/DQMXMLFile_SiStripDQM.db' )
 #       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
       connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
     , record  = cms.string( 'DQMXMLFileRcd' )
-    , tag     = cms.string( 'DQMXMLFile_SiStripDQM_v0_express' )
-    , label   = cms.untracked.string( 'SiStripDQM' )
+    , tag     = cms.string( 'DQMXMLFile_SiStripDQM_v1_mc' )
+    , label   = cms.untracked.string( 'SiStripDQMQTests' )
     )
     # SiPixel
   , cms.PSet(
 #       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/DQMXMLFile_SiPixelDQM.db' )
-#       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_PIXEL' )
+# #       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_PIXEL' ) # DB schema currently screwed up
       connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_PIXEL' )
     , record  = cms.string( 'DQMXMLFileRcd' )
-    , tag     = cms.string( 'DQMXMLFile_SiPixelDQM_v0_express' )
-    , label   = cms.untracked.string( 'SiPixelDQM' )
+    , tag     = cms.string( 'DQMXMLFile_SiPixelDQM_v1_mc' )
+    , label   = cms.untracked.string( 'SiPixelDQMQTests' )
     )
   )
 )
 
 process.siStripQTester.getQualityTestsFromFile = False
-process.siStripQTester.label                   = cms.untracked.string( 'SiStripDQM' )
+process.siStripQTester.label                   = cms.untracked.string( 'SiStripDQMQTests' )
 process.sipixelQTester.getQualityTestsFromFile = False
-process.sipixelQTester.label                   = cms.untracked.string( 'SiPixelDQM' )
+process.sipixelQTester.label                   = cms.untracked.string( 'SiPixelDQMQTests' )
 
 # Scheduling
 
