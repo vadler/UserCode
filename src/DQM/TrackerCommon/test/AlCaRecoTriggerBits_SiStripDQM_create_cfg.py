@@ -19,12 +19,6 @@ process.SiStripDQMCreate = cms.EDAnalyzer( "AlCaRecoTriggerBitsRcdUpdate"
 , listNamesRemove = cms.vstring()
 , triggerListsAdd = cms.VPSet(
     cms.PSet(
-      listName = cms.string( 'SiStripDQM_Gt' )
-    , hltPaths = cms.vstring(
-        'PhysicsDeclared'
-      )
-    )
-  , cms.PSet(
       listName = cms.string( 'SiStripDQM_L1' )
     , hltPaths = cms.vstring(
         'NOT L1Tech_BSC_halo_beam2_inner.v0'                                   # NOT 36
@@ -55,7 +49,7 @@ process.PoolDBOutputService = cms.Service( "PoolDBOutputService"
 , toPut    = cms.VPSet(
     cms.PSet(
       record = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v0_test' )
+    , tag    = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v2_test' )
     )
   )
 )
