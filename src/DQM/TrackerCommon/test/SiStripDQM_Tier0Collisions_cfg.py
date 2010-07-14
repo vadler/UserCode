@@ -17,8 +17,44 @@ process.GlobalTag.globaltag = 'GR_R_38X_V7::All'
 process.load( "Configuration.StandardSequences.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
+# DB accesses
+# check tags on https://twiki.cern.ch/twiki/bin/view/CMS/TrackerDQMCondDB
+import CondCore.DBCommon.CondDBCommon_cfi
+process.dbTrackerTriggerBits = cms.ESSource( "PoolDBESSource"
+, CondCore.DBCommon.CondDBCommon_cfi.CondDBCommon
+, toGet   = cms.VPSet(
+    # SiStrip
+    cms.PSet(
+#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/AlCaRecoTriggerBits_SiStripDQM.db' )
+#       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
+      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
+    , record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
+    , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v2_offline' )
+    , label   = cms.untracked.string( 'SiStripDQMTrigger' )
+    )
+  , cms.PSet(
+#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/DQMXMLFile_SiStripDQM.db' )
+#       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
+      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
+    , record  = cms.string( 'DQMXMLFileRcd' )
+    , tag     = cms.string( 'DQMXMLFile_SiStripDQM_v1_offline' )
+    , label   = cms.untracked.string( 'SiStripDQMQTests' )
+    )
+    # SiPixel
+  , cms.PSet(
+#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/DQMXMLFile_SiPixelDQM.db' )
+# #       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_PIXEL' ) # DB schema currently screwed up
+      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_PIXEL' )
+    , record  = cms.string( 'DQMXMLFileRcd' )
+    , tag     = cms.string( 'DQMXMLFile_SiPixelDQM_v1_offline' )
+    , label   = cms.untracked.string( 'SiPixelDQMQTests' )
+    )
+  )
+)
+
 # Reconstruction
 process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )
+process.load( "Configuration.StandardSequences.L1Reco_cff" )
 process.load( "Configuration.StandardSequences.Reconstruction_cff" )
 # Event cleaning
 process.fourthPLSeeds.ClusterCheckPSet.MaxNumberOfCosmicClusters = 20000
@@ -57,9 +93,14 @@ process.source = cms.Source( "PoolSource"
     '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr1Skim_GOODCOLL-v1/0139/FA7B208C-B33E-DF11-A713-003048679010.root', # 7831 events
     # 132658
     '/store/data/Commissioning10/MinimumBias/RAW-RECO/v8/000/132/658/E8443DDC-AF41-DF11-90D2-003048D4777E.root'
-    ## 133483
-    #'/store/data/Commissioning10/MinimumBias/RAW/v4/000/133/483/FE6CB7B6-E14A-DF11-BF6D-000423D98E54.root',
   )
+
+# , lumisToProcess = cms.untracked.VLuminosityBlockRange(
+#     '132440:157-132440:378'
+#   , '132658:1-132658:51'
+#   , '132658:56-132658:120'
+#   , '132658:127-132658:148'
+#   )
 , skipEvents    = cms.untracked.uint32( 7800 )
 , inputCommands = cms.untracked.vstring(
     'keep *'
@@ -180,7 +221,7 @@ process.TrackerCollisionTrackMon.verbosityLevel = cms.uint32( 2 )
 # #   'L1Tech_BPTX_plus_AND_minus.v0'                                        # 0
 # # , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0' # 40 OR 41
 #   'L1Tech_BSC_minBias_threshold2.v0'                                     # 41
-# , 'NOT L1Tech_BSC_halo_beam2_inner.v0'                                   # NOT 36
+# , 'NOT L1Tech_BSC_halo_beam2_inner.v0'  ~/cms/SiStripDQM/                                 # NOT 36
 # , 'NOT L1Tech_BSC_halo_beam2_outer.v0'                                   # NOT 37
 # , 'NOT L1Tech_BSC_halo_beam1_inner.v0'                                   # NOT 38
 # , 'NOT L1Tech_BSC_halo_beam1_outer.v0'                                   # NOT 39
@@ -198,42 +239,6 @@ process.TrackerCollisionTrackMon.verbosityLevel = cms.uint32( 2 )
 # process.TrackerCollisionTrackMon.andOrHlt      = cms.bool( False )
 # process.TrackerCollisionTrackMon.errorReplyHlt = cms.bool( False )
 
-# DB accesses
-# check tags on https://twiki.cern.ch/twiki/bin/view/CMS/TrackerDQMCondDB
-
-import CondCore.DBCommon.CondDBCommon_cfi
-process.dbTrackerTriggerBits = cms.ESSource( "PoolDBESSource"
-, CondCore.DBCommon.CondDBCommon_cfi.CondDBCommon
-, toGet   = cms.VPSet(
-    # SiStrip
-    cms.PSet(
-#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/AlCaRecoTriggerBits_SiStripDQM.db' )
-#       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
-      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
-    , record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v2_mc' )
-    , label   = cms.untracked.string( 'SiStripDQMTrigger' )
-    )
-  , cms.PSet(
-#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/DQMXMLFile_SiStripDQM.db' )
-#       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
-      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
-    , record  = cms.string( 'DQMXMLFileRcd' )
-    , tag     = cms.string( 'DQMXMLFile_SiStripDQM_v1_mc' )
-    , label   = cms.untracked.string( 'SiStripDQMQTests' )
-    )
-    # SiPixel
-  , cms.PSet(
-#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/DQMXMLFile_SiPixelDQM.db' )
-# #       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_PIXEL' ) # DB schema currently screwed up
-      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_PIXEL' )
-    , record  = cms.string( 'DQMXMLFileRcd' )
-    , tag     = cms.string( 'DQMXMLFile_SiPixelDQM_v1_mc' )
-    , label   = cms.untracked.string( 'SiPixelDQMQTests' )
-    )
-  )
-)
-
 process.siStripQTester.getQualityTestsFromFile = False
 process.siStripQTester.label                   = cms.untracked.string( 'SiStripDQMQTests' )
 process.sipixelQTester.getQualityTestsFromFile = False
@@ -243,12 +248,14 @@ process.sipixelQTester.label                   = cms.untracked.string( 'SiPixelD
 
 # Sequences
 process.raw2Digi = cms.Sequence(
-  process.scalersRawToDigi
+  process.gtDigis
+* process.scalersRawToDigi
 + process.siPixelDigis
 + process.siStripDigis
 )
 process.reco = cms.Sequence(
-  process.trackerlocalreco
+  process.conditionsInEdm
+* process.trackerlocalreco
 * process.offlineBeamSpot
 * process.recopixelvertexing
 * process.ckftracks
@@ -261,23 +268,25 @@ process.dqm = cms.Sequence(
 + process.SiStripDQMTier0
 * process.DQMMessageLogger
 )
-
-# Paths
-process.path = cms.Path(
-  # preparation
-  process.gtDigis
-* process.raw2Digi
-* process.reco
-  # DQM sources
-* process.dqm
-  # DQM client
-* process.dqmRefHistoRootFileGetter
+process.dqmOffline = cms.Sequence(
+  process.dqmRefHistoRootFileGetter
 * process.SiStripOfflineDQMClient
 * process.siStripDaqInfo
 * process.siStripDcsInfo
 * process.siStripCertificationInfo
 * process.PixelOfflineDQMClientWithDataCertification
 * process.DQMMessageLoggerClient
+)
+
+# Paths
+process.path = cms.Path(
+  # preparation
+  process.raw2Digi
+* process.reco
+  # DQM sources
+* process.dqm
+  # DQM client
+* process.dqmOffline
 * process.dqmSaver
 )
 
