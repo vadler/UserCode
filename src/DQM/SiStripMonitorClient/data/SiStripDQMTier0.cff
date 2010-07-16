@@ -1,0 +1,62 @@
+  #-------------------------------------------------
+  # DQM Services
+  #-------------------------------------------------
+
+  # core
+  include "DQMServices/Core/data/DQM.cfg"
+  
+  # DQM environment and saver
+  include "DQMServices/Components/data/DQMEnvironment.cfi"
+  replace dqmEnv.subSystemFolder     = "SiStrip"
+  replace dqmSaver.convention        = "Online" // "Online", "Offline" (default) or "RelVal"
+  replace dqmSaver.workflow          = ""
+  replace dqmSaver.dirName           = "."
+//   replace dqmSaver.forceRunNumber    = -1
+//   replace dqmSaver.saveByLumiSection = 1
+//   replace dqmSaver.saveByMinute      = -1
+  replace dqmSaver.saveByRun         =  1
+  replace dqmSaver.saveAtJobEnd      = true
+
+  #-------------------------------------------------
+  # SiStrip DQM Source and Client
+  #-------------------------------------------------
+  
+  # source
+  include "DQM/SiStripMonitorClient/data/SiStripSourceConfigTier0.cff"
+  
+  #-------------------------------------------------
+  # Scheduling
+  #-------------------------------------------------
+  
+  sequence SiStripDQMTest_cosmicTk = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
+    SiStripDQMTier0_cosmicTk,
+    # from "DQMServices/Components/data/DQMEnvironment.cfi"
+    dqmEnv, 
+    dqmSaver 
+  }
+  
+  sequence SiStripDQMTest_ckf = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
+    SiStripDQMTier0_ckf,
+    # from "DQMServices/Components/data/DQMEnvironment.cfi"
+    dqmEnv, 
+    dqmSaver 
+  }
+  
+  sequence SiStripDQMTest_rs = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
+    SiStripDQMTier0_rs,
+    # from "DQMServices/Components/data/DQMEnvironment.cfi"
+    dqmEnv, 
+    dqmSaver 
+  }
+  
+  sequence SiStripDQMTest = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
+    SiStripDQMTier0,
+    # from "DQMServices/Components/data/DQMEnvironment.cfi"
+    dqmEnv, 
+    dqmSaver 
+  }
+  
