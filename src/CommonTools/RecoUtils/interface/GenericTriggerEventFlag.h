@@ -52,7 +52,6 @@ class GenericTriggerEventFlag {
     std::vector< std::string > gtLogicalExpressions_;
     bool                       errorReplyGt_;
     bool                       andOrL1_;
-    bool                       l1BeforeMask_;
     std::string                l1DBKey_;
     std::vector< std::string > l1LogicalExpressions_;
     bool                       errorReplyL1_;
