@@ -93,6 +93,8 @@ process.source = cms.Source( "PoolSource"
     '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr1Skim_GOODCOLL-v1/0139/FA7B208C-B33E-DF11-A713-003048679010.root', # 7831 events
     # 132658
     '/store/data/Commissioning10/MinimumBias/RAW-RECO/v8/000/132/658/E8443DDC-AF41-DF11-90D2-003048D4777E.root'
+#     # 140059
+ #    '/store/data/Run2010A/MinimumBias/RAW/v1/000/140/059/F431B95E-3E8E-DF11-821F-001D09F2A690.root'
   )
 
 # , lumisToProcess = cms.untracked.VLuminosityBlockRange(
@@ -209,19 +211,22 @@ process.TrackerCollisionTrackMon.verbosityLevel = cms.uint32( 2 )
 # ]
 # process.TrackerCollisionTrackMon.andOrDcs      = False
 # process.TrackerCollisionTrackMon.errorReplyDcs = True
-# process.TrackerCollisionTrackMon.gtInputTag    = cms.InputTag( "gtDigis" )
-# process.TrackerCollisionTrackMon.gtDBKey       = cms.string( 'SiStripDQM_Gt' )
-# process.TrackerCollisionTrackMon.gtStatusBits  = cms.vstring(
-#   'PhysicsDeclared'
-# )
-# process.TrackerCollisionTrackMon.andOrGt       = cms.bool( False )
-# process.TrackerCollisionTrackMon.errorReplyGt  = cms.bool( True )
+process.TrackerCollisionTrackMon.gtInputTag    = cms.InputTag( "gtDigis" )
+# process.TrackerCollisionTrackMon.gtEvmInputTag = cms.InputTag( "gtEvmDigis" )
+process.TrackerCollisionTrackMon.gtDBKey       = cms.string( 'SiStripDQM_Gt' )
+process.TrackerCollisionTrackMon.gtStatusBits  = cms.vstring(
+  'PhysicsDeclared'
+, 'StableBeam'
+, '7TeV'
+)
+process.TrackerCollisionTrackMon.andOrGt        = cms.bool( False )
+process.TrackerCollisionTrackMon.errorReplyGt   = cms.bool( True )
 # process.TrackerCollisionTrackMon.l1DBKey       = 'SiStripDQM_L1'
 # process.TrackerCollisionTrackMon.l1Algorithms  = [
 # #   'L1Tech_BPTX_plus_AND_minus.v0'                                        # 0
 # # , 'L1Tech_BSC_minBias_threshold1.v0 OR L1Tech_BSC_minBias_threshold2.v0' # 40 OR 41
 #   'L1Tech_BSC_minBias_threshold2.v0'                                     # 41
-# , 'NOT L1Tech_BSC_halo_beam2_inner.v0'  ~/cms/SiStripDQM/                                 # NOT 36
+# , 'NOT L1Tech_BSC_halo_beam2_inner.v0'                                   # NOT 36
 # , 'NOT L1Tech_BSC_halo_beam2_outer.v0'                                   # NOT 37
 # , 'NOT L1Tech_BSC_halo_beam1_inner.v0'                                   # NOT 38
 # , 'NOT L1Tech_BSC_halo_beam1_outer.v0'                                   # NOT 39
@@ -249,13 +254,13 @@ process.sipixelQTester.label                   = cms.untracked.string( 'SiPixelD
 # Sequences
 process.raw2Digi = cms.Sequence(
   process.gtDigis
-* process.scalersRawToDigi
++ process.gtEvmDigis
++ process.scalersRawToDigi
 + process.siPixelDigis
 + process.siStripDigis
 )
 process.reco = cms.Sequence(
-  process.conditionsInEdm
-* process.trackerlocalreco
+  process.trackerlocalreco
 * process.offlineBeamSpot
 * process.recopixelvertexing
 * process.ckftracks
