@@ -15,7 +15,7 @@ process.source = cms.Source( "PoolSource"
 , fileNames = cms.untracked.vstring(
     # Prompt RECO
     '/store/data/Run2010A/MinimumBias/RECO/v2/000/136/441/48CD034A-2D6B-DF11-9CFE-0030487CD718.root'
-#     # RAW (needs process.gtDigis in the path)
+#     # RAW (needs process.gtDigis and process.conditionsInEdm in the path)
 #     '/store/data/Run2010A/MinimumBias/RAW/v1/000/136/441/3CC638F4-1F6B-DF11-8067-00304879BAB2.root'
   )
 )
@@ -33,6 +33,7 @@ process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff"
 process.GlobalTag.globaltag = 'GR10_P_V6::All'
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 # process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )
+# process.load( "Configuration.StandardSequences.L1Reco_cff" )
 
 ## PAT trigger
 process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
@@ -49,6 +50,7 @@ process.patTrigger.saveL1Refs     = cms.bool( True )
 process.patTriggerEvent.patTriggerMatches = []
 process.p = cms.Path(
 #   process.gtDigis
+# * process.conditionsInEdm
 # * process.patTrigger
   process.patTrigger
 * process.patTriggerEvent
@@ -58,7 +60,7 @@ process.p = cms.Path(
 from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_pre7/output/myPatTuple_triggerOnly.root' )
+, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_0_patch2/output/myPatTuple_triggerOnly.root' )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'p'
