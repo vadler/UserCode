@@ -80,7 +80,7 @@ process.DQMStore.collateHistograms = False
 process.load( "DQMServices.Components.DQMEnvironment_cfi" )
 process.dqmSaver.convention = 'Offline'
 process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_8_X/RECO'
-process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_8_0_pre8/output'
+process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_8_0_patch2/output'
 process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 # # L1 masking overrides
 # process.load( 'L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskAlgoTrigConfig_cff' )
@@ -297,7 +297,7 @@ process.path = cms.Path(
 
 # Output
 process.out = cms.OutputModule( "PoolOutputModule"
-, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_8_0_pre8/output/SiStripDQM_Tier0Collisions.root' )
+, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_8_0_patch2/output/SiStripDQM_Tier0Collisions.root' )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'path'
