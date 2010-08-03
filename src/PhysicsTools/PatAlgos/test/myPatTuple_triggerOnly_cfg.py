@@ -46,6 +46,8 @@ process.patTrigger.l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'     
 process.patTrigger.l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'        , 'RECO' )
 process.patTrigger.l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'        , 'RECO' )
 process.patTrigger.saveL1Refs     = cms.bool( True )
+process.patTriggerEvent.condGtTag         = cms.InputTag( 'conditionsInEdm' )
+process.patTriggerEvent.l1GtTag           = cms.InputTag( 'gtDigis' )
 process.patTriggerEvent.patTriggerMatches = []
 process.p = cms.Path(
 #   process.gtDigis
