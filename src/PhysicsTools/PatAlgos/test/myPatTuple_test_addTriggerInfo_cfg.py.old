@@ -196,17 +196,19 @@ process.patTriggerTestMatchEmbedder = cms.Sequence(
 )
 process.patTriggerEventTest = cms.EDProducer( "PATTriggerEventProducer"
 , processName        = cms.string( 'HLT' )
-, triggerResults     = cms.InputTag( "TriggerResults" )
-, patTriggerProducer = cms.InputTag( "patTrigger" )
+, triggerResults     = cms.InputTag( 'TriggerResults' )
+, patTriggerProducer = cms.InputTag( 'patTrigger' )
+, condGtTag          = cms.InputTag( 'conditionsInEdm' )
+, l1GtTag            = cms.InputTag( 'gtDigis' )
 , patTriggerMatches  = cms.VInputTag(
-    "electronTriggerTestMatchHLTElectrons"
-  , "electronTriggerTestMatchHLTFilterEGammas"
-  , "muonTriggerTestMatchL1Muons"
-  , "muonTriggerTestMatchL1FilterLabelMuons"
-  , "muonTriggerTestMatchNoMuons"
-  , "jetTriggerTestMatchHLTJet15U"
-  , "metTriggerTestMatchHLTMET45"
-  , "metTriggerTestMatchHLTMu3"
+    'electronTriggerTestMatchHLTElectrons'
+  , 'electronTriggerTestMatchHLTFilterEGammas'
+  , 'muonTriggerTestMatchL1Muons'
+  , 'muonTriggerTestMatchL1FilterLabelMuons'
+  , 'muonTriggerTestMatchNoMuons'
+  , 'jetTriggerTestMatchHLTJet15U'
+  , 'metTriggerTestMatchHLTMET45'
+  , 'metTriggerTestMatchHLTMu3'
   )
 )
 process.patTriggerTestSequence = cms.Sequence(
