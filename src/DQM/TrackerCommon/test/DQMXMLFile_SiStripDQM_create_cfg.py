@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+import os
+
 process = cms.Process( "CREATE" )
 
 process.MessageLogger=cms.Service( "MessageLogger"
@@ -23,12 +25,13 @@ process.dqmXmlFileTest = cms.EDAnalyzer( "DQMXMLFilePopConAnalyzer"
 , loggingOn       = cms.untracked.bool( True )
 , SinceAppendMode = cms.bool( False )
 , Source          = cms.PSet(
-    XMLFile    = cms.untracked.string( 'afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_8_0_patch2/src/DQM/SiStripMonitorClient/data/sistrip_qualitytest_config_tier0.xml' )
+    XMLFile    = cms.untracked.string( os.getenv( 'CMSSW_RELEASE_BASE' ) + '/src/DQM/SiStripMonitorClient/data/sistrip_qualitytest_config_tier0.xml' )
   , firstSince = cms.untracked.uint64( 1 )
   , debug      = cms.untracked.bool( False )
   , zip        = cms.untracked.bool( False )
   )
 )
+print "Used XML file: " + process.dqmXmlFileTest.Source.XMLFile.pythonValue()
 
 process.load( "CondCore.DBCommon.CondDBCommon_cfi" )
 process.CondDBCommon.connect          = cms.string( 'sqlite_file:DQMXMLFile_SiStripDQM.db' )
