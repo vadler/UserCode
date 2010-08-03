@@ -184,21 +184,27 @@ namespace {
        ==========================================================================================================================   */
   edm::Ptr<reco::Muon>	        ptr_mu;
   edm::PtrVector<reco::Muon>	ptrv_mu;
+  edm::Wrapper<edm::PtrVector<reco::Muon> >	ptrv_mu_w;
 
   edm::Ptr<reco::GsfElectron>	     ptr_e;
   edm::PtrVector<reco::GsfElectron>  ptrv_e;
+  edm::Wrapper<edm::PtrVector<reco::GsfElectron> >  ptrv_e_w;
 
   edm::Ptr<reco::BaseTau>	 ptr_t;
   edm::PtrVector<reco::BaseTau>	 ptrv_t;
+  edm::Wrapper<edm::PtrVector<reco::BaseTau> >	 ptrv_t_w;
 
   edm::Ptr<reco::Photon>	 ptr_ph;
   edm::PtrVector<reco::Photon>	 ptrv_ph;
+  edm::Wrapper<edm::PtrVector<reco::Photon> >	 ptrv_ph_w;
 
   edm::Ptr<reco::Jet>	     ptr_j;
   edm::PtrVector<reco::Jet>  ptrv_j;
+  edm::Wrapper<edm::PtrVector<reco::Jet> >  ptrv_j_w;
 
   edm::Ptr<reco::MET>	     ptr_m;
   edm::PtrVector<reco::MET>  ptrv_m;
+  edm::Wrapper<edm::PtrVector<reco::MET> >  ptrv_m_w;
 
   /*   ==========================================================================================================================
               PAT Dataformats: PatObjects
@@ -338,10 +344,10 @@ namespace {
   std::vector<pat::TriggerPrimitive>	 v_tp;
   std::vector<pat::TriggerPrimitive *>	 vp_tp;
   edm::Wrapper<pat::TriggerPrimitiveCollection>	 w_tpc;
-  edm::Wrapper<pat::TriggerPrimitiveMatch>	 w_tpm;
   pat::TriggerPrimitiveRef	                 tpr;
   pat::TriggerPrimitiveRefProd	                 tprp;
   pat::TriggerPrimitiveRefVector	         tprv;
+  edm::Wrapper<pat::TriggerPrimitiveMatch>	 w_tpm;
   edm::reftobase::Holder<reco::Candidate, pat::TriggerPrimitiveRef>	 rb_cand_h_p_tp;
   edm::reftobase::RefHolder<pat::TriggerPrimitiveRef>	                 rb_rh_p_tp;
 //   edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerPrimitiveRefVector>	 rb_cand_vh_tp;
@@ -350,23 +356,33 @@ namespace {
   std::vector<pat::TriggerObject>::const_iterator v_p_to_ci;
   edm::Wrapper<std::vector<pat::TriggerObject> > w_v_p_to;
   pat::TriggerObjectRef p_r_to;
+  std::map<std::string, pat::TriggerObjectRef> m_p_r_to;
+//   std::map<std::string, pat::TriggerObjectRef>::const_iterator  m_p_r_to_ci;
+  edm::Wrapper<std::map<std::string, pat::TriggerObjectRef> > w_m_p_r_to;
+  pat::TriggerObjectRefProd p_rp_to;
   edm::Wrapper<pat::TriggerObjectRefVector> w_p_rv_to;
+  edm::Wrapper<pat::TriggerObjectMatch> w_a_p_to;
   edm::reftobase::Holder<reco::Candidate, pat::TriggerObjectRef> rb_cand_h_p_to;
   edm::reftobase::RefHolder<pat::TriggerObjectRef> rb_rh_p_to;
 //   edm::reftobase::VectorHolder<reco::Candidate, pat::TriggerObjectRefVector> rb_cand_vh_p_to;
 //   edm::reftobase::RefVectorHolder<pat::TriggerObjectRefVector> rb_rvh_p_to;
+  pat::TriggerObjectMatchRefProd a_p_rp_to;
+//   std::map<std::string, pat::TriggerObjectMatchRefProd>::const_iterator m_s_a_p_rp_to_ci;
+  edm::Wrapper<std::map<std::string, pat::TriggerObjectMatchRefProd> > w_m_s_a_p_rp_to;
   
   std::vector<pat::TriggerFilter>::const_iterator v_p_tf_ci;
   edm::Wrapper<std::vector<pat::TriggerFilter> > w_v_p_tf;
   pat::TriggerFilterRef p_r_tf;
+  pat::TriggerFilterRefProd p_rp_tf;
   edm::Wrapper<pat::TriggerFilterRefVector> w_p_rv_tf;
   
   std::vector<pat::TriggerPath>::const_iterator v_p_tp_ci;
   edm::Wrapper<std::vector<pat::TriggerPath> > w_v_p_tp;
   pat::TriggerPathRef p_r_tp;
+  pat::TriggerPathRefProd p_rp_tp;
   edm::Wrapper<pat::TriggerPathRefVector> w_p_rv_tp;
   
-  edm::Wrapper<pat::TriggerEvent > w_p_te;
+  edm::Wrapper<pat::TriggerEvent> w_p_te;
 
   std::vector<std::pair<pat::IsolationKeys,reco::IsoDeposit> >	 v_p_ik_id;
 

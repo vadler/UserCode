@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerFilter
 //
-// $Id$
+// $Id: TriggerFilter.h,v 1.1.2.1 2008/12/18 11:26:15 vadler Exp $
 //
 /**
   \class    pat::TriggerFilter TriggerFilter.h "DataFormats/PatCandidates/interface/TriggerFilter.h"
@@ -18,13 +18,9 @@
    - [to be filled]
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: TriggerFilter.h,v 1.1.2.1 2008/12/18 11:26:15 vadler Exp $
 */
 
-
-// #include "DataFormats/PatCandidates/interface/TriggerObject.h"
-// #include "DataFormats/PatCandidates/interface/TriggerPath.h"
-// #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
 #include <string>
 #include <vector>
@@ -33,62 +29,50 @@
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
 
 namespace pat {
 
   class TriggerFilter {
+    
+      /// data members
+      std::string             label_;
+      std::string             type_;
+      std::vector< unsigned > objectKeys_;
+      std::vector< unsigned > objectIds_; // special filter related object ID as defined in enum 'TriggerObjectType' in DataFormats/HLTReco/interface/TriggerTypeDefs.h
+      int                     status_;    // -1: not run, 0: failed, 1: succeeded
 
     public:
 
       /// constructors and desctructor
       TriggerFilter();
-      TriggerFilter( std::string & label, std::string & type );
-      TriggerFilter( edm::InputTag & tag, std::string & type );
-      virtual ~TriggerFilter();
+      TriggerFilter( const std::string & label, int status = -1 );
+      TriggerFilter( const edm::InputTag & tag, int status = -1 );
+      virtual ~TriggerFilter() {};
       
-      /// filter related
-      void setLabel( std::string & label );
-      void setType( std::string & type );
-      void setLableInput( std::string & labelInput );
-      void setObjectId( unsigned int objectId );
-      void setWasRun( bool run );
-      void setWasAccept( bool accept );
-      std::string & getLabel();
-      std::string & getType();
-      std::string & getLabelInput();
-      unsigned int  getObjectId();
-      bool          wasRun();
-      bool          wasAccept();
-      
-      /// objects related
-/*      pat::TriggerObjectCollection getObjects();
-      unsigned int                 nObjects();*/
-      
-      /// paths related
-      
-      /// event related
-      
-    protected:
-    
-      std::string                 label_;
-      std::string                 type_;
-      std::string                 labelInput_;
-      unsigned int                objectId_; // what is this in this case?
-      bool                        run_;
-      bool                        accept_;
-//       pat::TriggerObjectRefVector objects_; // initialization?
+      /// setters & getters
+      void setLabel( const std::string & label ) { label_ = label; };
+      void setType( const std::string & type )   { type_ = type; };
+      void addObjectKey( unsigned objectKey )    { objectKeys_.push_back( objectKey ); };
+      void addObjectId( unsigned objectId )      { objectIds_.push_back( objectId ); };
+      bool setStatus( int status ); // only -1,0,1 accepted; returns 'false' (and does not modify the status) otherwise
+      std::string             label() const      { return label_; };
+      std::string             type() const       { return type_; };
+      std::vector< unsigned > objectKeys() const { return objectKeys_; };                 
+      std::vector< unsigned > objectIds() const  { return objectIds_; };                 
+      int                     status() const     { return status_; };
+      bool                    hasObjectKey( unsigned objectKey ) const;
+      bool                    hasObjectId( unsigned objectId ) const;
         
   };
   
 
   /// collection of TriggerFilter
   typedef std::vector< TriggerFilter >              TriggerFilterCollection;
-  /// persistent reference to a TriggerFilterCollection
+  /// persistent reference to an item in a TriggerFilterCollection
   typedef edm::Ref< TriggerFilterCollection >       TriggerFilterRef;
   /// persistent reference to a TriggerFilterCollection product
   typedef edm::RefProd< TriggerFilterCollection >   TriggerFilterRefProd;
-  /// vector of reference to TriggerFilter in the same collection
+  /// vector of persistent references to items in the same TriggerFilterCollection
   typedef edm::RefVector< TriggerFilterCollection > TriggerFilterRefVector;
 
 }

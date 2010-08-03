@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: TriggerFilter.cc,v 1.1.2.1 2008/12/18 11:26:16 vadler Exp $
 //
 
 
@@ -12,119 +12,60 @@ using namespace pat;
 
 TriggerFilter::TriggerFilter() :
   label_(),
-  labelInput_(),
-  objectId_(),
-  run_(),
-  accept_()
+  type_(),
+  status_()
 {
+  objectIds_.clear();
 }
 
 /// constructor from values
 
-TriggerFilter::TriggerFilter( std::string & label, std::string & type ) :
+TriggerFilter::TriggerFilter( const std::string & label, int status ) :
   label_( label ),
-  type_(type),
-  labelInput_(),
-  objectId_(),
-  run_(),
-  accept_()
+  type_(),
+  status_( status )
 {
+  objectIds_.clear();
 }
 
-TriggerFilter::TriggerFilter( edm::InputTag & tag, std::string & type ) :
+TriggerFilter::TriggerFilter( const edm::InputTag & tag, int status ) :
   label_( tag.label() ),
-  type_(type),
-  labelInput_(),
-  objectId_(),
-  run_(),
-  accept_()
+  type_(),
+  status_( status )
 {
+  objectIds_.clear();
 }
 
-/// destructor
+/// setters
 
-TriggerFilter::~TriggerFilter()
+// only -1,0,1 accepted; returns 'false' (and does not modify the status) otherwise
+bool TriggerFilter::setStatus( int status )
 {
+  if ( status < -1 || 1 < status ) {
+    return false;
+  }
+  status_ = status;
+  return true;
 }
 
-/// filter related
+/// getters
 
-void TriggerFilter::setLabel( std::string & label )
+bool TriggerFilter::hasObjectKey( unsigned objectKey ) const
 {
-  label_ = label;
+  for ( std::vector< unsigned >::const_iterator iO = objectKeys_.begin(); iO != objectKeys_.end(); ++iO ) {
+    if ( *iO == objectKey ) {
+      return true;
+    }
+  }
+  return false;
 }
 
-void TriggerFilter::setType( std::string & type )
+bool TriggerFilter::hasObjectId( unsigned objectId ) const
 {
-  type_ = type;
+  for ( std::vector< unsigned >::const_iterator iO = objectIds_.begin(); iO != objectIds_.end(); ++iO ) {
+    if ( *iO == objectId ) {
+      return true;
+    }
+  }
+  return false;
 }
-
-void TriggerFilter::setLableInput( std::string & labelInput )
-{
-  labelInput_ = labelInput;
-}
-
-void TriggerFilter::setObjectId( unsigned int objectId )
-{
-  objectId_ = objectId;
-}
-
-void TriggerFilter::setWasRun( bool run )
-{
-  run_ = run;
-}
-
-void TriggerFilter::setWasAccept( bool accept )
-{
-  accept_ = accept;
-}
-
-std::string & TriggerFilter::getLabel()
-{
-  return label_;
-}
-
-std::string & TriggerFilter::getType()
-{
-  return type_;
-}
-
-std::string & TriggerFilter::getLabelInput()
-{
-  return labelInput_;
-}
-
-unsigned int  TriggerFilter::getObjectId()
-{
-  return objectId_;
-}
-
-bool          TriggerFilter::wasRun()
-{
-  return run_;
-}
-
-bool          TriggerFilter::wasAccept()
-{
-  return accept_;
-}
-
-/// objects related
-
-// pat::TriggerObjectCollection TriggerFilter::getObjects() // this certainly has to be checked, protection added
-// {
-//   pat::TriggerObjectCollection objects;
-//   for ( pat::TriggerObjectRefVector::iterator i = objects_.begin(); i != objects_.end(); i++ ) {
-//     objects.push_back( **i );
-//   }
-//   return objects;
-// }
-// 
-// unsigned int TriggerFilter::nObjects()
-// {
-//   return objects_.size();
-// }
-
-/// paths related
-
-/// event related

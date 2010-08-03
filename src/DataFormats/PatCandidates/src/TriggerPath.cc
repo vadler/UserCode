@@ -1,5 +1,5 @@
 //
-// $Id$
+// $Id: TriggerPath.cc,v 1.1.2.1 2008/12/18 11:26:16 vadler Exp $
 //
 
 
@@ -15,136 +15,46 @@ TriggerPath::TriggerPath() :
   prescale_(),
   run_(),
   accept_(),
-  error_()
+  error_(),
+  lastActiveModule_()
 {
+  modules_.clear();
 }
 
 /// constructor from values
 
-TriggerPath::TriggerPath( std::string & name ) :
+TriggerPath::TriggerPath( const std::string & name ) :
   name_( name ),
   prescale_(),
   run_(),
   accept_(),
-  error_()
+  error_(),
+  lastActiveModule_()
 {
+  modules_.clear();
 }
 
-TriggerPath::TriggerPath( std::string & name, unsigned int prescale, bool run, bool accept, bool error) :
+TriggerPath::TriggerPath( const std::string & name, unsigned prescale, bool run, bool accept, bool error, unsigned lastActiveModule ) :
   name_( name ),
   prescale_( prescale ),
   run_( run ),
   accept_( accept ),
-  error_( error )
+  error_( error ),
+  lastActiveModule_( lastActiveModule )
 {
+  modules_.clear();
 }
 
-/// destructor
+/// getters
 
-TriggerPath::~TriggerPath()
+// returns size of modules_ if name unknown
+unsigned TriggerPath::indexModule( const std::string & name ) const
 {
+  unsigned i( 0 );
+  while ( i < modules().size() ) {
+    if ( name == modules().at( i ) ) {
+      return i;
+    }
+  }
+  return i;
 }
-
-/// path related
-
-void TriggerPath::setName( std::string & name )
-{
-  name_ = name;
-}
-
-void TriggerPath::setPrescale( unsigned int prescale )
-{
-  prescale_ = prescale;
-}
-
-void TriggerPath::setRun( bool run )
-{
-  run_ = run;
-}
-
-void TriggerPath::setAccept( bool accept )
-{
-  accept_ = accept;
-}
-
-void TriggerPath::setError( bool error )
-{
-  error_ = error;
-}
-
-std::string TriggerPath::getName()
-{
-  return name_;
-}
-
-unsigned int TriggerPath::getPrescale()
-{
-  return prescale_;
-}
-
-bool TriggerPath::wasRun()
-{
-  return run_;
-}
-
-bool TriggerPath::wasAccept()
-{
-  return accept_;
-}
-
-bool TriggerPath::wasError()
-{
-  return error_;
-}
-
-/// objects related
-
-/// filters related
-
-// pat::TriggerFilterCollection TriggerPath::getFilters() // this certainly has to be checked, protection added
-// {
-//   pat::TriggerFilterCollection filters;
-//   for ( pat::TriggerFilterRefVector::iterator i = filters_.begin(); i != filters_.end(); i++ ) {
-//     filters.push_back( **i );
-//   }
-//   return filters;
-// }
-// 
-// pat::TriggerFilterCollection TriggerPath::getFiltersFinal()
-// {
-//   pat::TriggerFilterCollection dummy; // dummy
-//   return dummy;
-// }
-// 
-// pat::TriggerFilter TriggerPath::getFilter( std::string & filterName )
-// {
-//   pat::TriggerFilter dummy; // dummy
-//   return dummy;
-// }
-// 
-// // pat::TriggerFilter TriggerPath::getFilter( edm::InputTag & filterTag )
-// // {
-// //   return getFilter( filterTag.label() );
-// // }
-// 
-// pat::TriggerFilter TriggerPath::getFilterFailed() // this certainly has to be checked, protection added
-// {
-//   pat::TriggerFilter filter;
-//   for ( pat::TriggerFilterRefVector::iterator i = filters_.begin(); i != filters_.end(); i++ ) {
-//     filter = **i;
-//     if ( ! filter.wasAccept() ) return filter;
-//   }
-//   return filter;
-// }
-// 
-// unsigned int TriggerPath::nFilters()
-// {
-//   return filters_.size();
-// }
-// 
-// unsigned int TriggerPath::nFiltersFinal()
-// {
-//   return getFiltersFinal().size();
-// }
-
-/// event related

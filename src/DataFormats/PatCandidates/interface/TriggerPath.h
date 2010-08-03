@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerPath
 //
-// $Id$
+// $Id: TriggerPath.h,v 1.1.2.1 2008/12/18 11:26:15 vadler Exp $
 //
 /**
   \class    pat::TriggerPath TriggerPath.h "DataFormats/PatCandidates/interface/TriggerPath.h"
@@ -18,13 +18,9 @@
    - [to be filled]
 
   \author   Volker Adler
-  \version  $Id$
+  \version  $Id: TriggerPath.h,v 1.1.2.1 2008/12/18 11:26:15 vadler Exp $
 */
 
-
-// #include "DataFormats/PatCandidates/interface/TriggerObject.h"
-// #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
-// #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
 #include <string>
 #include <vector>
@@ -37,59 +33,51 @@
 namespace pat {
 
   class TriggerPath {
+    
+      /// data members
+      std::string                name_;
+      unsigned                   prescale_;
+      bool                       run_;
+      bool                       accept_;
+      bool                       error_;
+      std::vector< std::string > modules_; // ordered
+      unsigned                   lastActiveModule_;
 
     public:
 
       /// constructors and desctructor
       TriggerPath();
-      TriggerPath( std::string & name);
-      TriggerPath( std::string & name, unsigned int prescale, bool run, bool accept, bool error);
-      virtual ~TriggerPath();
+      TriggerPath( const std::string & name);
+      TriggerPath( const std::string & name, unsigned prescale, bool run, bool accept, bool error, unsigned lastActiveModule );
+      virtual ~TriggerPath() {};
       
-      /// path related
-      void setName( std::string & name );
-      void setPrescale( unsigned int prescale );
-      void setRun( bool run );
-      void setAccept( bool accept );
-      void setError( bool error );
-      std::string  getName();
-      unsigned int getPrescale();
-      bool         wasRun();
-      bool         wasAccept();
-      bool         wasError();
-      
-      /// objects related
-      
-      /// filters related
-//       pat::TriggerFilterCollection getFilters();
-//       pat::TriggerFilterCollection getFiltersFinal();
-//       pat::TriggerFilter           getFilter( std::string & filterName );
-// //       pat::TriggerFilter           getFilter( edm::InputTag & filterTag );
-//       pat::TriggerFilter           getFilterFailed();
-//       unsigned int                 nFilters();
-//       unsigned int                 nFiltersFinal();
-      
-      /// event related
-      
-    protected:
-    
-      std::string                 name_;
-      unsigned int                prescale_;
-      bool                        run_;
-      bool                        accept_;
-      bool                        error_;
-//       pat::TriggerFilterRefVector filters_; // initialization?
+      /// setters & getters
+      void setName( const std::string & name )              { name_ = name; };
+      void setPrescale( unsigned prescale )                 { prescale_ = prescale; };
+      void setRun( bool run )                               { run_ = run; };
+      void setAccept( bool accept )                         { accept_ = accept; };
+      void setError( bool error )                           { error_ = error; };
+      void addModule( const std::string & name )            { modules_.push_back( name ); };
+      void setLastActiveModule( unsigned lastActiveModule ) { lastActiveModule_ = lastActiveModule; };
+      std::string                name() const             { return name_; };
+      unsigned                   prescale() const         { return prescale_; };
+      bool                       wasRun() const           { return run_; };
+      bool                       wasAccept() const        { return accept_; };
+      bool                       wasError() const         { return error_; };
+      std::vector< std::string > modules() const          { return modules_; }; // ordered
+      unsigned                   lastActiveModule() const { return lastActiveModule_; };
+      unsigned                   indexModule( const std::string & name ) const; // returns size of modules_ if name unknown
     
   };
   
 
   /// collection of TriggerPath
   typedef std::vector< TriggerPath >              TriggerPathCollection;
-  /// persistent reference to a TriggerPathCollection
+  /// persistent reference to an item in a TriggerPathCollection
   typedef edm::Ref< TriggerPathCollection >       TriggerPathRef;
   /// persistent reference to a TriggerPathCollection product
   typedef edm::RefProd< TriggerPathCollection >   TriggerPathRefProd;
-  /// vector of reference to TriggerPath in the same collection
+  /// vector of persistent references to items in the same TriggerPathCollection
   typedef edm::RefVector< TriggerPathCollection > TriggerPathRefVector;
 
 }
