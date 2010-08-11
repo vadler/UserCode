@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 # process.source.fileNames    = [ ... ]
 process.maxEvents.input     = 100
 # process.out.outputCommands  = [ ... ]
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_0_patch1/output/myPatTuple_addTriggerInfo.root'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_1/output/myPatTuple_addTriggerInfo.root'
 # process.options.wantSummary = False
 
 # # memory check

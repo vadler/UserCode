@@ -1,5 +1,5 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.out.fileName = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_0_patch1/output/myPatTuple_test_addTriggerInfo.root'
+process.out.fileName = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_1/output/myPatTuple_test_addTriggerInfo.root'
 
 process.p = cms.Path(
   process.patDefaultSequence

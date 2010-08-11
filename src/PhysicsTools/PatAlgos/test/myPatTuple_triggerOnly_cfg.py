@@ -60,7 +60,7 @@ process.p = cms.Path(
 from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_0_patch1/output/myPatTuple_triggerOnly.root' )
+, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_7_1/output/myPatTuple_triggerOnly.root' )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'p'
