@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 # process.source.fileNames    = [ ... ]
 process.maxEvents.input     = 100
 # process.out.outputCommands  = [ ... ]
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_1_patch1/output/myPatTuple_addTriggerInfo.root'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre2/output/myPatTuple_addTriggerInfo.root'
 # process.options.wantSummary = False
 
 # # memory check
@@ -17,7 +17,7 @@ process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_1_pa
 # process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
 
 process.p = cms.Path(
-# + process.hltEventAnalyzerAOD
+#   process.hltEventAnalyzerAOD
 # + process.triggerSummaryAnalyzerAOD
 # + process.patDefaultSequence
   process.patDefaultSequence
@@ -25,26 +25,24 @@ process.p = cms.Path(
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-### switch START ###
-# ## no stand-alone trigger objects
+from PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff import *
+process.hallo                     = patTrigger.clone()
+process.hallo.saveL1Refs          = cms.bool( True )
+process.hallo.addL1Algos          = cms.bool( True )
+process.hallo.addPathModuleLabels = cms.bool( True )
+process.tschuess           = patTriggerEvent.clone()
+process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
+process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
+switchOnTrigger( process, None, 'hallo', 'tschuess', None )
+switchOnTriggerStandAlone( process, None, 'hallo', None )
+print process.patDefaultSequence
+print process.out.outputCommands
+process.maxEvents.input = 10
 # switchOnTrigger( process )
-## all; default to run myTriggerTest_cfg.py afterwards
-switchOnTriggerAll( process )
-process.patTrigger.addL1Algos          = cms.bool( True )
-process.patTrigger.saveL1Refs          = cms.bool( True )
-process.patTrigger.addPathModuleLabels = cms.bool( True )
-process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
-process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
-switchOnTriggerMatchEmbedding( process )
-process.out.outputCommands += [
-  'keep edmTriggerResults_TriggerResults_*_HLT'
-, 'keep *_hltTriggerSummaryAOD_*_*'
-, 'keep L1GlobalTriggerReadoutRecord_gtDigis_*_*'
-, 'keep *_l1GtRecord_*_*'
-, 'keep *_l1extraParticles_*_*'
-]
-# ## stand-alone trigger objects only
 # switchOnTriggerStandAlone( process )
-# ## embedded trigger object matches only
+# process.patTrigger.addL1Algos          = cms.bool( True )
+# process.patTrigger.saveL1Refs          = cms.bool( True )
+# process.patTrigger.addPathModuleLabels = cms.bool( True )
+# process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
+# process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
 # switchOnTriggerMatchEmbedding( process )
-### switch END ###
