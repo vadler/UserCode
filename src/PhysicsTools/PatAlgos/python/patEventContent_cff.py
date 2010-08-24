@@ -45,7 +45,7 @@ patTriggerEventContent = [
     'keep patTriggerObjects_patTrigger_*_*',
     'keep patTriggerFilters_patTrigger_*_*',
     'keep patTriggerPaths_patTrigger_*_*',
-    'keep *_patTriggerEvent_*_*'
+    'keep patTriggerEvent_patTriggerEvent_*_*'
 ]
 patTriggerStandAloneEventContent = [
     'keep patTriggerObjectStandAlones_patTrigger_*_*',
@@ -57,11 +57,11 @@ patTriggerL1RefsEventContent = [
 ]
 
 patEventContentTriggerMatch = [
-    'keep *_*PatPhotonsTriggerMatch_*_*',
-    'keep *_*PatElectronsTriggerMatch_*_*',
-    'keep *_*PatMuonsTriggerMatch_*_*',
-    'keep *_*PatTausTriggerMatch_*_*',
-    'keep *_*PatJetsTriggerMatch_*_*',
+    'keep *_cleanPatPhotonsTriggerMatch_*_*',
+    'keep *_cleanPatElectronsTriggerMatch_*_*',
+    'keep *_cleanPatMuonsTriggerMatch_*_*',
+    'keep *_cleanPatTausTriggerMatch_*_*',
+    'keep *_cleanPatJetsTriggerMatch_*_*',
     'keep *_patMETsTriggerMatch_*_*'
 ]
 
