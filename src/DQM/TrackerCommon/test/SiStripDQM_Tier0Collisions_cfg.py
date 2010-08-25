@@ -13,44 +13,44 @@ process.load( "FWCore.MessageService.MessageLogger_cfi" )
 # Conditions and services
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'GR_R_38X_V7::All'
+process.GlobalTag.globaltag = 'GR_R_38X_V9::All'
 process.load( "Configuration.StandardSequences.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
-# DB accesses
-# check tags on https://twiki.cern.ch/twiki/bin/view/CMS/TrackerDQMCondDB
-import CondCore.DBCommon.CondDBCommon_cfi
-process.dbTrackerTriggerBits = cms.ESSource( "PoolDBESSource"
-, CondCore.DBCommon.CondDBCommon_cfi.CondDBCommon
-, toGet   = cms.VPSet(
-    # SiStrip
-    cms.PSet(
-#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/AlCaRecoTriggerBits_SiStripDQM.db' )
-#       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
-      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
-    , record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
-    , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v2_offline' )
-    , label   = cms.untracked.string( 'SiStripDQMTrigger' )
-    )
-  , cms.PSet(
-#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/DQMXMLFile_SiStripDQM.db' )
-#       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
-      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
-    , record  = cms.string( 'DQMXMLFileRcd' )
-    , tag     = cms.string( 'DQMXMLFile_SiStripDQM_v1_offline' )
-    , label   = cms.untracked.string( 'SiStripDQMQTests' )
-    )
-    # SiPixel
-  , cms.PSet(
-#       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/DQMXMLFile_SiPixelDQM.db' )
-# #       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_PIXEL' ) # DB schema currently screwed up
-      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_PIXEL' )
-    , record  = cms.string( 'DQMXMLFileRcd' )
-    , tag     = cms.string( 'DQMXMLFile_SiPixelDQM_v1_offline' )
-    , label   = cms.untracked.string( 'SiPixelDQMQTests' )
-    )
-  )
-)
+# # DB accesses
+# # check tags on https://twiki.cern.ch/twiki/bin/view/CMS/TrackerDQMCondDB
+# import CondCore.DBCommon.CondDBCommon_cfi
+# process.dbTrackerTriggerBits = cms.ESSource( "PoolDBESSource"
+# , CondCore.DBCommon.CondDBCommon_cfi.CondDBCommon
+# , toGet   = cms.VPSet(
+#     # SiStrip
+#     cms.PSet(
+# #       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/AlCaRecoTriggerBits_SiStripDQM.db' )
+# #       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
+#       connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
+#     , record  = cms.string( 'AlCaRecoTriggerBitsRcd' )
+#     , tag     = cms.string( 'AlCaRecoTriggerBits_SiStripDQM_v2_offline' )
+#     , label   = cms.untracked.string( 'SiStripDQMTrigger' )
+#     )
+#   , cms.PSet(
+# #       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/DQMXMLFile_SiStripDQM.db' )
+# #       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_STRIP' )
+#       connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_STRIP' )
+#     , record  = cms.string( 'DQMXMLFileRcd' )
+#     , tag     = cms.string( 'DQMXMLFile_SiStripDQM_v1_offline' )
+#     , label   = cms.untracked.string( 'SiStripDQMQTests' )
+#     )
+#     # SiPixel
+#   , cms.PSet(
+# #       connect = cms.untracked.string( 'sqlite_file:/afs/cern.ch/user/v/vadler/cms/SiStripDQM/data/DQMXMLFile_SiPixelDQM.db' )
+# # #       connect = cms.untracked.string( 'frontier://FrontierPrep/CMS_COND_PIXEL' ) # DB schema currently screwed up
+#       connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_PIXEL' )
+#     , record  = cms.string( 'DQMXMLFileRcd' )
+#     , tag     = cms.string( 'DQMXMLFile_SiPixelDQM_v1_offline' )
+#     , label   = cms.untracked.string( 'SiPixelDQMQTests' )
+#     )
+#   )
+# )
 
 # Reconstruction
 process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )
@@ -80,7 +80,7 @@ process.DQMStore.collateHistograms = False
 process.load( "DQMServices.Components.DQMEnvironment_cfi" )
 process.dqmSaver.convention = 'Offline'
 process.dqmSaver.workflow   = '/MinimumBias/CMSSW_3_8_X/RECO'
-process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_8_1_patch1/output'
+process.dqmSaver.dirName    = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_8_2/output'
 process.load( "DQMOffline.Configuration.DQMOffline_Certification_cff" )
 # # L1 masking overrides
 # process.load( 'L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskAlgoTrigConfig_cff' )
@@ -297,7 +297,7 @@ process.path = cms.Path(
 
 # Output
 process.out = cms.OutputModule( "PoolOutputModule"
-, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_8_1_patch1/output/SiStripDQM_Tier0Collisions.root' )
+, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_8_2/output/SiStripDQM_Tier0Collisions.root' )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'path'
