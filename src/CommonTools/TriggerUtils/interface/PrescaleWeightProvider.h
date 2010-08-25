@@ -7,7 +7,7 @@
 // Package:    CommonTools/TriggerUtils
 // Class:      PrescaleWeightProvider
 //
-// $Id$
+// $Id: PrescaleWeightProvider.h,v 1.1 2010/08/23 18:44:13 avetisya Exp $
 //
 /**
   \class    PrescaleWeightProvider PrescaleWeightProvider.h "CommonTools/TriggerUtils/interface/PrescaleWeightProvider.h"
@@ -19,7 +19,7 @@
 
 
   \author   Aram Avetisyan
-  \version  $Id$
+  \version  $Id: PrescaleWeightProvider.h,v 1.1 2010/08/23 18:44:13 avetisya Exp $
 */
 
 
@@ -54,8 +54,8 @@ class PrescaleWeightProvider {
     PrescaleWeightProvider( const edm::ParameterSet & config ); // to be called from the ED module's c'tor
     ~PrescaleWeightProvider() {}
 
-    void initRun( const edm::Run & run, const edm::EventSetup & setup );                                                  // to be called from the ED module's beginRun() method
-    int  prescaleWeight ( const edm::Event & event, const edm::EventSetup & setup, std::vector< std::string > hltPaths ); // to be called from the ED module's event loop method
+    void initRun( const edm::Run & run, const edm::EventSetup & setup );             // to be called from the ED module's beginRun() method
+    int  prescaleWeight ( const edm::Event & event, const edm::EventSetup & setup ); // to be called from the ED module's event loop method
 
   private:
 
