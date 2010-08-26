@@ -47,22 +47,24 @@ process.patTrigger.l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'     
 process.patTrigger.l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'        , 'RECO' )
 process.patTrigger.l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'        , 'RECO' )
 process.patTrigger.saveL1Refs     = cms.bool( True )
-process.patTriggerEvent.condGtTag         = cms.InputTag( 'conditionsInEdm' )
-process.patTriggerEvent.l1GtTag           = cms.InputTag( 'gtDigis' )
-process.patTriggerEvent.patTriggerMatches = []
+process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
+process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
+
+process.patDefaultSequence = cms.Sequence(
+  process.patTriggerDefaultSequence
+)
 process.p = cms.Path(
 #   process.gtDigis
 # * process.conditionsInEdm
-# * process.patTrigger
-  process.patTrigger
-* process.patTriggerEvent
+# * process.patDefaultSequence
+  process.patDefaultSequence
 )
 
 ## Output
 from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_1_patch1/output/myPatTuple_triggerOnly.root' )
+, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre2/output/myPatTuple_triggerOnly.root' )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'p'
@@ -70,11 +72,11 @@ process.out = cms.OutputModule(
   )
 , outputCommands = cms.untracked.vstring(
     'drop *'
-  , 'keep *_l1extraParticles_*_RECO'
-  , 'keep *_gctDigis_*_RECO'
-  , *patTriggerEventContent
   )
 )
 process.outpath = cms.EndPath(
   process.out
 )
+
+from PhysicsTools.PatAlgos.tools.trigTools import *
+switchOnTrigger( process )
