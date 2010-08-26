@@ -1,10 +1,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-# process.GlobalTag.globaltag = ...
-# process.source.fileNames    = [ ... ]
-process.maxEvents.input     = 100
-# process.out.outputCommands  = [ ... ]
+process.GlobalTag.globaltag = 'START38_V9::All'
 process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre2/output/myPatTuple_addTriggerInfo.root'
-# process.options.wantSummary = False
+process.options.wantSummary = False
 
 # # memory check
 # process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck"
@@ -12,14 +9,7 @@ process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pr
 # , ignoreTotal      = cms.untracked.int32( 0 )
 # )
 
-# # HLT analyzers
-# process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
-# process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
-
 process.p = cms.Path(
-#   process.hltEventAnalyzerAOD
-# + process.triggerSummaryAnalyzerAOD
-# + process.patDefaultSequence
   process.patDefaultSequence
 )
 
@@ -33,16 +23,27 @@ process.hallo.addPathModuleLabels = cms.bool( True )
 process.tschuess           = patTriggerEvent.clone()
 process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
-switchOnTrigger( process, None, 'hallo', 'tschuess', None )
+process.moin = cleanMuonTriggerMatchPDMu.clone()
+process.tach = metTriggerMatchHLTMu3.clone()
+switchOnTrigger( process )
+switchOnTriggerMatching( process )
+switchOnTriggerStandAlone( process )
+switchOnTriggerMatchingStandAlone( process )
+switchOnTriggerMatchEmbedding( process )
+switchOnTrigger( process, None, 'hallo', 'tschuess' )
+switchOnTriggerMatching( process, None, [ 'moin', 'tach' ], 'hallo', 'tschuess' )
 switchOnTriggerStandAlone( process, None, 'hallo', None )
-print process.patDefaultSequence
-print process.out.outputCommands
-process.maxEvents.input = 10
-# switchOnTrigger( process )
-# switchOnTriggerStandAlone( process )
-# process.patTrigger.addL1Algos          = cms.bool( True )
-# process.patTrigger.saveL1Refs          = cms.bool( True )
-# process.patTrigger.addPathModuleLabels = cms.bool( True )
-# process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
-# process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
-# switchOnTriggerMatchEmbedding( process )
+switchOnTriggerMatchingStandAlone( process, None, [ 'moin', 'tach' ], 'hallo', None )
+switchOnTriggerMatchEmbedding( process, None, [ 'moin', 'tach' ], 'hallo', None )
+print
+print 'patDefaultSequence'
+print '--> %s'%( process.patDefaultSequence )
+print
+print 'patTriggerSequence'
+print '--> %s'%( process.patTriggerSequence )
+print
+print 'patTriggerEventSequence'
+print '--> %s'%( process.patTriggerEventSequence )
+print
+print 'out.outputCommands'
+print '--> %s'%( process.out.outputCommands )
