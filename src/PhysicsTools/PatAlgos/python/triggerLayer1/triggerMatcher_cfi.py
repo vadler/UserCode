@@ -13,7 +13,7 @@ import FWCore.ParameterSet.Config as cms
 ## Default example matches ##
 
 # firing trigger objects used in succeeding HLT path 'HLT_Mu9'
-cleanMuonTriggerMatchHLTIsoMu3 = cms.EDProducer(
+cleanMuonTriggerMatchHLTMu9 = cms.EDProducer(
   "PATTriggerMatcherDRDPtLessByR"                 # match by DeltaR only, best match by DeltaR
 , src     = cms.InputTag( "cleanPatMuons" )
 , matched = cms.InputTag( "patTrigger" )          # default producer label as defined in PhysicsTools/PatAlgos/python/triggerLayer1/triggerProducer_cfi.py
@@ -53,7 +53,7 @@ cleanMuonTriggerMatchHLTDoubleIsoMu3 = cms.EDProducer(
 )
 
 # firing trigger objects used in succeeding HLT path 'HLT_Ele20_SW_L1R'
-cleanElectronTriggerMatchHLTEle15LWL1R = cms.EDProducer(
+cleanElectronTriggerMatchHLTEle20SWL1R = cms.EDProducer(
   "PATTriggerMatcherDRDPtLessByR"                 # match by DeltaR only, best match by DeltaR
 , src     = cms.InputTag( "cleanPatElectrons" )
 , matched = cms.InputTag( "patTrigger" )          # default producer label as defined in PhysicsTools/PatAlgos/python/triggerLayer1/triggerProducer_cfi.py
@@ -133,9 +133,9 @@ metTriggerMatchHLTMET45 = cms.EDProducer(
 )
 
 triggerMatchingDefaultSequence = cms.Sequence(
-  cleanMuonTriggerMatchHLTIsoMu3
+  cleanMuonTriggerMatchHLTMu9
 + cleanMuonTriggerMatchHLTDoubleIsoMu3
-+ cleanElectronTriggerMatchHLTEle15LWL1R
++ cleanElectronTriggerMatchHLTEle20SWL1R
 + cleanTauTriggerMatchHLTDoubleLooseIsoTau15
 + cleanJetTriggerMatchHLTJet15U
 + metTriggerMatchHLTMET45
