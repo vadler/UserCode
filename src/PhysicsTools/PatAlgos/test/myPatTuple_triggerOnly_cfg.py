@@ -47,15 +47,17 @@ process.patTrigger.l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'     
 process.patTrigger.l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'        , 'RECO' )
 process.patTrigger.l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'        , 'RECO' )
 process.patTrigger.saveL1Refs     = cms.bool( True )
-process.patTriggerEvent.condGtTag         = cms.InputTag( 'conditionsInEdm' )
-process.patTriggerEvent.l1GtTag           = cms.InputTag( 'gtDigis' )
-process.patTriggerEvent.patTriggerMatches = []
+process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
+process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
+
+process.patDefaultSequence = cms.Sequence(
+  process.patTriggerDefaultSequence
+)
 process.p = cms.Path(
 #   process.gtDigis
 # * process.conditionsInEdm
-# * process.patTrigger
-  process.patTrigger
-* process.patTriggerEvent
+# * process.patDefaultSequence
+  process.patDefaultSequence
 )
 
 ## Output
@@ -70,11 +72,11 @@ process.out = cms.OutputModule(
   )
 , outputCommands = cms.untracked.vstring(
     'drop *'
-  , 'keep *_l1extraParticles_*_RECO'
-  , 'keep *_gctDigis_*_RECO'
-  , *patTriggerEventContent
   )
 )
 process.outpath = cms.EndPath(
   process.out
 )
+
+from PhysicsTools.PatAlgos.tools.trigTools import *
+switchOnTrigger( process )
