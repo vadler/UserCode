@@ -6,7 +6,8 @@ process.p = cms.Path(
 )
 
 # Trigger Test
-process.patTrigger = cms.EDProducer( "PATTriggerProducer"
+process.patTrigger = cms.EDProducer(
+  "PATTriggerProducer"
   ## L1
 , addL1Algos     = cms.bool( True )
 , l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'HLT' )
@@ -26,7 +27,8 @@ process.patTrigger = cms.EDProducer( "PATTriggerProducer"
   # trigger paths
 , addPathModuleLabels = cms.bool( False ) # setting this 'True' stores the names of all modules as strings (~8kB/ev.)
 )
-process.electronTriggerTestMatchHLTElectrons = cms.EDProducer( "PATTriggerMatcherDRLessByR"
+process.electronTriggerTestMatchHLTElectrons = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "cleanPatElectrons" )
 , matched = cms.InputTag( "patTrigger" )
 , andOr          = cms.bool( False )
@@ -40,7 +42,8 @@ process.electronTriggerTestMatchHLTElectrons = cms.EDProducer( "PATTriggerMatche
 , resolveAmbiguities    = cms.bool( True )
 , resolveByMatchQuality = cms.bool( False )
 )
-process.electronTriggerTestMatchHLTFilterEGammas = cms.EDProducer( "PATTriggerMatcherDRLessByR"
+process.electronTriggerTestMatchHLTFilterEGammas = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "cleanPatElectrons" )
 , matched = cms.InputTag( "patTrigger" )
 , andOr          = cms.bool( False )
@@ -54,7 +57,8 @@ process.electronTriggerTestMatchHLTFilterEGammas = cms.EDProducer( "PATTriggerMa
 , resolveAmbiguities    = cms.bool( True )
 , resolveByMatchQuality = cms.bool( False )
 )
-process.muonTriggerTestMatchL1Muons = cms.EDProducer( "PATTriggerMatcherDRLessByR"
+process.muonTriggerTestMatchL1Muons = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "cleanPatMuons" )
 , matched = cms.InputTag( "patTrigger" )
 , andOr          = cms.bool( False )
@@ -68,13 +72,14 @@ process.muonTriggerTestMatchL1Muons = cms.EDProducer( "PATTriggerMatcherDRLessBy
 , resolveAmbiguities    = cms.bool( True )
 , resolveByMatchQuality = cms.bool( False )
 )
-process.muonTriggerTestMatchL1FilterLabelMuons = cms.EDProducer( "PATTriggerMatcherDRLessByR"
+process.muonTriggerTestMatchL1FilterLabelMuons = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "cleanPatMuons" )
 , matched = cms.InputTag( "patTrigger" )
 , andOr          = cms.bool( True )
 , filterIdsEnum  = cms.vstring( '*' )
 , filterIds      = cms.vint32( 0 )
-, filterLabels   = cms.vstring( 'hltMuLevel1PathL1Filtered' )
+, filterLabels   = cms.vstring( 'hltL1SingleMu7L1Filtered0' )
 , pathNames      = cms.vstring( '*' )
 , collectionTags = cms.vstring( '*' )
 , maxDPtRel = cms.double( 0.5 )
@@ -82,7 +87,8 @@ process.muonTriggerTestMatchL1FilterLabelMuons = cms.EDProducer( "PATTriggerMatc
 , resolveAmbiguities    = cms.bool( True )
 , resolveByMatchQuality = cms.bool( False )
 )
-process.muonTriggerTestMatchNoMuons = cms.EDProducer( "PATTriggerMatcherDRLessByR"
+process.muonTriggerTestMatchNoMuons = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "cleanPatMuons" )
 , matched = cms.InputTag( "patTrigger" )
 , andOr          = cms.bool( False )
@@ -96,7 +102,8 @@ process.muonTriggerTestMatchNoMuons = cms.EDProducer( "PATTriggerMatcherDRLessBy
 , resolveAmbiguities    = cms.bool( True )
 , resolveByMatchQuality = cms.bool( False )
 )
-process.jetTriggerTestMatchHLTJet15U = cms.EDProducer( "PATTriggerMatcherDRLessByR"
+process.jetTriggerTestMatchHLTJet15U = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "cleanPatJets" )
 , matched = cms.InputTag( "patTrigger" )
 , andOr          = cms.bool( False )
@@ -105,12 +112,13 @@ process.jetTriggerTestMatchHLTJet15U = cms.EDProducer( "PATTriggerMatcherDRLessB
 , filterLabels   = cms.vstring( '*' )
 , pathNames      = cms.vstring( 'HLT_Jet15U' )
 , collectionTags = cms.vstring( '*' )
-, maxDPtRel = cms.double( 0.5 )
-, maxDeltaR = cms.double( 0.5 )
+, maxDPtRel = cms.double( 3.0 )
+, maxDeltaR = cms.double( 0.4 )
 , resolveAmbiguities    = cms.bool( True )
 , resolveByMatchQuality = cms.bool( False )
 )
-process.metTriggerTestMatchHLTMET45 = cms.EDProducer( "PATTriggerMatcherDRLessByR"
+process.metTriggerTestMatchHLTMET45 = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "patMETs" )
 , matched = cms.InputTag( "patTrigger" )
 , andOr          = cms.bool( False )
@@ -124,15 +132,17 @@ process.metTriggerTestMatchHLTMET45 = cms.EDProducer( "PATTriggerMatcherDRLessBy
 , resolveAmbiguities    = cms.bool( True )
 , resolveByMatchQuality = cms.bool( False )
 )
-process.metTriggerTestMatchHLTMu3 = cms.EDProducer( "PATTriggerMatcherDRLessByR"
+process.metTriggerTestMatchHLTMu3 = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "patMETs" )
 , matched = cms.InputTag( "patTrigger" )
-, andOr          = cms.bool( False )
-, filterIdsEnum  = cms.vstring( '*' )
-, filterIds      = cms.vint32( 0 )
-, filterLabels   = cms.vstring( '*' )
-, pathNames      = cms.vstring( 'HLT_Mu3' )
-, collectionTags = cms.vstring( '*' )
+, andOr                      = cms.bool( False )
+, filterIdsEnum              = cms.vstring( '*' )
+, filterIds                  = cms.vint32( 0 )
+, filterLabels               = cms.vstring( '*' )
+, pathNames                  = cms.vstring( 'HLT_Mu3' )
+, pathLastFilterAcceptedOnly = cms.bool( False )
+, collectionTags             = cms.vstring( '*' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True )
@@ -148,19 +158,22 @@ process.patTriggerTestMatcher = cms.Sequence(
 + process.metTriggerTestMatchHLTMET45
 + process.metTriggerTestMatchHLTMu3
 )
-process.cleanPatPhotonsTriggerTestMatch = cms.EDProducer( "PATTriggerMatchPhotonEmbedder",
-    src     = cms.InputTag( "cleanPatPhotons" ),
-    matches = cms.VInputTag(
-                           )
+process.cleanPatPhotonsTriggerTestMatch = cms.EDProducer(
+  "PATTriggerMatchPhotonEmbedder"
+, src     = cms.InputTag( "cleanPatPhotons" )
+, matches = cms.VInputTag(
+  )
 )
-process.cleanPatElectronsTriggerTestMatch = cms.EDProducer( "PATTriggerMatchElectronEmbedder"
+process.cleanPatElectronsTriggerTestMatch = cms.EDProducer(
+  "PATTriggerMatchElectronEmbedder"
 , src     = cms.InputTag( "cleanPatElectrons" )
 , matches = cms.VInputTag(
     "electronTriggerTestMatchHLTElectrons"
   , "electronTriggerTestMatchHLTFilterEGammas"
   )
 )
-process.cleanPatMuonsTriggerTestMatch = cms.EDProducer( "PATTriggerMatchMuonEmbedder"
+process.cleanPatMuonsTriggerTestMatch = cms.EDProducer(
+  "PATTriggerMatchMuonEmbedder"
 , src     = cms.InputTag( "cleanPatMuons" )
 , matches = cms.VInputTag(
     "muonTriggerTestMatchL1Muons"
@@ -168,18 +181,21 @@ process.cleanPatMuonsTriggerTestMatch = cms.EDProducer( "PATTriggerMatchMuonEmbe
   , "muonTriggerTestMatchNoMuons"
   )
 )
-process.cleanPatTausTriggerTestMatch = cms.EDProducer( "PATTriggerMatchTauEmbedder"
+process.cleanPatTausTriggerTestMatch = cms.EDProducer(
+  "PATTriggerMatchTauEmbedder"
 , src     = cms.InputTag( "cleanPatTaus" )
 , matches = cms.VInputTag(
   )
 )
-process.cleanPatJetsTriggerTestMatch = cms.EDProducer( "PATTriggerMatchJetEmbedder"
+process.cleanPatJetsTriggerTestMatch = cms.EDProducer(
+  "PATTriggerMatchJetEmbedder"
 , src     = cms.InputTag( "cleanPatJets" )
 , matches = cms.VInputTag(
     "jetTriggerTestMatchHLTJet15U"
   )
 )
-process.patMETsTriggerTestMatch = cms.EDProducer( "PATTriggerMatchMETEmbedder"
+process.patMETsTriggerTestMatch = cms.EDProducer(
+  "PATTriggerMatchMETEmbedder"
 , src     = cms.InputTag( "patMETs" )
 , matches = cms.VInputTag(
     "metTriggerTestMatchHLTMET45"
@@ -194,7 +210,8 @@ process.patTriggerTestMatchEmbedder = cms.Sequence(
 + process.cleanPatJetsTriggerTestMatch
 + process.patMETsTriggerTestMatch
 )
-process.patTriggerEventTest = cms.EDProducer( "PATTriggerEventProducer"
+process.patTriggerEventTest = cms.EDProducer(
+  "PATTriggerEventProducer"
 , processName        = cms.string( 'HLT' )
 , triggerResults     = cms.InputTag( 'TriggerResults' )
 , patTriggerProducer = cms.InputTag( 'patTrigger' )
