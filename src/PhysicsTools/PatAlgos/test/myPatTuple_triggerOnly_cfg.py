@@ -74,4 +74,4 @@ process.patTrigger.saveL1Refs     = cms.bool( True )
 process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOnTrigger( process )
+switchOnTrigger( process, None, None, 'p' )
