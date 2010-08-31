@@ -4,9 +4,11 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre2
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/CaloTowers                           V02-05-08      V02-05-07      
 DataFormats/PatCandidates                        NoTag          V06-00-04      
+JetMETCorrections/Configuration                  V03-00-05      V03-00-03      
+JetMETCorrections/Type1MET                       V04-03-08      V04-03-07      
 PhysicsTools/PatAlgos                            NoTag          V08-00-21      
 PhysicsTools/PatExamples                         NoTag          V00-04-05      
 PhysicsTools/PatUtils                            NoTag          V03-09-13      
-PhysicsTools/SelectorUtils                       V00-02-07      V00-02-03      
+PhysicsTools/SelectorUtils                       V00-02-11      V00-02-03      
 ---------------------------------------
-total packages: 6 (6 displayed)
+total packages: 8 (8 displayed)
