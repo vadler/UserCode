@@ -15,37 +15,37 @@ process.p = cms.Path(
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-# from PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff import *
-# process.hallo                     = patTrigger.clone()
-# process.hallo.saveL1Refs          = cms.bool( True )
-# process.hallo.addL1Algos          = cms.bool( True )
-# process.hallo.addPathModuleLabels = cms.bool( True )
-# process.tschuess           = patTriggerEvent.clone()
-# process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
-# process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
-# process.moin = cleanMuonTriggerMatchPDMu.clone()
-# process.tach = metTriggerMatchHLTMu3.clone()
-# process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi" )
-# process.patTrigger.saveL1Refs = cms.bool( True )
+from PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff import *
+process.hallo                     = patTrigger.clone()
+process.hallo.saveL1Refs          = cms.bool( True )
+process.hallo.addL1Algos          = cms.bool( True )
+process.hallo.addPathModuleLabels = cms.bool( True )
+process.tschuess           = patTriggerEvent.clone()
+process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
+process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
+process.moin = cleanMuonTriggerMatchPDMu.clone()
+process.tach = metTriggerMatchHLTMu3.clone()
+process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi" )
+process.patTrigger.saveL1Refs = cms.bool( True )
 switchOnTrigger( process )
 switchOnTriggerMatching( process )
 switchOnTriggerStandAlone( process )
 switchOnTriggerMatchingStandAlone( process )
 switchOnTriggerMatchEmbedding( process )
-# switchOnTrigger( process, 'hallo', 'tschuess' )
-# switchOnTriggerMatching( process, [ 'moin', 'tach' ], 'hallo', 'tschuess' )
-# switchOnTriggerStandAlone( process, 'hallo' )
-# switchOnTriggerMatchingStandAlone( process, [ 'moin', 'tach' ], 'hallo' )
-# switchOnTriggerMatchEmbedding( process, [ 'moin', 'tach' ], 'hallo' )
+switchOnTrigger( process, 'hallo', 'tschuess' )
+switchOnTriggerMatching( process, [ 'moin', 'tach' ], 'hallo', 'tschuess' )
+switchOnTriggerStandAlone( process, 'hallo' )
+switchOnTriggerMatchingStandAlone( process, [ 'moin', 'tach' ], 'hallo' )
+switchOnTriggerMatchEmbedding( process, [ 'moin', 'tach' ], 'hallo' )
 print
-print 'patDefaultSequence'
-print '--> %s'%( process.patDefaultSequence )
+print 'Path p'
+print '--> %s'%( process.p )
 print
-print 'patTriggerSequence'
+print 'Sequence patTriggerSequence'
 print '--> %s'%( process.patTriggerSequence )
 print
-print 'patTriggerEventSequence'
+print 'Sequence patTriggerEventSequence'
 print '--> %s'%( process.patTriggerEventSequence )
 print
-print 'out.outputCommands'
+print 'PoolOutputModule out.outputCommands'
 print '--> %s'%( process.out.outputCommands )
