@@ -30,30 +30,12 @@ process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-# process.GlobalTag.globaltag = 'GR_R_38X_V3::All'
-process.GlobalTag.globaltag = 'GR10_P_V6::All'
+# process.GlobalTag.globaltag = 'GR_R_38X_V9::All'
+process.GlobalTag.globaltag = 'GR10_P_V8::All'
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )
 process.load( "Configuration.StandardSequences.L1Reco_cff" )
 
-## PAT trigger
-process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
-process.patTrigger.addL1Algos     = cms.bool( True )
-process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'PAT' )
-process.patTrigger.l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', 'PAT' )
-process.patTrigger.l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , 'PAT' )
-process.patTrigger.l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central'    , 'PAT' )
-process.patTrigger.l1ExtraForJet  = cms.InputTag( 'l1extraParticles', 'Forward'    , 'PAT' )
-process.patTrigger.l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'        , 'PAT' )
-process.patTrigger.l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'        , 'PAT' )
-process.patTrigger.l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'        , 'PAT' )
-process.patTrigger.saveL1Refs     = cms.bool( True )
-process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
-process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
-
-# process.patDefaultSequence = cms.Sequence(
-#   process.patTriggerDefaultSequence
-# )
 process.p = cms.Path(
   process.gtDigis
 * process.l1extraParticles
@@ -77,5 +59,19 @@ process.outpath = cms.EndPath(
   process.out
 )
 
+## PAT trigger
+process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
+process.patTrigger.addL1Algos     = cms.bool( True )
+process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'PAT' )
+process.patTrigger.l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', 'PAT' )
+process.patTrigger.l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , 'PAT' )
+process.patTrigger.l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central'    , 'PAT' )
+process.patTrigger.l1ExtraForJet  = cms.InputTag( 'l1extraParticles', 'Forward'    , 'PAT' )
+process.patTrigger.l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'        , 'PAT' )
+process.patTrigger.l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'        , 'PAT' )
+process.patTrigger.l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'        , 'PAT' )
+process.patTrigger.saveL1Refs     = cms.bool( True )
+process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
+process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger( process )
