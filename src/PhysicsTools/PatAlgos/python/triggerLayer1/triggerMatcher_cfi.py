@@ -132,7 +132,6 @@ metTriggerMatchHLTMET45 = cms.EDProducer(
 , resolveByMatchQuality = cms.bool( True )        # take best match found per reco object: by DeltaR here (s. above)
 )
 
-
 triggerMatchingDefaultSequence = cms.Sequence(
   cleanMuonTriggerMatchHLTMu9
 + cleanMuonTriggerMatchHLTDoubleIsoMu3

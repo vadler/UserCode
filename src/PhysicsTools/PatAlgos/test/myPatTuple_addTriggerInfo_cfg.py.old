@@ -38,14 +38,14 @@ switchOnTriggerStandAlone( process, 'hallo' )
 switchOnTriggerMatchingStandAlone( process, [ 'moin', 'tach' ], 'hallo' )
 switchOnTriggerMatchEmbedding( process, [ 'moin', 'tach' ], 'hallo' )
 print
-print 'patDefaultSequence'
-print '--> %s'%( process.patDefaultSequence )
+print 'Path p'
+print '--> %s'%( process.p )
 print
-print 'patTriggerSequence'
+print 'Sequence patTriggerSequence'
 print '--> %s'%( process.patTriggerSequence )
 print
-print 'patTriggerEventSequence'
+print 'Sequence patTriggerEventSequence'
 print '--> %s'%( process.patTriggerEventSequence )
 print
-print 'out.outputCommands'
+print 'PoolOutputModule out.outputCommands'
 print '--> %s'%( process.out.outputCommands )
