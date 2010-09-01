@@ -9,7 +9,7 @@ process.options = cms.untracked.PSet(
 
 process.source = cms.Source( "PoolSource"
 , fileNames = cms.untracked.vstring(
-    'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre2/output/myPatTuple_addTriggerInfo.root'
+    'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre3/output/myPatTuple_addTriggerInfo.root'
   )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -17,7 +17,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 process.TFileService = cms.Service( "TFileService"
-, fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre2/output/myTest.root' )
+, fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre3/output/myTest.root' )
 )
 
 process.triggerTest = cms.EDAnalyzer( "myTriggerTest"
