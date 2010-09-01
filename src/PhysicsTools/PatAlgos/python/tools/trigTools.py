@@ -365,7 +365,7 @@ class SwitchOnTriggerMatching( ConfigToolBase ):
             for matcher in getattr( trigEvtProdMod, 'patTriggerMatches' ):
                 trigMchMod = getattr( process, matcher )
                 if trigMchMod.matched.value() is not triggerProducer:
-                    process.patTriggerSequence.remove( trigMchMod )
+                    removeIfInSequence( process, matcher, 'patTriggerSequence' )
                     trigMchMod.matched          = triggerProducer
                     process.patTriggerSequence *= trigMchMod
                     print '                           PAT trigger matcher %s.matched --> %s'%( matcher, trigMchMod.matched )
@@ -583,10 +583,10 @@ class SwitchOnTriggerMatchEmbedding( ConfigToolBase ):
                 label      = srcInput + 'TriggerMatch'
                 trigEmbMod = getattr( process, label )
                 if label in _labelsInSequence( process, sequence ):
-                    print 'switchOnTriggerMatchEmbedding(): PAT trigger matcher embedder %s exists already in sequence %s'%( label, sequence )
+                    print 'switchOnTriggerMatchEmbedding(): PAT trigger match embedder %s exists already in sequence %s'%( label, sequence )
                     print '                                 ==> entry moved'
                     print '---------------------------------------------------------------------'
-                    process.patTriggerSequence.remove( trigEmbMod )
+                    removeIfInSequence( process, label, 'patTriggerSequence' )
                 trigEmbMod.matches         += cms.VInputTag( dictConfig[ srcInput ] )
                 process.patTriggerSequence *= trigEmbMod
                 # Add event content
