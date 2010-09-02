@@ -3,21 +3,30 @@ from FWCore.GuiBrowsers.ConfigToolBase import *
 from PhysicsTools.PatAlgos.tools.helpers import *
 from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerL1RefsEventContent
 
+_defaultTriggerMatchers      = [ 'cleanMuonTriggerMatchHLTMu9'
+                               , 'cleanMuonTriggerMatchHLTDoubleIsoMu3'
+                               , 'cleanPhotonTriggerMatchHLTPhoton20CleanedL1R'
+                               , 'cleanElectronTriggerMatchHLTEle20SWL1R'
+                               , 'cleanTauTriggerMatchHLTDoubleLooseIsoTau15'
+                               , 'cleanJetTriggerMatchHLTJet15U'
+                               , 'metTriggerMatchHLTMET45'
+                               ]
+_defaultTriggerProducer      = 'patTrigger'
+_defaultTriggerEventProducer = 'patTriggerEvent'
+_defaultSequence             = 'patDefaultSequence'
+_defaultHltProcess           = 'HLT'
+_defaultOutputModule         = 'out'
 
-_defaultTriggerMatchers = [ 'cleanMuonTriggerMatchHLTMu9'
-                          , 'cleanMuonTriggerMatchHLTDoubleIsoMu3'
-                          , 'cleanElectronTriggerMatchHLTEle20SWL1R'
-                          , 'cleanTauTriggerMatchHLTDoubleLooseIsoTau15'
-                          , 'cleanJetTriggerMatchHLTJet15U'
-                          , 'metTriggerMatchHLTMET45'
-                          ]
+_defaultTriggerMatchersComment      = "Trigger matcher modules' labels, default: ..."
+_defaultTriggerProducerComment      = "PATTriggerProducer module label, default: %s"%( _defaultTriggerProducer )
+_defaultTriggerEventProducerComment = "PATTriggerEventProducer module label, default: %s"%( _defaultTriggerEventProducer )
+_defaultSequenceComment             = "Name of sequence to use, default: %s"%( _defaultSequence )
+_defaultHltProcessComment           = "HLT process name, default: %s"%( _defaultHltProcess )
+_defaultOutputModuleComment         = "Output module label, empty label indicates no output, default: %s"%( _defaultOutputModule )
 
 
 def _modulesInSequence( process, sequenceLabel ):
-    result = [ m.label() for m in listModules( getattr( process, sequenceLabel ) ) ]
-    for m in listSequences( getattr( process, sequenceLabel ) ):
-        result.extend( _modulesInSequence( process, m.label() ) )
-    return result
+    return [ m.label() for m in listModules( getattr( process, sequenceLabel ) ) ]
 
 
 def _addEventContent( outputCommands, eventContent ):
@@ -30,7 +39,7 @@ def _addEventContent( outputCommands, eventContent ):
             continue
         command = outputCommands[ i ]
         if command[ : 4 ] == 'keep':
-            dropCommand = 'drop%s'%( command[ 4: ] )
+            dropCommand = command.replace( 'keep ', 'drop ' )
             for j in range( i + 1, len( outputCommands ) ):
                 testCommand = outputCommands[ j ]
                 if testCommand == command:
@@ -67,11 +76,11 @@ class SwitchOnTrigger( ConfigToolBase ):
 
     def __init__( self ):
         ConfigToolBase.__init__( self )
-        self.addParameter( self._defaultParameters, 'triggerProducer'     , 'patTrigger'        , "PATTriggerProducer module label, default: 'patTrigger'" )
-        self.addParameter( self._defaultParameters, 'triggerEventProducer', 'patTriggerEvent'   , "PATTriggerEventProducer module label, default: 'patTriggerEvent'" )
-        self.addParameter( self._defaultParameters, 'sequence'            , 'patDefaultSequence', "Name of sequence to use, default: 'patDefaultSequence'" )
-        self.addParameter( self._defaultParameters, 'hltProcess'          , 'HLT'               , "HLT process name, default: 'HLT'" )
-        self.addParameter( self._defaultParameters, 'outputModule'        , 'out'               , "Output module label, empty label indicates no output, default: 'out'" )
+        self.addParameter( self._defaultParameters, 'triggerProducer'     , _defaultTriggerProducer     , _defaultTriggerProducerComment )
+        self.addParameter( self._defaultParameters, 'triggerEventProducer', _defaultTriggerEventProducer, _defaultTriggerEventProducerComment )
+        self.addParameter( self._defaultParameters, 'sequence'            , _defaultSequence            , _defaultSequenceComment )
+        self.addParameter( self._defaultParameters, 'hltProcess'          , _defaultHltProcess          , _defaultHltProcessComment )
+        self.addParameter( self._defaultParameters, 'outputModule'        , _defaultOutputModule        , _defaultOutputModuleComment )
         self._parameters = copy.deepcopy( self._defaultParameters )
         self._comment = ""
 
@@ -188,10 +197,10 @@ class SwitchOnTriggerStandAlone( ConfigToolBase ):
 
     def __init__( self ):
         ConfigToolBase.__init__( self )
-        self.addParameter( self._defaultParameters, 'triggerProducer', 'patTrigger'        , "PATTriggerProducer module label, default: 'patTrigger'" )
-        self.addParameter( self._defaultParameters, 'sequence'       , 'patDefaultSequence', "Name of sequence to use, default: 'patDefaultSequence'" )
-        self.addParameter( self._defaultParameters, 'hltProcess'     , 'HLT'               , "HLT process name, default: 'HLT'" )
-        self.addParameter( self._defaultParameters, 'outputModule'   , 'out'               , "Output module label, empty label indicates no output, default: 'out'" )
+        self.addParameter( self._defaultParameters, 'triggerProducer', _defaultTriggerProducer, _defaultTriggerProducerComment )
+        self.addParameter( self._defaultParameters, 'sequence'       , _defaultSequence       , _defaultSequenceComment )
+        self.addParameter( self._defaultParameters, 'hltProcess'     , _defaultHltProcess     , _defaultHltProcessComment )
+        self.addParameter( self._defaultParameters, 'outputModule'   , _defaultOutputModule   , _defaultOutputModuleComment )
         self._parameters = copy.deepcopy( self._defaultParameters )
         self._comment = ""
 
@@ -283,12 +292,12 @@ class SwitchOnTriggerMatching( ConfigToolBase ):
 
     def __init__( self ):
         ConfigToolBase.__init__( self )
-        self.addParameter( self._defaultParameters, 'triggerMatchers'     , _defaultTriggerMatchers, "trigger matcher modules' labels, default: [ '' ]" )
-        self.addParameter( self._defaultParameters, 'triggerProducer'     , 'patTrigger'           , "PATTriggerProducer module label, default: 'patTrigger'" )
-        self.addParameter( self._defaultParameters, 'triggerEventProducer', 'patTriggerEvent'      , "PATTriggerEventProducer module label, default: 'patTriggerEvent'" )
-        self.addParameter( self._defaultParameters, 'sequence'            , 'patDefaultSequence'   , "Name of sequence to use, default: 'patDefaultSequence'" )
-        self.addParameter( self._defaultParameters, 'hltProcess'          , 'HLT'                  , "HLT process name, default: 'HLT'" )
-        self.addParameter( self._defaultParameters, 'outputModule'        , 'out'                  , "Output module label, empty label indicates no output, default: 'out'" )
+        self.addParameter( self._defaultParameters, 'triggerMatchers'     , _defaultTriggerMatchers     , _defaultTriggerMatchersComment )
+        self.addParameter( self._defaultParameters, 'triggerProducer'     , _defaultTriggerProducer     , _defaultTriggerProducerComment )
+        self.addParameter( self._defaultParameters, 'triggerEventProducer', _defaultTriggerEventProducer, _defaultTriggerEventProducerComment )
+        self.addParameter( self._defaultParameters, 'sequence'            , _defaultSequence            , _defaultSequenceComment )
+        self.addParameter( self._defaultParameters, 'hltProcess'          , _defaultHltProcess          , _defaultHltProcessComment )
+        self.addParameter( self._defaultParameters, 'outputModule'        , _defaultOutputModule        , _defaultOutputModuleComment )
         self._parameters = copy.deepcopy( self._defaultParameters )
         self._comment = ""
 
@@ -363,10 +372,11 @@ class SwitchOnTriggerMatching( ConfigToolBase ):
             else:
                 # Sequence arithmetics for PAT trigger matcher modules
                 process.patTriggerSequence *= trigMchMod
-        if len( getattr( trigEvtProdMod, 'patTriggerMatches' ) ) > 0:
+        matchers = getattr( trigEvtProdMod, 'patTriggerMatches' )
+        if len( matchers ) > 0:
             print 'switchOnTriggerMatching(): PAT trigger matchers already attached to existing PATTriggerEventProducer %s'%( triggerEventProducer )
             print '                           configuration parameters automatically changed'
-            for matcher in getattr( trigEvtProdMod, 'patTriggerMatches' ):
+            for matcher in matchers:
                 trigMchMod = getattr( process, matcher )
                 if trigMchMod.matched.value() is not triggerProducer:
                     removeIfInSequence( process, matcher, 'patTriggerSequence' )
@@ -412,11 +422,11 @@ class SwitchOnTriggerMatchingStandAlone( ConfigToolBase ):
 
     def __init__( self ):
         ConfigToolBase.__init__( self )
-        self.addParameter( self._defaultParameters, 'triggerMatchers', _defaultTriggerMatchers, "trigger matcher modules' labels, default: [ '' ]" )
-        self.addParameter( self._defaultParameters, 'triggerProducer', 'patTrigger'           , "PATTriggerProducer module label, default: 'patTrigger'" )
-        self.addParameter( self._defaultParameters, 'sequence'       , 'patDefaultSequence'   , "Name of sequence to use, default: 'patDefaultSequence'" )
-        self.addParameter( self._defaultParameters, 'hltProcess'     , 'HLT'                  , "HLT process name, default: 'HLT'" )
-        self.addParameter( self._defaultParameters, 'outputModule'   , 'out'                  , "Output module label, empty label indicates no output, default: 'out'" )
+        self.addParameter( self._defaultParameters, 'triggerMatchers', _defaultTriggerMatchers, _defaultTriggerMatchersComment )
+        self.addParameter( self._defaultParameters, 'triggerProducer', _defaultTriggerProducer, _defaultTriggerProducerComment )
+        self.addParameter( self._defaultParameters, 'sequence'       , _defaultSequence       , _defaultSequenceComment )
+        self.addParameter( self._defaultParameters, 'hltProcess'     , _defaultHltProcess     , _defaultHltProcessComment )
+        self.addParameter( self._defaultParameters, 'outputModule'   , _defaultOutputModule   , _defaultOutputModuleComment )
         self._parameters = copy.deepcopy( self._defaultParameters )
         self._comment = ""
 
@@ -511,11 +521,11 @@ class SwitchOnTriggerMatchEmbedding( ConfigToolBase ):
 
     def __init__( self ):
         ConfigToolBase.__init__( self )
-        self.addParameter( self._defaultParameters, 'triggerMatchers', _defaultTriggerMatchers, "trigger matcher modules' labels, default: [ '' ]" )
-        self.addParameter( self._defaultParameters, 'triggerProducer', 'patTrigger'           , "PATTriggerProducer module label, default: 'patTrigger'" )
-        self.addParameter( self._defaultParameters, 'sequence'       , 'patDefaultSequence'   , "Name of sequence to use, default: 'patDefaultSequence'" )
-        self.addParameter( self._defaultParameters, 'hltProcess'     , 'HLT'                  , "HLT process name, default: 'HLT'" )
-        self.addParameter( self._defaultParameters, 'outputModule'   , 'out'                  , "Output module label, empty label indicates no output, default: 'out'" )
+        self.addParameter( self._defaultParameters, 'triggerMatchers', _defaultTriggerMatchers, _defaultTriggerMatchersComment )
+        self.addParameter( self._defaultParameters, 'triggerProducer', _defaultTriggerProducer, _defaultTriggerProducerComment )
+        self.addParameter( self._defaultParameters, 'sequence'       , _defaultSequence       , _defaultSequenceComment )
+        self.addParameter( self._defaultParameters, 'hltProcess'     , _defaultHltProcess     , _defaultHltProcessComment )
+        self.addParameter( self._defaultParameters, 'outputModule'   , _defaultOutputModule   , _defaultOutputModuleComment )
         self._parameters = copy.deepcopy( self._defaultParameters )
         self._comment = ""
 

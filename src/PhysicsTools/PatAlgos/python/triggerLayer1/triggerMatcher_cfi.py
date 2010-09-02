@@ -52,6 +52,26 @@ cleanMuonTriggerMatchHLTDoubleIsoMu3 = cms.EDProducer(
 , resolveByMatchQuality = cms.bool( True )        # take best match found per reco object: by DeltaR here (s. above)
 )
 
+# firing trigger objects used in succeeding HLT path 'HLT_Photon20_Cleaned_L1R'
+cleanPhotonTriggerMatchHLTPhoton20CleanedL1R = cms.EDProducer(
+  "PATTriggerMatcherDRDPtLessByR"                 # match by DeltaR only, best match by DeltaR
+, src     = cms.InputTag( "cleanPatPhotons" )
+, matched = cms.InputTag( "patTrigger" )          # default producer label as defined in PhysicsTools/PatAlgos/python/triggerLayer1/triggerProducer_cfi.py
+, andOr                      = cms.bool( False )  # AND
+, filterIdsEnum              = cms.vstring( '*' ) # wildcard, overlaps with 'filterIds'
+, filterIds                  = cms.vint32( 0 )    # wildcard, overlaps with 'filterIdsEnum'
+, filterLabels               = cms.vstring( '*' ) # wildcard
+, pathNames                  = cms.vstring(
+    'HLT_Photon20_Cleaned_L1R'
+  )
+, pathLastFilterAcceptedOnly = cms.bool( True )   # select only trigger objects used in last filters of succeeding paths
+, collectionTags             = cms.vstring( '*' ) # wildcard
+, maxDPtRel = cms.double( 0.5 )
+, maxDeltaR = cms.double( 0.5 )
+, resolveAmbiguities    = cms.bool( True )        # only one match per trigger object
+, resolveByMatchQuality = cms.bool( True )        # take best match found per reco object: by DeltaR here (s. above)
+)
+
 # firing trigger objects used in succeeding HLT path 'HLT_Ele20_SW_L1R'
 cleanElectronTriggerMatchHLTEle20SWL1R = cms.EDProducer(
   "PATTriggerMatcherDRDPtLessByR"                 # match by DeltaR only, best match by DeltaR
@@ -132,9 +152,11 @@ metTriggerMatchHLTMET45 = cms.EDProducer(
 , resolveByMatchQuality = cms.bool( True )        # take best match found per reco object: by DeltaR here (s. above)
 )
 
+
 triggerMatchingDefaultSequence = cms.Sequence(
   cleanMuonTriggerMatchHLTMu9
 + cleanMuonTriggerMatchHLTDoubleIsoMu3
++ cleanPhotonTriggerMatchHLTPhoton20CleanedL1R
 + cleanElectronTriggerMatchHLTEle20SWL1R
 + cleanTauTriggerMatchHLTDoubleLooseIsoTau15
 + cleanJetTriggerMatchHLTJet15U

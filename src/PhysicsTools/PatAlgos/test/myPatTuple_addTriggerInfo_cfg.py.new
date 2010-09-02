@@ -1,5 +1,5 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.GlobalTag.globaltag = 'START38_V9::All'
+process.GlobalTag.globaltag = 'START38_V10::All'
 process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre3/output/myPatTuple_addTriggerInfo.root'
 process.options.wantSummary = False
 
@@ -13,8 +13,13 @@ process.p = cms.Path(
   process.patDefaultSequence
 )
 
-from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
-removeCleaning( process )
+process.out.outputCommands += [
+  'keep edmTriggerResults_TriggerResults_*_HLT'
+, 'keep *_hltTriggerSummaryAOD_*_*'
+]
+
+# from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
+# removeCleaning( process )
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
@@ -40,7 +45,7 @@ switchOnTriggerMatching( process, [ 'moin', 'tach' ], 'hallo', 'tschuess' )
 switchOnTriggerStandAlone( process, 'hallo' )
 switchOnTriggerMatchingStandAlone( process, [ 'moin', 'tach' ], 'hallo' )
 switchOnTriggerMatchEmbedding( process, [ 'moin', 'tach' ], 'hallo' )
-removeCleaningFromTriggerMatching( process )
+# removeCleaningFromTriggerMatching( process )
 # print
 # print 'Path p'
 # print '--> %s'%( process.p )
