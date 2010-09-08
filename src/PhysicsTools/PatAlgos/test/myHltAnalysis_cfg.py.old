@@ -14,7 +14,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # conditions
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string('START38_V7::All')
+process.GlobalTag.globaltag = cms.string('START38_V10::All')
 
 # HLT analyzers
 process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
