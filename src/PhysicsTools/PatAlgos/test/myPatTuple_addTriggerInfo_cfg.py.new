@@ -1,5 +1,5 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.GlobalTag.globaltag = 'START38_V9::All'
+process.GlobalTag.globaltag = 'START38_V10::All'
 process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_2/output/myPatTuple_addTriggerInfo.root'
 process.options.wantSummary = False
 
@@ -13,6 +13,14 @@ process.p = cms.Path(
   process.patDefaultSequence
 )
 
+process.out.outputCommands += [
+  'keep edmTriggerResults_TriggerResults_*_HLT'
+, 'keep *_hltTriggerSummaryAOD_*_*'
+]
+
+# from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
+# removeCleaning( process )
+
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
 from PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff import *
@@ -25,8 +33,8 @@ process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
 process.moin = cleanMuonTriggerMatchPDMu.clone()
 process.tach = metTriggerMatchHLTMu3.clone()
-process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi" )
-process.patTrigger.saveL1Refs = cms.bool( True )
+# process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi" )
+# process.patTrigger.saveL1Refs = cms.bool( True )
 switchOnTrigger( process )
 switchOnTriggerMatching( process )
 switchOnTriggerStandAlone( process )
@@ -37,9 +45,10 @@ switchOnTriggerMatching( process, [ 'moin', 'tach' ], 'hallo', 'tschuess' )
 switchOnTriggerStandAlone( process, 'hallo' )
 switchOnTriggerMatchingStandAlone( process, [ 'moin', 'tach' ], 'hallo' )
 switchOnTriggerMatchEmbedding( process, [ 'moin', 'tach' ], 'hallo' )
-print
-print 'Path p'
-print '--> %s'%( process.p )
+# removeCleaningFromTriggerMatching( process )
+# print
+# print 'Path p'
+# print '--> %s'%( process.p )
 print
 print 'Sequence patTriggerSequence'
 print '--> %s'%( process.patTriggerSequence )
