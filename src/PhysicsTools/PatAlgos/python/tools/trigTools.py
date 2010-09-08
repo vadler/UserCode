@@ -678,19 +678,19 @@ class RemoveCleaningFromTriggerMatching( ConfigToolBase ):
                        , 'PATTriggerMatcherDEtaLessByDR'
                        , 'PATTriggerMatcherDEtaLessByDEta'
                        ]
-        listEmedders = [ 'PATTriggerMatchPhotonEmbedder'
-                       , 'PATTriggerMatchElectronEmbedder'
-                       , 'PATTriggerMatchMuonEmbedder'
-                       , 'PATTriggerMatchTauEmbedder'
-                       , 'PATTriggerMatchJetEmbedder'
-                       , 'PATTriggerMatchMETEmbedder'
-                       ]
+        listEmbedders = [ 'PATTriggerMatchPhotonEmbedder'
+                        , 'PATTriggerMatchElectronEmbedder'
+                        , 'PATTriggerMatchMuonEmbedder'
+                        , 'PATTriggerMatchTauEmbedder'
+                        , 'PATTriggerMatchJetEmbedder'
+                        , 'PATTriggerMatchMETEmbedder'
+                        ]
         modules = _modulesInSequence( process, sequence )
         oldModules = []
         for module in modules:
             if hasattr( process, module ):
                 trigMod = getattr( process, module )
-                if trigMod.type_() in listMatchers or trigMod.type_() in listEmedders:
+                if trigMod.type_() in listMatchers or trigMod.type_() in listEmbedders:
                     if trigMod.src.value()[ : 8 ] == 'cleanPat':
                         trigMod.src = trigMod.src.value().replace( 'cleanPat', 'selectedPat' )
                         if trigMod.label()[ : 5 ] == 'clean':
@@ -702,7 +702,7 @@ class RemoveCleaningFromTriggerMatching( ConfigToolBase ):
                 if trigMod.type_() == 'PATTriggerEventProducer':
                     matchers = getattr( trigMod, 'patTriggerMatches' )
                     matchers = self._renameMatchers( matchers, oldModules )
-                elif trigMod.type_() in listEmedders:
+                elif trigMod.type_() in listEmbedders:
                     matchers = getattr( trigMod, 'matches' )
                     matchers = self._renameMatchers( matchers, oldModules )
         # Maintain event content
