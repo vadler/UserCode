@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.41 2010/07/28 13:07:53 srappocc Exp $
+// $Id: PATElectronProducer.cc,v 1.43 2010/09/07 16:08:11 mbluj Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
@@ -29,6 +29,9 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
+
+#include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
+#include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 
 #include <vector>
 #include <memory>
@@ -163,6 +166,11 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
   edm::Handle<edm::View<reco::GsfElectron> > electrons;
   iEvent.getByLabel(electronSrc_, electrons);
 
+  if (iEvent.isRealData()){
+       addGenMatch_ = false;
+       embedGenMatch_ = false;
+   }
+
   // Get the ESHandle for the transient track builder, if needed for
   // high level selection embedding
   edm::ESHandle<TransientTrackBuilder> trackBuilder;
@@ -261,14 +269,25 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
       reco::GsfTrackRef PfTk= i->gsfTrackRef(); 
 
       bool Matched=false;
+      bool MatchedToAmbiguousGsfTrack=false;
       for (edm::View<reco::GsfElectron>::const_iterator itElectron = electrons->begin(); itElectron != electrons->end(); ++itElectron) {
 	unsigned int idx = itElectron - electrons->begin();
-	if (Matched) continue;
-	reco::GsfTrackRef EgTk= itElectron->gsfTrack();
-	if (itElectron->gsfTrack()==i->gsfTrackRef()){
+	if (Matched || MatchedToAmbiguousGsfTrack) continue;
 
+	reco::GsfTrackRef EgTk= itElectron->gsfTrack();
+
+	if (itElectron->gsfTrack()==i->gsfTrackRef()){
 	  Matched=true;
-	  
+	}
+	else {
+	  for( reco::GsfTrackRefVector::const_iterator it = itElectron->ambiguousGsfTracksBegin() ; 
+	       it!=itElectron->ambiguousGsfTracksEnd(); it++ ){
+	    MatchedToAmbiguousGsfTrack |= (bool)(i->gsfTrackRef()==(*it));
+	  }
+	}
+
+	if (Matched || MatchedToAmbiguousGsfTrack){
+
 	  // ptr needed for finding the matched gen particle
 	  reco::CandidatePtr ptrToGsfElectron(electrons,idx);
 
@@ -338,7 +357,8 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 
 	  patElectrons->push_back(anElectron);
 	}
-      }      
+      }
+      //if( !Matched && !MatchedToAmbiguousGsfTrack) std::cout << "!!!!A pf electron could not be matched to a gsf!!!!"  << std::endl;
     }
   }
 

@@ -1,5 +1,5 @@
 //
-// $Id: PATJetProducer.cc,v 1.51 2010/08/31 16:16:19 srappocc Exp $
+// $Id: PATJetProducer.cc,v 1.52 2010/09/03 15:41:26 hegner Exp $
 
 
 #include "PhysicsTools/PatAlgos/plugins/PATJetProducer.h"
@@ -132,6 +132,14 @@ PATJetProducer::~PATJetProducer() {
 
 
 void PATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
+
+  // check whether dealing with MC or real data
+  if (iEvent.isRealData()){
+    getJetMCFlavour_ = false;
+    addGenPartonMatch_ = false;
+    addGenJetMatch_ = false;
+    addPartonJetMatch_ = false;
+  }
 
   // Get the vector of jets
   edm::Handle<edm::View<reco::Jet> > jets;
