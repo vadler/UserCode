@@ -45,7 +45,7 @@ process.p = cms.Path(
 ## Output
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_2/output/myPatTuple_triggerOnly.root' )
+, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_3/output/myPatTuple_triggerOnly.root' )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'p'
