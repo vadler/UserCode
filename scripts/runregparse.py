@@ -5,11 +5,12 @@
 # LM: updated 15/04/2010 --> added bfield threshold
 # LM: updated 3/05/2010 --> added Energy range selection,Lumi quality flags and DBS cross check
 # LM: updated 1/07/2010 --> fixed a bug which would prevent the BAD LS comment to be picked up for some runs
-# LM: updated 7/07/2010 --> removes empty runs from the output JSON 
-# LM: updated 12/7/2010 --> adapted to ne RR (H0 --> Ho) 
-# LM: updated 14/7/2010 --> adapted to ne RR, add Online dataset selection for dcs status 
+# LM: updated 7/07/2010 --> removes empty runs from the output JSON
+# LM: updated 12/7/2010 --> adapted to ne RR (H0 --> Ho)
+# LM: updated 14/7/2010 --> adapted to ne RR, add Online dataset selection for dcs status
 # LM: updated 17/7/2010 --> added possibility to mix datasets based on run ranges
- 
+# VA: updated 10/9/2010 --> handle new table structure in RR lumi section table
+
 # include XML-RPC client library
 # RR API uses XML-RPC webservices interface for data access
 import xmlrpclib,sys,ConfigParser,os,string,commands,time,re
@@ -32,7 +33,7 @@ EXCEPTION=False
 EXRUN=-1
 
 def invert_intervals(intervals,min_val=1,max_val=9999):
-    # first order and merge in case 
+    # first order and merge in case
     if not intervals:
         return []
     intervals=merge_intervals(intervals)
@@ -103,7 +104,7 @@ def searchrun(runno):
                     for tag in QF_ALL_SYS:
                         selectls=selectls.replace(tag+":","\n"+tag+":")
                     # print selectls
-                    
+
                     for line in selectls.split("\n"):
                         try:
                             tag=line.split(":")[0]
@@ -120,7 +121,7 @@ def searchrun(runno):
                                         strmin=interval.split('-')[0]
                                         strmax=interval.split('-')[1]
                                         lmin=int(strmin)
-                                        if "END" in strmax: 
+                                        if "END" in strmax:
                                             lmax=9999
                                         else:
                                             lmax=int(strmax)
@@ -254,7 +255,7 @@ def get_dbsjson():
                 if run not in unsorted.keys():
                     unsorted[run]=[]
                 unsorted[run].append(lumi)
-    
+
 #    print unsorted
     sorted={}
     for run in unsorted.keys():
@@ -262,7 +263,7 @@ def get_dbsjson():
         lumilist.sort()
         sorted[run]=lumilist
 #    print sorted
-    
+
     dbsjson={}
     for run in sorted.keys():
         lumilist=sorted[run]
@@ -282,7 +283,7 @@ def get_dbsjson():
             lumirange.append(lastlumi)
             lumiranges.append(lumirange)
         dbsjson[run]=lumiranges
-    
+
 #    print dbsjson
     return dbsjson
 
@@ -294,11 +295,35 @@ def get_dbsjson():
 
 QF_Req={}
 GOODRUN={}
-compactList = {} 
+compactList = {}
 
 QF_ALL_SYS=["Hcal","Track","Strip","Egam","Es","Dt","Csc","Pix","Muon","Rpc","Castor","Jmet","Ecal","L1t","Hlt","Lumi","NONE"]
 QF_ALL_STAT=["GOOD","BAD","EXCL","NONE"]
-DCS_ALL=['Bpix','Fpix','Tibtid','TecM','TecP','Tob','Ebminus','Ebplus','EeMinus','EePlus','EsMinus','EsPlus','HbheA','HbheB','HbheC','Ho','Hf','Dtminus','Dtplus','Dt0','CscMinus','CscPlus','Rpc','Castor',"NONE"]
+DCS_ALL={'Bpix':'BPix',
+         'Fpix':'FPix',
+         'Tibtid':'TibTid',
+         'TecM':'TecM',
+         'TecP':'TecP',
+         'Tob':'Tob',
+         'Ebminus':'EbM',
+         'Ebplus':'EbP',
+         'EeMinus':'EeM',
+         'EePlus':'EeP',
+         'EsMinus':'EsM',
+         'EsPlus':'EsP',
+         'HbheA':'HbHeA',
+         'HbheB':'HbHeB',
+         'HbheC':'HbHeC',
+         'Ho':'H0',
+         'Hf':'Hf',
+         'Dtminus':'DtM',
+         'Dtplus':'DtP',
+         'Dt0':'Dt0',
+         'CscMinus':'CscM',
+         'CscPlus':'CscP',
+         'Rpc':'Rpc',
+         'Castor':'Castor',
+         'NONE':'NONE'}
 
 # reading config file
 if len(sys.argv)==2:
@@ -352,12 +377,12 @@ for QF in QFlist:
     syst=string.split(QF,":")[0]
     value=string.split(QF,":")[1]
     if syst not in QF_ALL_SYS or value not in QF_ALL_STAT:
-        print "QFLAG not valid:",syst,value 
+        print "QFLAG not valid:",syst,value
         sys.exit(1)
     QF_Req[syst]=value
 
 for dcs in DCSLIST:
-    if dcs not in DCS_ALL:
+    if dcs not in DCS_ALL.keys():
         print "DCS not valid:",dcs
         sys.exit(1)
 
@@ -428,7 +453,7 @@ else:
     print "Cross-check requested agains DBS in PDs:",DBS_PDS
     USEDBS=True
 
- 
+
 # get handler to RR XML-RPC server
 FULLADDRESS=ADDRESS+"/xmlrpc"
 print "RunRegistry from: ",FULLADDRESS
@@ -452,15 +477,15 @@ for key in QF_Req.keys():
 #    print sel_runtable[DSindex]
 
 # build up selection in RUNLUMISECTION table, not requestuing bfield here because only runs in the run table selection will be considered
-sel_dcstable="{groupName} ='"+GROUP+"' and {runNumber} >= "+RUNMIN+" and {runNumber} <= "+RUNMAX+" and {datasetName} LIKE '%Online%'"
+sel_dcstable="{groupName} ='"+GROUP+"' and {runNumber} >= "+RUNMIN+" and {runNumber} <= "+RUNMAX+" and {datasetName} LIKE '%Express%'"
 for dcs in DCSLIST:
     if dcs !="NONE":
-        sel_dcstable+=" and {parDcs"+dcs+"} = 1"
+        sel_dcstable+=" and ( ( {cmpDcs"+DCS_ALL[dcs]+"} is null and {parDcs"+dcs+"} = 1 ) or {cmpDcs"+DCS_ALL[dcs]+"} = 1 )"
 # = 'True'"
-# print sel_dcstable
+#print 'sel_dcstable: %s'%( sel_dcstable )
 
 Tries=0
-print " " 
+print " "
 run_data=""
 
 while Tries<10:
@@ -482,10 +507,10 @@ while Tries<10:
 if Tries==10:
     print "Run registry unaccessible.....exiting now"
     sys.exit(1)
-    
-#print dcs_data
-#print run_data
-#print ls_temp_data
+
+#print 'dcs_data: %s'%( dcs_data )
+#print 'run_data: %s'%( run_data )
+#print 'ls_temp_data: %s'%( ls_temp_data )
 # find LS info in comment
 #print run_data
 #sys.exit(1)
@@ -521,7 +546,7 @@ jsonlist=json.loads(dcs_data)
 for element in jsonlist:
     if element in LISTOFRUN:
 # first search manual ls certification
-# this part really performs the run selection        
+# this part really performs the run selection
         if LSCOMMENT:
             # using LS intervals in comment
             manualbad_int=searchrun(element)
@@ -542,7 +567,7 @@ for element in jsonlist:
                     dbsbad_int=[[1,9999]]
                 for interval in  dbsbad_int:
                     combined.append(interval)
-                
+
             combined=merge_intervals(combined)
             combined=invert_intervals(combined)
             if len(combined)!=0:
@@ -559,7 +584,7 @@ for element in jsonlist:
 if JSONFILE != "NONE":
     lumiSummary = open(JSONFILE, 'w')
     json.dump(selected_dcs, lumiSummary,sort_keys=True)
-    lumiSummary.close() 
+    lumiSummary.close()
     print " "
     print "-------------------------------------------"
     print "Json file: ",JSONFILE," written."
