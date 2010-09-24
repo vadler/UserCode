@@ -1,6 +1,6 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.GlobalTag.globaltag = 'START38_V10::All'
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre3/output/myPatTuple_addTriggerInfo.root'
+process.GlobalTag.globaltag = 'START38_V12::All'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre4/output/myPatTuple_addTriggerInfo.root'
 process.options.wantSummary = False
 
 # # memory check
