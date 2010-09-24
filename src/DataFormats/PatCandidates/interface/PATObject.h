@@ -1,5 +1,5 @@
 //
-// $Id: PATObject.h,v 1.29.2.1 2010/06/16 18:06:20 vadler Exp $
+// $Id: PATObject.h,v 1.30 2010/06/16 15:40:51 vadler Exp $
 //
 
 #ifndef DataFormats_PatCandidates_PATObject_h
@@ -15,7 +15,7 @@
    https://hypernews.cern.ch/HyperNews/CMS/get/physTools.html
 
   \author   Steven Lowette, Giovanni Petrucciani, Frederic Ronga, Volker Adler, Sal Rappoccio
-  \version  $Id: PATObject.h,v 1.29.2.1 2010/06/16 18:06:20 vadler Exp $
+  \version  $Id: PATObject.h,v 1.30 2010/06/16 15:40:51 vadler Exp $
 */
 
 

@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerEvent
 //
-// $Id: TriggerEvent.h,v 1.6.4.2 2010/07/16 12:05:35 vadler Exp $
+// $Id: TriggerEvent.h,v 1.8 2010/07/15 21:33:28 vadler Exp $
 //
 /**
   \class    pat::TriggerEvent TriggerEvent.h "DataFormats/PatCandidates/interface/TriggerEvent.h"
@@ -18,7 +18,7 @@
    https://twiki.cern.ch/twiki/bin/view/CMS/SWGuidePATTrigger#TriggerEvent
 
   \author   Volker Adler
-  \version  $Id: TriggerEvent.h,v 1.6.4.2 2010/07/16 12:05:35 vadler Exp $
+  \version  $Id: TriggerEvent.h,v 1.8 2010/07/15 21:33:28 vadler Exp $
 */
 
 

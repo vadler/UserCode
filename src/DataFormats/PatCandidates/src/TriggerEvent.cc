@@ -72,7 +72,7 @@ TriggerAlgorithmRefVector TriggerEvent::techAlgorithms() const
 {
   TriggerAlgorithmRefVector theTechAlgorithms;
   for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
-    if ( iAlgorithm->decision() ) {
+    if ( iAlgorithm->techTrigger() ) {
       const std::string nameAlgorithm( iAlgorithm->name() );
       const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
       theTechAlgorithms.push_back( algorithmRef );
