@@ -1,8 +1,8 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.GlobalTag.globaltag = 'START38_V12::All'
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre5/output/myPatTuple_addTriggerInfo.root'
+process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre6/output/myPatTuple_addTriggerInfo.root'
 process.options.wantSummary = False
-process.maxEvents.input = 5
+process.maxEvents.input = 100
 
 # # memory check
 # process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck"
