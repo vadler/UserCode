@@ -1,8 +1,10 @@
+import os
+cmsswBase = os.getenv( "CMSSW_BASE" )
+
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.GlobalTag.globaltag = 'START38_V12::All'
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre7/output/myPatTuple_addTriggerInfo.root'
+process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo.root'%( cmsswBase )
 process.options.wantSummary = False
-process.maxEvents.input = 100
 
 # # memory check
 # process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck"
@@ -47,9 +49,9 @@ switchOnTriggerStandAlone( process, 'hallo' )
 switchOnTriggerMatchingStandAlone( process, [ 'moin', 'tach' ], 'hallo' )
 switchOnTriggerMatchEmbedding( process, [ 'moin', 'tach' ], 'hallo' )
 # removeCleaningFromTriggerMatching( process )
-print
-print 'Path p'
-print '--> %s'%( process.p )
+# print
+# print 'Path p'
+# print '--> %s'%( process.p )
 print
 print 'Sequence patTriggerSequence'
 print '--> %s'%( process.patTriggerSequence )

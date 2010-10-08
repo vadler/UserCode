@@ -1,6 +1,9 @@
+import os
+cmsswBase = os.getenv( "CMSSW_BASE" )
+
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.GlobalTag.globaltag = 'START38_V12::All'
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_0_pre7/output/myPatTuple_test_addTriggerInfo.root'
+process.out.fileName        = '%s/output/myPatTuple_test_addTriggerInfo.root'%( cmsswBase )
 
 process.p = cms.Path(
   process.patDefaultSequence
