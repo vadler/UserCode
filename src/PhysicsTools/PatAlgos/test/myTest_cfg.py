@@ -1,3 +1,6 @@
+import os
+cmsswBase = os.getenv( "CMSSW_BASE" )
+
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process( "TEST" )
@@ -9,7 +12,7 @@ process.options = cms.untracked.PSet(
 
 process.source = cms.Source( "PoolSource"
 , fileNames = cms.untracked.vstring(
-    'file:/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_5/output/myPatTuple_addTriggerInfo.root'
+    'file:%s/output/myPatTuple_addTriggerInfo.root'%( cmsswBase )
   )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -17,7 +20,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 process.TFileService = cms.Service( "TFileService"
-, fileName = cms.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_5/output/myTest.root' )
+, fileName = cms.string( '%s/output/myTest.root'%( cmsswBase ) )
 )
 
 process.triggerTest = cms.EDAnalyzer( "myTriggerTest"

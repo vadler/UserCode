@@ -1,3 +1,6 @@
+import os
+cmsswBase = os.getenv( "CMSSW_BASE" )
+
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process( "PAT" )
@@ -38,7 +41,7 @@ process.p = cms.Path(
 ## Output
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, fileName       = cms.untracked.string( '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_5/output/myPatTuple_triggerOnly.root' )
+, fileName       = cms.untracked.string( '%s/output/myPatTuple_triggerOnly.root'%( cmsswBase ) )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'p'

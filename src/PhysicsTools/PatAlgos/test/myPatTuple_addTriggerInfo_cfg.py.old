@@ -1,6 +1,9 @@
+import os
+cmsswBase = os.getenv( "CMSSW_BASE" )
+
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.GlobalTag.globaltag = 'START38_V12::All'
-process.out.fileName        = '/afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_5/output/myPatTuple_addTriggerInfo.root'
+process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo.root'%( cmsswBase )
 process.options.wantSummary = False
 
 # # memory check
