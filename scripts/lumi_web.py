@@ -242,7 +242,7 @@ def makeplot(cur):
     # use this for batch mode
     gROOT.SetBatch(True)
 
-    repref=REPORT[0] # always use PBD as reference
+    repref=REPORT[len(JSONLIST)-1] # always use PBD as reference
     repcur=REPORT[cur]
 
     lumi_json_ref=file(repref[2],'r')
@@ -991,15 +991,15 @@ def makehtmlpages():
     # add plots to main page
     # first lumi
     PLOTLINE=""
-    PLOTLEFT ='plot_lumi_time_tot_1'
-    PLOTRIGHT='plot_lumi_time_lastweek_1'
+    PLOTLEFT ='plot_lumi_time_tot_0'
+    PLOTRIGHT='plot_lumi_time_lastweek_0'
     PLOTLINE+='<a href="'+PLOTLEFT +'.png"> <img src="'+PLOTLEFT +'.png" alt="'+PLOTLEFT +'" width="45%" /></a>\n'
     PLOTLINE+='<a href="'+PLOTRIGHT+'.png"> <img src="'+PLOTRIGHT+'.png" alt="'+PLOTRIGHT+'" width="45%" /></a>\n'
     MAINPAGE_TEMPL=MAINPAGE_TEMPL.replace("TAG_LUMIPLOT",PLOTLINE)
     # then losses
     PLOTLINE=""
-    PLOTLEFT ='plot_loss_time_tot_1'
-    PLOTRIGHT='plot_loss_time_lastweek_1'
+    PLOTLEFT ='plot_loss_time_tot_0'
+    PLOTRIGHT='plot_loss_time_lastweek_0'
     PLOTLINE+='<a href="'+PLOTLEFT +'.png"> <img src="'+PLOTLEFT +'.png" alt="'+PLOTLEFT +'" width="45%" /></a>\n'
     PLOTLINE+='<a href="'+PLOTRIGHT+'.png"> <img src="'+PLOTRIGHT+'.png" alt="'+PLOTRIGHT+'" width="45%" /></a>\n'
     MAINPAGE_TEMPL=MAINPAGE_TEMPL.replace("TAG_LOSSPLOT",PLOTLINE)
@@ -1107,9 +1107,10 @@ def main():
     makehtmlpages()
 
     ## copy the basic json (DCS tracker on only) in the certification area
+    #ref=REPORT[1]
     # copy the basic json (DCS all on only) in the certification area
+    ref=REPORT[len(JSONLIST)-1]
     # first read run range from json
-    ref=REPORT[0]
     json_file_ref=file(ref[2],'r')
     json_dict = json.load(json_file_ref)
     # determine runmin and runmax
