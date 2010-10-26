@@ -7,5 +7,6 @@ PhysicsTools/PatAlgos                            NoTag          V08-01-03
 PhysicsTools/PatExamples                         NoTag          V00-04-10-01   
 PhysicsTools/PatUtils                            NoTag          V03-09-14      
 PhysicsTools/SelectorUtils                       V00-02-24      V00-02-20      
+PhysicsTools/UtilAlgos                           V08-02-00      V08-01-03      
 ---------------------------------------
-total packages: 5 (5 displayed)
+total packages: 6 (6 displayed)
