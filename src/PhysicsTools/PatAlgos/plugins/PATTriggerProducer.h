@@ -7,7 +7,7 @@
 // Package:    PatAlgos
 // Class:      pat::PATTriggerProducer
 //
-// $Id: PATTriggerProducer.h,v 1.11 2010/06/26 17:53:57 vadler Exp $
+// $Id: PATTriggerProducer.h,v 1.13 2010/10/29 13:28:41 gpetrucc Exp $
 //
 /**
   \class    pat::PATTriggerProducer PATTriggerProducer.h "PhysicsTools/PatAlgos/plugins/PATTriggerProducer.h"
@@ -16,7 +16,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id: PATTriggerProducer.h,v 1.11 2010/06/26 17:53:57 vadler Exp $
+  \version  $Id: PATTriggerProducer.h,v 1.13 2010/10/29 13:28:41 gpetrucc Exp $
 */
 
 
@@ -47,7 +47,13 @@ namespace pat {
       virtual void beginLuminosityBlock( edm::LuminosityBlock & iLuminosityBlock, const edm::EventSetup & iSetup );
       virtual void produce( edm::Event & iEvent, const edm::EventSetup & iSetup );
 
-      bool onlyStandAlone_; // configuration
+      // I need to make a copy of these two methods taking const Run and const LumiBlock so that I can call them from 'produce' 
+      // when auto-discovering process name
+      void beginConstRun( const edm::Run & iRun, const edm::EventSetup & iSetup );
+      void beginConstLuminosityBlock( const edm::LuminosityBlock & iLuminosityBlock, const edm::EventSetup & iSetup );
+
+      bool onlyStandAlone_;  // configuration
+      bool autoProcessName_; // configuration (optional with default)
       // L1
       L1GtUtils     l1GtUtils_;
       bool          addL1Algos_;        // configuration (optional with default)
