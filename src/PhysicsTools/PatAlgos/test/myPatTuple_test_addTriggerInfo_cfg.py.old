@@ -12,19 +12,19 @@ process.p = cms.Path(
 # Trigger Test
 process.patTrigger = cms.EDProducer(
   "PATTriggerProducer"
+, processName    = cms.string( '*' )
   ## L1
 , addL1Algos     = cms.bool( True )
-, l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'HLT' )
-, l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', 'HLT' )
-, l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , 'HLT' )
-, l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central'    , 'HLT' )
-, l1ExtraForJet  = cms.InputTag( 'l1extraParticles', 'Forward'    , 'HLT' )
-, l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'        , 'HLT' )
-, l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'        , 'HLT' )
-, l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'        , 'HLT' )
+, l1ExtraMu      = cms.InputTag( 'l1extraParticles', '' )
+, l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated' )
+, l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated' )
+, l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central' )
+, l1ExtraForJet  = cms.InputTag( 'l1extraParticles', 'Forward' )
+, l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau' )
+, l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET' )
+, l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT' )
 , saveL1Refs     = cms.bool( True )
   ## HLT (L3)
-, processName    = cms.string( 'HLT' )
 , triggerResults = cms.InputTag( "TriggerResults" )
 , triggerEvent   = cms.InputTag( "hltTriggerSummaryAOD" )
 , onlyStandAlone = cms.bool( False )
@@ -216,7 +216,7 @@ process.patTriggerTestMatchEmbedder = cms.Sequence(
 )
 process.patTriggerEventTest = cms.EDProducer(
   "PATTriggerEventProducer"
-, processName        = cms.string( 'HLT' )
+, processName        = cms.string( '*' )
 , triggerResults     = cms.InputTag( 'TriggerResults' )
 , patTriggerProducer = cms.InputTag( 'patTrigger' )
 , condGtTag          = cms.InputTag( 'conditionsInEdm' )
