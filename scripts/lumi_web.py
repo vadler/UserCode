@@ -87,8 +87,6 @@ def produce_json(SC,QF,DCS):
     DS_LIST=[]
     DATASETS=DATASET_ALL.split()
 
-
-
     for DS in DATASETS:
         DS_TEMP=DS.split(":")
         if len(DS_TEMP)==2:
@@ -395,21 +393,21 @@ def makeplot(cur):
     ll_deliv_nr = tot_deliv_nr/coeff
 
     print "In the run range:",RUNMIN,"-",RUNMAX
-    print "Total accepted  luminosity: %1.2f /ub, %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll,ll/1000,ll/1e+6,ll/1e+9)
-    print "Total rejected  luminosity: %1.2f /ub, %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll_rec-ll,(ll_rec-ll)/1000,(ll_rec-ll)/1e+6,(ll_rec-ll)/1e+9)
-    print "Total recorded  luminosity: %1.2f /ub, %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll_rec,ll_rec/1000,ll_rec/1e+6,ll_rec/1e+9)
-    print "Total delivered luminosity: %1.2f /ub, %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll_deliv,ll_deliv/1000,ll_deliv/1e+6,ll_deliv/1e+9)
+    print "Total accepted  luminosity: %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll,ll/1000,ll/1e+6)
+    print "Total rejected  luminosity: %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll_rec-ll,(ll_rec-ll)/1000,(ll_rec-ll)/1e+6)
+    print "Total recorded  luminosity: %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll_rec,ll_rec/1000,ll_rec/1e+6)
+    print "Total delivered luminosity: %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll_deliv,ll_deliv/1000,ll_deliv/1e+6)
     print "Efficiency of accepted luminosity:",ll/ll_rec
-    print "Total accepted  luminosity last week: %1.2f /ub" % (ll_lw)
-    print "Total rejected  luminosity last week: %1.2f /ub" % (ll_rec_lw-ll_lw)
-    print "Total recorded  luminosity last week: %1.2f /ub" % (ll_rec_lw)
-    print "Total delivered luminosity last week: %1.2f /ub" % (ll_deliv_lw)
+    print "Total accepted  luminosity last week: %1.2f /nb" % (ll_lw)
+    print "Total rejected  luminosity last week: %1.2f /nb" % (ll_rec_lw-ll_lw)
+    print "Total recorded  luminosity last week: %1.2f /nb" % (ll_rec_lw)
+    print "Total delivered luminosity last week: %1.2f /nb" % (ll_deliv_lw)
     print "Efficiency of accepted luminosity last week:",ll_lw/ll_rec_lw
-    print "Total accepted  luminosity new runs: %1.2f /ub" % (ll_nr)
-    print "Total rejected  luminosity new runs: %1.2f /ub" % (ll_rec_nr-ll_nr)
-    print "Total recorded  luminosity new runs: %1.2f /ub" % (ll_rec_nr)
-    print "Total delivered luminosity new runs: %1.2f /ub" % (ll_deliv_nr)
-    print "Efficiency of accepted luminosity new runs:",ll_lw/ll_rec_nr
+    print "Total accepted  luminosity new runs: %1.2f /nb" % (ll_nr)
+    print "Total rejected  luminosity new runs: %1.2f /nb" % (ll_rec_nr-ll_nr)
+    print "Total recorded  luminosity new runs: %1.2f /nb" % (ll_rec_nr)
+    print "Total delivered luminosity new runs: %1.2f /nb" % (ll_deliv_nr)
+    print "Efficiency of accepted luminosity new runs:",ll_nr/ll_rec_nr
 
     TOTLUMIACC[cur]=ll
     TOTLUMI[cur]=ll_rec
@@ -1048,7 +1046,7 @@ def makehtmlpages():
                 PLOTS=""
                 for p_xrange in plot_xrange:
                     plotname='plot_'+p_type+'_'+p_xtype+'_'+p_xrange+'_'+str(scenario)
-                    PLOTS+='<a href="'+plotname +'.png"> <img src="'+plotname +'.png" alt="'+plotname +'" width="45%" /></a>\n'
+                    PLOTS+='<a href="'+plotname +'.png"> <img src="'+plotname +'.png" alt="'+plotname +'" width="30%" /></a>\n'
                     os.system('mv '+plotname+'.png '+HTMLDIR+'/')
                 PLOT_CURR=PLOT_CURR.replace("TAG_SINGLEPLOT",PLOTS)
                 PLOT_LINES+=PLOT_CURR
