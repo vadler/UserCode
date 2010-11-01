@@ -1086,7 +1086,7 @@ def makehtmlpages():
     PLOTLINE+='<a href="'+PLOTRIGHT+'.png"> <img src="'+PLOTRIGHT+'.png" alt="'+PLOTRIGHT+'" width="30%" /></a>\n'
     MAINPAGE_TEMPL=MAINPAGE_TEMPL.replace("TAG_SUMMARYPLOT",PLOTLINE)
     os.system('mv '+PLOTLEFT+'.png '+HTMLDIR+'/')
-    os.system('cp '+PLOTMIDDLE+'.png '+HTMLDIR+'/')
+    os.system('mv '+PLOTMIDDLE+'.png '+HTMLDIR+'/')
     os.system('mv '+PLOTRIGHT+'.png '+HTMLDIR+'/')
 
 
