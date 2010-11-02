@@ -56,6 +56,7 @@ lumi={}
 
 RUNMIN=0
 RUNMAX=0
+RUNNEW=0
 
 RUNMINCFG=0
 RUNNEWCFG=0
@@ -66,6 +67,7 @@ plot_xtype=[]
 plot_xrange=[]
 
 ultimate_date=''
+first_date_lw=''
 
 def produce_json(SC,QF,DCS):
     global KEEPRUNRANGE,NEW_DATASET_ALL
@@ -229,11 +231,11 @@ def makeplot(cur):
     from ROOT import TCanvas,TGraph,gStyle,gROOT,TH1F,TLatex
     global TOTLUMI,TOTLUMIACC,TOTLUMI_LW,TOTLUMIACC_LW,TOTLUMI_NR,TOTLUMIACC_NR
     global TOTLUMIDELIV,TOTLUMIDELIV_LW,TOTLUMIDELIV_NR
-    global RUNMIN,RUNMAX
+    global RUNMIN,RUNMAX,RUNNEW
     global LUMI_CSV
     global lumi,lumi_deliv
     global plot_type,plot_xtype,plot_xrange
-    global ultimate_date
+    global ultimate_date,first_date_lw
 
     kTRUE=True
 
@@ -326,7 +328,7 @@ def makeplot(cur):
         coeff=1.
 
     firstrun_lw=999999
-    firstrun_nr=999999
+    RUNNEW=999999
 
 
 
@@ -351,8 +353,8 @@ def makeplot(cur):
                 if int(str_run)>=int(RUNNEWCFG):
                     tot_rec_nr+=lumi[l]
                     tot_deliv_nr+=lumi_deliv[l]
-                    if int(str_run)<firstrun_nr:
-                        firstrun_nr=int(str_run)
+                    if int(str_run)<RUNNEW:
+                        RUNNEW=int(str_run)
 
     		if str_run in reclumiinrun.keys():
     			reclumiinrun[str_run]+=lumi[l]/coeff/1e+6
@@ -491,7 +493,7 @@ def makeplot(cur):
                         if runno<firstrun_lw:
                             continue
                     if "new" in p_xrange:
-                        if runno<firstrun_nr:
+                        if runno<RUNNEW:
                             continue
 
                     if  'run' in p_xtype:
@@ -550,8 +552,9 @@ def makeplot(cur):
                 if 'time' in p_xtype:
                     if "lastweek" in p_xrange:
                         time_day_min=RUN_TIME_00[str(firstrun_lw)]
+                        first_date_lw=time.strftime("%d %b",time.localtime(time_day_min))
                     elif "new" in p_xrange:
-                        time_day_min=RUN_TIME_00[str(firstrun_nr)]
+                        time_day_min=RUN_TIME_00[str(RUNNEW)]
                     elif "tot" in p_xrange:
                         time_day_min=RUN_TIME_00[str(listofrun[0])]
 
@@ -560,6 +563,7 @@ def makeplot(cur):
 
                     timehistomin=time_day_min
                     timehistomax=numdays*86400+timehistomin
+                    ultimate_date=time.strftime("%d %b",time.localtime(timehistomax))
                     xlabel="Date"
                     nbin=numdays
                     xlow=0
@@ -573,8 +577,6 @@ def makeplot(cur):
                         labelx=label[ibin]
                     elif 'time' in p_xtype:
                         labelx=time.strftime("%d %b",time.localtime(timehistomin+(ibin*86400)))
-                        if ibin is ( nbin - 1 ):
-                            ultimate_date = labelx
                         #if not ( ibin == 0 or ibin == ( nbin - 1 ) or labelx[ : 2 ] == "01" ):
                         if "tot" in p_xrange and not ( labelx[ : 2 ] == "01" ):
                             labelx = ""
@@ -673,7 +675,7 @@ def makeplot(cur):
                     tex0a.Draw()
 
                     if 'tot' in p_xrange:
-                        legendtext +=" until %s 2010"%(ultimate_date)
+                        legendtext +=" until %s 2010, run %s"%(ultimate_date, RUNMAX)
                     ycoord -= 0.05
                     tex0b = TLatex(xcoord,ycoord,legendtext)
                     tex0b.SetNDC(kTRUE)
@@ -841,7 +843,7 @@ def makesummaryplot():
     tex0a.SetLineWidth(2)
     tex0a.Draw()
 
-    legendtext ="All runs until %s 2010"%(ultimate_date)
+    legendtext ="All runs until run %s (%s 2010)"%(RUNMAX, ultimate_date)
     ycoord -= 0.03
     tex1 = TLatex(xcoord,ycoord,legendtext)
     tex1.SetNDC(kTRUE)
@@ -875,7 +877,8 @@ def makesummaryplot():
     tex0a.Draw()
 
     ycoord += 0.03
-    tex2 = TLatex(xcoord,ycoord,"Last week")
+    legendtext = "Last week, between %s and %s"%(first_date_lw,ultimate_date)
+    tex2 = TLatex(xcoord,ycoord,legendtext)
     tex2.SetNDC(kTRUE)
     tex2.SetTextSize(0.03)
     tex2.SetTextColor(1)
@@ -907,7 +910,8 @@ def makesummaryplot():
     tex0a.Draw()
 
     ycoord += 0.03
-    tex3 = TLatex(xcoord,ycoord,"New runs")
+    legendtext = "New runs %i - %i"%(RUNNEW,RUNMAX)
+    tex3 = TLatex(xcoord,ycoord,legendtext)
     tex3.SetNDC(kTRUE)
     tex3.SetTextSize(0.03)
     tex3.SetTextColor(1)
