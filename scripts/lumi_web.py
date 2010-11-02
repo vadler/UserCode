@@ -1,25 +1,20 @@
 #!/usr/bin/env python
 
 import sys,ConfigParser,os,string,commands,time,xmlrpclib
-#from ROOT import *
 
 from optparse import OptionParser
 from array import array
 import json, csv
 
 #parameters
-#QF_ALL_SYS=["Hcal","Track","Strip","Egam","Es","Dt","Csc","Pix","Muon","Rpc","Castor","Jmet","Ecal","L1t","Hlt","Lumi","NONE"]
 DCS_ALL=['Bpix','Fpix','Tibtid','TecM','TecP','Tob','Ebminus','Ebplus','EeMinus','EePlus','EsMinus','EsPlus','HbheA','HbheB','HbheC','Ho','Hf','Dtminus','Dtplus','Dt0','CscMinus','CscPlus','Rpc','Castor',"NONE"]
-QF_ALL_SYS=["Hcal","Track","Strip","Egam","Es","Dt","Csc","Pix","Muon","Rpc","Castor","Jmet","Ecal","L1t","Hlt"]
-#QF_ALL_SYS=["Hcal","Track"]
-#QF_ALL_SYS=[]
+#QF_ALL_SYS=["Hcal","Track","Strip","Egam","Es","Dt","Csc","Pix","Muon","Rpc","Castor","Jmet","Ecal","L1t","Hlt"]
+QF_ALL_SYS=["Muon","Jmet","Egam","Track","Rpc","Csc","Dt","Hcal","Ecal","Es","Strip","Pix","Hlt","L1t"]
 
 # physics declared bit (~ stable beam) DCS equivalent
 DCS_PDB='Bpix,Fpix,Tibtid,TecM,TecP,Tob'
 
-# htmldirectory
 HTMLDIR=""
-#HTMLDIR=""
 LUMICACHE=""
 CERT_DIR=""
 
@@ -36,12 +31,7 @@ DEF_DCS=''
 RUN_TIME={}
 RUN_TIME_00={}
 
-#TIME_DAYBOUND_MIN=9999999999
-#TIME_DAYBOUND_MAX=0
-
 CONFIG = ConfigParser.ConfigParser()
-CURR_CFG='runreg_curr.cfg'
-
 
 REPORT={}
 JSONLIST=[]
@@ -55,6 +45,10 @@ TOTLUMIDELIV_LW={}
 TOTLUMI_LW={}
 TOTLUMIACC_LW={}
 
+TOTLUMIDELIV_NR={}
+TOTLUMI_NR={}
+TOTLUMIACC_NR={}
+
 
 lumi_deliv={}
 lumi={}
@@ -62,21 +56,22 @@ lumi={}
 
 RUNMIN=0
 RUNMAX=0
+RUNNEW=0
 
 RUNMINCFG=0
+RUNNEWCFG=0
 RUNMAXCFG=0
 
 plot_type=[]
 plot_xtype=[]
 plot_xrange=[]
-#plot_type=['lumi','loss']
-#plot_xtype=['run','time']
-#plot_xrange=['tot','lastweek']
 
-# then change options
+ultimate_date=''
+first_date_lw=''
+
 def produce_json(SC,QF,DCS):
     global KEEPRUNRANGE,NEW_DATASET_ALL
-    global RUNMINCFG,RUNMAXCFG
+    global RUNMINCFG,RUNNEWCFG,RUNMAXCFG
 
     JSON_ADD=str(SC)
     JSON_OUT="json_"+JSON_ADD+".txt"
@@ -87,16 +82,14 @@ def produce_json(SC,QF,DCS):
         CONFIG.set("Common","runmax","999999")
 
     RUNMINCFG=CONFIG.get("Common","runmin")
+    RUNNEWCFG=CONFIG.get("Common","runnew")
     RUNMAXCFG=CONFIG.get("Common","runmax")
 
-# read also the datasets
     DATASET_ALL=CONFIG.get("Common","dataset")
     DS_RUNMIN=[]
     DS_RUNMAX=[]
     DS_LIST=[]
     DATASETS=DATASET_ALL.split()
-
-
 
     for DS in DATASETS:
         DS_TEMP=DS.split(":")
@@ -129,12 +122,12 @@ def produce_json(SC,QF,DCS):
 
     CONFIG.set("Common","dataset",NEW_DATASET_ALL)
 
+    CURR_CFG = "json_" + JSON_ADD + ".cfg"
     CURR_CFG_FP=open(CURR_CFG,'wb')
     CONFIG.write(CURR_CFG_FP)
 
 
     CURR_CFG_FP.close()
-    # here run runregparse..
     LOGFILE="json_"+JSON_ADD+".log"
     COMMAND="./runregparse.py "+CURR_CFG+" > "+LOGFILE
     print "======================================================================================"
@@ -176,10 +169,8 @@ def readlumi_db():
 
     runmaxincache=-1
     if not LUMI_RESET:
-        # first check if it exists
         if os.path.exists(LUMICACHE):
 
-            # open lumicache file for reading
             print "opening lumicache"
             f=open(LUMICACHE,'r')
 
@@ -210,8 +201,8 @@ def readlumi_db():
             if not LUMI_RESET and runmaxincache!=-1:
                 if RUN_TIME[runno]<(RUN_TIME[str(runmaxincache)]-86400*2):
                     continue
-            # otherwise make the query
 
+            # otherwise make the query
             try:
                 print "Accessing LumiDB for run: "+runno
                 lumitable=commands.getoutput("lumiCalc.py  -c frontier://LumiProd/CMS_LUMI_PROD lumibyls -r "+runno)
@@ -238,29 +229,29 @@ def readlumi_db():
 
 def makeplot(cur):
     from ROOT import TCanvas,TGraph,gStyle,gROOT,TH1F,TLatex
-#    global TIME_DAYBOUND_MAX,TIME_DAYBOUND_MIN
-    global TOTLUMI,TOTLUMIACC,TOTLUMI_LW,TOTLUMIACC_LW
-    global TOTLUMIDELIV,TOTLUMIDELIV_LW
-    global RUNMIN,RUNMAX
+    global TOTLUMI,TOTLUMIACC,TOTLUMI_LW,TOTLUMIACC_LW,TOTLUMI_NR,TOTLUMIACC_NR
+    global TOTLUMIDELIV,TOTLUMIDELIV_LW,TOTLUMIDELIV_NR
+    global RUNMIN,RUNMAX,RUNNEW
     global LUMI_CSV
     global lumi,lumi_deliv
     global plot_type,plot_xtype,plot_xrange
-# let's define which plots we want
+    global ultimate_date,first_date_lw
 
     kTRUE=True
 
     plot_type=['lumi','loss']
     plot_xtype=['run','time']
-    plot_xrange=['tot','lastweek']
+    plot_xrange=['tot','lastweek','new']
 
 
     print " "
     print "Producing plot for scenario:",cur
+    print TAG_NAME[cur]
 
     # use this for batch mode
     gROOT.SetBatch(True)
 
-    repref=REPORT[0] # always use PBD as reference
+    repref=REPORT[len(JSONLIST)-1] # always use PBD as reference
     repcur=REPORT[cur]
 
     lumi_json_ref=file(repref[2],'r')
@@ -323,8 +314,10 @@ def makeplot(cur):
 
     tot_rec=1e-30
     tot_rec_lw=1e-30
+    tot_rec_nr=1e-30
     tot_deliv=1e-30
     tot_deliv_lw=1e-30
+    tot_deliv_nr=1e-30
 
     # determine run boundary for "last week" run
     lastrun_time=RUN_TIME[str(RUNMAX)]
@@ -335,6 +328,7 @@ def makeplot(cur):
         coeff=1.
 
     firstrun_lw=999999
+    RUNNEW=999999
 
 
 
@@ -351,22 +345,27 @@ def makeplot(cur):
     		tot_rec+=lumi[l]
     		tot_deliv+=lumi_deliv[l]
 
-#                print str_run,RUN_TIME[str_run],lastrun_time
                 if RUN_TIME[str_run]>(lastrun_time-86400*7):
                     tot_rec_lw+=lumi[l]
                     tot_deliv_lw+=lumi_deliv[l]
                     if int(str_run)<firstrun_lw:
                         firstrun_lw=int(str_run)
+                if int(str_run)>=int(RUNNEWCFG):
+                    tot_rec_nr+=lumi[l]
+                    tot_deliv_nr+=lumi_deliv[l]
+                    if int(str_run)<RUNNEW:
+                        RUNNEW=int(str_run)
 
     		if str_run in reclumiinrun.keys():
-    			reclumiinrun[str_run]+=lumi[l]/coeff/1000.
-    			delivlumiinrun[str_run]+=lumi_deliv[l]/coeff/1000.
+    			reclumiinrun[str_run]+=lumi[l]/coeff/1e+6
+    			delivlumiinrun[str_run]+=lumi_deliv[l]/coeff/1e+6
     		else:
-    			reclumiinrun[str_run]=lumi[l]/coeff/1000.
-    			delivlumiinrun[str_run]=lumi_deliv[l]/coeff/1000.
+    			reclumiinrun[str_run]=lumi[l]/coeff/1e+6
+    			delivlumiinrun[str_run]=lumi_deliv[l]/coeff/1e+6
 
     tot=1e-30
     tot_lw=1e-30
+    tot_nr=1e-30
 
     # builds up accepted lumi in good runs
     for k, v in my_lumi_dict.items():
@@ -379,10 +378,12 @@ def makeplot(cur):
     			str_run=str(k).strip()
                         if RUN_TIME[str_run]>(lastrun_time-86400*7):
                             tot_lw+=lumi[kw]
+                        if int(str_run)>=int(RUNNEWCFG):
+                            tot_nr+=lumi[kw]
     			if str_run in acclumiinrun.keys():
-    				acclumiinrun[str_run]+=lumi[kw]/coeff/1000.
+    				acclumiinrun[str_run]+=lumi[kw]/coeff/1e+6
     			else:
-    				acclumiinrun[str_run]=lumi[kw]/coeff/1000.
+    				acclumiinrun[str_run]=lumi[kw]/coeff/1e+6
 
     ll = tot / coeff
     ll_rec = tot_rec/coeff
@@ -392,16 +393,26 @@ def makeplot(cur):
     ll_rec_lw = tot_rec_lw/coeff
     ll_deliv_lw = tot_deliv_lw/coeff
 
-#    print tot_lw,tot_rec_lw
+    ll_nr = tot_nr / coeff
+    ll_rec_nr = tot_rec_nr/coeff
+    ll_deliv_nr = tot_deliv_nr/coeff
 
     print "In the run range:",RUNMIN,"-",RUNMAX
-    print "Total accepted  luminosity: %1.2f /ub, %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll,ll/1000,ll/1e+6,ll/1e+9)
-    print "Total recorded  luminosity: %1.2f /ub, %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll_rec,ll_rec/1000,ll_rec/1e+6,ll_rec/1e+9)
-    print "Total delivered luminosity: %1.2f /ub, %1.2f /nb, %1.2e /pb, %1.2e /fb" % (ll_deliv,ll_deliv/1000,ll_deliv/1e+6,ll_deliv/1e+9)
-    print "Total accepted  luminosity lastweek: %1.2f /ub" % (ll_lw)
-    print "Total recorded  luminosity lastweek: %1.2f /ub" % (ll_rec_lw)
-    print "Total delivered luminosity lastweek: %1.2f /ub" % (ll_deliv_lw)
-    print "Efficiency of good LS selection:",ll/ll_rec
+    print "Delivered luminosity: %2.5f /pb" % (ll_deliv/1e+6)
+    print "Recorded  luminosity: %2.5f /pb" % (ll_rec/1e+6)
+    print "Certified luminosity: %2.5f /pb" % (ll/1e+6)
+    print "Rejected  luminosity: %2.5f /pb" % ((ll_rec-ll)/1e+6)
+    print "Efficiency of certified luminosity: %2.2f%%" % (100.*ll/ll_rec)
+    print "Delivered luminosity last week: %2.5f /pb" % (ll_deliv_lw/1e+6)
+    print "Recorded  luminosity last week: %2.5f /pb" % (ll_rec_lw/1e+6)
+    print "Certified luminosity last week: %2.5f /pb" % (ll_lw/1e+6)
+    print "Rejected  luminosity last week: %2.5f /pb" % ((ll_rec_lw-ll_lw)/1e+6)
+    print "Efficiency of certified luminosity last week: %2.2f%%" % (100.*ll_lw/ll_rec_lw)
+    print "Delivered luminosity new runs: %2.5f /pb" % (ll_deliv_nr/1e+6)
+    print "Recorded  luminosity new runs: %2.5f /pb" % (ll_rec_nr/1e+6)
+    print "Certified luminosity new runs: %2.5f /pb" % (ll_nr/1e+6)
+    print "Rejected  luminosity new runs: %2.5f /pb" % ((ll_rec_nr-ll_nr)/1e+6)
+    print "Efficiency of certified luminosity new runs: %2.2f%%" % (100.*ll_nr/ll_rec_nr)
 
     TOTLUMIACC[cur]=ll
     TOTLUMI[cur]=ll_rec
@@ -409,10 +420,9 @@ def makeplot(cur):
     TOTLUMIACC_LW[cur]=ll_lw
     TOTLUMI_LW[cur]=ll_rec_lw
     TOTLUMIDELIV_LW[cur]=ll_deliv_lw
-
-    #print acclumiinrun
-    #print reclumiinrun
-
+    TOTLUMIACC_NR[cur]=ll_nr
+    TOTLUMI_NR[cur]=ll_rec_nr
+    TOTLUMIDELIV_NR[cur]=ll_deliv_nr
 
     c_rec={}
     c_acc={}
@@ -431,7 +441,6 @@ def makeplot(cur):
     	listofrun.append(int(run))
     listofrun.sort()
 
-    #print listofrun
     for runno in listofrun:
     	run=str(runno)
     	c_rec_curr+=reclumiinrun[run]
@@ -449,10 +458,6 @@ def makeplot(cur):
             c_acc_diff[run]=0.
 
     	c_acc[run]=c_acc_curr
-
-    #for runno in listofrun:
-    #	run=str(runno)
-    #	print run,c_rec[run],c_acc[run],c_acc[run]/c_rec[run]
 
     # preparing now the graphs
 
@@ -473,39 +478,45 @@ def makeplot(cur):
 
 
 
+                rec_lumi=0.
+                acc_lumi=0.
+                deliv_lumi=0.
                 for runno in listofrun:
-                    if "lastweek" in p_xrange:
-                        if runno<firstrun_lw:
-                            continue
-
+                    last_rec_lumi=rec_lumi
+                    last_acc_lumi=acc_lumi
+                    last_deliv_lumi=deliv_lumi
                     rec_lumi=c_rec[str(runno)]
                     acc_lumi=c_acc[str(runno)]
                     deliv_lumi=c_deliv[str(runno)]
 
+                    if "lastweek" in p_xrange:
+                        if runno<firstrun_lw:
+                            continue
+                    if "new" in p_xrange:
+                        if runno<RUNNEW:
+                            continue
+
                     if  'run' in p_xtype:
-                        x.append(numpoint)
+                        x.append(numpoint+0.5)
                         label.append(str(runno))
                     elif 'time' in p_xtype:
                         x.append(RUN_TIME[str(runno)])
-#                        print runno,RUN_TIME[str(runno)]
 
                     if 'lumi' in p_type:
                         y1.append(rec_lumi)
                         y2.append(acc_lumi)
                         y3.append(deliv_lumi)
-                        if "lastweek" in p_xrange:
+                        if "lastweek" in p_xrange or "new" in p_xrange:
                             if len(y1)==1:
-                                b_y1=y1[0]
-                                b_y2=y2[0]
-                                b_y3=y3[0]
+                                b_y1=last_rec_lumi
+                                b_y2=last_acc_lumi
+                                b_y3=last_deliv_lumi
                             y1[len(y1)-1]-=b_y1
                             y2[len(y1)-1]-=b_y2
                             y3[len(y1)-1]-=b_y3
 
                         if deliv_lumi>ymax:
-                            ymax=deliv_lumi
-                            if "lastweek" in p_xrange:
-                                ymax-=b_y3
+                            ymax=y3[len(y1)-1]
                     elif 'loss' in p_type:
                         loss=c_acc_diff[str(runno)]-c_rec_diff[str(runno)]
                         y1.append(loss)
@@ -518,6 +529,7 @@ def makeplot(cur):
     # then histos
     # run based histos
 
+                name=''
                 title=''
                 xlabel=''
                 ylabel=''
@@ -525,19 +537,24 @@ def makeplot(cur):
                 xlow=0
                 xhigh=0
                 if 'lumi' in p_type:
-                    title="Lumi"
-                    ylabel="Lint(nb-1)"
+                    name="IntegratedLuminosity"
+#                     title="Integrated luminosity"
+                    ylabel="L_{int} (pb^{-1})"
                 if 'loss' in p_type:
-                    title="Lumi loss"
-                    ylabel="Lint(nb-1)"
+                    name="LossOfIntegratedLuminosity"
+#                     title="Loss of integrated luminosity"
+                    ylabel="L_{int} (pb^{-1})"
                 if 'run' in p_xtype:
-                    xlabel="RUN"
+                    xlabel="Run"
                     nbin=numpoint
                     xlow=0
                     xhigh=numpoint
                 if 'time' in p_xtype:
                     if "lastweek" in p_xrange:
                         time_day_min=RUN_TIME_00[str(firstrun_lw)]
+                        first_date_lw=time.strftime("%d %b",time.localtime(time_day_min))
+                    elif "new" in p_xrange:
+                        time_day_min=RUN_TIME_00[str(RUNNEW)]
                     elif "tot" in p_xrange:
                         time_day_min=RUN_TIME_00[str(listofrun[0])]
 
@@ -546,14 +563,13 @@ def makeplot(cur):
 
                     timehistomin=time_day_min
                     timehistomax=numdays*86400+timehistomin
+                    ultimate_date=time.strftime("%d %b",time.localtime(timehistomax))
                     xlabel="Date"
                     nbin=numdays
-#                    xlow=timehistomin
-#                    xhigh=timehistomax
                     xlow=0
                     xhigh=numdays
 
-                plot= TH1F(title,title+";"+xlabel+";"+ylabel,nbin,xlow,xhigh)
+                plot= TH1F(name,title+";"+xlabel+";"+ylabel,nbin,xlow,xhigh)
 
                 labelx=''
                 for ibin in range(0,nbin):
@@ -561,6 +577,9 @@ def makeplot(cur):
                         labelx=label[ibin]
                     elif 'time' in p_xtype:
                         labelx=time.strftime("%d %b",time.localtime(timehistomin+(ibin*86400)))
+                        #if not ( ibin == 0 or ibin == ( nbin - 1 ) or labelx[ : 2 ] == "01" ):
+                        if "tot" in p_xrange and not ( labelx[ : 2 ] == "01" ):
+                            labelx = ""
                     plot.GetXaxis().SetBinLabel(ibin+1,labelx)
 
 
@@ -584,18 +603,18 @@ def makeplot(cur):
                     gr3.SetMarkerStyle(20)
                     gr3.SetMarkerSize(0.8)
                     if 'run' in p_xtype:
-                        gr1.SetTitle("Luminosity vs run number")
-                        gr2.SetTitle("Luminosity vs run number")
-                        gr3.SetTitle("Luminosity vs run number")
+                        gr1.SetTitle("Luminosity vs. run number")
+                        gr2.SetTitle("Luminosity vs. run number")
+                        gr3.SetTitle("Luminosity vs. run number")
                     elif 'time' in p_xtype:
-                        gr1.SetTitle("Luminosity vs time")
-                        gr2.SetTitle("Luminosity vs time")
-                        gr3.SetTitle("Luminosity vs time")
+                        gr1.SetTitle("Luminosity vs. time")
+                        gr2.SetTitle("Luminosity vs. time")
+                        gr3.SetTitle("Luminosity vs. time")
                 elif 'loss' in p_type:
                     if 'run' in p_xtype:
-                        gr1.SetTitle("Luminosity loss vs run number")
+                        gr1.SetTitle("Luminosity loss vs. run number")
                     elif 'time' in p_xtype:
-                        gr1.SetTitle("Luminosity loss vs time")
+                        gr1.SetTitle("Luminosity loss vs. time")
 
 
 
@@ -604,12 +623,10 @@ def makeplot(cur):
 # now really finally plotting it....
 
                 gStyle.SetOptStat(0)
+                gStyle.SetOptFit(0)
                 plot.LabelsOption("v","X")
-                plot.SetMaximum(ymax)
-                plot.SetMinimum(ymin)
-
-    #h.GetXaxis()->SetRange(50,80);
-
+                plot.SetMaximum(ymax*1.05)
+                plot.SetMinimum(ymin*1.05)
 
                 c1 = TCanvas("c1","c1",800,600)
                 c1.SetFillColor(0)
@@ -620,59 +637,92 @@ def makeplot(cur):
 
 
                 if "lumi" in p_type:
-                    lumitext=""
-                    lumiacctext=""
-                    lumidelivtext=""
+                    lumitext="Recorded: "
+                    lumiacctext="Certified: "
+                    lumidelivtext="Delivered: "
+                    legendtext = ""
                     if "lastweek" in p_xrange:
-                        lumitext     ="Recorded last week : %5.3f nb-1" % (TOTLUMI_LW[cur]/1000.)
-                        lumiacctext  ="Accepted last week : %5.3f nb-1" % (TOTLUMIACC_LW[cur]/1000.)
-                        lumidelivtext="Delivered last week: %5.3f nb-1" % (TOTLUMIDELIV_LW[cur]/1000.)
+                        legendtext   ="Last week"
+                        lumitext     +="%2.5f pb^{-1}" % (TOTLUMI_LW[cur]/1e+6)
+                        lumiacctext  +="%2.5f pb^{-1}" % (TOTLUMIACC_LW[cur]/1e+6)
+                        lumidelivtext+="%2.5f pb^{-1}" % (TOTLUMIDELIV_LW[cur]/1e+6)
+                    elif "new" in p_xrange:
+                        legendtext   ="New runs"
+                        lumitext     +="%2.5f pb-1" % (TOTLUMI_NR[cur]/1e+6)
+                        lumiacctext  +="%2.5f pb-1" % (TOTLUMIACC_NR[cur]/1e+6)
+                        lumidelivtext+="%2.5f pb-1" % (TOTLUMIDELIV_NR[cur]/1e+6)
                     elif "tot" in p_xrange:
-                        lumitext     ="Recorded : %5.3f nb-1" % (TOTLUMI[cur]/1000.)
-                        lumiacctext  ="Accepted : %5.3f nb-1" % (TOTLUMIACC[cur]/1000.)
-                        lumidelivtext="Delivered: %5.3f nb-1" % (TOTLUMIDELIV[cur]/1000.)
+                        legendtext   ="All runs"
+                        lumitext     +="%2.5f pb^{-1}" % (TOTLUMI[cur]/1e+6)
+                        lumiacctext  +="%2.5f pb^{-1}" % (TOTLUMIACC[cur]/1e+6)
+                        lumidelivtext+="%2.5f pb^{-1}" % (TOTLUMIDELIV[cur]/1e+6)
 
-                    tex = TLatex(0.15,0.75,lumitext)
-                    # tex = TLatex(0.15,0.8,"Recorded lumi")
-                    tex.SetNDC(kTRUE);
+                    xcoord = 0.15
+                    ycoord = 0.82
+                    tex0 = TLatex(xcoord,ycoord,"CMS preliminary 2010")
+                    tex0.SetNDC(kTRUE)
+                    tex0.SetTextSize(0.04)
+                    tex0.SetTextColor(1)
+                    tex0.SetLineWidth(2)
+                    tex0.Draw()
+
+                    ycoord -= 0.04
+                    tex0a = TLatex(xcoord,ycoord,"Integrated luminosity")
+                    tex0a.SetNDC(kTRUE)
+                    tex0a.SetTextSize(0.05)
+                    tex0a.SetTextColor(1)
+                    tex0a.SetLineWidth(2)
+                    tex0a.Draw()
+
+                    if 'tot' in p_xrange:
+                        legendtext +=" until %s 2010, run %s"%(ultimate_date, RUNMAX)
+                    ycoord -= 0.05
+                    tex0b = TLatex(xcoord,ycoord,legendtext)
+                    tex0b.SetNDC(kTRUE)
+                    tex0b.SetTextSize(0.03)
+                    tex0b.SetTextColor(1)
+                    tex0b.SetLineWidth(2)
+                    tex0b.Draw()
+
+                    gr3.Draw("PL")
+                    ycoord -= 0.05
+                    tex2a = TLatex(xcoord,ycoord,lumidelivtext)
+                    tex2a.SetNDC(kTRUE)
+                    tex2a.SetTextSize(0.04)
+                    tex2a.SetTextColor(1)
+                    tex2a.SetLineWidth(1)
+                    tex2a.Draw()
+
+                    ycoord -= 0.04
+                    tex = TLatex(xcoord,ycoord,lumitext)
+                    tex.SetNDC(kTRUE)
+                    tex.SetTextSize(0.04)
                     tex.SetTextColor(2)
-                    tex.SetLineWidth(2)
+                    tex.SetLineWidth(1)
                     tex.Draw()
 
                     gr2.Draw("PL")
-                    tex2 = TLatex(0.15,0.7,lumiacctext)
-                    tex2.SetNDC(kTRUE);
+                    ycoord -= 0.04
+                    tex2 = TLatex(xcoord,ycoord,lumiacctext)
+                    tex2.SetNDC(kTRUE)
+                    tex2.SetTextSize(0.04)
                     tex2.SetTextColor(4)
-                    tex2.SetLineWidth(2)
+                    tex2.SetLineWidth(1)
                     tex2.Draw()
 
-                    gr3.Draw("PL")
-                    tex2a = TLatex(0.15,0.8,lumidelivtext)
-                    tex2a.SetNDC(kTRUE);
-                    tex2a.SetTextColor(1)
-                    tex2a.SetLineWidth(2)
-                    tex2a.Draw()
-
-                    tex3 = TLatex(0.15,0.9,TAG_NAME[cur])
-                    tex3.SetNDC(kTRUE);
-                    tex3.SetTextSize(0.03)
-                    tex3.SetTextColor(4)
-                    tex3.SetLineWidth(2)
-                    tex3.Draw()
-                elif "loss" in p_type:
-                    tex4 = TLatex(0.15,0.15,TAG_NAME[cur])
-                    tex4.SetNDC(kTRUE);
-                    tex4.SetTextSize(0.03)
-                    tex4.SetTextColor(4)
-                    tex4.SetLineWidth(2)
-                    tex4.Draw()
+                tex3 = TLatex(0.5,0.95,TAG_NAME[cur])
+                tex3.SetNDC(kTRUE)
+                tex3.SetTextSize(0.03)
+                tex3.SetTextColor(4)
+                tex3.SetLineWidth(2)
+                tex3.Draw()
 
 
                 c1.Update()
                 pngfile='plot_'+p_type+'_'+p_xtype+'_'+p_xrange+'_'+str(cur)+'.png'
-#                cfile='plot_'+p_type+'_'+p_xtype+'_'+p_xrange+'_'+str(cur)+'.C'
+                cfile='plot_'+p_type+'_'+p_xtype+'_'+p_xrange+'_'+str(cur)+'.C'
                 c1.Print(pngfile)
-#                c1.Print(cfile)
+                c1.Print(cfile)
 
                 del c1
                 del plot
@@ -681,21 +731,16 @@ def makeplot(cur):
                     del gr2
                     del gr3
 
-#                a=raw_input("Hit a key to continue....")
-
-    #gr.Write()
-    #plot.Write()
-
-    #fileout.Close()
     return True
 
 
 
 def makesummaryplot():
-#    global TIME_DAYBOUND_MAX,TIME_DAYBOUND_MIN
     from ROOT import TCanvas,TGraph,gStyle,gROOT,TH1F,TLatex
-    global TOTLUMI,TOTLUMIACC,TOTLUMI_LW,TOTLUMIACC_LW
+    global TOTLUMI,TOTLUMIACC,TOTLUMI_LW,TOTLUMIACC_LW,TOTLUMI_NR,TOTLUMIACC_NR
     global TAG_NAME
+
+    kTRUE=True
 
     print " "
     print "Producing summary plot"
@@ -710,9 +755,11 @@ def makesummaryplot():
     x=array('d')
     y=array('d')
     y_lw=array('d')
+    y_nr=array('d')
 
     label=[]
     label_lw=[]
+    label_nr=[]
 
     numpoint=0
 
@@ -733,68 +780,156 @@ def makesummaryplot():
         y_lw.append(effi)
     	label_lw.append(TAG_NAME[scenario]+" -- %5.3f" %(effi))
 
+        if  TOTLUMI_NR[scenario] != 0:
+            effi=TOTLUMIACC_NR[scenario]/TOTLUMI_NR[scenario]
+        else:
+            effi=0.
+        y_nr.append(effi)
+    	label_nr.append(TAG_NAME[scenario]+" -- %5.3f" %(effi))
+
         numpoint+=1
-#    print x
-#    print y
 
 
-    chart_tot = TH1F("Accepted effi","Accepted Efficiency Total;;",numpoint,0,numpoint)
-    chart_lw = TH1F("Accepted effi lw","Accepted Efficiency Last Week;;",numpoint,0,numpoint)
+    chart_tot = TH1F("AcceptedEffi",";;",numpoint,0,numpoint)
+    chart_lw = TH1F("AcceptedEffiLw",";;",numpoint,0,numpoint)
+    chart_nr = TH1F("AcceptedEffiNr",";;",numpoint,0,numpoint)
 
     for ibin in range(0,numpoint):
         chart_tot.GetXaxis().SetBinLabel(ibin+1,label[ibin])
         chart_lw.GetXaxis().SetBinLabel(ibin+1,label_lw[ibin])
+        chart_nr.GetXaxis().SetBinLabel(ibin+1,label_nr[ibin])
 
     gStyle.SetOptStat(0)
 
-#    chart_tot.LabelsOption("v","X")
-#    chart_lw.LabelsOption("v","X")
-#    chart_tot.LabelsOption("u","Y")
-#    chart_lw.LabelsOption("u","Y")
-
     chart_tot.SetLabelOffset(-0.2,"X")
     chart_lw.SetLabelOffset(-0.2,"X")
+    chart_nr.SetLabelOffset(-0.2,"X")
 
     chart_tot.SetMaximum(1.001)
     chart_lw.SetMaximum(1.001)
+    chart_nr.SetMaximum(1.001)
     chart_tot.SetFillColor(5)
     chart_lw.SetFillColor(5)
+    chart_nr.SetFillColor(5)
 
     # we have to fill them
     for bar in range(0,numpoint):
         chart_tot.Fill(bar,y[bar])
         chart_lw.Fill(bar,y_lw[bar])
+        chart_nr.Fill(bar,y_nr[bar])
 
     c1 = TCanvas("c1","c1",600,800)
     c1.SetFillColor(0)
-#    chart_tot.SetFillColor(0)
+    c1.SetTopMargin(0.19)
+    c1.SetGridx()
+    c1.SetTicky(0)
 
     chart_tot.Draw("hbar1")
 
-#    tex = TLatex(0.15,0.8,"Recorded lumi")
-#    tex.SetNDC(kTRUE);
-#    tex.SetTextColor(2)
-#    tex.SetLineWidth(2)
-#    tex.Draw()
+    xcoord = 0.10
+    ycoord = 0.92
+    tex0 = TLatex(xcoord,ycoord,"CMS preliminary 2010")
+    tex0.SetNDC(kTRUE)
+    tex0.SetTextSize(0.03)
+    tex0.SetTextColor(1)
+    tex0.SetLineWidth(2)
+    tex0.Draw()
+
+    ycoord -= 0.04
+    tex0a = TLatex(xcoord,ycoord,"Current certification efficiencies")
+    tex0a.SetNDC(kTRUE)
+    tex0a.SetTextSize(0.04)
+    tex0a.SetTextColor(1)
+    tex0a.SetLineWidth(2)
+    tex0a.Draw()
+
+    legendtext ="All runs until run %s (%s 2010)"%(RUNMAX, ultimate_date)
+    ycoord -= 0.03
+    tex1 = TLatex(xcoord,ycoord,legendtext)
+    tex1.SetNDC(kTRUE)
+    tex1.SetTextSize(0.03)
+    tex1.SetTextColor(1)
+    tex1.SetLineWidth(2)
+    tex1.Draw()
+
+    lumitext ="Recorded integrated luminosity: %2.5f pb^{-1}"%(TOTLUMI[0]/1e+6)
+    ycoord -= 0.03
+    tex1a = TLatex(xcoord,ycoord,lumitext)
+    tex1a.SetNDC(kTRUE)
+    tex1a.SetTextSize(0.03)
+    tex1a.SetTextColor(1)
+    tex1a.SetLineWidth(2)
+    tex1a.Draw()
 
     c1.Update()
     c1.Print('plot_summary_tot'+'.png')
+    c1.Print('plot_summary_tot'+'.C')
 
     c2 = TCanvas("c2","c2",600,800)
     c2.SetFillColor(0)
-#    chart_lw.SetFillColor(0)
+    c2.SetTopMargin(0.19)
+    c2.SetGridx()
+    c2.SetTicky(0)
+
     chart_lw.Draw("hbar1")
 
-#    tex = TLatex(0.15,0.8,"Recorded lumi")
-#    tex.SetNDC(kTRUE);
-#    tex.SetTextColor(2)
-#    tex.SetLineWidth(2)
-#    tex.Draw()
+    tex0.Draw()
+    tex0a.Draw()
+
+    ycoord += 0.03
+    legendtext = "Last week, between %s and %s"%(first_date_lw,ultimate_date)
+    tex2 = TLatex(xcoord,ycoord,legendtext)
+    tex2.SetNDC(kTRUE)
+    tex2.SetTextSize(0.03)
+    tex2.SetTextColor(1)
+    tex2.SetLineWidth(2)
+    tex2.Draw()
+
+    lumitext ="Recorded integrated luminosity: %2.5f pb^{-1}" % (TOTLUMI_LW[0]/1e+6)
+    ycoord -= 0.03
+    tex2a = TLatex(xcoord,ycoord,lumitext)
+    tex2a.SetNDC(kTRUE)
+    tex2a.SetTextSize(0.03)
+    tex2a.SetTextColor(1)
+    tex2a.SetLineWidth(2)
+    tex2a.Draw()
 
     c2.Update()
     c2.Print('plot_summary_lw'+'.png')
+    c2.Print('plot_summary_lw'+'.C')
 
-#    a=raw_input("Hit a key to continue....")
+    c3 = TCanvas("c3","c3",600,800)
+    c3.SetFillColor(0)
+    c3.SetTopMargin(0.19)
+    c3.SetGridx()
+    c3.SetTicky(0)
+
+    chart_nr.Draw("hbar1")
+
+    tex0.Draw()
+    tex0a.Draw()
+
+    ycoord += 0.03
+    legendtext = "New runs %i - %i"%(RUNNEW,RUNMAX)
+    tex3 = TLatex(xcoord,ycoord,legendtext)
+    tex3.SetNDC(kTRUE)
+    tex3.SetTextSize(0.03)
+    tex3.SetTextColor(1)
+    tex3.SetLineWidth(2)
+    tex3.Draw()
+
+    lumitext ="Recorded integrated luminosity: %2.5f pb^{-1}" % (TOTLUMI_NR[0]/1000000.)
+    ycoord -= 0.03
+    tex3a = TLatex(xcoord,ycoord,lumitext)
+    tex3a.SetNDC(kTRUE)
+    tex3a.SetTextSize(0.03)
+    tex3a.SetTextColor(1)
+    tex3a.SetLineWidth(2)
+    tex3a.Draw()
+
+    c3.Update()
+    c3.Print('plot_summary_nr'+'.png')
+    c3.Print('plot_summary_nr'+'.C')
 
     return True
 
@@ -816,41 +951,37 @@ def looponscenario():
     DEF_QF=CONFIG.get('Common','QFLAGS')
     DEF_DCS=CONFIG.get('Common','DCS')
 
+    DEF_QFS =string.split(DEF_QF, ',')
+    DEF_DCSS=string.split(DEF_DCS, ',')
+
 
     # first remove the dbs option.... too expensive
     CONFIG.remove_option("Common","dbs_pds")
 
 
-    ## first produce the full with only requirement tracker on
-    JSONLIST.append(produce_json(0,"NONE:NONE",DCS_PDB))
-    TAG_NAME.append("QF:none,DCS: tracker on")
-
-    ## then the standard
-    JSONLIST.append(produce_json(1,DEF_QF,DEF_DCS))
-    TAG_NAME.append("QF:std JSON,DCS:all on")
-
-
-    ## then loop on all flags
-    for qf in range(0,len(QF_ALL_SYS)):
-        JSONLIST.append(produce_json(qf+2,QF_ALL_SYS[qf]+":GOOD",DCS_PDB))
-        TAG_NAME.append("QF:"+QF_ALL_SYS[qf]+",DCS: tracker on")
-    ## finally only with DCS requirement ALL
+    # first produce the full with all required DCS on
+    JSONLIST.append(produce_json(len(JSONLIST),DEF_QF,DEF_DCS))
+    TAG_NAME.append("DQM: all, DCS: all on")
+    # then only all DCS on
     JSONLIST.append(produce_json(len(JSONLIST),"NONE:NONE",DEF_DCS))
-    TAG_NAME.append("QF:none,DCS:all")
+    TAG_NAME.append("DQM: none, DCS: all on")
+    # then the full with only requirement tracker on
+    JSONLIST.append(produce_json(len(JSONLIST),DEF_QF,DCS_PDB))
+    TAG_NAME.append("DQM: all, DCS: Tracker on")
+    # then per sub-system with only requirement tracker on
+    for qf in range(len(QF_ALL_SYS)):
+        JSONLIST.append(produce_json(len(JSONLIST),QF_ALL_SYS[qf]+":GOOD",DCS_PDB))
+        TAG_NAME.append("DQM: "+QF_ALL_SYS[qf]+", DCS: Tracker on")
+    # finally only tracker on
+    JSONLIST.append(produce_json(len(JSONLIST),"NONE:NONE",DCS_PDB))
+    TAG_NAME.append("DQM: none, DCS: Tracker on")
 
 
     # access run registry to get the full list of runs and start/end time
     server = xmlrpclib.ServerProxy("http://pccmsdqm04.cern.ch/runregistry/xmlrpc")
-#    sel_runtable="{groupName} = 'Collisions10' and {datasetName} LIKE '%Express%' and {bfield}>3.7"
     sel_runtable="{groupName} = 'Collisions10' and {datasetName} LIKE '%Express%' and {bfield}>3.7 and {runNumber} >= "+RUNMINCFG+" and {runNumber} <= "+RUNMAXCFG
     RUN_DATA= server.DataExporter.export('RUN', 'GLOBAL', 'csv_runs', sel_runtable)
 
-    #outfile=open("rundata","w")
-    #outfile.write(RUN_DATA)
-    #outfile.close()
-
-#    TIME_DAYBOUND_MIN=9999999999
-#    TIME_DAYBOUND_MAX=0
     BEAM_ENE_ALL=[450.0,3500.0]
     BEAM_ENE_DEF=3500.0
 
@@ -880,20 +1011,9 @@ def looponscenario():
             day_bound=endtime.split('T')[0]
             day_bound_min=time.mktime(time.strptime(day_bound+'T00:00:00"','"%Y-%m-%dT%H:%M:%S"'))
             day_bound_max=time.mktime(time.strptime(day_bound+'T23:59:59"','"%Y-%m-%dT%H:%M:%S"'))
-#            if day_bound_min<TIME_DAYBOUND_MIN:
-#                TIME_DAYBOUND_MIN=day_bound_min
-#            if day_bound_max>TIME_DAYBOUND_MAX:
-#                TIME_DAYBOUND_MAX=day_bound_max
 
             RUN_TIME_00[runno]=day_bound_min
             RUN_TIME[runno]=timeinsec
-
-#    print RUN_TIME
-#    days = int((TIME_DAYBOUND_MAX-TIME_DAYBOUND_MIN)/86400)
-#    TIME_DAYBOUND_MAX=(days+1)*86400+TIME_DAYBOUND_MIN
-
-#    print time.ctime(TIME_DAYBOUND_MIN)
-#    print time.ctime(TIME_DAYBOUND_MAX)
 
 
 def definetemplates():
@@ -991,7 +1111,6 @@ def makehtmlpages():
     # replace tags and lines
     curr_time=time.asctime()
     MAINPAGE_TEMPL=MAINPAGE_TEMPL.replace("TAG_DATE",curr_time)
-#    MAINPAGE_TEMPL=MAINPAGE_TEMPL.replace("TAG_RUNREGCFG",DEF_CFG)
     # copy cfg file
     os.system('cp '+DEF_CFG+' '+HTMLDIR+'/runreg_std.cfg')
 
@@ -1008,8 +1127,6 @@ def makehtmlpages():
 
     SCENARIO_LINES=""
     for scenario in range(0,len(JSONLIST)):
-#    TAG_NAME=["pippo","pluto","topolino","minnie","gambadilegno"]
-#    for scenario in range(1,4):
         SCENARIO_CURR=SCENARIOLINE_TEMPL.replace("TAG_SCENARIO",TAG_NAME[scenario])
         SCENARIO_CURR=SCENARIO_CURR.replace("TAG_PAGE","scenario_"+str(scenario))
         SCENARIO_LINES+=SCENARIO_CURR
@@ -1027,8 +1144,8 @@ def makehtmlpages():
                 PLOTS=""
                 for p_xrange in plot_xrange:
                     plotname='plot_'+p_type+'_'+p_xtype+'_'+p_xrange+'_'+str(scenario)
-                    PLOTS+='<a href="'+plotname +'.png"> <img src="'+plotname +'.png" alt="'+plotname +'" width="45%" /></a>\n'
-                    os.system('cp '+plotname+'.png '+HTMLDIR+'/')
+                    PLOTS+='<a href="'+plotname +'.png"> <img src="'+plotname +'.png" alt="'+plotname +'" width="30%" /></a>\n'
+                    os.system('mv '+plotname+'.png '+HTMLDIR+'/')
                 PLOT_CURR=PLOT_CURR.replace("TAG_SINGLEPLOT",PLOTS)
                 PLOT_LINES+=PLOT_CURR
 
@@ -1041,31 +1158,36 @@ def makehtmlpages():
     # add plots to main page
     # first lumi
     PLOTLINE=""
-    PLOTLEFT ='plot_lumi_time_tot_1'
-    PLOTRIGHT='plot_lumi_time_lastweek_1'
-    PLOTLINE+='<a href="'+PLOTLEFT +'.png"> <img src="'+PLOTLEFT +'.png" alt="'+PLOTLEFT +'" width="45%" /></a>\n'
-    PLOTLINE+='<a href="'+PLOTRIGHT+'.png"> <img src="'+PLOTRIGHT+'.png" alt="'+PLOTRIGHT+'" width="45%" /></a>\n'
+    PLOTLEFT ='plot_lumi_time_tot_0'
+    PLOTMIDDLE='plot_lumi_run_new_0'
+    PLOTRIGHT='plot_lumi_run_lastweek_0'
+    PLOTLINE+='<a href="'+PLOTLEFT +'.png"> <img src="'+PLOTLEFT +'.png" alt="'+PLOTLEFT +'" width="30%" /></a>\n'
+    PLOTLINE+='<a href="'+PLOTMIDDLE+'.png"> <img src="'+PLOTMIDDLE+'.png" alt="'+PLOTMIDDLE+'" width="30%" /></a>\n'
+    PLOTLINE+='<a href="'+PLOTRIGHT+'.png"> <img src="'+PLOTRIGHT+'.png" alt="'+PLOTRIGHT+'" width="30%" /></a>\n'
     MAINPAGE_TEMPL=MAINPAGE_TEMPL.replace("TAG_LUMIPLOT",PLOTLINE)
     # then losses
     PLOTLINE=""
-    PLOTLEFT ='plot_loss_time_tot_1'
-    PLOTRIGHT='plot_loss_time_lastweek_1'
-    PLOTLINE+='<a href="'+PLOTLEFT +'.png"> <img src="'+PLOTLEFT +'.png" alt="'+PLOTLEFT +'" width="45%" /></a>\n'
-    PLOTLINE+='<a href="'+PLOTRIGHT+'.png"> <img src="'+PLOTRIGHT+'.png" alt="'+PLOTRIGHT+'" width="45%" /></a>\n'
+    PLOTLEFT ='plot_loss_time_tot_0'
+    PLOTMIDDLE='plot_loss_run_new_0'
+    PLOTRIGHT='plot_loss_run_lastweek_0'
+    PLOTLINE+='<a href="'+PLOTLEFT +'.png"> <img src="'+PLOTLEFT +'.png" alt="'+PLOTLEFT +'" width="30%" /></a>\n'
+    PLOTLINE+='<a href="'+PLOTMIDDLE+'.png"> <img src="'+PLOTMIDDLE+'.png" alt="'+PLOTMIDDLE+'" width="30%" /></a>\n'
+    PLOTLINE+='<a href="'+PLOTRIGHT+'.png"> <img src="'+PLOTRIGHT+'.png" alt="'+PLOTRIGHT+'" width="30%" /></a>\n'
     MAINPAGE_TEMPL=MAINPAGE_TEMPL.replace("TAG_LOSSPLOT",PLOTLINE)
     # then summaries
     PLOTLINE=""
     PLOTLEFT ='plot_summary_tot'
+    PLOTMIDDLE='plot_summary_nr'
     PLOTRIGHT='plot_summary_lw'
-    PLOTLINE+='<a href="'+PLOTLEFT +'.png"> <img src="'+PLOTLEFT +'.png" alt="'+PLOTLEFT +'" width="45%" /></a>\n'
-    PLOTLINE+='<a href="'+PLOTRIGHT+'.png"> <img src="'+PLOTRIGHT+'.png" alt="'+PLOTRIGHT+'" width="45%" /></a>\n'
+    PLOTLINE+='<a href="'+PLOTLEFT +'.png"> <img src="'+PLOTLEFT +'.png" alt="'+PLOTLEFT +'" width="30%" /></a>\n'
+    PLOTLINE+='<a href="'+PLOTMIDDLE+'.png"> <img src="'+PLOTMIDDLE+'.png" alt="'+PLOTMIDDLE+'" width="30%" /></a>\n'
+    PLOTLINE+='<a href="'+PLOTRIGHT+'.png"> <img src="'+PLOTRIGHT+'.png" alt="'+PLOTRIGHT+'" width="30%" /></a>\n'
     MAINPAGE_TEMPL=MAINPAGE_TEMPL.replace("TAG_SUMMARYPLOT",PLOTLINE)
-    os.system('cp '+PLOTLEFT+'.png '+HTMLDIR+'/')
-    os.system('cp '+PLOTRIGHT+'.png '+HTMLDIR+'/')
+    os.system('mv '+PLOTLEFT+'.png '+HTMLDIR+'/')
+    os.system('mv '+PLOTMIDDLE+'.png '+HTMLDIR+'/')
+    os.system('mv '+PLOTRIGHT+'.png '+HTMLDIR+'/')
 
 
-#    print TOTLUMI[scenario],TOTLUMIACC[scenario]
-#    print TOTLUMI_LW[scenario],TOTLUMIACC_LW[scenario]
     # write page
     htmlfile=open(HTMLDIR+"/lumiforphys.html",'w')
     htmlfile.write(MAINPAGE_TEMPL)
@@ -1146,15 +1268,15 @@ def main():
     # final make the plots for each scenario
     for scenario in range(0,len(JSONLIST)):
         makeplot(scenario)
-    #    print TOTLUMI[scenario],TOTLUMIACC[scenario]
-    #    print TOTLUMI_LW[scenario],TOTLUMIACC_LW[scenario]
 
     makesummaryplot()
     makehtmlpages()
 
+    ## copy the basic json (DCS all on only) in the certification area
+    #ref=REPORT[1]
     # copy the basic json (DCS tracker on only) in the certification area
+    ref=REPORT[len(JSONLIST)-1]
     # first read run range from json
-    ref=REPORT[0]
     json_file_ref=file(ref[2],'r')
     json_dict = json.load(json_file_ref)
     # determine runmin and runmax
@@ -1165,7 +1287,7 @@ def main():
     		RMAX=int(run)
     	if int(run)<RMIN:
     		RMIN=int(run)
-    print "Run Range in JSON file for DCSOnly certification:",RMIN,"-",RMAX
+    print "Run Range in JSON file for DCS Tracker Only certification:",RMIN,"-",RMAX
     certfile_name=CERT_DIR+"/DCSTRONLY_"+str(RMIN)+"-"+str(RMAX)
     os.system("cp "+ref[2]+" "+certfile_name)
     json_file_ref.close()
