@@ -2,7 +2,7 @@ import os
 cmsswBase = os.getenv( "CMSSW_BASE" )
 
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.GlobalTag.globaltag = 'START38_V12::All'
+process.GlobalTag.globaltag = 'START38_V13::All'
 process.out.fileName        = '%s/output/myPatTuple_test_addTriggerInfo.root'%( cmsswBase )
 
 process.p = cms.Path(
