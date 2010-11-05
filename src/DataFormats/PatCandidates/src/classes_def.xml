@@ -160,12 +160,15 @@
   <class name="std::vector<edm::Ptr<CaloTower> >" />
   <class name="std::vector<CaloTower>" />
   <class name="edm::Wrapper<std::vector<CaloTower> >" />
+
+  <class name="std::pair<std::string,std::vector<float> >" />
+  <class name="edm::Wrapper<std::pair<std::string,std::vector<float> > >" />
+  <class name="std::vector<pat::JetCorrFactors::CorrectionFactor>" />
+  <class name="edm::Wrapper<std::vector<pat::JetCorrFactors::CorrectionFactor> >" />
   <class name="pat::JetCorrFactors" />
   <class name="std::vector<pat::JetCorrFactors>" />
   <class name="edm::ValueMap<pat::JetCorrFactors>" />
   <class name="edm::Wrapper<edm::ValueMap<pat::JetCorrFactors> >" />
-  <class name="pat::JetCorrFactors::FlavourCorrections" />
-  <class name="std::vector<pat::JetCorrFactors::FlavourCorrections>" />
 
   <class name="StringMap" />
   <class name="edm::Wrapper<StringMap>" />
