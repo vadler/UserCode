@@ -8,12 +8,14 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <iostream> // DEBUG
 
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
 #include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
+#include "DataFormats/Provenance/interface/ProcessHistory.h"
 
 #include "DataFormats/PatCandidates/interface/TriggerAlgorithm.h"
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
@@ -154,7 +156,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   if ( tagTriggerEvent_.process().empty() )   tagTriggerEvent_   = InputTag( tagTriggerEvent_.label(), tagTriggerEvent_.instance(), nameProcess_ );
 
   if ( ! onlyStandAlone_ ) {
-    produces< TriggerAlgorithmCollection >();
+    if ( addL1Algos_ ) produces< TriggerAlgorithmCollection >();
     produces< TriggerPathCollection >();
     produces< TriggerFilterCollection >();
     produces< TriggerObjectCollection >();
@@ -166,14 +168,49 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
 
 void PATTriggerProducer::beginRun( Run & iRun, const EventSetup & iSetup )
 {
-  if ( autoProcessName_ && ( nameProcess_ == "*" ) ) return;
-  beginConstRun( iRun, iSetup );
-}
 
-void PATTriggerProducer::beginConstRun( const Run & iRun, const EventSetup & iSetup )
-{
   // Initialize
   hltConfigInit_ = false;
+
+  // Initialize process name
+  if ( autoProcessName_ ) {
+    // reset
+    nameProcess_ = "*";
+    // determine process name from last run TriggerSummaryProducerAOD module in process history of input
+    const ProcessHistory & processHistory( iRun.processHistory() );
+    ProcessConfiguration processConfiguration;
+    ParameterSet processPSet;
+    for ( ProcessHistory::const_iterator iHist = processHistory.begin(); iHist != processHistory.end(); ++iHist ) {
+      std::cout << "PATTriggerProducer beginRun: process name \t--> " << iHist->processName() << std::endl;
+      if ( processHistory.getConfigurationForProcess( iHist->processName(), processConfiguration )     &&
+           pset::Registry::instance()->getMapped( processConfiguration.parameterSetID(), processPSet ) &&
+           processPSet.exists( tagTriggerEvent_.label() )
+         ) {
+        nameProcess_ = iHist->processName();
+        LogDebug( "autoProcessName" ) << "Trigger process name " << nameProcess_ << "discovered";
+        std::cout << "PATTriggerProducer beginRun: GOOD" << std::endl;
+      }
+    }
+    // terminate, if nothing is found
+    if ( nameProcess_ == "*" ) {
+      LogError( "autoProcessName" ) << "trigger::TriggerEvent product with label " << tagTriggerEvent_.label() << " not produced according to process history of input data\n"
+                                    << "No trigger information produced.";
+      return;
+    }
+    LogInfo( "autoProcessName" ) << "Trigger process name " << nameProcess_ << "used for PAT trigger information";
+    std::cout << "PATTriggerProducer beginRun: process name \t--> " << nameProcess_ << "\t used" << std::endl;
+    // adapt configuration of used input tags
+    tagTriggerResults_ = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
+    tagTriggerEvent_   = InputTag( tagTriggerEvent_.label(),   tagTriggerEvent_.instance(),   nameProcess_ );
+    if ( autoProcessNameL1ExtraMu_ )      tagL1ExtraMu_      = InputTag( tagL1ExtraMu_.label()     , tagL1ExtraMu_.instance()     , nameProcess_ );
+    if ( autoProcessNameL1ExtraNoIsoEG_ ) tagL1ExtraNoIsoEG_ = InputTag( tagL1ExtraNoIsoEG_.label(), tagL1ExtraNoIsoEG_.instance(), nameProcess_ );
+    if ( autoProcessNameL1ExtraIsoEG_ )   tagL1ExtraIsoEG_   = InputTag( tagL1ExtraIsoEG_.label()  , tagL1ExtraIsoEG_.instance()  , nameProcess_ );
+    if ( autoProcessNameL1ExtraCenJet_ )  tagL1ExtraCenJet_  = InputTag( tagL1ExtraCenJet_.label() , tagL1ExtraCenJet_.instance() , nameProcess_ );
+    if ( autoProcessNameL1ExtraForJet_ )  tagL1ExtraForJet_  = InputTag( tagL1ExtraForJet_.label() , tagL1ExtraForJet_.instance() , nameProcess_ );
+    if ( autoProcessNameL1ExtraTauJet_ )  tagL1ExtraTauJet_  = InputTag( tagL1ExtraTauJet_.label() , tagL1ExtraTauJet_.instance() , nameProcess_ );
+    if ( autoProcessNameL1ExtraETM_ )     tagL1ExtraETM_     = InputTag( tagL1ExtraETM_.label()    , tagL1ExtraETM_.instance()    , nameProcess_ );
+    if ( autoProcessNameL1ExtraHTM_ )     tagL1ExtraHTM_     = InputTag( tagL1ExtraHTM_.label()    , tagL1ExtraHTM_.instance()    , nameProcess_ );
+  }
 
   // Initialize HLTConfigProvider
   bool changed( true );
@@ -202,12 +239,10 @@ void PATTriggerProducer::beginConstRun( const Run & iRun, const EventSetup & iSe
 
 void PATTriggerProducer::beginLuminosityBlock( LuminosityBlock & iLuminosityBlock, const EventSetup & iSetup )
 {
-  if ( autoProcessName_ && ( nameProcess_ == "*" ) ) return;
-  beginConstLuminosityBlock( iLuminosityBlock, iSetup );
-}
 
-void PATTriggerProducer::beginConstLuminosityBlock( const LuminosityBlock & iLuminosityBlock, const EventSetup & iSetup )
-{
+  // Terminate, if auto process name determination failed
+  if ( nameProcess_ == "*" ) return;
+
   // Extract pre-scales
   if ( hltConfigInit_ ) {
     // Start from run
@@ -228,6 +263,9 @@ void PATTriggerProducer::beginConstLuminosityBlock( const LuminosityBlock & iLum
 void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
 {
 
+  // Terminate, if auto process name determination failed
+  if ( nameProcess_ == "*" ) return;
+
   std::auto_ptr< TriggerObjectCollection > triggerObjects( new TriggerObjectCollection() );
   if ( onlyStandAlone_ ) triggerObjects->reserve( 0 );
   std::auto_ptr< TriggerObjectStandAloneCollection > triggerObjectsStandAlone( new TriggerObjectStandAloneCollection() );
@@ -236,31 +274,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
 
   // Get and check HLT event data
   Handle< trigger::TriggerEvent > handleTriggerEvent;
-
-  if ( autoProcessName_) {
-    iEvent.getByLabel( edm::InputTag(tagTriggerEvent_.label(), tagTriggerEvent_.instance()), handleTriggerEvent );
-    if ( ! handleTriggerEvent.failedToGet() ) {
-        const edm::Provenance *meta = handleTriggerEvent.provenance();
-        if ( meta->processName() != nameProcess_ ) {
-            nameProcess_ = meta->processName();
-            LogInfo( "autoProcessName" ) << "Discovered trigger process name " << nameProcess_;
-            tagTriggerResults_ = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
-            tagTriggerEvent_   = InputTag( tagTriggerEvent_.label(),   tagTriggerEvent_.instance(),   nameProcess_ );
-            if ( autoProcessNameL1ExtraMu_ )      tagL1ExtraMu_      = InputTag( tagL1ExtraMu_.label()     , tagL1ExtraMu_.instance()     , nameProcess_ );
-            if ( autoProcessNameL1ExtraNoIsoEG_ ) tagL1ExtraNoIsoEG_ = InputTag( tagL1ExtraNoIsoEG_.label(), tagL1ExtraNoIsoEG_.instance(), nameProcess_ );
-            if ( autoProcessNameL1ExtraIsoEG_ )   tagL1ExtraIsoEG_   = InputTag( tagL1ExtraIsoEG_.label()  , tagL1ExtraIsoEG_.instance()  , nameProcess_ );
-            if ( autoProcessNameL1ExtraCenJet_ )  tagL1ExtraCenJet_  = InputTag( tagL1ExtraCenJet_.label() , tagL1ExtraCenJet_.instance() , nameProcess_ );
-            if ( autoProcessNameL1ExtraForJet_ )  tagL1ExtraForJet_  = InputTag( tagL1ExtraForJet_.label() , tagL1ExtraForJet_.instance() , nameProcess_ );
-            if ( autoProcessNameL1ExtraTauJet_ )  tagL1ExtraTauJet_  = InputTag( tagL1ExtraTauJet_.label() , tagL1ExtraTauJet_.instance() , nameProcess_ );
-            if ( autoProcessNameL1ExtraETM_ )     tagL1ExtraETM_     = InputTag( tagL1ExtraETM_.label()    , tagL1ExtraETM_.instance()    , nameProcess_ );
-            if ( autoProcessNameL1ExtraHTM_ )     tagL1ExtraHTM_     = InputTag( tagL1ExtraHTM_.label()    , tagL1ExtraHTM_.instance()    , nameProcess_ );
-            beginConstRun( iEvent.getRun(), iSetup );
-            beginConstLuminosityBlock( iEvent.getLuminosityBlock(), iSetup );
-        }
-    }
-  } else {
-    iEvent.getByLabel( tagTriggerEvent_, handleTriggerEvent );
-  }
+  iEvent.getByLabel( tagTriggerEvent_, handleTriggerEvent );
   Handle< TriggerResults > handleTriggerResults;
   iEvent.getByLabel( tagTriggerResults_, handleTriggerResults );
   bool goodHlt( hltConfigInit_ );
@@ -635,65 +649,62 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
   iEvent.put( triggerObjectsStandAlone );
 
   // L1 algorithms
-  if ( ! onlyStandAlone_ ) {
+  if ( ! onlyStandAlone_ && addL1Algos_ ) {
     std::auto_ptr< TriggerAlgorithmCollection > triggerAlgos( new TriggerAlgorithmCollection() );
-    if ( addL1Algos_ ) {
-      l1GtUtils_.retrieveL1EventSetup( iSetup );
-      ESHandle< L1GtTriggerMenu > handleL1GtTriggerMenu;
-      iSetup.get< L1GtTriggerMenuRcd >().get( handleL1GtTriggerMenu );
-      const AlgorithmMap l1GtAlgorithms( handleL1GtTriggerMenu->gtAlgorithmMap() );
-      const AlgorithmMap l1GtTechTriggers( handleL1GtTriggerMenu->gtTechnicalTriggerMap() );
-      triggerAlgos->reserve( l1GtAlgorithms.size() + l1GtTechTriggers.size() );
-      // physics algorithms
-      for ( AlgorithmMap::const_iterator iAlgo = l1GtAlgorithms.begin(); iAlgo != l1GtAlgorithms.end(); ++iAlgo ) {
-        if ( iAlgo->second.algoBitNumber() > 127 ) {
-          LogError( "errorL1AlgoBit" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' has bit number " << iAlgo->second.algoBitNumber() << " > 127; skipping";
-          continue;
-        }
-        L1GtUtils::TriggerCategory category;
-        int bit;
-        if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( iAlgo->second.algoName(), category, bit ) ) {
-          LogError( "errorL1AlgoName" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' not found in the L1 menu; skipping";
-          continue;
-        }
-        bool decisionBeforeMask;
-        bool decisionAfterMask;
-        int  prescale;
-        int  mask;
-        int  error( l1GtUtils_.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
-        if ( error ) {
-          LogError( "errorL1AlgoDecision" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' decision has error code " << error << " from 'L1GtUtils'; skipping";
-          continue;
-        }
-        TriggerAlgorithm triggerAlgo( iAlgo->second.algoName(), iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
-        triggerAlgos->push_back( triggerAlgo );
+    l1GtUtils_.retrieveL1EventSetup( iSetup );
+    ESHandle< L1GtTriggerMenu > handleL1GtTriggerMenu;
+    iSetup.get< L1GtTriggerMenuRcd >().get( handleL1GtTriggerMenu );
+    const AlgorithmMap l1GtAlgorithms( handleL1GtTriggerMenu->gtAlgorithmMap() );
+    const AlgorithmMap l1GtTechTriggers( handleL1GtTriggerMenu->gtTechnicalTriggerMap() );
+    triggerAlgos->reserve( l1GtAlgorithms.size() + l1GtTechTriggers.size() );
+    // physics algorithms
+    for ( AlgorithmMap::const_iterator iAlgo = l1GtAlgorithms.begin(); iAlgo != l1GtAlgorithms.end(); ++iAlgo ) {
+      if ( iAlgo->second.algoBitNumber() > 127 ) {
+        LogError( "errorL1AlgoBit" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' has bit number " << iAlgo->second.algoBitNumber() << " > 127; skipping";
+        continue;
       }
-      // technical triggers
-      for ( AlgorithmMap::const_iterator iAlgo = l1GtTechTriggers.begin(); iAlgo != l1GtTechTriggers.end(); ++iAlgo ) {
-        if ( iAlgo->second.algoBitNumber() > 63 ) {
-          LogError( "errorL1AlgoBit" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' has bit number " << iAlgo->second.algoBitNumber() << " > 63; skipping";
-          continue;
-        }
-        L1GtUtils::TriggerCategory category;
-        int bit;
-        if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( iAlgo->second.algoName(), category, bit ) ) {
-          LogError( "errorL1AlgoName" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' not found in the L1 menu; skipping";
-          continue;
-        }
-        bool decisionBeforeMask;
-        bool decisionAfterMask;
-        int  prescale;
-        int  mask;
-        int  error( l1GtUtils_.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
-        if ( error ) {
-          LogError( "errorL1AlgoDecision" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' decision has error code " << error << " from 'L1GtUtils'; skipping";
-          continue;
-        }
-        TriggerAlgorithm triggerAlgo( iAlgo->second.algoName(), iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
-        triggerAlgos->push_back( triggerAlgo );
+      L1GtUtils::TriggerCategory category;
+      int bit;
+      if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( iAlgo->second.algoName(), category, bit ) ) {
+        LogError( "errorL1AlgoName" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' not found in the L1 menu; skipping";
+        continue;
       }
+      bool decisionBeforeMask;
+      bool decisionAfterMask;
+      int  prescale;
+      int  mask;
+      int  error( l1GtUtils_.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
+      if ( error ) {
+        LogError( "errorL1AlgoDecision" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' decision has error code " << error << " from 'L1GtUtils'; skipping";
+        continue;
+      }
+      TriggerAlgorithm triggerAlgo( iAlgo->second.algoName(), iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
+      triggerAlgos->push_back( triggerAlgo );
     }
-
+    // technical triggers
+    for ( AlgorithmMap::const_iterator iAlgo = l1GtTechTriggers.begin(); iAlgo != l1GtTechTriggers.end(); ++iAlgo ) {
+      if ( iAlgo->second.algoBitNumber() > 63 ) {
+        LogError( "errorL1AlgoBit" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' has bit number " << iAlgo->second.algoBitNumber() << " > 63; skipping";
+        continue;
+      }
+      L1GtUtils::TriggerCategory category;
+      int bit;
+      if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( iAlgo->second.algoName(), category, bit ) ) {
+        LogError( "errorL1AlgoName" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' not found in the L1 menu; skipping";
+        continue;
+      }
+      bool decisionBeforeMask;
+      bool decisionAfterMask;
+      int  prescale;
+      int  mask;
+      int  error( l1GtUtils_.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
+      if ( error ) {
+        LogError( "errorL1AlgoDecision" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' decision has error code " << error << " from 'L1GtUtils'; skipping";
+        continue;
+      }
+      TriggerAlgorithm triggerAlgo( iAlgo->second.algoName(), iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
+      triggerAlgos->push_back( triggerAlgo );
+    }
     // Put L1 algorithms to event
     iEvent.put( triggerAlgos );
   }

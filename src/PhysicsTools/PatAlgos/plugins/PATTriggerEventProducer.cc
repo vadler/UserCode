@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerEventProducer.cc,v 1.13 2010/10/29 13:28:41 gpetrucc Exp $
+// $Id: PATTriggerEventProducer.cc,v 1.12.2.1 2010/10/31 16:20:32 vadler Exp $
 //
 
 
@@ -14,6 +14,7 @@
 #include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+#include "DataFormats/Provenance/interface/ProcessHistory.h"
 
 #include "DataFormats/Common/interface/AssociativeIterator.h"
 #include "FWCore/Framework/interface/ESHandle.h"
@@ -54,12 +55,38 @@ PATTriggerEventProducer::PATTriggerEventProducer( const ParameterSet & iConfig )
 
 void PATTriggerEventProducer::beginRun( Run & iRun, const EventSetup & iSetup )
 {
-  if (autoProcessName_ && (nameProcess_ == "*")) return;
-  beginConstRun(iRun, iSetup);
-}
 
-void PATTriggerEventProducer::beginConstRun( const Run & iRun, const EventSetup & iSetup )
-{
+  // Initialize process name
+  if ( autoProcessName_ ) {
+    // reset
+    nameProcess_ = "*";
+    // determine process name from last run TriggerSummaryProducerAOD module in process history of input
+    const ProcessHistory & processHistory( iRun.processHistory() );
+    ProcessConfiguration processConfiguration;
+    ParameterSet processPSet;
+    for ( ProcessHistory::const_iterator iHist = processHistory.begin(); iHist != processHistory.end(); ++iHist ) {
+      std::cout << "PATTriggerEventProducer beginRun: process name \t--> " << iHist->processName() << std::endl;
+      if ( processHistory.getConfigurationForProcess( iHist->processName(), processConfiguration )     &&
+           pset::Registry::instance()->getMapped( processConfiguration.parameterSetID(), processPSet ) &&
+           processPSet.exists( tagTriggerEvent_.label() )
+         ) {
+        nameProcess_ = iHist->processName();
+        LogDebug( "autoProcessName" ) << "Trigger process name " << nameProcess_ << "discovered";
+        std::cout << "PATTriggerEventProducer beginRun: GOOD" << std::endl;
+      }
+    }
+    // terminate, if nothing is found
+    if ( nameProcess_ == "*" ) {
+      LogError( "autoProcessName" ) << "trigger::TriggerEvent product with label " << tagTriggerEvent_.label() << " not produced according to process history of input data\n"
+                                    << "No trigger information produced.";
+      return;
+    }
+    LogInfo( "autoProcessName" ) << "Trigger process name " << nameProcess_ << "used for PAT trigger information";
+    std::cout << "PATTriggerEventProducer beginRun: process name \t--> " << nameProcess_ << "\t used" << std::endl;
+    // adapt configuration of used input tags
+    tagTriggerResults_ = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
+    tagTriggerEvent_   = InputTag( tagTriggerEvent_.label(),   tagTriggerEvent_.instance(),   nameProcess_ );
+  }
 
   gtCondRunInit_ = false;
   if ( ! tagCondGt_.label().empty() ) {
@@ -86,18 +113,14 @@ void PATTriggerEventProducer::beginConstRun( const Run & iRun, const EventSetup 
 
 void PATTriggerEventProducer::beginLuminosityBlock( LuminosityBlock & iLuminosityBlock, const EventSetup & iSetup )
 {
-  if (autoProcessName_ && (nameProcess_ == "*")) return;
-  beginConstLuminosityBlock( iLuminosityBlock, iSetup );
-}
 
-
-void PATTriggerEventProducer::beginConstLuminosityBlock( const LuminosityBlock & iLumi, const EventSetup & iSetup )
-{
+  // Terminate, if auto process name determination failed
+  if ( nameProcess_ == "*" ) return;
 
   gtCondLumiInit_ = false;
   if ( ! tagCondGt_.label().empty() ) {
     Handle< ConditionsInLumiBlock > condLumiBlock;
-    iLumi.getByLabel( tagCondGt_, condLumiBlock );
+    iLuminosityBlock.getByLabel( tagCondGt_, condLumiBlock );
     if ( condLumiBlock.isValid() ) {
       condLumi_       = *condLumiBlock;
       gtCondLumiInit_ = true;
@@ -112,21 +135,8 @@ void PATTriggerEventProducer::beginConstLuminosityBlock( const LuminosityBlock &
 void PATTriggerEventProducer::produce( Event& iEvent, const EventSetup& iSetup )
 {
 
-  if (autoProcessName_) {
-    Handle< trigger::TriggerEvent > handleTriggerEvent;
-    iEvent.getByLabel( edm::InputTag(tagTriggerEvent_.label(), tagTriggerEvent_.instance()), handleTriggerEvent );
-    if (!handleTriggerEvent.failedToGet()) {
-        const edm::Provenance *meta = handleTriggerEvent.provenance();
-        if (meta->processName() != nameProcess_) {
-            nameProcess_ = meta->processName();
-            LogInfo("AutoProcessName") << "Discovered trigger process name " << nameProcess_ << std::endl;
-            tagTriggerResults_ = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
-            tagTriggerEvent_   = InputTag( tagTriggerEvent_.label(),   tagTriggerEvent_.instance(),   nameProcess_ );
-            beginConstRun(iEvent.getRun(), iSetup);
-            beginConstLuminosityBlock(iEvent.getLuminosityBlock(), iSetup);
-        }
-    }
-  }
+  // Terminate, if auto process name determination failed
+  if ( nameProcess_ == "*" ) return;
 
   if ( ! hltConfigInit_ ) return;
 
