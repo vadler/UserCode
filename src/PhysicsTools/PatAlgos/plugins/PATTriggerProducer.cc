@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.20.2.1 2010/10/31 16:20:32 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.20.2.3 2010/11/08 12:14:14 vadler Exp $
 //
 
 
@@ -65,51 +65,83 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   if ( iConfig.exists( "addL1Algos" ) ) addL1Algos_ = iConfig.getParameter< bool >( "addL1Algos" );
   if ( iConfig.exists( "l1ExtraMu" ) ) {
     tagL1ExtraMu_ = iConfig.getParameter< InputTag >( "l1ExtraMu" );
-    if ( tagL1ExtraMu_.process().empty() )
-      if ( ! autoProcessName_ ) tagL1ExtraMu_ = InputTag( tagL1ExtraMu_.label(), tagL1ExtraMu_.instance(), nameProcess_ );
-      else                      autoProcessNameL1ExtraMu_ = true;
+    if ( tagL1ExtraMu_.process().empty() ) {
+      if ( ! autoProcessName_ ) {
+        tagL1ExtraMu_ = InputTag( tagL1ExtraMu_.label(), tagL1ExtraMu_.instance(), nameProcess_ );
+      } else {
+        autoProcessNameL1ExtraMu_ = true;
+      }
+    }
   }
   if ( iConfig.exists( "l1ExtraNoIsoEG" ) ) {
     tagL1ExtraNoIsoEG_ = iConfig.getParameter< InputTag >( "l1ExtraNoIsoEG" );
-    if ( tagL1ExtraNoIsoEG_.process().empty() )
-      if ( ! autoProcessName_ ) tagL1ExtraNoIsoEG_ = InputTag( tagL1ExtraNoIsoEG_.label(), tagL1ExtraNoIsoEG_.instance(), nameProcess_ );
-      else                      autoProcessNameL1ExtraNoIsoEG_ = true;
+    if ( tagL1ExtraNoIsoEG_.process().empty() ) {
+      if ( ! autoProcessName_ ) {
+        tagL1ExtraNoIsoEG_ = InputTag( tagL1ExtraNoIsoEG_.label(), tagL1ExtraNoIsoEG_.instance(), nameProcess_ );
+      } else {
+        autoProcessNameL1ExtraNoIsoEG_ = true;
+      }
+    }
   }
   if ( iConfig.exists( "l1ExtraIsoEG" ) ) {
     tagL1ExtraIsoEG_ = iConfig.getParameter< InputTag >( "l1ExtraIsoEG" );
-    if ( tagL1ExtraIsoEG_.process().empty() )
-      if ( ! autoProcessName_ ) tagL1ExtraIsoEG_ = InputTag( tagL1ExtraIsoEG_.label(), tagL1ExtraIsoEG_.instance(), nameProcess_ );
-      else                      autoProcessNameL1ExtraIsoEG_ = true;
+    if ( tagL1ExtraIsoEG_.process().empty() ) {
+      if ( ! autoProcessName_ ) {
+        tagL1ExtraIsoEG_ = InputTag( tagL1ExtraIsoEG_.label(), tagL1ExtraIsoEG_.instance(), nameProcess_ );
+      } else {
+        autoProcessNameL1ExtraIsoEG_ = true;
+      }
+    }
   }
   if ( iConfig.exists( "l1ExtraCenJet" ) ) {
     tagL1ExtraCenJet_ = iConfig.getParameter< InputTag >( "l1ExtraCenJet" );
-    if ( tagL1ExtraCenJet_.process().empty() )
-      if ( ! autoProcessName_ ) tagL1ExtraCenJet_ = InputTag( tagL1ExtraCenJet_.label(), tagL1ExtraCenJet_.instance(), nameProcess_ );
-      else                      autoProcessNameL1ExtraCenJet_ = true;
+    if ( tagL1ExtraCenJet_.process().empty() ) {
+      if ( ! autoProcessName_ ) {
+        tagL1ExtraCenJet_ = InputTag( tagL1ExtraCenJet_.label(), tagL1ExtraCenJet_.instance(), nameProcess_ );
+      } else {
+        autoProcessNameL1ExtraCenJet_ = true;
+      }
+    }
   }
   if ( iConfig.exists( "l1ExtraForJet" ) ) {
     tagL1ExtraForJet_ = iConfig.getParameter< InputTag >( "l1ExtraForJet" );
-    if ( tagL1ExtraForJet_.process().empty() )
-      if ( ! autoProcessName_ ) tagL1ExtraForJet_ = InputTag( tagL1ExtraForJet_.label(), tagL1ExtraForJet_.instance(), nameProcess_ );
-      else                      autoProcessNameL1ExtraForJet_ = true;
+    if ( tagL1ExtraForJet_.process().empty() ) {
+      if ( ! autoProcessName_ ) {
+        tagL1ExtraForJet_ = InputTag( tagL1ExtraForJet_.label(), tagL1ExtraForJet_.instance(), nameProcess_ );
+      } else {
+        autoProcessNameL1ExtraForJet_ = true;
+      }
+    }
   }
   if ( iConfig.exists( "l1ExtraTauJet" ) ) {
     tagL1ExtraTauJet_ = iConfig.getParameter< InputTag >( "l1ExtraTauJet" );
-    if ( tagL1ExtraTauJet_.process().empty() )
-      if ( ! autoProcessName_ ) tagL1ExtraTauJet_ = InputTag( tagL1ExtraTauJet_.label(), tagL1ExtraTauJet_.instance(), nameProcess_ );
-      else                      autoProcessNameL1ExtraTauJet_ = true;
+    if ( tagL1ExtraTauJet_.process().empty() ) {
+      if ( ! autoProcessName_ ) {
+        tagL1ExtraTauJet_ = InputTag( tagL1ExtraTauJet_.label(), tagL1ExtraTauJet_.instance(), nameProcess_ );
+      } else {
+        autoProcessNameL1ExtraTauJet_ = true;
+      }
+    }
   }
   if ( iConfig.exists( "l1ExtraETM" ) ) {
     tagL1ExtraETM_ = iConfig.getParameter< InputTag >( "l1ExtraETM" );
-    if ( tagL1ExtraETM_.process().empty() )
-      if ( ! autoProcessName_ ) tagL1ExtraETM_ = InputTag( tagL1ExtraETM_.label(), tagL1ExtraETM_.instance(), nameProcess_ );
-      else                      autoProcessNameL1ExtraETM_ = true;
+    if ( tagL1ExtraETM_.process().empty() ) {
+      if ( ! autoProcessName_ ) {
+        tagL1ExtraETM_ = InputTag( tagL1ExtraETM_.label(), tagL1ExtraETM_.instance(), nameProcess_ );
+      } else {
+        autoProcessNameL1ExtraETM_ = true;
+      }
+    }
   }
   if ( iConfig.exists( "l1ExtraHTM" ) ) {
     tagL1ExtraHTM_ = iConfig.getParameter< InputTag >( "l1ExtraHTM" );
-    if ( tagL1ExtraHTM_.process().empty() )
-      if ( ! autoProcessName_ ) tagL1ExtraHTM_ = InputTag( tagL1ExtraHTM_.label(), tagL1ExtraHTM_.instance(), nameProcess_ );
-      else                      autoProcessNameL1ExtraHTM_ = true;
+    if ( tagL1ExtraHTM_.process().empty() ) {
+      if ( ! autoProcessName_ ) {
+        tagL1ExtraHTM_ = InputTag( tagL1ExtraHTM_.label(), tagL1ExtraHTM_.instance(), nameProcess_ );
+      } else {
+        autoProcessNameL1ExtraHTM_ = true;
+      }
+    }
   }
   if ( iConfig.exists( "saveL1Refs" ) ) saveL1Refs_ = iConfig.getParameter< bool >( "saveL1Refs" );
   // HLT configuration parameters
