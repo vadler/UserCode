@@ -1,5 +1,5 @@
 //
-// $Id: PATJetProducer.cc,v 1.50.2.3 2010/11/03 21:47:35 rwolf Exp $
+// $Id: PATJetProducer.cc,v 1.50.2.4 2010/11/11 20:01:11 srappocc Exp $
 
 
 #include "PhysicsTools/PatAlgos/plugins/PATJetProducer.h"
@@ -269,13 +269,16 @@ void PATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
 	ajet.addJECFactors(jcf);
       }
       std::vector<std::string> levels = jetCorrs[0][jetRef].correctionLabels();
-      if(std::find(levels.begin(), levels.end(), "L3Absolute")!=levels.end()){
+      if(std::find(levels.begin(), levels.end(), "L2L3Residual")!=levels.end()){
+	ajet.initializeJEC(jetCorrs[0][jetRef].jecLevel("L2L3Residual"));
+      }
+      else if(std::find(levels.begin(), levels.end(), "L3Absolute")!=levels.end()){
 	ajet.initializeJEC(jetCorrs[0][jetRef].jecLevel("L3Absolute"));
       }
       else{
 	ajet.initializeJEC(jetCorrs[0][jetRef].jecLevel("Uncorrected"));
 	if(first){	  
-	  edm::LogWarning("L3Absolute not found") << "L3Absolute is not part of the correction applied jetCorrFactors \n"
+	  edm::LogWarning("L3Absolute not found") << "L2L3Residual and L3Absolute are not part of the correction applied jetCorrFactors \n"
 						  << "of module " <<  jetCorrs[0][jetRef].jecSet() << " jets will remain"
 						  << " uncorrected."; first=false;
 	}
