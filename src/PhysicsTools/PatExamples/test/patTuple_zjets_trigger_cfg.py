@@ -3,12 +3,21 @@
 ## ---
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 ## ... and modify it according to the needs
-process.maxEvents.input     = 1000 # reduce number of events for testing.
-process.out.fileName        = 'patTuple.root'
-process.options.wantSummary = False # to suppress the long output at the end of the job
-
-process.patJets.addTagInfos  = False # to save space
-process.selectedPatMuons.cut = 'isTrackerMuon=1 & isGlobalMuon=1 & innerTrack.numberOfValidHits>=11 & globalTrack.normalizedChi2<10.0  & globalTrack.hitPattern.numberOfValidMuonHits>0 & abs(dB)<0.02 & (trackIso+caloIso)/pt<0.05'
+from PhysicsTools.PatExamples.samplesFNAL_cff import zjetsRECO
+process.source.fileNames    = zjetsRECO
+process.maxEvents.input     = -1 # reduce number of events for testing.
+process.out.fileName        = '/uscms_data/d3/vadler/PATTutorial/Nov10/patTuple_zjets_trigger.root'
+process.out.outputCommands += [
+  "keep *_globalMuons_*_*"
+, "keep *_generalTracks_*_*"
+, "keep *_standAloneMuons_*_*"
+]
+# for the tag'n'probe analysis
+process.patMuons.embedStandAloneMuon = False
+process.patMuons.embedCombinedMuon   = False
+process.patMuons.embedTrack          = False
+process.selectedPatMuons.cut         = 'isTrackerMuon=1 & isGlobalMuon=1 & innerTrack.numberOfValidHits>=11 & globalTrack.normalizedChi2<10.0  & globalTrack.hitPattern.numberOfValidMuonHits
+>0 & abs(dB)<0.02 & (trackIso+caloIso)/pt<0.05'
 
 ## ---
 ## Define the path
@@ -37,22 +46,8 @@ process.muonTriggerMatchHLTMuons = cms.EDProducer(
 , resolveByMatchQuality = cms.bool( True )
 )
 
-### ============
-### Python tools
-### ============
-### Attention: order matters!
-
-## --
-## Switch to selected PAT objects in the main work flow
-## --
-from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
-removeCleaning( process )
-
 ## --
 ## Switch on PAT trigger
 ## --
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOnTrigger( process ) # This is optional and can be omitted.
 switchOnTriggerMatching( process, triggerMatchers = [ 'muonTriggerMatchHLTMuons' ] )
-# Switch to selected PAT objects in the trigger matching
-removeCleaningFromTriggerMatching( process )
