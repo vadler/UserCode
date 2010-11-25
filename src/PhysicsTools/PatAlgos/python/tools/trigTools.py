@@ -592,14 +592,19 @@ class SwitchOnTriggerMatchEmbedding( ConfigToolBase ):
         sequence        = self._parameters[ 'sequence' ].value
         hltProcess      = self._parameters[ 'hltProcess' ].value
         outputModule    = self._parameters[ 'outputModule' ].value
-        dictEmbedders = { 'selectedPatPhotons'  : 'PATTriggerMatchPhotonEmbedder'
+        dictEmbedders = { 'patPhotons'          : 'PATTriggerMatchPhotonEmbedder'
+                        , 'selectedPatPhotons'  : 'PATTriggerMatchPhotonEmbedder'
                         , 'cleanPatPhotons'     : 'PATTriggerMatchPhotonEmbedder'
+                        , 'patElectrons'        : 'PATTriggerMatchElectronEmbedder'
                         , 'selectedPatElectrons': 'PATTriggerMatchElectronEmbedder'
                         , 'cleanPatElectrons'   : 'PATTriggerMatchElectronEmbedder'
+                        , 'patMuons'            : 'PATTriggerMatchMuonEmbedder'
                         , 'selectedPatMuons'    : 'PATTriggerMatchMuonEmbedder'
                         , 'cleanPatMuons'       : 'PATTriggerMatchMuonEmbedder'
+                        , 'patTaus'             : 'PATTriggerMatchTauEmbedder'
                         , 'selectedPatTaus'     : 'PATTriggerMatchTauEmbedder'
                         , 'cleanPatTaus'        : 'PATTriggerMatchTauEmbedder'
+                        , 'patJets'             : 'PATTriggerMatchJetEmbedder'
                         , 'selectedPatJets'     : 'PATTriggerMatchJetEmbedder'
                         , 'cleanPatJets'        : 'PATTriggerMatchJetEmbedder'
                         , 'patMETs'             : 'PATTriggerMatchMETEmbedder'
