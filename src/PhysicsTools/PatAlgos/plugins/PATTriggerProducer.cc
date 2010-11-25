@@ -31,7 +31,7 @@ using namespace edm;
 
 PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   nameProcess_( iConfig.getParameter< std::string >( "processName" ) ),
-  autoProcessName_( nameProcess_  == "*" ),
+  autoProcessName_( nameProcess_ == "*" ),
   onlyStandAlone_( iConfig.getParameter< bool >( "onlyStandAlone" ) ),
   // L1 configuration parameters
   addL1Algos_( false ),
@@ -66,7 +66,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   if ( iConfig.exists( "addL1Algos" ) ) addL1Algos_ = iConfig.getParameter< bool >( "addL1Algos" );
   if ( iConfig.exists( "l1ExtraMu" ) ) {
     tagL1ExtraMu_ = iConfig.getParameter< InputTag >( "l1ExtraMu" );
-    if ( tagL1ExtraMu_.process().empty() ) {
+    if ( tagL1ExtraMu_.process() == "*" ) {
       if ( ! autoProcessName_ ) {
         tagL1ExtraMu_ = InputTag( tagL1ExtraMu_.label(), tagL1ExtraMu_.instance(), nameProcess_ );
       } else {
@@ -76,7 +76,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   }
   if ( iConfig.exists( "l1ExtraNoIsoEG" ) ) {
     tagL1ExtraNoIsoEG_ = iConfig.getParameter< InputTag >( "l1ExtraNoIsoEG" );
-    if ( tagL1ExtraNoIsoEG_.process().empty() ) {
+    if ( tagL1ExtraNoIsoEG_.process() == "*" ) {
       if ( ! autoProcessName_ ) {
         tagL1ExtraNoIsoEG_ = InputTag( tagL1ExtraNoIsoEG_.label(), tagL1ExtraNoIsoEG_.instance(), nameProcess_ );
       } else {
@@ -86,7 +86,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   }
   if ( iConfig.exists( "l1ExtraIsoEG" ) ) {
     tagL1ExtraIsoEG_ = iConfig.getParameter< InputTag >( "l1ExtraIsoEG" );
-    if ( tagL1ExtraIsoEG_.process().empty() ) {
+    if ( tagL1ExtraIsoEG_.process() == "*" ) {
       if ( ! autoProcessName_ ) {
         tagL1ExtraIsoEG_ = InputTag( tagL1ExtraIsoEG_.label(), tagL1ExtraIsoEG_.instance(), nameProcess_ );
       } else {
@@ -96,7 +96,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   }
   if ( iConfig.exists( "l1ExtraCenJet" ) ) {
     tagL1ExtraCenJet_ = iConfig.getParameter< InputTag >( "l1ExtraCenJet" );
-    if ( tagL1ExtraCenJet_.process().empty() ) {
+    if ( tagL1ExtraCenJet_.process() == "*" ) {
       if ( ! autoProcessName_ ) {
         tagL1ExtraCenJet_ = InputTag( tagL1ExtraCenJet_.label(), tagL1ExtraCenJet_.instance(), nameProcess_ );
       } else {
@@ -106,7 +106,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   }
   if ( iConfig.exists( "l1ExtraForJet" ) ) {
     tagL1ExtraForJet_ = iConfig.getParameter< InputTag >( "l1ExtraForJet" );
-    if ( tagL1ExtraForJet_.process().empty() ) {
+    if ( tagL1ExtraForJet_.process() == "*" ) {
       if ( ! autoProcessName_ ) {
         tagL1ExtraForJet_ = InputTag( tagL1ExtraForJet_.label(), tagL1ExtraForJet_.instance(), nameProcess_ );
       } else {
@@ -116,7 +116,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   }
   if ( iConfig.exists( "l1ExtraTauJet" ) ) {
     tagL1ExtraTauJet_ = iConfig.getParameter< InputTag >( "l1ExtraTauJet" );
-    if ( tagL1ExtraTauJet_.process().empty() ) {
+    if ( tagL1ExtraTauJet_.process() == "*" ) {
       if ( ! autoProcessName_ ) {
         tagL1ExtraTauJet_ = InputTag( tagL1ExtraTauJet_.label(), tagL1ExtraTauJet_.instance(), nameProcess_ );
       } else {
@@ -126,7 +126,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   }
   if ( iConfig.exists( "l1ExtraETM" ) ) {
     tagL1ExtraETM_ = iConfig.getParameter< InputTag >( "l1ExtraETM" );
-    if ( tagL1ExtraETM_.process().empty() ) {
+    if ( tagL1ExtraETM_.process() == "*" ) {
       if ( ! autoProcessName_ ) {
         tagL1ExtraETM_ = InputTag( tagL1ExtraETM_.label(), tagL1ExtraETM_.instance(), nameProcess_ );
       } else {
@@ -136,7 +136,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   }
   if ( iConfig.exists( "l1ExtraHTM" ) ) {
     tagL1ExtraHTM_ = iConfig.getParameter< InputTag >( "l1ExtraHTM" );
-    if ( tagL1ExtraHTM_.process().empty() ) {
+    if ( tagL1ExtraHTM_.process() == "*" ) {
       if ( ! autoProcessName_ ) {
         tagL1ExtraHTM_ = InputTag( tagL1ExtraHTM_.label(), tagL1ExtraHTM_.instance(), nameProcess_ );
       } else {
@@ -201,15 +201,23 @@ void PATTriggerProducer::beginRun( Run & iRun, const EventSetup & iSetup )
     // adapt configuration of used input tags
     tagTriggerResults_ = InputTag( tagTriggerResults_.label(), tagTriggerResults_.instance(), nameProcess_ );
     tagTriggerEvent_   = InputTag( tagTriggerEvent_.label(),   tagTriggerEvent_.instance(),   nameProcess_ );
-    if ( autoProcessNameL1ExtraMu_ )      tagL1ExtraMu_      = InputTag( tagL1ExtraMu_.label()     , tagL1ExtraMu_.instance()     , nameProcess_ );
-    if ( autoProcessNameL1ExtraNoIsoEG_ ) tagL1ExtraNoIsoEG_ = InputTag( tagL1ExtraNoIsoEG_.label(), tagL1ExtraNoIsoEG_.instance(), nameProcess_ );
-    if ( autoProcessNameL1ExtraIsoEG_ )   tagL1ExtraIsoEG_   = InputTag( tagL1ExtraIsoEG_.label()  , tagL1ExtraIsoEG_.instance()  , nameProcess_ );
-    if ( autoProcessNameL1ExtraCenJet_ )  tagL1ExtraCenJet_  = InputTag( tagL1ExtraCenJet_.label() , tagL1ExtraCenJet_.instance() , nameProcess_ );
-    if ( autoProcessNameL1ExtraForJet_ )  tagL1ExtraForJet_  = InputTag( tagL1ExtraForJet_.label() , tagL1ExtraForJet_.instance() , nameProcess_ );
-    if ( autoProcessNameL1ExtraTauJet_ )  tagL1ExtraTauJet_  = InputTag( tagL1ExtraTauJet_.label() , tagL1ExtraTauJet_.instance() , nameProcess_ );
-    if ( autoProcessNameL1ExtraETM_ )     tagL1ExtraETM_     = InputTag( tagL1ExtraETM_.label()    , tagL1ExtraETM_.instance()    , nameProcess_ );
-    if ( autoProcessNameL1ExtraHTM_ )     tagL1ExtraHTM_     = InputTag( tagL1ExtraHTM_.label()    , tagL1ExtraHTM_.instance()    , nameProcess_ );
   }
+  if ( autoProcessNameL1ExtraMu_ )      tagL1ExtraMu_      = InputTag( tagL1ExtraMu_.label()     , tagL1ExtraMu_.instance()     , nameProcess_ );
+  std::cout << "PATTriggerProducer beginRun: tagL1ExtraMu \t--> " << tagL1ExtraMu_.encode() << "\t used" << std::endl;
+  if ( autoProcessNameL1ExtraNoIsoEG_ ) tagL1ExtraNoIsoEG_ = InputTag( tagL1ExtraNoIsoEG_.label(), tagL1ExtraNoIsoEG_.instance(), nameProcess_ );
+  std::cout << "PATTriggerProducer beginRun: tagL1ExtraNoIsoEG \t--> " << tagL1ExtraNoIsoEG_.encode() << "\t used" << std::endl;
+  if ( autoProcessNameL1ExtraIsoEG_ )   tagL1ExtraIsoEG_   = InputTag( tagL1ExtraIsoEG_.label()  , tagL1ExtraIsoEG_.instance()  , nameProcess_ );
+  std::cout << "PATTriggerProducer beginRun: tagL1ExtraIsoEG \t--> " << tagL1ExtraIsoEG_.encode() << "\t used" << std::endl;
+  if ( autoProcessNameL1ExtraCenJet_ )  tagL1ExtraCenJet_  = InputTag( tagL1ExtraCenJet_.label() , tagL1ExtraCenJet_.instance() , nameProcess_ );
+  std::cout << "PATTriggerProducer beginRun: tagL1ExtraCenJet \t--> " << tagL1ExtraCenJet_.encode() << "\t used" << std::endl;
+  if ( autoProcessNameL1ExtraForJet_ )  tagL1ExtraForJet_  = InputTag( tagL1ExtraForJet_.label() , tagL1ExtraForJet_.instance() , nameProcess_ );
+  std::cout << "PATTriggerProducer beginRun: tagL1ExtraForJet \t--> " << tagL1ExtraForJet_.encode() << "\t used" << std::endl;
+  if ( autoProcessNameL1ExtraTauJet_ )  tagL1ExtraTauJet_  = InputTag( tagL1ExtraTauJet_.label() , tagL1ExtraTauJet_.instance() , nameProcess_ );
+  std::cout << "PATTriggerProducer beginRun: tagL1ExtraTauJet \t--> " << tagL1ExtraTauJet_.encode() << "\t used" << std::endl;
+  if ( autoProcessNameL1ExtraETM_ )     tagL1ExtraETM_     = InputTag( tagL1ExtraETM_.label()    , tagL1ExtraETM_.instance()    , nameProcess_ );
+  std::cout << "PATTriggerProducer beginRun: tagL1ExtraETM \t--> " << tagL1ExtraETM_.encode() << "\t used" << std::endl;
+  if ( autoProcessNameL1ExtraHTM_ )     tagL1ExtraHTM_     = InputTag( tagL1ExtraHTM_.label()    , tagL1ExtraHTM_.instance()    , nameProcess_ );
+  std::cout << "PATTriggerProducer beginRun: tagL1ExtraHTM \t--> " << tagL1ExtraHTM_.encode() << "\t used" << std::endl;
 
   // Initialize HLTConfigProvider
   bool changed( true );
