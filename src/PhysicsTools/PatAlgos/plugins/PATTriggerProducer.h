@@ -11,9 +11,25 @@
 //
 /**
   \class    pat::PATTriggerProducer PATTriggerProducer.h "PhysicsTools/PatAlgos/plugins/PATTriggerProducer.h"
-  \brief    Produces the pat::TriggerPathCollection, pat::TriggerFilterCollection and pat::TriggerObjectCollection.
+  \brief    Produces the full or stand-alone PAT trigger information collections
 
-   [...]
+   This producer extracts the trigger information from
+   - the edm::TriggerResults written by the HLT process,
+   - the corresponding trigger::TriggerEvent,
+   - the provenance information,
+   - the process history,
+   - the GlobalTrigger information in the event and the event setup and
+   - the L1 object collections ("l1extra")
+   re-arranges it and writes it either (full mode) to
+   - a pat::TriggerObjectCollection,
+   - a pat::TriggerFilterCollection,
+   - a pat::TriggerPathCollection and
+   - optionally a pat::TriggerAlgorithmCollection
+   or (stand-alone mode) to
+   - a pat::TriggerObjectStandAloneCollection
+
+   For me information, s.
+   https://twiki.cern.ch/twiki/bin/view/CMS/SWGuidePATTrigger
 
   \author   Volker Adler
   \version  $Id: PATTriggerProducer.h,v 1.12.2.2 2010/11/05 17:33:37 vadler Exp $
