@@ -369,7 +369,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         }
         // store path
         triggerPaths->push_back( triggerPath );
-        // store module states to be used for the filters
+        // cache module states to be used for the filters
         for ( std::map< unsigned, std::string >::const_iterator iM = indicesModules.begin(); iM != indicesModules.end(); ++iM ) {
           if ( iM->first < indexLastFilterPath ) {
             moduleStates[ iM->second ] = 1;

@@ -15,7 +15,7 @@ process.p = cms.Path(
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger( process, sequence = 'p', hltProcess = '*' )
 process.patTrigger.triggerResults = cms.InputTag( 'TriggerResults'      , '', '*' )
-process.patTrigger.triggerEvent   = cms.InputTag( 'hltTriggerSummaryAOD', '', 'HLT' )
+process.patTrigger.triggerEvent   = cms.InputTag( 'hltTriggerSummaryAOD', '', '*' )
 process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'RECO' )
 process.patTrigger.l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', '*' )
 process.patTrigger.l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , '*' )
