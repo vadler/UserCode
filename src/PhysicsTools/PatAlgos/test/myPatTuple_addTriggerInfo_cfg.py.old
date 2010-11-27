@@ -2,7 +2,6 @@ import os
 cmsswBase = os.getenv( "CMSSW_BASE" )
 
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.GlobalTag.globaltag = 'START38_V13::All'
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo.root'%( cmsswBase )
 process.options.wantSummary = False
 
@@ -42,11 +41,11 @@ switchOnTriggerMatching( process )
 switchOnTriggerStandAlone( process )
 switchOnTriggerMatchingStandAlone( process )
 switchOnTriggerMatchEmbedding( process )
-switchOnTrigger( process, 'hallo', 'tschuess', None, '*' )
-switchOnTriggerMatching( process, [ 'moin', 'tach' ], 'hallo', 'tschuess' )
-switchOnTriggerStandAlone( process, 'hallo', None, '*' )
-switchOnTriggerMatchingStandAlone( process, [ 'moin', 'tach' ], 'hallo' )
-switchOnTriggerMatchEmbedding( process, [ 'moin', 'tach' ], 'hallo' )
+switchOnTrigger( process, triggerProducer = 'hallo', triggerEventProducer = 'tschuess', hltProcess = '*' )
+switchOnTriggerMatching( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo', triggerEventProducer = 'tschuess' )
+switchOnTriggerStandAlone( process, triggerProducer = 'hallo', hltProcess = '*' )
+switchOnTriggerMatchingStandAlone( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo' )
+switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo' )
 # removeCleaningFromTriggerMatching( process )
 # print
 # print 'Path p'
