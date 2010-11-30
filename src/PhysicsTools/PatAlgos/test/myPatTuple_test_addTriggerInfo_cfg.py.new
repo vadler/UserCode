@@ -2,7 +2,9 @@ import os
 cmsswBase = os.getenv( "CMSSW_BASE" )
 
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-# process.GlobalTag.globaltag = 'START38_V13::All'
+process.source.fileNames    = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data/ZJetToMuMu_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6__Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1__GEN-SIM-RECO/FED5121F-B1E4-DF11-B53F-00261834B580.root' ]
+process.source.skipEvents   = cms.untracked.uint32( 1000 )
+process.GlobalTag.globaltag = 'START38_V14::All'
 process.out.fileName        = '%s/output/myPatTuple_test_addTriggerInfo.root'%( cmsswBase )
 
 process.p = cms.Path(
