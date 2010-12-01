@@ -6,6 +6,11 @@ process.source.fileNames    = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data
 process.source.skipEvents   = cms.untracked.uint32( 1000 )
 process.GlobalTag.globaltag = 'START38_V14::All'
 process.out.fileName        = '%s/output/myPatTuple_test_addTriggerInfo.root'%( cmsswBase )
+# process.MessageLogger.cerr.threshold = 'INFO'
+# process.MessageLogger.categories.append( 'autoProcessName' )
+# process.MessageLogger.cerr.INFO = cms.untracked.PSet(
+#   limit = cms.untracked.int32( -1 )
+# )
 
 process.p = cms.Path(
   process.patDefaultSequence
@@ -246,8 +251,8 @@ process.out.outputCommands += [
 , 'keep *_patTriggerEventTest_*_*'
 , 'keep *_*TriggerTestMatch_*_*'
 , 'keep patTriggerObjectStandAlonesedmAssociation_*_*_*'
-, 'keep edmTriggerResults_TriggerResults_*_HLT'
+, 'keep edmTriggerResults_TriggerResults_*_*'
 , 'keep *_hltTriggerSummaryAOD_*_*'
-, 'keep *_l1extraParticles_*_HLT'
-, 'keep *_gctDigis_*_HLT'
+, 'keep *_l1extraParticles_*_*'
+, 'keep *_gctDigis_*_*'
 ]
