@@ -7,6 +7,11 @@ process = cms.Process( "PAT" )
 
 ## MessageLogger
 process.load( "FWCore.MessageService.MessageLogger_cfi" )
+process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.categories.append( 'autoProcessName' )
+process.MessageLogger.cerr.INFO = cms.untracked.PSet(
+  limit = cms.untracked.int32( -1 )
+)
 
 ## Options and Output Report
 process.options = cms.untracked.PSet(
