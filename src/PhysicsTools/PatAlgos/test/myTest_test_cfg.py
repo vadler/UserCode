@@ -24,7 +24,7 @@ process.TFileService = cms.Service( "TFileService"
 )
 
 process.triggerTest = cms.EDAnalyzer( "myTriggerTest"
-, hltProcessName  = cms.string( 'HLT' )
+, hltProcessName  = cms.string( 'REDIGI38XPU' )
 , triggerResults  = cms.InputTag( "TriggerResults" )
 , triggerEvent    = cms.InputTag( "hltTriggerSummaryAOD" )
 , patProcessName  = cms.string( 'PAT' )
