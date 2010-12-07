@@ -4,21 +4,17 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 CondFormats/JetMETObjects                        V03-01-14      V03-01-01      
 DataFormats/PatCandidates                        NoTag          V06-02-02      
-DataFormats/TauReco                              V01-00-02      V00-16-00      
 JetMETCorrections/Algorithms                     V02-01-02      V02-01-00      
 JetMETCorrections/Modules                        V05-00-14      V04-00-03      
 PhysicsTools/IsolationAlgos                      V01-05-07      V01-05-06      
 PhysicsTools/JetMCAlgos                          V00-13-10      V00-13-09      
 PhysicsTools/PFCandProducer                      V04-07-00      V04-06-03      
-PhysicsTools/PatAlgos                            NoTag          V08-01-03      
+PhysicsTools/PatAlgos                            B3_9_X         V08-01-03      
 PhysicsTools/PatExamples                         NoTag          V00-04-10-01   
 PhysicsTools/PatUtils                            NoTag          V03-09-14      
 PhysicsTools/PythonAnalysis                      V00-05-01      V00-04-00      
 PhysicsTools/SelectorUtils                       V00-03-03      V00-02-20      
-PhysicsTools/UtilAlgos                           V08-02-02      V08-01-03      
+PhysicsTools/UtilAlgos                           V08-02-04      V08-01-03      
 PhysicsTools/Utilities                           V08-01-02      V08-01-00      
-RecoTauTag/Configuration                         V01-00-03      V00-24-00      
-RecoTauTag/RecoTau                               V01-00-05      V00-24-00      
-RecoTauTag/TauTagTools                           V01-00-00      V00-21-06      
 ---------------------------------------
-total packages: 18 (18 displayed)
+total packages: 14 (14 displayed)
