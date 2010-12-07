@@ -7,6 +7,7 @@ DataFormats/PatCandidates                        V06-02-08      V06-02-02-01
 DataFormats/TauReco                              V01-00-02      V00-16-01      
 JetMETCorrections/Algorithms                     V02-01-02      V02-01-00-01   
 JetMETCorrections/Modules                        V05-00-14      V04-00-04      
+PhysicsTools/IsolationAlgos                      V01-05-07      V01-05-07      
 PhysicsTools/JetMCAlgos                          V00-13-10      V00-13-09      
 PhysicsTools/PFCandProducer                      V04-07-00      V04-06-04      
 PhysicsTools/PatAlgos                            V08-04-00      V08-01-03-01   
@@ -19,4 +20,4 @@ RecoTauTag/Configuration                         V01-00-11      V00-24-00
 RecoTauTag/RecoTau                               V01-00-19      V00-24-01-00   
 RecoTauTag/TauTagTools                           V01-00-03      V00-21-07      
 ---------------------------------------
-total packages: 16 (16 displayed)
+total packages: 17 (17 displayed)
