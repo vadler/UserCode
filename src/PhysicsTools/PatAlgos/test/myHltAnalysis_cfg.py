@@ -14,7 +14,8 @@ process.maxEvents = cms.untracked.PSet(
 
 # conditions
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string('START38_V14::All')
+from Configuration.PyReleaseValidation.autoCond import autoCond
+process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
 
 # HLT analyzers
 process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )

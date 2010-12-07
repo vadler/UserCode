@@ -1,6 +1,7 @@
 ## import skeleton process
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.maxEvents.input = 10
+process.maxEvents.input     = 10
+process.options.wantSummary = False
 
 ## let it run
 process.p = cms.Path(
@@ -26,7 +27,7 @@ switchOnTriggerMatchEmbedding( process
                                , 'metTriggerMatchHLTMET45'
                                ]
                              , sequence = 'patCandidates'
-                             , outputModule = ''
+                             #, outputModule = ''
                              )
 process.selectedPatMuons.src     = 'patMuonsTriggerMatch'
 process.selectedPatPhotons.src   = 'patPhotonsTriggerMatch'
@@ -41,3 +42,10 @@ process.out.outputCommands += [ 'drop *_patMETs_*_*'
 process.p *= process.selectedPatCandidates
 process.p *= process.cleanPatCandidates
 process.p *= process.countPatCandidates
+print
+print process.patTriggerSequence
+print
+print process.patCandidates
+print
+print process.p
+print
