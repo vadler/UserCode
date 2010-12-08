@@ -12,20 +12,21 @@ class PickRelValInputFile( ConfigToolBase ):
     _label             = 'pickRelValInputFile'
     _defaultParameters = dicttypes.SortedKeysDict()
 
-    def __init__( self ):
-        ConfigToolBase.__init__( self )
-        self.addParameter( self._defaultParameters, 'condition'   , 'startup'                                                        , '' )
-        self.addParameter( self._defaultParameters, 'globalTag'   , autoCond[ self._defaultParameters[ 'condition' ].value ][ 0: -5 ], 'auto' )
-        self.addParameter( self._defaultParameters, 'cmsswVersion', os.getenv( "CMSSW_VERSION" )                                     , 'auto' )
-        self.addParameter( self._defaultParameters, 'relVal'      , 'RelValTTbar'                                                    , '' )
-        self.addParameter( self._defaultParameters, 'dataTier'    , 'GEN-SIM-RECO'                                                   , '' )
-        self.addParameter( self._defaultParameters, 'maxVersions' , '9'                                                              , '' )
-        self.addParameter( self._defaultParameters, 'maxFile'     , '1'                                                              , '' )
-        self._parameters = copy.deepcopy( self._defaultParameters )
-        self._comment = ""
-
     def getDefaultParameters( self ):
         return self._defaultParameters
+
+    def __init__( self ):
+        ConfigToolBase.__init__( self )
+        self.addParameter( self._defaultParameters, 'condition'   , 'startup'                                                           , '' )
+        self.addParameter( self._defaultParameters, 'globalTag'   , autoCond[ self.getDefaultParameters()[ 'condition' ].value ][ : -5 ], 'auto' )
+        self.addParameter( self._defaultParameters, 'cmsswVersion', os.getenv( "CMSSW_VERSION" )                                        , 'auto' )
+        self.addParameter( self._defaultParameters, 'relVal'      , 'RelValTTbar'                                                       , '' )
+        self.addParameter( self._defaultParameters, 'dataTier'    , 'GEN-SIM-RECO'                                                      , '' )
+        self.addParameter( self._defaultParameters, 'maxVersions' , 9                                                                   , '' )
+        self.addParameter( self._defaultParameters, 'maxFile'     , 1                                                                   , '' )
+        self.addParameter( self._defaultParameters, 'debug'       , False                                                               , '' )
+        self._parameters = copy.deepcopy( self._defaultParameters )
+        self._comment = ""
 
     def __call__( self
                 , condition    = None
@@ -35,21 +36,24 @@ class PickRelValInputFile( ConfigToolBase ):
                 , dataTier     = None
                 , maxVersions  = None
                 , maxFile      = None
+                , debug        = None
                 ):
         if condition is None:
-            condition = self._defaultParameters[ 'condition' ].value
+            condition = self.getDefaultParameters()[ 'condition' ].value
         if globalTag is None:
-            globalTag = self._defaultParameters[ 'globalTag' ].value
+            globalTag = self.getDefaultParameters()[ 'globalTag' ].value
         if cmsswVersion is None:
-            cmsswVersion = self._defaultParameters[ 'cmsswVersion' ].value
+            cmsswVersion = self.getDefaultParameters()[ 'cmsswVersion' ].value
         if relVal is None:
-            relVal = self._defaultParameters[ 'relVal' ].value
+            relVal = self.getDefaultParameters()[ 'relVal' ].value
         if dataTier is None:
-            dataTier = self._defaultParameters[ 'dataTier' ].value
+            dataTier = self.getDefaultParameters()[ 'dataTier' ].value
         if maxVersions is None:
-            maxVersions = self._defaultParameters[ 'maxVersions' ].value
+            maxVersions = self.getDefaultParameters()[ 'maxVersions' ].value
         if maxFile is None:
-            maxFile = self._defaultParameters[ 'maxFile' ].value
+            maxFile = self.getDefaultParameters()[ 'maxFile' ].value
+        if debug is None:
+            debug = self.getDefaultParameters()[ 'debug' ].value
         self.setParameter( 'condition'   , condition )
         self.setParameter( 'globalTag'   , globalTag )
         self.setParameter( 'cmsswVersion', cmsswVersion )
@@ -57,6 +61,7 @@ class PickRelValInputFile( ConfigToolBase ):
         self.setParameter( 'dataTier'    , dataTier )
         self.setParameter( 'maxVersions' , maxVersions )
         self.setParameter( 'maxFile'     , maxFile )
+        self.setParameter( 'debug'       , debug )
         return self.apply()
 
     def apply( self ):
@@ -67,31 +72,49 @@ class PickRelValInputFile( ConfigToolBase ):
         dataTier     = self._parameters[ 'dataTier'     ].value
         maxVersions  = self._parameters[ 'maxVersions'  ].value
         maxFile      = self._parameters[ 'maxFile'      ].value
+        debug        = self._parameters[ 'debug'        ].value
 
-        maxFileInt = int( maxFile )
-        command    = 'nsls'
-        rfdirPath  = '/store/relval/%s/%s/%s/%s-v'%( cmsswVersion, relVal, dataTier, globalTag )
-        argument   = '/castor/cern.ch/cms%s'%( rfdirPath )
-        filePath   = ''
-        fileCount  = 0
+        if debug:
+            print 'DEBUG %s: Called with...'%( self._label )
+            for key in self._parameters.keys():
+               print '    %s:\t'%( key ),
+               print self._parameters[ key ].value
 
-        for version in range( 1, int( maxVersions ) + 1 ):
-            directories = Popen( [ command, argument + '%i'%( version ) ], stdout = PIPE, stderr = PIPE ).communicate()[0]
+        command      = 'nsls'
+        rfdirPath    = '/store/relval/%s/%s/%s/%s-v'%( cmsswVersion, relVal, dataTier, globalTag )
+        argument     = '/castor/cern.ch/cms%s'%( rfdirPath )
+        filePath     = ''
+        fileCount    = {}
+        lastValidVersion = 0
+
+        for version in range( 1, maxVersions + 1 ):
+            fileCount[ version ] = 0
+            if debug:
+                print 'DEBUG %s: Checking directory %s%i'%( self._label, argument, version )
+            directories = Popen( [ command, '%s%i'%( argument, version ) ], stdout = PIPE, stderr = PIPE ).communicate()[0]
             for directory in directories.splitlines():
-                files = Popen( [ command, argument + '%i/%s'%( version, directory ) ], stdout = PIPE, stderr = PIPE ).communicate()[0]
+                files = Popen( [ command, '%s%i/%s'%( argument, version, directory ) ], stdout = PIPE, stderr = PIPE ).communicate()[0]
                 for file in files.splitlines():
                     if len( file ) > 0:
-                        fileCount += 1
-                    if fileCount >= maxFileInt:
-                        filePath = rfdirPath + '%i/%s/%s'%( version, directory, file )
+                        if debug:
+                            print 'DEBUG %s: File %s found'%( self._label, file )
+                        fileCount[ version ] += 1
+                        lastValidVersion = version
+                    if fileCount[ version ] >= maxFile:
+                        filePath = '%s%i/%s/%s'%( rfdirPath, version, directory, file )
                         break
-                if fileCount >= maxFileInt:
+                if debug:
+                    print 'DEBUG %s: %i file(s) found'%( self._label, fileCount[ version ] )
+                if fileCount[ version ] >= maxFile:
                     break
-            if fileCount >= maxFileInt:
+            if fileCount[ version ] >= maxFile:
               break
-        if fileCount < maxFileInt:
-            print 'Error: could not find any file in %s*'%( argument )
+        if fileCount[ lastValidVersion ] < maxFile:
+            print 'pickRelValInputFile() Error'
+            print '    Only %i RelVal file(s) found in %s%i'%( fileCount[ lastValidVersion ], argument, lastValidVersion )
 
+        if debug:
+            print 'DEBUG %s: returning file %s'%( self._label, filePath )
         return filePath
 
 pickRelValInputFile = PickRelValInputFile()
