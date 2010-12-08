@@ -1,6 +1,10 @@
 ## import skeleton process
+import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+from PhysicsTools.PatAlgos.tools.myTools import pickRelValInputFile
+process.source.fileNames    = [ pickRelValInputFile() ]
 process.maxEvents.input     = 10
+process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly.root'%( os.getenv( "CMSSW_BASE" ) )
 process.options.wantSummary = False
 
 ## let it run
@@ -27,7 +31,7 @@ switchOnTriggerMatchEmbedding( process
                                , 'metTriggerMatchHLTMET45'
                                ]
                              , sequence = 'patCandidates'
-                             #, outputModule = ''
+                             , outputModule = ''
                              )
 process.selectedPatMuons.src     = 'patMuonsTriggerMatch'
 process.selectedPatPhotons.src   = 'patPhotonsTriggerMatch'

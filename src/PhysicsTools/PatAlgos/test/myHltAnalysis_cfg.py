@@ -2,20 +2,22 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process( "HLTPROV" )
 
-# source
+# Conditions
+condition = 'startup'
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+from Configuration.PyReleaseValidation.autoCond import autoCond
+process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
+
+# Source
+from PhysicsTools.PatAlgos.tools.myTools import pickRelValInputFile
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    '/store/relval/CMSSW_3_9_5/RelValTTbar/GEN-SIM-RECO/START39_V6-v1/0008/0AEEDFA4-88FA-DF11-B6FF-001A92811718.root'
+    pickRelValInputFile( condition = condition )
   )
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 1 )
 )
-
-# conditions
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-from Configuration.PyReleaseValidation.autoCond import autoCond
-process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
 
 # HLT analyzers
 process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
