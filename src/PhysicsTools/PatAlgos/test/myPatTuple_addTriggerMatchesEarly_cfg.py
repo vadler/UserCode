@@ -1,6 +1,11 @@
 ## import skeleton process
+import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.maxEvents.input = 10
+from PhysicsTools.PatAlgos.tools.myTools import pickRelValInputFile
+process.source.fileNames    = [ pickRelValInputFile() ]
+process.maxEvents.input     = 10
+process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly.root'%( os.getenv( "CMSSW_BASE" ) )
+process.options.wantSummary = False
 
 ## let it run
 process.p = cms.Path(
@@ -41,3 +46,10 @@ process.out.outputCommands += [ 'drop *_patMETs_*_*'
 process.p *= process.selectedPatCandidates
 process.p *= process.cleanPatCandidates
 process.p *= process.countPatCandidates
+print
+print process.patTriggerSequence
+print
+print process.patCandidates
+print
+print process.p
+print
