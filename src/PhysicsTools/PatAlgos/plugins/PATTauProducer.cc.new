@@ -1,5 +1,5 @@
 //
-// $Id: PATTauProducer.cc,v 1.35 2010/11/08 16:18:06 veelken Exp $
+// $Id: PATTauProducer.cc,v 1.34 2010/09/03 15:41:27 hegner Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATTauProducer.h"
@@ -12,6 +12,8 @@
 
 #include "DataFormats/TauReco/interface/PFTau.h"
 #include "DataFormats/TauReco/interface/PFTauDiscriminator.h"
+#include "DataFormats/TauReco/interface/PFTauDecayMode.h"
+#include "DataFormats/TauReco/interface/PFTauDecayModeAssociation.h"
 #include "DataFormats/TauReco/interface/CaloTau.h"
 #include "DataFormats/TauReco/interface/CaloTauDiscriminator.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
@@ -94,6 +96,12 @@ PATTauProducer::PATTauProducer(const edm::ParameterSet & iConfig):
       "\t}\n";
   }
   
+  // tau decay mode configurables
+  addDecayMode_ = iConfig.getParameter<bool>         ( "addDecayMode" );
+  if ( addDecayMode_ ) {
+    decayModeSrc_ = iConfig.getParameter<edm::InputTag>( "decayModeSrc" );
+  }
+
   // IsoDeposit configurables
   if (iConfig.exists("isoDeposits")) {
     edm::ParameterSet depconf = iConfig.getParameter<edm::ParameterSet>("isoDeposits");
@@ -314,13 +322,17 @@ void PATTauProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup
     }
 
     // extraction of reconstructed tau decay mode 
-    // (only available for PFTaus)
-    if ( aTau.isPFTau() ) {
+    if ( addDecayMode_ ) {
+      edm::Handle<reco::PFTauDecayModeAssociation> pfDecayModeAssoc;
+      iEvent.getByLabel(decayModeSrc_, pfDecayModeAssoc);
       edm::Handle<reco::PFTauCollection> pfTaus;
       iEvent.getByLabel(tauSrc_, pfTaus);
       reco::PFTauRef pfTauRef(pfTaus, idx);
-
-      aTau.setDecayMode(pfTauRef->decayMode());
+      // need PFTauRef (edm::RefToBase<reco::BaseTau> does not suffice) 
+      // for PFTauDecayMode look-up
+      //const reco::PFTauDecayMode& pfDecayMode = (*pfDecayModeAssoc)[tausRef];
+      const reco::PFTauDecayMode& pfDecayMode = (*pfDecayModeAssoc)[pfTauRef];
+      aTau.setDecayMode(pfDecayMode.getDecayMode());
     }
 
     // Isolation
@@ -407,6 +419,10 @@ void PATTauProducer::fillDescriptions(edm::ConfigurationDescriptions & descripti
   iDesc.addNode( edm::ParameterDescription<edm::InputTag>("tauIDSource", edm::InputTag(), true) xor
                  edm::ParameterDescription<edm::ParameterSetDescription>("tauIDSources", tauIDSourcesPSet, true)
                )->setComment("input with electron ID variables");
+
+  // tau decay mode configurables
+  iDesc.add<bool>("addDecayMode", false)->setComment("add tau ID variables");  
+  iDesc.add<edm::InputTag>("decayModeSrc", edm::InputTag("fixedConePFTauDecayModeProducer"));
 
   // IsoDeposit configurables
   edm::ParameterSetDescription isoDepositsPSet;

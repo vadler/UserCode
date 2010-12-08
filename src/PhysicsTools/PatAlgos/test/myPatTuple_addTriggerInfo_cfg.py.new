@@ -1,14 +1,9 @@
 import os
-cmsswVersion = os.getenv( "CMSSW_VERSION" )
-cmsswBase    = os.getenv( "CMSSW_BASE" )
-
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.source.fileNames    = [
-  '/store/relval/%s/RelValTTbar/GEN-SIM-RECO/START39_V6-v1/0011/20060F25-E7FA-DF11-91CA-00261894396D.root'%( cmsswVersion )
-]
-# process.GlobalTag.globaltag = cms.string('START39_V6::All')
-process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo.root'%( cmsswBase )
+from PhysicsTools.PatAlgos.tools.myTools import pickRelValInputFile
+process.source.fileNames    = [ pickRelValInputFile() ]
 process.options.wantSummary = False
+process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo.root'%( os.getenv( "CMSSW_BASE" ) )
 
 # # memory check
 # process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck"
