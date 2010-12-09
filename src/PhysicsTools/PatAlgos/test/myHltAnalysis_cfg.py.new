@@ -9,10 +9,10 @@ from Configuration.PyReleaseValidation.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
 
 # Source
-from PhysicsTools.PatAlgos.tools.myTools import pickRelValInputFile
+from PhysicsTools.PatAlgos.tools.myTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    pickRelValInputFile( condition = condition )
+    pickRelValInputFiles( condition = condition, debug = True )
   )
 )
 process.maxEvents = cms.untracked.PSet(
