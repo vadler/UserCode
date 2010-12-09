@@ -8,7 +8,7 @@ process.source.fileNames = [
   '/store/data/Run2010A/Mu/AOD/Nov4ReReco_v1/0011/D2E5D86F-AEEC-DF11-B261-0017A4771028.root' # /Mu/Run2010A-Nov4ReReco_v1/AOD, run 144112, 17717 events
 ]
 # use the correct conditions
-process.GlobalTag.globaltag = 'GR_R_38X_V14::All'
+process.GlobalTag.globaltag = 'GR_R_38X_V15::All'
 # use a sufficient number of events
 process.maxEvents.input = 1000
 # have a proper output file name
