@@ -1,6 +1,6 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-from PhysicsTools.PatAlgos.tools.myTools import pickRelValInputFiles
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source.fileNames    = pickRelValInputFiles()
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo.root'%( os.getenv( "CMSSW_BASE" ) )
