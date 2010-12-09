@@ -3,10 +3,10 @@
 ## ---
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 ## ... and modify it according to the needs
-from PhysicsTools.PatExamples.samplesCERN_cff import zjetsRECO
+from PhysicsTools.PatExamples.samplesFNAL_cff import zjetsRECO
 process.source.fileNames    = zjetsRECO
 process.maxEvents.input     = -1 # reduce number of events for testing.
-process.out.fileName        = 'patTuple_zjets_trigger.root'
+process.out.fileName        = '/uscms_data/d3/vadler/PATTutorial/Nov10/patTuple_zjets_trigger.root'
 process.out.outputCommands += [
   "keep *_globalMuons_*_*"
 , "keep *_generalTracks_*_*"

@@ -46,5 +46,5 @@ process.patTrigger.l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'     
 process.patTrigger.l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'        , 'RECO' )
 # save references to original L1 objects (no tool yet)
 process.patTrigger.saveL1Refs = cms.bool( True ) # default: 'False'
-# update event content to save
-switchOnTrigger( process, sequence = 'p' )       # called once more to update the event content according to the changed parameters!!!
+from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerL1RefsEventContent
+process.out.outputCommands += patTriggerL1RefsEventContent
