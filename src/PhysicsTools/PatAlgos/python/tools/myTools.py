@@ -95,7 +95,7 @@ class PickRelValInputFiles( ConfigToolBase ):
         filePaths    = []
         validVersion = 0
 
-        for version in range( 1, maxVersions + 1 ):
+        for version in range( maxVersions, 0, -1 ):
             filePaths = []
             fileCount = 0
             if debug:
