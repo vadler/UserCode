@@ -17,11 +17,11 @@ class PickRelValInputFiles( ConfigToolBase ):
 
     def __init__( self ):
         ConfigToolBase.__init__( self )
-        self.addParameter( self._defaultParameters, 'condition'    , 'startup'                                                           , '' )
-        self.addParameter( self._defaultParameters, 'globalTag'    , autoCond[ self.getDefaultParameters()[ 'condition' ].value ][ : -5 ], 'auto' )
-        self.addParameter( self._defaultParameters, 'cmsswVersion' , os.getenv( "CMSSW_VERSION" )                                        , 'auto' )
+        self.addParameter( self._defaultParameters, 'cmsswVersion' , os.getenv( "CMSSW_VERSION" )                                        , 'auto from environment' )
         self.addParameter( self._defaultParameters, 'relVal'       , 'RelValTTbar'                                                       , '' )
         self.addParameter( self._defaultParameters, 'dataTier'     , 'GEN-SIM-RECO'                                                      , '' )
+        self.addParameter( self._defaultParameters, 'condition'    , 'startup'                                                           , '' )
+        self.addParameter( self._defaultParameters, 'globalTag'    , autoCond[ self.getDefaultParameters()[ 'condition' ].value ][ : -5 ], 'auto from \'condition\'' )
         self.addParameter( self._defaultParameters, 'maxVersions'  , 9                                                                   , '' )
         self.addParameter( self._defaultParameters, 'skipFiles'    , 0                                                                   , '' )
         self.addParameter( self._defaultParameters, 'numberOfFiles', 1                                                                   , '' )
@@ -30,26 +30,26 @@ class PickRelValInputFiles( ConfigToolBase ):
         self._comment = ""
 
     def __call__( self
-                , condition     = None
-                , globalTag     = None
                 , cmsswVersion  = None
                 , relVal        = None
                 , dataTier      = None
+                , condition     = None
+                , globalTag     = None
                 , maxVersions   = None
                 , skipFiles     = None
                 , numberOfFiles = None
                 , debug         = None
                 ):
-        if condition is None:
-            condition = self.getDefaultParameters()[ 'condition' ].value
-        if globalTag is None:
-            globalTag = self.getDefaultParameters()[ 'globalTag' ].value
         if cmsswVersion is None:
             cmsswVersion = self.getDefaultParameters()[ 'cmsswVersion' ].value
         if relVal is None:
             relVal = self.getDefaultParameters()[ 'relVal' ].value
         if dataTier is None:
             dataTier = self.getDefaultParameters()[ 'dataTier' ].value
+        if condition is None:
+            condition = self.getDefaultParameters()[ 'condition' ].value
+        if globalTag is None:
+            globalTag = autoCond[ condition ][ : -5 ] # auto from 'condition'
         if maxVersions is None:
             maxVersions = self.getDefaultParameters()[ 'maxVersions' ].value
         if skipFiles is None:
@@ -58,11 +58,11 @@ class PickRelValInputFiles( ConfigToolBase ):
             numberOfFiles = self.getDefaultParameters()[ 'numberOfFiles' ].value
         if debug is None:
             debug = self.getDefaultParameters()[ 'debug' ].value
-        self.setParameter( 'condition'    , condition )
-        self.setParameter( 'globalTag'    , globalTag )
         self.setParameter( 'cmsswVersion' , cmsswVersion )
         self.setParameter( 'relVal'       , relVal )
         self.setParameter( 'dataTier'     , dataTier )
+        self.setParameter( 'condition'    , condition )
+        self.setParameter( 'globalTag'    , globalTag )
         self.setParameter( 'maxVersions'  , maxVersions )
         self.setParameter( 'skipFiles'    , skipFiles )
         self.setParameter( 'numberOfFiles', numberOfFiles )
@@ -70,11 +70,11 @@ class PickRelValInputFiles( ConfigToolBase ):
         return self.apply()
 
     def apply( self ):
-        condition     = self._parameters[ 'condition'     ].value
-        globalTag     = self._parameters[ 'globalTag'     ].value
         cmsswVersion  = self._parameters[ 'cmsswVersion'  ].value
         relVal        = self._parameters[ 'relVal'        ].value
         dataTier      = self._parameters[ 'dataTier'      ].value
+        condition     = self._parameters[ 'condition'     ].value # only used for GT determination in initialization, if GT not explicitly given
+        globalTag     = self._parameters[ 'globalTag'     ].value
         maxVersions   = self._parameters[ 'maxVersions'   ].value
         skipFiles     = self._parameters[ 'skipFiles'     ].value
         numberOfFiles = self._parameters[ 'numberOfFiles' ].value
