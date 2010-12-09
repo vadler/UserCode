@@ -12,7 +12,16 @@ process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
 from PhysicsTools.PatAlgos.tools.myTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    pickRelValInputFiles( condition = condition, debug = True )
+    pickRelValInputFiles( cmsswVersion  = None
+                        , relVal        = None
+                        , dataTier      = None
+                        , condition     = None
+                        , globalTag     = None
+                        , maxVersions   = None
+                        , skipFiles     = None
+                        , numberOfFiles = None
+                        , debug         = True
+                        )
   )
 )
 process.maxEvents = cms.untracked.PSet(

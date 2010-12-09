@@ -6,7 +6,29 @@ from FWCore.GuiBrowsers.ConfigToolBase import *
 from Configuration.PyReleaseValidation.autoCond import autoCond
 
 class PickRelValInputFiles( ConfigToolBase ):
-    """
+    """  Picks up RelVal input files automatically and
+  returns a vector of strings with the paths to be used in [PoolSource].fileNames
+    PickRelValInputFiles( cmsswVersion, relVal, dataTier, condition, globalTag, maxVersions, skipFiles, numberOfFiles, debug )
+    - cmsswVersion : CMSSW release to pick up the RelVal files from
+                     optional; default: the current release (determined automatically from environment)
+    . relVal       : RelVal sample to be used
+                     optional; default: 'RelValTTbar'
+    - dataTier     : data tier to be used
+                     optional; default: 'GEN-SIM-RECO'
+    - condition    : identifier of GlobalTag as defined in Configurations/PyReleaseValidation/python/autoCond.py
+                     possibly overwritten by 'globalTag'
+                     optional; default: 'startup'
+    - globalTag    : name of GlobalTag to be used
+                     optional; default: determined automatically as defined by 'condition' in Configurations/PyReleaseValidation/python/autoCond.py
+    - maxVersions  : max. versioning number of RelVal to check
+                     optional; default: 9
+    - skipFiles    : number of files to skip for a found RelVal sample
+                     optional; default: 0
+    - numberOfFiles: number of files to pick up
+                     setting it to 0, returns all found ('skipFiles' remains active though)
+                     optional; default: 1
+    - debug        : switch to enable enhanced messages in 'stdout'
+                     optional; default: False
     """
 
     _label             = 'pickRelValInputFiles'
@@ -112,13 +134,16 @@ class PickRelValInputFiles( ConfigToolBase ):
                     if fileCount > skipFiles:
                         filePath = '%s%i/%s/%s'%( rfdirPath, version, directory, file )
                         filePaths.append( filePath )
-                    if len( filePaths ) >= numberOfFiles:
+                    if numberOfFiles != 0 and len( filePaths ) >= numberOfFiles:
                         break
                 if debug:
                     print 'DEBUG %s: %i file(s) found'%( self._label, fileCount )
-                if len( filePaths ) >= numberOfFiles:
+                if numberOfFiles != 0 and len( filePaths ) >= numberOfFiles:
                     break
-            if len( filePaths ) >= numberOfFiles:
+            if numberOfFiles != 0:
+              if len( filePaths ) >= numberOfFiles:
+                break
+            elif validVersion > 0:
               break
 
         if validVersion == 0:
@@ -132,7 +157,7 @@ class PickRelValInputFiles( ConfigToolBase ):
             print '    Only %i RelVal files picked up in \'%s%i\''%( len( filePaths ), argument, validVersion )
 
         if debug:
-            print 'DEBUG %s: returning file(s) \'%s\''%( self._label, filePaths )
+            print 'DEBUG %s: returning %i file(s)\n%s'%( self._label, len( filePaths ), filePaths )
         return filePaths
 
 pickRelValInputFiles = PickRelValInputFiles()
