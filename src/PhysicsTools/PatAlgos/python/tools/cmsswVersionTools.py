@@ -892,3 +892,4 @@ class PickRelValInputFiles( ConfigToolBase ):
         return filePaths
 
 pickRelValInputFiles = PickRelValInputFiles()
+
