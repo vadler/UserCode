@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.44 2010/10/14 13:56:38 beaudett Exp $
+// $Id: PATElectronProducer.cc,v 1.45 2010/12/13 14:10:19 salerno Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
@@ -647,6 +647,7 @@ void PATElectronProducer::fillDescriptions(edm::ConfigurationDescriptions & desc
   isolationValuesPSet.addOptional<edm::InputTag>("pfChargedHadrons");
   isolationValuesPSet.addOptional<edm::InputTag>("pfNeutralHadrons");
   isolationValuesPSet.addOptional<edm::InputTag>("pfPhotons");
+  isolationValuesPSet.addOptional<std::vector<edm::InputTag> >("user");  
   iDesc.addOptional("isolationValues", isolationValuesPSet);
 
   // Efficiency configurables
