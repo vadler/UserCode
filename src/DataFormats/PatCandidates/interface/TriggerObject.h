@@ -91,8 +91,8 @@ namespace pat {
       /// Get all trigger object type identifiers
       std::vector< trigger::TriggerObjectType > filterIds() const { return filterIds_; };
       /// Checks, if a certain label of original collection is assigned
-      bool hasCollection( const std::string & coll ) const;
-      bool hasCollection( const edm::InputTag & coll ) const { return hasCollection( coll.encode() ); };
+      virtual bool hasCollection( const std::string & coll ) const;
+      virtual bool hasCollection( const edm::InputTag & coll ) const { return hasCollection( coll.encode() ); };
       /// Checks, if a certain trigger object type identifier is assigned
       bool hasFilterId( trigger::TriggerObjectType filterId ) const;
       bool hasFilterId( int filterId ) const { return hasFilterId( trigger::TriggerObjectType( filterId ) ); };
@@ -124,7 +124,7 @@ namespace pat {
       /// - short names for readable configuration files
 
       /// Calls 'hasCollection(...)'
-      bool coll( const std::string & coll ) const { return hasCollection( coll );};
+      virtual bool coll( const std::string & coll ) const { return hasCollection( coll );};
       /// Call 'hasFilterId(...)'
       bool id( trigger::TriggerObjectType filterId ) const { return hasFilterId( filterId ); };
       bool id( int filterId ) const                        { return hasFilterId( trigger::TriggerObjectType ( filterId ) ); };
