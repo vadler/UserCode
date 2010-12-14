@@ -3,7 +3,7 @@ Base Release in: /afs/cern.ch/cms/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_10_0_pre9
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_10_0_pre9
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 CondFormats/JetMETObjects                        V03-01-14      V03-01-01-02   
-DataFormats/PatCandidates                        V06-02-13      V06-02-02-01   
+DataFormats/PatCandidates                        V06-02-14      V06-02-02-01   
 JetMETCorrections/Algorithms                     V02-01-02      V02-01-00-01   
 JetMETCorrections/Modules                        V05-00-14      V04-00-04      
 PhysicsTools/IsolationAlgos                      V01-05-07      V01-05-07      
