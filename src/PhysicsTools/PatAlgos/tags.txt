@@ -3,8 +3,9 @@ Base Release in: /afs/cern.ch/cms/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_8_7
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_8_7
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        V06-01-09      V06-01-08      
-PhysicsTools/PatAlgos                            V08-00-54      V08-00-51      
+FWCore/PythonUtilities                           V01-01-01      V01-00-02      
+PhysicsTools/PatAlgos                            V08-00-55      V08-00-51      
 PhysicsTools/PatExamples                         V00-04-26      V00-04-25      
 PhysicsTools/PatUtils                            V03-09-16      V03-09-14      
 ---------------------------------------
-total packages: 4 (4 displayed)
+total packages: 5 (5 displayed)
