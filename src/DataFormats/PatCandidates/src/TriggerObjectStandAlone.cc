@@ -11,15 +11,16 @@
 using namespace pat;
 
 
-/// Const data members' definitions
+// Const data members' definitions
 
 
 const char TriggerObjectStandAlone::wildcard_;
 
 
-/// Private methods
+// Private methods
 
 
+// Checks a string vector for occurence of a certain string, incl. wild-card mechanism
 bool TriggerObjectStandAlone::hasAnyName( const std::string & name, const std::vector< std::string > & nameVec ) const
 {
   // Split name to evaluate in parts, seperated by wild-cards
@@ -60,65 +61,82 @@ bool TriggerObjectStandAlone::hasAnyName( const std::string & name, const std::v
 }
 
 
-/// Methods
+// Methods
 
 
+// Adds a new path name
 void TriggerObjectStandAlone::addPathName( const std::string & pathName, bool pathLastFilterAccepted )
 {
+  // Check, if path is already assigned
   if ( ! hasPathName( pathName, false ) ) {
+    // The path itself
     pathNames_.push_back( pathName );
+    // The corresponding usage of the trigger objects
     pathLastFilterAccepted_.push_back( pathLastFilterAccepted );
   }
 }
 
 
+// Gets all path names
 std::vector< std::string > TriggerObjectStandAlone::pathNames( bool pathLastFilterAccepted ) const
 {
+  // All path names, if usage not restricted (not required or not available)
   if ( ! pathLastFilterAccepted || ! hasPathLastFilterAccepted() ) return pathNames_;
+  // Temp vector of path names
   std::vector< std::string > paths;
+  // Loop over usage vector and fill corresponding paths into temp vector
   for ( unsigned iPath = 0; iPath < pathNames_.size(); ++iPath ) {
     if ( pathLastFilterAccepted_.at( iPath ) ) paths.push_back( pathNames_.at( iPath ) );
   }
+  // Return temp vector
   return paths;
 }
 
 
+// Gets the pat::TriggerObject (parent class)
 TriggerObject TriggerObjectStandAlone::triggerObject()
 {
+  // Create a TriggerObjects
   TriggerObject theObj( p4(), pdgId() );
+  // Set its collection and trigger objects types (no c'tor for that)
   theObj.setCollection( collection() );
   for ( size_t i = 0; i < filterIds().size(); ++i ) theObj.addFilterId( filterIds().at( i ) );
+  // Return TriggerObject
   return theObj;
 }
 
 
+// Checks, if a certain filter label is assigned
 bool TriggerObjectStandAlone::hasFilterLabel( const std::string & filterLabel ) const
 {
+  // Move to wild-card parser, if needed
   if ( filterLabel.find( wildcard_ ) != std::string::npos ) return hasAnyName( filterLabel, filterLabels_ );
-  return ( std::find( filterLabels_.begin(), filterLabels_.end(), filterLabel ) != filterLabels_.end());
+  // Return, if filter label is assigned
+  return ( std::find( filterLabels_.begin(), filterLabels_.end(), filterLabel ) != filterLabels_.end() );
 }
 
 
+// Checks, if a certain path name is assigned
 bool TriggerObjectStandAlone::hasPathName( const std::string & pathName, bool pathLastFilterAccepted ) const
 {
+  // Move to wild-card parser, if needed
   if ( pathName.find( wildcard_ ) != std::string::npos ) return hasAnyName( pathName, pathNames( pathLastFilterAccepted ) );
+  // Deal with older PAT-tuples, where trigger object usage is not available
   if ( ! hasPathLastFilterAccepted() ) pathLastFilterAccepted = false;
+  // Check, if path name is assigned at all
   std::vector< std::string >::const_iterator match( std::find( pathNames_.begin(), pathNames_.end(), pathName ) );
+  // False, if path name not assigned
   if ( match == pathNames_.end() ) return false;
+  // Return for assigned path name, if trigger object usage meets requirement
   return ( pathLastFilterAccepted ? pathLastFilterAccepted_.at( match - pathNames_.begin() ) : true );
 }
 
 
+// Checks, if a certain label of original collection is assigned (method overrides)
 bool TriggerObjectStandAlone::hasCollection( const std::string & coll ) const
 {
+  // Move to wild-card parser, if needed
   if ( coll.find( wildcard_ ) != std::string::npos ) return false; // FIXME: dummy
-  if ( collection() == coll ) return true;
-  const edm::InputTag collectionTag( collection() );
-  const edm::InputTag collTag( coll );
-  if ( collTag.process().empty() ) {
-    if ( ( collTag.instance().empty() && collectionTag.instance().empty() ) || collTag.instance() == collectionTag.instance() ) {
-      if ( collTag.label() == collectionTag.label() ) return true;
-    }
-  }
-  return false;
+  // Use parent class's method other wise
+  return TriggerObject::hasCollection( coll );
 }

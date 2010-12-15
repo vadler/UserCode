@@ -26,8 +26,6 @@
 
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
 
-#include <algorithm>
-
 
 namespace pat {
 
