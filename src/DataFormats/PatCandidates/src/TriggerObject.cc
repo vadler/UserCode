@@ -67,16 +67,16 @@ TriggerObject::TriggerObject( const reco::Particle::PolarLorentzVector & vec, in
 bool TriggerObject::hasCollection( const std::string & coll ) const
 {
   // True, if collection name is simply fine
-  if ( collection() == coll ) return true;
+  if ( coll == collection_ ) return true;
   // Check, if collection name possibly fits in an edm::InputTag approach
-  const edm::InputTag collectionTag( collection() );
+  const edm::InputTag collectionTag( collection_ );
   const edm::InputTag collTag( coll );
   // If evaluated collection tag contains a process name, it must have been found already by identity check
   if ( collTag.process().empty() ) {
     // Check instance ...
     if ( ( collTag.instance().empty() && collectionTag.instance().empty() ) || collTag.instance() == collectionTag.instance() ) {
       // ... and label
-      if ( collTag.label() == collectionTag.label() ) return true;
+      return ( collTag.label() == collectionTag.label() );
     }
   }
   return false;
