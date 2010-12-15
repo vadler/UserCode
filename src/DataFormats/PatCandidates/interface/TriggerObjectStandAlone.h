@@ -105,17 +105,17 @@ namespace pat {
 
 
   /// Collection of TriggerObjectStandAlone
-  typedef std::vector< TriggerObjectStandAlone >                       TriggerObjectStandAloneCollection;
+  typedef std::vector< TriggerObjectStandAlone >                      TriggerObjectStandAloneCollection;
   /// Persistent reference to an item in a TriggerObjectStandAloneCollection
-  typedef edm::Ref< TriggerObjectStandAloneCollection >                TriggerObjectStandAloneRef;
+  typedef edm::Ref< TriggerObjectStandAloneCollection >               TriggerObjectStandAloneRef;
   /// Persistent reference to a TriggerObjectStandAloneCollection product
-  typedef edm::RefProd< TriggerObjectStandAloneCollection >            TriggerObjectStandAloneRefProd;
+  typedef edm::RefProd< TriggerObjectStandAloneCollection >           TriggerObjectStandAloneRefProd;
   /// Vector of persistent references to items in the same TriggerObjectStandAloneCollection
-  typedef edm::RefVector< TriggerObjectStandAloneCollection >          TriggerObjectStandAloneRefVector;
+  typedef edm::RefVector< TriggerObjectStandAloneCollection >         TriggerObjectStandAloneRefVector;
   /// Const iterator over vector of persistent references to items in the same TriggerObjectStandAloneCollection
-  typedef edm::RefVectorIterator< TriggerObjectStandAloneCollection >  TriggerObjectStandAloneRefVectorIterator;
+  typedef edm::RefVectorIterator< TriggerObjectStandAloneCollection > TriggerObjectStandAloneRefVectorIterator;
   /// Association of TriggerObjectStandAlones to store matches to Candidates
-  typedef edm::Association< TriggerObjectStandAloneCollection >        TriggerObjectStandAloneMatch;
+  typedef edm::Association< TriggerObjectStandAloneCollection >       TriggerObjectStandAloneMatch;
 
 }
 

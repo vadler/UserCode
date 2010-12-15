@@ -104,7 +104,7 @@ TriggerObject TriggerObjectStandAlone::triggerObject()
   TriggerObject theObj( p4(), pdgId() );
   // Set its collection and trigger objects types (no c'tor for that)
   theObj.setCollection( collection() );
-  for ( size_t i = 0; i < filterIds().size(); ++i ) theObj.addFilterId( filterIds().at( i ) );
+  for ( size_t i = 0; i < triggerObjectTypes().size(); ++i ) theObj.addTriggerObjectType( triggerObjectTypes().at( i ) );
   // Return TriggerObject
   return theObj;
 }

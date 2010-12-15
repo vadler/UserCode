@@ -55,7 +55,7 @@ namespace pat {
       /// Vector of special identifiers for the trigger object type as defined in
       /// trigger::TriggerObjectType (DataFormats/HLTReco/interface/TriggerTypeDefs.h),
       /// possibly empty
-      std::vector< trigger::TriggerObjectType > filterIds_;
+      std::vector< trigger::TriggerObjectType > triggerObjectTypes_;
       /// Reference to trigger object,
       /// meant for 'l1extra' particles to access their additional functionalities,
       /// empty otherwise
@@ -85,18 +85,25 @@ namespace pat {
       void setCollection( const std::string & coll )   { collection_ = coll; };
       void setCollection( const edm::InputTag & coll ) { collection_ = coll.encode(); };
       /// Add a new trigger object type identifier
-      void addFilterId( trigger::TriggerObjectType filterId ) { filterIds_.push_back( filterId ); };
-      void addFilterId( int filterId )                        { addFilterId( trigger::TriggerObjectType( filterId ) ); };
+      void addTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) { if ( ! hasTriggerObjectType( triggerObjectType ) ) triggerObjectTypes_.push_back( triggerObjectType ); };
+      void addTriggerObjectType( int triggerObjectType )                        { addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
+      void addFilterId( trigger::TriggerObjectType triggerObjectType ) { addTriggerObjectType( triggerObjectType ); };                               // for backward compatibility
+      void addFilterId( int triggerObjectType )                        { addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); }; // for backward compatibility
       /// Get the label of the collection the trigger object originates from
       std::string collection() const { return collection_; };
       /// Get all trigger object type identifiers
-      std::vector< trigger::TriggerObjectType > filterIds() const { return filterIds_; };
+//       std::vector< trigger::TriggerObjectType > triggerObjectTypes() const { return triggerObjectTypes_; };
+//       std::vector< trigger::TriggerObjectType > filterIds()          const { return triggerObjectTypes(); }; // for backward compatibility
+      std::vector< int > triggerObjectTypes() const;                                  // for backward compatibility
+      std::vector< int > filterIds()          const { return triggerObjectTypes(); }; // for double backward compatibility
       /// Checks, if a certain label of original collection is assigned
       virtual bool hasCollection( const std::string & coll ) const;
       virtual bool hasCollection( const edm::InputTag & coll ) const { return hasCollection( coll.encode() ); };
       /// Checks, if a certain trigger object type identifier is assigned
-      bool hasFilterId( trigger::TriggerObjectType filterId ) const;
-      bool hasFilterId( int filterId ) const { return hasFilterId( trigger::TriggerObjectType( filterId ) ); };
+      bool hasTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) const;
+      bool hasTriggerObjectType( int triggerObjectType )                        const { return hasTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
+      bool hasFilterId( trigger::TriggerObjectType triggerObjectType ) const { return hasTriggerObjectType( triggerObjectType ); };                               // for backward compatibility
+      bool hasFilterId( int triggerObjectType )                        const { return hasTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); }; // for backward compatibility
 
       /// Special methods for 'l1extra' particles
 
@@ -127,8 +134,10 @@ namespace pat {
       /// Calls 'hasCollection(...)'
       virtual bool coll( const std::string & coll ) const { return hasCollection( coll );};
       /// Call 'hasFilterId(...)'
-      bool id( trigger::TriggerObjectType filterId ) const { return hasFilterId( filterId ); };
-      bool id( int filterId ) const                        { return hasFilterId( trigger::TriggerObjectType ( filterId ) ); };
+      bool type( trigger::TriggerObjectType triggerObjectType ) const { return hasTriggerObjectType( triggerObjectType ); };
+      bool type( int triggerObjectType ) const                        { return hasTriggerObjectType( trigger::TriggerObjectType ( triggerObjectType ) ); };
+      bool id( trigger::TriggerObjectType triggerObjectType ) const { return hasTriggerObjectType( triggerObjectType ); };                                // for backward compatibility
+      bool id( int triggerObjectType ) const                        { return hasTriggerObjectType( trigger::TriggerObjectType ( triggerObjectType ) ); }; // for backward compatibility
 
   };
 

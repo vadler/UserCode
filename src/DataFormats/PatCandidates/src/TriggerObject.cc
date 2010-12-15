@@ -17,7 +17,7 @@ using namespace pat;
 TriggerObject::TriggerObject() :
   reco::LeafCandidate()
 {
-  filterIds_.clear();
+  triggerObjectTypes_.clear();
 }
 
 
@@ -26,7 +26,7 @@ TriggerObject::TriggerObject( const trigger::TriggerObject & trigObj ) :
   reco::LeafCandidate( 0, trigObj.particle().p4(), reco::Particle::Point( 0., 0., 0. ), trigObj.id() ),
   refToOrig_()
 {
-  filterIds_.clear();
+  triggerObjectTypes_.clear();
 }
 
 
@@ -35,13 +35,13 @@ TriggerObject::TriggerObject( const reco::LeafCandidate & leafCand ) :
   reco::LeafCandidate( leafCand ),
   refToOrig_()
 {
-  filterIds_.clear();
+  triggerObjectTypes_.clear();
 }
 TriggerObject::TriggerObject( const reco::CandidateBaseRef & candRef ) :
   reco::LeafCandidate( *candRef ),
   refToOrig_( candRef )
 {
-  filterIds_.clear();
+  triggerObjectTypes_.clear();
 }
 
 
@@ -50,17 +50,28 @@ TriggerObject::TriggerObject( const reco::Particle::LorentzVector & vec, int id 
   reco::LeafCandidate( 0, vec, reco::Particle::Point( 0., 0., 0. ), id ),
   refToOrig_()
 {
-  filterIds_.clear();
+  triggerObjectTypes_.clear();
 }
 TriggerObject::TriggerObject( const reco::Particle::PolarLorentzVector & vec, int id ) :
   reco::LeafCandidate( 0, vec, reco::Particle::Point( 0., 0., 0. ), id ),
   refToOrig_()
 {
-  filterIds_.clear();
+  triggerObjectTypes_.clear();
 }
 
 
 // Methods
+
+
+// Get all trigger object type identifiers
+std::vector< int > TriggerObject::triggerObjectTypes() const
+{
+  std::vector< int > triggerObjectTypes;
+  for ( size_t iTo = 0; iTo < triggerObjectTypes_.size(); ++iTo ) {
+    triggerObjectTypes.push_back( triggerObjectTypes_.at( iTo ) );
+  }
+  return triggerObjectTypes;
+}
 
 
 // Checks, if a certain label of original collection is assigned
@@ -84,12 +95,10 @@ bool TriggerObject::hasCollection( const std::string & coll ) const
 
 
 // Checks, if a certain trigger object type identifier is assigned
-bool TriggerObject::hasFilterId( trigger::TriggerObjectType filterId ) const
+bool TriggerObject::hasTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) const
 {
-  for ( size_t iF = 0; iF < filterIds().size(); ++iF ) {
-    if ( filterIds().at( iF ) == filterId ) {
-      return true;
-    }
+  for ( size_t iF = 0; iF < triggerObjectTypes_.size(); ++iF ) {
+    if ( triggerObjectType == triggerObjectTypes_.at( iF ) ) return true;
   }
   return false;
 }
