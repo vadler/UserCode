@@ -3,18 +3,19 @@ Base Release in: /afs/cern.ch/cms/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_9_5
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 CondFormats/JetMETObjects                        V03-01-14      V03-01-01      
-DataFormats/PatCandidates                        V06-02-08      V06-02-02      
+DataFormats/HLTReco                              V02-05-02      V02-04-14      
+DataFormats/PatCandidates                        V06-02-09      V06-02-02      
 JetMETCorrections/Algorithms                     V02-01-02      V02-01-00      
 JetMETCorrections/Modules                        V05-00-14      V04-00-03      
 PhysicsTools/IsolationAlgos                      V01-05-07      V01-05-06      
 PhysicsTools/JetMCAlgos                          V00-13-10      V00-13-09      
 PhysicsTools/PFCandProducer                      V04-07-00      V04-06-03      
-PhysicsTools/PatAlgos                            V08-03-01      V08-01-03      
-PhysicsTools/PatExamples                         V00-05-00      V00-04-10-01   
+PhysicsTools/PatAlgos                            V08-03-02      V08-01-03      
+PhysicsTools/PatExamples                         V00-05-01      V00-04-10-01   
 PhysicsTools/PatUtils                            V03-09-16      V03-09-14      
 PhysicsTools/PythonAnalysis                      V00-05-01      V00-04-00      
 PhysicsTools/SelectorUtils                       V00-03-03      V00-02-20      
 PhysicsTools/UtilAlgos                           V08-02-04      V08-01-03      
 PhysicsTools/Utilities                           V08-01-02      V08-01-00      
 ---------------------------------------
-total packages: 14 (14 displayed)
+total packages: 15 (15 displayed)
