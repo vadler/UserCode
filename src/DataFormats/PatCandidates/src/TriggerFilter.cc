@@ -11,6 +11,7 @@ using namespace pat;
 
 // Constructors and Destructor
 
+
 // Default constructor
 TriggerFilter::TriggerFilter() :
   label_(),

@@ -36,7 +36,7 @@ namespace pat {
 
   class TriggerFilter {
 
-      /// Data members
+      /// Data Members
 
       /// Label of the filter
       std::string label_;

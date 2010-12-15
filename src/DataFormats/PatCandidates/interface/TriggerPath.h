@@ -40,7 +40,7 @@ namespace pat {
 
   class TriggerPath {
 
-      /// Data members
+      /// Data Members
 
       /// Path name
       std::string name_;
@@ -72,7 +72,7 @@ namespace pat {
 
     public:
 
-      /// Constructors and desctructor
+      /// Constructors and Desctructor
 
       /// Default constructor
       TriggerPath();

@@ -70,10 +70,10 @@ namespace pat {
       /// Constructor from trigger::TriggerObject
       TriggerObject( const trigger::TriggerObject & trigObj );
       /// Constructors from reco::Candidate
-      TriggerObject( const reco::LeafCandidate & leafCand );
+      TriggerObject( const reco::LeafCandidate    & leafCand );
       TriggerObject( const reco::CandidateBaseRef & candRef );
       /// Constructors from Lorentz-vectors and (optional) PDG ID
-      TriggerObject( const reco::Particle::LorentzVector & vec, int id = 0 );
+      TriggerObject( const reco::Particle::LorentzVector      & vec, int id = 0 );
       TriggerObject( const reco::Particle::PolarLorentzVector & vec, int id = 0 );
 
       /// Destructor
@@ -86,9 +86,9 @@ namespace pat {
       void setCollection( const edm::InputTag & coll ) { collection_ = coll.encode(); };
       /// Add a new trigger object type identifier
       void addTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) { if ( ! hasTriggerObjectType( triggerObjectType ) ) triggerObjectTypes_.push_back( triggerObjectType ); };
-      void addTriggerObjectType( int triggerObjectType )                        { addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
+      void addTriggerObjectType( int                        triggerObjectType ) { addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
       void addFilterId( trigger::TriggerObjectType triggerObjectType ) { addTriggerObjectType( triggerObjectType ); };                               // for backward compatibility
-      void addFilterId( int triggerObjectType )                        { addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); }; // for backward compatibility
+      void addFilterId( int                        triggerObjectType ) { addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); }; // for backward compatibility
       /// Get the label of the collection the trigger object originates from
       std::string collection() const { return collection_; };
       /// Get all trigger object type identifiers
@@ -101,9 +101,9 @@ namespace pat {
       virtual bool hasCollection( const edm::InputTag & coll ) const { return hasCollection( coll.encode() ); };
       /// Checks, if a certain trigger object type identifier is assigned
       bool hasTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) const;
-      bool hasTriggerObjectType( int triggerObjectType )                        const { return hasTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
+      bool hasTriggerObjectType( int                        triggerObjectType ) const { return hasTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
       bool hasFilterId( trigger::TriggerObjectType triggerObjectType ) const { return hasTriggerObjectType( triggerObjectType ); };                               // for backward compatibility
-      bool hasFilterId( int triggerObjectType )                        const { return hasTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); }; // for backward compatibility
+      bool hasFilterId( int                        triggerObjectType ) const { return hasTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); }; // for backward compatibility
 
       /// Special methods for 'l1extra' particles
 
@@ -135,30 +135,30 @@ namespace pat {
       virtual bool coll( const std::string & coll ) const { return hasCollection( coll );};
       /// Call 'hasFilterId(...)'
       bool type( trigger::TriggerObjectType triggerObjectType ) const { return hasTriggerObjectType( triggerObjectType ); };
-      bool type( int triggerObjectType ) const                        { return hasTriggerObjectType( trigger::TriggerObjectType ( triggerObjectType ) ); };
+      bool type( int                        triggerObjectType ) const { return hasTriggerObjectType( trigger::TriggerObjectType ( triggerObjectType ) ); };
       bool id( trigger::TriggerObjectType triggerObjectType ) const { return hasTriggerObjectType( triggerObjectType ); };                                // for backward compatibility
-      bool id( int triggerObjectType ) const                        { return hasTriggerObjectType( trigger::TriggerObjectType ( triggerObjectType ) ); }; // for backward compatibility
+      bool id( int                        triggerObjectType ) const { return hasTriggerObjectType( trigger::TriggerObjectType ( triggerObjectType ) ); }; // for backward compatibility
 
   };
 
 
-  /// collection of TriggerObject
+  /// Collection of TriggerObject
   typedef std::vector< TriggerObject >                       TriggerObjectCollection;
-  /// persistent reference to an item in a TriggerObjectCollection
+  /// Persistent reference to an item in a TriggerObjectCollection
   typedef edm::Ref< TriggerObjectCollection >                TriggerObjectRef;
-  /// container to store match references from different producers (for one PAT object)
+  /// Container to store match references from different producers (for one PAT object)
   typedef std::map< std::string, TriggerObjectRef >          TriggerObjectMatchMap;
-  /// persistent reference to a TriggerObjectCollection product
+  /// Persistent reference to a TriggerObjectCollection product
   typedef edm::RefProd< TriggerObjectCollection >            TriggerObjectRefProd;
-  /// vector of persistent references to items in the same TriggerObjectCollection
+  /// Vector of persistent references to items in the same TriggerObjectCollection
   typedef edm::RefVector< TriggerObjectCollection >          TriggerObjectRefVector;
-  /// const iterator over vector of persistent references to items in the same TriggerObjectCollection
+  /// Const iterator over vector of persistent references to items in the same TriggerObjectCollection
   typedef edm::RefVectorIterator< TriggerObjectCollection >  TriggerObjectRefVectorIterator;
-  /// association of TriggerObjects to store matches to Candidates
+  /// Association of TriggerObjects to store matches to Candidates
   typedef edm::Association< TriggerObjectCollection >        TriggerObjectMatch;
-  /// persistent reference to a TriggerObjectMatch product
+  /// Persistent reference to a TriggerObjectMatch product
   typedef edm::RefProd< TriggerObjectMatch >                 TriggerObjectMatchRefProd;
-  /// container to store references to matches from different producers in the trigger event
+  /// Container to store references to matches from different producers in the trigger event
   typedef std::map< std::string, TriggerObjectMatchRefProd > TriggerObjectMatchContainer;
 
 }
