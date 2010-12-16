@@ -1,5 +1,5 @@
 //
-// $Id: TriggerObjectStandAlone.cc,v 1.6 2010/12/14 19:31:36 vadler Exp $
+// $Id: TriggerObjectStandAlone.cc,v 1.15 2010/12/15 19:44:28 vadler Exp $
 //
 
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
@@ -137,15 +137,15 @@ bool TriggerObjectStandAlone::hasPathName( const std::string & pathName, bool pa
 
 
 // Checks, if a certain label of original collection is assigned (method overrides)
-bool TriggerObjectStandAlone::hasCollection( const std::string & coll ) const
+bool TriggerObjectStandAlone::hasCollection( const std::string & collName ) const
 {
-  // Move to wild-card parser, if needed
-  if ( coll.find( wildcard_ ) != std::string::npos ) {
+  // Move to wild-card parser, if needed only
+  if ( collName.find( wildcard_ ) != std::string::npos ) {
     // True, if collection name is simply fine
-    if ( hasAnyName( coll, std::vector< std::string >( 1, collection() ) ) ) return true;
+    if ( hasAnyName( collName, std::vector< std::string >( 1, collection() ) ) ) return true;
     // Check, if collection name possibly fits in an edm::InputTag approach
     const edm::InputTag collectionTag( collection() );
-    const edm::InputTag collTag( coll );
+    const edm::InputTag collTag( collName );
     // If evaluated collection tag contains a process name, it must have been found already by identity check
     if ( collTag.process().empty() ) {
       // Check instance ...
@@ -157,5 +157,5 @@ bool TriggerObjectStandAlone::hasCollection( const std::string & coll ) const
     return false;
   }
   // Use parent class's method other wise
-  return TriggerObject::hasCollection( coll );
+  return TriggerObject::hasCollection( collName );
 }

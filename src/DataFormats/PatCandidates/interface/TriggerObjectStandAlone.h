@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerObjectStandAlone
 //
-// $Id: TriggerObjectStandAlone.h,v 1.8 2010/12/14 19:31:36 vadler Exp $
+// $Id: TriggerObjectStandAlone.h,v 1.15 2010/12/15 19:44:27 vadler Exp $
 //
 /**
   \class    pat::TriggerObjectStandAlone TriggerObjectStandAlone.h "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
@@ -20,7 +20,7 @@
    https://twiki.cern.ch/twiki/bin/view/CMS/SWGuidePATTrigger#TriggerObjectStandAlone
 
   \author   Volker Adler
-  \version  $Id: TriggerObjectStandAlone.h,v 1.8 2010/12/14 19:31:36 vadler Exp $
+  \version  $Id: TriggerObjectStandAlone.h,v 1.15 2010/12/15 19:44:27 vadler Exp $
 */
 
 
@@ -85,8 +85,8 @@ namespace pat {
       /// Checks, if a certain path name is assigned
       bool hasPathName( const std::string & pathName, bool pathLastFilterAccepted = true ) const;
       /// Checks, if a certain label of original collection is assigned (method overrides)
-      virtual bool hasCollection( const std::string & coll ) const;
-      virtual bool hasCollection( const edm::InputTag & coll ) const { return hasCollection( coll.encode() ); };
+      virtual bool hasCollection( const std::string & collName ) const;
+      virtual bool hasCollection( const edm::InputTag & collName ) const { return hasCollection( collName.encode() ); };
       /// Checks, if the usage indicator vector has been filled
       bool hasPathLastFilterAccepted() const { return ( pathLastFilterAccepted_.size() > 0 && pathLastFilterAccepted_.size() == pathNames_.size() ); };
 
@@ -99,7 +99,7 @@ namespace pat {
       /// Calls 'hasPathName(...)'
       bool path( const std::string & pathName, unsigned pathLastFilterAccepted = true ) const { return hasPathName( pathName, pathLastFilterAccepted ); };
       /// Calls 'hasCollection(...)' (method override)
-      virtual bool coll( const std::string & coll ) const { return hasCollection( coll );};
+      virtual bool coll( const std::string & collName ) const { return hasCollection( collName );};
 
   };
 

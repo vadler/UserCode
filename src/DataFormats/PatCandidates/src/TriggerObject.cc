@@ -1,5 +1,5 @@
 //
-// $Id: TriggerObject.cc,v 1.10 2010/12/14 19:31:36 vadler Exp $
+// $Id: TriggerObject.cc,v 1.16 2010/12/15 19:44:28 vadler Exp $
 //
 
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
@@ -75,13 +75,13 @@ std::vector< int > TriggerObject::triggerObjectTypes() const
 
 
 // Checks, if a certain label of original collection is assigned
-bool TriggerObject::hasCollection( const std::string & coll ) const
+bool TriggerObject::hasCollection( const std::string & collName ) const
 {
   // True, if collection name is simply fine
-  if ( coll == collection_ ) return true;
+  if ( collName == collection_ ) return true;
   // Check, if collection name possibly fits in an edm::InputTag approach
   const edm::InputTag collectionTag( collection_ );
-  const edm::InputTag collTag( coll );
+  const edm::InputTag collTag( collName );
   // If evaluated collection tag contains a process name, it must have been found already by identity check
   if ( collTag.process().empty() ) {
     // Check instance ...
