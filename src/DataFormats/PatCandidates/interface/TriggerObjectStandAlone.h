@@ -87,6 +87,7 @@ namespace pat {
       /// Checks, if a certain label of original collection is assigned (method overrides)
 // FIXME: Currently needs to be redirected to coll(...) in order to avoid segmentation violations from the cut string parser
 //       virtual bool hasCollection( const std::string & collName ) const;
+//       virtual bool hasCollection( const edm::InputTag & collName ) const { return hasCollection( collName.encode() ); };
       virtual bool hasCollection( const std::string & collName ) const { return coll( collName ); };
       virtual bool hasCollection( const edm::InputTag & collName ) const { return coll( collName.encode() ); };
       /// Checks, if the usage indicator vector has been filled
@@ -101,8 +102,7 @@ namespace pat {
       /// Calls 'hasPathName(...)'
       bool path( const std::string & pathName, unsigned pathLastFilterAccepted = true ) const { return hasPathName( pathName, pathLastFilterAccepted ); };
       /// Calls 'hasCollection(...)' (method override)
-// FIXME: Currently implememnts the method rather than hasCollection(...) in order to avoid segmentation violations from the cut string parser
-// FIXME: Currently implememnts the method rather than hasCollection(...) in order to avoid segmentation violations from the cut string parser
+// FIXME: Currently implememnts the method coll(..) rather than hasCollection(...) in order to avoid segmentation violations from the cut string parser
 //       bool coll( const std::string & collName ) const { return hasCollection( collName ) };
       bool coll( const std::string & collName ) const;
 
