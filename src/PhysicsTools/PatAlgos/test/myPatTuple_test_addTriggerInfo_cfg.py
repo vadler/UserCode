@@ -4,11 +4,11 @@ cmsswBase = os.getenv( "CMSSW_BASE" )
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.source.fileNames    = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data/ZJetToMuMu_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6__Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1__GEN-SIM-RECO/FED5121F-B1E4-DF11-B53F-00261834B580.root' ]
 process.out.fileName        = '%s/output/myPatTuple_test_addTriggerInfo.root'%( cmsswBase )
-process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append( 'autoProcessName' )
-process.MessageLogger.cerr.INFO = cms.untracked.PSet(
-  limit = cms.untracked.int32( -1 )
-)
+# process.MessageLogger.cerr.threshold = 'INFO'
+# process.MessageLogger.categories.append( 'autoProcessName' )
+# process.MessageLogger.cerr.INFO = cms.untracked.PSet(
+#   limit = cms.untracked.int32( -1 )
+# )
 
 process.p = cms.Path(
   process.patDefaultSequence
@@ -40,7 +40,7 @@ process.electronTriggerTestMatchHLTElectrons = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "cleanPatElectrons" )
 , matched = cms.InputTag( "patTrigger" )
-, matchedCuts = cms.string( 'id( "TriggerElectron" )' )
+, matchedCuts = cms.string( 'type( "TriggerElectron" )' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True )
@@ -50,7 +50,7 @@ process.electronTriggerTestMatchHLTFilterEGammas = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "cleanPatElectrons" )
 , matched = cms.InputTag( "patTrigger" )
-, matchedCuts = cms.string( 'filter( "hltL1sL1SingleEG5" )' )
+, matchedCuts = cms.string( 'filter( "hltL1sL1*EG*" )' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True )
@@ -110,8 +110,7 @@ process.metTriggerTestMatchHLTMu3 = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( "patMETs" )
 , matched = cms.InputTag( "patTrigger" )
-#, matchedCuts = cms.string( 'path( "HLT_Mu3", 0 )' )
-, matchedCuts = cms.string( 'path( "HLT_Mu3" )' )
+, matchedCuts = cms.string( 'path( "HLT_Mu3", 0 )' )
 , maxDPtRel = cms.double( 0.5 )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True )
