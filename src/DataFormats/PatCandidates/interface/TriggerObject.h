@@ -132,7 +132,8 @@ namespace pat {
       /// - short names for readable configuration files
 
       /// Calls 'hasCollection(...)'
-      virtual bool coll( const std::string & collName ) const { return hasCollection( collName );};
+// FIXME: This needs to be masked for the moment, since the cut string parser can't deal with method overiding.
+//       virtual bool coll( const std::string & collName ) const { return hasCollection( collName );};
       /// Call 'hasFilterId(...)'
       bool type( trigger::TriggerObjectType triggerObjectType ) const { return hasTriggerObjectType( triggerObjectType ); };
       bool type( int                        triggerObjectType ) const { return hasTriggerObjectType( trigger::TriggerObjectType ( triggerObjectType ) ); };

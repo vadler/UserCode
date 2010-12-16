@@ -85,8 +85,10 @@ namespace pat {
       /// Checks, if a certain path name is assigned
       bool hasPathName( const std::string & pathName, bool pathLastFilterAccepted = true ) const;
       /// Checks, if a certain label of original collection is assigned (method overrides)
-      virtual bool hasCollection( const std::string & collName ) const;
-      virtual bool hasCollection( const edm::InputTag & collName ) const { return hasCollection( collName.encode() ); };
+// FIXME: Currently needs to be redirected to coll(...) in order to avoid segmentation violations from the cut string parser
+//       virtual bool hasCollection( const std::string & collName ) const;
+      virtual bool hasCollection( const std::string & collName ) const { return coll( collName ); };
+      virtual bool hasCollection( const edm::InputTag & collName ) const { return coll( collName.encode() ); };
       /// Checks, if the usage indicator vector has been filled
       bool hasPathLastFilterAccepted() const { return ( pathLastFilterAccepted_.size() > 0 && pathLastFilterAccepted_.size() == pathNames_.size() ); };
 
@@ -99,7 +101,10 @@ namespace pat {
       /// Calls 'hasPathName(...)'
       bool path( const std::string & pathName, unsigned pathLastFilterAccepted = true ) const { return hasPathName( pathName, pathLastFilterAccepted ); };
       /// Calls 'hasCollection(...)' (method override)
-      virtual bool coll( const std::string & collName ) const { return hasCollection( collName );};
+// FIXME: Currently implememnts the method rather than hasCollection(...) in order to avoid segmentation violations from the cut string parser
+// FIXME: Currently implememnts the method rather than hasCollection(...) in order to avoid segmentation violations from the cut string parser
+//       bool coll( const std::string & collName ) const { return hasCollection( collName ) };
+      bool coll( const std::string & collName ) const;
 
   };
 

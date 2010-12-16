@@ -137,7 +137,9 @@ bool TriggerObjectStandAlone::hasPathName( const std::string & pathName, bool pa
 
 
 // Checks, if a certain label of original collection is assigned (method overrides)
-bool TriggerObjectStandAlone::hasCollection( const std::string & collName ) const
+// FIXME: Currently implememnts the method rather than hasCollection(...) in order to avoid segmentation violations from the cut string parser
+// bool TriggerObjectStandAlone::hasCollection( const std::string & collName ) const
+bool TriggerObjectStandAlone::coll( const std::string & collName ) const
 {
   // Move to wild-card parser, if needed only
   if ( collName.find( wildcard_ ) != std::string::npos ) {
