@@ -1,19 +1,10 @@
-Test Release based on: CMSSW_3_10_0_pre8
-Base Release in: /afs/cern.ch/cms/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_10_0_pre8
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_10_0_pre8
--------- Package --------                        --- Tag ---    --- RelTag --- 
-CondFormats/JetMETObjects                        V03-01-14      V03-01-01-02   
-DataFormats/PatCandidates                        V06-02-08      V06-02-02-01   
-JetMETCorrections/Algorithms                     V02-01-02      V02-01-00-01   
-JetMETCorrections/Modules                        V05-00-14      V04-00-04      
-PhysicsTools/IsolationAlgos                      V01-05-07      V01-05-07      
-PhysicsTools/JetMCAlgos                          V00-13-10      V00-13-09      
-PhysicsTools/PFCandProducer                      V04-07-00      V04-06-04      
-PhysicsTools/PatAlgos                            V08-04-02      V08-01-03-03   
-PhysicsTools/PatExamples                         V00-05-00      V00-04-10-01   
-PhysicsTools/PythonAnalysis                      V00-05-01      V00-04-00      
-PhysicsTools/SelectorUtils                       V00-03-03      V00-02-20-01   
-PhysicsTools/UtilAlgos                           V08-02-04      V08-01-03      
-PhysicsTools/Utilities                           V08-01-02      V08-01-00-01   
+Test Release based on: CMSSW_3_9_X_2010-12-19-1300
+Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_ia32_gcc434/sun/3.9-sun-13/CMSSW_3_9_X_2010-12-19-1300
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_X_2010-12-19-1300
+--- Tag ---    -------- Package --------                        
+V01-05-07      PhysicsTools/IsolationAlgos                      
+V08-03-03      PhysicsTools/PatAlgos                            
+V00-05-02      PhysicsTools/PatExamples                         
+V03-09-16      PhysicsTools/PatUtils                            
 ---------------------------------------
-total packages: 13 (13 displayed)
+total packages: 4 (4 displayed)
