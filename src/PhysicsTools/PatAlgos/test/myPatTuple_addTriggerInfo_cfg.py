@@ -11,6 +11,12 @@ process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo.root'%( os.ge
 # , ignoreTotal      = cms.untracked.int32( 0 )
 # )
 
+# Internediate step to get the taus working in CMSSW_3_10_X RelVals
+process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
+process.p0 = cms.Path(
+  process.PFTau
+)
+
 process.p = cms.Path(
   process.patDefaultSequence
 )

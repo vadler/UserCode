@@ -7,6 +7,12 @@ process.maxEvents.input     = 10
 process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly.root'%( os.getenv( "CMSSW_BASE" ) )
 process.options.wantSummary = False
 
+# Internediate step to get the taus working in CMSSW_3_10_X RelVals
+process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
+process.p0 = cms.Path(
+  process.PFTau
+)
+
 ## let it run
 process.p = cms.Path(
   process.patCandidates
