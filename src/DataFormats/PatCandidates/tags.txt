@@ -11,7 +11,7 @@ PhysicsTools/JetMCAlgos                          V00-13-10      V00-13-09
 PhysicsTools/PFCandProducer                      V04-07-00      V04-06-04      
 PhysicsTools/PatAlgos                            V08-04-08      V08-01-03-03   
 PhysicsTools/PatExamples                         V00-05-02      V00-04-10-01   
-PhysicsTools/PatUtils                            V03-09-16      V03-09-16      
+PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
 PhysicsTools/PythonAnalysis                      V00-05-01      V00-04-00      
 PhysicsTools/SelectorUtils                       V00-03-03      V00-02-20-01   
 PhysicsTools/UtilAlgos                           V08-02-05      V08-01-03      
