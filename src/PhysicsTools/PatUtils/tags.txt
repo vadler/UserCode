@@ -3,7 +3,7 @@ Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_ia32_gcc434/sun/3.9-
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_X_2010-12-19-1300
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 PhysicsTools/FWLite                              V02-03-07      V02-03-03      
-PhysicsTools/PatAlgos                            V08-03-04      V08-03-01      
+PhysicsTools/PatAlgos                            V08-03-05      V08-03-01      
 PhysicsTools/PatExamples                         V00-05-02      V00-05-01      
 PhysicsTools/PatUtils                            V03-09-16      V03-09-14      
 PhysicsTools/UtilAlgos                           V08-02-05      V08-02-04      
