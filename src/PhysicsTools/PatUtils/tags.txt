@@ -4,7 +4,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_10_X_2010-12-19
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 CondFormats/JetMETObjects                        V03-01-14      V03-01-01-02   
 DataFormats/CaloTowers                           V02-05-11      V02-05-10      
-DataFormats/PatCandidates                        V06-02-17      V06-02-02-01   
+DataFormats/PatCandidates                        V06-02-18      V06-02-02-01   
 JetMETCorrections/Algorithms                     V02-01-02      V02-01-00-01   
 JetMETCorrections/Modules                        V05-00-14      V04-00-04      
 PhysicsTools/FWLite                              V02-03-07      V02-03-05      
