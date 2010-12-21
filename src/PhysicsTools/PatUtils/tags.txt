@@ -16,7 +16,7 @@ PhysicsTools/PatUtils                            V03-09-17      V03-09-16
 PhysicsTools/PythonAnalysis                      V00-05-01      V00-04-00      
 PhysicsTools/SelectorUtils                       V00-03-03      V00-02-20-01   
 PhysicsTools/UtilAlgos                           V08-02-05      V08-01-03      
-PhysicsTools/Utilities                           V08-01-02      V08-01-00-01   
+PhysicsTools/Utilities                           V08-01-03      V08-01-00-01   
 RecoTauTag/Configuration                         V01-00-14      V01-00-13      
 ---------------------------------------
 total packages: 16 (16 displayed)
