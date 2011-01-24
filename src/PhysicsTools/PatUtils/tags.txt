@@ -2,10 +2,13 @@ Test Release based on: CMSSW_3_10_0
 Base Release in: /afs/cern.ch/cms/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_10_0
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_10_0
 -------- Package --------                        --- Tag ---    --- RelTag --- 
+DataFormats/FWLite                               V01-11-04      V01-11-03      
 DataFormats/PatCandidates                        V06-02-18      V06-02-14-01   
+PhysicsTools/FWLite                              V02-03-10      V02-03-09      
 PhysicsTools/PatAlgos                            V08-04-08      V08-04-06      
 PhysicsTools/PatExamples                         V00-05-02      V00-05-02      
 PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
+PhysicsTools/UtilAlgos                           V08-02-06      V08-02-05      
 RecoTauTag/Configuration                         V01-00-14      V01-00-13      
 ---------------------------------------
-total packages: 5 (5 displayed)
+total packages: 8 (8 displayed)
