@@ -34,10 +34,7 @@
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 
 #include "DataFormats/Common/interface/AssociativeIterator.h"
-#include "DataFormats/PatCandidates/interface/TriggerObject.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
-#include "DataFormats/PatCandidates/interface/TriggerFilter.h"
-#include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/Photon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
