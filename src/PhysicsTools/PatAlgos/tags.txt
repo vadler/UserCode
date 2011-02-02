@@ -1,19 +1,13 @@
-Test Release based on: CMSSW_3_10_0_pre8
-Base Release in: /afs/cern.ch/cms/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_10_0_pre8
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_10_0_pre8
+Test Release based on: CMSSW_3_9_7
+Base Release in: /afs/cern.ch/cms/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_9_7
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_9_7
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CondFormats/JetMETObjects                        V03-01-14      V03-01-01-02   
-DataFormats/PatCandidates                        V06-02-08      V06-02-02-01   
-JetMETCorrections/Algorithms                     V02-01-02      V02-01-00-01   
-JetMETCorrections/Modules                        V05-00-14      V04-00-04      
-PhysicsTools/IsolationAlgos                      V01-05-07      V01-05-07      
-PhysicsTools/JetMCAlgos                          V00-13-10      V00-13-09      
-PhysicsTools/PFCandProducer                      V04-07-00      V04-06-04      
-PhysicsTools/PatAlgos                            V08-04-02      V08-01-03-03   
-PhysicsTools/PatExamples                         V00-05-00      V00-04-10-01   
-PhysicsTools/PythonAnalysis                      V00-05-01      V00-04-00      
-PhysicsTools/SelectorUtils                       V00-03-03      V00-02-20-01   
-PhysicsTools/UtilAlgos                           V08-02-04      V08-01-03      
-PhysicsTools/Utilities                           V08-01-02      V08-01-00-01   
+CondFormats/JetMETObjects                        V03-01-20      V03-01-14      
+JetMETCorrections/Algorithms                     V02-02-01      V02-01-02      
+JetMETCorrections/Configuration                  V03-02-05      V03-01-00      
+JetMETCorrections/Modules                        V05-00-17      V05-00-14      
+PhysicsTools/PatAlgos                            V08-03-06      V08-03-05      
+PhysicsTools/PatUtils                            V03-09-16      V03-09-14      
+PhysicsTools/Utilities                           V08-01-03      V08-01-02      
 ---------------------------------------
-total packages: 13 (13 displayed)
+total packages: 7 (7 displayed)
