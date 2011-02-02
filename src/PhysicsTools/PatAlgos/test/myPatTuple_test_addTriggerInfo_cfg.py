@@ -2,6 +2,8 @@ import os
 cmsswBase = os.getenv( "CMSSW_BASE" )
 
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+from Configuration.PyReleaseValidation.autoCond import autoCond
+process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
 process.source.fileNames    = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data/ZJetToMuMu_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6__Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1__GEN-SIM-RECO/FED5121F-B1E4-DF11-B53F-00261834B580.root' ]
 process.out.fileName        = '%s/output/myPatTuple_test_addTriggerInfo.root'%( cmsswBase )
 # process.MessageLogger.cerr.threshold = 'INFO'

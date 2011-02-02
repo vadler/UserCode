@@ -1,5 +1,7 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+from Configuration.PyReleaseValidation.autoCond import autoCond
+process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source.fileNames    = pickRelValInputFiles()
 process.options.wantSummary = False
