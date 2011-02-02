@@ -1,14 +1,13 @@
-Test Release based on: CMSSW_3_10_1
-Base Release in: /afs/cern.ch/cms/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_10_1
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_10_1
+Test Release based on: CMSSW_4_2_0_pre1
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_0_pre1
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_0_pre1
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/FWLite                               V01-11-04      V01-11-03      
+CommonTools/ParticleFlow                         V00-00-00                     
 DataFormats/PatCandidates                        V06-02-18      V06-02-14-01   
-PhysicsTools/FWLite                              V02-03-10      V02-03-09      
-PhysicsTools/PatAlgos                            V08-04-08      V08-04-06      
-PhysicsTools/PatExamples                         V00-05-02      V00-05-02      
+PhysicsTools/PFCandProducer                      NoTag          V04-07-00      
+PhysicsTools/PatAlgos                            V08-05-01      V08-04-06-01   
+PhysicsTools/PatExamples                         V00-05-04      V00-05-04      
 PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
-PhysicsTools/UtilAlgos                           V08-02-06      V08-02-05      
-RecoTauTag/Configuration                         V01-00-14      V01-00-13      
+RecoTauTag/Configuration                         V01-00-14      V01-00-13-02   
 ---------------------------------------
-total packages: 8 (8 displayed)
+total packages: 7 (7 displayed)
