@@ -8,6 +8,5 @@ PhysicsTools/PFCandProducer                      NoTag          V04-07-00
 PhysicsTools/PatAlgos                            V08-05-01      V08-04-06-01   
 PhysicsTools/PatExamples                         V00-05-04      V00-05-04      
 PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
-RecoTauTag/Configuration                         V01-00-14      V01-00-13-02   
 ---------------------------------------
-total packages: 7 (7 displayed)
+total packages: 6 (6 displayed)
