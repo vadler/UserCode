@@ -10,7 +10,7 @@ JetMETCorrections/Algorithms                     V02-02-03      V02-01-02
 JetMETCorrections/Configuration                  V03-02-07      V03-01-00      
 JetMETCorrections/Modules                        V05-00-17      V05-00-14      
 PhysicsTools/PFCandProducer                      NoTag          V04-07-00      
-PhysicsTools/PatAlgos                            V08-05-02      V08-04-06-01   
+PhysicsTools/PatAlgos                            V08-05-04      V08-04-06-01   
 PhysicsTools/PatExamples                         V00-05-04      V00-05-04      
 PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
 ---------------------------------------
