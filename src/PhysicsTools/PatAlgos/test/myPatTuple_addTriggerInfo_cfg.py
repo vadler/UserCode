@@ -22,6 +22,24 @@ process.p0 = cms.Path(
 process.p = cms.Path(
   process.patDefaultSequence
 )
+process.patTaus.tauIDSources = cms.PSet(
+        leadingTrackFinding = cms.InputTag("shrinkingConePFTauDiscriminationByLeadingTrackFinding"),
+        #leadingTrackPtCut = cms.InputTag("shrinkingConePFTauDiscriminationByLeadingTrackPtCut"),
+        leadingPionPtCut = cms.InputTag("shrinkingConePFTauDiscriminationByLeadingPionPtCut"),
+        #trackIsolation = cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolation"),
+        #trackIsolationUsingLeadingPion = cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolationUsingLeadingPion"),
+        #ecalIsolation = cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolation"),
+        #ecalIsolationUsingLeadingPion = cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolationUsingLeadingPion"),
+        #byIsolation = cms.InputTag("shrinkingConePFTauDiscriminationByIsolation"),
+        byIsolationUsingLeadingPion = cms.InputTag("shrinkingConePFTauDiscriminationByIsolationUsingLeadingPion"),
+        againstElectron = cms.InputTag("shrinkingConePFTauDiscriminationAgainstElectron"),
+        againstMuon = cms.InputTag("shrinkingConePFTauDiscriminationAgainstMuon")#,
+        #byTaNC = cms.InputTag("shrinkingConePFTauDiscriminationByTaNC"),
+        #byTaNCfrOnePercent = cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrOnePercent"),
+        #byTaNCfrHalfPercent = cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrHalfPercent"),
+        #byTaNCfrQuarterPercent = cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrQuarterPercent"),
+        #byTaNCfrTenthPercent = cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrTenthPercent")
+    )
 
 process.out.outputCommands += [
   'keep edmTriggerResults_TriggerResults_*_HLT'
