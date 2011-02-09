@@ -7,7 +7,7 @@
 // Package:    PatAlgos
 // Class:      pat::PATTriggerProducer
 //
-// $Id: PATTriggerProducer.h,v 1.12.2.2 2010/11/05 17:33:37 vadler Exp $
+// $Id: PATTriggerProducer.h,v 1.15 2010/11/27 15:16:21 vadler Exp $
 //
 /**
   \class    pat::PATTriggerProducer PATTriggerProducer.h "PhysicsTools/PatAlgos/plugins/PATTriggerProducer.h"
@@ -32,7 +32,7 @@
    https://twiki.cern.ch/twiki/bin/view/CMS/SWGuidePATTrigger
 
   \author   Volker Adler
-  \version  $Id: PATTriggerProducer.h,v 1.12.2.2 2010/11/05 17:33:37 vadler Exp $
+  \version  $Id: PATTriggerProducer.h,v 1.15 2010/11/27 15:16:21 vadler Exp $
 */
 
 
@@ -68,15 +68,16 @@ namespace pat {
       bool        onlyStandAlone_;  // configuration
       // L1
       L1GtUtils     l1GtUtils_;
-      bool          addL1Algos_;        // configuration (optional with default)
-      edm::InputTag tagL1ExtraMu_;      // configuration (optional)
-      edm::InputTag tagL1ExtraNoIsoEG_; // configuration (optional)
-      edm::InputTag tagL1ExtraIsoEG_;   // configuration (optional)
-      edm::InputTag tagL1ExtraCenJet_;  // configuration (optional)
-      edm::InputTag tagL1ExtraForJet_;  // configuration (optional)
-      edm::InputTag tagL1ExtraTauJet_;  // configuration (optional)
-      edm::InputTag tagL1ExtraETM_;     // configuration (optional)
-      edm::InputTag tagL1ExtraHTM_;     // configuration (optional)
+      bool          addL1Algos_;                        // configuration (optional with default)
+      edm::InputTag tagL1GlobalTriggerObjectMapRecord_; // configuration (optional with default)
+      edm::InputTag tagL1ExtraMu_;                      // configuration (optional)
+      edm::InputTag tagL1ExtraNoIsoEG_;                 // configuration (optional)
+      edm::InputTag tagL1ExtraIsoEG_;                   // configuration (optional)
+      edm::InputTag tagL1ExtraCenJet_;                  // configuration (optional)
+      edm::InputTag tagL1ExtraForJet_;                  // configuration (optional)
+      edm::InputTag tagL1ExtraTauJet_;                  // configuration (optional)
+      edm::InputTag tagL1ExtraETM_;                     // configuration (optional)
+      edm::InputTag tagL1ExtraHTM_;                     // configuration (optional)
       bool          autoProcessNameL1ExtraMu_;
       bool          autoProcessNameL1ExtraNoIsoEG_;
       bool          autoProcessNameL1ExtraIsoEG_;

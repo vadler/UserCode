@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.20.2.3 2010/11/08 12:14:14 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.24 2010/11/27 15:16:20 vadler Exp $
 //
 
 
@@ -8,10 +8,12 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <iostream> // DEBUG
 
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
 #include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/Provenance/interface/ProcessHistory.h"
@@ -36,6 +38,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   onlyStandAlone_( iConfig.getParameter< bool >( "onlyStandAlone" ) ),
   // L1 configuration parameters
   addL1Algos_( false ),
+  tagL1GlobalTriggerObjectMapRecord_( "hltL1GtObjectMap" ),
   tagL1ExtraMu_(),
   tagL1ExtraNoIsoEG_(),
   tagL1ExtraIsoEG_(),
@@ -65,6 +68,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
 
   // L1 configuration parameters
   if ( iConfig.exists( "addL1Algos" ) ) addL1Algos_ = iConfig.getParameter< bool >( "addL1Algos" );
+  if ( iConfig.exists( "l1GlobalTriggerObjectMapRecord" ) ) tagL1GlobalTriggerObjectMapRecord_ = iConfig.getParameter< InputTag >( "l1GlobalTriggerObjectMapRecord" );
   if ( iConfig.exists( "l1ExtraMu" ) ) {
     tagL1ExtraMu_ = iConfig.getParameter< InputTag >( "l1ExtraMu" );
     if ( tagL1ExtraMu_.process() == "*" ) {
@@ -649,6 +653,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       const AlgorithmMap l1GtAlgorithms( handleL1GtTriggerMenu->gtAlgorithmMap() );
       const AlgorithmMap l1GtTechTriggers( handleL1GtTriggerMenu->gtTechnicalTriggerMap() );
       triggerAlgos->reserve( l1GtAlgorithms.size() + l1GtTechTriggers.size() );
+      Handle< L1GlobalTriggerObjectMapRecord > handleL1GlobalTriggerObjectMapRecord;
+      iEvent.getByLabel( tagL1GlobalTriggerObjectMapRecord_, handleL1GlobalTriggerObjectMapRecord );
       // physics algorithms
       for ( AlgorithmMap::const_iterator iAlgo = l1GtAlgorithms.begin(); iAlgo != l1GtAlgorithms.end(); ++iAlgo ) {
         if ( iAlgo->second.algoBitNumber() > 127 ) {
@@ -670,6 +676,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         int  error( l1GtUtils_.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
         if ( error ) {
           LogError( "l1Algo" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' decision has error code " << error << " from 'L1GtUtils'\n"
+                               << "Skipping";
+          continue;
+        }
+        std::cout << "DEBUG physics algo: " << iAlgo->second.algoName() << "\t " << bit << std::endl;
+        const L1GlobalTriggerObjectMap * objectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( iAlgo->second.algoName() ) );
+        if ( ! objectMap ) {
+          LogError( "l1Algo" ) << "L1 algorithm '" << iAlgo->second.algoName() << "' is missing in L1GlobalTriggerObjectMapRecord\n"
                                << "Skipping";
           continue;
         }
