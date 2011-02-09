@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerAlgorithm
 //
-// $Id: TriggerAlgorithm.h,v 1.2 2010/06/16 15:40:52 vadler Exp $
+// $Id: TriggerAlgorithm.h,v 1.3 2010/12/16 18:39:16 vadler Exp $
 //
 /**
   \class    pat::TriggerAlgorithm TriggerAlgorithm.h "DataFormats/PatCandidates/interface/TriggerAlgorithm.h"
@@ -18,7 +18,7 @@
    https://twiki.cern.ch/twiki/bin/view/CMS/SWGuidePATTrigger#TriggerAlgorithm
 
   \author   Volker Adler
-  \version  $Id: TriggerAlgorithm.h,v 1.2 2010/06/16 15:40:52 vadler Exp $
+  \version  $Id: TriggerAlgorithm.h,v 1.3 2010/12/16 18:39:16 vadler Exp $
 */
 
 
@@ -53,6 +53,9 @@ namespace pat {
       bool decisionBeforeMask_;
       /// L1 algorithm decision, considering the mask
       bool decisionAfterMask_;
+      /// Indeces of trigger objects in pat::TriggerObjectCollection in event
+      /// as produced together with the pat::TriggerAlgorithmCollection
+      std::vector< unsigned > objectKeys_;
 
     public:
 
@@ -86,6 +89,8 @@ namespace pat {
       void setDecisionBeforeMask( bool decisionBeforeMask ) { decisionBeforeMask_ = decisionBeforeMask; };
       /// Set L1 algorithm decision, considering the mask
       void setDecisionAfterMas( bool decisionAfterMask ) { decisionAfterMask_ = decisionAfterMask; };
+      /// Add a new trigger object collection index
+      void addObjectKey( unsigned objectKey ) { if ( ! hasObjectKey( objectKey ) ) objectKeys_.push_back( objectKey ); };
       /// Get L1 algorithm name
       std::string name() const { return name_; };
       /// Get L1 algorithm alias
@@ -105,6 +110,10 @@ namespace pat {
       /// Get L1 algorithm decision as applied,
       /// identical to L1 algorithm decision, considering the mask
       bool decision() const { return decisionAfterMask(); };
+      /// Get all trigger object collection indeces
+      std::vector< unsigned > objectKeys() const { return objectKeys_; };
+      /// Checks, if a certain trigger object collection index is assigned
+      bool hasObjectKey( unsigned objectKey ) const;
 
   };
 

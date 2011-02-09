@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerEvent
 //
-// $Id: TriggerEvent.h,v 1.10 2010/12/11 21:25:44 vadler Exp $
+// $Id: TriggerEvent.h,v 1.11 2010/12/16 18:39:17 vadler Exp $
 //
 /**
   \class    pat::TriggerEvent TriggerEvent.h "DataFormats/PatCandidates/interface/TriggerEvent.h"
@@ -19,7 +19,7 @@
    https://twiki.cern.ch/twiki/bin/view/CMS/SWGuidePATTrigger#TriggerEvent
 
   \author   Volker Adler
-  \version  $Id: TriggerEvent.h,v 1.10 2010/12/11 21:25:44 vadler Exp $
+  \version  $Id: TriggerEvent.h,v 1.11 2010/12/16 18:39:17 vadler Exp $
 */
 
 
@@ -180,6 +180,9 @@ namespace pat {
       /// Get a pointer to a certain L1 algorithm by name,
       /// returns 0 if algorithm is not found
       const TriggerAlgorithm * algorithm( const std::string & nameAlgorithm ) const;
+      /// Get the name of a certain L1 algorithm in the event collection by bit number physics or technical (default) algorithms,
+      /// returns empty string if algorithm is not found
+      std::string nameAlgorithm( const unsigned bitAlgorithm, const bool techAlgorithm = true ) const;
       /// Get the index of a certain L1 algorithm in the event collection by name,
       /// returns size of algorithm collection if algorithm is not found
       unsigned indexAlgorithm( const std::string & nameAlgorithm ) const;
@@ -259,6 +262,14 @@ namespace pat {
       bool objectInPath( const TriggerObjectRef & objectRef, const std::string & namePath ) const;
       /// Get a vector of references to all paths, which have a certain object assigned
       TriggerPathRefVector objectPaths( const TriggerObjectRef & objectRef  ) const;
+      /// Get a list of all trigger object collections used in a certain algorithm given by name
+      std::vector< std::string > algorithmCollections( const std::string & nameAlgorithm ) const;
+      /// Get a vector of references to all objects, which were used in a certain algorithm given by name
+      TriggerObjectRefVector algorithmObjects( const std::string & nameAlgorithm ) const;
+      /// Checks, if an object was used in a certain algorithm given by name
+      bool objectInAlgorithm( const TriggerObjectRef & objectRef, const std::string & nameAlgorithm ) const;
+      /// Get a vector of references to all algorithms, which have a certain object assigned
+      TriggerAlgorithmRefVector objectAlgorithms( const TriggerObjectRef & objectRef ) const;
 
       /// Get a list of all linked trigger matches
       std::vector< std::string > triggerMatchers() const;

@@ -1,5 +1,5 @@
 //
-// $Id: TriggerAlgorithm.cc,v 1.1 2010/04/20 21:41:01 vadler Exp $
+// $Id: TriggerAlgorithm.cc,v 1.2 2010/12/16 18:39:17 vadler Exp $
 //
 
 
@@ -22,7 +22,9 @@ TriggerAlgorithm::TriggerAlgorithm() :
   mask_(),
   decisionBeforeMask_(),
   decisionAfterMask_()
-{}
+{
+  objectKeys_.clear();
+}
 
 
 // Constructor from algorithm name only
@@ -35,7 +37,9 @@ TriggerAlgorithm::TriggerAlgorithm( const std::string & name ) :
   mask_(),
   decisionBeforeMask_(),
   decisionAfterMask_()
-{}
+{
+  objectKeys_.clear();
+}
 
 
 // Constructor from values
@@ -48,4 +52,21 @@ TriggerAlgorithm::TriggerAlgorithm( const std::string & name, const std::string 
   mask_( mask ),
   decisionBeforeMask_( decisionBeforeMask ),
   decisionAfterMask_( decisionAfterMask )
-{}
+{
+  objectKeys_.clear();
+}
+
+
+// Methods
+
+
+// Checks, if a certain trigger object collection index is assigned
+bool TriggerAlgorithm::hasObjectKey( unsigned objectKey ) const
+{
+  for ( size_t iO = 0; iO < objectKeys().size(); ++iO ) {
+    if ( objectKeys().at( iO ) == objectKey ) {
+      return true;
+    }
+  }
+  return false;
+}

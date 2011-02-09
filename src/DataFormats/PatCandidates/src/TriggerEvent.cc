@@ -1,5 +1,5 @@
 //
-// $Id: TriggerEvent.cc,v 1.12 2010/12/11 00:04:13 vadler Exp $
+// $Id: TriggerEvent.cc,v 1.13 2010/12/16 18:39:17 vadler Exp $
 //
 
 
@@ -49,6 +49,20 @@ const TriggerAlgorithm * TriggerEvent::algorithm( const std::string & nameAlgori
     }
   }
   return 0;
+}
+
+
+// Get the name of a certain L1 algorithm in the event collection by bit number physics or technical algorithms,
+std::string TriggerEvent::nameAlgorithm( const unsigned bitAlgorithm, const bool techAlgorithm ) const
+{
+
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    if ( bitAlgorithm == iAlgorithm->bit() && techAlgorithm == iAlgorithm->techTrigger() ) {
+      return iAlgorithm->name();
+    }
+  }
+  return std::string( "" );
+
 }
 
 
@@ -403,6 +417,69 @@ TriggerPathRefVector TriggerEvent::objectPaths( const TriggerObjectRef & objectR
     }
   }
   return theObjectPaths;
+}
+
+
+// Get a list of all trigger object collections used in a certain algorithm given by name
+std::vector< std::string > TriggerEvent::algorithmCollections( const std::string & nameAlgorithm ) const
+{
+  std::vector< std::string > theAlgorithmCollections;
+  if ( filter( nameAlgorithm ) ) {
+    for ( unsigned iObject = 0; iObject < objects()->size(); ++iObject ) {
+      if ( algorithm( nameAlgorithm )->hasObjectKey( iObject ) ) {
+        bool found( false );
+        std::string objectCollection( objects()->at( iObject ).collection() );
+        for ( std::vector< std::string >::const_iterator iC = theAlgorithmCollections.begin(); iC != theAlgorithmCollections.end(); ++iC ) {
+          if ( *iC == objectCollection ) {
+            found = true;
+            break;
+          }
+        }
+        if ( ! found ) {
+          theAlgorithmCollections.push_back( objectCollection );
+        }
+      }
+    }
+  }
+  return theAlgorithmCollections;
+}
+
+
+// Get a vector of references to all objects, which were used in a certain algorithm given by name
+TriggerObjectRefVector TriggerEvent::algorithmObjects( const std::string & nameAlgorithm ) const
+{
+  TriggerObjectRefVector theAlgorithmObjects;
+  if ( filter( nameAlgorithm ) ) {
+    for ( unsigned iObject = 0; iObject < objects()->size(); ++iObject ) {
+      if ( algorithm( nameAlgorithm )->hasObjectKey( iObject ) ) {
+        const TriggerObjectRef objectRef( objects(), iObject );
+        theAlgorithmObjects.push_back( objectRef );
+      }
+    }
+  }
+  return theAlgorithmObjects;
+}
+
+
+// Checks, if an object was used in a certain algorithm given by name
+bool TriggerEvent::objectInAlgorithm( const TriggerObjectRef & objectRef, const std::string & nameAlgorithm ) const {
+  if ( algorithm( nameAlgorithm ) ) return algorithm( nameAlgorithm )->hasObjectKey( objectRef.key() );
+  return false;
+}
+
+
+// Get a vector of references to all algorithms, which have a certain object assigned
+TriggerAlgorithmRefVector TriggerEvent::objectAlgorithms( const TriggerObjectRef & objectRef ) const
+{
+  TriggerAlgorithmRefVector theObjectAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    const std::string nameAlgorithm( iAlgorithm->name() );
+    if ( objectInAlgorithm( objectRef, nameAlgorithm ) ) {
+      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
+      theObjectAlgorithms.push_back( algorithmRef );
+    }
+  }
+  return theObjectAlgorithms;
 }
 
 
