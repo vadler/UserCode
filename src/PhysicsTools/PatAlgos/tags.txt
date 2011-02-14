@@ -1,16 +1,11 @@
-Test Release based on: CMSSW_4_2_0_pre2
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_0_pre2
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_0_pre2
+Test Release based on: CMSSW_4_2_0_pre3
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_0_pre3
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_0_pre3
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CondFormats/JetMETObjects                        V03-01-21      V03-01-15      
-DataFormats/PatCandidates                        V06-03-00      V06-02-14-01   
-FWCore/GuiBrowsers                               V00-00-46      V00-00-45      
-JetMETCorrections/Algorithms                     V02-02-03      V02-01-02      
-JetMETCorrections/Configuration                  V03-02-07      V03-01-00      
-JetMETCorrections/Modules                        V05-00-17      V05-00-14      
+DataFormats/PatCandidates                        V06-03-00      V06-03-00      
 L1Trigger/GlobalTriggerAnalyzer                  V01-07-01      V01-07-01      
-PhysicsTools/PatAlgos                            V08-05-07      V08-05-02      
+PhysicsTools/PatAlgos                            V08-05-07      V08-05-07      
 PhysicsTools/PatExamples                         V00-05-04      V00-05-04      
 PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
 ---------------------------------------
-total packages: 10 (10 displayed)
+total packages: 5 (5 displayed)
