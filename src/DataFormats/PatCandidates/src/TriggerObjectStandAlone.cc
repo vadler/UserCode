@@ -1,10 +1,11 @@
 //
-// $Id: TriggerObjectStandAlone.cc,v 1.8 2010/12/19 21:06:43 vadler Exp $
+// $Id: TriggerObjectStandAlone.cc,v 1.9 2011/02/02 17:06:24 vadler Exp $
 //
 
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 #include <boost/algorithm/string.hpp>
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 
 using namespace pat;
@@ -65,27 +66,24 @@ bool TriggerObjectStandAlone::hasAnyName( const std::string & name, const std::v
 }
 
 
-// Methods
-
-
-// Adds a new path name
-void TriggerObjectStandAlone::addPathName( const std::string & pathName, bool pathLastFilterAccepted )
+// Adds a new HLT path or L1 algorithm name
+void TriggerObjectStandAlone::addPathOrAlgorithm( const std::string & name, bool firing )
 {
   // Check, if path is already assigned
-  if ( ! hasPathName( pathName, false ) ) {
+  if ( ! hasPathOrAlgorithm( name, false ) ) {
     // The path itself
-    pathNames_.push_back( pathName );
+    pathNames_.push_back( name );
     // The corresponding usage of the trigger objects
-    pathLastFilterAccepted_.push_back( pathLastFilterAccepted );
+    pathLastFilterAccepted_.push_back( firing );
   }
 }
 
 
-// Gets all path names
-std::vector< std::string > TriggerObjectStandAlone::pathNames( bool pathLastFilterAccepted ) const
+// Gets all HLT path or L1 algorithm names
+std::vector< std::string > TriggerObjectStandAlone::pathsOrAlgorithms( bool firing ) const
 {
   // All path names, if usage not restricted (not required or not available)
-  if ( ! pathLastFilterAccepted || ! hasPathLastFilterAccepted() ) return pathNames_;
+  if ( ! firing || ! hasFiring() ) return pathNames_;
   // Temp vector of path names
   std::vector< std::string > paths;
   // Loop over usage vector and fill corresponding paths into temp vector
@@ -94,6 +92,131 @@ std::vector< std::string > TriggerObjectStandAlone::pathNames( bool pathLastFilt
   }
   // Return temp vector
   return paths;
+}
+
+
+// Checks, if a certain HLT filter label or L1 condition name is assigned
+bool TriggerObjectStandAlone::hasFilterOrCondition( const std::string & name ) const
+{
+  // Move to wild-card parser, if needed
+  if ( name.find( wildcard_ ) != std::string::npos ) return hasAnyName( name, filterLabels_ );
+  // Return, if filter label is assigned
+  return ( std::find( filterLabels_.begin(), filterLabels_.end(), name ) != filterLabels_.end() );
+}
+
+
+// Checks, if a certain path name is assigned
+bool TriggerObjectStandAlone::hasPathOrAlgorithm( const std::string & name, bool firing ) const
+{
+  // Move to wild-card parser, if needed
+  if ( name.find( wildcard_ ) != std::string::npos ) return hasAnyName( name, pathsOrAlgorithms( firing ) );
+  // Deal with older PAT-tuples, where trigger object usage is not available
+  if ( ! hasFiring() ) firing = false;
+  // Check, if path name is assigned at all
+  std::vector< std::string >::const_iterator match( std::find( pathNames_.begin(), pathNames_.end(), name ) );
+  // False, if path name not assigned
+  if ( match == pathNames_.end() ) return false;
+  // Return for assigned path name, if trigger object usage meets requirement
+  return ( firing ? pathLastFilterAccepted_.at( match - pathNames_.begin() ) : true );
+}
+
+
+// Prints warnings, if an HLT objects functions is used with an L1 or inconsistent objects
+void TriggerObjectStandAlone::checkHlt() const
+{
+//   const int isHlt( isHltObject() );
+//   switch ( isHlt ) {
+  switch ( isHltObject() ) {
+    case 0:
+      edm::LogWarning( "triggerObjectType" ) << "Using an HLT object function with an L1 object";
+      break;
+    case -1:
+      edm::LogWarning( "triggerObjectType" ) << "Object with inconsistent trigger object type";
+      break;
+  }
+}
+
+
+// Prints warnings, if an L1 objects functions is used with an HLT or inconsistent objects
+void TriggerObjectStandAlone::checkL1() const
+{
+//   const int isL1( isL1Object() );
+//   switch ( isL1 ) {
+  switch ( isL1Object() ) {
+    case 0:
+      edm::LogWarning( "triggerObjectType" ) << "Using an L1 object function with an HLT object";
+      break;
+    case -1:
+      edm::LogWarning( "triggerObjectType" ) << "Object with inconsistent trigger object type";
+      break;
+  }
+}
+
+
+// Methods
+
+
+// Adds a new HLT filter label
+void TriggerObjectStandAlone::addFilterLabel( const std::string & filterLabel )
+{
+  checkHlt();
+  addFilterOrCondition( filterLabel );
+}
+
+
+// Adds a new L1 condition name
+void TriggerObjectStandAlone::addConditionName( const std::string & conditionName )
+{
+  checkL1();
+  addFilterOrCondition( conditionName );
+}
+
+
+// Adds a new HLT path name
+void TriggerObjectStandAlone::addPathName( const std::string & pathName, bool pathLastFilterAccepted )
+{
+  checkHlt();
+  addPathOrAlgorithm( pathName, pathLastFilterAccepted );
+}
+
+
+// Adds a new L1 algorithm name
+void TriggerObjectStandAlone::addAlgorithmName( const std::string & algorithmName, bool algoCondAccepted )
+{
+  checkL1();
+  addPathOrAlgorithm( algorithmName, algoCondAccepted );
+}
+
+
+// Gets all HLT filter labels
+std::vector< std::string > TriggerObjectStandAlone::filterLabels() const
+{
+  checkHlt();
+  return filtersOrConditions();
+}
+
+
+// Gets all L1 condition names
+std::vector< std::string > TriggerObjectStandAlone::conditionNames() const
+{
+  checkL1();
+  return filtersOrConditions();
+}
+
+
+// Gets all HLT path names
+std::vector< std::string > TriggerObjectStandAlone::pathNames( bool pathLastFilterAccepted ) const
+{
+  checkHlt();
+  return pathsOrAlgorithms( pathLastFilterAccepted );
+}
+
+
+// Gets all L1 algorithm names
+std::vector< std::string > TriggerObjectStandAlone::algorithmNames( bool algoCondAccepted ) const
+{
+  checkL1();
+  return pathsOrAlgorithms( algoCondAccepted );
 }
 
 
@@ -110,29 +233,35 @@ TriggerObject TriggerObjectStandAlone::triggerObject()
 }
 
 
-// Checks, if a certain filter label is assigned
+// Checks, if a certain HLT filter label is assigned
 bool TriggerObjectStandAlone::hasFilterLabel( const std::string & filterLabel ) const
 {
-  // Move to wild-card parser, if needed
-  if ( filterLabel.find( wildcard_ ) != std::string::npos ) return hasAnyName( filterLabel, filterLabels_ );
-  // Return, if filter label is assigned
-  return ( std::find( filterLabels_.begin(), filterLabels_.end(), filterLabel ) != filterLabels_.end() );
+  checkHlt();
+  return hasFilterOrCondition( filterLabel );
 }
 
 
-// Checks, if a certain path name is assigned
+// Checks, if a certain L1 condition name is assigned
+bool TriggerObjectStandAlone::hasConditionName( const std::string & conditionName ) const
+{
+  checkL1();
+  return hasFilterOrCondition( conditionName );
+}
+
+
+// Checks, if a certain HLT path name is assigned
 bool TriggerObjectStandAlone::hasPathName( const std::string & pathName, bool pathLastFilterAccepted ) const
 {
-  // Move to wild-card parser, if needed
-  if ( pathName.find( wildcard_ ) != std::string::npos ) return hasAnyName( pathName, pathNames( pathLastFilterAccepted ) );
-  // Deal with older PAT-tuples, where trigger object usage is not available
-  if ( ! hasPathLastFilterAccepted() ) pathLastFilterAccepted = false;
-  // Check, if path name is assigned at all
-  std::vector< std::string >::const_iterator match( std::find( pathNames_.begin(), pathNames_.end(), pathName ) );
-  // False, if path name not assigned
-  if ( match == pathNames_.end() ) return false;
-  // Return for assigned path name, if trigger object usage meets requirement
-  return ( pathLastFilterAccepted ? pathLastFilterAccepted_.at( match - pathNames_.begin() ) : true );
+  checkHlt();
+  return hasPathOrAlgorithm( pathName, pathLastFilterAccepted );
+}
+
+
+// Checks, if a certain L1 algorithm name is assigned
+bool TriggerObjectStandAlone::hasAlgorithmName( const std::string & algorithmName, bool algoCondAccepted ) const
+{
+  checkL1();
+  return hasPathOrAlgorithm( algorithmName, algoCondAccepted );
 }
 
 
@@ -156,6 +285,19 @@ bool TriggerObjectStandAlone::hasCollection( const std::string & collName ) cons
     }
     return false;
   }
-  // Use parent class's method other wise
+  // Use parent class's method otherwise
   return TriggerObject::hasCollection( collName );
+}
+
+
+// Checks, if the usage indicator vector has been filled
+bool TriggerObjectStandAlone::hasPathLastFilterAccepted() const
+{
+  checkHlt();
+  return hasFiring();
+}
+bool TriggerObjectStandAlone::hasAlgoCondAccepted() const
+{
+  checkL1();
+  return hasFiring();
 }

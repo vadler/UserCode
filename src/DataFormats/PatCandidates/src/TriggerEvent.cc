@@ -44,9 +44,7 @@ TriggerEvent::TriggerEvent( const std::string & nameL1Menu, const std::string & 
 const TriggerAlgorithm * TriggerEvent::algorithm( const std::string & nameAlgorithm ) const
 {
   for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
-    if ( nameAlgorithm == iAlgorithm->name() ) {
-      return &*iAlgorithm;
-    }
+    if ( nameAlgorithm == iAlgorithm->name() ) return &*iAlgorithm;
   }
   return 0;
 }
@@ -57,9 +55,7 @@ std::string TriggerEvent::nameAlgorithm( const unsigned bitAlgorithm, const bool
 {
 
   for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
-    if ( bitAlgorithm == iAlgorithm->bit() && techAlgorithm == iAlgorithm->techTrigger() ) {
-      return iAlgorithm->name();
-    }
+    if ( bitAlgorithm == iAlgorithm->bit() && techAlgorithm == iAlgorithm->techTrigger() ) return iAlgorithm->name();
   }
   return std::string( "" );
 
@@ -70,9 +66,7 @@ std::string TriggerEvent::nameAlgorithm( const unsigned bitAlgorithm, const bool
 unsigned TriggerEvent::indexAlgorithm( const std::string & nameAlgorithm ) const
 {
   unsigned iAlgorithm( 0 );
-  while ( iAlgorithm < algorithms()->size() && algorithms()->at( iAlgorithm ).name() != nameAlgorithm ) {
-    ++iAlgorithm;
-  }
+  while ( iAlgorithm < algorithms()->size() && algorithms()->at( iAlgorithm ).name() != nameAlgorithm ) ++iAlgorithm;
   return iAlgorithm;
 }
 
@@ -156,9 +150,7 @@ TriggerAlgorithmRefVector TriggerEvent::acceptedPhysAlgorithms() const
 const TriggerPath * TriggerEvent::path( const std::string & namePath ) const
 {
   for ( TriggerPathCollection::const_iterator iPath = paths()->begin(); iPath != paths()->end(); ++iPath ) {
-    if ( namePath == iPath->name() ) {
-      return &*iPath;
-    }
+    if ( namePath == iPath->name() ) return &*iPath;
   }
   return 0;
 }
@@ -168,9 +160,7 @@ const TriggerPath * TriggerEvent::path( const std::string & namePath ) const
 unsigned TriggerEvent::indexPath( const std::string & namePath ) const
 {
   unsigned iPath( 0 );
-  while ( iPath < paths()->size() && paths()->at( iPath ).name() != namePath ) {
-    ++iPath;
-  }
+  while ( iPath < paths()->size() && paths()->at( iPath ).name() != namePath ) ++iPath;
   return iPath;
 }
 
@@ -194,9 +184,7 @@ TriggerPathRefVector TriggerEvent::acceptedPaths() const
 const TriggerFilter * TriggerEvent::filter( const std::string & labelFilter ) const
 {
   for ( TriggerFilterCollection::const_iterator iFilter = filters()->begin(); iFilter != filters()->end(); ++iFilter ) {
-    if ( iFilter->label() == labelFilter ) {
-      return &*iFilter;
-    }
+    if ( iFilter->label() == labelFilter ) return &*iFilter;
   }
   return 0;
 }
@@ -206,9 +194,7 @@ const TriggerFilter * TriggerEvent::filter( const std::string & labelFilter ) co
 unsigned TriggerEvent::indexFilter( const std::string & labelFilter ) const
 {
   unsigned iFilter( 0 );
-  while ( iFilter < filters()->size() && filters()->at( iFilter ).label() != labelFilter ) {
-    ++iFilter;
-  }
+  while ( iFilter < filters()->size() && filters()->at( iFilter ).label() != labelFilter ) ++iFilter;
   return iFilter;
 }
 
@@ -288,9 +274,7 @@ bool TriggerEvent::filterInPath( const TriggerFilterRef & filterRef, const std::
 {
   TriggerFilterRefVector theFilters = pathFilters( namePath );
   for ( TriggerFilterRefVectorIterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
-    if ( filterRef == *iFilter ) {
-      return true;
-    }
+    if ( filterRef == *iFilter ) return true;
   }
   return false;
 }
@@ -397,9 +381,7 @@ bool TriggerEvent::objectInPath( const TriggerObjectRef & objectRef, const std::
 {
   TriggerFilterRefVector theFilters = pathFilters( namePath );
   for ( TriggerFilterRefVectorIterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
-    if ( objectInFilter( objectRef, ( *iFilter )->label() ) ) {
-      return true;
-    }
+    if ( objectInFilter( objectRef, ( *iFilter )->label() ) ) return true;
   }
   return false;
 }
@@ -487,9 +469,7 @@ TriggerAlgorithmRefVector TriggerEvent::objectAlgorithms( const TriggerObjectRef
 std::vector< std::string > TriggerEvent::triggerMatchers() const
 {
   std::vector< std::string > theMatchers;
-  for ( TriggerObjectMatchContainer::const_iterator iMatch = triggerObjectMatchResults()->begin(); iMatch != triggerObjectMatchResults()->end(); ++iMatch ) {
-    theMatchers.push_back( iMatch->first );
-  }
+  for ( TriggerObjectMatchContainer::const_iterator iMatch = triggerObjectMatchResults()->begin(); iMatch != triggerObjectMatchResults()->end(); ++iMatch ) theMatchers.push_back( iMatch->first );
   return theMatchers;
 }
 
@@ -498,8 +478,6 @@ std::vector< std::string > TriggerEvent::triggerMatchers() const
 const TriggerObjectMatch * TriggerEvent::triggerObjectMatchResult( const std::string & labelMatcher ) const
 {
   const TriggerObjectMatchContainer::const_iterator iMatch( triggerObjectMatchResults()->find( labelMatcher ) );
-  if ( iMatch != triggerObjectMatchResults()->end() ) {
-    return iMatch->second.get();
-  }
+  if ( iMatch != triggerObjectMatchResults()->end() ) return iMatch->second.get();
   return 0;
 }

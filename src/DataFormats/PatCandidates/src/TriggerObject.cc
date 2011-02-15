@@ -1,5 +1,5 @@
 //
-// $Id: TriggerObject.cc,v 1.11 2010/12/16 18:39:17 vadler Exp $
+// $Id: TriggerObject.cc,v 1.12 2010/12/20 20:05:52 vadler Exp $
 //
 
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
@@ -66,14 +66,59 @@ TriggerObject::TriggerObject( const reco::Particle::PolarLorentzVector & vec, in
 // Methods
 
 
+// Add a new trigger object type identifier
+bool TriggerObject::addTriggerObjectType( trigger::TriggerObjectType triggerObjectType )
+{
+  // Add trigger object type in any case, if not present yet
+  if ( ! hasTriggerObjectType( triggerObjectType ) ) triggerObjectTypes_.push_back( triggerObjectType );
+  // Checks for consistency of HLT object type
+  if ( triggerObjectType > 0 && isHltObject() > 0 ) return true;
+  // Checks for consistency of L1 object type
+  if ( triggerObjectType < 0 && isL1Object()  > 0 ) return true;
+  // Trigger object type found to be inconsistent
+  return false;
+}
+
+
 // Get all trigger object type identifiers
 std::vector< int > TriggerObject::triggerObjectTypes() const
 {
   std::vector< int > triggerObjectTypes;
-  for ( size_t iTo = 0; iTo < triggerObjectTypes_.size(); ++iTo ) {
-    triggerObjectTypes.push_back( triggerObjectTypes_.at( iTo ) );
-  }
+  std::copy( triggerObjectTypes_.begin(), triggerObjectTypes_.end(), triggerObjectTypes.begin() );
   return triggerObjectTypes;
+}
+
+
+// Check for the "generic" trigger object type (HLT or L1)
+int TriggerObject::isHltObject() const
+{
+  int reply( 2 );
+  if ( triggerObjectTypes_.size() == 0 ) return reply;
+  for ( size_t iTo = 0; iTo < triggerObjectTypes_.size(); ++iTo ) {
+    if ( triggerObjectTypes_.at( iTo ) > 0 ) {
+      if ( reply == 0 ) return -1;
+      reply = 1;
+    } else if ( triggerObjectTypes_.at( iTo ) < 0 ) {
+      if ( reply == 1 ) return -1;
+      reply = 0;
+    }
+  }
+  return reply;
+}
+int TriggerObject::isL1Object() const
+{
+  int reply( 2 );
+  if ( triggerObjectTypes_.size() == 0 ) return reply;
+  for ( size_t iTo = 0; iTo < triggerObjectTypes_.size(); ++iTo ) {
+    if ( triggerObjectTypes_.at( iTo ) < 0 ) {
+      if ( reply == 0 ) return -1;
+      reply = 1;
+    } else if ( triggerObjectTypes_.at( iTo ) > 0 ) {
+      if ( reply == 1 ) return -1;
+      reply = 0;
+    }
+  }
+  return reply;
 }
 
 

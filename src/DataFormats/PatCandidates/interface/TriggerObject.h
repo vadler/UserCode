@@ -7,7 +7,7 @@
 // Package:    PatCandidates
 // Class:      pat::TriggerObject
 //
-// $Id: TriggerObject.h,v 1.12 2010/12/19 21:06:43 vadler Exp $
+// $Id: TriggerObject.h,v 1.13 2010/12/20 20:05:52 vadler Exp $
 //
 /**
   \class    pat::TriggerObject TriggerObject.h "DataFormats/PatCandidates/interface/TriggerObject.h"
@@ -18,7 +18,7 @@
    https://twiki.cern.ch/twiki/bin/view/CMS/SWGuidePATTrigger#TriggerObject
 
   \author   Volker Adler
-  \version  $Id: TriggerObject.h,v 1.12 2010/12/19 21:06:43 vadler Exp $
+  \version  $Id: TriggerObject.h,v 1.13 2010/12/20 20:05:52 vadler Exp $
 */
 
 
@@ -86,10 +86,11 @@ namespace pat {
       void setCollection( const std::string & collName )   { collection_ = collName; };
       void setCollection( const edm::InputTag & collName ) { collection_ = collName.encode(); };
       /// Add a new trigger object type identifier
-      void addTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) { if ( ! hasTriggerObjectType( triggerObjectType ) ) triggerObjectTypes_.push_back( triggerObjectType ); };
-      void addTriggerObjectType( int                        triggerObjectType ) { addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
-      void addFilterId( trigger::TriggerObjectType triggerObjectType ) { addTriggerObjectType( triggerObjectType ); };                               // for backward compatibility
-      void addFilterId( int                        triggerObjectType ) { addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); }; // for backward compatibility
+      /// Checks, if this is consistent with existing identifiers
+      bool addTriggerObjectType( trigger::TriggerObjectType triggerObjectType );
+      bool addTriggerObjectType( int                        triggerObjectType ) { return addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
+      bool addFilterId( trigger::TriggerObjectType triggerObjectType ) { return addTriggerObjectType( triggerObjectType ); };                               // for backward compatibility
+      bool addFilterId( int                        triggerObjectType ) { return addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); }; // for backward compatibility
       /// Get the label of the collection the trigger object originates from
       std::string collection() const { return collection_; };
       /// Get all trigger object type identifiers
@@ -100,6 +101,13 @@ namespace pat {
       /// Checks, if a certain label of original collection is assigned
       virtual bool hasCollection( const std::string   & collName ) const;
       virtual bool hasCollection( const edm::InputTag & collName ) const { return hasCollection( collName.encode() ); };
+      /// Check for the "generic" trigger object type (HLT or L1); return
+      ///  2, if undefined (no type yet or only zeroes)
+      ///  1, if true
+      ///  0, if false (true for other generic type)
+      /// -1, if inconsistent (mixed types found)
+      int isHltObject() const;
+      int isL1Object() const;
       /// Checks, if a certain trigger object type identifier is assigned
       bool hasTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) const;
       bool hasTriggerObjectType( int                        triggerObjectType ) const { return hasTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
@@ -134,6 +142,10 @@ namespace pat {
 
       /// Calls 'hasCollection(...)'
       virtual bool coll( const std::string & collName ) const { return hasCollection( collName ); };
+      /// Calls 'isHlt()'
+      int hlt() const { return isHltObject(); };
+      /// Calls 'isL1()'
+      int l1() const { return isL1Object(); };
       /// Calls 'hasTriggerObjectType(...)'
       bool type( trigger::TriggerObjectType triggerObjectType ) const { return hasTriggerObjectType( triggerObjectType ); };
       bool type( int                        triggerObjectType ) const { return hasTriggerObjectType( trigger::TriggerObjectType ( triggerObjectType ) ); };
