@@ -24,6 +24,7 @@
 
 
 #include "DataFormats/PatCandidates/interface/TriggerAlgorithm.h"
+#include "DataFormats/PatCandidates/interface/TriggerCondition.h"
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerFilter.h"
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
@@ -82,6 +83,8 @@ namespace pat {
       /// Member collection related data members
       /// Reference to pat::TriggerAlgorithmCollection in event
       TriggerAlgorithmRefProd algorithms_;
+      /// Reference to pat::TriggerConditionCollection in event
+      TriggerConditionRefProd conditions_;
       /// Reference to pat::TriggerPathCollection in event
       TriggerPathRefProd paths_;
       /// Reference to pat::TriggerAlgorithmCollection in event
