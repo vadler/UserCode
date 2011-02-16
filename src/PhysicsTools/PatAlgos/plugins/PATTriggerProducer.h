@@ -23,8 +23,9 @@
    re-arranges it and writes it either (full mode) to
    - a pat::TriggerObjectCollection,
    - a pat::TriggerFilterCollection,
-   - a pat::TriggerPathCollection and
-   - optionally a pat::TriggerAlgorithmCollection
+   - a pat::TriggerPathCollection,
+   - a pat::TriggerAlgorithmCollection (optionally filled or empty) and
+   - a pat::TriggerConditionCollection (optionally filled or empty)
    or (stand-alone mode) to
    - a pat::TriggerObjectStandAloneCollection
 
@@ -86,7 +87,7 @@ namespace pat {
       bool          autoProcessNameL1ExtraTauJet_;
       bool          autoProcessNameL1ExtraETM_;
       bool          autoProcessNameL1ExtraHTM_;
-      bool          saveL1Refs_;        // configuration (optional with default)
+      bool          saveL1Refs_;                        // configuration (optional with default)
       // HLT
       HLTConfigProvider         hltConfig_;
       bool                      hltConfigInit_;

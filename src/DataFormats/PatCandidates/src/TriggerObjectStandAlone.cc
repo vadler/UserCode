@@ -6,7 +6,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include <iostream> // DEBUG
 
 
 using namespace pat;
