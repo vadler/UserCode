@@ -38,17 +38,52 @@ namespace pat {
 
       /// Data Members
 
+      /// Name of the condition
+      std::string name_;
+      /// Did condition succeed?
+      bool accept_;
+      /// Special identifier for the used trigger object type as defined in
+      /// trigger::TriggerObjectType (DataFormats/HLTReco/interface/TriggerTypeDefs.h)
+      trigger::TriggerObjectType triggerObjectType_;
+      /// Indeces of trigger objects in pat::TriggerObjectCollection in event
+      /// as produced together with the pat::TriggerAlgorithmCollection
+      std::vector< unsigned > objectKeys_;
+
     public:
 
       /// Constructors and Desctructor
 
       /// Default constructor
       TriggerCondition();
+      /// Constructor from condition name "only"
+      TriggerCondition( const std::string & name, trigger::TriggerObjectType triggerObjectType = trigger::TriggerObjectType( 0 ) );
+      /// Constructor from values
+      TriggerCondition( const std::string & name, bool accept, trigger::TriggerObjectType triggerObjectType = trigger::TriggerObjectType( 0 ) );
 
       /// Destructor
       virtual ~TriggerCondition() {};
 
       /// Methods
+
+      /// Set the condition name
+      void setName( const std::string & name ) { name_ = name; };
+      /// Set the success flag
+      void setAccept( bool accept ) { accept_ = accept; };
+      /// Set the trigger object type
+      void setTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) { triggerObjectType_ = triggerObjectType; };
+      void setTriggerObjectType( int triggerObjectType )                        { triggerObjectType_ = trigger::TriggerObjectType( triggerObjectType ); };
+      /// Add a new trigger object collection index
+      void addObjectKey( unsigned objectKey ) { if ( ! hasObjectKey( objectKey ) ) objectKeys_.push_back( objectKey ); };
+      /// Get the filter label
+      std::string name() const { return name_; };
+      /// Get the success flag
+      bool wasAccept() const { return accept_; };
+      /// Get the trigger object type
+      int triggerObjectType() const { return triggerObjectType_; };
+      /// Get all trigger object collection indeces
+      std::vector< unsigned > objectKeys() const { return objectKeys_; };
+      /// Checks, if a certain trigger object collection index is assigned
+      bool hasObjectKey( unsigned objectKey ) const;
 
   };
 

@@ -53,12 +53,10 @@ const TriggerAlgorithm * TriggerEvent::algorithm( const std::string & nameAlgori
 // Get the name of a certain L1 algorithm in the event collection by bit number physics or technical algorithms,
 std::string TriggerEvent::nameAlgorithm( const unsigned bitAlgorithm, const bool techAlgorithm ) const
 {
-
   for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
     if ( bitAlgorithm == iAlgorithm->bit() && techAlgorithm == iAlgorithm->techTrigger() ) return iAlgorithm->name();
   }
   return std::string( "" );
-
 }
 
 
@@ -146,6 +144,40 @@ TriggerAlgorithmRefVector TriggerEvent::acceptedPhysAlgorithms() const
 }
 
 
+// Get a pointer to a certain L1 condition by name
+const TriggerCondition * TriggerEvent::condition( const std::string & nameCondition ) const
+{
+  for ( TriggerConditionCollection::const_iterator iCondition = conditions()->begin(); iCondition != conditions()->end(); ++iCondition ) {
+    if ( nameCondition == iCondition->name() ) return &*iCondition;
+  }
+  return 0;
+}
+
+
+// Get the index of a certain L1 condition in the event collection by name
+unsigned TriggerEvent::indexCondition( const std::string & nameCondition ) const
+{
+  unsigned iCondition( 0 );
+  while ( iCondition < conditions()->size() && conditions()->at( iCondition ).name() != nameCondition ) ++iCondition;
+  return iCondition;
+}
+
+
+// Get a vector of references to all succeeding L1 conditions
+TriggerConditionRefVector TriggerEvent::acceptedConditions() const
+{
+  TriggerConditionRefVector theAcceptedConditions;
+  for ( TriggerConditionCollection::const_iterator iCondition = conditions()->begin(); iCondition != conditions()->end(); ++iCondition ) {
+    if ( iCondition->wasAccept() ) {
+      const std::string nameCondition( iCondition->name() );
+      const TriggerConditionRef conditionRef( conditions(), indexCondition( nameCondition ) );
+      theAcceptedConditions.push_back( conditionRef );
+    }
+  }
+  return theAcceptedConditions;
+}
+
+
 // Get a pointer to a certain HLT path by name
 const TriggerPath * TriggerEvent::path( const std::string & namePath ) const
 {
@@ -214,17 +246,6 @@ TriggerFilterRefVector TriggerEvent::acceptedFilters() const
 }
 
 
-// Add a pat::TriggerObjectMatch association
-bool TriggerEvent::addObjectMatchResult( const TriggerObjectMatchRefProd & trigMatches, const std::string & labelMatcher )
-{
-  if ( triggerObjectMatchResults()->find( labelMatcher ) == triggerObjectMatchResults()->end() ) {
-    objectMatchResults_[ labelMatcher ] = trigMatches;
-    return true;
-  }
-  return false;
-}
-
-
 // Get a vector of references to all trigger objects by trigger object type
 TriggerObjectRefVector TriggerEvent::objects( trigger::TriggerObjectType triggerObjectType ) const
 {
@@ -236,6 +257,153 @@ TriggerObjectRefVector TriggerEvent::objects( trigger::TriggerObjectType trigger
     }
   }
   return theObjects;
+}
+
+
+// Get a vector of references to all conditions assigned to a certain algorithm given by name
+TriggerConditionRefVector TriggerEvent::algorithmConditions( const std::string & nameAlgorithm ) const
+{
+  TriggerConditionRefVector theAlgorithmConditions;
+  if ( algorithm( nameAlgorithm ) ) {
+    for ( unsigned iC = 0; iC < algorithm( nameAlgorithm )->conditionKeys().size(); ++iC ) {
+      const TriggerConditionRef conditionRef( conditions(), algorithm( nameAlgorithm )->conditionKeys().at( iC ) );
+      theAlgorithmConditions.push_back( conditionRef );
+    }
+  }
+  return theAlgorithmConditions;
+}
+
+
+// Checks, if a condition is assigned to a certain algorithm given by name
+bool TriggerEvent::conditionInAlgorithm( const TriggerConditionRef & conditionRef, const std::string & nameAlgorithm ) const
+{
+  TriggerConditionRefVector theConditions = algorithmConditions( nameAlgorithm );
+  for ( TriggerConditionRefVectorIterator iCondition = theConditions.begin(); iCondition != theConditions.end(); ++iCondition ) {
+    if ( conditionRef == *iCondition ) return true;
+  }
+  return false;
+}
+
+
+// Get a vector of references to all algorithms, which have a certain condition assigned
+TriggerAlgorithmRefVector TriggerEvent::conditionAlgorithms( const TriggerConditionRef & conditionRef ) const
+{
+  TriggerAlgorithmRefVector theConditionAlgorithms;
+  size_t cAlgorithms( 0 );
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    const std::string nameAlgorithm( iAlgorithm->name() );
+    if ( conditionInAlgorithm( conditionRef, nameAlgorithm ) ) {
+      const TriggerAlgorithmRef algorithmRef( algorithms(), cAlgorithms );
+      theConditionAlgorithms.push_back( algorithmRef );
+    }
+    ++cAlgorithms;
+  }
+  return theConditionAlgorithms;
+}
+
+
+// Get a list of all trigger object collections used in a certain condition given by name
+std::vector< std::string > TriggerEvent::conditionCollections( const std::string & nameCondition ) const
+{
+  std::vector< std::string > theConditionCollections;
+  if ( condition( nameCondition ) ) {
+    for ( unsigned iObject = 0; iObject < objects()->size(); ++iObject ) {
+      if ( condition( nameCondition )->hasObjectKey( iObject ) ) {
+        bool found( false );
+        std::string objectCollection( objects()->at( iObject ).collection() );
+        for ( std::vector< std::string >::const_iterator iC = theConditionCollections.begin(); iC != theConditionCollections.end(); ++iC ) {
+          if ( *iC == objectCollection ) {
+            found = true;
+            break;
+          }
+        }
+        if ( ! found ) {
+          theConditionCollections.push_back( objectCollection );
+        }
+      }
+    }
+  }
+  return theConditionCollections;
+}
+
+
+// Get a vector of references to all objects, which were used in a certain condition given by name
+TriggerObjectRefVector TriggerEvent::conditionObjects( const std::string & nameCondition ) const
+{
+  TriggerObjectRefVector theConditionObjects;
+  if ( condition( nameCondition ) ) {
+    for ( unsigned iObject = 0; iObject < objects()->size(); ++iObject ) {
+      if ( condition( nameCondition )->hasObjectKey( iObject ) ) {
+        const TriggerObjectRef objectRef( objects(), iObject );
+        theConditionObjects.push_back( objectRef );
+      }
+    }
+  }
+  return theConditionObjects;
+}
+
+
+// Checks, if an object was used in a certain condition given by name
+bool TriggerEvent::objectInCondition( const TriggerObjectRef & objectRef, const std::string & nameCondition ) const {
+  if ( condition( nameCondition ) ) return condition( nameCondition )->hasObjectKey( objectRef.key() );
+  return false;
+}
+
+
+// Get a vector of references to all conditions, which have a certain object assigned
+TriggerConditionRefVector TriggerEvent::objectConditions( const TriggerObjectRef & objectRef ) const
+{
+  TriggerConditionRefVector theObjectConditions;
+  for ( TriggerConditionCollection::const_iterator iCondition = conditions()->begin(); iCondition != conditions()->end(); ++iCondition ) {
+    const std::string nameCondition( iCondition->name() );
+    if ( objectInCondition( objectRef, nameCondition ) ) {
+      const TriggerConditionRef conditionRef( conditions(), indexCondition( nameCondition ) );
+      theObjectConditions.push_back( conditionRef );
+    }
+  }
+  return theObjectConditions;
+}
+
+
+// Get a vector of references to all objects, which were used in a certain algorithm given by name
+TriggerObjectRefVector TriggerEvent::algorithmObjects( const std::string & nameAlgorithm ) const
+{
+  TriggerObjectRefVector    theAlgorithmObjects;
+  TriggerConditionRefVector theConditions = algorithmConditions( nameAlgorithm );
+  for ( TriggerConditionRefVectorIterator iCondition = theConditions.begin(); iCondition != theConditions.end(); ++iCondition ) {
+    const std::string nameCondition( ( *iCondition )->name() );
+    TriggerObjectRefVector theObjects = conditionObjects( nameCondition );
+    for ( TriggerObjectRefVectorIterator iObject = theObjects.begin(); iObject != theObjects.end(); ++iObject ) {
+      theAlgorithmObjects.push_back( *iObject );
+    }
+  }
+  return theAlgorithmObjects;
+}
+
+
+// Checks, if an object was used in a certain algorithm given by name
+bool TriggerEvent::objectInAlgorithm( const TriggerObjectRef & objectRef, const std::string & nameAlgorithm ) const
+{
+  TriggerConditionRefVector theConditions = algorithmConditions( nameAlgorithm );
+  for ( TriggerConditionRefVectorIterator iCondition = theConditions.begin(); iCondition != theConditions.end(); ++iCondition ) {
+    if ( objectInCondition( objectRef, ( *iCondition )->name() ) ) return true;
+  }
+  return false;
+}
+
+
+// Get a vector of references to all algorithms, which have a certain object assigned
+TriggerAlgorithmRefVector TriggerEvent::objectAlgorithms( const TriggerObjectRef & objectRef ) const
+{
+  TriggerAlgorithmRefVector theObjectAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    const std::string nameAlgorithm( iAlgorithm->name() );
+    if ( objectInAlgorithm( objectRef, nameAlgorithm ) ) {
+      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
+      theObjectAlgorithms.push_back( algorithmRef );
+    }
+  }
+  return theObjectAlgorithms;
 }
 
 
@@ -360,7 +528,7 @@ TriggerFilterRefVector TriggerEvent::objectFilters( const TriggerObjectRef & obj
 }
 
 
-// Get a vector of references to all objects, which wree used in a certain path given by name
+// Get a vector of references to all objects, which were used in a certain path given by name
 TriggerObjectRefVector TriggerEvent::pathObjects( const std::string & namePath ) const
 {
   TriggerObjectRefVector thePathObjects;
@@ -402,66 +570,14 @@ TriggerPathRefVector TriggerEvent::objectPaths( const TriggerObjectRef & objectR
 }
 
 
-// Get a list of all trigger object collections used in a certain algorithm given by name
-std::vector< std::string > TriggerEvent::algorithmCollections( const std::string & nameAlgorithm ) const
+// Add a pat::TriggerObjectMatch association
+bool TriggerEvent::addObjectMatchResult( const TriggerObjectMatchRefProd & trigMatches, const std::string & labelMatcher )
 {
-  std::vector< std::string > theAlgorithmCollections;
-  if ( filter( nameAlgorithm ) ) {
-    for ( unsigned iObject = 0; iObject < objects()->size(); ++iObject ) {
-      if ( algorithm( nameAlgorithm )->hasObjectKey( iObject ) ) {
-        bool found( false );
-        std::string objectCollection( objects()->at( iObject ).collection() );
-        for ( std::vector< std::string >::const_iterator iC = theAlgorithmCollections.begin(); iC != theAlgorithmCollections.end(); ++iC ) {
-          if ( *iC == objectCollection ) {
-            found = true;
-            break;
-          }
-        }
-        if ( ! found ) {
-          theAlgorithmCollections.push_back( objectCollection );
-        }
-      }
-    }
+  if ( triggerObjectMatchResults()->find( labelMatcher ) == triggerObjectMatchResults()->end() ) {
+    objectMatchResults_[ labelMatcher ] = trigMatches;
+    return true;
   }
-  return theAlgorithmCollections;
-}
-
-
-// Get a vector of references to all objects, which were used in a certain algorithm given by name
-TriggerObjectRefVector TriggerEvent::algorithmObjects( const std::string & nameAlgorithm ) const
-{
-  TriggerObjectRefVector theAlgorithmObjects;
-  if ( filter( nameAlgorithm ) ) {
-    for ( unsigned iObject = 0; iObject < objects()->size(); ++iObject ) {
-      if ( algorithm( nameAlgorithm )->hasObjectKey( iObject ) ) {
-        const TriggerObjectRef objectRef( objects(), iObject );
-        theAlgorithmObjects.push_back( objectRef );
-      }
-    }
-  }
-  return theAlgorithmObjects;
-}
-
-
-// Checks, if an object was used in a certain algorithm given by name
-bool TriggerEvent::objectInAlgorithm( const TriggerObjectRef & objectRef, const std::string & nameAlgorithm ) const {
-  if ( algorithm( nameAlgorithm ) ) return algorithm( nameAlgorithm )->hasObjectKey( objectRef.key() );
   return false;
-}
-
-
-// Get a vector of references to all algorithms, which have a certain object assigned
-TriggerAlgorithmRefVector TriggerEvent::objectAlgorithms( const TriggerObjectRef & objectRef ) const
-{
-  TriggerAlgorithmRefVector theObjectAlgorithms;
-  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
-    const std::string nameAlgorithm( iAlgorithm->name() );
-    if ( objectInAlgorithm( objectRef, nameAlgorithm ) ) {
-      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
-      theObjectAlgorithms.push_back( algorithmRef );
-    }
-  }
-  return theObjectAlgorithms;
 }
 
 

@@ -23,7 +23,7 @@ TriggerAlgorithm::TriggerAlgorithm() :
   decisionBeforeMask_(),
   decisionAfterMask_()
 {
-  objectKeys_.clear();
+  conditionKeys_.clear();
 }
 
 
@@ -38,7 +38,7 @@ TriggerAlgorithm::TriggerAlgorithm( const std::string & name ) :
   decisionBeforeMask_(),
   decisionAfterMask_()
 {
-  objectKeys_.clear();
+  conditionKeys_.clear();
 }
 
 
@@ -53,18 +53,18 @@ TriggerAlgorithm::TriggerAlgorithm( const std::string & name, const std::string 
   decisionBeforeMask_( decisionBeforeMask ),
   decisionAfterMask_( decisionAfterMask )
 {
-  objectKeys_.clear();
+  conditionKeys_.clear();
 }
 
 
 // Methods
 
 
-// Checks, if a certain trigger object collection index is assigned
-bool TriggerAlgorithm::hasObjectKey( unsigned objectKey ) const
+// Checks, if a certain trigger condition collection index is assigned
+bool TriggerAlgorithm::hasConditionKey( unsigned conditionKey ) const
 {
-  for ( size_t iO = 0; iO < objectKeys().size(); ++iO ) {
-    if ( objectKeys().at( iO ) == objectKey ) {
+  for ( size_t iO = 0; iO < conditionKeys().size(); ++iO ) {
+    if ( conditionKeys().at( iO ) == conditionKey ) {
       return true;
     }
   }

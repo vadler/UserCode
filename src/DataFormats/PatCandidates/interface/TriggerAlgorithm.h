@@ -53,9 +53,9 @@ namespace pat {
       bool decisionBeforeMask_;
       /// L1 algorithm decision, considering the mask
       bool decisionAfterMask_;
-      /// Indeces of trigger objects in pat::TriggerObjectCollection in event
+      /// Indeces of trigger conditions in pat::TriggerConditionCollection in event
       /// as produced together with the pat::TriggerAlgorithmCollection
-      std::vector< unsigned > objectKeys_;
+      std::vector< unsigned > conditionKeys_;
 
     public:
 
@@ -89,8 +89,8 @@ namespace pat {
       void setDecisionBeforeMask( bool decisionBeforeMask ) { decisionBeforeMask_ = decisionBeforeMask; };
       /// Set L1 algorithm decision, considering the mask
       void setDecisionAfterMas( bool decisionAfterMask ) { decisionAfterMask_ = decisionAfterMask; };
-      /// Add a new trigger object collection index
-      void addObjectKey( unsigned objectKey ) { if ( ! hasObjectKey( objectKey ) ) objectKeys_.push_back( objectKey ); };
+      /// Add a new trigger condition collection index
+      void addConditionKey( unsigned conditionKey ) { if ( ! hasConditionKey( conditionKey ) ) conditionKeys_.push_back( conditionKey ); };
       /// Get L1 algorithm name
       std::string name() const { return name_; };
       /// Get L1 algorithm alias
@@ -110,10 +110,10 @@ namespace pat {
       /// Get L1 algorithm decision as applied,
       /// identical to L1 algorithm decision, considering the mask
       bool decision() const { return decisionAfterMask(); };
-      /// Get all trigger object collection indeces
-      std::vector< unsigned > objectKeys() const { return objectKeys_; };
-      /// Checks, if a certain trigger object collection index is assigned
-      bool hasObjectKey( unsigned objectKey ) const;
+      /// Get all trigger condition collection indeces
+      std::vector< unsigned > conditionKeys() const { return conditionKeys_; };
+      /// Checks, if a certain trigger condition collection index is assigned
+      bool hasConditionKey( unsigned conditionKey ) const;
 
   };
 

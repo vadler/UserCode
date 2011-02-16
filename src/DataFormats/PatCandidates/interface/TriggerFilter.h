@@ -45,9 +45,9 @@ namespace pat {
       /// Indeces of trigger objects in pat::TriggerObjectCollection in event
       /// as produced together with the pat::TriggerFilterCollection
       std::vector< unsigned > objectKeys_;
-      /// List of (unique) special identifiers for the trigger object types used as defined in
+      /// List of (unique) special identifiers for the used trigger object types as defined in
       /// trigger::TriggerObjectType (DataFormats/HLTReco/interface/TriggerTypeDefs.h),
-      /// possibly empty
+      /// possibly empty or containing also zeroes
       std::vector< trigger::TriggerObjectType > triggerObjectTypes_;
       /// Indicator for filter status: -1: not run, 0: failed, 1: succeeded
       int status_;
