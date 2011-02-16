@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <iostream> // DEBUG
 
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
 #include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
@@ -401,17 +402,17 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
 
     std::auto_ptr< TriggerFilterCollection > triggerFilters( new TriggerFilterCollection() );
     triggerFilters->reserve( onlyStandAlone_ ? 0 : sizeFilters );
-    std::multimap< trigger::size_type, int >         filterIds;
+    std::multimap< trigger::size_type, int >         objectTypes;
     std::multimap< trigger::size_type, std::string > filterLabels;
 
     for ( size_t iF = 0; iF < sizeFilters; ++iF ) {
       const std::string nameFilter( handleTriggerEvent->filterTag( iF ).label() );
-      const trigger::Keys & keys = handleTriggerEvent->filterKeys( iF );
-      const trigger::Vids & ids  = handleTriggerEvent->filterIds( iF );
-      assert( ids.size() == keys.size() );
+      const trigger::Keys & keys  = handleTriggerEvent->filterKeys( iF );
+      const trigger::Vids & types = handleTriggerEvent->filterIds( iF );
+      assert( types.size() == keys.size() );
       for ( size_t iK = 0; iK < keys.size(); ++iK ) {
         filterLabels.insert( std::pair< trigger::size_type, std::string >( keys[ iK ], nameFilter ) ); // only for objects used in last active filter
-        filterIds.insert( std::pair< trigger::size_type, int >( keys[ iK ], ids[ iK ] ) );             // only for objects used in last active filter
+        objectTypes.insert( std::pair< trigger::size_type, int >( keys[ iK ], types[ iK ] ) );             // only for objects used in last active filter
       }
       if ( ! onlyStandAlone_ ) {
         TriggerFilter triggerFilter( nameFilter );
@@ -422,8 +423,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         for ( size_t iK = 0; iK < keys.size(); ++iK ) {
           triggerFilter.addObjectKey( keys[ iK ] );
         }
-        for ( size_t iI = 0; iI < ids.size(); ++iI ) {
-          triggerFilter.addObjectId( ids[ iI ] );
+        for ( size_t iT = 0; iT < types.size(); ++iT ) {
+          triggerFilter.addTriggerObjectType( types[ iT ] );
         }
         // set status from path info
         std::map< std::string, int >::iterator iS( moduleStates.find( nameFilter ) );
@@ -452,7 +453,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       while ( iO >= collectionKeys[ iC ] ) ++iC; // relies on well ordering of trigger objects with respect to the collections
       triggerObject.setCollection( handleTriggerEvent->collectionTag( iC ) );
       // set filter ID
-      for ( std::multimap< trigger::size_type, int >::iterator iM = filterIds.begin(); iM != filterIds.end(); ++iM ) {
+      for ( std::multimap< trigger::size_type, int >::iterator iM = objectTypes.begin(); iM != objectTypes.end(); ++iM ) {
         if ( iM->first == iO ) {
           triggerObject.addTriggerObjectType( iM->second );
         }
@@ -495,20 +496,21 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       }
       // physics algorithms
       for ( AlgorithmMap::const_iterator iAlgo = l1GtAlgorithms.begin(); iAlgo != l1GtAlgorithms.end(); ++iAlgo ) {
+        const std::string & algoName( iAlgo->second.algoName() );
         if ( iAlgo->second.algoBitNumber() > 127 ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << iAlgo->second.algoName() << "' has bit number " << iAlgo->second.algoBitNumber() << " > 127\n"
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " > 127\n"
                                << "Skipping";
           continue;
         }
         L1GtUtils::TriggerCategory category;
         int bit;
-        if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( iAlgo->second.algoName(), category, bit ) ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << iAlgo->second.algoName() << "' not found in the L1 menu\n"
+        if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( algoName, category, bit ) ) {
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' not found in the L1 menu\n"
                                << "Skipping";
           continue;
         }
         if ( category != L1GtUtils::AlgorithmTrigger ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << iAlgo->second.algoName() << "' does not have category 'AlgorithmTrigger' from 'L1GtUtils'\n"
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' does not have category 'AlgorithmTrigger' from 'L1GtUtils'\n"
                                << "Skipping";
           continue;
         }
@@ -516,44 +518,69 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         bool decisionAfterMask;
         int  prescale;
         int  mask;
-        int  error( l1GtUtils_.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
+        int  error( l1GtUtils_.l1Results( iEvent, algoName, decisionBeforeMask, decisionAfterMask, prescale, mask ) );
         if ( error ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << iAlgo->second.algoName() << "' decision has error code " << error << " from 'L1GtUtils'\n"
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' decision has error code " << error << " from 'L1GtUtils'\n"
                                << "Skipping";
           continue;
         }
+        TriggerAlgorithm triggerAlgo( algoName, iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
+        // conditions used in physics algorithm
         if( handleL1GlobalTriggerObjectMapRecord.isValid() ) {
-          const L1GlobalTriggerObjectMap * objectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( iAlgo->second.algoName() ) );
+          const L1GlobalTriggerObjectMap * objectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( algoName ) );
           if ( ! objectMap ) {
-            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << iAlgo->second.algoName() << "' is missing in L1GlobalTriggerObjectMapRecord\n"
-                                        << "Skipping object map";
+            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' is missing in L1GlobalTriggerObjectMapRecord\n"
+                                        << "Skipping conditions";
 //           } else if ( objectMap->algoGtlResult() != decisionBeforeMask && ( decisionBeforeMask == true || prescale == 1 ) ) {
           } else if ( objectMap->algoGtlResult() != decisionBeforeMask && decisionBeforeMask == true ) { // FIXME: understand the difference for un-prescaled algos 118, 119, 123
-            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << iAlgo->second.algoName() << "' with different decisions in\n"
+            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' with different decisions in\n"
                                         << "L1GlobalTriggerObjectMapRecord: " << objectMap->algoGtlResult() << "\n"
                                         << "L1GlobalTriggerReadoutRecord  : " << decisionBeforeMask << "\n"
-                                        << "Skipping object map";
+                                        << "Skipping conditions";
+          } else {
+            const std::vector< L1GtLogicParser::OperandToken > & tokens( objectMap->operandTokenVector() );
+// // DEBUG START
+            std::cout << "DEBUG algo " << algoName << "\t " << tokens.size() << std::endl;
+// // DEBUG END
+            for ( size_t iT = 0; iT < tokens.size(); ++iT ) {
+              const L1GtLogicParser::OperandToken & token( tokens.at( iT ) );
+// // DEBUG START
+              std::cout << "DEBUG   token " << token.tokenName << "\t " << token.tokenResult << std::endl;
+// // DEBUG END
+              size_t key( triggerConditions->size() );
+              for ( size_t iC = 0; iC < triggerConditions->size(); ++iC ) {
+                if ( token.tokenName == triggerConditions->at( iC ).name() ) {
+                  key = iC;
+                  break;
+                }
+              }
+              if ( key == triggerConditions->size() ) {
+                TriggerCondition triggerCond( token.tokenName, token.tokenResult );
+                triggerConditions->push_back( triggerCond );
+              }
+              triggerAlgo.addConditionKey( key );
+            }
           }
         }
-        TriggerAlgorithm triggerAlgo( iAlgo->second.algoName(), iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
         triggerAlgos->push_back( triggerAlgo );
       }
       // technical triggers
       for ( AlgorithmMap::const_iterator iAlgo = l1GtTechTriggers.begin(); iAlgo != l1GtTechTriggers.end(); ++iAlgo ) {
+        const std::string & algoName( iAlgo->second.algoName() );
         if ( iAlgo->second.algoBitNumber() > 63 ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << iAlgo->second.algoName() << "' has bit number " << iAlgo->second.algoBitNumber() << " > 63\n"
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " > 63\n"
                                << "Skipping";
           continue;
         }
         L1GtUtils::TriggerCategory category;
         int bit;
-        if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( iAlgo->second.algoName(), category, bit ) ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << iAlgo->second.algoName() << "' not found in the L1 menu\n"
+        if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( algoName, category, bit ) ) {
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' not found in the L1 menu\n"
                                << "Skipping";
           continue;
         }
         if ( category != L1GtUtils::TechnicalTrigger ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << iAlgo->second.algoName() << "' does not have category 'TechnicalTrigger' from 'L1GtUtils'\n"
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' does not have category 'TechnicalTrigger' from 'L1GtUtils'\n"
                                << "Skipping";
           continue;
         }
@@ -561,13 +588,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         bool decisionAfterMask;
         int  prescale;
         int  mask;
-        int  error( l1GtUtils_.l1Results( iEvent, iAlgo->second.algoName(), decisionBeforeMask, decisionAfterMask, prescale, mask ) );
+        int  error( l1GtUtils_.l1Results( iEvent, algoName, decisionBeforeMask, decisionAfterMask, prescale, mask ) );
         if ( error ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << iAlgo->second.algoName() << "' decision has error code " << error << " from 'L1GtUtils'\n"
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' decision has error code " << error << " from 'L1GtUtils'\n"
                                << "Skipping";
           continue;
         }
-        TriggerAlgorithm triggerAlgo( iAlgo->second.algoName(), iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
+        TriggerAlgorithm triggerAlgo( algoName, iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
         triggerAlgos->push_back( triggerAlgo );
       }
     }
@@ -596,6 +623,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.addTriggerObjectType( trigger::TriggerL1Mu );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+// // DEBUG START
+        std::cout << "DEBUG muon " << l1Mu << ": pt " << triggerObject.pt() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
+// // DEBUG END
       }
     } else LogError( "l1ExtraValid" ) << "l1extra::L1MuonParticleCollection product with InputTag '" << tagL1ExtraMu_.encode() << "' not in event";
   }
@@ -616,6 +646,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.addTriggerObjectType( trigger::TriggerL1NoIsoEG );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+// // DEBUG START
+        std::cout << "DEBUG eg noIso " << l1NoIsoEG << ": pt " << triggerObject.pt() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
+// // DEBUG END
       }
     } else LogError( "l1ExtraValid" ) << "l1extra::L1EmParticleCollection product with InputTag '" << tagL1ExtraNoIsoEG_.encode() << "' not in event";
   }
@@ -636,6 +669,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.addTriggerObjectType( trigger::TriggerL1IsoEG );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+// // DEBUG START
+        std::cout << "DEBUG eg iso " << l1IsoEG << ": pt " << triggerObject.pt() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
+// // DEBUG END
       }
     } else LogError( "l1ExtraValid" ) << "l1extra::L1EmParticleCollection product with InputTag '" << tagL1ExtraIsoEG_.encode() << "' not in event";
   }
@@ -656,6 +692,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.addTriggerObjectType( trigger::TriggerL1CenJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+// // DEBUG START
+        std::cout << "DEBUG jet cen " << l1CenJet << ": et " << triggerObject.et() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
+// // DEBUG END
       }
     } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraCenJet_.encode() << "' not in event";
   }
@@ -676,6 +715,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.addTriggerObjectType( trigger::TriggerL1ForJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+// // DEBUG START
+        std::cout << "DEBUG jet for " << l1ForJet << ": et " << triggerObject.et() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
+// // DEBUG END
       }
     } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraForJet_.encode() << "' not in event";
   }
@@ -696,6 +738,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.addTriggerObjectType( trigger::TriggerL1TauJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+// // DEBUG START
+        std::cout << "DEBUG jet tau " << l1TauJet << ": et " << triggerObject.et() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
+// // DEBUG END
       }
     } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraTauJet_.encode() << "' not in event";
   }
@@ -716,6 +761,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.addTriggerObjectType( trigger::TriggerL1ETM );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+// // DEBUG START
+        std::cout << "DEBUG etm " << l1ETM << ": et " << triggerObject.et() << "\t phi " << triggerObject.phi() << std::endl;
+// // DEBUG END
       }
     } else LogError( "l1ExtraValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag '" << tagL1ExtraETM_.encode() << "' not in event";
   }
@@ -736,6 +784,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.addTriggerObjectType( trigger::TriggerL1HTM );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+// // DEBUG START
+//         std::cout << "DEBUG htm " << l1HTM << ": ht " << triggerObject.ht() << "\t phi " << triggerObject.phi() << std::endl;
+// // DEBUG END
       }
     } else LogError( "l1ExtraValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag '" << tagL1ExtraHTM_.encode() << "' not in event";
   }
