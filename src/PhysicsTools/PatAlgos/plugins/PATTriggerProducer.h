@@ -87,6 +87,7 @@ namespace pat {
       bool          autoProcessNameL1ExtraTauJet_;
       bool          autoProcessNameL1ExtraETM_;
       bool          autoProcessNameL1ExtraHTM_;
+      bool          mainBxOnly_;                        // configuration (optional with default)
       bool          saveL1Refs_;                        // configuration (optional with default)
       // HLT
       HLTConfigProvider         hltConfig_;

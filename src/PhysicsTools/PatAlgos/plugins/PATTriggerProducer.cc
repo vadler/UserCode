@@ -56,6 +56,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   autoProcessNameL1ExtraTauJet_( false ),
   autoProcessNameL1ExtraETM_( false ),
   autoProcessNameL1ExtraHTM_( false ),
+  mainBxOnly_( true ),
   saveL1Refs_( false ),
   // HLT configuration parameters
   tagTriggerResults_( "TriggerResults" ),
@@ -551,6 +552,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
               for ( size_t iC = 0; iC < triggerConditions->size(); ++iC ) {
                 if ( token.tokenName == triggerConditions->at( iC ).name() ) {
                   key = iC;
+// // DEBUG START
+              std::cout << "DEBUG         EXISTS!!!" << std::endl;
+// // DEBUG END
                   break;
                 }
               }
@@ -619,6 +623,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           const reco::LeafCandidate * leafCandidate( handleL1ExtraMu->at( l1Mu ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
         }
+        if ( mainBxOnly_ ) {
+          ;
+        }
         triggerObject.setCollection( tagL1ExtraMu_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1Mu );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
@@ -641,6 +648,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraNoIsoEG->at( l1NoIsoEG ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
         }
         triggerObject.setCollection( tagL1ExtraNoIsoEG_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1NoIsoEG );
@@ -665,6 +675,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           const reco::LeafCandidate * leafCandidate( handleL1ExtraIsoEG->at( l1IsoEG ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
         }
+        if ( mainBxOnly_ ) {
+          ;
+        }
         triggerObject.setCollection( tagL1ExtraIsoEG_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1IsoEG );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
@@ -687,6 +700,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraCenJet->at( l1CenJet ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
         }
         triggerObject.setCollection( tagL1ExtraCenJet_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1CenJet );
@@ -711,6 +727,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           const reco::LeafCandidate * leafCandidate( handleL1ExtraForJet->at( l1ForJet ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
         }
+        if ( mainBxOnly_ ) {
+          ;
+        }
         triggerObject.setCollection( tagL1ExtraForJet_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1ForJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
@@ -733,6 +752,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraTauJet->at( l1TauJet ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
         }
         triggerObject.setCollection( tagL1ExtraTauJet_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1TauJet );
@@ -757,6 +779,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           const reco::LeafCandidate * leafCandidate( handleL1ExtraETM->at( l1ETM ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
         }
+        if ( mainBxOnly_ ) {
+          ;
+        }
         triggerObject.setCollection( tagL1ExtraETM_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1ETM );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
@@ -779,6 +804,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraHTM->at( l1HTM ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
         }
         triggerObject.setCollection( tagL1ExtraHTM_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1HTM );
