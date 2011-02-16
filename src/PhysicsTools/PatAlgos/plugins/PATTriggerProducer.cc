@@ -486,6 +486,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     iEvent.getByLabel( tagL1ExtraMu_, handleL1ExtraMu );
     if ( handleL1ExtraMu.isValid() ) {
       for ( size_t l1Mu = 0; l1Mu < handleL1ExtraMu->size(); ++l1Mu ) {
+        if ( mainBxOnly_ && handleL1ExtraMu->at( l1Mu ).bx() != 0 ) continue;
         TriggerObject triggerObject;
         if ( saveL1Refs_ ) {
           const reco::CandidateBaseRef leafCandRef( l1extra::L1MuonParticleRef( handleL1ExtraMu, l1Mu ) );
@@ -493,9 +494,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraMu->at( l1Mu ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
         }
         triggerObject.setCollection( tagL1ExtraMu_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1Mu );
@@ -509,6 +507,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     iEvent.getByLabel( tagL1ExtraNoIsoEG_, handleL1ExtraNoIsoEG );
     if ( handleL1ExtraNoIsoEG.isValid() ) {
       for ( size_t l1NoIsoEG = 0; l1NoIsoEG < handleL1ExtraNoIsoEG->size(); ++l1NoIsoEG ) {
+        if ( mainBxOnly_ && handleL1ExtraNoIsoEG->at( l1NoIsoEG ).bx() != 0 ) continue;
         TriggerObject triggerObject;
         if ( saveL1Refs_ ) {
           const reco::CandidateBaseRef leafCandRef( l1extra::L1EmParticleRef( handleL1ExtraNoIsoEG, l1NoIsoEG ) );
@@ -516,9 +515,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraNoIsoEG->at( l1NoIsoEG ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
         }
         triggerObject.setCollection( tagL1ExtraNoIsoEG_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1NoIsoEG );
@@ -532,6 +528,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     iEvent.getByLabel( tagL1ExtraIsoEG_, handleL1ExtraIsoEG );
     if ( handleL1ExtraIsoEG.isValid() ) {
       for ( size_t l1IsoEG = 0; l1IsoEG < handleL1ExtraIsoEG->size(); ++l1IsoEG ) {
+        if ( mainBxOnly_ && handleL1ExtraIsoEG->at( l1IsoEG ).bx() != 0 ) continue;
         TriggerObject triggerObject;
         if ( saveL1Refs_ ) {
           const reco::CandidateBaseRef leafCandRef( l1extra::L1EmParticleRef( handleL1ExtraIsoEG, l1IsoEG ) );
@@ -539,9 +536,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraIsoEG->at( l1IsoEG ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
         }
         triggerObject.setCollection( tagL1ExtraIsoEG_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1IsoEG );
@@ -555,6 +549,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     iEvent.getByLabel( tagL1ExtraCenJet_, handleL1ExtraCenJet );
     if ( handleL1ExtraCenJet.isValid() ) {
       for ( size_t l1CenJet = 0; l1CenJet < handleL1ExtraCenJet->size(); ++l1CenJet ) {
+        if ( mainBxOnly_ && handleL1ExtraCenJet->at( l1CenJet ).bx() != 0 ) continue;
         TriggerObject triggerObject;
         if ( saveL1Refs_ ) {
           const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraCenJet, l1CenJet ) );
@@ -562,9 +557,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraCenJet->at( l1CenJet ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
         }
         triggerObject.setCollection( tagL1ExtraCenJet_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1CenJet );
@@ -578,6 +570,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     iEvent.getByLabel( tagL1ExtraForJet_, handleL1ExtraForJet );
     if ( handleL1ExtraForJet.isValid() ) {
       for ( size_t l1ForJet = 0; l1ForJet < handleL1ExtraForJet->size(); ++l1ForJet ) {
+        if ( mainBxOnly_ && handleL1ExtraForJet->at( l1ForJet ).bx() != 0 ) continue;
         TriggerObject triggerObject;
         if ( saveL1Refs_ ) {
           const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraForJet, l1ForJet ) );
@@ -585,9 +578,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraForJet->at( l1ForJet ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
         }
         triggerObject.setCollection( tagL1ExtraForJet_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1ForJet );
@@ -601,6 +591,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     iEvent.getByLabel( tagL1ExtraTauJet_, handleL1ExtraTauJet );
     if ( handleL1ExtraTauJet.isValid() ) {
       for ( size_t l1TauJet = 0; l1TauJet < handleL1ExtraTauJet->size(); ++l1TauJet ) {
+        if ( mainBxOnly_ && handleL1ExtraTauJet->at( l1TauJet ).bx() != 0 ) continue;
         TriggerObject triggerObject;
         if ( saveL1Refs_ ) {
           const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraTauJet, l1TauJet ) );
@@ -608,9 +599,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraTauJet->at( l1TauJet ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
         }
         triggerObject.setCollection( tagL1ExtraTauJet_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1TauJet );
@@ -624,6 +612,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     iEvent.getByLabel( tagL1ExtraETM_, handleL1ExtraETM );
     if ( handleL1ExtraETM.isValid() ) {
       for ( size_t l1ETM = 0; l1ETM < handleL1ExtraETM->size(); ++l1ETM ) {
+        if ( mainBxOnly_ && handleL1ExtraETM->at( l1ETM ).bx() != 0 ) continue;
         TriggerObject triggerObject;
         if ( saveL1Refs_ ) {
           const reco::CandidateBaseRef leafCandRef( l1extra::L1EtMissParticleRef( handleL1ExtraETM, l1ETM ) );
@@ -631,9 +620,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraETM->at( l1ETM ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
         }
         triggerObject.setCollection( tagL1ExtraETM_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1ETM );
@@ -647,6 +633,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     iEvent.getByLabel( tagL1ExtraHTM_, handleL1ExtraHTM );
     if ( handleL1ExtraHTM.isValid() ) {
       for ( size_t l1HTM = 0; l1HTM < handleL1ExtraHTM->size(); ++l1HTM ) {
+        if ( mainBxOnly_ && handleL1ExtraHTM->at( l1HTM ).bx() != 0 ) continue;
         TriggerObject triggerObject;
         if ( saveL1Refs_ ) {
           const reco::CandidateBaseRef leafCandRef( l1extra::L1EtMissParticleRef( handleL1ExtraHTM, l1HTM ) );
@@ -654,9 +641,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         } else {
           const reco::LeafCandidate * leafCandidate( handleL1ExtraHTM->at( l1HTM ).reco::LeafCandidate::clone() );
           triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
         }
         triggerObject.setCollection( tagL1ExtraHTM_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1HTM );

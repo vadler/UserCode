@@ -22,6 +22,7 @@ process.patTrigger = cms.EDProducer(
 , processName    = cms.string( '*' )
   ## L1
 , addL1Algos     = cms.bool( True )
+, l1GlobalTriggerObjectMapRecord = cms.InputTag( "hltL1GtObjectMap" )
 , l1ExtraMu      = cms.InputTag( 'l1extraParticles', '' )
 , l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated' )
 , l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated' )
@@ -30,6 +31,7 @@ process.patTrigger = cms.EDProducer(
 , l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau' )
 , l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET' )
 , l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT' )
+, mainBxOnly     = cms.bool( False )
 , saveL1Refs     = cms.bool( True )
   ## HLT (L3)
 , triggerResults = cms.InputTag( "TriggerResults" )
