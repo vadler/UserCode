@@ -127,6 +127,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
       else                    tagL1ExtraHTM_ = InputTag( tagL1ExtraHTM_.label(), tagL1ExtraHTM_.instance(), nameProcess_ );
     }
   }
+  if ( iConfig.exists( "mainBxOnly" ) ) mainBxOnly_ = iConfig.getParameter< bool >( "mainBxOnly" );
   if ( iConfig.exists( "saveL1Refs" ) ) saveL1Refs_ = iConfig.getParameter< bool >( "saveL1Refs" );
   // HLT configuration parameters
   if ( iConfig.exists( "triggerResults" ) )      tagTriggerResults_     = iConfig.getParameter< InputTag >( "triggerResults" );
@@ -486,7 +487,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     iEvent.getByLabel( tagL1ExtraMu_, handleL1ExtraMu );
     if ( handleL1ExtraMu.isValid() ) {
       for ( size_t l1Mu = 0; l1Mu < handleL1ExtraMu->size(); ++l1Mu ) {
-        if ( mainBxOnly_ && handleL1ExtraMu->at( l1Mu ).bx() != 0 ) continue;
+// // DEBUG START
+//         if ( mainBxOnly_ && handleL1ExtraMu->at( l1Mu ).bx() != 0 ) continue;
+        if ( mainBxOnly_ && handleL1ExtraMu->at( l1Mu ).bx() != 0 ) {
+          std::cout << "SKIPPED bx = " << handleL1ExtraMu->at( l1Mu ).bx() << std::endl;
+          continue;
+        }
+// // DEBUG END
         TriggerObject triggerObject;
         if ( saveL1Refs_ ) {
           const reco::CandidateBaseRef leafCandRef( l1extra::L1MuonParticleRef( handleL1ExtraMu, l1Mu ) );
