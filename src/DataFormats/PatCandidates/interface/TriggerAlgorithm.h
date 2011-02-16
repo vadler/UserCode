@@ -45,6 +45,8 @@ namespace pat {
       bool tech_;
       /// L1 algorithm bit number
       unsigned bit_;
+      /// L1 algorithm result as determined on the GTL board
+      bool gtlResult_;
       /// L1 algorithm pre-scale
       unsigned prescale_;
       /// L1 algorithm mask
@@ -65,8 +67,9 @@ namespace pat {
       TriggerAlgorithm();
       /// Constructor from algorithm name only
       TriggerAlgorithm( const std::string & name );
-      /// Constructor from values
-      TriggerAlgorithm( const std::string & name, const std::string & alias, bool tech, unsigned bit, unsigned prescale, bool mask, bool decisionBeforeMask, bool decisionAfterMask );
+      /// Constructors from values
+      TriggerAlgorithm( const std::string & name, const std::string & alias, bool tech, unsigned bit, unsigned prescale, bool mask, bool decisionBeforeMask, bool decisionAfterMask ); // for backward compatibility
+      TriggerAlgorithm( const std::string & name, const std::string & alias, bool tech, unsigned bit, bool gtlResult, unsigned prescale, bool mask, bool decisionBeforeMask, bool decisionAfterMask );
 
       /// Destructor
       virtual ~TriggerAlgorithm() {};
@@ -81,6 +84,8 @@ namespace pat {
       void setTechTrigger( bool tech ) { tech_ = tech; };
       /// Set L1 algorithm bit number
       void setBit( unsigned bit ) { bit_ = bit; };
+      /// Set L1 algorithm GTL result
+      void setGtlResult( bool gtlResult ) { gtlResult_ = gtlResult; };
       /// Set L1 algorithm pre-scale
       void setPrescale( unsigned prescale )  { prescale_ = prescale; };
       /// Set L1 algorithm mask
@@ -99,6 +104,8 @@ namespace pat {
       bool techTrigger() const { return tech_; };
       /// Get L1 algorithm bit number
       unsigned bit() const { return bit_; };
+      /// Get L1 algorithm GTL result
+      bool gtlResult() const { return gtlResult_; };
       /// Get L1 algorithm pre-scale
       unsigned prescale() const { return prescale_; };
       /// Get L1 algorithm mask

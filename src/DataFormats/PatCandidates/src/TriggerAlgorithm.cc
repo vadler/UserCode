@@ -33,6 +33,7 @@ TriggerAlgorithm::TriggerAlgorithm( const std::string & name ) :
   alias_(),
   tech_(),
   bit_(),
+  gtlResult_(),
   prescale_(),
   mask_(),
   decisionBeforeMask_(),
@@ -42,12 +43,26 @@ TriggerAlgorithm::TriggerAlgorithm( const std::string & name ) :
 }
 
 
-// Constructor from values
+// Constructors from values
 TriggerAlgorithm::TriggerAlgorithm( const std::string & name, const std::string & alias, bool tech, unsigned bit, unsigned prescale, bool mask, bool decisionBeforeMask, bool decisionAfterMask ) :
   name_( name ),
   alias_( alias),
   tech_( tech ),
   bit_( bit ),
+  gtlResult_(),
+  prescale_( prescale ),
+  mask_( mask ),
+  decisionBeforeMask_( decisionBeforeMask ),
+  decisionAfterMask_( decisionAfterMask )
+{
+  conditionKeys_.clear();
+}
+TriggerAlgorithm::TriggerAlgorithm( const std::string & name, const std::string & alias, bool tech, unsigned bit, bool gtlResult, unsigned prescale, bool mask, bool decisionBeforeMask, bool decisionAfterMask ) :
+  name_( name ),
+  alias_( alias),
+  tech_( tech ),
+  bit_( bit ),
+  gtlResult_( gtlResult ),
   prescale_( prescale ),
   mask_( mask ),
   decisionBeforeMask_( decisionBeforeMask ),

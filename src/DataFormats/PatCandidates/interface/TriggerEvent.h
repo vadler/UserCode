@@ -193,14 +193,20 @@ namespace pat {
       unsigned indexAlgorithm( const std::string & nameAlgorithm ) const;
       /// Get a vector of references to all succeeding L1 algorithms
       TriggerAlgorithmRefVector acceptedAlgorithms() const;
+      /// Get a vector of references to all L1 algorithms succeeding on the GTL board
+      TriggerAlgorithmRefVector acceptedAlgorithmsGtl() const;
       /// Get a vector of references to all technical L1 algorithms
       TriggerAlgorithmRefVector techAlgorithms() const;
       /// Get a vector of references to all succeeding technical L1 algorithms
       TriggerAlgorithmRefVector acceptedTechAlgorithms() const;
+      /// Get a vector of references to all technical L1 algorithms succeeding on the GTL board
+      TriggerAlgorithmRefVector acceptedTechAlgorithmsGtl() const;
       /// Get a vector of references to all physics L1 algorithms
       TriggerAlgorithmRefVector physAlgorithms() const;
       /// Get a vector of references to all succeeding physics L1 algorithms
       TriggerAlgorithmRefVector acceptedPhysAlgorithms() const;
+      /// Get a vector of references to all physics L1 algorithms succeeding on the GTL board
+      TriggerAlgorithmRefVector acceptedPhysAlgorithmsGtl() const;
 
       /// L1 conditions
       /// Set the reference to the pat::TriggerConditionCollection in the event

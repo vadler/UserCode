@@ -84,6 +84,21 @@ TriggerAlgorithmRefVector TriggerEvent::acceptedAlgorithms() const
 }
 
 
+// Get a vector of references to all L1 algorithms succeeding on the GTL board
+TriggerAlgorithmRefVector TriggerEvent::acceptedAlgorithmsGtl() const
+{
+  TriggerAlgorithmRefVector theAcceptedAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    if ( iAlgorithm->gtlResult() ) {
+      const std::string nameAlgorithm( iAlgorithm->name() );
+      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
+      theAcceptedAlgorithms.push_back( algorithmRef );
+    }
+  }
+  return theAcceptedAlgorithms;
+}
+
+
 // Get a vector of references to all technical L1 algorithms
 TriggerAlgorithmRefVector TriggerEvent::techAlgorithms() const
 {
@@ -114,6 +129,21 @@ TriggerAlgorithmRefVector TriggerEvent::acceptedTechAlgorithms() const
 }
 
 
+// Get a vector of references to all technical L1 algorithms succeeding on the GTL board
+TriggerAlgorithmRefVector TriggerEvent::acceptedTechAlgorithmsGtl() const
+{
+  TriggerAlgorithmRefVector theAcceptedTechAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    if ( iAlgorithm->techTrigger() && iAlgorithm->gtlResult() ) {
+      const std::string nameAlgorithm( iAlgorithm->name() );
+      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
+      theAcceptedTechAlgorithms.push_back( algorithmRef );
+    }
+  }
+  return theAcceptedTechAlgorithms;
+}
+
+
 // Get a vector of references to all physics L1 algorithms
 TriggerAlgorithmRefVector TriggerEvent::physAlgorithms() const
 {
@@ -135,6 +165,21 @@ TriggerAlgorithmRefVector TriggerEvent::acceptedPhysAlgorithms() const
   TriggerAlgorithmRefVector theAcceptedPhysAlgorithms;
   for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
     if ( ! iAlgorithm->techTrigger() && iAlgorithm->decision() ) {
+      const std::string nameAlgorithm( iAlgorithm->name() );
+      const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
+      theAcceptedPhysAlgorithms.push_back( algorithmRef );
+    }
+  }
+  return theAcceptedPhysAlgorithms;
+}
+
+
+// Get a vector of references to all physics L1 algorithms succeeding on the GTL board
+TriggerAlgorithmRefVector TriggerEvent::acceptedPhysAlgorithmsGtl() const
+{
+  TriggerAlgorithmRefVector theAcceptedPhysAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    if ( ! iAlgorithm->techTrigger() && iAlgorithm->gtlResult() ) {
       const std::string nameAlgorithm( iAlgorithm->name() );
       const TriggerAlgorithmRef algorithmRef( algorithms(), indexAlgorithm( nameAlgorithm ) );
       theAcceptedPhysAlgorithms.push_back( algorithmRef );

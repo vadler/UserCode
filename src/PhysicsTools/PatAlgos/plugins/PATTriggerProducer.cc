@@ -708,14 +708,15 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           const L1GlobalTriggerObjectMap * objectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( algoName ) );
           if ( ! objectMap ) {
             LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' is missing in L1GlobalTriggerObjectMapRecord\n"
-                                        << "Skipping conditions";
+                                        << "Skipping conditions and GTL result";
 //           } else if ( objectMap->algoGtlResult() != decisionBeforeMask && ( decisionBeforeMask == true || prescale == 1 ) ) {
           } else if ( objectMap->algoGtlResult() != decisionBeforeMask && decisionBeforeMask == true ) { // FIXME: understand the difference for un-prescaled algos 118, 119, 123
             LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' with different decisions in\n"
                                         << "L1GlobalTriggerObjectMapRecord: " << objectMap->algoGtlResult() << "\n"
                                         << "L1GlobalTriggerReadoutRecord  : " << decisionBeforeMask << "\n"
-                                        << "Skipping conditions";
+                                        << "Skipping conditions and GTL result";
           } else {
+            triggerAlgo.setGtlResult( objectMap->algoGtlResult() );
             const std::vector< L1GtLogicParser::OperandToken > & tokens( objectMap->operandTokenVector() );
 // // DEBUG START
             std::cout << "DEBUG algo " << algoName << "\t " << tokens.size() << std::endl;
