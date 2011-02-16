@@ -68,10 +68,6 @@ namespace pat {
       bool hasPathOrAlgorithm( const std::string & name, bool firing = true ) const;
       /// Checks, if the usage indicator vector has been filled
       bool hasFiring() const { return ( pathLastFilterAccepted_.size() > 0 && pathLastFilterAccepted_.size() == pathNames_.size() ); };
-      /// Prints warnings, if an HLT objects functions is used with an L1 or inconsistent objects
-      void checkHlt() const;
-      /// Prints warnings, if an L1 objects functions is used with an HLT or inconsistent objects
-      void checkL1() const;
 
     public:
 
@@ -95,37 +91,37 @@ namespace pat {
       /// Methods
 
       /// Adds a new HLT filter label
-      void addFilterLabel( const std::string & filterLabel );
+      void addFilterLabel( const std::string & filterLabel ) { addFilterOrCondition( filterLabel ); };
       /// Adds a new L1 condition name
-      void addConditionName( const std::string & conditionName );
+      void addConditionName( const std::string & conditionName ) { addFilterOrCondition( conditionName ); };
       /// Adds a new HLT path name
-      void addPathName( const std::string & pathName, bool pathLastFilterAccepted = true );
+      void addPathName( const std::string & pathName, bool pathLastFilterAccepted = true ) { addPathOrAlgorithm( pathName, pathLastFilterAccepted ); };
       /// Adds a new L1 algorithm name
-      void addAlgorithmName( const std::string & algorithmName, bool algoCondAccepted = true );
+      void addAlgorithmName( const std::string & algorithmName, bool algoCondAccepted = true ) { addPathOrAlgorithm( algorithmName, algoCondAccepted ); };
       /// Gets all HLT filter labels
-      std::vector< std::string > filterLabels() const;
+      std::vector< std::string > filterLabels() const { return filtersOrConditions(); };
       /// Gets all L1 condition names
-      std::vector< std::string > conditionNames() const;
+      std::vector< std::string > conditionNames() const { return filtersOrConditions(); };
       /// Gets all HLT path names
-      std::vector< std::string > pathNames( bool pathLastFilterAccepted = true ) const;
+      std::vector< std::string > pathNames( bool pathLastFilterAccepted = true ) const { return pathsOrAlgorithms( pathLastFilterAccepted ); };
       /// Gets all L1 algorithm names
-      std::vector< std::string > algorithmNames( bool algoCondAccepted = true ) const;
+      std::vector< std::string > algorithmNames( bool algoCondAccepted = true ) const { return pathsOrAlgorithms( algoCondAccepted ); };
       /// Gets the pat::TriggerObject (parent class)
       TriggerObject triggerObject();
       /// Checks, if a certain HLT filter label is assigned
-      bool hasFilterLabel( const std::string & filterLabel ) const;
+      bool hasFilterLabel( const std::string & filterLabel ) const { return hasFilterOrCondition( filterLabel ); };
       /// Checks, if a certain L1 condition name is assigned
-      bool hasConditionName( const std::string & conditionName ) const;
+      bool hasConditionName( const std::string & conditionName ) const { return hasFilterOrCondition( conditionName ); };
       /// Checks, if a certain HLT path name is assigned
-      bool hasPathName( const std::string & pathName, bool pathLastFilterAccepted = true ) const;
+      bool hasPathName( const std::string & pathName, bool pathLastFilterAccepted = true ) const { return hasPathOrAlgorithm( pathName, pathLastFilterAccepted ); };
       /// Checks, if a certain L1 algorithm name is assigned
-      bool hasAlgorithmName( const std::string & algorithmName, bool algoCondAccepted = true ) const;
+      bool hasAlgorithmName( const std::string & algorithmName, bool algoCondAccepted = true ) const { return hasPathOrAlgorithm( algorithmName, algoCondAccepted ); };
       /// Checks, if a certain label of original collection is assigned (method overrides)
       virtual bool hasCollection( const std::string & collName ) const;
       virtual bool hasCollection( const edm::InputTag & collName ) const { return hasCollection( collName.encode() ); };
       /// Checks, if the usage indicator vector has been filled
-      bool hasPathLastFilterAccepted() const;
-      bool hasAlgoCondAccepted() const;
+      bool hasPathLastFilterAccepted() const { return hasFiring(); };
+      bool hasAlgoCondAccepted() const { return hasFiring(); };
 
       /// Special methods for the cut string parser
       /// - argument types usable in the cut string parser
