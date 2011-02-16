@@ -478,6 +478,198 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
 
   } // if ( goodHlt )
 
+  // L1 objects
+  // (needs to be done after HLT objects, since their x-links with filters rely on their collection keys)
+
+  if ( ! tagL1ExtraMu_.label().empty() ) {
+    Handle< l1extra::L1MuonParticleCollection > handleL1ExtraMu;
+    iEvent.getByLabel( tagL1ExtraMu_, handleL1ExtraMu );
+    if ( handleL1ExtraMu.isValid() ) {
+      for ( size_t l1Mu = 0; l1Mu < handleL1ExtraMu->size(); ++l1Mu ) {
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1MuonParticleRef( handleL1ExtraMu, l1Mu ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraMu->at( l1Mu ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
+        }
+        triggerObject.setCollection( tagL1ExtraMu_ );
+        triggerObject.addTriggerObjectType( trigger::TriggerL1Mu );
+        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
+        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+      }
+    } else LogError( "l1ExtraValid" ) << "l1extra::L1MuonParticleCollection product with InputTag '" << tagL1ExtraMu_.encode() << "' not in event";
+  }
+  if ( ! tagL1ExtraNoIsoEG_.label().empty() ) {
+    Handle< l1extra::L1EmParticleCollection > handleL1ExtraNoIsoEG;
+    iEvent.getByLabel( tagL1ExtraNoIsoEG_, handleL1ExtraNoIsoEG );
+    if ( handleL1ExtraNoIsoEG.isValid() ) {
+      for ( size_t l1NoIsoEG = 0; l1NoIsoEG < handleL1ExtraNoIsoEG->size(); ++l1NoIsoEG ) {
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1EmParticleRef( handleL1ExtraNoIsoEG, l1NoIsoEG ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraNoIsoEG->at( l1NoIsoEG ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
+        }
+        triggerObject.setCollection( tagL1ExtraNoIsoEG_ );
+        triggerObject.addTriggerObjectType( trigger::TriggerL1NoIsoEG );
+        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
+        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+      }
+    } else LogError( "l1ExtraValid" ) << "l1extra::L1EmParticleCollection product with InputTag '" << tagL1ExtraNoIsoEG_.encode() << "' not in event";
+  }
+  if ( ! tagL1ExtraIsoEG_.label().empty() ) {
+    Handle< l1extra::L1EmParticleCollection > handleL1ExtraIsoEG;
+    iEvent.getByLabel( tagL1ExtraIsoEG_, handleL1ExtraIsoEG );
+    if ( handleL1ExtraIsoEG.isValid() ) {
+      for ( size_t l1IsoEG = 0; l1IsoEG < handleL1ExtraIsoEG->size(); ++l1IsoEG ) {
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1EmParticleRef( handleL1ExtraIsoEG, l1IsoEG ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraIsoEG->at( l1IsoEG ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
+        }
+        triggerObject.setCollection( tagL1ExtraIsoEG_ );
+        triggerObject.addTriggerObjectType( trigger::TriggerL1IsoEG );
+        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
+        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+      }
+    } else LogError( "l1ExtraValid" ) << "l1extra::L1EmParticleCollection product with InputTag '" << tagL1ExtraIsoEG_.encode() << "' not in event";
+  }
+  if ( ! tagL1ExtraCenJet_.label().empty() ) {
+    Handle< l1extra::L1JetParticleCollection > handleL1ExtraCenJet;
+    iEvent.getByLabel( tagL1ExtraCenJet_, handleL1ExtraCenJet );
+    if ( handleL1ExtraCenJet.isValid() ) {
+      for ( size_t l1CenJet = 0; l1CenJet < handleL1ExtraCenJet->size(); ++l1CenJet ) {
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraCenJet, l1CenJet ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraCenJet->at( l1CenJet ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
+        }
+        triggerObject.setCollection( tagL1ExtraCenJet_ );
+        triggerObject.addTriggerObjectType( trigger::TriggerL1CenJet );
+        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
+        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+      }
+    } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraCenJet_.encode() << "' not in event";
+  }
+  if ( ! tagL1ExtraForJet_.label().empty() ) {
+    Handle< l1extra::L1JetParticleCollection > handleL1ExtraForJet;
+    iEvent.getByLabel( tagL1ExtraForJet_, handleL1ExtraForJet );
+    if ( handleL1ExtraForJet.isValid() ) {
+      for ( size_t l1ForJet = 0; l1ForJet < handleL1ExtraForJet->size(); ++l1ForJet ) {
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraForJet, l1ForJet ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraForJet->at( l1ForJet ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
+        }
+        triggerObject.setCollection( tagL1ExtraForJet_ );
+        triggerObject.addTriggerObjectType( trigger::TriggerL1ForJet );
+        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
+        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+      }
+    } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraForJet_.encode() << "' not in event";
+  }
+  if ( ! tagL1ExtraTauJet_.label().empty() ) {
+    Handle< l1extra::L1JetParticleCollection > handleL1ExtraTauJet;
+    iEvent.getByLabel( tagL1ExtraTauJet_, handleL1ExtraTauJet );
+    if ( handleL1ExtraTauJet.isValid() ) {
+      for ( size_t l1TauJet = 0; l1TauJet < handleL1ExtraTauJet->size(); ++l1TauJet ) {
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraTauJet, l1TauJet ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraTauJet->at( l1TauJet ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
+        }
+        triggerObject.setCollection( tagL1ExtraTauJet_ );
+        triggerObject.addTriggerObjectType( trigger::TriggerL1TauJet );
+        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
+        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+      }
+    } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraTauJet_.encode() << "' not in event";
+  }
+  if ( ! tagL1ExtraETM_ .label().empty()) {
+    Handle< l1extra::L1EtMissParticleCollection > handleL1ExtraETM;
+    iEvent.getByLabel( tagL1ExtraETM_, handleL1ExtraETM );
+    if ( handleL1ExtraETM.isValid() ) {
+      for ( size_t l1ETM = 0; l1ETM < handleL1ExtraETM->size(); ++l1ETM ) {
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1EtMissParticleRef( handleL1ExtraETM, l1ETM ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraETM->at( l1ETM ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
+        }
+        triggerObject.setCollection( tagL1ExtraETM_ );
+        triggerObject.addTriggerObjectType( trigger::TriggerL1ETM );
+        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
+        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+      }
+    } else LogError( "l1ExtraValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag '" << tagL1ExtraETM_.encode() << "' not in event";
+  }
+  if ( ! tagL1ExtraHTM_.label().empty() ) {
+    Handle< l1extra::L1EtMissParticleCollection > handleL1ExtraHTM;
+    iEvent.getByLabel( tagL1ExtraHTM_, handleL1ExtraHTM );
+    if ( handleL1ExtraHTM.isValid() ) {
+      for ( size_t l1HTM = 0; l1HTM < handleL1ExtraHTM->size(); ++l1HTM ) {
+        TriggerObject triggerObject;
+        if ( saveL1Refs_ ) {
+          const reco::CandidateBaseRef leafCandRef( l1extra::L1EtMissParticleRef( handleL1ExtraHTM, l1HTM ) );
+          triggerObject = TriggerObject( leafCandRef );
+        } else {
+          const reco::LeafCandidate * leafCandidate( handleL1ExtraHTM->at( l1HTM ).reco::LeafCandidate::clone() );
+          triggerObject = TriggerObject( *leafCandidate );
+        }
+        if ( mainBxOnly_ ) {
+          ;
+        }
+        triggerObject.setCollection( tagL1ExtraHTM_ );
+        triggerObject.addTriggerObjectType( trigger::TriggerL1HTM );
+        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
+        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+      }
+    } else LogError( "l1ExtraValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag '" << tagL1ExtraHTM_.encode() << "' not in event";
+  }
+
+  // Put HLT & L1 objects to event
+  if ( ! onlyStandAlone_ ) iEvent.put( triggerObjects );
+  iEvent.put( triggerObjectsStandAlone );
+
   // L1 algorithms
   if ( ! onlyStandAlone_ ) {
     std::auto_ptr< TriggerAlgorithmCollection > triggerAlgos( new TriggerAlgorithmCollection() );
@@ -606,222 +798,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     iEvent.put( triggerAlgos );
     iEvent.put( triggerConditions );
   }
-
-  // L1 objects
-  // (needs to be done after HLT objects, since their x-links with filters rely on their collection keys)
-
-  if ( ! tagL1ExtraMu_.label().empty() ) {
-    Handle< l1extra::L1MuonParticleCollection > handleL1ExtraMu;
-    iEvent.getByLabel( tagL1ExtraMu_, handleL1ExtraMu );
-    if ( handleL1ExtraMu.isValid() ) {
-      for ( size_t l1Mu = 0; l1Mu < handleL1ExtraMu->size(); ++l1Mu ) {
-        TriggerObject triggerObject;
-        if ( saveL1Refs_ ) {
-          const reco::CandidateBaseRef leafCandRef( l1extra::L1MuonParticleRef( handleL1ExtraMu, l1Mu ) );
-          triggerObject = TriggerObject( leafCandRef );
-        } else {
-          const reco::LeafCandidate * leafCandidate( handleL1ExtraMu->at( l1Mu ).reco::LeafCandidate::clone() );
-          triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
-        }
-        triggerObject.setCollection( tagL1ExtraMu_ );
-        triggerObject.addTriggerObjectType( trigger::TriggerL1Mu );
-        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
-// // DEBUG START
-        std::cout << "DEBUG muon " << l1Mu << ": pt " << triggerObject.pt() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
-// // DEBUG END
-      }
-    } else LogError( "l1ExtraValid" ) << "l1extra::L1MuonParticleCollection product with InputTag '" << tagL1ExtraMu_.encode() << "' not in event";
-  }
-  if ( ! tagL1ExtraNoIsoEG_.label().empty() ) {
-    Handle< l1extra::L1EmParticleCollection > handleL1ExtraNoIsoEG;
-    iEvent.getByLabel( tagL1ExtraNoIsoEG_, handleL1ExtraNoIsoEG );
-    if ( handleL1ExtraNoIsoEG.isValid() ) {
-      for ( size_t l1NoIsoEG = 0; l1NoIsoEG < handleL1ExtraNoIsoEG->size(); ++l1NoIsoEG ) {
-        TriggerObject triggerObject;
-        if ( saveL1Refs_ ) {
-          const reco::CandidateBaseRef leafCandRef( l1extra::L1EmParticleRef( handleL1ExtraNoIsoEG, l1NoIsoEG ) );
-          triggerObject = TriggerObject( leafCandRef );
-        } else {
-          const reco::LeafCandidate * leafCandidate( handleL1ExtraNoIsoEG->at( l1NoIsoEG ).reco::LeafCandidate::clone() );
-          triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
-        }
-        triggerObject.setCollection( tagL1ExtraNoIsoEG_ );
-        triggerObject.addTriggerObjectType( trigger::TriggerL1NoIsoEG );
-        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
-// // DEBUG START
-        std::cout << "DEBUG eg noIso " << l1NoIsoEG << ": pt " << triggerObject.pt() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
-// // DEBUG END
-      }
-    } else LogError( "l1ExtraValid" ) << "l1extra::L1EmParticleCollection product with InputTag '" << tagL1ExtraNoIsoEG_.encode() << "' not in event";
-  }
-  if ( ! tagL1ExtraIsoEG_.label().empty() ) {
-    Handle< l1extra::L1EmParticleCollection > handleL1ExtraIsoEG;
-    iEvent.getByLabel( tagL1ExtraIsoEG_, handleL1ExtraIsoEG );
-    if ( handleL1ExtraIsoEG.isValid() ) {
-      for ( size_t l1IsoEG = 0; l1IsoEG < handleL1ExtraIsoEG->size(); ++l1IsoEG ) {
-        TriggerObject triggerObject;
-        if ( saveL1Refs_ ) {
-          const reco::CandidateBaseRef leafCandRef( l1extra::L1EmParticleRef( handleL1ExtraIsoEG, l1IsoEG ) );
-          triggerObject = TriggerObject( leafCandRef );
-        } else {
-          const reco::LeafCandidate * leafCandidate( handleL1ExtraIsoEG->at( l1IsoEG ).reco::LeafCandidate::clone() );
-          triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
-        }
-        triggerObject.setCollection( tagL1ExtraIsoEG_ );
-        triggerObject.addTriggerObjectType( trigger::TriggerL1IsoEG );
-        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
-// // DEBUG START
-        std::cout << "DEBUG eg iso " << l1IsoEG << ": pt " << triggerObject.pt() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
-// // DEBUG END
-      }
-    } else LogError( "l1ExtraValid" ) << "l1extra::L1EmParticleCollection product with InputTag '" << tagL1ExtraIsoEG_.encode() << "' not in event";
-  }
-  if ( ! tagL1ExtraCenJet_.label().empty() ) {
-    Handle< l1extra::L1JetParticleCollection > handleL1ExtraCenJet;
-    iEvent.getByLabel( tagL1ExtraCenJet_, handleL1ExtraCenJet );
-    if ( handleL1ExtraCenJet.isValid() ) {
-      for ( size_t l1CenJet = 0; l1CenJet < handleL1ExtraCenJet->size(); ++l1CenJet ) {
-        TriggerObject triggerObject;
-        if ( saveL1Refs_ ) {
-          const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraCenJet, l1CenJet ) );
-          triggerObject = TriggerObject( leafCandRef );
-        } else {
-          const reco::LeafCandidate * leafCandidate( handleL1ExtraCenJet->at( l1CenJet ).reco::LeafCandidate::clone() );
-          triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
-        }
-        triggerObject.setCollection( tagL1ExtraCenJet_ );
-        triggerObject.addTriggerObjectType( trigger::TriggerL1CenJet );
-        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
-// // DEBUG START
-        std::cout << "DEBUG jet cen " << l1CenJet << ": et " << triggerObject.et() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
-// // DEBUG END
-      }
-    } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraCenJet_.encode() << "' not in event";
-  }
-  if ( ! tagL1ExtraForJet_.label().empty() ) {
-    Handle< l1extra::L1JetParticleCollection > handleL1ExtraForJet;
-    iEvent.getByLabel( tagL1ExtraForJet_, handleL1ExtraForJet );
-    if ( handleL1ExtraForJet.isValid() ) {
-      for ( size_t l1ForJet = 0; l1ForJet < handleL1ExtraForJet->size(); ++l1ForJet ) {
-        TriggerObject triggerObject;
-        if ( saveL1Refs_ ) {
-          const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraForJet, l1ForJet ) );
-          triggerObject = TriggerObject( leafCandRef );
-        } else {
-          const reco::LeafCandidate * leafCandidate( handleL1ExtraForJet->at( l1ForJet ).reco::LeafCandidate::clone() );
-          triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
-        }
-        triggerObject.setCollection( tagL1ExtraForJet_ );
-        triggerObject.addTriggerObjectType( trigger::TriggerL1ForJet );
-        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
-// // DEBUG START
-        std::cout << "DEBUG jet for " << l1ForJet << ": et " << triggerObject.et() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
-// // DEBUG END
-      }
-    } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraForJet_.encode() << "' not in event";
-  }
-  if ( ! tagL1ExtraTauJet_.label().empty() ) {
-    Handle< l1extra::L1JetParticleCollection > handleL1ExtraTauJet;
-    iEvent.getByLabel( tagL1ExtraTauJet_, handleL1ExtraTauJet );
-    if ( handleL1ExtraTauJet.isValid() ) {
-      for ( size_t l1TauJet = 0; l1TauJet < handleL1ExtraTauJet->size(); ++l1TauJet ) {
-        TriggerObject triggerObject;
-        if ( saveL1Refs_ ) {
-          const reco::CandidateBaseRef leafCandRef( l1extra::L1JetParticleRef( handleL1ExtraTauJet, l1TauJet ) );
-          triggerObject = TriggerObject( leafCandRef );
-        } else {
-          const reco::LeafCandidate * leafCandidate( handleL1ExtraTauJet->at( l1TauJet ).reco::LeafCandidate::clone() );
-          triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
-        }
-        triggerObject.setCollection( tagL1ExtraTauJet_ );
-        triggerObject.addTriggerObjectType( trigger::TriggerL1TauJet );
-        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
-// // DEBUG START
-        std::cout << "DEBUG jet tau " << l1TauJet << ": et " << triggerObject.et() << "\t eta " << triggerObject.eta() << "\t phi " << triggerObject.phi() << std::endl;
-// // DEBUG END
-      }
-    } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraTauJet_.encode() << "' not in event";
-  }
-  if ( ! tagL1ExtraETM_ .label().empty()) {
-    Handle< l1extra::L1EtMissParticleCollection > handleL1ExtraETM;
-    iEvent.getByLabel( tagL1ExtraETM_, handleL1ExtraETM );
-    if ( handleL1ExtraETM.isValid() ) {
-      for ( size_t l1ETM = 0; l1ETM < handleL1ExtraETM->size(); ++l1ETM ) {
-        TriggerObject triggerObject;
-        if ( saveL1Refs_ ) {
-          const reco::CandidateBaseRef leafCandRef( l1extra::L1EtMissParticleRef( handleL1ExtraETM, l1ETM ) );
-          triggerObject = TriggerObject( leafCandRef );
-        } else {
-          const reco::LeafCandidate * leafCandidate( handleL1ExtraETM->at( l1ETM ).reco::LeafCandidate::clone() );
-          triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
-        }
-        triggerObject.setCollection( tagL1ExtraETM_ );
-        triggerObject.addTriggerObjectType( trigger::TriggerL1ETM );
-        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
-// // DEBUG START
-        std::cout << "DEBUG etm " << l1ETM << ": et " << triggerObject.et() << "\t phi " << triggerObject.phi() << std::endl;
-// // DEBUG END
-      }
-    } else LogError( "l1ExtraValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag '" << tagL1ExtraETM_.encode() << "' not in event";
-  }
-  if ( ! tagL1ExtraHTM_.label().empty() ) {
-    Handle< l1extra::L1EtMissParticleCollection > handleL1ExtraHTM;
-    iEvent.getByLabel( tagL1ExtraHTM_, handleL1ExtraHTM );
-    if ( handleL1ExtraHTM.isValid() ) {
-      for ( size_t l1HTM = 0; l1HTM < handleL1ExtraHTM->size(); ++l1HTM ) {
-        TriggerObject triggerObject;
-        if ( saveL1Refs_ ) {
-          const reco::CandidateBaseRef leafCandRef( l1extra::L1EtMissParticleRef( handleL1ExtraHTM, l1HTM ) );
-          triggerObject = TriggerObject( leafCandRef );
-        } else {
-          const reco::LeafCandidate * leafCandidate( handleL1ExtraHTM->at( l1HTM ).reco::LeafCandidate::clone() );
-          triggerObject = TriggerObject( *leafCandidate );
-        }
-        if ( mainBxOnly_ ) {
-          ;
-        }
-        triggerObject.setCollection( tagL1ExtraHTM_ );
-        triggerObject.addTriggerObjectType( trigger::TriggerL1HTM );
-        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
-// // DEBUG START
-//         std::cout << "DEBUG htm " << l1HTM << ": ht " << triggerObject.ht() << "\t phi " << triggerObject.phi() << std::endl;
-// // DEBUG END
-      }
-    } else LogError( "l1ExtraValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag '" << tagL1ExtraHTM_.encode() << "' not in event";
-  }
-
-  // Put HLT & L1 objects to event
-  if ( ! onlyStandAlone_ ) iEvent.put( triggerObjects );
-  iEvent.put( triggerObjectsStandAlone );
 
 }
 
