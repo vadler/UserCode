@@ -12,7 +12,6 @@
 <use   name="DataFormats/HepMCCandidate"/>
 <use   name="DataFormats/BTauReco"/>
 <use   name="DataFormats/L1Trigger"/>
-<use   name="DataFormats/L1GlobalTrigger"/>
 <use   name="DataFormats/HLTReco"/>
 <use   name="boost"/>
 <use   name="rootrflx"/>

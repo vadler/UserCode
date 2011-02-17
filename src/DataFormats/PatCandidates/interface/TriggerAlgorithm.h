@@ -44,7 +44,7 @@ namespace pat {
       /// L1 algorithm alias
       std::string alias_;
       /// L1 algorithm logival expression
-      L1GtLogicParser logic_;
+      std::string logic_;
       /// Flag for technical L1 algorithms
       bool tech_;
       /// L1 algorithm bit number
@@ -107,8 +107,7 @@ namespace pat {
       /// Get L1 algorithm alias
       std::string alias() const { return alias_; };
       /// Get L1 algorithm logical expression
-      std::string     logicalExpression() const { return logic_.logicalExpression(); };
-      L1GtLogicParser logicalExpressionParsed() const { return logic_; };
+      std::string logicalExpression() const { return logic_; };
       /// Get flag for technical L1 algorithms
       bool techTrigger() const { return tech_; };
       /// Get L1 algorithm bit number
