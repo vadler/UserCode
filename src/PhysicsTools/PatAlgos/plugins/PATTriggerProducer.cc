@@ -12,6 +12,7 @@
 
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
 #include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
@@ -670,13 +671,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       iEvent.getByLabel( tagL1GlobalTriggerObjectMapRecord_, handleL1GlobalTriggerObjectMapRecord );
       if( ! handleL1GlobalTriggerObjectMapRecord.isValid() ) {
         LogWarning( "l1ObjectMap" ) << "L1GlobalTriggerObjectMapRecord product with InputTag '" << tagL1GlobalTriggerObjectMapRecord_.encode() << "' not in event\n"
-                                    << "No L1 objects available for algorithms";
+                                    << "No L1 objects and GTL results available for physics algorithms";
       }
       // physics algorithms
       for ( AlgorithmMap::const_iterator iAlgo = l1GtAlgorithms.begin(); iAlgo != l1GtAlgorithms.end(); ++iAlgo ) {
         const std::string & algoName( iAlgo->second.algoName() );
-        if ( iAlgo->second.algoBitNumber() > 127 ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " > 127\n"
+        if ( ! iAlgo->second.algoBitNumber() < L1GlobalTriggerReadoutSetup::NumberPhysTriggers ) {
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberPhysTriggers << "\n"
                                << "Skipping";
           continue;
         }
@@ -703,7 +704,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           continue;
         }
         TriggerAlgorithm triggerAlgo( algoName, iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
-        // conditions used in physics algorithm
+        // GTL result and used conditions in physics algorithm
         if( handleL1GlobalTriggerObjectMapRecord.isValid() ) {
           const L1GlobalTriggerObjectMap * objectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( algoName ) );
           if ( ! objectMap ) {
@@ -730,14 +731,20 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
               for ( size_t iC = 0; iC < triggerConditions->size(); ++iC ) {
                 if ( token.tokenName == triggerConditions->at( iC ).name() ) {
                   key = iC;
-// // DEBUG START
-              std::cout << "DEBUG         EXISTS!!!" << std::endl;
-// // DEBUG END
                   break;
                 }
               }
               if ( key == triggerConditions->size() ) {
                 TriggerCondition triggerCond( token.tokenName, token.tokenResult );
+// // DEBUG START
+                CombinationsInCond combis( objectMap->combinationVector().at( token.tokenNumber ) );
+                for ( size_t iVV = 0; iVV < combis.size(); ++iVV ) {
+                  SingleCombInCond combi( combis.at( iVV ) );
+                  for ( size_t iV = 0; iV < combi.size(); ++iV ) {
+                    triggerCond.addObjectKey( unsigned( combi.at( iV ) ) );
+                  }
+                }
+// // DEBUG END
                 triggerConditions->push_back( triggerCond );
               }
               triggerAlgo.addConditionKey( key );
@@ -749,8 +756,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       // technical triggers
       for ( AlgorithmMap::const_iterator iAlgo = l1GtTechTriggers.begin(); iAlgo != l1GtTechTriggers.end(); ++iAlgo ) {
         const std::string & algoName( iAlgo->second.algoName() );
-        if ( iAlgo->second.algoBitNumber() > 63 ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " > 63\n"
+        if ( ! iAlgo->second.algoBitNumber() < L1GlobalTriggerReadoutSetup::NumberTechnicalTriggers ) {
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberTechnicalTriggers << "\n"
                                << "Skipping";
           continue;
         }
