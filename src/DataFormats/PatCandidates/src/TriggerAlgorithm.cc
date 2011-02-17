@@ -16,6 +16,7 @@ using namespace pat;
 TriggerAlgorithm::TriggerAlgorithm() :
   name_(),
   alias_(),
+  expression_(),
   tech_(),
   bit_(),
   prescale_(),
@@ -31,6 +32,7 @@ TriggerAlgorithm::TriggerAlgorithm() :
 TriggerAlgorithm::TriggerAlgorithm( const std::string & name ) :
   name_( name ),
   alias_(),
+  expression_(),
   tech_(),
   bit_(),
   gtlResult_(),
@@ -47,6 +49,7 @@ TriggerAlgorithm::TriggerAlgorithm( const std::string & name ) :
 TriggerAlgorithm::TriggerAlgorithm( const std::string & name, const std::string & alias, bool tech, unsigned bit, unsigned prescale, bool mask, bool decisionBeforeMask, bool decisionAfterMask ) :
   name_( name ),
   alias_( alias),
+  expression_(),
   tech_( tech ),
   bit_( bit ),
   gtlResult_(),
@@ -60,6 +63,7 @@ TriggerAlgorithm::TriggerAlgorithm( const std::string & name, const std::string 
 TriggerAlgorithm::TriggerAlgorithm( const std::string & name, const std::string & alias, bool tech, unsigned bit, bool gtlResult, unsigned prescale, bool mask, bool decisionBeforeMask, bool decisionAfterMask ) :
   name_( name ),
   alias_( alias),
+  expression_(),
   tech_( tech ),
   bit_( bit ),
   gtlResult_( gtlResult ),

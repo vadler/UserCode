@@ -674,7 +674,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
                                     << "No L1 objects and GTL results available for physics algorithms";
       }
       // physics algorithms
-      for ( AlgorithmMap::const_iterator iAlgo = l1GtAlgorithms.begin(); iAlgo != l1GtAlgorithms.end(); ++iAlgo ) {
+      for ( CItAlgo iAlgo = l1GtAlgorithms.begin(); iAlgo != l1GtAlgorithms.end(); ++iAlgo ) {
         const std::string & algoName( iAlgo->second.algoName() );
         if ( ! iAlgo->second.algoBitNumber() < L1GlobalTriggerReadoutSetup::NumberPhysTriggers ) {
           LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberPhysTriggers << "\n"
@@ -704,6 +704,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           continue;
         }
         TriggerAlgorithm triggerAlgo( algoName, iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
+        triggerAlgo.setLogicalExpression( iAlgo->second.algoLogicalExpression() );
         // GTL result and used conditions in physics algorithm
         if( handleL1GlobalTriggerObjectMapRecord.isValid() ) {
           const L1GlobalTriggerObjectMap * objectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( algoName ) );
@@ -754,7 +755,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerAlgos->push_back( triggerAlgo );
       }
       // technical triggers
-      for ( AlgorithmMap::const_iterator iAlgo = l1GtTechTriggers.begin(); iAlgo != l1GtTechTriggers.end(); ++iAlgo ) {
+      for ( CItAlgo iAlgo = l1GtTechTriggers.begin(); iAlgo != l1GtTechTriggers.end(); ++iAlgo ) {
         const std::string & algoName( iAlgo->second.algoName() );
         if ( ! iAlgo->second.algoBitNumber() < L1GlobalTriggerReadoutSetup::NumberTechnicalTriggers ) {
           LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberTechnicalTriggers << "\n"
@@ -784,6 +785,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           continue;
         }
         TriggerAlgorithm triggerAlgo( algoName, iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
+        triggerAlgo.setLogicalExpression( iAlgo->second.algoLogicalExpression() );
         triggerAlgos->push_back( triggerAlgo );
       }
     }
