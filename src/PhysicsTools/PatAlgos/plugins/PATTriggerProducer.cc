@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <map>
+#include <utility>
 #include <cassert>
 
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
@@ -695,14 +696,14 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     if ( addL1Algos_ ) {
       // fill trigger obejct types transalation map (yes, it's ugly!)
       std::map< L1GtObject, trigger::TriggerObjectType > mapObjectTypes;
-      mapObjectTypes.insert( make_pair( Mu     , trigger::TriggerL1Mu ) );
-      mapObjectTypes.insert( make_pair( NoIsoEG, trigger::TriggerL1NoIsoEG ) );
-      mapObjectTypes.insert( make_pair( IsoEG  , trigger::TriggerL1IsoEG ) );
-      mapObjectTypes.insert( make_pair( CenJet , trigger::TriggerL1CenJet ) );
-      mapObjectTypes.insert( make_pair( ForJet , trigger::TriggerL1ForJet ) );
-      mapObjectTypes.insert( make_pair( TauJet , trigger::TriggerL1TauJet ) );
-      mapObjectTypes.insert( make_pair( ETM    , trigger::TriggerL1ETM ) );
-      mapObjectTypes.insert( make_pair( HTM    , trigger::TriggerL1HTM ) );
+      mapObjectTypes.insert( std::make_pair( Mu     , trigger::TriggerL1Mu ) );
+      mapObjectTypes.insert( std::make_pair( NoIsoEG, trigger::TriggerL1NoIsoEG ) );
+      mapObjectTypes.insert( std::make_pair( IsoEG  , trigger::TriggerL1IsoEG ) );
+      mapObjectTypes.insert( std::make_pair( CenJet , trigger::TriggerL1CenJet ) );
+      mapObjectTypes.insert( std::make_pair( ForJet , trigger::TriggerL1ForJet ) );
+      mapObjectTypes.insert( std::make_pair( TauJet , trigger::TriggerL1TauJet ) );
+      mapObjectTypes.insert( std::make_pair( ETM    , trigger::TriggerL1ETM ) );
+      mapObjectTypes.insert( std::make_pair( HTM    , trigger::TriggerL1HTM ) );
       // get and cache L1 menu
       l1GtUtils_.retrieveL1EventSetup( iSetup );
       ESHandle< L1GtTriggerMenu > handleL1GtTriggerMenu;
@@ -782,15 +783,20 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
               }
               if ( key == triggerConditions->size() ) {
                 TriggerCondition triggerCond( token.tokenName, token.tokenResult );
-                triggerCond.setCategory( l1GtConditions[ triggerCond.name() ].condCategory() );
-                triggerCond.setType( l1GtConditions[ triggerCond.name() ].condType() );
-                triggerCond.setTriggerObjectType( mapObjectTypes[ l1GtConditions[ triggerCond.name() ].objectType().at( 0 ) ] ); // FIXME: adjust as soon as object types are mixed
-                CombinationsInCond combis( objectMap->combinationVector().at( token.tokenNumber ) );
-                for ( size_t iVV = 0; iVV < combis.size(); ++iVV ) {
-                  SingleCombInCond combi( combis.at( iVV ) );
-                  for ( size_t iV = 0; iV < combi.size(); ++iV ) {
-                    triggerCond.addObjectKey( l1ObjectTypeMap[ l1GtConditions[ triggerCond.name() ].objectType().at( iV ) ].at( combi.at( iV ) ) ); // already prepared for mixed object types
+                if ( l1GtConditions.find( triggerCond.name() ) != l1GtConditions.end() ) {
+                  triggerCond.setCategory( l1GtConditions[ triggerCond.name() ]->condCategory() );
+                  triggerCond.setType( l1GtConditions[ triggerCond.name() ]->condType() );
+                  triggerCond.setTriggerObjectType( mapObjectTypes[ l1GtConditions[ triggerCond.name() ]->objectType().at( 0 ) ] ); // FIXME: adjust as soon as object types are mixed
+                  CombinationsInCond combis( objectMap->combinationVector().at( token.tokenNumber ) );
+                  for ( size_t iVV = 0; iVV < combis.size(); ++iVV ) {
+                    SingleCombInCond combi( combis.at( iVV ) );
+                    for ( size_t iV = 0; iV < combi.size(); ++iV ) {
+                      triggerCond.addObjectKey( l1ObjectTypeMap[ l1GtConditions[ triggerCond.name() ]->objectType().at( iV ) ].at( combi.at( iV ) ) ); // already prepared for mixed object types
+                    }
                   }
+                } else {
+                  LogWarning( "l1CondMap" ) << "L1 conditions '" << triggerCond.name() << "' not found in the L1 menu\n"
+                                            << "Remains incomplete";
                 }
                 triggerConditions->push_back( triggerCond );
               }
