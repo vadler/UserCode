@@ -8,7 +8,6 @@
 #include <vector>
 #include <map>
 #include <cassert>
-#include <iostream> // DEBUG
 
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
 #include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
@@ -694,6 +693,17 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     std::auto_ptr< TriggerAlgorithmCollection > triggerAlgos( new TriggerAlgorithmCollection() );
     std::auto_ptr< TriggerConditionCollection > triggerConditions( new TriggerConditionCollection() );
     if ( addL1Algos_ ) {
+      // fill trigger obejct types transalation map (yes, it's ugly!)
+      std::map< L1GtObject, trigger::TriggerObjectType > mapObjectTypes;
+      mapObjectTypes.insert( make_pair( Mu     , trigger::TriggerL1Mu ) );
+      mapObjectTypes.insert( make_pair( NoIsoEG, trigger::TriggerL1NoIsoEG ) );
+      mapObjectTypes.insert( make_pair( IsoEG  , trigger::TriggerL1IsoEG ) );
+      mapObjectTypes.insert( make_pair( CenJet , trigger::TriggerL1CenJet ) );
+      mapObjectTypes.insert( make_pair( ForJet , trigger::TriggerL1ForJet ) );
+      mapObjectTypes.insert( make_pair( TauJet , trigger::TriggerL1TauJet ) );
+      mapObjectTypes.insert( make_pair( ETM    , trigger::TriggerL1ETM ) );
+      mapObjectTypes.insert( make_pair( HTM    , trigger::TriggerL1HTM ) );
+      // get and cache L1 menu
       l1GtUtils_.retrieveL1EventSetup( iSetup );
       ESHandle< L1GtTriggerMenu > handleL1GtTriggerMenu;
       iSetup.get< L1GtTriggerMenuRcd >().get( handleL1GtTriggerMenu );
@@ -702,7 +712,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       const AlgorithmMap l1GtTechTriggers( l1GtTriggerMenu.gtTechnicalTriggerMap() );
       l1GtTriggerMenu.buildGtConditionMap();
       const std::vector< ConditionMap > l1GtConditionsVector( l1GtTriggerMenu.gtConditionMap() );
-      // Cache conditions in one single condition map
+      // cache conditions in one single condition map
       ConditionMap l1GtConditions;
       for ( size_t iCv = 0; iCv < l1GtConditionsVector.size(); ++iCv ) {
         l1GtConditions.insert( l1GtConditionsVector.at( iCv ).begin(), l1GtConditionsVector.at( iCv ).end() );
@@ -746,10 +756,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         }
         TriggerAlgorithm triggerAlgo( algoName, iAlgo->second.algoAlias(), category == L1GtUtils::TechnicalTrigger, (unsigned)bit, (unsigned)prescale, (bool)mask, decisionBeforeMask, decisionAfterMask );
         triggerAlgo.setLogicalExpression( iAlgo->second.algoLogicalExpression() );
-// // DEBUG START
-        std::cout << "DEBUG algo " << triggerAlgo.name() << std::endl;
-        std::cout << "DEBUG   expression " << triggerAlgo.logicalExpression() << std::endl;
-// // DEBUG END
         // GTL result and used conditions in physics algorithm
         if( handleL1GlobalTriggerObjectMapRecord.isValid() ) {
           const L1GlobalTriggerObjectMap * objectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( algoName ) );
@@ -767,9 +773,6 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
             const std::vector< L1GtLogicParser::OperandToken > & tokens( objectMap->operandTokenVector() );
             for ( size_t iT = 0; iT < tokens.size(); ++iT ) {
               const L1GtLogicParser::OperandToken & token( tokens.at( iT ) );
-// // DEBUG START
-              std::cout << "DEBUG   token " << token.tokenName << "\t " << token.tokenResult << std::endl;
-// // DEBUG END
               size_t key( triggerConditions->size() );
               for ( size_t iC = 0; iC < triggerConditions->size(); ++iC ) {
                 if ( token.tokenName == triggerConditions->at( iC ).name() ) {
@@ -779,15 +782,16 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
               }
               if ( key == triggerConditions->size() ) {
                 TriggerCondition triggerCond( token.tokenName, token.tokenResult );
-// // DEBUG START
+                triggerCond.setCategory( l1GtConditions[ triggerCond.name() ].condCategory() );
+                triggerCond.setType( l1GtConditions[ triggerCond.name() ].condType() );
+                triggerCond.setTriggerObjectType( mapObjectTypes[ l1GtConditions[ triggerCond.name() ].objectType().at( 0 ) ] ); // FIXME: adjust as soon as object types are mixed
                 CombinationsInCond combis( objectMap->combinationVector().at( token.tokenNumber ) );
                 for ( size_t iVV = 0; iVV < combis.size(); ++iVV ) {
                   SingleCombInCond combi( combis.at( iVV ) );
                   for ( size_t iV = 0; iV < combi.size(); ++iV ) {
-                    triggerCond.addObjectKey( unsigned( combi.at( iV ) ) );
+                    triggerCond.addObjectKey( l1ObjectTypeMap[ l1GtConditions[ triggerCond.name() ].objectType().at( iV ) ].at( combi.at( iV ) ) ); // already prepared for mixed object types
                   }
                 }
-// // DEBUG END
                 triggerConditions->push_back( triggerCond );
               }
               triggerAlgo.addConditionKey( key );
