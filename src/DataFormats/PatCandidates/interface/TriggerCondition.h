@@ -42,10 +42,15 @@ namespace pat {
       std::string name_;
       /// Did condition succeed?
       bool accept_;
+      /// L1 condition category as defined in CondFormats/L1TObjects/interface/L1GtFwd.h
+      L1GtConditionCategory category_;
+      /// L1 condition type as defined in CondFormats/L1TObjects/interface/L1GtFwd.h
+      L1GtConditionType type_;
       /// Special identifier for the used trigger object type as defined in
-      /// trigger::TriggerObjectType (DataFormats/HLTReco/interface/TriggerTypeDefs.h)
+      /// DataFormats/HLTReco/interface/TriggerTypeDefs.h
+      /// translated from L1GtObject type (DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h)
       trigger::TriggerObjectType triggerObjectType_;
-      /// Indeces of trigger objects in pat::TriggerObjectCollection in event
+      /// Indeces of trigger objects from succeeding combinations in pat::TriggerObjectCollection in event
       /// as produced together with the pat::TriggerAlgorithmCollection
       std::vector< unsigned > objectKeys_;
 
@@ -69,6 +74,12 @@ namespace pat {
       void setName( const std::string & name ) { name_ = name; };
       /// Set the success flag
       void setAccept( bool accept ) { accept_ = accept; };
+      /// Set the condition category
+      void setCategory( L1GtConditionCategory category ) { category_ = category; };
+      void setCategory( int category )                   { category_ = L1GtConditionCategory( category ); };
+      /// Set the condition type
+      void setType( L1GtConditionType type ) { type_ = type; };
+      void setType( int type )               { type_ = L1GtConditionType( type ); };
       /// Set the trigger object type
       void setTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) { triggerObjectType_ = triggerObjectType; };
       void setTriggerObjectType( int triggerObjectType )                        { triggerObjectType_ = trigger::TriggerObjectType( triggerObjectType ); };
@@ -78,8 +89,12 @@ namespace pat {
       std::string name() const { return name_; };
       /// Get the success flag
       bool wasAccept() const { return accept_; };
+      /// Get the condition category
+      int category() const { return int( category_ ); };
+      /// Get the condition type
+      int type() const { return int( type_ ); };
       /// Get the trigger object type
-      int triggerObjectType() const { return triggerObjectType_; };
+      int triggerObjectType() const { return int( triggerObjectType_ ); };
       /// Get all trigger object collection indeces
       std::vector< unsigned > objectKeys() const { return objectKeys_; };
       /// Checks, if a certain trigger object collection index is assigned
