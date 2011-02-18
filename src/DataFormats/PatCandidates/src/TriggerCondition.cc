@@ -16,28 +16,28 @@ using namespace pat;
 TriggerCondition::TriggerCondition() :
   name_()
 , accept_()
-, triggerObjectType_()
 {
+  triggerObjectTypes_.clear();
   objectKeys_.clear();
 }
 
 
 // Constructor from condition name "only"
-TriggerCondition::TriggerCondition( const std::string & name, trigger::TriggerObjectType triggerObjectType ) :
+TriggerCondition::TriggerCondition( const std::string & name ) :
   name_( name )
 , accept_()
-, triggerObjectType_( triggerObjectType )
 {
+  triggerObjectTypes_.clear();
   objectKeys_.clear();
 }
 
 
 // Constructor from values
-TriggerCondition::TriggerCondition( const std::string & name, bool accept, trigger::TriggerObjectType triggerObjectType ) :
+TriggerCondition::TriggerCondition( const std::string & name, bool accept ) :
   name_( name )
 , accept_( accept )
-, triggerObjectType_( triggerObjectType )
 {
+  triggerObjectTypes_.clear();
   objectKeys_.clear();
 }
 
@@ -45,11 +45,32 @@ TriggerCondition::TriggerCondition( const std::string & name, bool accept, trigg
 // Methods
 
 
+// Get the trigger object types
+std::vector< int > TriggerCondition::triggerObjectTypes() const
+{
+  std::vector< int > triggerObjectTypes;
+  for ( size_t iT = 0; iT < triggerObjectTypes_.size(); ++iT ) {
+    triggerObjectTypes.push_back( int( triggerObjectTypes_.at( iT ) ) );
+  }
+  return triggerObjectTypes;
+}
+
+
+// Checks, if a certain trigger object type is assigned
+bool TriggerCondition::hasTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) const
+{
+  for ( size_t iT = 0; iT < triggerObjectTypes_.size(); ++iT ) {
+    if ( triggerObjectTypes_.at( iT ) == triggerObjectType ) return true;
+  }
+  return false;
+}
+
+
 // Checks, if a certain trigger object collection index is assigned
 bool TriggerCondition::hasObjectKey( unsigned objectKey ) const
 {
-  for ( size_t iO = 0; iO < objectKeys().size(); ++iO ) {
-    if ( objectKeys().at( iO ) == objectKey ) return true;
+  for ( size_t iO = 0; iO < objectKeys_.size(); ++iO ) {
+    if ( objectKeys_.at( iO ) == objectKey ) return true;
   }
   return false;
 }

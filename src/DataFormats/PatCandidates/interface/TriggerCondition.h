@@ -30,6 +30,7 @@
 #include "DataFormats/Common/interface/RefProd.h"
 #include "DataFormats/Common/interface/RefVector.h"
 #include "DataFormats/Common/interface/RefVectorIterator.h"
+#include "CondFormats/L1TObjects/interface/L1GtFwd.h"
 #include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
 
 namespace pat {
@@ -46,10 +47,10 @@ namespace pat {
       L1GtConditionCategory category_;
       /// L1 condition type as defined in CondFormats/L1TObjects/interface/L1GtFwd.h
       L1GtConditionType type_;
-      /// Special identifier for the used trigger object type as defined in
+      /// Special identifiers for the used trigger object type as defined in
       /// DataFormats/HLTReco/interface/TriggerTypeDefs.h
       /// translated from L1GtObject type (DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h)
-      trigger::TriggerObjectType triggerObjectType_;
+      std::vector< trigger::TriggerObjectType > triggerObjectTypes_;
       /// Indeces of trigger objects from succeeding combinations in pat::TriggerObjectCollection in event
       /// as produced together with the pat::TriggerAlgorithmCollection
       std::vector< unsigned > objectKeys_;
@@ -61,9 +62,9 @@ namespace pat {
       /// Default constructor
       TriggerCondition();
       /// Constructor from condition name "only"
-      TriggerCondition( const std::string & name, trigger::TriggerObjectType triggerObjectType = trigger::TriggerObjectType( 0 ) );
+      TriggerCondition( const std::string & name );
       /// Constructor from values
-      TriggerCondition( const std::string & name, bool accept, trigger::TriggerObjectType triggerObjectType = trigger::TriggerObjectType( 0 ) );
+      TriggerCondition( const std::string & name, bool accept );
 
       /// Destructor
       virtual ~TriggerCondition() {};
@@ -80,9 +81,9 @@ namespace pat {
       /// Set the condition type
       void setType( L1GtConditionType type ) { type_ = type; };
       void setType( int type )               { type_ = L1GtConditionType( type ); };
-      /// Set the trigger object type
-      void setTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) { triggerObjectType_ = triggerObjectType; };
-      void setTriggerObjectType( int triggerObjectType )                        { triggerObjectType_ = trigger::TriggerObjectType( triggerObjectType ); };
+      /// Add a new trigger object type
+      void addTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) { triggerObjectTypes_.push_back( triggerObjectType ); }; // explicitely NOT checking for existence
+      void addTriggerObjectType( int triggerObjectType )                        { addTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
       /// Add a new trigger object collection index
       void addObjectKey( unsigned objectKey ) { if ( ! hasObjectKey( objectKey ) ) objectKeys_.push_back( objectKey ); };
       /// Get the filter label
@@ -93,8 +94,11 @@ namespace pat {
       int category() const { return int( category_ ); };
       /// Get the condition type
       int type() const { return int( type_ ); };
-      /// Get the trigger object type
-      int triggerObjectType() const { return int( triggerObjectType_ ); };
+      /// Get the trigger object types
+      std::vector< int > triggerObjectTypes() const;
+      /// Checks, if a certain trigger object type is assigned
+      bool hasTriggerObjectType( trigger::TriggerObjectType triggerObjectType ) const;
+      bool hasTriggerObjectType( int triggerObjectType ) const { return hasTriggerObjectType( trigger::TriggerObjectType( triggerObjectType ) ); };
       /// Get all trigger object collection indeces
       std::vector< unsigned > objectKeys() const { return objectKeys_; };
       /// Checks, if a certain trigger object collection index is assigned

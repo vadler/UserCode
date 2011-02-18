@@ -786,7 +786,9 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
                 if ( l1GtConditions.find( triggerCond.name() ) != l1GtConditions.end() ) {
                   triggerCond.setCategory( l1GtConditions[ triggerCond.name() ]->condCategory() );
                   triggerCond.setType( l1GtConditions[ triggerCond.name() ]->condType() );
-                  triggerCond.setTriggerObjectType( mapObjectTypes[ l1GtConditions[ triggerCond.name() ]->objectType().at( 0 ) ] ); // FIXME: adjust as soon as object types are mixed
+                  for ( size_t iT = 0 ; iT < l1GtConditions[ triggerCond.name() ]->objectType().size(); ++iT ) {
+                    triggerCond.addTriggerObjectType( mapObjectTypes[ l1GtConditions[ triggerCond.name() ]->objectType().at( iT ) ] );
+                  }
                   CombinationsInCond combis( objectMap->combinationVector().at( token.tokenNumber ) );
                   for ( size_t iVV = 0; iVV < combis.size(); ++iVV ) {
                     SingleCombInCond combi( combis.at( iVV ) );
@@ -799,7 +801,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
                           LogError( "l1CondMap" ) << "Index " << combi.at( iV ) << " in combination overshoots number " << l1ObjectTypeMap[ l1GtConditions[ triggerCond.name() ]->objectType().at( iV ) ].size() << "of according trigger objects\n"
                                                   << "Skipping object key in condition " << triggerCond.name();
                         }
-                        triggerCond.addObjectKey( l1ObjectTypeMap[ l1GtConditions[ triggerCond.name() ]->objectType().at( iV ) ].at( combi.at( iV ) ) ); // already prepared for mixed object types
+                        triggerCond.addObjectKey( l1ObjectTypeMap[ l1GtConditions[ triggerCond.name() ]->objectType().at( iV ) ].at( combi.at( iV ) ) );
                       }
                     }
                   }
