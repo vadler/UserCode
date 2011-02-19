@@ -9,6 +9,7 @@
 #include <map>
 #include <utility>
 #include <cassert>
+#include <iostream> // DEBUG
 
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
 #include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
@@ -512,6 +513,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
         if ( handleL1ExtraMu->at( l1Mu ).bx() == 0 ) muKeys.push_back( triggerObjectsStandAlone->size() - 1 );
+// DEBUG START
+        if ( handleL1ExtraMu->at( l1Mu ).bx() == 0 ) {
+          std::cout << "DEBUG Mu " << l1Mu << " ==> " << triggerObjectsStandAlone->size() - 1 << std::endl;
+        } else {
+          std::cout << "DEBUG Mu " << l1Mu << " skipped" << std::endl;
+        }
+// DEBUG END
       }
       l1ObjectTypeMap.insert( std::make_pair( Mu, muKeys ) );
     } else LogError( "l1ExtraValid" ) << "l1extra::L1MuonParticleCollection product with InputTag '" << tagL1ExtraMu_.encode() << "' not in event";
@@ -536,6 +544,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
         if ( handleL1ExtraNoIsoEG->at( l1NoIsoEG ).bx() == 0 ) noIsoEGKeys.push_back( triggerObjectsStandAlone->size() - 1 );
+// DEBUG START
+        if ( handleL1ExtraNoIsoEG->at( l1NoIsoEG ).bx() == 0 ) {
+          std::cout << "DEBUG NoIsoEG " << l1NoIsoEG << " ==> " << triggerObjectsStandAlone->size() - 1 << std::endl;
+        } else {
+          std::cout << "DEBUG NoIsoEG " << l1NoIsoEG << " skipped" << std::endl;
+        }
+// DEBUG END
       }
       l1ObjectTypeMap.insert( std::make_pair( NoIsoEG, noIsoEGKeys ) );
     } else LogError( "l1ExtraValid" ) << "l1extra::L1EmParticleCollection product with InputTag '" << tagL1ExtraNoIsoEG_.encode() << "' not in event";
@@ -560,6 +575,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
         if ( handleL1ExtraIsoEG->at( l1IsoEG ).bx() == 0 ) isoEGKeys.push_back( triggerObjectsStandAlone->size() - 1 );
+// DEBUG START
+        if ( handleL1ExtraIsoEG->at( l1IsoEG ).bx() == 0 ) {
+          std::cout << "DEBUG IsoEG " << l1IsoEG << " ==> " << triggerObjectsStandAlone->size() - 1 << std::endl;
+        } else {
+          std::cout << "DEBUG IsoEG " << l1IsoEG << " skipped" << std::endl;
+        }
+// DEBUG END
       }
       l1ObjectTypeMap.insert( std::make_pair( IsoEG, isoEGKeys ) );
     } else LogError( "l1ExtraValid" ) << "l1extra::L1EmParticleCollection product with InputTag '" << tagL1ExtraIsoEG_.encode() << "' not in event";
@@ -584,6 +606,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
         if ( handleL1ExtraCenJet->at( l1CenJet ).bx() == 0 ) cenJetKeys.push_back( triggerObjectsStandAlone->size() - 1 );
+// DEBUG START
+        if ( handleL1ExtraCenJet->at( l1CenJet ).bx() == 0 ) {
+          std::cout << "DEBUG CenJet " << l1CenJet << " ==> " << triggerObjectsStandAlone->size() - 1 << std::endl;
+        } else {
+          std::cout << "DEBUG CenJet " << l1CenJet << " skipped" << std::endl;
+        }
+// DEBUG END
       }
       l1ObjectTypeMap.insert( std::make_pair( CenJet, cenJetKeys ) );
     } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraCenJet_.encode() << "' not in event";
@@ -608,6 +637,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
         if ( handleL1ExtraForJet->at( l1ForJet ).bx() == 0 ) forJetKeys.push_back( triggerObjectsStandAlone->size() - 1 );
+// DEBUG START
+        if ( handleL1ExtraForJet->at( l1ForJet ).bx() == 0 ) {
+          std::cout << "DEBUG ForJet " << l1ForJet << " ==> " << triggerObjectsStandAlone->size() - 1 << std::endl;
+        } else {
+          std::cout << "DEBUG ForJet " << l1ForJet << " skipped" << std::endl;
+        }
+// DEBUG END
       }
       l1ObjectTypeMap.insert( std::make_pair( ForJet, forJetKeys ) );
     } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraForJet_.encode() << "' not in event";
@@ -632,6 +668,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
         if ( handleL1ExtraTauJet->at( l1TauJet ).bx() == 0 ) tauJetKeys.push_back( triggerObjectsStandAlone->size() - 1 );
+// DEBUG START
+        if ( handleL1ExtraTauJet->at( l1TauJet ).bx() == 0 ) {
+          std::cout << "DEBUG TauJet " << l1TauJet << " ==> " << triggerObjectsStandAlone->size() - 1 << std::endl;
+        } else {
+          std::cout << "DEBUG TauJet " << l1TauJet << " skipped" << std::endl;
+        }
+// DEBUG END
       }
       l1ObjectTypeMap.insert( std::make_pair( TauJet, tauJetKeys ) );
     } else LogError( "l1ExtraValid" ) << "l1extra::L1JetParticleCollection product with InputTag '" << tagL1ExtraTauJet_.encode() << "' not in event";
@@ -656,6 +699,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
         if ( handleL1ExtraETM->at( l1ETM ).bx() == 0 ) etmKeys.push_back( triggerObjectsStandAlone->size() - 1 );
+// DEBUG START
+        if ( handleL1ExtraETM->at( l1ETM ).bx() == 0 ) {
+          std::cout << "DEBUG ETM " << l1ETM << " ==> " << triggerObjectsStandAlone->size() - 1 << std::endl;
+        } else {
+          std::cout << "DEBUG ETM " << l1ETM << " skipped" << std::endl;
+        }
+// DEBUG END
       }
       l1ObjectTypeMap.insert( std::make_pair( ETM, etmKeys ) );
     } else LogError( "l1ExtraValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag '" << tagL1ExtraETM_.encode() << "' not in event";
@@ -680,21 +730,30 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
         if ( handleL1ExtraHTM->at( l1HTM ).bx() == 0 ) htmKeys.push_back( triggerObjectsStandAlone->size() - 1 );
+// DEBUG START
+        if ( handleL1ExtraHTM->at( l1HTM ).bx() == 0 ) {
+          std::cout << "DEBUG HTM " << l1HTM << " ==> " << triggerObjectsStandAlone->size() - 1 << std::endl;
+        } else {
+          std::cout << "DEBUG HTM " << l1HTM << " skipped" << std::endl;
+        }
+// DEBUG END
       }
       l1ObjectTypeMap.insert( std::make_pair( HTM, htmKeys ) );
     } else LogError( "l1ExtraValid" ) << "l1extra::L1EtMissParticleCollection product with InputTag '" << tagL1ExtraHTM_.encode() << "' not in event";
   }
 
-  // Put HLT & L1 objects to event
-  if ( ! onlyStandAlone_ ) iEvent.put( triggerObjects );
-  iEvent.put( triggerObjectsStandAlone );
+// // DEBUG START
+//   // Put HLT & L1 objects to event
+//   if ( ! onlyStandAlone_ ) iEvent.put( triggerObjects );
+//   iEvent.put( triggerObjectsStandAlone );
+// // DEBUG END
 
   // L1 algorithms
   if ( ! onlyStandAlone_ ) {
     std::auto_ptr< TriggerAlgorithmCollection > triggerAlgos( new TriggerAlgorithmCollection() );
     std::auto_ptr< TriggerConditionCollection > triggerConditions( new TriggerConditionCollection() );
     if ( addL1Algos_ ) {
-      // fill trigger obejct types transalation map (yes, it's ugly!)
+      // fill trigger object types transalation map (yes, it's ugly!)
       std::map< L1GtObject, trigger::TriggerObjectType > mapObjectTypes;
       mapObjectTypes.insert( std::make_pair( Mu     , trigger::TriggerL1Mu ) );
       mapObjectTypes.insert( std::make_pair( NoIsoEG, trigger::TriggerL1NoIsoEG ) );
@@ -786,22 +845,33 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
                 if ( l1GtConditions.find( triggerCond.name() ) != l1GtConditions.end() ) {
                   triggerCond.setCategory( l1GtConditions[ triggerCond.name() ]->condCategory() );
                   triggerCond.setType( l1GtConditions[ triggerCond.name() ]->condType() );
-                  for ( size_t iT = 0 ; iT < l1GtConditions[ triggerCond.name() ]->objectType().size(); ++iT ) {
-                    triggerCond.addTriggerObjectType( mapObjectTypes[ l1GtConditions[ triggerCond.name() ]->objectType().at( iT ) ] );
+                  const std::vector< L1GtObject > objectTypes( l1GtConditions[ triggerCond.name() ]->objectType() );
+                  for ( size_t iT = 0 ; iT < objectTypes.size(); ++iT ) {
+                    triggerCond.addTriggerObjectType( mapObjectTypes[ objectTypes.at( iT ) ] );
                   }
                   CombinationsInCond combis( objectMap->combinationVector().at( token.tokenNumber ) );
                   for ( size_t iVV = 0; iVV < combis.size(); ++iVV ) {
                     SingleCombInCond combi( combis.at( iVV ) );
                     for ( size_t iV = 0; iV < combi.size(); ++iV ) {
-                      if ( iV >= l1GtConditions[ triggerCond.name() ]->objectType().size() ) {
-                        LogError( "l1CondMap" ) << "Index " << iV << " in combinations vector overshoots size " << l1GtConditions[ triggerCond.name() ]->objectType().size() << " of types vector in conditions map\n"
+                      if ( iV >= objectTypes.size() ) {
+                        LogError( "l1CondMap" ) << "Index " << iV << " in combinations vector overshoots size " << objectTypes.size() << " of types vector in conditions map\n"
                                                 << "Skipping object key in condition " << triggerCond.name();
-                      } else if ( l1ObjectTypeMap.find( l1GtConditions[ triggerCond.name() ]->objectType().at( iV ) ) != l1ObjectTypeMap.end() ) {
-                        if ( combi.at( iV ) >= int( l1ObjectTypeMap[ l1GtConditions[ triggerCond.name() ]->objectType().at( iV ) ].size() ) ) {
-                          LogError( "l1CondMap" ) << "Index " << combi.at( iV ) << " in combination overshoots number " << l1ObjectTypeMap[ l1GtConditions[ triggerCond.name() ]->objectType().at( iV ) ].size() << "of according trigger objects\n"
+                      } else if ( l1ObjectTypeMap.find( objectTypes.at( iV ) ) != l1ObjectTypeMap.end() ) {
+                        if ( combi.at( iV ) >= int( l1ObjectTypeMap[ objectTypes.at( iV ) ].size() ) ) {
+                          LogError( "l1CondMap" ) << "Index " << combi.at( iV ) << " in combination overshoots number " << l1ObjectTypeMap[ objectTypes.at( iV ) ].size() << "of according trigger objects\n"
                                                   << "Skipping object key in condition " << triggerCond.name();
                         }
-                        triggerCond.addObjectKey( l1ObjectTypeMap[ l1GtConditions[ triggerCond.name() ]->objectType().at( iV ) ].at( combi.at( iV ) ) );
+                        triggerCond.addObjectKey( l1ObjectTypeMap[ objectTypes.at( iV ) ].at( combi.at( iV ) ) );
+// DEBUG START
+                        unsigned newKey( l1ObjectTypeMap[ objectTypes.at( iV ) ].at( combi.at( iV ) ) );
+                        std::cout << "DEBUG condition " << triggerCond.name() << "\t " << combi.at( iV ) << " ==> " << newKey << " of " << triggerObjects->size() << std::endl;
+                        if ( newKey < triggerObjects->size() ) {
+                          std::cout << "DEBUG   object type      : " << triggerObjects->at( newKey ).triggerObjectTypes().at( 0 ) << std::endl;
+                          std::cout << "DEBUG   object collection: " << triggerObjects->at( newKey ).collection()                 << std::endl;
+                        } else {
+                          std::cout << "DEBUG ERROR: key " << newKey << " requested for collection size " << triggerObjects->size() << std::endl;
+                        }
+// DEBUG END
                       }
                     }
                   }
@@ -852,10 +922,20 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerAlgos->push_back( triggerAlgo );
       }
     }
+
     // Put L1 algorithms and conditions to event
     iEvent.put( triggerAlgos );
     iEvent.put( triggerConditions );
   }
+// DEBUG START
+  // Put HLT & L1 objects to event
+  if ( ! onlyStandAlone_ ) for ( size_t iO = 0; iO < triggerObjects->size(); ++iO ) {
+    if ( triggerObjects->at( iO ).triggerObjectTypes().size() > 0 ) std::cout << "DEBUG object " << iO << ": " << triggerObjects->at( iO ).triggerObjectTypes().at( 0 ) << " from " << triggerObjects->at( iO ).collection() << std::endl;
+    else                                                            std::cout << "DEBUG object " << iO << ": None from "                                                            << triggerObjects->at( iO ).collection() << std::endl;
+  }
+  if ( ! onlyStandAlone_ ) iEvent.put( triggerObjects );
+  iEvent.put( triggerObjectsStandAlone );
+// DEBUG END
 
 }
 
