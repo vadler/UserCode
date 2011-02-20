@@ -137,12 +137,21 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   }
   if ( iConfig.exists( "mainBxOnly" ) ) mainBxOnly_ = iConfig.getParameter< bool >( "mainBxOnly" );
   if ( iConfig.exists( "saveL1Refs" ) ) saveL1Refs_ = iConfig.getParameter< bool >( "saveL1Refs" );
+
   // HLT configuration parameters
   if ( iConfig.exists( "triggerResults" ) )      tagTriggerResults_     = iConfig.getParameter< InputTag >( "triggerResults" );
   if ( iConfig.exists( "triggerEvent" ) )        tagTriggerEvent_       = iConfig.getParameter< InputTag >( "triggerEvent" );
   if ( iConfig.exists( "hltPrescaleLabel" ) )    hltPrescaleLabel_      = iConfig.getParameter< std::string >( "hltPrescaleLabel" );
   if ( iConfig.exists( "hltPrescaleTable" ) )    labelHltPrescaleTable_ = iConfig.getParameter< std::string >( "hltPrescaleTable" );
   if ( iConfig.exists( "addPathModuleLabels" ) ) addPathModuleLabels_   = iConfig.getParameter< bool >( "addPathModuleLabels" );
+  exludeCollections_.clear();
+  if ( iConfig.exists( "exludeCollections" )  ) exludeCollections_      = iConfig.getParameter< std::vector< std::string > >( "exludeCollections" );
+// DEBUG START
+  std::cout << "DEBUG excluded collections: " << exludeCollections_.size() << std::endl;
+  for ( size_t iE = 0; iE < exludeCollections_.size(); ++iE ) {
+    std::cout << "DEBUG   " << iE << "\t " << exludeCollections_.at( iE ) << std::endl;
+  }
+// DEBUG END
 
   if ( ! onlyStandAlone_ ) {
     produces< TriggerAlgorithmCollection >();
@@ -182,7 +191,7 @@ void PATTriggerProducer::beginRun( Run & iRun, const EventSetup & iSetup )
     }
     // terminate, if nothing is found
     if ( nameProcess_ == "*" ) {
-      LogError( "autoProcessName" ) << "trigger::TriggerEvent product with label '" << tagTriggerEvent_.label() << "' not produced according to process history of input data\n"
+      LogError( "autoProcessName" ) << "trigger::TriggerEvent product with label '" << tagTriggerEvent_.label() << "' not produced according to process history of input data" << std::endl
                                     << "No trigger information produced";
       return;
     }
@@ -276,11 +285,11 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
   bool goodHlt( hltConfigInit_ );
   if ( goodHlt ) {
     if( ! handleTriggerResults.isValid() ) {
-      LogError( "triggerResultsValid" ) << "TriggerResults product with InputTag '" << tagTriggerResults_.encode() << "' not in event\n"
+      LogError( "triggerResultsValid" ) << "TriggerResults product with InputTag '" << tagTriggerResults_.encode() << "' not in event" << std::endl
                                         << "No HLT information produced";
       goodHlt = false;
     } else if ( ! handleTriggerEvent.isValid() ) {
-      LogError( "triggerEventValid" ) << "trigger::TriggerEvent product with InputTag '" << tagTriggerEvent_.encode() << "' not in event\n"
+      LogError( "triggerEventValid" ) << "trigger::TriggerEvent product with InputTag '" << tagTriggerEvent_.encode() << "' not in event" << std::endl
                                       << "No HLT information produced";
       goodHlt = false;
     }
@@ -304,7 +313,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     // Try event setup, if no product
     if ( hltPrescaleTable.size() == 0 ) {
       if ( ! labelHltPrescaleTable_.empty() ) {
-        LogWarning( "hltPrescaleInputTag" ) << "HLTPrescaleTable product with label '" << labelHltPrescaleTable_ << "' not found in process" << nameProcess_ << "\n"
+        LogWarning( "hltPrescaleInputTag" ) << "HLTPrescaleTable product with label '" << labelHltPrescaleTable_ << "' not found in process" << nameProcess_ << std::endl
                                             << "Using default from event setup";
       }
       if ( hltConfig_.prescaleSize() > 0 ) {
@@ -328,12 +337,12 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           }
         }
         if ( ! foundPrescaleLabel ) {
-          LogWarning( "hltPrescaleLabel" ) << "HLT prescale label '" << hltPrescaleLabel_ << "' not in prescale table\n"
+          LogWarning( "hltPrescaleLabel" ) << "HLT prescale label '" << hltPrescaleLabel_ << "' not in prescale table" << std::endl
                                            << "Using default";
         }
       }
     } else if ( iEvent.isRealData() ) {
-      LogWarning( "hltPrescaleTable" ) << "No HLT prescale table found\n"
+      LogWarning( "hltPrescaleTable" ) << "No HLT prescale table found" << std::endl
                                        << "Using default empty table with all prescales 1";
     }
 
@@ -407,7 +416,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     // Put HLT paths to event
     if ( ! onlyStandAlone_ ) iEvent.put( triggerPaths );
 
-    // Produce HLT filters and store used trigger object types
+    // Store used trigger objects and their types for HLT filters
     // (only last active filter(s) available from trigger::TriggerEvent)
 
     std::auto_ptr< TriggerFilterCollection > triggerFilters( new TriggerFilterCollection() );
@@ -424,17 +433,93 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         filterLabels.insert( std::pair< trigger::size_type, std::string >( keys[ iK ], nameFilter ) ); // only for objects used in last active filter
         objectTypes.insert( std::pair< trigger::size_type, int >( keys[ iK ], types[ iK ] ) );             // only for objects used in last active filter
       }
-      if ( ! onlyStandAlone_ ) {
+    }
+
+    // HLT objects
+
+    const trigger::Keys & collectionKeys( handleTriggerEvent->collectionKeys() );
+    std::map< trigger::size_type, trigger::size_type > newObjectKeys;
+    for ( size_t iO = 0, iC = 0; iO < sizeObjects && iC < handleTriggerEvent->sizeCollections(); ++iO ) {
+
+      TriggerObject triggerObject( handleTriggerEvent->getObjects().at( iO ) );
+      // set collection
+      while ( iO >= collectionKeys[ iC ] ) ++iC; // relies on well ordering of trigger objects with respect to the collections
+      triggerObject.setCollection( handleTriggerEvent->collectionTag( iC ) );
+      // set filter ID
+      for ( std::multimap< trigger::size_type, int >::iterator iM = objectTypes.begin(); iM != objectTypes.end(); ++iM ) {
+        if ( iM->first == iO ) {
+          triggerObject.addTriggerObjectType( iM->second );
+        }
+      }
+
+      // stand-alone trigger object
+      TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+      // check for excluded collections
+      bool excluded( false );
+      for ( size_t iE = 0; iE < exludeCollections_.size(); ++iE ) {
+        if ( triggerObjectStandAlone.hasCollection( exludeCollections_.at( iE ) ) ) {
+// DEBUG START
+          std::cout << "DEBUG exclusion " << iO << std::endl;
+          std::cout << "DEBUG   collections requested: " << exludeCollections_.at( iE )           << std::endl;
+          std::cout << "DEBUG   collections found    : " << triggerObjectStandAlone.collection()  << std::endl;
+// DEBUG END
+          newObjectKeys[ iO ] = trigger::size_type( sizeObjects );
+          excluded = true;
+          break;
+        }
+      }
+      if ( excluded ) continue;
+      for ( std::multimap< trigger::size_type, std::string >::iterator iM = filterLabels.begin(); iM != filterLabels.end(); ++iM ) {
+        if ( iM->first == iO ) {
+          triggerObjectStandAlone.addFilterLabel( iM->second );
+          for ( std::multimap< std::string, std::pair< std::string, bool > >::iterator iP = filterPaths.begin(); iP != filterPaths.end(); ++iP ) {
+            if ( iP->first == iM->second ) {
+              triggerObjectStandAlone.addPathName( iP->second.first, iP->second.second );
+            }
+          }
+        }
+      }
+
+      if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
+      newObjectKeys[ iO ] = trigger::size_type( triggerObjectsStandAlone->size() );
+      triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+    }
+
+    // Re-iterate HLT filters and finally produce them
+    // in ordert to account for optionally skipped objects
+
+    if ( ! onlyStandAlone_ ) {
+      for ( size_t iF = 0; iF < sizeFilters; ++iF ) {
+        const std::string nameFilter( handleTriggerEvent->filterTag( iF ).label() );
+        const trigger::Keys & keys  = handleTriggerEvent->filterKeys( iF ); // not cached
+        const trigger::Vids & types = handleTriggerEvent->filterIds( iF );  // not cached
         TriggerFilter triggerFilter( nameFilter );
         // set filter type
         const std::string typeFilter( hltConfig_.moduleType( nameFilter ) );
         triggerFilter.setType( typeFilter );
-        // set filter IDs of used objects
-        for ( size_t iK = 0; iK < keys.size(); ++iK ) {
-          triggerFilter.addObjectKey( keys[ iK ] );
-        }
-        for ( size_t iT = 0; iT < types.size(); ++iT ) {
-          triggerFilter.addTriggerObjectType( types[ iT ] );
+        // set keys and trigger object types of used objects
+        for ( size_t iK = 0; iK < keys.size(); ++iK ) { // identical to types.size()
+          // check, if current object is excluded
+          if ( newObjectKeys.find( keys.at( iK ) ) != newObjectKeys.end() ) {
+// DEBUG START
+//             if ( newObjectKeys[ keys.at( iK ) ] == sizeObjects ) continue;
+            if ( newObjectKeys[ keys.at( iK ) ] == sizeObjects ) {
+              std::cout << "DEBUG filter " << nameFilter << std::endl;
+              std::cout << "DEBUG   exclided key : " << keys.at( iK )  << std::endl;
+              std::cout << "DEBUG   exclided type: " << types.at( iK ) << std::endl;
+              continue;
+            } else {
+              std::cout << "DEBUG filter " << nameFilter << std::endl;
+              std::cout << "DEBUG   old key: " << keys.at( iK )                  << std::endl;
+              std::cout << "DEBUG   new key: " << newObjectKeys[ keys.at( iK ) ] << std::endl;
+            }
+// DEBUG END
+            triggerFilter.addObjectKey( keys.at( iK ) );
+            triggerFilter.addTriggerObjectType( types.at( iK ) );
+          } else {
+            LogWarning( "triggerObjectKey" ) << "TriggerFilter '" << nameFilter << "' requests non-existing TriggerObject key " << keys.at( iK ) << std::endl
+                                             << "Skipping object assignment";
+          }
         }
         // set status from path info
         std::map< std::string, int >::iterator iS( moduleStates.find( nameFilter ) );
@@ -448,41 +533,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         // store filter
         triggerFilters->push_back( triggerFilter );
       }
-    }
-
-    // Put HLT filters to event
-    if ( ! onlyStandAlone_ ) iEvent.put( triggerFilters );
-
-    // HLT objects
-
-    const trigger::Keys & collectionKeys( handleTriggerEvent->collectionKeys() );
-    for ( size_t iO = 0, iC = 0; iO < sizeObjects && iC < handleTriggerEvent->sizeCollections(); ++iO ) {
-
-      TriggerObject triggerObject( handleTriggerEvent->getObjects().at( iO ) );
-      // set collection
-      while ( iO >= collectionKeys[ iC ] ) ++iC; // relies on well ordering of trigger objects with respect to the collections
-      triggerObject.setCollection( handleTriggerEvent->collectionTag( iC ) );
-      // set filter ID
-      for ( std::multimap< trigger::size_type, int >::iterator iM = objectTypes.begin(); iM != objectTypes.end(); ++iM ) {
-        if ( iM->first == iO ) {
-          triggerObject.addTriggerObjectType( iM->second );
-        }
-      }
-      if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-      // stand-alone trigger object
-      TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
-      for ( std::multimap< trigger::size_type, std::string >::iterator iM = filterLabels.begin(); iM != filterLabels.end(); ++iM ) {
-        if ( iM->first == iO ) {
-          triggerObjectStandAlone.addFilterLabel( iM->second );
-          for ( std::multimap< std::string, std::pair< std::string, bool > >::iterator iP = filterPaths.begin(); iP != filterPaths.end(); ++iP ) {
-            if ( iP->first == iM->second ) {
-              triggerObjectStandAlone.addPathName( iP->second.first, iP->second.second );
-            }
-          }
-        }
-      }
-
-      triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+      // put HLT filters to event
+      iEvent.put( triggerFilters );
     }
 
   } // if ( goodHlt )
@@ -781,26 +833,26 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       Handle< L1GlobalTriggerObjectMapRecord > handleL1GlobalTriggerObjectMapRecord;
       iEvent.getByLabel( tagL1GlobalTriggerObjectMapRecord_, handleL1GlobalTriggerObjectMapRecord );
       if( ! handleL1GlobalTriggerObjectMapRecord.isValid() ) {
-        LogWarning( "l1ObjectMap" ) << "L1GlobalTriggerObjectMapRecord product with InputTag '" << tagL1GlobalTriggerObjectMapRecord_.encode() << "' not in event\n"
+        LogWarning( "l1ObjectMap" ) << "L1GlobalTriggerObjectMapRecord product with InputTag '" << tagL1GlobalTriggerObjectMapRecord_.encode() << "' not in event" << std::endl
                                     << "No L1 objects and GTL results available for physics algorithms";
       }
       // physics algorithms
       for ( CItAlgo iAlgo = l1GtAlgorithms.begin(); iAlgo != l1GtAlgorithms.end(); ++iAlgo ) {
         const std::string & algoName( iAlgo->second.algoName() );
         if ( ! ( iAlgo->second.algoBitNumber() < int( L1GlobalTriggerReadoutSetup::NumberPhysTriggers ) ) ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberPhysTriggers << "\n"
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberPhysTriggers << std::endl
                                << "Skipping";
           continue;
         }
         L1GtUtils::TriggerCategory category;
         int bit;
         if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( algoName, category, bit ) ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' not found in the L1 menu\n"
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' not found in the L1 menu" << std::endl
                                << "Skipping";
           continue;
         }
         if ( category != L1GtUtils::AlgorithmTrigger ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' does not have category 'AlgorithmTrigger' from 'L1GtUtils'\n"
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' does not have category 'AlgorithmTrigger' from 'L1GtUtils'" << std::endl
                                << "Skipping";
           continue;
         }
@@ -810,7 +862,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         int  mask;
         int  error( l1GtUtils_.l1Results( iEvent, algoName, decisionBeforeMask, decisionAfterMask, prescale, mask ) );
         if ( error ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' decision has error code " << error << " from 'L1GtUtils'\n"
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' decision has error code " << error << " from 'L1GtUtils'" << std::endl
                                << "Skipping";
           continue;
         }
@@ -820,13 +872,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if( handleL1GlobalTriggerObjectMapRecord.isValid() ) {
           const L1GlobalTriggerObjectMap * objectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( algoName ) );
           if ( ! objectMap ) {
-            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' is missing in L1GlobalTriggerObjectMapRecord\n"
+            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' is missing in L1GlobalTriggerObjectMapRecord" << std::endl
                                         << "Skipping conditions and GTL result";
 //           } else if ( objectMap->algoGtlResult() != decisionBeforeMask && ( decisionBeforeMask == true || prescale == 1 ) ) {
           } else if ( objectMap->algoGtlResult() != decisionBeforeMask && decisionBeforeMask == true ) { // FIXME: understand the difference for un-prescaled algos 118, 119, 123
-            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' with different decisions in\n"
-                                        << "L1GlobalTriggerObjectMapRecord: " << objectMap->algoGtlResult() << "\n"
-                                        << "L1GlobalTriggerReadoutRecord  : " << decisionBeforeMask << "\n"
+            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' with different decisions in" << std::endl
+                                        << "L1GlobalTriggerObjectMapRecord: " << objectMap->algoGtlResult() << std::endl
+                                        << "L1GlobalTriggerReadoutRecord  : " << decisionBeforeMask << std::endl
                                         << "Skipping conditions and GTL result";
           } else {
             triggerAlgo.setGtlResult( objectMap->algoGtlResult() );
@@ -854,11 +906,11 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
                     SingleCombInCond combi( combis.at( iVV ) );
                     for ( size_t iV = 0; iV < combi.size(); ++iV ) {
                       if ( iV >= objectTypes.size() ) {
-                        LogError( "l1CondMap" ) << "Index " << iV << " in combinations vector overshoots size " << objectTypes.size() << " of types vector in conditions map\n"
+                        LogError( "l1CondMap" ) << "Index " << iV << " in combinations vector overshoots size " << objectTypes.size() << " of types vector in conditions map" << std::endl
                                                 << "Skipping object key in condition " << triggerCond.name();
                       } else if ( l1ObjectTypeMap.find( objectTypes.at( iV ) ) != l1ObjectTypeMap.end() ) {
                         if ( combi.at( iV ) >= int( l1ObjectTypeMap[ objectTypes.at( iV ) ].size() ) ) {
-                          LogError( "l1CondMap" ) << "Index " << combi.at( iV ) << " in combination overshoots number " << l1ObjectTypeMap[ objectTypes.at( iV ) ].size() << "of according trigger objects\n"
+                          LogError( "l1CondMap" ) << "Index " << combi.at( iV ) << " in combination overshoots number " << l1ObjectTypeMap[ objectTypes.at( iV ) ].size() << "of according trigger objects" << std::endl
                                                   << "Skipping object key in condition " << triggerCond.name();
                         }
                         triggerCond.addObjectKey( l1ObjectTypeMap[ objectTypes.at( iV ) ].at( combi.at( iV ) ) );
@@ -876,7 +928,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
                     }
                   }
                 } else {
-                  LogWarning( "l1CondMap" ) << "L1 conditions '" << triggerCond.name() << "' not found in the L1 menu\n"
+                  LogWarning( "l1CondMap" ) << "L1 conditions '" << triggerCond.name() << "' not found in the L1 menu" << std::endl
                                             << "Remains incomplete";
                 }
                 triggerConditions->push_back( triggerCond );
@@ -891,19 +943,19 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       for ( CItAlgo iAlgo = l1GtTechTriggers.begin(); iAlgo != l1GtTechTriggers.end(); ++iAlgo ) {
         const std::string & algoName( iAlgo->second.algoName() );
         if ( ! ( iAlgo->second.algoBitNumber() < int( L1GlobalTriggerReadoutSetup::NumberTechnicalTriggers ) ) ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberTechnicalTriggers << "\n"
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberTechnicalTriggers << std::endl
                                << "Skipping";
           continue;
         }
         L1GtUtils::TriggerCategory category;
         int bit;
         if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( algoName, category, bit ) ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' not found in the L1 menu\n"
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' not found in the L1 menu" << std::endl
                                << "Skipping";
           continue;
         }
         if ( category != L1GtUtils::TechnicalTrigger ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' does not have category 'TechnicalTrigger' from 'L1GtUtils'\n"
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' does not have category 'TechnicalTrigger' from 'L1GtUtils'" << std::endl
                                << "Skipping";
           continue;
         }
@@ -913,7 +965,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         int  mask;
         int  error( l1GtUtils_.l1Results( iEvent, algoName, decisionBeforeMask, decisionAfterMask, prescale, mask ) );
         if ( error ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' decision has error code " << error << " from 'L1GtUtils'\n"
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' decision has error code " << error << " from 'L1GtUtils'" << std::endl
                                << "Skipping";
           continue;
         }

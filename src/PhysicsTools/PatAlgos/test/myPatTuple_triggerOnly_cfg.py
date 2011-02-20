@@ -90,6 +90,9 @@ process.patTrigger.l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'     
 process.patTrigger.l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'         )
 process.patTrigger.mainBxOnly     = cms.bool( False )
 process.patTrigger.saveL1Refs     = cms.bool( True )
+process.patTrigger.exludeCollections = cms.vstring(
+  "hltL1extraParticles*"
+)
 process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
 switchOnTrigger( process, sequence = 'p', hltProcess = '*' ) # to update event content

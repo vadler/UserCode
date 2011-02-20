@@ -98,7 +98,8 @@ namespace pat {
       std::string               labelHltPrescaleTable_; // configuration (optional)
       trigger::HLTPrescaleTable hltPrescaleTableRun_;
       trigger::HLTPrescaleTable hltPrescaleTableLumi_;
-      bool                      addPathModuleLabels_;   // configuration (optional with default)
+      bool                       addPathModuleLabels_;   // configuration (optional with default)
+      std::vector< std::string > exludeCollections_; // configuration (optional)
 
   };
 
