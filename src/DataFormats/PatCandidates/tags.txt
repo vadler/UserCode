@@ -1,6 +1,6 @@
-Test Release based on: CMSSW_4_2_0_pre3
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_0_pre3
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_0_pre3
+Test Release based on: CMSSW_4_2_0_pre5
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_0_pre5
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_0_pre5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        V06-03-00      V06-03-00      
 L1Trigger/GlobalTriggerAnalyzer                  V01-07-01      V01-07-01      
