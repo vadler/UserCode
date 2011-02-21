@@ -808,10 +808,11 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
 //         if ( ( l1ObjectMap->algoGtlResult() != decisionBeforeMask ) && ( decisionBeforeMask == true || prescale == 1 ) ) {
         if ( ( l1ObjectMap->algoGtlResult() != decisionBeforeMask ) && ( decisionBeforeMask == true ) ) { // FIXME: understand the difference for un-prescaled algos 118, 119, 123
           LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' with different decisions in\n"
-                                      << "L1GlobalTriggerObjectMapRecord: " << l1ObjectMap->algoGtlResult() << "\n"
-                                      << "L1GlobalTriggerReadoutRecord  : " << decisionBeforeMask;
+                                      << "L1GlobalTriggerObjectMapRecord (GTL result)        : " << l1ObjectMap->algoGtlResult() << "\n"
+                                      << "L1GlobalTriggerReadoutRecord (decision before mask): " << decisionBeforeMask;
         }
         triggerAlgo.setGtlResult( l1ObjectMap->algoGtlResult() );
+        // conditions in algorithm
         const std::vector< L1GtLogicParser::OperandToken > & tokens( l1ObjectMap->operandTokenVector() );
         for ( size_t iT = 0; iT < tokens.size(); ++iT ) {
           const L1GtLogicParser::OperandToken & token( tokens.at( iT ) );
@@ -831,6 +832,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
               for ( size_t iT = 0 ; iT < l1ObjectTypes.size(); ++iT ) {
                 triggerCond.addTriggerObjectType( mapObjectTypes[ l1ObjectTypes.at( iT ) ] );
               }
+              // objects in condition
               CombinationsInCond combis( l1ObjectMap->combinationVector().at( token.tokenNumber ) );
               for ( size_t iVV = 0; iVV < combis.size(); ++iVV ) {
                 SingleCombInCond combi( combis.at( iVV ) );
@@ -845,7 +847,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
                     }
                     const unsigned objectKey( l1ObjectTypeMap[ l1ObjectTypes.at( iV ) ].at( combi.at( iV ) ) );
                     triggerCond.addObjectKey( objectKey );
-                    // Add current condition and algorithm also to the according stand-alone trigger object
+                    // add current condition and algorithm also to the according stand-alone trigger object
                     triggerObjectsStandAlone->at( objectKey ).addAlgorithmName( triggerAlgo.name(), ( triggerAlgo.decision() && triggerCond.wasAccept() ) );
                     triggerObjectsStandAlone->at( objectKey ).addConditionName( triggerCond.name() );
                   }
