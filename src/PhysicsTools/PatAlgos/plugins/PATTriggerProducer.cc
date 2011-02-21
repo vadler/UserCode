@@ -184,7 +184,7 @@ void PATTriggerProducer::beginRun( Run & iRun, const EventSetup & iSetup )
     }
     // terminate, if nothing is found
     if ( nameProcess_ == "*" ) {
-      LogError( "autoProcessName" ) << "trigger::TriggerEvent product with label '" << tagTriggerEvent_.label() << "' not produced according to process history of input data" << std::endl
+      LogError( "autoProcessName" ) << "trigger::TriggerEvent product with label '" << tagTriggerEvent_.label() << "' not produced according to process history of input data\n"
                                     << "No trigger information produced";
       return;
     }
@@ -278,11 +278,11 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
   bool goodHlt( hltConfigInit_ );
   if ( goodHlt ) {
     if( ! handleTriggerResults.isValid() ) {
-      LogError( "triggerResultsValid" ) << "TriggerResults product with InputTag '" << tagTriggerResults_.encode() << "' not in event" << std::endl
+      LogError( "triggerResultsValid" ) << "TriggerResults product with InputTag '" << tagTriggerResults_.encode() << "' not in event\n"
                                         << "No HLT information produced";
       goodHlt = false;
     } else if ( ! handleTriggerEvent.isValid() ) {
-      LogError( "triggerEventValid" ) << "trigger::TriggerEvent product with InputTag '" << tagTriggerEvent_.encode() << "' not in event" << std::endl
+      LogError( "triggerEventValid" ) << "trigger::TriggerEvent product with InputTag '" << tagTriggerEvent_.encode() << "' not in event\n"
                                       << "No HLT information produced";
       goodHlt = false;
     }
@@ -306,7 +306,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     // Try event setup, if no product
     if ( hltPrescaleTable.size() == 0 ) {
       if ( ! labelHltPrescaleTable_.empty() ) {
-        LogWarning( "hltPrescaleInputTag" ) << "HLTPrescaleTable product with label '" << labelHltPrescaleTable_ << "' not found in process" << nameProcess_ << std::endl
+        LogWarning( "hltPrescaleInputTag" ) << "HLTPrescaleTable product with label '" << labelHltPrescaleTable_ << "' not found in process" << nameProcess_ << "\n"
                                             << "Using default from event setup";
       }
       if ( hltConfig_.prescaleSize() > 0 ) {
@@ -330,12 +330,12 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
           }
         }
         if ( ! foundPrescaleLabel ) {
-          LogWarning( "hltPrescaleLabel" ) << "HLT prescale label '" << hltPrescaleLabel_ << "' not in prescale table" << std::endl
+          LogWarning( "hltPrescaleLabel" ) << "HLT prescale label '" << hltPrescaleLabel_ << "' not in prescale table\n"
                                            << "Using default";
         }
       }
     } else if ( iEvent.isRealData() ) {
-      LogWarning( "hltPrescaleTable" ) << "No HLT prescale table found" << std::endl
+      LogWarning( "hltPrescaleTable" ) << "No HLT prescale table found\n"
                                        << "Using default empty table with all prescales 1";
     }
 
@@ -493,7 +493,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
             triggerFilter.addObjectKey( keys.at( iK ) );
             triggerFilter.addTriggerObjectType( types.at( iK ) );
           } else {
-            LogWarning( "triggerObjectKey" ) << "TriggerFilter '" << nameFilter << "' requests non-existing TriggerObject key " << keys.at( iK ) << std::endl
+            LogWarning( "triggerObjectKey" ) << "TriggerFilter '" << nameFilter << "' requests non-existing TriggerObject key " << keys.at( iK ) << "\n"
                                              << "Skipping object assignment";
           }
         }
@@ -759,26 +759,26 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       Handle< L1GlobalTriggerObjectMapRecord > handleL1GlobalTriggerObjectMapRecord;
       iEvent.getByLabel( tagL1GlobalTriggerObjectMapRecord_, handleL1GlobalTriggerObjectMapRecord );
       if( ! handleL1GlobalTriggerObjectMapRecord.isValid() ) {
-        LogWarning( "l1ObjectMap" ) << "L1GlobalTriggerObjectMapRecord product with InputTag '" << tagL1GlobalTriggerObjectMapRecord_.encode() << "' not in event" << std::endl
+        LogWarning( "l1ObjectMap" ) << "L1GlobalTriggerObjectMapRecord product with InputTag '" << tagL1GlobalTriggerObjectMapRecord_.encode() << "' not in event\n"
                                     << "No L1 objects and GTL results available for physics algorithms";
       }
       // physics algorithms
       for ( CItAlgo iAlgo = l1GtAlgorithms.begin(); iAlgo != l1GtAlgorithms.end(); ++iAlgo ) {
         const std::string & algoName( iAlgo->second.algoName() );
         if ( ! ( iAlgo->second.algoBitNumber() < int( L1GlobalTriggerReadoutSetup::NumberPhysTriggers ) ) ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberPhysTriggers << std::endl
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberPhysTriggers << "\n"
                                << "Skipping";
           continue;
         }
         L1GtUtils::TriggerCategory category;
         int bit;
         if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( algoName, category, bit ) ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' not found in the L1 menu" << std::endl
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' not found in the L1 menu\n"
                                << "Skipping";
           continue;
         }
         if ( category != L1GtUtils::AlgorithmTrigger ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' does not have category 'AlgorithmTrigger' from 'L1GtUtils'" << std::endl
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' does not have category 'AlgorithmTrigger' from 'L1GtUtils'\n"
                                << "Skipping";
           continue;
         }
@@ -788,7 +788,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         int  mask;
         int  error( l1GtUtils_.l1Results( iEvent, algoName, decisionBeforeMask, decisionAfterMask, prescale, mask ) );
         if ( error ) {
-          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' decision has error code " << error << " from 'L1GtUtils'" << std::endl
+          LogError( "l1Algo" ) << "L1 physics algorithm '" << algoName << "' decision has error code " << error << " from 'L1GtUtils'\n"
                                << "Skipping";
           continue;
         }
@@ -798,13 +798,13 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         if( handleL1GlobalTriggerObjectMapRecord.isValid() ) {
           const L1GlobalTriggerObjectMap * l1ObjectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( algoName ) );
           if ( ! l1ObjectMap ) {
-            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' is missing in L1GlobalTriggerObjectMapRecord" << std::endl
+            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' is missing in L1GlobalTriggerObjectMapRecord\n"
                                         << "Skipping conditions and GTL result";
 //           } else if ( l1ObjectMap->algoGtlResult() != decisionBeforeMask && ( decisionBeforeMask == true || prescale == 1 ) ) {
           } else if ( l1ObjectMap->algoGtlResult() != decisionBeforeMask && decisionBeforeMask == true ) { // FIXME: understand the difference for un-prescaled algos 118, 119, 123
-            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' with different decisions in" << std::endl
-                                        << "L1GlobalTriggerObjectMapRecord: " << l1ObjectMap->algoGtlResult() << std::endl
-                                        << "L1GlobalTriggerReadoutRecord  : " << decisionBeforeMask << std::endl
+            LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' with different decisions in\n"
+                                        << "L1GlobalTriggerObjectMapRecord: " << l1ObjectMap->algoGtlResult() << "\n"
+                                        << "L1GlobalTriggerReadoutRecord  : " << decisionBeforeMask << "\n"
                                         << "Skipping conditions and GTL result";
           } else {
             triggerAlgo.setGtlResult( l1ObjectMap->algoGtlResult() );
@@ -832,11 +832,11 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
                     SingleCombInCond combi( combis.at( iVV ) );
                     for ( size_t iV = 0; iV < combi.size(); ++iV ) {
                       if ( iV >= l1ObjectTypes.size() ) {
-                        LogError( "l1CondMap" ) << "Index " << iV << " in combinations vector overshoots size " << l1ObjectTypes.size() << " of types vector in conditions map" << std::endl
+                        LogError( "l1CondMap" ) << "Index " << iV << " in combinations vector overshoots size " << l1ObjectTypes.size() << " of types vector in conditions map\n"
                                                 << "Skipping object key in condition " << triggerCond.name();
                       } else if ( l1ObjectTypeMap.find( l1ObjectTypes.at( iV ) ) != l1ObjectTypeMap.end() ) {
                         if ( combi.at( iV ) >= int( l1ObjectTypeMap[ l1ObjectTypes.at( iV ) ].size() ) ) {
-                          LogError( "l1CondMap" ) << "Index " << combi.at( iV ) << " in combination overshoots number " << l1ObjectTypeMap[ l1ObjectTypes.at( iV ) ].size() << "of according trigger objects" << std::endl
+                          LogError( "l1CondMap" ) << "Index " << combi.at( iV ) << " in combination overshoots number " << l1ObjectTypeMap[ l1ObjectTypes.at( iV ) ].size() << "of according trigger objects\n"
                                                   << "Skipping object key in condition " << triggerCond.name();
                         }
                         triggerCond.addObjectKey( l1ObjectTypeMap[ l1ObjectTypes.at( iV ) ].at( combi.at( iV ) ) );
@@ -844,7 +844,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
                     }
                   }
                 } else {
-                  LogWarning( "l1CondMap" ) << "L1 conditions '" << triggerCond.name() << "' not found in the L1 menu" << std::endl
+                  LogWarning( "l1CondMap" ) << "L1 conditions '" << triggerCond.name() << "' not found in the L1 menu\n"
                                             << "Remains incomplete";
                 }
                 triggerConditions->push_back( triggerCond );
@@ -859,19 +859,19 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       for ( CItAlgo iAlgo = l1GtTechTriggers.begin(); iAlgo != l1GtTechTriggers.end(); ++iAlgo ) {
         const std::string & algoName( iAlgo->second.algoName() );
         if ( ! ( iAlgo->second.algoBitNumber() < int( L1GlobalTriggerReadoutSetup::NumberTechnicalTriggers ) ) ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberTechnicalTriggers << std::endl
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' has bit number " << iAlgo->second.algoBitNumber() << " >= " << L1GlobalTriggerReadoutSetup::NumberTechnicalTriggers << "\n"
                                << "Skipping";
           continue;
         }
         L1GtUtils::TriggerCategory category;
         int bit;
         if ( ! l1GtUtils_.l1AlgoTechTrigBitNumber( algoName, category, bit ) ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' not found in the L1 menu" << std::endl
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' not found in the L1 menu\n"
                                << "Skipping";
           continue;
         }
         if ( category != L1GtUtils::TechnicalTrigger ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' does not have category 'TechnicalTrigger' from 'L1GtUtils'" << std::endl
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' does not have category 'TechnicalTrigger' from 'L1GtUtils'\n"
                                << "Skipping";
           continue;
         }
@@ -881,7 +881,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         int  mask;
         int  error( l1GtUtils_.l1Results( iEvent, algoName, decisionBeforeMask, decisionAfterMask, prescale, mask ) );
         if ( error ) {
-          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' decision has error code " << error << " from 'L1GtUtils'" << std::endl
+          LogError( "l1Algo" ) << "L1 technical trigger '" << algoName << "' decision has error code " << error << " from 'L1GtUtils'\n"
                                << "Skipping";
           continue;
         }
