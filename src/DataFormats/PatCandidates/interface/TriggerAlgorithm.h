@@ -30,8 +30,6 @@
 #include "DataFormats/Common/interface/RefVector.h"
 #include "DataFormats/Common/interface/RefVectorIterator.h"
 
-#include "DataFormats/L1GlobalTrigger/interface/L1GtLogicParser.h"
-
 
 namespace pat {
 
@@ -85,7 +83,7 @@ namespace pat {
       /// Set L1 algorithm alias
       void setAlias( const std::string & alias ) { alias_ = alias; };
       /// Set L1 algorithm logical expression
-      void setLogicalExpression( const std::string & expression ) { logic_ = L1GtLogicParser( expression ); };
+      void setLogicalExpression( const std::string & expression ) { logic_ = expression; };
       /// Set flag for technical L1 algorithms
       void setTechTrigger( bool tech ) { tech_ = tech; };
       /// Set L1 algorithm bit number
