@@ -713,6 +713,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         }
         triggerObject.setCollection( tagL1ExtraHTM_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1HTM );
+        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
         TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
         triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
         if ( handleL1ExtraHTM->at( l1HTM ).bx() == 0 ) htmKeys.push_back( triggerObjectsStandAlone->size() - 1 );
