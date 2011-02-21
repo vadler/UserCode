@@ -77,7 +77,7 @@ process.outpath = cms.EndPath(
 )
 
 ## PAT trigger
-from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
+from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger( process, sequence = 'p', hltProcess = '*' )
 process.patTrigger.addL1Algos     = cms.bool( True )
 process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''            )
@@ -96,3 +96,4 @@ process.patTrigger.exludeCollections = cms.vstring(
 process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
 switchOnTrigger( process, sequence = 'p', hltProcess = '*' ) # to update event content
+switchOnTriggerStandAlone( process, sequence = 'p', hltProcess = '*' )
