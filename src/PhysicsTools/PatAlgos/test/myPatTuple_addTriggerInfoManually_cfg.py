@@ -5,7 +5,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from Configuration.PyReleaseValidation.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
 process.source.fileNames    = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data/ZJetToMuMu_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6__Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1__GEN-SIM-RECO/FED5121F-B1E4-DF11-B53F-00261834B580.root' ]
-process.out.fileName        = '%s/output/myPatTuple_test_addTriggerInfo.root'%( cmsswBase )
+process.out.fileName        = '%s/output/myPatTuple_addTriggerInfoManually.root'%( cmsswBase )
 # process.MessageLogger.cerr.threshold = 'INFO'
 # process.MessageLogger.categories.append( 'autoProcessName' )
 # process.MessageLogger.cerr.INFO = cms.untracked.PSet(
@@ -20,25 +20,25 @@ process.p = cms.Path(
 process.patTrigger = cms.EDProducer(
   "PATTriggerProducer"
 , processName    = cms.string( '*' )
+, onlyStandAlone = cms.bool( False )
   ## L1
-, addL1Algos     = cms.bool( True )
+, addL1Algos                     = cms.bool( True )
 , l1GlobalTriggerObjectMapRecord = cms.InputTag( "hltL1GtObjectMap" )
-, l1ExtraMu      = cms.InputTag( 'l1extraParticles', '' )
-, l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated' )
-, l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated' )
-, l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central' )
-, l1ExtraForJet  = cms.InputTag( 'l1extraParticles', 'Forward' )
-, l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau' )
-, l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET' )
-, l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT' )
-, mainBxOnly     = cms.bool( False )
-, saveL1Refs     = cms.bool( True )
+, l1ExtraMu                      = cms.InputTag( 'l1extraParticles', '' )
+, l1ExtraNoIsoEG                 = cms.InputTag( 'l1extraParticles', 'NonIsolated' )
+, l1ExtraIsoEG                   = cms.InputTag( 'l1extraParticles', 'Isolated' )
+, l1ExtraCenJet                  = cms.InputTag( 'l1extraParticles', 'Central' )
+, l1ExtraForJet                  = cms.InputTag( 'l1extraParticles', 'Forward' )
+, l1ExtraTauJet                  = cms.InputTag( 'l1extraParticles', 'Tau' )
+, l1ExtraETM                     = cms.InputTag( 'l1extraParticles', 'MET' )
+, l1ExtraHTM                     = cms.InputTag( 'l1extraParticles', 'MHT' )
+, mainBxOnly                     = cms.bool( False )
+, saveL1Refs                     = cms.bool( True )
   ## HLT (L3)
 , triggerResults = cms.InputTag( "TriggerResults" )
 , triggerEvent   = cms.InputTag( "hltTriggerSummaryAOD" )
-, onlyStandAlone = cms.bool( False )
-  # trigger paths
 , addPathModuleLabels = cms.bool( False ) # setting this 'True' stores the names of all modules as strings (~8kB/ev.)
+, exludeCollections   = cms.vstring()
 )
 process.electronTriggerTestMatchHLTElectrons = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
