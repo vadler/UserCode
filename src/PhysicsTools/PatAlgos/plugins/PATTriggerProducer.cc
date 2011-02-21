@@ -469,8 +469,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       }
 
       if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-      newObjectKeys[ iO ] = trigger::size_type( triggerObjectsStandAlone->size() );
       triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
+      newObjectKeys[ iO ] = trigger::size_type( triggerObjectsStandAlone->size() - 1 );
     }
 
     // Re-iterate HLT filters and finally produce them
@@ -539,7 +539,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.setCollection( tagL1ExtraMu_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1Mu );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+        TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+        triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
         if ( handleL1ExtraMu->at( l1Mu ).bx() == 0 ) muKeys.push_back( triggerObjectsStandAlone->size() - 1 );
       }
       l1ObjectTypeMap.insert( std::make_pair( Mu, muKeys ) );
@@ -563,7 +564,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.setCollection( tagL1ExtraNoIsoEG_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1NoIsoEG );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+        TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+        triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
         if ( handleL1ExtraNoIsoEG->at( l1NoIsoEG ).bx() == 0 ) noIsoEGKeys.push_back( triggerObjectsStandAlone->size() - 1 );
       }
       l1ObjectTypeMap.insert( std::make_pair( NoIsoEG, noIsoEGKeys ) );
@@ -587,7 +589,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.setCollection( tagL1ExtraIsoEG_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1IsoEG );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+        TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+        triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
         if ( handleL1ExtraIsoEG->at( l1IsoEG ).bx() == 0 ) isoEGKeys.push_back( triggerObjectsStandAlone->size() - 1 );
       }
       l1ObjectTypeMap.insert( std::make_pair( IsoEG, isoEGKeys ) );
@@ -611,7 +614,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.setCollection( tagL1ExtraCenJet_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1CenJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+        TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+        triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
         if ( handleL1ExtraCenJet->at( l1CenJet ).bx() == 0 ) cenJetKeys.push_back( triggerObjectsStandAlone->size() - 1 );
       }
       l1ObjectTypeMap.insert( std::make_pair( CenJet, cenJetKeys ) );
@@ -635,7 +639,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.setCollection( tagL1ExtraForJet_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1ForJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+        TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+        triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
         if ( handleL1ExtraForJet->at( l1ForJet ).bx() == 0 ) forJetKeys.push_back( triggerObjectsStandAlone->size() - 1 );
       }
       l1ObjectTypeMap.insert( std::make_pair( ForJet, forJetKeys ) );
@@ -659,7 +664,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.setCollection( tagL1ExtraTauJet_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1TauJet );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+        TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+        triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
         if ( handleL1ExtraTauJet->at( l1TauJet ).bx() == 0 ) tauJetKeys.push_back( triggerObjectsStandAlone->size() - 1 );
       }
       l1ObjectTypeMap.insert( std::make_pair( TauJet, tauJetKeys ) );
@@ -683,7 +689,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerObject.setCollection( tagL1ExtraETM_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1ETM );
         if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+        TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+        triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
         if ( handleL1ExtraETM->at( l1ETM ).bx() == 0 ) etmKeys.push_back( triggerObjectsStandAlone->size() - 1 );
       }
       l1ObjectTypeMap.insert( std::make_pair( ETM, etmKeys ) );
@@ -706,8 +713,8 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         }
         triggerObject.setCollection( tagL1ExtraHTM_ );
         triggerObject.addTriggerObjectType( trigger::TriggerL1HTM );
-        if ( ! onlyStandAlone_ ) triggerObjects->push_back( triggerObject );
-        triggerObjectsStandAlone->push_back( TriggerObjectStandAlone( triggerObject ) );
+        TriggerObjectStandAlone triggerObjectStandAlone( triggerObject );
+        triggerObjectsStandAlone->push_back( triggerObjectStandAlone );
         if ( handleL1ExtraHTM->at( l1HTM ).bx() == 0 ) htmKeys.push_back( triggerObjectsStandAlone->size() - 1 );
       }
       l1ObjectTypeMap.insert( std::make_pair( HTM, htmKeys ) );
@@ -723,7 +730,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
     std::auto_ptr< TriggerAlgorithmCollection > triggerAlgos( new TriggerAlgorithmCollection() );
     std::auto_ptr< TriggerConditionCollection > triggerConditions( new TriggerConditionCollection() );
     if ( addL1Algos_ ) {
-      // fill trigger object types transalation map (yes, it's ugly!)
+      // create trigger object types transalation map (yes, it's ugly!)
       std::map< L1GtObject, trigger::TriggerObjectType > mapObjectTypes;
       mapObjectTypes.insert( std::make_pair( Mu     , trigger::TriggerL1Mu ) );
       mapObjectTypes.insert( std::make_pair( NoIsoEG, trigger::TriggerL1NoIsoEG ) );
@@ -788,19 +795,19 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         triggerAlgo.setLogicalExpression( iAlgo->second.algoLogicalExpression() );
         // GTL result and used conditions in physics algorithm
         if( handleL1GlobalTriggerObjectMapRecord.isValid() ) {
-          const L1GlobalTriggerObjectMap * objectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( algoName ) );
-          if ( ! objectMap ) {
+          const L1GlobalTriggerObjectMap * l1ObjectMap( handleL1GlobalTriggerObjectMapRecord->getObjectMap( algoName ) );
+          if ( ! l1ObjectMap ) {
             LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' is missing in L1GlobalTriggerObjectMapRecord" << std::endl
                                         << "Skipping conditions and GTL result";
-//           } else if ( objectMap->algoGtlResult() != decisionBeforeMask && ( decisionBeforeMask == true || prescale == 1 ) ) {
-          } else if ( objectMap->algoGtlResult() != decisionBeforeMask && decisionBeforeMask == true ) { // FIXME: understand the difference for un-prescaled algos 118, 119, 123
+//           } else if ( l1ObjectMap->algoGtlResult() != decisionBeforeMask && ( decisionBeforeMask == true || prescale == 1 ) ) {
+          } else if ( l1ObjectMap->algoGtlResult() != decisionBeforeMask && decisionBeforeMask == true ) { // FIXME: understand the difference for un-prescaled algos 118, 119, 123
             LogWarning( "l1ObjectMap" ) << "L1 physics algorithm '" << algoName << "' with different decisions in" << std::endl
-                                        << "L1GlobalTriggerObjectMapRecord: " << objectMap->algoGtlResult() << std::endl
+                                        << "L1GlobalTriggerObjectMapRecord: " << l1ObjectMap->algoGtlResult() << std::endl
                                         << "L1GlobalTriggerReadoutRecord  : " << decisionBeforeMask << std::endl
                                         << "Skipping conditions and GTL result";
           } else {
-            triggerAlgo.setGtlResult( objectMap->algoGtlResult() );
-            const std::vector< L1GtLogicParser::OperandToken > & tokens( objectMap->operandTokenVector() );
+            triggerAlgo.setGtlResult( l1ObjectMap->algoGtlResult() );
+            const std::vector< L1GtLogicParser::OperandToken > & tokens( l1ObjectMap->operandTokenVector() );
             for ( size_t iT = 0; iT < tokens.size(); ++iT ) {
               const L1GtLogicParser::OperandToken & token( tokens.at( iT ) );
               size_t key( triggerConditions->size() );
@@ -815,23 +822,23 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
                 if ( l1GtConditions.find( triggerCond.name() ) != l1GtConditions.end() ) {
                   triggerCond.setCategory( l1GtConditions[ triggerCond.name() ]->condCategory() );
                   triggerCond.setType( l1GtConditions[ triggerCond.name() ]->condType() );
-                  const std::vector< L1GtObject > objectTypes( l1GtConditions[ triggerCond.name() ]->objectType() );
-                  for ( size_t iT = 0 ; iT < objectTypes.size(); ++iT ) {
-                    triggerCond.addTriggerObjectType( mapObjectTypes[ objectTypes.at( iT ) ] );
+                  const std::vector< L1GtObject > l1ObjectTypes( l1GtConditions[ triggerCond.name() ]->objectType() );
+                  for ( size_t iT = 0 ; iT < l1ObjectTypes.size(); ++iT ) {
+                    triggerCond.addTriggerObjectType( mapObjectTypes[ l1ObjectTypes.at( iT ) ] );
                   }
-                  CombinationsInCond combis( objectMap->combinationVector().at( token.tokenNumber ) );
+                  CombinationsInCond combis( l1ObjectMap->combinationVector().at( token.tokenNumber ) );
                   for ( size_t iVV = 0; iVV < combis.size(); ++iVV ) {
                     SingleCombInCond combi( combis.at( iVV ) );
                     for ( size_t iV = 0; iV < combi.size(); ++iV ) {
-                      if ( iV >= objectTypes.size() ) {
-                        LogError( "l1CondMap" ) << "Index " << iV << " in combinations vector overshoots size " << objectTypes.size() << " of types vector in conditions map" << std::endl
+                      if ( iV >= l1ObjectTypes.size() ) {
+                        LogError( "l1CondMap" ) << "Index " << iV << " in combinations vector overshoots size " << l1ObjectTypes.size() << " of types vector in conditions map" << std::endl
                                                 << "Skipping object key in condition " << triggerCond.name();
-                      } else if ( l1ObjectTypeMap.find( objectTypes.at( iV ) ) != l1ObjectTypeMap.end() ) {
-                        if ( combi.at( iV ) >= int( l1ObjectTypeMap[ objectTypes.at( iV ) ].size() ) ) {
-                          LogError( "l1CondMap" ) << "Index " << combi.at( iV ) << " in combination overshoots number " << l1ObjectTypeMap[ objectTypes.at( iV ) ].size() << "of according trigger objects" << std::endl
+                      } else if ( l1ObjectTypeMap.find( l1ObjectTypes.at( iV ) ) != l1ObjectTypeMap.end() ) {
+                        if ( combi.at( iV ) >= int( l1ObjectTypeMap[ l1ObjectTypes.at( iV ) ].size() ) ) {
+                          LogError( "l1CondMap" ) << "Index " << combi.at( iV ) << " in combination overshoots number " << l1ObjectTypeMap[ l1ObjectTypes.at( iV ) ].size() << "of according trigger objects" << std::endl
                                                   << "Skipping object key in condition " << triggerCond.name();
                         }
-                        triggerCond.addObjectKey( l1ObjectTypeMap[ objectTypes.at( iV ) ].at( combi.at( iV ) ) );
+                        triggerCond.addObjectKey( l1ObjectTypeMap[ l1ObjectTypes.at( iV ) ].at( combi.at( iV ) ) );
                       }
                     }
                   }
