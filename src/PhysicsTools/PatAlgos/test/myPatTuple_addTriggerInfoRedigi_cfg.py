@@ -17,13 +17,17 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger( process, sequence = 'p', hltProcess = '*' )
 process.patTrigger.triggerResults = cms.InputTag( 'TriggerResults'      , '', '*' )
 process.patTrigger.triggerEvent   = cms.InputTag( 'hltTriggerSummaryAOD', '', '*' )
-process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'RECO' )
-process.patTrigger.l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', '' ) # process '*' should produce errors
-process.patTrigger.l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , '' ) # process '*' should produce errors
+process.patTrigger.addL1Algos     = cms.bool( True )
+process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'RECO' ) # process '*' should produce errors
+process.patTrigger.l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', '' )
+process.patTrigger.l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , '' )
 process.patTrigger.l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central'    , '' )
 process.patTrigger.l1ExtraForJet  = cms.InputTag( 'l1extraParticles', 'Forward'    , '' )
 process.patTrigger.l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'        , '' )
 process.patTrigger.l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET' )
 process.patTrigger.l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT' )
+process.patTrigger.mainBxOnly     = cms.bool( False )
+process.patTrigger.saveL1Refs     = cms.bool( True )
 process.patTriggerEvent.triggerResults = cms.InputTag( 'TriggerResults'      , '' )
 process.patTriggerEvent.triggerEvent   = cms.InputTag( 'hltTriggerSummaryAOD' )
+switchOnTrigger( process, sequence = 'p', hltProcess = '*' )
