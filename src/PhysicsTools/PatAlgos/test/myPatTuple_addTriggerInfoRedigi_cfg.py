@@ -18,8 +18,7 @@ process.l1GtTriggerMenu = cms.ESSource( "PoolDBESSource"
 process.preferL1GtTriggerMenu = cms.ESPrefer( "PoolDBESSource", "l1GtTriggerMenu" )
 process.options.wantSummary = False
 process.source.fileNames    = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data/ZJetToMuMu_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6__Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1__GEN-SIM-RECO/FED5121F-B1E4-DF11-B53F-00261834B580.root' ]
-#process.maxEvents.input     = 100
-process.maxEvents.input     = 10
+process.maxEvents.input     = 100
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfoRedigi.root'%( cmsswBase )
 
 process.p = cms.Path(
