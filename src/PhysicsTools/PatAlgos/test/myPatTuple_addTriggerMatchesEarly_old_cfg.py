@@ -1,9 +1,8 @@
 ## import skeleton process
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-from Configuration.PyReleaseValidation.autoCond import autoCond
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source.fileNames    = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_2_0_pre4'
                                                   , globalTag    = 'START42_V1'
                                                   )

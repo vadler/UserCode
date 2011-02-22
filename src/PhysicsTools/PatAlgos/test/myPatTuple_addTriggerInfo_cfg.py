@@ -1,8 +1,7 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-from Configuration.PyReleaseValidation.autoCond import autoCond
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source.fileNames    = pickRelValInputFiles()
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo.root'%( os.getenv( "CMSSW_BASE" ) )
