@@ -48,14 +48,11 @@ process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'GR_R_38X_V15::All'
+#process.GlobalTag.globaltag = 'GR_R_38X_V15::All'
+process.GlobalTag.globaltag = 'GR_R_42_V2::All'
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
-process.load( "L1Trigger.GlobalTriggerAnalyzer.l1GtAnalyzer_cfi" )
-process.l1GtAnalyzer.AlgorithmName = "L1_SingleMu7"
-process.l1GtAnalyzer.ConditionName = "SingleMu_0x0B"
 
 process.p = cms.Path(
-  # process.l1GtAnalyzer
 )
 
 ## Output
