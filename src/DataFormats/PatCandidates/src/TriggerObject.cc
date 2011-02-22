@@ -70,7 +70,6 @@ TriggerObject::TriggerObject( const reco::Particle::PolarLorentzVector & vec, in
 std::vector< int > TriggerObject::triggerObjectTypes() const
 {
   std::vector< int > triggerObjectTypes;
-//   std::copy( triggerObjectTypes_.begin(), triggerObjectTypes_.end(), triggerObjectTypes.begin() );
   for ( size_t iTo = 0; iTo < triggerObjectTypes_.size(); ++iTo ) {
     triggerObjectTypes.push_back( triggerObjectTypes_.at( iTo ) );
   }
