@@ -7,7 +7,7 @@ process.source.fileNames    = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_2_0_
                                                   , globalTag    = 'START42_V1'
                                                   )
 process.maxEvents.input     = 10
-process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly.root'%( os.getenv( "CMSSW_BASE" ) )
+process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
 process.options.wantSummary = False
 
 # Internediate step to get the taus working in CMSSW_3_10_X RelVals

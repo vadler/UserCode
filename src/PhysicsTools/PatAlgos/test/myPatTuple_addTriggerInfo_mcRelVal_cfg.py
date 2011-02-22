@@ -4,7 +4,7 @@ from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
 process.source.fileNames    = pickRelValInputFiles()
 process.options.wantSummary = False
-process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo.root'%( os.getenv( "CMSSW_BASE" ) )
+process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
 
 # # memory check
 # process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck"

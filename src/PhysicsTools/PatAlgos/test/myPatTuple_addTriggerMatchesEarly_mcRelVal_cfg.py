@@ -5,7 +5,7 @@ from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
 process.source.fileNames    = pickRelValInputFiles()
 process.maxEvents.input     = 10
-process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly.root'%( os.getenv( "CMSSW_BASE" ) )
+process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
 process.options.wantSummary = False
 
 # Internediate step to get the taus working in CMSSW_3_10_X RelVals
