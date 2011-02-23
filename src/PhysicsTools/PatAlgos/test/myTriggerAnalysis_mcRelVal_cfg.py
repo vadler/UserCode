@@ -26,6 +26,7 @@ process.source = cms.Source("PoolSource",
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 1 )
+#   input = cms.untracked.int32( 100 )
 )
 
 # Trigger analyzers
@@ -36,12 +37,13 @@ process.load( "L1Trigger.GlobalTriggerAnalyzer.l1GtAnalyzer_cfi" )
 process.l1GtAnalyzer.AlgorithmName = "L1_SingleMu7"
 process.l1GtAnalyzer.ConditionName = "SingleMu_0x0B"
 process.load( "L1Trigger.GlobalTriggerAnalyzer.l1GtTrigReport_cfi" )
-process.l1GtTrigReport.PrintVerbosity = 101
+# process.l1GtTrigReport.PrintVerbosity = 101
 
 process.p = cms.Path(
   process.l1GtAnalyzer
-+ process.l1GtTrigReport
 + process.hltEventAnalyzerAOD
++ process.l1GtTrigReport
+#   process.l1GtTrigReport
 + process.triggerSummaryAnalyzerAOD
 )
 

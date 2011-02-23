@@ -12,11 +12,11 @@ process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0_pre4'
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0_pre5'
                         , relVal        = None
                         , dataTier      = None
                         , condition     = condition
-                        , globalTag     = 'START42_V1'
+                        , globalTag     = 'START42_V3'
                         , maxVersions   = None
                         , skipFiles     = 2
                         , numberOfFiles = 0
@@ -26,6 +26,7 @@ process.source = cms.Source("PoolSource",
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 1 )
+#   input = cms.untracked.int32( 100 )
 )
 
 # HLT analyzers
@@ -36,12 +37,13 @@ process.load( "L1Trigger.GlobalTriggerAnalyzer.l1GtAnalyzer_cfi" )
 process.l1GtAnalyzer.AlgorithmName = "L1_SingleMu7"
 process.l1GtAnalyzer.ConditionName = "SingleMu_0x0B"
 process.load( "L1Trigger.GlobalTriggerAnalyzer.l1GtTrigReport_cfi" )
-process.l1GtTrigReport.PrintVerbosity = 101
+# process.l1GtTrigReport.PrintVerbosity = 101
 
 process.p = cms.Path(
   process.l1GtAnalyzer
-+ process.l1GtTrigReport
 + process.hltEventAnalyzerAOD
++ process.l1GtTrigReport
+#   process.l1GtTrigReport
 + process.triggerSummaryAnalyzerAOD
 )
 
