@@ -3,7 +3,7 @@
 // Package:    PhysicsTools/PatAlgos
 // Class:      pat::TestTriggerInfo
 //
-// $Id: TestTriggerInfo.cc,v 1.15 2010/02/28 13:37:09 vadler Exp $
+// $Id: TestTriggerInfo.cc,v 1.1 2010/03/03 18:59:27 vadler Exp $
 //
 /**
   \class TestTriggerInfo TestTriggerInfo.cc "PhysicsTools/PatAlgos/test/private/TestTriggerInfo.cc"
@@ -12,7 +12,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id:$
+  \version  $Id: TestTriggerInfo.cc,v 1.1 2010/03/03 18:59:27 vadler Exp $
 */
 
 
@@ -39,6 +39,7 @@ namespace pat {
 
       // Configuration parameters
       edm::InputTag tagPatTriggerEvent_;
+      edm::InputTag tagPatTriggerObjectStandAlones_
       // Output histograms
       std::map< std::string, TH1D* > histos1D_;
       std::map< std::string, TH2D* > histos2D_;
@@ -63,6 +64,7 @@ namespace pat {
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 
 
@@ -71,9 +73,10 @@ using namespace pat::helper;
 
 
 TestTriggerInfo::TestTriggerInfo( const edm::ParameterSet & iConfig ) :
-  tagPatTriggerEvent_( iConfig.getParameter< edm::InputTag >( "patTriggerEvent" ) ),
-  histos1D_(),
-  histos2D_()
+: tagPatTriggerEvent_( iConfig.getParameter< edm::InputTag >( "patTriggerEvent" ) )
+, tagPatTriggerObjectStandAlones_( iConfig.getParameter< edm::InputTag >( "tagPatTriggerObjectStandAlones" ) )
+, histos1D_()
+, histos2D_()
 {
 
 
@@ -95,14 +98,45 @@ void TestTriggerInfo::analyze( const edm::Event & iEvent, const edm::EventSetup 
   edm::Handle< TriggerEvent > patTriggerEvent;
   iEvent.getByLabel( tagPatTriggerEvent_, patTriggerEvent );
   if ( ! patTriggerEvent.isValid() ) {
-    edm::LogError( "patTriggerEventInvalid" ) << " pat::TriggerEvent with the tag " << tagPatTriggerEvent_.encode() << " not valid.";
+    edm::LogError( "patTriggerEventInvalid" ) << " pat::TriggerEvent with InputTag '" << tagPatTriggerEvent_.encode() << "' not valid";
     return;
   }
+
+  const TriggerAlgorithmCollection  * patTriggerAlgorithms( patTriggerEvent->algorithms() );
+  const TriggerConditionCollection  * patTriggerConditions( patTriggerEvent->conditions() );
   const TriggerPathCollection       * patTriggerPaths( patTriggerEvent->paths() );
   const TriggerFilterCollection     * patTriggerFilters( patTriggerEvent->filters() );
   const TriggerObjectCollection     * patTriggerObjects( patTriggerEvent->objects() );
+  if ( ! patTriggerAlgorithms ) {
+    edm::LogError( "patTriggerAlgorithmsInvalid" ) << "pat::TriggerAlgorithmCollection not found";
+    return;
+  }
+  if ( ! patTriggerConditions ) {
+    edm::LogError( "patTriggerConditionsInvalid" ) << "pat::TriggerConditionCollection not found";
+    return;
+  }
+  if ( ! patTriggerPaths ) {
+    edm::LogError( "patTriggerPathsInvalid" ) << "pat::TriggerPathCollection not found";
+    return;
+  }
+  if ( ! patTriggerFilters ) {
+    edm::LogError( "patTriggerFiltersInvalid" ) << "pat::TriggerFilterCollection not found";
+    return;
+  }
+  if ( ! patTriggerObjects ) {
+    edm::LogError( "patTriggerObjectsInvalid" ) << "pat::TriggerObjectCollection not found";
+    return;
+  }
+
   const TriggerObjectMatchContainer * patTriggerMatches( patTriggerEvent->triggerObjectMatchResults() );
   TriggerMatchHelper triggerMatchHelper;
+
+  edm::Handle< TriggerObjectStandAloneCollection > patTriggerObjectStandAlones;
+  iEvent.getByLabel( tagPatTriggerObjectStandAlones_, patTriggerObjectStandAlones );
+  if ( ! patTriggerObjectStandAlones.isValid() ) {
+    edm::LogError( "patTriggerObjectStandAlonesInvalid" ) << " pat::TriggerObjectStandAloneCollection with InputTag '" << tagPatTriggerObjectStandAlones_.encode() << "' not valid";
+    return;
+  }
 
 }
 
