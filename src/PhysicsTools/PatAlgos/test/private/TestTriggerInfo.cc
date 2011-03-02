@@ -39,7 +39,7 @@ namespace pat {
 
       // Configuration parameters
       edm::InputTag tagPatTriggerEvent_;
-      edm::InputTag tagPatTriggerObjectStandAlones_
+      edm::InputTag tagPatTriggerObjectStandAlones_;
       // Output histograms
       std::map< std::string, TH1D* > histos1D_;
       std::map< std::string, TH2D* > histos2D_;
@@ -72,7 +72,7 @@ using namespace pat;
 using namespace pat::helper;
 
 
-TestTriggerInfo::TestTriggerInfo( const edm::ParameterSet & iConfig ) :
+TestTriggerInfo::TestTriggerInfo( const edm::ParameterSet & iConfig )
 : tagPatTriggerEvent_( iConfig.getParameter< edm::InputTag >( "patTriggerEvent" ) )
 , tagPatTriggerObjectStandAlones_( iConfig.getParameter< edm::InputTag >( "tagPatTriggerObjectStandAlones" ) )
 , histos1D_()
@@ -129,6 +129,13 @@ void TestTriggerInfo::analyze( const edm::Event & iEvent, const edm::EventSetup 
   }
 
   const TriggerObjectMatchContainer * patTriggerMatches( patTriggerEvent->triggerObjectMatchResults() );
+  const std::vector< std::string > patTriggerMatcherLabels( patTriggerEvent->triggerMatchers() );
+  for ( size_t iLabel = 0; iLabel < patTriggerMatcherLabels.size(); ++iLabel ) {
+    if ( ! patTriggerEvent->triggerObjectMatchResult( patTriggerMatcherLabels.at( iLabel ) ) ) {
+      edm::LogError( "patTriggerMatchInvalid" ) << "pat::TriggerObjectMatch with label '" << patTriggerMatcherLabels.at( iLabel ) << "' not found";
+      return;
+    }
+  }
   TriggerMatchHelper triggerMatchHelper;
 
   edm::Handle< TriggerObjectStandAloneCollection > patTriggerObjectStandAlones;
