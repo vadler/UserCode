@@ -5,14 +5,6 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process( "PAT" )
 
-## MessageLogger
-process.load( "FWCore.MessageService.MessageLogger_cfi" )
-process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append( 'autoProcessName' )
-process.MessageLogger.cerr.INFO = cms.untracked.PSet(
-  limit = cms.untracked.int32( -1 )
-)
-
 ## Options and Output Report
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( False )
@@ -36,9 +28,18 @@ process.source = cms.Source( "PoolSource"
   , '/store/data/Run2010A/Mu/RECO/v4/000/144/112/EE66B7B6-0BB4-DF11-BC6C-001D09F2B30B.root' # other lumi sectionsevents
   )
 , skipEvents = cms.untracked.uint32( 18000 ) # end of re-reco file
+# , fileNames = cms.untracked.vstring(
+#     # Re-RECO, 1 event locally
+#     'file:/afs/cern.ch/user/v/vadler/scratch0/data/PAT/Mu__Run2010A-Sep17ReReco_v2__RECO/r144112l406e423329356.root'
+#   )
+# , fileNames = cms.untracked.vstring(
+#     # AOD, latest Re-RECO
+#     'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data/Multijet__Run2010B-Dec22ReReco_v1__AOD/66A62074-7A1B-E011-8DD5-002618FDA265.root'
+#   )
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 100 )
+#   input = cms.untracked.int32( 1 )
 )
 process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskAlgoTrigConfig_cff" )
 process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff" )
@@ -49,8 +50,6 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 process.GlobalTag.globaltag = 'GR_R_38X_V15::All'
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
-process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )
-process.load( "Configuration.StandardSequences.L1Reco_cff" )
 
 process.p = cms.Path(
 )
@@ -58,7 +57,8 @@ process.p = cms.Path(
 ## Output
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, fileName       = cms.untracked.string( '%s/output/myPatTuple_triggerOnly.root'%( cmsswBase ) )
+# , fileName       = cms.untracked.string( '%s/output/myPatTuple_triggerOnly.root'%( cmsswBase ) )
+, fileName       = cms.untracked.string( '%s/output/myPatTuple_triggerOnly_data.root'%( cmsswBase ) )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'p'
@@ -73,7 +73,7 @@ process.outpath = cms.EndPath(
 )
 
 ## PAT trigger
-from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
+from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger( process, sequence = 'p', hltProcess = '*' )
 process.patTrigger.addL1Algos     = cms.bool( True )
 process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''            )
@@ -84,7 +84,12 @@ process.patTrigger.l1ExtraForJet  = cms.InputTag( 'l1extraParticles', 'Forward' 
 process.patTrigger.l1ExtraTauJet  = cms.InputTag( 'l1extraParticles', 'Tau'         )
 process.patTrigger.l1ExtraETM     = cms.InputTag( 'l1extraParticles', 'MET'         )
 process.patTrigger.l1ExtraHTM     = cms.InputTag( 'l1extraParticles', 'MHT'         )
+process.patTrigger.mainBxOnly     = cms.bool( False )
 process.patTrigger.saveL1Refs     = cms.bool( True )
+process.patTrigger.exludeCollections = cms.vstring(
+  "hltL1extraParticles*"
+)
 process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
 switchOnTrigger( process, sequence = 'p', hltProcess = '*' ) # to update event content
+switchOnTriggerStandAlone( process, sequence = 'p', hltProcess = '*' )
