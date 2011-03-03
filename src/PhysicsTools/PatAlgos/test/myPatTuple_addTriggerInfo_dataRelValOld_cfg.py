@@ -10,7 +10,7 @@ process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0
                                                   , numberOfFiles = 1
                                                   )
 process.options.wantSummary = False
-process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
+process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
 
 # # memory check
 # process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck"
