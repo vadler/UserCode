@@ -176,9 +176,6 @@ namespace {
               PAT Dataformats beyond PatObjects
        ==========================================================================================================================   */
   std::vector<edm::Ptr<CaloTower> > v_p_ct;
-  std::vector<CaloTower> v_ct;
-  edm::Wrapper<std::vector<CaloTower> > wv_ct;
-
   std::pair<std::string, std::vector<float> > jcfcf;
   edm::Wrapper<std::pair<std::string, std::vector<float> > > w_jcfcf;
   std::vector<pat::JetCorrFactors::CorrectionFactor> v_jcfcf;
@@ -251,6 +248,15 @@ namespace {
   pat::L1Seed p_bs;
   pat::L1SeedCollection vp_bs;
   pat::L1SeedCollection::const_iterator vp_bs_ci;
+
+  pat::TriggerConditionCollection v_p_tc;
+  pat::TriggerConditionCollection::const_iterator v_p_tc_ci;
+  edm::Wrapper<pat::TriggerConditionCollection> w_v_p_tc;
+  pat::TriggerConditionRef r_p_tc;
+  pat::TriggerConditionRefProd rp_p_tc;
+  edm::Wrapper<pat::TriggerConditionRefProd> w_rp_p_tc;
+  pat::TriggerConditionRefVector rv_p_tc;
+  pat::TriggerConditionRefVectorIterator rv_p_tc_i;
 
   pat::TriggerAlgorithmCollection v_p_ta;
   pat::TriggerAlgorithmCollection::const_iterator v_p_ta_ci;
