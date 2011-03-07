@@ -12,11 +12,11 @@ process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0_pre5'
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0_pre6'
                         , relVal        = None
                         , dataTier      = None
                         , condition     = condition
-                        , globalTag     = 'START42_V3'
+                        , globalTag     = 'START42_V4'
                         , maxVersions   = None
                         , skipFiles     = 2
                         , numberOfFiles = 0

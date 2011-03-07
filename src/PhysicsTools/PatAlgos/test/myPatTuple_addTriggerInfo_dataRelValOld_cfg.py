@@ -2,11 +2,11 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 process.GlobalTag.globaltag = cms.string( autoCond[ 'hltonline' ] )
-process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0_pre5'
+process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0_pre6'
                                                   , relVal        = 'Mu'
                                                   , dataTier      = 'RECO'
                                                   , condition     = 'hltonline' # not needed, if GT explicitely given
-                                                  , globalTag     = 'GR_R_42_V2_RelVal_mu2010B'
+                                                  , globalTag     = 'GR_R_42_V3_RelVal_wzMu2010B'
                                                   , numberOfFiles = 1
                                                   )
 process.options.wantSummary = False
