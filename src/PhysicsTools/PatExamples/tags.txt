@@ -7,5 +7,7 @@ DataFormats/PatCandidates                        V06-04-01      V06-04-01
 PhysicsTools/PatAlgos                            V08-06-02      V08-06-01      
 PhysicsTools/PatExamples                         V00-05-04      V00-05-04      
 PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
+PhysicsTools/SelectorUtils                       V00-03-05      V00-03-03      
+PhysicsTools/UtilAlgos                           V08-02-10      V08-02-09      
 ---------------------------------------
-total packages: 5 (5 displayed)
+total packages: 7 (7 displayed)
