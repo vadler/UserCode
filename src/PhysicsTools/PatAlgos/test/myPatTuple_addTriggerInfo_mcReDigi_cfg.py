@@ -4,18 +4,11 @@ cmsswBase = os.getenv( 'CMSSW_BASE' )
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from Configuration.PyReleaseValidation.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] ) # contains L1 menu 'L1GtTriggerMenu_L1Menu_Collisions2011_v0a_mc'
-import CondCore.DBCommon.CondDBCommon_cfi
-process.l1GtTriggerMenu = cms.ESSource( "PoolDBESSource"
-, CondCore.DBCommon.CondDBCommon_cfi.CondDBCommon
-, toGet   = cms.VPSet(
-    cms.PSet(
-      connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_L1T' )
-    , record  = cms.string( 'L1GtTriggerMenuRcd' )
-    , tag     = cms.string( 'L1GtTriggerMenu_L1Menu_Commissioning2010_v4_mc' )  # L1 menu for Fall10 REDIGI (CMSSW_3_8_7)
-    )
-  )
-)
-process.preferL1GtTriggerMenu = cms.ESPrefer( "PoolDBESSource", "l1GtTriggerMenu" )
+
+# To run on 3XY MC
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import run42xOn3yzMcInput
+run42xOn3yzMcInput( process )
+
 process.options.wantSummary = False
 process.source.fileNames    = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data/ZJetToMuMu_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6__Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1__GEN-SIM-RECO/FED5121F-B1E4-DF11-B53F-00261834B580.root' ]
 process.maxEvents.input     = 100
