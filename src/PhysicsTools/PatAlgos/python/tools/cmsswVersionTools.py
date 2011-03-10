@@ -20,8 +20,10 @@ def run42xOn3yzMcInput(process
                       ):
   """
   """
+  # Remove special PFTauTagInfo path again, since its output is still available in 3YZ
   if hasattr( process, pfTauTagPath ):
     process.__delattr__( pfTauTagPath )
+  # Use correct L1 trigger menu
   import CondCore.DBCommon.CondDBCommon_cfi
   process.l1GtTriggerMenu = cms.ESSource( "PoolDBESSource"
   , CondCore.DBCommon.CondDBCommon_cfi.CondDBCommon
