@@ -6,23 +6,11 @@ process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = None
                                                   , relVal        = 'Mu'
                                                   , dataTier      = 'RECO'
                                                   , condition     = 'hltonline' # not needed, if GT explicitely given
-                                                  , globalTag     = 'GR_R_42_V2_RelVal_mu2010B'
+                                                  , globalTag     = 'GR_R_42_V3_RelVal_wzMu2010B'
                                                   , numberOfFiles = 1
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
-
-# # memory check
-# process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck"
-# # , oncePerEventMode = cms.untracked.bool( True )
-# , ignoreTotal      = cms.untracked.int32( 0 )
-# )
-
-# Internediate step to get the taus working in CMSSW_3_10_X RelVals
-process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
-process.p0 = cms.Path(
-  process.PFTau
-)
 
 process.p = cms.Path(
   process.patDefaultSequence
