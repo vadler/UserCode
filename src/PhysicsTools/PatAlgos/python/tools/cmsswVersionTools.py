@@ -10,6 +10,33 @@ from subprocess import *
 
 
 ## ------------------------------------------------------
+## Deal with backweard incompatibilities in event content
+## and conditions
+## ------------------------------------------------------
+
+def run42xOn3yzMcInput(process
+                      , pfTauTagPath = 'p0'
+                      , l1MenuTag    = 'L1GtTriggerMenu_L1Menu_Commissioning2010_v4_mc' # L1 menu for Fall10 REDIGI (CMSSW_3_8_7)
+                      ):
+  """
+  """
+  if hasattr( process, pfTauTagPath ):
+    process.__delattr__( pfTauTagPath )
+  import CondCore.DBCommon.CondDBCommon_cfi
+  process.l1GtTriggerMenu = cms.ESSource( "PoolDBESSource"
+  , CondCore.DBCommon.CondDBCommon_cfi.CondDBCommon
+  , toGet   = cms.VPSet(
+      cms.PSet(
+        connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_L1T' )
+      , record  = cms.string( 'L1GtTriggerMenuRcd' )
+      , tag     = cms.string( l1MenuTag )
+      )
+    )
+  )
+  process.preferL1GtTriggerMenu = cms.ESPrefer( "PoolDBESSource", "l1GtTriggerMenu" )
+
+
+## ------------------------------------------------------
 ## Re-configuration of PATJetProducer
 ## ------------------------------------------------------
 
