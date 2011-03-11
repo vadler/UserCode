@@ -1,13 +1,22 @@
-Test Release based on: CMSSW_4_2_0_pre7
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_0_pre7
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_0_pre7
+Test Release based on: CMSSW_3_10_X_2010-12-19-1300
+Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_ia32_gcc434/sun/3.10-sun-13/CMSSW_3_10_X_2010-12-19-1300
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_3_10_X_2010-12-19-1300
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CommonTools/CandUtils                            V00-01-01      V00-00-04-01   
-DataFormats/PatCandidates                        V06-04-01      V06-04-01      
-PhysicsTools/PatAlgos                            V08-06-04      V08-06-01      
-PhysicsTools/PatExamples                         V00-05-04      V00-05-04      
+CondFormats/JetMETObjects                        V03-01-14      V03-01-01-02   
+DataFormats/CaloTowers                           V02-05-11      V02-05-10      
+DataFormats/PatCandidates                        V06-02-18      V06-02-02-01   
+JetMETCorrections/Algorithms                     V02-01-02      V02-01-00-01   
+JetMETCorrections/Modules                        V05-00-14      V04-00-04      
+PhysicsTools/FWLite                              V02-03-07      V02-03-05      
+PhysicsTools/JetMCAlgos                          V00-13-10      V00-13-09      
+PhysicsTools/PFCandProducer                      V04-07-00      V04-06-04      
+PhysicsTools/PatAlgos                            V08-04-08      V08-01-03-03   
+PhysicsTools/PatExamples                         V00-05-02      V00-04-10-01   
 PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
-PhysicsTools/SelectorUtils                       V00-03-05      V00-03-03      
-PhysicsTools/UtilAlgos                           V08-02-10      V08-02-09      
+PhysicsTools/PythonAnalysis                      V00-05-01      V00-04-00      
+PhysicsTools/SelectorUtils                       V00-03-03      V00-02-20-01   
+PhysicsTools/UtilAlgos                           V08-02-05      V08-01-03      
+PhysicsTools/Utilities                           V08-01-02      V08-01-00-01   
+RecoTauTag/Configuration                         V01-00-14      V01-00-13      
 ---------------------------------------
-total packages: 7 (7 displayed)
+total packages: 16 (16 displayed)
