@@ -59,7 +59,7 @@ process.p = cms.Path(
 process.out = cms.OutputModule(
   "PoolOutputModule"
 # , fileName       = cms.untracked.string( '%s/output/myPatTuple_triggerOnly.root'%( cmsswBase ) )
-, fileName       = cms.untracked.string( '%s/output/myPatTuple_triggerOnly_data.root'%( cmsswBase ) )
+, fileName       = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfoOnly_data.root'%( cmsswBase ) )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'p'
