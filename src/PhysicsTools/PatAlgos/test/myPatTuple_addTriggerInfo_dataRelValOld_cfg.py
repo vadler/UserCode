@@ -1,7 +1,7 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
-process.GlobalTag.globaltag = cms.string( autoCond[ 'hltonline' ] )
+process.GlobalTag.globaltag = autoCond[ 'hltonline' ]
 process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0_pre6'
                                                   , relVal        = 'Mu'
                                                   , dataTier      = 'RECO'

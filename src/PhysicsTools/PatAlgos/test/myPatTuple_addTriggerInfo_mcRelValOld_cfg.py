@@ -1,7 +1,7 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
-process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
+process.GlobalTag.globaltag = autoCond[ 'startup' ]
 process.source.fileNames    = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_2_0_pre6'
                                                   , globalTag    = 'START42_V4'
                                                   )
