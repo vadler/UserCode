@@ -2,8 +2,8 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 process.GlobalTag.globaltag = autoCond[ 'startup' ]
-process.source.fileNames    = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_2_0_pre6'
-                                                  , globalTag    = 'START42_V4'
+process.source.fileNames    = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_1_2'
+                                                  , globalTag    = 'START311_V2'
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
@@ -14,33 +14,9 @@ process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelValOld.r
 # , ignoreTotal      = cms.untracked.int32( 0 )
 # )
 
-# Internediate step to get the taus working in CMSSW_3_10_X RelVals
-process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
-process.p0 = cms.Path(
-  process.PFTau
-)
-
 process.p = cms.Path(
   process.patDefaultSequence
 )
-process.patTaus.tauIDSources = cms.PSet(
-        leadingTrackFinding = cms.InputTag("shrinkingConePFTauDiscriminationByLeadingTrackFinding"),
-        #leadingTrackPtCut = cms.InputTag("shrinkingConePFTauDiscriminationByLeadingTrackPtCut"),
-        leadingPionPtCut = cms.InputTag("shrinkingConePFTauDiscriminationByLeadingPionPtCut"),
-        #trackIsolation = cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolation"),
-        #trackIsolationUsingLeadingPion = cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolationUsingLeadingPion"),
-        #ecalIsolation = cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolation"),
-        #ecalIsolationUsingLeadingPion = cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolationUsingLeadingPion"),
-        #byIsolation = cms.InputTag("shrinkingConePFTauDiscriminationByIsolation"),
-        byIsolationUsingLeadingPion = cms.InputTag("shrinkingConePFTauDiscriminationByIsolationUsingLeadingPion"),
-        againstElectron = cms.InputTag("shrinkingConePFTauDiscriminationAgainstElectron"),
-        againstMuon = cms.InputTag("shrinkingConePFTauDiscriminationAgainstMuon")#,
-        #byTaNC = cms.InputTag("shrinkingConePFTauDiscriminationByTaNC"),
-        #byTaNCfrOnePercent = cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrOnePercent"),
-        #byTaNCfrHalfPercent = cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrHalfPercent"),
-        #byTaNCfrQuarterPercent = cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrQuarterPercent"),
-        #byTaNCfrTenthPercent = cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrTenthPercent")
-    )
 
 process.out.outputCommands += [
   'keep edmTriggerResults_TriggerResults_*_HLT'
