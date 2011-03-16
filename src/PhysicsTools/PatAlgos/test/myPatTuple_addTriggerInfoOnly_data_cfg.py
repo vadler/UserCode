@@ -14,7 +14,7 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source( "PoolSource"
 , fileNames = cms.untracked.vstring(
   # Prompt RECO
-    '/store/data/Run2011A/MuHad/RECO/PromptReco-v1/000/160/433/C6F4247F-B54F-E011-88F1-003048F1C420.root'
+    '/store/data/Run2011A/SingleMu/RECO/PromptReco-v1/000/160/433/6060139A-B54F-E011-AEA3-001D09F25479.root'
   )
 )
 process.maxEvents = cms.untracked.PSet(

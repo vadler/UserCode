@@ -13,7 +13,7 @@ process.options = cms.untracked.PSet(
 ## Source
 process.source = cms.Source( "PoolSource"
 , fileNames = cms.untracked.vstring(
-    '/store/data/Run2011A/MuHad/RAW/v1/000/160/433/A2554639-0D4E-E011-A0C6-0030487CD6B4.root'
+    '/store/data/Run2011A/SingleMu/RAW/v1/000/160/433/68946939-0D4E-E011-81F7-0030487CD77E.root'
   )
 )
 process.maxEvents = cms.untracked.PSet(
