@@ -3,6 +3,6 @@ Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_amd64_gcc434/wed/4.1
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_1_X_2011-03-16-0200
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        V06-04-01-01   V06-02-14-01   
-PhysicsTools/PatAlgos                            V08-06-01-01   V08-04-06-07   
+PhysicsTools/PatAlgos                            V08-06-01-02   V08-04-06-07   
 ---------------------------------------
 total packages: 2 (2 displayed)
