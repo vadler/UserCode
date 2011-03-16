@@ -13,11 +13,8 @@ process.options = cms.untracked.PSet(
 ## Source
 process.source = cms.Source( "PoolSource"
 , fileNames = cms.untracked.vstring(
-    # Re-RECO
-    'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data/Mu__Run2010A-Sep17ReReco_v2__RECO/5E60A76B-11C8-DF11-829A-0017A4770C18.root' # same lumi sections/events
-    # Prompt RECO, switch
-  #, '/store/data/Run2010A/Mu/RECO/v4/000/144/112/E6F6D3D9-CBB3-DF11-8A0E-001D09F2AD4D.root' # same lumi sections/events
-  , '/store/data/Run2010A/Mu/RECO/v4/000/144/112/EE66B7B6-0BB4-DF11-BC6C-001D09F2B30B.root' # other lumi sectionsevents
+  # Prompt RECO
+    '/store/data/Run2011A/MuHad/RECO/PromptReco-v1/000/160/433/C6F4247F-B54F-E011-88F1-003048F1C420.root'
   )
 )
 process.maxEvents = cms.untracked.PSet(
