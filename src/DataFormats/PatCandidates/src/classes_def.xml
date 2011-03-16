@@ -157,6 +157,10 @@
   <!-- ==========================================================================================================================
               PAT Dataformats beyond PatObjects
        ========================================================================================================================== -->
+  <class name="std::vector<edm::Ptr<CaloTower> >" />
+  <class name="std::vector<CaloTower>" />
+  <class name="edm::Wrapper<std::vector<CaloTower> >" />
+
   <class name="std::pair<std::string,std::vector<float> >" />
   <class name="edm::Wrapper<std::pair<std::string,std::vector<float> > >" />
   <class name="std::vector<pat::JetCorrFactors::CorrectionFactor>" />
@@ -235,16 +239,6 @@
   <class name="pat::L1Seed" />
   <class name="std::vector<pat::L1Seed>" />
   <class name="std::vector<pat::L1Seed>::const_iterator" />
-
-  <class name="pat::TriggerCondition" />
-  <class name="std::vector<pat::TriggerCondition>" />
-  <class name="std::vector<pat::TriggerCondition>::const_iterator" />
-  <class name="edm::Wrapper<std::vector<pat::TriggerCondition> >" />
-  <class name="pat::TriggerConditionRef" />
-  <class name="pat::TriggerConditionRefProd" />
-  <class name="edm::Wrapper<pat::TriggerConditionRefProd >" />
-  <class name="pat::TriggerConditionRefVector" />
-  <class name="pat::TriggerConditionRefVectorIterator" />
 
   <class name="pat::TriggerAlgorithm" />
   <class name="std::vector<pat::TriggerAlgorithm>" />

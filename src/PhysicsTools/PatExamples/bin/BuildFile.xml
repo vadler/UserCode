@@ -23,4 +23,5 @@
   <bin   file="PatBasicFWLiteJetUnitTest.cc"></bin>
   <bin   file="WrappedFWLiteMuonAnalyzer.cc"></bin>
   <bin   file="PatCleaningExercise.cc"></bin>
+  <bin   file="FWLiteLumiAccess.cc"></bin>
 </environment>
