@@ -2,7 +2,10 @@ Test Release based on: CMSSW_4_1_X_2011-03-16-0200
 Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_amd64_gcc434/wed/4.1-wed-02/CMSSW_4_1_X_2011-03-16-0200
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_1_X_2011-03-16-0200
 -------- Package --------                        --- Tag ---    --- RelTag --- 
+CommonTools/CandAlgos                            V00-01-00      V00-00-14      
+CommonTools/CandUtils                            V00-01-01      V00-00-04-01   
 DataFormats/PatCandidates                        V06-04-01-01   V06-02-14-01   
 PhysicsTools/PatAlgos                            V08-06-01-02   V08-04-06-07   
+PhysicsTools/UtilAlgos                           V08-02-09      V08-02-07      
 ---------------------------------------
-total packages: 2 (2 displayed)
+total packages: 5 (5 displayed)
