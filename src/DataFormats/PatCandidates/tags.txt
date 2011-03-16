@@ -2,17 +2,18 @@ Test Release based on: CMSSW_4_2_0_pre7
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_0_pre7
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_0_pre7
 -------- Package --------                        --- Tag ---    --- RelTag --- 
+CommonTools/CandAlgos                            V00-01-00      V00-00-14      
 CommonTools/CandUtils                            V00-01-01      V00-00-04-01   
 DataFormats/PatCandidates                        V06-04-02      V06-04-01      
 DataFormats/TauReco                              V01-00-07-01   V01-00-06      
 PhysicsTools/MVAComputer                         V00-06-03      V00-06-01      
-PhysicsTools/PatAlgos                            V08-06-06      V08-06-01      
+PhysicsTools/PatAlgos                            V08-06-08      V08-06-01      
 PhysicsTools/PatExamples                         V00-05-04      V00-05-04      
 PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
 PhysicsTools/SelectorUtils                       V00-03-05      V00-03-03      
 PhysicsTools/UtilAlgos                           V08-02-10      V08-02-09      
-RecoTauTag/Configuration                         V01-00-26      V01-01-22      
+RecoTauTag/Configuration                         V01-00-27      V01-01-22      
 RecoTauTag/RecoTau                               V01-00-33      V01-00-30      
 RecoTauTag/TauTagTools                           V01-00-12      V01-00-11      
 ---------------------------------------
-total packages: 12 (12 displayed)
+total packages: 13 (13 displayed)
