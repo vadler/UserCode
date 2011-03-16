@@ -13,7 +13,7 @@ from subprocess import *
 ## Deal with backweard incompatibilities of conditions
 ## ------------------------------------------------------
 
-def run42xOn3yzMcInput( process
+def run41xOn3yzMcInput( process
                       , l1MenuTag    = 'L1GtTriggerMenu_L1Menu_Commissioning2010_v4_mc' # L1 menu for Fall10 REDIGI (CMSSW_3_8_7)
                       ):
   """
