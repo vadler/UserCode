@@ -4,6 +4,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_0_pre7
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 CommonTools/CandAlgos                            V00-01-00      V00-00-14      
 CommonTools/CandUtils                            V00-01-01      V00-00-04-01   
+CommonTools/ParticleFlow                         michal_17Mar2011 V00-01-01      
 DataFormats/PatCandidates                        V06-04-02      V06-04-01      
 DataFormats/TauReco                              V01-00-07-01   V01-00-06      
 PhysicsTools/MVAComputer                         V00-06-03      V00-06-01      
@@ -16,4 +17,54 @@ RecoTauTag/Configuration                         V01-00-27      V01-01-22
 RecoTauTag/RecoTau                               V01-00-33      V01-00-30      
 RecoTauTag/TauTagTools                           V01-00-12      V01-00-11      
 ---------------------------------------
-total packages: 13 (13 displayed)
+total packages: 14 (14 displayed)
+===================================================================
+File: helpers.py       	Status: Up-to-date
+
+   Working revision:	1.17
+   Repository revision:	1.17	/cvs_server/repositories/CMSSW/CMSSW/PhysicsTools/PatAlgos/python/tools/helpers.py,v
+   Commit Identifier:	y29GuM5hplLAbdcv
+   Sticky Tag:		michal_17Mar2011_V08-06-05 (revision: 1.17)
+   Sticky Date:		(none)
+   Sticky Options:	(none)
+
+===================================================================
+File: pfTools.py       	Status: Up-to-date
+
+   Working revision:	1.55
+   Repository revision:	1.55	/cvs_server/repositories/CMSSW/CMSSW/PhysicsTools/PatAlgos/python/tools/pfTools.py,v
+   Commit Identifier:	y29GuM5hplLAbdcv
+   Sticky Tag:		michal_17Mar2011_V08-06-05 (revision: 1.55)
+   Sticky Date:		(none)
+   Sticky Options:	(none)
+
+===================================================================
+File: tauTools.py      	Status: Up-to-date
+
+   Working revision:	1.38
+   Repository revision:	1.38	/cvs_server/repositories/CMSSW/CMSSW/PhysicsTools/PatAlgos/python/tools/tauTools.py,v
+   Commit Identifier:	y29GuM5hplLAbdcv
+   Sticky Tag:		michal_17Mar2011_V08-06-05 (revision: 1.38)
+   Sticky Date:		(none)
+   Sticky Options:	(none)
+
+===================================================================
+File: patTuple_PATandPF2PAT_cfg.py	Status: Up-to-date
+
+   Working revision:	1.11
+   Repository revision:	1.11	/cvs_server/repositories/CMSSW/CMSSW/PhysicsTools/PatAlgos/test/patTuple_PATandPF2PAT_cfg.py,v
+   Commit Identifier:	c4yFhz5tKvE4Gdcv
+   Sticky Tag:		michal_17Mar2011_V08-06-05 (revision: 1.11)
+   Sticky Date:		(none)
+   Sticky Options:	(none)
+
+===================================================================
+File: patTuple_PF2PAT_cfg.py	Status: Up-to-date
+
+   Working revision:	1.14
+   Repository revision:	1.14	/cvs_server/repositories/CMSSW/CMSSW/PhysicsTools/PatAlgos/test/patTuple_PF2PAT_cfg.py,v
+   Commit Identifier:	c4yFhz5tKvE4Gdcv
+   Sticky Tag:		michal_17Mar2011_V08-06-05 (revision: 1.14)
+   Sticky Date:		(none)
+   Sticky Options:	(none)
+
