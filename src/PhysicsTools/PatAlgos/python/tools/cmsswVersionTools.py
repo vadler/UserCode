@@ -766,15 +766,20 @@ class PickRelValInputFiles( ConfigToolBase ):
     PickRelValInputFiles( cmsswVersion, relVal, dataTier, condition, globalTag, maxVersions, skipFiles, numberOfFiles, debug )
     - cmsswVersion : CMSSW release to pick up the RelVal files from
                      optional; default: the current release (determined automatically from environment)
-    . relVal       : RelVal sample to be used
+    - storage      : path of the rf system the RelVals are accessible from on the current site
+                     optional; default: '/castor/cern.ch/cms'
+    - relVal       : RelVal sample to be used
                      optional; default: 'RelValTTbar'
     - dataTier     : data tier to be used
                      optional; default: 'GEN-SIM-RECO'
     - condition    : identifier of GlobalTag as defined in Configurations/PyReleaseValidation/python/autoCond.py
                      possibly overwritten by 'globalTag'
                      optional; default: 'startup'
-    - globalTag    : name of GlobalTag to be used
+    - globalTag    : name of GlobalTag as it is used in the data path of the RelVals
                      optional; default: determined automatically as defined by 'condition' in Configurations/PyReleaseValidation/python/autoCond.py
+      !!!            Determination is done for the release one runs in, not for the release the RelVals have been produced in.
+      !!!            Example of deviation: data RelVals (CMSSW_4_1_X) might not only have the pure name of the GlobalTag 'GR_R_311_V2' in the full path,
+                     but also an extension identifying the data: 'GR_R_311_V2_RelVal_wzMu2010B'
     - maxVersions  : max. versioning number of RelVal to check
                      optional; default: 9
     - skipFiles    : number of files to skip for a found RelVal sample
@@ -795,6 +800,7 @@ class PickRelValInputFiles( ConfigToolBase ):
     def __init__( self ):
         ConfigToolBase.__init__( self )
         self.addParameter( self._defaultParameters, 'cmsswVersion' , os.getenv( "CMSSW_VERSION" )                                        , 'auto from environment' )
+        self.addParameter( self._defaultParameters, 'storage'      , '/castor/cern.ch/cms'                                               , '' )
         self.addParameter( self._defaultParameters, 'relVal'       , 'RelValTTbar'                                                       , '' )
         self.addParameter( self._defaultParameters, 'dataTier'     , 'GEN-SIM-RECO'                                                      , '' )
         self.addParameter( self._defaultParameters, 'condition'    , 'startup'                                                           , '' )
@@ -808,6 +814,7 @@ class PickRelValInputFiles( ConfigToolBase ):
 
     def __call__( self
                 , cmsswVersion  = None
+                , storage       = None
                 , relVal        = None
                 , dataTier      = None
                 , condition     = None
@@ -819,6 +826,8 @@ class PickRelValInputFiles( ConfigToolBase ):
                 ):
         if cmsswVersion is None:
             cmsswVersion = self.getDefaultParameters()[ 'cmsswVersion' ].value
+        if storage is None:
+            storage = self.getDefaultParameters()[ 'storage' ].value
         if relVal is None:
             relVal = self.getDefaultParameters()[ 'relVal' ].value
         if dataTier is None:
@@ -836,6 +845,7 @@ class PickRelValInputFiles( ConfigToolBase ):
         if debug is None:
             debug = self.getDefaultParameters()[ 'debug' ].value
         self.setParameter( 'cmsswVersion' , cmsswVersion )
+        self.setParameter( 'storage'      , storage )
         self.setParameter( 'relVal'       , relVal )
         self.setParameter( 'dataTier'     , dataTier )
         self.setParameter( 'condition'    , condition )
@@ -848,6 +858,7 @@ class PickRelValInputFiles( ConfigToolBase ):
 
     def apply( self ):
         cmsswVersion  = self._parameters[ 'cmsswVersion'  ].value
+        storage       = self._parameters[ 'storage'       ].value
         relVal        = self._parameters[ 'relVal'        ].value
         dataTier      = self._parameters[ 'dataTier'      ].value
         condition     = self._parameters[ 'condition'     ].value # only used for GT determination in initialization, if GT not explicitly given
@@ -868,7 +879,7 @@ class PickRelValInputFiles( ConfigToolBase ):
 
         command      = 'nsls'
         rfdirPath    = '/store/relval/%s/%s/%s/%s-v'%( cmsswVersion, relVal, dataTier, globalTag )
-        argument     = '/castor/cern.ch/cms%s'%( rfdirPath )
+        argument     = '%s%s'%( storage, rfdirPath )
         filePaths    = []
         validVersion = 0
 
