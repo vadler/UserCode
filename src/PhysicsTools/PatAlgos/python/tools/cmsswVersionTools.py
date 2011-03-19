@@ -6,6 +6,7 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 from Configuration.PyReleaseValidation.autoCond import autoCond
 
 import os
+import socket
 from subprocess import *
 
 
@@ -766,8 +767,6 @@ class PickRelValInputFiles( ConfigToolBase ):
     PickRelValInputFiles( cmsswVersion, relVal, dataTier, condition, globalTag, maxVersions, skipFiles, numberOfFiles, debug )
     - cmsswVersion : CMSSW release to pick up the RelVal files from
                      optional; default: the current release (determined automatically from environment)
-    - site         : identifies site to run on, either 'CERN' or 'FNAL'
-                     optional; default: 'CERN'
     - relVal       : RelVal sample to be used
                      optional; default: 'RelValTTbar'
     - dataTier     : data tier to be used
@@ -802,7 +801,6 @@ class PickRelValInputFiles( ConfigToolBase ):
     def __init__( self ):
         ConfigToolBase.__init__( self )
         self.addParameter( self._defaultParameters, 'cmsswVersion' , os.getenv( "CMSSW_VERSION" )                                        , 'auto from environment' )
-        self.addParameter( self._defaultParameters, 'site'         , 'CERN'                                                              , '' )
         self.addParameter( self._defaultParameters, 'relVal'       , 'RelValTTbar'                                                       , '' )
         self.addParameter( self._defaultParameters, 'dataTier'     , 'GEN-SIM-RECO'                                                      , '' )
         self.addParameter( self._defaultParameters, 'condition'    , 'startup'                                                           , '' )
@@ -816,7 +814,6 @@ class PickRelValInputFiles( ConfigToolBase ):
 
     def __call__( self
                 , cmsswVersion  = None
-                , site          = None
                 , relVal        = None
                 , dataTier      = None
                 , condition     = None
@@ -828,8 +825,6 @@ class PickRelValInputFiles( ConfigToolBase ):
                 ):
         if cmsswVersion is None:
             cmsswVersion = self.getDefaultParameters()[ 'cmsswVersion' ].value
-        if site is None:
-            site = self.getDefaultParameters()[ 'site' ].value
         if relVal is None:
             relVal = self.getDefaultParameters()[ 'relVal' ].value
         if dataTier is None:
@@ -847,7 +842,6 @@ class PickRelValInputFiles( ConfigToolBase ):
         if debug is None:
             debug = self.getDefaultParameters()[ 'debug' ].value
         self.setParameter( 'cmsswVersion' , cmsswVersion )
-        self.setParameter( 'site'         , site )
         self.setParameter( 'relVal'       , relVal )
         self.setParameter( 'dataTier'     , dataTier )
         self.setParameter( 'condition'    , condition )
@@ -860,7 +854,6 @@ class PickRelValInputFiles( ConfigToolBase ):
 
     def apply( self ):
         cmsswVersion  = self._parameters[ 'cmsswVersion'  ].value
-        site          = self._parameters[ 'site'          ].value
         relVal        = self._parameters[ 'relVal'        ].value
         dataTier      = self._parameters[ 'dataTier'      ].value
         condition     = self._parameters[ 'condition'     ].value # only used for GT determination in initialization, if GT not explicitly given
@@ -882,19 +875,20 @@ class PickRelValInputFiles( ConfigToolBase ):
         command   = ''
         storage   = ''
         filePaths = []
-        if site is 'CERN':
+        domain    = socket.getfqdn().split( '.' )
+        if domain[ -2 ] == 'cern' and domain[ -1 ] == 'ch':
             command = 'nsls'
             storage = '/castor/cern.ch/cms'
-        elif site is 'FNAL':
+        elif domain[ -2 ] == 'fnal' and domain[ -1 ] == 'gov':
             command = 'ls'
             storage = '/pnfs/cms/WAX/11'
         else:
             print 'ERROR %s'%( self._label )
-            print '    Unknown site %s'%( site )
+            print '    Running on site \'%s.%s\' without access to RelVal files'%( domain[ -2 ], domain[ -1 ] )
             print '    Aborting...'
             return filePaths
         if debug:
-            print 'DEBUG %s: Running at %s'%( self._label, site )
+            print 'DEBUG %s: Running on site \'%s.%s\''%( self._label, domain[ -2 ], domain[ -1 ] )
             print '    using command   \'%s\''%( command )
             print '    on storage path %s'%( storage )
         rfdirPath    = '/store/relval/%s/%s/%s/%s-v'%( cmsswVersion, relVal, dataTier, globalTag )
