@@ -2,7 +2,7 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 process.GlobalTag.globaltag = autoCond[ 'com10' ]
-process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0_pre6'
+process.source.fileNames    = pickRelValInputFiles( formerVersion = True
                                                   , relVal        = 'Mu'
                                                   , dataTier      = 'RECO'
                                                   , condition     = 'com10' # not needed, if GT explicitely given
