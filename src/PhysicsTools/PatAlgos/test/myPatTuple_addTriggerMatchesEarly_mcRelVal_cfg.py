@@ -14,21 +14,21 @@ process.p = cms.Path(
 
 ## add trigger information to the configuration
 from PhysicsTools.PatAlgos.triggerLayer1.triggerMatcher_cfi import *
-process.muonTriggerMatchHLTMu9                  = cleanMuonTriggerMatchHLTMu9.clone( src = 'patMuons' )
-process.muonTriggerMatchHLTDoubleIsoMu3         = cleanMuonTriggerMatchHLTDoubleIsoMu3.clone( src = 'patMuons' )
-process.photonTriggerMatchHLTPhoton20CleanedL1R = cleanPhotonTriggerMatchHLTPhoton20CleanedL1R.clone( src = 'patPhotons' )
-process.electronTriggerMatchHLTEle20SWL1R       = cleanElectronTriggerMatchHLTEle20SWL1R.clone( src = 'patElectrons' )
-process.tauTriggerMatchHLTDoubleLooseIsoTau15   = cleanTauTriggerMatchHLTDoubleLooseIsoTau15.clone( src = 'patTaus' )
-process.jetTriggerMatchHLTJet15U                = cleanJetTriggerMatchHLTJet15U.clone( src = 'patJets' )
+process.muonTriggerMatchHLTMu20                                   = cleanMuonTriggerMatchHLTMu20.clone( src = 'patMuons' )
+process.muonTriggerMatchHLTDoubleMu6                              = cleanMuonTriggerMatchHLTDoubleMu6.clone( src = 'patMuons' )
+process.photonTriggerMatchHLTPhoton26IsoVLPhoton18                = cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18.clone( src = 'patPhotons' )
+process.electronTriggerMatchHLTEle27CaloIdVTCaloIsoTTrkIdTTrkIsoT = cleanElectronTriggerMatchHLTEle27CaloIdVTCaloIsoTTrkIdTTrkIsoT.clone( src = 'patElectrons' )
+process.tauTriggerMatchHLTDoubleIsoPFTau20Trk5                    = cleanTauTriggerMatchHLTDoubleIsoPFTau20Trk5.clone( src = 'patTaus' )
+process.jetTriggerMatchHLTJet240                                  = cleanJetTriggerMatchHLTJet240.clone( src = 'patJets' )
 from PhysicsTools.PatAlgos.tools.trigTools import switchOnTriggerMatchEmbedding
 switchOnTriggerMatchEmbedding( process
-                             , [ 'muonTriggerMatchHLTMu9'
-                               , 'muonTriggerMatchHLTDoubleIsoMu3'
-                               , 'photonTriggerMatchHLTPhoton20CleanedL1R'
-                               , 'electronTriggerMatchHLTEle20SWL1R'
-                               , 'tauTriggerMatchHLTDoubleLooseIsoTau15'
-                               , 'jetTriggerMatchHLTJet15U'
-                               , 'metTriggerMatchHLTMET45'
+                             , [ 'muonTriggerMatchHLTMu20'
+                               , 'muonTriggerMatchHLTDoubleMu6'
+                               , 'photonTriggerMatchHLTPhoton26IsoVLPhoton18'
+                               , 'electronTriggerMatchHLTEle27CaloIdVTCaloIsoTTrkIdTTrkIsoT'
+                               , 'tauTriggerMatchHLTDoubleIsoPFTau20Trk5'
+                               , 'jetTriggerMatchHLTJet240'
+                               , 'metTriggerMatchHLTMET100'
                                ]
                              , sequence = 'patCandidates'
                              , outputModule = ''

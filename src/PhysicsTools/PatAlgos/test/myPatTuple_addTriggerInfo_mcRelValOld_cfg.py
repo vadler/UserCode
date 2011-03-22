@@ -37,7 +37,7 @@ process.tschuess           = patTriggerEvent.clone()
 process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
 process.moin = cleanMuonTriggerMatchPDMu.clone()
-process.tach = metTriggerMatchHLTMu3.clone()
+process.tach = metTriggerMatchHLTMu20.clone()
 switchOnTrigger( process )
 # process.patTrigger.saveL1Refs = cms.bool( True )
 # switchOnTrigger( process ) # to update event content
