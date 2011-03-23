@@ -8,7 +8,7 @@ CommonTools/ParticleFlow                         V00-01-03      V00-01-01
 DataFormats/PatCandidates                        V06-04-02      V06-04-01      
 DataFormats/TauReco                              V01-00-07-01   V01-00-06      
 PhysicsTools/MVAComputer                         V00-06-03      V00-06-01      
-PhysicsTools/PatAlgos                            V08-06-14      V08-06-01      
+PhysicsTools/PatAlgos                            V08-06-15      V08-06-01      
 PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
 PhysicsTools/SelectorUtils                       V00-03-05      V00-03-03      
 PhysicsTools/UtilAlgos                           V08-02-10      V08-02-09      
