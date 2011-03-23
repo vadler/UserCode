@@ -1,5 +1,3 @@
-import os
-
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("TEST")
@@ -21,7 +19,7 @@ process.source = cms.Source("PoolSource",
 
 ## define maximal number of events to loop over
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(50)
 )
 
 ## configure process options
@@ -47,30 +45,28 @@ process.load("TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff")
 process.load("TopQuarkAnalysis.TopTools.TtSemiLepJetPartonMatch_cfi")
 process.load("TopQuarkAnalysis.TopJetCombination.TtSemiLepHypGenMatch_cfi")
 process.load("TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Muons_cfi")
-#process.kinFitTtSemiLepEvent.match        = 'ttSemiLepJetPartonMatch'
-#process.kinFitTtSemiLepEvent.useOnlyMatch = True
-#process.kinFitTtSemiLepEvent.maxNComb     = -1
 process.load("TopQuarkAnalysis.TopJetCombination.TtSemiLepHypKinFit_cfi")
-process.ttSemiLepHypKinFit.match       = cms.InputTag("kinFitTtSemiLepEvent")
-process.ttSemiLepHypKinFit.status      = cms.InputTag("kinFitTtSemiLepEvent","Status")
-process.ttSemiLepHypKinFit.leptons     = cms.InputTag("kinFitTtSemiLepEvent","Leptons")
-process.ttSemiLepHypKinFit.neutrinos   = cms.InputTag("kinFitTtSemiLepEvent","Neutrinos")
-process.ttSemiLepHypKinFit.partonsHadP = cms.InputTag("kinFitTtSemiLepEvent","PartonsHadP")
-process.ttSemiLepHypKinFit.partonsHadQ = cms.InputTag("kinFitTtSemiLepEvent","PartonsHadQ")
-process.ttSemiLepHypKinFit.partonsHadB = cms.InputTag("kinFitTtSemiLepEvent","PartonsHadB")
-process.ttSemiLepHypKinFit.partonsLepB = cms.InputTag("kinFitTtSemiLepEvent","PartonsLepB")
 process.load("TopQuarkAnalysis.TopEventProducers.producers.TtSemiLepEvtBuilder_cfi")
 process.ttSemiLepEvent.hypotheses = [ 'ttSemiLepHypGenMatch'
                                     , 'ttSemiLepHypKinFit'
                                     ]
-process.ttSemiLepEvent.kinFit.chi2 = cms.InputTag("kinFitTtSemiLepEvent","Chi2")
-process.ttSemiLepEvent.kinFit.prob = cms.InputTag("kinFitTtSemiLepEvent","Prob")
 process.ttSemiLepEvent.verbosity  = 1
+
+#process.kinFitTtSemiLepEventHypothesis.match = "findTtSemiLepJetCombGeom"
+#process.kinFitTtSemiLepEventHypothesis.useOnlyMatch = True
 
 ## change maximum number of jets taken into account per event (default: 4)
 #setForAllTtSemiLepHypotheses(process, "maxNJets", 5)
+
 ## solve kinematic equation to determine neutrino pz
 #setForAllTtSemiLepHypotheses(process, "neutrinoSolutionType", 2)
+
+## change maximum number of jet combinations taken into account per event (default: 1)
+#process.findTtSemiLepJetCombMVA.maxNComb        = -1
+#process.kinFitTtSemiLepEventHypothesis.maxNComb = -1
+
+## use electrons instead of muons for the hypotheses
+#useElectronsForAllTtSemiLepHypotheses(process)
 
 ## process path
 process.p = cms.Path(process.patDefaultSequence *
@@ -84,7 +80,7 @@ process.p = cms.Path(process.patDefaultSequence *
 
 ## configure output module
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName     = cms.untracked.string('%s/output/ttSemiLepKinFitEvtBuilder.root'%( os.getenv( "CMSSW_BASE" ))),
+    fileName     = cms.untracked.string('ttSemiLepEvtBuilder.root'),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p') ),
     outputCommands = cms.untracked.vstring('drop *'),
     dropMetaData = cms.untracked.string('DROPPED')
@@ -93,6 +89,7 @@ process.outpath = cms.EndPath(process.out)
 
 ## PAT content
 from PhysicsTools.PatAlgos.patEventContent_cff import *
+process.out.outputCommands += patTriggerEventContent
 process.out.outputCommands += patExtraAodEventContent
 process.out.outputCommands += patEventContentNoCleaning
 ## TQAF content
