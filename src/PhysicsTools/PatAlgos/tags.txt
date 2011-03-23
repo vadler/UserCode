@@ -6,7 +6,7 @@ CommonTools/CandAlgos                            V00-01-01      V00-01-00
 DataFormats/PatCandidates                        V06-04-01-01   V06-04-01-01   
 FWCore/Skeletons                                 V01-01-01      V01-00-07      
 PhysicsTools/PFCandProducer                      V04-07-01-00   V04-07-01      
-PhysicsTools/PatAlgos                            V08-06-01-10   V08-06-01-02   
+PhysicsTools/PatAlgos                            V08-06-01-11   V08-06-01-02   
 PhysicsTools/PatExamples                         V00-05-06      V00-05-04      
 ---------------------------------------
 total packages: 6 (6 displayed)
