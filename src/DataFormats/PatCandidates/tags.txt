@@ -1,9 +1,4 @@
-Test Release based on: CMSSW_4_1_3_patch1
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw-patch/CMSSW_4_1_3_patch1
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_1_3_patch1
--------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/PatCandidates                        V06-04-01-01   V06-04-01-01   
-PhysicsTools/PatAlgos                            V08-06-01-12   V08-06-01-07   
-PhysicsTools/PatExamples                         V00-05-06      V00-05-06      
----------------------------------------
-total packages: 3 (3 displayed)
+[00m-rw-r--r-- 1 vadler zh   0 Mar 25 12:47 [00mDataFormats/PatCandidates/tags.txt[00m
+-rw-r--r-- 1 vadler zh 597 Mar 23 18:40 [00mPhysicsTools/PatAlgos/tags.txt[00m
+-rw-r--r-- 1 vadler zh 597 Mar 23 18:40 [00mPhysicsTools/PatExamples/tags.txt[00m
+[m
