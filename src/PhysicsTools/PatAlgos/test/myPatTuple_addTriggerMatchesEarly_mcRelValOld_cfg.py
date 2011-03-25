@@ -3,7 +3,7 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 process.source.fileNames    = pickRelValInputFiles( formerVersion = True
-                                                  , globalTag     = 'START42_V4'
+                                                  , globalTag     = 'START42_V6'
                                                   )
 process.maxEvents.input     = 10
 process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )

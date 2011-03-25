@@ -7,8 +7,8 @@ process.source.fileNames    = pickRelValInputFiles( formerVersion = True
                                                   , relVal        = 'Mu'
                                                   , dataTier      = 'RECO'
                                                   , condition     = condition # not needed, if GT explicitely given
-                                                  #, globalTag     = 'GR_R_42_V3_RelVal_wzMu2010A'
-                                                  , globalTag     = 'GR_R_42_V3_RelVal_wzMu2010B'
+                                                  #, globalTag     = 'GR_R_42_V6_RelVal_wzMu2010A'
+                                                  , globalTag     = 'GR_R_42_V6_RelVal_wzMu2010B'
                                                   , numberOfFiles = 1
                                                   )
 process.options.wantSummary = False
