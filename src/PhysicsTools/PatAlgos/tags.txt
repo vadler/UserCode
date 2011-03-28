@@ -5,8 +5,9 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_0_pre8
 CommonTools/ParticleFlow                         V00-01-03      V00-01-01-03   
 DataFormats/PatCandidates                        V06-04-02      V06-04-02      
 DataFormats/TauReco                              V01-00-07-01   V01-00-06-01   
+PhysicsTools/FWLite                              V02-03-13      V02-03-12      
 PhysicsTools/PatAlgos                            V08-06-16      V08-06-15      
 PhysicsTools/PatUtils                            V03-09-17      V03-09-16      
 RecoTauTag/TauTagTools                           V01-00-12      V01-00-11      
 ---------------------------------------
-total packages: 6 (6 displayed)
+total packages: 7 (7 displayed)
