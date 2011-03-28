@@ -6,8 +6,8 @@ process.GlobalTag.globaltag = autoCond[ condition ]
 process.source.fileNames    = pickRelValInputFiles( relVal        = 'Mu'
                                                   , dataTier      = 'RECO'
                                                   , condition     = condition # not needed, if GT explicitely given
-                                                  #, globalTag     = 'GR_R_42_V6_RelVal_wzMu2010A'
-                                                  , globalTag     = 'GR_R_42_V6_RelVal_wzMu2010B'
+                                                  #, globalTag     = 'GR_R_42_V7_RelVal_wzMu2010A'
+                                                  , globalTag     = 'GR_R_42_V7_RelVal_wzMu2010B'
                                                   , numberOfFiles = 1
                                                   )
 process.options.wantSummary = False
@@ -38,7 +38,7 @@ process.hallo.addPathModuleLabels = cms.bool( True )
 process.tschuess           = patTriggerEvent.clone()
 process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
-process.moin = cleanMuonTriggerMatchPDMu.clone()
+process.moin = cleanMuonTriggerMatchPDSingleMu.clone()
 process.tach = metTriggerMatchHLTMu20.clone()
 switchOnTrigger( process )
 # process.patTrigger.saveL1Refs = cms.bool( True )
