@@ -1,3 +1,5 @@
+import os
+
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("TEST")
@@ -57,7 +59,7 @@ process.options = cms.untracked.PSet(
 ## configure output module
 process.out = cms.OutputModule("PoolOutputModule",
     SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('p') ),
-    fileName = cms.untracked.string('ttSemiLepKinFitProducer_neutrinoMassConstraintGt0.root'),
+    fileName = cms.untracked.string('%s/output/ttSemiLepKinFitProducer_neutrinoMassConstraintGt0.root'%( os.getenv( "CMSSW_BASE" ))),
     outputCommands = cms.untracked.vstring('drop *')
 )
 process.out.outputCommands += ['keep *_kinFitTtSemiLepEvent_*_*']
