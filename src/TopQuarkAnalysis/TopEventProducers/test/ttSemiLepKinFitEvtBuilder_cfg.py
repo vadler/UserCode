@@ -27,7 +27,7 @@ process.source = cms.Source("PoolSource",
 
 ## define maximal number of events to loop over
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(100)
 )
 
 ## configure process options
@@ -48,29 +48,42 @@ process.load("PhysicsTools.PatAlgos.patSequences_cff")
 ## std sequence to produce the ttGenEvt
 process.load("TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff")
 
-## std sequence to produce the ttSemiLepEvent
+## modules to produce the ttSemiLepEvent
 process.load("TopQuarkAnalysis.TopTools.TtSemiLepJetPartonMatch_cfi")
+process.ttSemiLepJetPartonMatch.verbosity  = 1
 process.load("TopQuarkAnalysis.TopJetCombination.TtSemiLepHypGenMatch_cfi")
-process.load("TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Muons_cfi")
-#process.kinFitTtSemiLepEvent.match        = 'ttSemiLepJetPartonMatch'
-#process.kinFitTtSemiLepEvent.useOnlyMatch = True
-process.kinFitTtSemiLepEvent.maxNComb     = -1
+from TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Muons_cfi import kinFitTtSemiLepEvent
+process.ttSemiLepKinFit          = kinFitTtSemiLepEvent.clone()
+process.ttSemiLepKinFit.maxNComb = -1
 process.load("TopQuarkAnalysis.TopJetCombination.TtSemiLepHypKinFit_cfi")
-process.ttSemiLepHypKinFit.match       = cms.InputTag("kinFitTtSemiLepEvent")
-process.ttSemiLepHypKinFit.status      = cms.InputTag("kinFitTtSemiLepEvent","Status")
-process.ttSemiLepHypKinFit.leptons     = cms.InputTag("kinFitTtSemiLepEvent","Leptons")
-process.ttSemiLepHypKinFit.neutrinos   = cms.InputTag("kinFitTtSemiLepEvent","Neutrinos")
-process.ttSemiLepHypKinFit.partonsHadP = cms.InputTag("kinFitTtSemiLepEvent","PartonsHadP")
-process.ttSemiLepHypKinFit.partonsHadQ = cms.InputTag("kinFitTtSemiLepEvent","PartonsHadQ")
-process.ttSemiLepHypKinFit.partonsHadB = cms.InputTag("kinFitTtSemiLepEvent","PartonsHadB")
-process.ttSemiLepHypKinFit.partonsLepB = cms.InputTag("kinFitTtSemiLepEvent","PartonsLepB")
+process.ttSemiLepHypKinFit.match       = cms.InputTag("ttSemiLepKinFit")
+process.ttSemiLepHypKinFit.status      = cms.InputTag("ttSemiLepKinFit","Status")
+process.ttSemiLepHypKinFit.leptons     = cms.InputTag("ttSemiLepKinFit","Leptons")
+process.ttSemiLepHypKinFit.neutrinos   = cms.InputTag("ttSemiLepKinFit","Neutrinos")
+process.ttSemiLepHypKinFit.partonsHadP = cms.InputTag("ttSemiLepKinFit","PartonsHadP")
+process.ttSemiLepHypKinFit.partonsHadQ = cms.InputTag("ttSemiLepKinFit","PartonsHadQ")
+process.ttSemiLepHypKinFit.partonsHadB = cms.InputTag("ttSemiLepKinFit","PartonsHadB")
+process.ttSemiLepHypKinFit.partonsLepB = cms.InputTag("ttSemiLepKinFit","PartonsLepB")
+process.ttSemiLepKinFitGenMatch              = kinFitTtSemiLepEvent.clone()
+process.ttSemiLepKinFitGenMatch.match        = 'ttSemiLepJetPartonMatch'
+process.ttSemiLepKinFitGenMatch.useOnlyMatch = True
+process.ttSemiLepHypKinFitGenMatch             = process.ttSemiLepHypKinFit.clone()
+process.ttSemiLepHypKinFitGenMatch.match       = cms.InputTag("ttSemiLepKinFitGenMatch")
+process.ttSemiLepHypKinFitGenMatch.status      = cms.InputTag("ttSemiLepKinFitGenMatch","Status")
+process.ttSemiLepHypKinFitGenMatch.leptons     = cms.InputTag("ttSemiLepKinFitGenMatch","Leptons")
+process.ttSemiLepHypKinFitGenMatch.neutrinos   = cms.InputTag("ttSemiLepKinFitGenMatch","Neutrinos")
+process.ttSemiLepHypKinFitGenMatch.partonsHadP = cms.InputTag("ttSemiLepKinFitGenMatch","PartonsHadP")
+process.ttSemiLepHypKinFitGenMatch.partonsHadQ = cms.InputTag("ttSemiLepKinFitGenMatch","PartonsHadQ")
+process.ttSemiLepHypKinFitGenMatch.partonsHadB = cms.InputTag("ttSemiLepKinFitGenMatch","PartonsHadB")
+process.ttSemiLepHypKinFitGenMatch.partonsLepB = cms.InputTag("ttSemiLepKinFitGenMatch","PartonsLepB")
 process.load("TopQuarkAnalysis.TopEventProducers.producers.TtSemiLepEvtBuilder_cfi")
-process.ttSemiLepEvent.hypotheses = [ 'ttSemiLepHypGenMatch'
-                                    , 'ttSemiLepHypKinFit'
-                                    ]
-process.ttSemiLepEvent.kinFit.chi2 = cms.InputTag("kinFitTtSemiLepEvent","Chi2")
-process.ttSemiLepEvent.kinFit.prob = cms.InputTag("kinFitTtSemiLepEvent","Prob")
-process.ttSemiLepEvent.verbosity  = 13
+process.ttSemiLepEvent.hypotheses  = [ 'ttSemiLepHypGenMatch'
+                                     , 'ttSemiLepHypKinFit'
+                                     , 'ttSemiLepHypKinFitGenMatch'
+                                     ]
+process.ttSemiLepEvent.kinFit.chi2 = cms.InputTag("ttSemiLepKinFit","Chi2")
+process.ttSemiLepEvent.kinFit.prob = cms.InputTag("ttSemiLepKinFit","Prob")
+process.ttSemiLepEvent.verbosity   = 13
 
 ## change maximum number of jets taken into account per event (default: 4)
 #setForAllTtSemiLepHypotheses(process, "maxNJets", 5)
@@ -82,8 +95,10 @@ process.p = cms.Path(process.patDefaultSequence *
                      process.makeGenEvt         *
                      process.ttSemiLepJetPartonMatch *
                      process.ttSemiLepHypGenMatch *
-                     process.kinFitTtSemiLepEvent *
+                     process.ttSemiLepKinFit *
                      process.ttSemiLepHypKinFit *
+                     process.ttSemiLepKinFitGenMatch *
+                     process.ttSemiLepHypKinFitGenMatch *
                      process.ttSemiLepEvent
                      )
 
@@ -103,4 +118,6 @@ process.out.outputCommands += patEventContentNoCleaning
 ## TQAF content
 from TopQuarkAnalysis.TopEventProducers.tqafEventContent_cff import *
 process.out.outputCommands += tqafEventContent
-process.out.outputCommands += ['keep *_kinFitTtSemiLepEvent_*_*']
+process.out.outputCommands += ['keep *_ttSemiLepJetPartonMatch_*_*'
+                              ,'keep *_ttSemiLepKinFit_*_*'
+                              ,'keep *_ttSemiLepKinFitGenMatch_*_*']
