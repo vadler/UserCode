@@ -7,6 +7,7 @@ process = cms.Process("TEST")
 ## add message logger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.categories.append('KinFitter')
 process.MessageLogger.categories.append('TtSemiLepKinFitter')
 process.MessageLogger.categories.append('TtSemiLeptonicEvent')
 process.MessageLogger.cerr.TtSemiLeptonicEvent = cms.untracked.PSet(
@@ -14,9 +15,14 @@ process.MessageLogger.cerr.TtSemiLeptonicEvent = cms.untracked.PSet(
 )
 
 ## define input
-from TopQuarkAnalysis.TopEventProducers.tqafInputFiles_cff import relValTTbar
+condition = 'mc'
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(relValTTbar)
+    fileNames = cms.untracked.vstring(
+        pickRelValInputFiles( cmsswVersion = 'CMSSW_3_9_9'
+                            , condition    = condition
+                            )
+    )
 )
 
 ## define maximal number of events to loop over
@@ -33,9 +39,8 @@ process.options = cms.untracked.PSet(
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-
 from Configuration.PyReleaseValidation.autoCond import autoCond
-process.GlobalTag.globaltag = autoCond['mc']
+process.GlobalTag.globaltag = autoCond[condition]
 
 ## std sequence for PAT
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
@@ -49,7 +54,7 @@ process.load("TopQuarkAnalysis.TopJetCombination.TtSemiLepHypGenMatch_cfi")
 process.load("TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Muons_cfi")
 #process.kinFitTtSemiLepEvent.match        = 'ttSemiLepJetPartonMatch'
 #process.kinFitTtSemiLepEvent.useOnlyMatch = True
-#process.kinFitTtSemiLepEvent.maxNComb     = -1
+process.kinFitTtSemiLepEvent.maxNComb     = -1
 process.load("TopQuarkAnalysis.TopJetCombination.TtSemiLepHypKinFit_cfi")
 process.ttSemiLepHypKinFit.match       = cms.InputTag("kinFitTtSemiLepEvent")
 process.ttSemiLepHypKinFit.status      = cms.InputTag("kinFitTtSemiLepEvent","Status")
@@ -65,7 +70,7 @@ process.ttSemiLepEvent.hypotheses = [ 'ttSemiLepHypGenMatch'
                                     ]
 process.ttSemiLepEvent.kinFit.chi2 = cms.InputTag("kinFitTtSemiLepEvent","Chi2")
 process.ttSemiLepEvent.kinFit.prob = cms.InputTag("kinFitTtSemiLepEvent","Prob")
-process.ttSemiLepEvent.verbosity  = 1
+process.ttSemiLepEvent.verbosity  = 13
 
 ## change maximum number of jets taken into account per event (default: 4)
 #setForAllTtSemiLepHypotheses(process, "maxNJets", 5)
@@ -98,3 +103,4 @@ process.out.outputCommands += patEventContentNoCleaning
 ## TQAF content
 from TopQuarkAnalysis.TopEventProducers.tqafEventContent_cff import *
 process.out.outputCommands += tqafEventContent
+process.out.outputCommands += ['keep *_kinFitTtSemiLepEvent_*_*']
