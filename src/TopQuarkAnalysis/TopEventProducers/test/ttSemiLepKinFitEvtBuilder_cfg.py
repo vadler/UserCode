@@ -15,14 +15,9 @@ process.MessageLogger.cerr.TtSemiLeptonicEvent = cms.untracked.PSet(
 )
 
 ## define input
-condition = 'mc'
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
+from TopQuarkAnalysis.TopEventProducers.tqafInputFiles_cff import relValTTbar
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-        pickRelValInputFiles( cmsswVersion = 'CMSSW_3_9_9'
-                            , condition    = condition
-                            )
-    )
+    fileNames = cms.untracked.vstring(relValTTbar)
 )
 
 ## define maximal number of events to loop over
@@ -40,7 +35,7 @@ process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.PyReleaseValidation.autoCond import autoCond
-process.GlobalTag.globaltag = autoCond[condition]
+process.GlobalTag.globaltag = autoCond['mc']
 
 ## std sequence for PAT
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
