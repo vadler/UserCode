@@ -3,10 +3,6 @@ cmsswBase = os.getenv( 'CMSSW_BASE' )
 
 from PhysicsTools.PatAlgos.patTemplate_cfg import * # conditions contain L1 menu 'L1GtTriggerMenu_L1Menu_Collisions2011_v0a_mc'
 
-## To run on 3XY MC
-#from PhysicsTools.PatAlgos.tools.cmsswVersionTools import run41xOn3yzMcInput
-#run41xOn3yzMcInput( process )
-
 process.options.wantSummary = False
 process.source.fileNames    = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data/TTJets_TuneD6T_7TeV-madgraph-tauola__Spring11-PU_S1_START311_V1G1-v1__AODSIM/D42E9BB3-C759-E011-B8DC-00A0D1EE8E74.root' ]
 process.maxEvents.input     = 100
@@ -21,7 +17,7 @@ switchOnTrigger( process, sequence = 'p', hltProcess = '*' )
 process.patTrigger.triggerResults = cms.InputTag( 'TriggerResults'      , '', '*' )
 process.patTrigger.triggerEvent   = cms.InputTag( 'hltTriggerSummaryAOD', '', '*' )
 process.patTrigger.addL1Algos     = cms.bool( True )
-process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , 'RECO' ) # process '*' should produce errors
+process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''           , '' )
 process.patTrigger.l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated', '' )
 process.patTrigger.l1ExtraIsoEG   = cms.InputTag( 'l1extraParticles', 'Isolated'   , '' )
 process.patTrigger.l1ExtraCenJet  = cms.InputTag( 'l1extraParticles', 'Central'    , '' )
