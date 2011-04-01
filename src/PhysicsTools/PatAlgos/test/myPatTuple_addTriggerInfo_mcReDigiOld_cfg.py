@@ -4,7 +4,7 @@ cmsswBase = os.getenv( 'CMSSW_BASE' )
 from PhysicsTools.PatAlgos.patTemplate_cfg import * # conditions contain L1 menu 'L1GtTriggerMenu_L1Menu_Collisions2011_v0a_mc'
 
 # To run on 3XY MC
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import run41xOn3yzMcInput
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import run42xOn3yzMcInput
 run42xOn3yzMcInput( process )
 
 process.options.wantSummary = False
