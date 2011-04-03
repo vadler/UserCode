@@ -1,8 +1,8 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 condition = 'com10'
-process.GlobalTag.globaltag = autoCond[ condition ]
+#process.GlobalTag.globaltag = autoCond[ condition ]
+process.GlobalTag.globaltag = 'GR_R_42_V7::All'
 process.source.fileNames    = pickRelValInputFiles( formerVersion = True
                                                   , relVal        = 'Mu'
                                                   , dataTier      = 'RECO'

@@ -6,7 +6,8 @@ process = cms.Process( "HLTPROV" )
 condition = 'startup'
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.PyReleaseValidation.autoCond import autoCond
-process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
+#process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
+process.GlobalTag.globaltag = cms.string( 'START42_V7::All' )
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles

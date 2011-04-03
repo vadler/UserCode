@@ -14,7 +14,15 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source( "PoolSource"
 , fileNames = cms.untracked.vstring(
   # Prompt RECO
-    '/store/data/Run2011A/SingleMu/RECO/PromptReco-v1/000/160/433/6060139A-B54F-E011-AEA3-001D09F25479.root'
+    '/store/data/Run2011A/SingleMu/AOD/PromptReco-v1/000/161/016/1C159A2D-D455-E011-9502-003048F01E88.root'
+  , '/store/data/Run2011A/SingleMu/AOD/PromptReco-v1/000/161/016/1C1D1BBA-D255-E011-81F6-003048F1182E.root'
+  , '/store/data/Run2011A/SingleMu/AOD/PromptReco-v1/000/161/016/2C9C9787-C755-E011-AC9A-0019DB2F3F9A.root'
+  , '/store/data/Run2011A/SingleMu/AOD/PromptReco-v1/000/161/016/52713845-C855-E011-A1AB-000423D98B6C.root'
+  , '/store/data/Run2011A/SingleMu/AOD/PromptReco-v1/000/161/016/702DDB20-E355-E011-BA84-0030487C2B86.root'
+  , '/store/data/Run2011A/SingleMu/AOD/PromptReco-v1/000/161/016/78186858-D155-E011-B08A-003048F118C4.root'
+  , '/store/data/Run2011A/SingleMu/AOD/PromptReco-v1/000/161/016/86102236-D455-E011-85C5-0030487CD812.root'
+  , '/store/data/Run2011A/SingleMu/AOD/PromptReco-v1/000/161/016/9E612DE9-D455-E011-8FA6-003048F11C28.root'
+  , '/store/data/Run2011A/SingleMu/AOD/PromptReco-v1/000/161/016/F8DFDD84-4B56-E011-84BD-003048D2BE08.root'
   )
 )
 process.maxEvents = cms.untracked.PSet(
