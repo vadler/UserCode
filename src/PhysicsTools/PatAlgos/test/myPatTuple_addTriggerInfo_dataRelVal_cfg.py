@@ -1,6 +1,5 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 condition = 'com10'
 process.GlobalTag.globaltag = autoCond[ condition ]
 process.source.fileNames    = pickRelValInputFiles( relVal        = 'Mu'
