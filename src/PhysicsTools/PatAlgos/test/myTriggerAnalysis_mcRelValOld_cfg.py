@@ -18,7 +18,7 @@ process.source = cms.Source("PoolSource",
                         , condition     = condition
                         , globalTag     = 'START311_V2'
                         , maxVersions   = None
-                        , skipFiles     = 2
+                        , skipFiles     = 0
                         , numberOfFiles = 0
                         , debug         = True
                         )
