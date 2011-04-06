@@ -3,6 +3,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 #include "PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.h"
+#include <iostream> // DEBUG
 
 
 using namespace pat;
@@ -94,22 +95,19 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
     turn-on curve
   */
 
-  // PAT trigger objects
-  // (currently needed directly for access to the correct edm::Refs)
-  edm::Handle< TriggerObjectCollection > triggerObjects;
-  iEvent.getByLabel( trigger_, triggerObjects );
-
-  // loop over HLT muon references
-  for ( size_t iTrig = 0; iTrig < triggerObjects->size(); ++iTrig ) {
+  // get the trigger objects corresponding to the used matching (HLT muons)
+  const TriggerObjectRefVector trigRefs( triggerEvent->objects( trigger::TriggerMuon ) );
+  // loop over selected trigger objects
+  for ( TriggerObjectRefVector::const_iterator iTrig = trigRefs.begin(); iTrig != trigRefs.end(); ++iTrig ) {
     // get all matched candidates for the trigger object
-    const reco::CandidateBaseRefVector candRefs( matchHelper.triggerMatchCandidates( triggerObjects, iTrig, muonMatch_, iEvent, *triggerEvent ) );
+    const reco::CandidateBaseRefVector candRefs( matchHelper.triggerMatchCandidates( ( *iTrig), muonMatch_, iEvent, *triggerEvent ) );
     if ( candRefs.empty() ) continue;
     // fill the histogram...
     // (only for the first match, since we resolved ambiguities in the matching configuration,
     // so that we have one at maximum per trigger object)
-    reco::CandidateBaseRef muon( candRefs.at( 0 ) );
-    if ( candRefs.at( 0 ).isAvailable() && candRefs.at( 0 ).isNonnull() ) {
-      histos1D_[ "turnOn" ]->Fill( candRefs.at( 0 )->pt() );
+    reco::CandidateBaseRef muonRef( candRefs.at( 0 ) );
+    if ( muonRef.isAvailable() && muonRef.isNonnull() ) {
+      histos1D_[ "turnOn" ]->Fill( muonRef->pt() );
     }
   }
 
