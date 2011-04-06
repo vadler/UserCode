@@ -33,12 +33,6 @@ void PatTriggerAnalyzer::beginJob()
 {
   edm::Service< TFileService > fileService;
 
-  /*   YOUR HISTOGRAM DEFINITIONS GO HERE!
-  histos1D_[ "histoName" ] = fileService->make< TH1D >( "[normal TH1D constructor]" ); // EXAMPLE CODE
-  histos1D_[ "histoName" ]->SetXTitle( "x-axis label" );                               // EXAMPLE CODE
-  histos1D_[ "histoName" ]->SetYTitle( "y-axis label" );                               // EXAMPLE CODE
-  */
-
   // pt correlation plot
   histos2D_[ "ptTrigCand" ] = fileService->make< TH2D >( "ptTrigCand", "Object vs. candidate p_{T} (GeV)", 60, 0., 300., 60, 0., 300. );
   histos2D_[ "ptTrigCand" ]->SetXTitle( "candidate p_{T} (GeV)" );
@@ -72,9 +66,6 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
   // PAT trigger event
   edm::Handle< TriggerEvent > triggerEvent;
   iEvent.getByLabel( triggerEvent_, triggerEvent );
-  // PAT trigger objects
-  edm::Handle< TriggerObjectCollection > triggerObjects;
-  iEvent.getByLabel( trigger_, triggerObjects );
 
   // PAT object collection
   edm::Handle< MuonCollection > muons;
@@ -82,10 +73,6 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
 
   // PAT trigger helper for trigger matching information
   const helper::TriggerMatchHelper matchHelper;
-
-  /*
-    YOUR ANALYSIS CODE GOES HERE!
-  */
 
   /*
     kinematics comparison
@@ -106,6 +93,11 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
   /*
     turn-on curve
   */
+
+  // PAT trigger objects
+  // (currently needed directly for access to the correct edm::Refs)
+  edm::Handle< TriggerObjectCollection > triggerObjects;
+  iEvent.getByLabel( trigger_, triggerObjects );
 
   // loop over HLT muon references
   for ( size_t iTrig = 0; iTrig < triggerObjects->size(); ++iTrig ) {
