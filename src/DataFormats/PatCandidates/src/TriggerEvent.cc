@@ -1,5 +1,5 @@
 //
-// $Id: TriggerEvent.cc,v 1.14.2.2 2011/04/07 09:36:49 vadler Exp $
+// $Id: TriggerEvent.cc,v 1.16 2011/04/07 10:00:13 vadler Exp $
 //
 
 
@@ -47,6 +47,17 @@ const TriggerAlgorithm * TriggerEvent::algorithm( const std::string & nameAlgori
     if ( nameAlgorithm == iAlgorithm->name() ) return &*iAlgorithm;
   }
   return 0;
+}
+
+
+// Get a refernce to a certain L1 algorithm by name
+const TriggerAlgorithmRef TriggerEvent::algorithmRef( const std::string & nameAlgorithm ) const
+{
+  TriggerAlgorithmRefVector algoRefs( algorithmRefs() );
+  for ( TriggerAlgorithmRefVector::const_iterator iAlgorithm = algorithmRefs().begin(); iAlgorithm != algorithmRefs().end(); ++iAlgorithm ) {
+    if ( nameAlgorithm == ( *iAlgorithm )->name() ) return *iAlgorithm;
+  }
+  return TriggerAlgorithmRef();
 }
 
 
