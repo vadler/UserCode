@@ -50,10 +50,9 @@ const TriggerAlgorithm * TriggerEvent::algorithm( const std::string & nameAlgori
 }
 
 
-// Get a refernce to a certain L1 algorithm by name
+// Get a reference to a certain L1 algorithm by name
 const TriggerAlgorithmRef TriggerEvent::algorithmRef( const std::string & nameAlgorithm ) const
 {
-  TriggerAlgorithmRefVector algoRefs( algorithmRefs() );
   for ( TriggerAlgorithmRefVector::const_iterator iAlgorithm = algorithmRefs().begin(); iAlgorithm != algorithmRefs().end(); ++iAlgorithm ) {
     if ( nameAlgorithm == ( *iAlgorithm )->name() ) return *iAlgorithm;
   }
@@ -210,6 +209,16 @@ const TriggerCondition * TriggerEvent::condition( const std::string & nameCondit
 }
 
 
+// Get a reference to a certain L1 condition by name
+const TriggerConditionRef TriggerEvent::conditionRef( const std::string & nameCondition ) const
+{
+  for ( TriggerConditionRefVector::const_iterator iCondition = conditionRefs().begin(); iCondition != conditionRefs().end(); ++iCondition ) {
+    if ( nameCondition == ( *iCondition )->name() ) return *iCondition;
+  }
+  return TriggerConditionRef();
+}
+
+
 // Get the index of a certain L1 condition in the event collection by name
 unsigned TriggerEvent::indexCondition( const std::string & nameCondition ) const
 {
@@ -244,6 +253,16 @@ const TriggerPath * TriggerEvent::path( const std::string & namePath ) const
 }
 
 
+// Get a reference to a certain HLT path by name
+const TriggerPathRef TriggerEvent::pathRef( const std::string & namePath ) const
+{
+  for ( TriggerPathRefVector::const_iterator iPath = pathRefs().begin(); iPath != pathRefs().end(); ++iPath ) {
+    if ( namePath == ( *iPath )->name() ) return *iPath;
+  }
+  return TriggerPathRef();
+}
+
+
 // Get the index of a certain HLT path in the event collection by name
 unsigned TriggerEvent::indexPath( const std::string & namePath ) const
 {
@@ -272,9 +291,19 @@ TriggerPathRefVector TriggerEvent::acceptedPaths() const
 const TriggerFilter * TriggerEvent::filter( const std::string & labelFilter ) const
 {
   for ( TriggerFilterCollection::const_iterator iFilter = filters()->begin(); iFilter != filters()->end(); ++iFilter ) {
-    if ( iFilter->label() == labelFilter ) return &*iFilter;
+    if ( labelFilter == iFilter->label() ) return &*iFilter;
   }
   return 0;
+}
+
+
+// Get a reference to a certain HLT filter by label
+const TriggerFilterRef TriggerEvent::filterRef( const std::string & labelFilter ) const
+{
+  for ( TriggerFilterRefVector::const_iterator iFilter = filterRefs().begin(); iFilter != filterRefs().end(); ++iFilter ) {
+    if ( labelFilter == ( *iFilter )->label() ) return *iFilter;
+  }
+  return TriggerFilterRef();
 }
 
 
