@@ -40,6 +40,19 @@ TriggerEvent::TriggerEvent( const std::string & nameL1Menu, const std::string & 
 // Methods
 
 
+// Get a vector of references to all L1 algorithms
+const TriggerAlgorithmRefVector TriggerEvent::algorithmRefs() const
+{
+  TriggerAlgorithmRefVector theAlgorithms;
+  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
+    const std::string nameAlgorithm( iAlgorithm->name() );
+    const TriggerAlgorithmRef algorithmRef( algorithms_, indexAlgorithm( nameAlgorithm ) );
+    theAlgorithms.push_back( algorithmRef );
+  }
+  return theAlgorithms;
+}
+
+
 // Get a pointer to a certain L1 algorithm by name
 const TriggerAlgorithm * TriggerEvent::algorithm( const std::string & nameAlgorithm ) const
 {
@@ -199,6 +212,19 @@ TriggerAlgorithmRefVector TriggerEvent::acceptedPhysAlgorithmsGtl() const
 }
 
 
+// Get a vector of references to all L1 conditions
+const TriggerConditionRefVector TriggerEvent::conditionRefs() const
+{
+  TriggerConditionRefVector theConditions;
+  for ( TriggerConditionCollection::const_iterator iCondition = conditions()->begin(); iCondition != conditions()->end(); ++iCondition ) {
+    const std::string nameCondition( iCondition->name() );
+    const TriggerConditionRef conditionRef( conditions_, indexCondition( nameCondition ) );
+    theConditions.push_back( conditionRef );
+  }
+  return theConditions;
+}
+
+
 // Get a pointer to a certain L1 condition by name
 const TriggerCondition * TriggerEvent::condition( const std::string & nameCondition ) const
 {
@@ -240,6 +266,19 @@ TriggerConditionRefVector TriggerEvent::acceptedConditions() const
     }
   }
   return theAcceptedConditions;
+}
+
+
+// Get a vector of references to all HLT paths
+const TriggerPathRefVector TriggerEvent::pathRefs() const
+{
+  TriggerPathRefVector thePaths;
+  for ( TriggerPathCollection::const_iterator iPath = paths()->begin(); iPath != paths()->end(); ++iPath ) {
+    const std::string namePath( iPath->name() );
+    const TriggerPathRef pathRef( paths_, indexPath( namePath ) );
+    thePaths.push_back( pathRef );
+  }
+  return thePaths;
 }
 
 
@@ -287,6 +326,19 @@ TriggerPathRefVector TriggerEvent::acceptedPaths() const
 }
 
 
+// Get a vector of references to all HLT filters
+const TriggerFilterRefVector TriggerEvent::filterRefs() const
+{
+  TriggerFilterRefVector theFilters;
+  for ( TriggerFilterCollection::const_iterator iFilter = filters()->begin(); iFilter != filters()->end(); ++iFilter ) {
+    const std::string labelFilter( iFilter->label() );
+    const TriggerFilterRef filterRef( filters_, indexFilter( labelFilter ) );
+    theFilters.push_back( filterRef );
+  }
+  return theFilters;
+}
+
+
 // Get a pointer to a certain HLT filter by label
 const TriggerFilter * TriggerEvent::filter( const std::string & labelFilter ) const
 {
@@ -328,6 +380,18 @@ TriggerFilterRefVector TriggerEvent::acceptedFilters() const
     }
   }
   return theAcceptedFilters;
+}
+
+
+// Get a vector of references to all trigger objects
+const TriggerObjectRefVector TriggerEvent::objectRefs() const
+{
+  TriggerObjectRefVector theObjects;
+  for ( unsigned iObject = 0; iObject < objects()->size(); ++iObject ) {
+    const TriggerObjectRef objectRef( objects_, iObject );
+    theObjects.push_back( objectRef );
+  }
+  return theObjects;
 }
 
 

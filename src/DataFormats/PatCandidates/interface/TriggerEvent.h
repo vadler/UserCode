@@ -184,7 +184,7 @@ namespace pat {
       const TriggerAlgorithmCollection * algorithms() const { return algorithms_.get(); };
       /// Get a vector of references to all L1 algorithms,
       /// empty, if RefProd is NULL
-      const TriggerAlgorithmRefVector algorithmRefs() const { return TriggerAlgorithmRefVector( algorithms_.id() ); };
+      const TriggerAlgorithmRefVector algorithmRefs() const;
       /// Get a pointer to a certain L1 algorithm by name,
       /// returns 0, if algorithm is not found
       const TriggerAlgorithm * algorithm( const std::string & nameAlgorithm ) const;
@@ -222,7 +222,7 @@ namespace pat {
       const TriggerConditionCollection * conditions() const { return conditions_.get(); };
       /// Get a vector of references to all L1 conditions,
       /// empty, if RefProd is NULL
-      const TriggerConditionRefVector conditionRefs() const { return TriggerConditionRefVector( conditions_.id() ); };
+      const TriggerConditionRefVector conditionRefs() const;
       /// Get a pointer to a certain L1 condition by name,
       /// returns 0, if condition is not found
       const TriggerCondition * condition( const std::string & nameCondition ) const;
@@ -243,7 +243,7 @@ namespace pat {
       const TriggerPathCollection * paths() const { return paths_.get(); };
       /// Get a vector of references to all HLT paths,
       /// empty, if RefProd is NULL
-      const TriggerPathRefVector pathRefs() const { return TriggerPathRefVector( paths_.id() ); };
+      const TriggerPathRefVector pathRefs() const;
       /// Get a pointer to a certain HLT path by name,
       /// returns 0, if algorithm is not found
       const TriggerPath * path( const std::string & namePath ) const;
@@ -264,7 +264,7 @@ namespace pat {
       const TriggerFilterCollection * filters() const { return filters_.get(); };
       /// Get a vector of references to all HLT filters,
       /// empty, if RefProd is NULL
-      const TriggerFilterRefVector filterRefs() const { return TriggerFilterRefVector( filters_.id() ); };
+      const TriggerFilterRefVector filterRefs() const;
       /// Get a pointer to a certain HLT filter by label,
       /// returns 0, if algorithm is not found
       const TriggerFilter * filter( const std::string & labelFilter ) const;
@@ -285,7 +285,7 @@ namespace pat {
       const TriggerObjectCollection * objects() const { return objects_.get(); };
       /// Get a vector of references to all trigger objects,
       /// empty, if RefProd is NULL
-      const TriggerObjectRefVector objectRefs() const { return TriggerObjectRefVector( objects_.id() ); };
+      const TriggerObjectRefVector objectRefs() const;
       /// Get a vector of references to all trigger objects by trigger object type
       TriggerObjectRefVector objects( trigger::TriggerObjectType triggerObjectType ) const;
       TriggerObjectRefVector objects( int                        triggerObjectType ) const { return objects( trigger::TriggerObjectType( triggerObjectType ) ); }; // for backward compatibility
