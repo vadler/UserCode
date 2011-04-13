@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.46 2011/02/08 09:11:41 chamont Exp $
+// $Id: PATElectronProducer.cc,v 1.46.2.2 2011/04/12 21:41:44 rwolf Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
@@ -348,11 +348,11 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 	  // because of this, we should not change the source of the electron matcher
 	  // to the collection of PFElectrons in the python configuration
 	  // I don't know what to do with the efficiencyLoader, since I don't know
-	  // what this class is for.
-	  fillElectron2( anElectron,
-			 ptrToPFElectron->sourceCandidatePtr(0),
-			 ptrToGsfElectron,
-			 ptrToGsfElectron,
+	  // what this class is for. 
+	  fillElectron2( anElectron, 
+			 ptrToPFElectron, 
+			 ptrToGsfElectron, 
+			 ptrToGsfElectron, 
 			 genMatches, deposits, isolationValues );
 
 	  //COLIN need to use fillElectron2 in the non-pflow case as well, and to test it.
@@ -535,7 +535,8 @@ void PATElectronProducer::fillElectron2( Electron& anElectron,
   //COLIN/Florian: use the PFCandidate 4-mom.
   anElectron.setEcalDrivenMomentum(anElectron.p4()) ;
   anElectron.setP4( anElectron.pfCandidateRef()->p4() );
-
+  // Safer to take the mva from the PFCandidate in case of ambiguosity
+  anElectron.setMva( anElectron.pfCandidateRef()->mva_e_pi() ); 
 
   // is the concrete elecRef needed for the efficiency loader? what is this loader?
   // how can we make it compatible with the particle flow electrons?
@@ -572,9 +573,13 @@ void PATElectronProducer::fillElectron2( Electron& anElectron,
       anElectron.setIsoDeposit(isoDepositLabels_[j].first,
  			       (*deposits[j])[candPtrForGenMatch]);
     }
+    else if (deposits[j]->contains(candPtrForIsolation.id())) {
+      anElectron.setIsoDeposit(isoDepositLabels_[j].first,
+                               (*deposits[j])[candPtrForIsolation]);
+    }
     else {
       anElectron.setIsoDeposit(isoDepositLabels_[j].first,
- 			       (*deposits[j])[candPtrForIsolation]);
+                               (*deposits[j])[candPtrForIsolation->sourceCandidatePtr(0)]);
     }
   }
 
@@ -585,9 +590,13 @@ void PATElectronProducer::fillElectron2( Electron& anElectron,
       anElectron.setIsolation(isolationValueLabels_[j].first,
  			      (*isolationValues[j])[candPtrForGenMatch]);
     }
+    else if (isolationValues[j]->contains(candPtrForIsolation.id())) {
+      anElectron.setIsolation(isolationValueLabels_[j].first,
+                              (*isolationValues[j])[candPtrForIsolation]);
+    }
     else {
       anElectron.setIsolation(isolationValueLabels_[j].first,
- 			      (*isolationValues[j])[candPtrForIsolation]);
+                              (*isolationValues[j])[candPtrForIsolation->sourceCandidatePtr(0)]);
     }
   }
 }
