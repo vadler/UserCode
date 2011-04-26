@@ -71,7 +71,10 @@ simulationTtbar = cms.untracked.vstring(
 
 
 ttbarRECO = cms.untracked.vstring(
-    pickRelValInputFiles( relVal = 'RelValZTT', numberOfFiles = 0 )
+   pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_1_3'
+                       , relVal        = 'RelValZTT'
+                       , globalTag     = 'START311_V2'
+                       , numberOfFiles = 0 )
 )
 
 ttbarJets  = cms.untracked.vstring(
@@ -79,7 +82,10 @@ ttbarJets  = cms.untracked.vstring(
 )
 
 zjetsRECO = cms.untracked.vstring(
-    pickRelValInputFiles( relVal = 'RelValZMM', numberOfFiles = 0 )
+   pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_1_3'
+                       , relVal        = 'RelValZMM'
+                       , globalTag     = 'START311_V2'
+                       , numberOfFiles = 0 )
 )
 
 zjetsTracks  = cms.untracked.vstring(
