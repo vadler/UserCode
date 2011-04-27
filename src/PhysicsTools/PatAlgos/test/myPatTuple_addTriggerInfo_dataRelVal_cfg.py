@@ -5,8 +5,7 @@ process.GlobalTag.globaltag = autoCond[ condition ]
 process.source.fileNames    = pickRelValInputFiles( relVal        = 'Mu'
                                                   , dataTier      = 'RECO'
                                                   , condition     = condition # not needed, if GT explicitely given
-                                                  #, globalTag     = 'GR_R_42_V7_RelVal_wzMu2010A'
-                                                  , globalTag     = 'GR_R_42_V7_RelVal_wzMu2010B'
+                                                  , globalTag     = 'GR_R_42_V10_RelVal_mu2010B'
                                                   , numberOfFiles = 1
                                                   )
 process.options.wantSummary = False
