@@ -4,7 +4,6 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_2
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/TauReco                              V01-00-07-01   V01-00-06-01   
 PhysicsTools/PatAlgos                            V08-06-21      V08-06-21      
-PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
 RecoTauTag/TauTagTools                           V01-00-12      V01-00-11      
 ---------------------------------------
-total packages: 4 (4 displayed)
+total packages: 3 (3 displayed)
