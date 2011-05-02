@@ -2,9 +2,106 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process( 'PAT' )
 
+
 ###
 ### Constants
 ###
+
+### ------------------------- Reference selection -------------------------- ###
+
+### Switch on/off selection steps
+
+useLooseMuon    = True
+useTightMuon    = True
+useMuonVeto     = True
+useElectronVeto = True
+use1Jet         = True
+use2Jets        = False
+use3Jets        = False
+use4Jets        = False
+
+### Trigger selection
+
+# logical expression
+#triggerSelection = 'HLT_Mu9'                 # run <  147196
+triggerSelection = 'HLT_Mu15 OR HLT_Mu15_v*' # run >= 147196
+
+### Muon configuration
+
+muonsUsePV = False # use beam spot rather than PV, which is necessary for 'dB' cut
+
+### Muon selection
+
+# minimal selection, incl. also veto muons
+# general reconstruction property
+muonCut  =     'isGlobalMuon'
+# transverse momentum
+muonCut += ' && pt > 10.'
+# pseudo-rapisity range
+muonCut += ' && abs(eta) < 2.5'
+# relative isolation
+muonCut += ' && (trackIso+caloIso)/pt < 0.2'
+
+# loose selection, on top of 'muonCut'
+# general reconstruction property
+looseMuonCut  =     'isTrackerMuon'
+# transverse momentum
+looseMuonCut += ' && pt > 20.'
+# pseudo-rapisity range
+looseMuonCut += ' && abs(eta) < 2.1'
+# relative isolation
+looseMuonCut += ' && (trackIso+caloIso)/pt < 0.1'
+# muon ID: 'isGlobalMuonPromptTight'
+looseMuonCut += ' && globalTrack.normalizedChi2 < 10.'
+looseMuonCut += ' && globalTrack.hitPattern.numberOfValidMuonHits > 0'
+# 2-dim impact parameter with respect to beam spot (s. "PAT muon configuration" above)
+looseMuonCut += ' && abs(dB) < 0.02'
+# tracker reconstruction
+looseMuonCut += ' && innerTrack.numberOfValidHits > 10'
+looseMuonCut += ' && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1'
+# muon chamber reconstruction
+looseMuonCut += ' && numberOfMatches > 1'
+
+## longitudinal distance of muon vertex from PV
+#muonCut += ' && ()' # DeltaZ between muon vertex and PV < 1.
+# minimum DeltaR from any selected jet
+muonJetsDR = 0.3
+
+# tight selection, on top of 'looseMuonCut'
+tightMuonCut  = '(trackIso+caloIso)/pt < 0.05'
+
+### Jet selection
+
+# transverse momentum
+jetCut  =     'pt > 30.'
+# pseudo-rapisity range
+jetCut += ' && abs(eta) < 2.4'
+# jet ID: electro-magnetic energy fraction
+jetCut += ' && emEnergyFraction > 0.01'
+# jet ID: number of RecHits carying 90% of the total energy
+jetCut += ' && jetID.n90Hits > 1'
+# jet ID: fraction of energy in the hottest readout
+jetCut += ' && jetID.fHPD < 0.98'
+
+
+### Electron selection
+
+# transverse momentum
+electronCut  =     'et > 15.'
+# pseudo-rapisity range
+electronCut += ' && abs(eta) < 2.5'
+# relative isolation
+electronCut += ' && (dr03TkSumPt+dr03EcalRecHitSumEt+dr03HcalTowerSumEt)/et < 0.2'
+
+### ------------------------------------------------------------------------ ###
+
+
+### Trigger matching
+
+# trigger object selection (corresponding to 'triggerSelection' above)
+#triggerObjectSelection = 'type("TriggerMuon") && ( path("HLT_Mu9") )'                         # run <  147196
+triggerObjectSelection = 'type("TriggerMuon") && ( path("HLT_Mu15") || path("HLT_Mu15_v*") )' # run >= 147196
+
 
 ### Basic
 
@@ -23,92 +120,6 @@ inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_2'
 fwkReportEvery = 100
 # switch for 'TrigReport'/'TimeReport' at job end
 wantSummary = True
-
-
-### ------------------------- Reference selection -------------------------- ###
-
-### Trigger selection
-
-# logical expression
-triggerSelection = 'HLT_Mu15 OR HLT_Mu15_v*'
-
-### Muon selection
-
-# muon configuration
-muonsUsePV = False # use beam spot rather than PV, which is necessary for 'dB' cut
-# general reconstruction property
-muonCut  =     '(isGlobalMuon && isTrackerMuon)'
-# transverse momentum
-muonCut += ' && pt > 20.'
-# pseudo-rapisity range
-muonCut += ' && abs(eta) < 2.1'
-# relative isolation
-muonCut += ' && (trackIso+ecalIso+hcalIso)/pt < 0.05' # RelIso for l+jets
-#muonCut += ' && (trackIso+ecalIso+hcalIso)/pt < 0.1'  # RelIso for single top
-# muon ID: 'isGlobalMuonPromptTight'
-muonCut += ' && globalTrack.normalizedChi2 < 10.'
-muonCut += ' && globalTrack.hitPattern.numberOfValidMuonHits > 0'
-## distance to selected jets
-#muonCut += ' && ()' # DeltaR to any selected jet < 0.3
-# 2-dim impact parameter with respect to beam spot (s. "PAT muon configuration" above)
-muonCut += ' && dB < 0.02'
-## longitudinal distance of muon vertex from PV
-#muonCut += ' && ()' # DeltaZ between muon vertex and PV < 1.
-# tracker reconstruction
-muonCut += ' && innerTrack.numberOfValidHits > 10'
-muonCut += ' && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1'
-# muon chamber reconstruction
-muonCut += ' && numberOfMatches > 1'
-# exactly 1 muon selected
-minMuons = 1
-maxMuons = 1
-
-### Jet selection
-
-# transverse momentum
-jetCut  =     'pt > 30.'
-# pseudo-rapisity range
-jetCut += ' && abs(eta) < 2.4'
-# jet ID: electro-magnetic energy fraction
-jetCut += ' && emEnergyFraction > 0.01'
-# jet ID: number of RecHits carying 90% of the total energy
-jetCut += ' && jetID.n90Hits > 1'
-# jet ID: fraction of energy in the hottest readout
-jetCut += ' && jetID.fHPD < 0.98'
-# minimum number of selected jets
-minJets = 1 # 1, 2, 3 or 4
-
-### Second loose muon veto selection
-
-# general reconstruction property
-muonVetoCut  =     'isGlobalMuon'
-# transverse momentum
-muonVetoCut += ' && pt > 10.'
-# pseudo-rapisity range
-muonVetoCut += ' && abs(eta) < 2.5'
-# relative isolation
-muonVetoCut += ' && (trackIso+ecalIso+hcalIso)/pt < 0.2'
-# NO veto muon found
-maxVetoMuons = 0 # increase to keep vetoed events
-
-### Electron veto selection
-
-# transverse momentum
-electronVetoCut  =     'et > 15.'
-# pseudo-rapisity range
-electronVetoCut += ' && abs(eta) < 2.5'
-# relative isolation
-electronVetoCut += ' && (dr03TkSumPt+dr03EcalRecHitSumEt+dr03HcalTowerSumEt)/et < 0.2'
-# NO veto electron found
-maxVetoElectrons = 0 # increase to keep vetoed events
-
-### ------------------------------------------------------------------------ ###
-
-
-### Trigger matching
-
-# trigger object selection (corresponding to 'triggerSelection' above)
-triggerObjectSelection = 'type("TriggerMuon") && ( path("HLT_Mu15") || path("HLT_Mu15_v*") )'
 
 
 ### ======================================================================== ###
@@ -150,15 +161,16 @@ process.out.outputCommands += patEventContent
 ### Cleaning and trigger selection configuration
 ###
 
-### Good vertex selection
-process.load( 'TopQuarkAnalysis.Configuration.patRefSel_goodVertex_cff' )
-
 ### Trigger selection
-process.load( 'TopQuarkAnalysis.Configuration.patRefSel_triggerSelection_cff' )
-# supress exception on unknown trigger names
-process.triggerResults.throw = False
-# HLT selection
-process.triggerResults.triggerConditions = [ triggerSelection ]
+from TopQuarkAnalysis.Configuration.patRefSel_triggerSelection_cff import triggerResults
+process.step1 = triggerResults.clone(
+  throw             = False
+, triggerConditions = [ triggerSelection ]
+)
+
+### Good vertex selection
+from TopQuarkAnalysis.Configuration.patRefSel_goodVertex_cff import goodVertex
+process.step2 = goodVertex.clone()
 
 
 ###
@@ -166,114 +178,125 @@ process.triggerResults.triggerConditions = [ triggerSelection ]
 ###
 
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
-process.patJets.embedCaloTowers   = False
-process.patJets.embedPFCandidates = False
-# remove object cleaning
-from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
+# remove object cleaning and photons and taus
+from PhysicsTools.PatAlgos.tools.coreTools import *
 removeCleaning( process )
+removeSpecificPATObjects( process, [ 'Photons', 'Taus' ] )
 # additional event content has to be added _after_ the call to 'removeCleaning()':
 process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
                               , 'keep *_hltTriggerSummaryAOD_*_*'
                               # tracks, vertices and beam spot
-                              , 'keep recoTracks_generalTracks*_*_*'
                               , 'keep *_offlineBeamSpot_*_*'
                               , 'keep *_offlinePrimaryVertices*_*_*'
                               # MC generator info
                               , 'keep GenEventInfoProduct_*_*_*'
                               , 'keep recoGenParticles_*_*_*'
-                              ,]
+                              ]
 
 
 ###
-### Muon selection
+### Muons
 ###
 
-### PAT muon configuration
-process.patMuons.usePV = muonsUsePV
+process.patMuons.usePV      = muonsUsePV
+process.patMuons.embedTrack = True
+
 process.selectedPatMuons.cut = muonCut
 
-### PAT muon counting
-process.countPatMuons.minNumber = minMuons
-process.countPatMuons.maxNumber = maxMuons
+process.step4 = process.countPatMuons.clone( maxNumber = 1 ) #
+
+process.loosePatMuons = process.cleanPatMuons.clone(
+  preselection = looseMuonCut
+, checkOverlaps = cms.PSet(
+    jets = cms.PSet(
+      src                 = cms.InputTag( 'goodPatJets' )
+    , algorithm           = cms.string( 'byDeltaR' )
+    , preselection        = cms.string( '' )
+    , deltaR              = cms.double( muonJetsDR )
+    , checkRecoComponents = cms.bool( False )
+    , pairCut             = cms.string( '' )
+    , requireNoOverlaps   = cms.bool( True)
+    )
+  )
+)
+process.out.outputCommands.append( 'keep *_loosePatMuons_*_*' )
+
+process.step3b = process.countPatMuons.clone( src = cms.InputTag( 'loosePatMuons' )
+                                            , minNumber = 1
+                                            , maxNumber = 1
+                                            )
+
+process.tightPatMuons = process.cleanPatMuons.clone(
+  src          = cms.InputTag( 'loosePatMuons' )
+, preselection = tightMuonCut
+)
+process.out.outputCommands.append( 'keep *_tightPatMuons_*_*' )
+
+process.step3a = process.countPatMuons.clone( src = cms.InputTag( 'tightPatMuons' )
+                                            , minNumber = 1
+                                            , maxNumber = 1
+                                            )
 
 
 ###
-### Jet selection
+### Jets
 ###
 
-### PAT jet configuration
-process.selectedPatJets.cut = jetCut
+process.goodPatJets = process.cleanPatJets.clone(
+  preselection = jetCut
+, checkOverlaps = cms.PSet()
+)
+process.out.outputCommands.append( 'keep *_goodPatJets_*_*' )
 
-### PAT jet counting
-process.countPatJets.minNumber = minJets
-
-
-###
-### Second loose muon veto selection
-###
-
-### PAT muon configuration for veto
-process.selectedPatVetoMuons = process.selectedPatMuons.clone( cut = '(' + muonVetoCut + ') && !(' + muonCut + ')' )
-# event content
-process.out.outputCommands.append( 'keep *_selectedPatVetoMuons*_*_*' )
-
-### PAT muon counting for veto
-process.countPatVetoMuons = process.countPatMuons.clone( src = cms.InputTag( 'selectedPatVetoMuons' )
-                                                       , minNumber = 0
-                                                       , maxNumber = maxVetoMuons
-                                                       )
+process.step6a = process.countPatJets.clone( minNumber = 1 )
+process.step6b = process.countPatJets.clone( minNumber = 2 )
+process.step6c = process.countPatJets.clone( minNumber = 3 )
+process.step7  = process.countPatJets.clone( minNumber = 4 )
 
 
 ###
-### Electron veto selection
+### Electrons
 ###
 
-### PAT electron configuration for veto
-process.selectedPatVetoElectrons = process.selectedPatElectrons.clone( cut = electronVetoCut )
-# event content
-process.out.outputCommands.append( 'keep *_selectedPatVetoElectrons*_*_*' )
+process.selectedPatElectrons.cut = electronCut
 
-### PAT electron counting for veto
-process.countPatVetoElectrons = process.countPatElectrons.clone( src = cms.InputTag( 'selectedPatVetoElectrons' )
-                                                               , minNumber = 0
-                                                               , maxNumber = maxVetoElectrons
-                                                               )
-
-
-###
-### Veto summary
-###
-
-process.vetoPatCandidateSummary = process.selectedPatCandidateSummary.clone( logName    = 'vetoPatCandidates|PATSummaryTables'
-                                                                           , candidates = cms.VInputTag( cms.InputTag( 'selectedPatVetoMuons' )
-                                                                                                       , cms.InputTag( 'selectedPatVetoElectrons' )
-                                                                                                       )
-                                                                           )
+process.step5 = process.countPatElectrons.clone( maxNumber = 0 )
 
 
 ###
 ### Scheduling
 ###
 
-### Veto sequence
-process.vetoPatCandidates = cms.Sequence(
-  process.selectedPatVetoMuons
-* process.countPatVetoMuons
-* process.selectedPatVetoElectrons
-* process.countPatVetoElectrons
-* process.vetoPatCandidateSummary
+# The additional sequence
+process.patAddOnSequence = cms.Sequence(
+  process.goodPatJets
+* process.loosePatMuons
+* process.tightPatMuons
 )
 
-### The path
+# The path
 process.p = cms.Path(
-  # cleaning and trigger selection
-  process.triggerSelection
-* process.goodVertex
-  # PAT, incl. muon and jets selection
+  process.step1
+* process.step2
 * process.patDefaultSequence
-  # veto sequence
-* process.vetoPatCandidates
+* process.patAddOnSequence
 )
+if useLooseMuon:
+  process.p += process.step3b
+if useTightMuon:
+  process.p += process.step3a
+if useMuonVeto:
+  process.p += process.step4
+if useElectronVeto:
+  process.p += process.step5
+if use1Jet:
+  process.p += process.step6a
+if use2Jets:
+  process.p += process.step6b
+if use3Jets:
+  process.p += process.step6c
+if use4Jets:
+  process.p += process.step7
 
 
 ###
@@ -290,3 +313,6 @@ switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'triggerMatch' ] )
 # remove object cleaning as for the PAT default sequence
 removeCleaningFromTriggerMatching( process )
 switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'triggerMatch' ] ) # once more in order to fix event content
+# adapt input sources for additional muon collections
+process.loosePatMuons.src = cms.InputTag( 'selectedPatMuonsTriggerMatch' )
+process.tightPatMuons.src = cms.InputTag( 'selectedPatMuonsTriggerMatch' )
