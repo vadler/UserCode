@@ -28,7 +28,8 @@ triggerSelection = 'HLT_Mu15 OR HLT_Mu15_v*' # run >= 147196
 
 ### Muon configuration
 
-muonsUsePV = False # use beam spot rather than PV, which is necessary for 'dB' cut
+muonsUsePV     = False # use beam spot rather than PV, which is necessary for 'dB' cut
+muonEmbedTrack = True  # embedded track needed for muon ID cuts
 
 ### Muon selection
 
@@ -109,7 +110,6 @@ triggerObjectSelection = 'type("TriggerMuon") && ( path("HLT_Mu15") || path("HLT
 condition = 'com10'
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
-maxInputEvents = 1000
 # input files
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_2'
@@ -202,7 +202,7 @@ process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
 ###
 
 process.patMuons.usePV      = muonsUsePV
-process.patMuons.embedTrack = True
+process.patMuons.embedTrack = muonEmbedTrack
 
 process.selectedPatMuons.cut = muonCut
 

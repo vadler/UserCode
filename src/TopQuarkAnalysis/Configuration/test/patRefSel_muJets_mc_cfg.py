@@ -28,7 +28,8 @@ triggerSelection = 'HLT_Mu15 OR HLT_Mu15_v*' # run >= 147196
 
 ### Muon configuration
 
-muonsUsePV = False # use beam spot rather than PV, which is necessary for 'dB' cut
+muonsUsePV     = False # use beam spot rather than PV, which is necessary for 'dB' cut
+muonEmbedTrack = True  # embedded track needed for muon ID cuts
 
 ### Muon selection
 
@@ -199,7 +200,7 @@ process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
 ###
 
 process.patMuons.usePV      = muonsUsePV
-process.patMuons.embedTrack = True
+process.patMuons.embedTrack = muonEmbedTrack
 
 process.selectedPatMuons.cut = muonCut
 
