@@ -9,7 +9,12 @@ process = cms.Process( 'PAT' )
 
 ### Data or MC?
 
-runOnMC = False
+runOnMC = True
+
+### Particle flow
+
+postfix = 'PF'
+jetAlgo = 'AK5'
 
 ### Switch on/off selection steps
 
@@ -35,7 +40,8 @@ from TopQuarkAnalysis.Configuration.patRefSel_refMuJets import *
 #looseMuonCut           = ''
 #tightMuonCut           = ''
 #muonJetsDR             = 0.3
-#jetCut                 = ''
+#jetCutPF               = ''
+#jetMuonsDRPF           = 0.1
 #electronCut            = ''
 #triggerSelection       = 'HLT_Mu15 OR HLT_Mu15_v*' # 'HLT_Mu9' for run numbers < 147196
 #triggerObjectSelection = 'type("TriggerMuon") && ( path("HLT_Mu15") || path("HLT_Mu15_v*") )'
@@ -63,9 +69,9 @@ if runOnMC:
                                    , numberOfFiles = 0
                                    )
 # output file
-outputFile = 'patRefSel_muJets_data.root'
+outputFile = 'patRefSel_muJets_PF_data.root'
 if runOnMC:
-  outputFile = 'patRefSel_muJets_mc.root'
+  outputFile = 'patRefSel_muJets_PF_mc.root'
 # event frequency of Fwk report
 fwkReportEvery = 100
 # switch for 'TrigReport'/'TimeReport' at job end
@@ -127,17 +133,27 @@ process.step2 = goodVertex.clone()
 
 
 ###
-### PAT configuration
+### PF2PAT configuration
 ###
 
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
+from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
+usePF2PAT( process
+         , runPF2PAT = True
+         , runOnMC   = runOnMC
+         , jetAlgo   = jetAlgo
+         , postfix   = postfix
+         )
 # remove MC matching, object cleaning, photons and taus and adapt JECs
 from PhysicsTools.PatAlgos.tools.coreTools import *
 if not runOnMC:
-  runOnData( process )
-#removeCleaning( process )
+  runOnData( process
+           , names = [ 'PFAll' ]
+           , postfix = postfix
+           )
 removeSpecificPATObjects( process
                         , names = [ 'Photons', 'Taus' ]
+                        , postfix = postfix
                         ) # includes 'removeCleaning'
 # additional event content has to be added _after_ the call to 'removeCleaning()':
 process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
@@ -156,32 +172,57 @@ if runOnMC:
 ### Selection configuration
 ###
 
-process.load( "TopQuarkAnalysis.Configuration.patRefSel_refMuJets_cfi" )
+from TopQuarkAnalysis.Configuration.patRefSel_refMuJets_cfi import *
 
 ### Muons
 
-process.patMuons.usePV      = muonsUsePV
-process.patMuons.embedTrack = muonEmbedTrack
+applyPostfix( process, 'patMuons', postfix ).usePV      = muonsUsePV
+applyPostfix( process, 'patMuons', postfix ).embedTrack = muonEmbedTrack
 
-process.selectedPatMuons.cut = muonCut
+applyPostfix( process, 'selectedPatMuons', postfix ).cut = muonCut
 
-process.intermediatePatMuons.preselection = looseMuonCut
-process.out.outputCommands.append( 'keep *_intermediatePatMuons_*_*' )
+intermediatePatMuons.src          = cms.InputTag( 'selectedPatMuons' + postfix )
+intermediatePatMuons.preselection = looseMuonCut
+setattr( process, 'intermediatePatMuons' + postfix, intermediatePatMuons )
+process.out.outputCommands.append( 'keep *_intermediatePatMuons' + postfix + '_*_*' )
 
-process.loosePatMuons.checkOverlaps.jets.deltaR = muonJetsDR
-process.out.outputCommands.append( 'keep *_loosePatMuons_*_*' )
+loosePatMuons.src                       = cms.InputTag( 'intermediatePatMuons' + postfix )
+loosePatMuons.preselection              = looseMuonCut
+loosePatMuons.checkOverlaps.jets.src    = cms.InputTag( 'goodPatJets' + postfix )
+loosePatMuons.checkOverlaps.jets.deltaR = muonJetsDR
+setattr( process, 'loosePatMuons' + postfix, loosePatMuons )
+process.out.outputCommands.append( 'keep *_loosePatMuons' + postfix + '_*_*' )
 
-process.tightPatMuons.preselection = tightMuonCut
-process.out.outputCommands.append( 'keep *_tightPatMuons_*_*' )
+process.step3b = step3b.clone( src = cms.InputTag( 'loosePatMuons' + postfix ) )
+
+tightPatMuons.src          = cms.InputTag( 'loosePatMuons' + postfix )
+tightPatMuons.preselection = tightMuonCut
+setattr( process, 'tightPatMuons' + postfix, tightPatMuons )
+process.out.outputCommands.append( 'keep *_tightPatMuons' + postfix + '_*_*' )
+
+process.step3a = step3a.clone( src = cms.InputTag( 'tightPatMuons' + postfix ) )
+
+process.step4 = step4.clone( src = cms.InputTag( 'selectedPatMuons' + postfix ) )
 
 ### Jets
 
-process.goodPatJets.preselection = jetCut
-process.out.outputCommands.append( 'keep *_goodPatJets_*_*' )
+goodPatJets.src          = cms.InputTag( 'selectedPatJets' + postfix  )
+goodPatJets.preselection = jetCutPF
+goodPatJets.checkOverlaps.muons.src    = cms.InputTag( 'intermediatePatMuons' + postfix )
+goodPatJets.checkOverlaps.muons.deltaR = jetMuonsDRPF
+setattr( process, 'goodPatJets' + postfix, goodPatJets )
+process.out.outputCommands.append( 'keep *_goodPatJets' + postfix + '_*_*' )
+
+process.step6a = step6a.clone( src = cms.InputTag( 'goodPatJets' + postfix ) )
+process.step6b = step6b.clone( src = cms.InputTag( 'goodPatJets' + postfix ) )
+process.step6c = step6c.clone( src = cms.InputTag( 'goodPatJets' + postfix ) )
+process.step7  = step7.clone( src = cms.InputTag( 'goodPatJets' + postfix ) )
 
 ### Electrons
 
-process.selectedPatElectrons.cut = electronCut
+applyPostfix( process, 'selectedPatElectrons', postfix ).cut = electronCut
+
+process.step5 = step5.clone( src = cms.InputTag( 'selectedPatElectrons' + postfix ) )
 
 
 ###
@@ -189,12 +230,13 @@ process.selectedPatElectrons.cut = electronCut
 ###
 
 # The additional sequence
-process.patAddOnSequence = cms.Sequence(
-  process.intermediatePatMuons
-* process.goodPatJets
-* process.loosePatMuons
-* process.tightPatMuons
+patAddOnSequence = cms.Sequence(
+  getattr( process, 'intermediatePatMuons' + postfix )
+* getattr( process, 'goodPatJets' + postfix )
+* getattr( process, 'loosePatMuons' + postfix )
+* getattr( process, 'tightPatMuons' + postfix )
 )
+setattr( process, 'patAddOnSequence' + postfix, patAddOnSequence )
 
 # The path
 process.p = cms.Path()
@@ -204,8 +246,8 @@ if useTrigger:
   process.p += process.step1
 if useGoodVertex:
   process.p += process.step2
-process.p += process.patDefaultSequence
-process.p += process.patAddOnSequence
+process.p += getattr( process, 'patPF2PATSequence' + postfix )
+process.p += getattr( process, 'patAddOnSequence' + postfix )
 if useLooseMuon:
   process.p += process.step3b
 if useTightMuon:
@@ -232,18 +274,29 @@ if addTriggerMatching:
 
   ### Trigger matching configuration
   from TopQuarkAnalysis.Configuration.patRefSel_triggerMatching_cfi import patMuonTriggerMatch
-  process.triggerMatch = patMuonTriggerMatch.clone( matchedCuts = triggerObjectSelection )
+  triggerMatch = patMuonTriggerMatch.clone( matchedCuts = triggerObjectSelection )
+  setattr( process, 'triggerMatch' + postfix, triggerMatch )
 
   ### Enabling trigger matching and embedding
   from PhysicsTools.PatAlgos.tools.trigTools import *
   switchOnTriggerMatchEmbedding( process
-                               , triggerMatchers = [ 'triggerMatch' ]
+                               , triggerMatchers = [ 'triggerMatch' + postfix ]
+                               , sequence        = 'patPF2PATSequence' + postfix
                                )
   # remove object cleaning as for the PAT default sequence
-  removeCleaningFromTriggerMatching( process )
-  switchOnTriggerMatchEmbedding( process
-                               , triggerMatchers = [ 'triggerMatch' ]
-                               ) # once more in order to fix event content
+  removeCleaningFromTriggerMatching( process
+                                   , sequence = 'patPF2PATSequence' + postfix
+                                   )
+  setattr( process, 'selectedPatMuons' + postfix + 'TriggerMatch', getattr( process, 'selectedPatMuonsTriggerMatch' ) )
+  getattr( process, 'selectedPatMuons' + postfix + 'TriggerMatch').src = cms.InputTag( 'selectedPatMuons' + postfix )
+  applyPostfix( process, 'patPF2PATSequence', postfix ).replace( getattr( process, 'selectedPatMuonsTriggerMatch' )
+                                                               , getattr( process, 'selectedPatMuons' + postfix + 'TriggerMatch' )
+                                                               )
   # adapt input sources for additional muon collections
-  process.loosePatMuons.src = cms.InputTag( 'selectedPatMuonsTriggerMatch' )
-  process.tightPatMuons.src = cms.InputTag( 'selectedPatMuonsTriggerMatch' )
+  applyPostfix( process, 'triggerMatch', postfix ).src = cms.InputTag( 'selectedPatMuons' + postfix )
+  getattr( process, 'loosePatMuons' + postfix ).src = cms.InputTag( 'selectedPatMuons' + postfix + 'TriggerMatch' )
+  getattr( process, 'tightPatMuons' + postfix ).src = cms.InputTag( 'selectedPatMuons' + postfix + 'TriggerMatch' )
+  # adapt event content
+  process.out.outputCommands += [ 'drop *_selectedPatMuons*_*_*'
+                                , 'keep *_selectedPatMuons' + postfix + 'TriggerMatch_*_*'
+                                ]
