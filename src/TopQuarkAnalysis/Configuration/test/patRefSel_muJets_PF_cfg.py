@@ -152,7 +152,7 @@ if usePFnoPU:
   getattr( process, 'pfJets' + postfix ).Vertices      = cms.InputTag( 'goodOfflinePrimaryVertices' )
   getattr( process, 'pfJets' + postfix ).doAreaFastjet = True
   getattr( process, 'pfJets' + postfix ).doRhoFastjet  = False
-  getattr( process, 'pfPileUp' + postfix ).checkClosestZVertex = cms.bool(False)
+  getattr( process, 'pfPileUp' + postfix ).checkClosestZVertex = False
 
 
 # remove MC matching, object cleaning, photons and taus and adapt JECs
