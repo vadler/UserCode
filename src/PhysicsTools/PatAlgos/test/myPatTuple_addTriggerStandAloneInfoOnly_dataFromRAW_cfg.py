@@ -32,7 +32,7 @@ process.maxEvents = cms.untracked.PSet(
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-from Configuration.PyReleaseValidation.autoCond import autoCond
+from Configuration.AlCa.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ 'com10' ] )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
