@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.25 2011/02/22 18:29:50 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.26 2011/03/16 13:03:53 vadler Exp $
 //
 
 
@@ -370,7 +370,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         }
       }
       if ( ! onlyStandAlone_ ) {
-        TriggerPath triggerPath( namePath, indexPath, hltConfig_.prescaleValue( set, namePath ), handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), indexLastFilterPath );
+        TriggerPath triggerPath( namePath, indexPath, hltConfig_.prescaleValue( set, namePath ), handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ), indexLastFilterPath, hltConfig_.saveTagsModules( namePath ).size() );
         // add module names to path and states' map
         assert( indexLastFilterPath < sizeModulesPath );
         std::map< unsigned, std::string > indicesModules;
@@ -485,6 +485,7 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
         // set filter type
         const std::string typeFilter( hltConfig_.moduleType( nameFilter ) );
         triggerFilter.setType( typeFilter );
+        triggerFilter.setSaveTags( hltConfig_.saveTags( nameFilter ) );
         // set keys and trigger object types of used objects
         for ( size_t iK = 0; iK < keys.size(); ++iK ) { // identical to types.size()
           // check, if current object is excluded
