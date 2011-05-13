@@ -4,7 +4,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/TQAF/CMSSW_4_2_3
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-07-05      V06-07-05      
 DataFormats/TauReco                              V01-00-07-01   V01-00-06-01   
-PhysicsTools/PatAlgos                            V08-06-22      V08-06-21      
+PhysicsTools/PatAlgos                            V08-06-23      V08-06-21      
 RecoTauTag/TauTagTools                           V01-00-12      V01-00-11      
 TopQuarkAnalysis/Configuration                   NoTag          V05-00-01      
 TopQuarkAnalysis/Examples                        V06-07-09      V06-07-09      
