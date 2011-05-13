@@ -12,7 +12,7 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = True
+runOnMC = False
 
 ### Switch on/off selection steps
 
@@ -69,6 +69,7 @@ useRelVals = True # if 'False', "inputFiles" must be defined
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
+maxInputEvents = 1000
 
 ### Conditions
 
@@ -110,7 +111,7 @@ else:
 ### Input configuration
 ###
 
-process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cff" )
+process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
@@ -179,6 +180,7 @@ process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
                               # tracks, vertices and beam spot
                               , 'keep *_offlineBeamSpot_*_*'
                               , 'keep *_offlinePrimaryVertices*_*_*'
+                              , 'keep *_goodPrimaryVertices*_*_*'
                               ]
 if runOnMC:
   process.out.outputCommands += [ 'keep GenEventInfoProduct_*_*_*'
@@ -238,6 +240,7 @@ if useTrigger:
   process.p += process.step1
 if useGoodVertex:
   process.p += process.step2
+process.p += process.goodPrimaryVertices
 process.p += process.patDefaultSequence
 process.p += process.patAddOnSequence
 if useLooseMuon:
