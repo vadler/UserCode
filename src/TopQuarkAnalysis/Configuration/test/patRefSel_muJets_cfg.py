@@ -157,8 +157,7 @@ process.step1 = triggerResults.clone(
 )
 
 ### Good vertex selection
-from TopQuarkAnalysis.Configuration.patRefSel_goodVertex_cff import goodVertex
-process.step2 = goodVertex.clone()
+process.load( "TopQuarkAnalysis.Configuration.patRefSel_goodVertex_cfi" )
 
 
 ###
