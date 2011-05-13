@@ -5,7 +5,13 @@ pvSelection = cms.PSet(
 , maxZ    = cms.double( 24. )
 , maxRho  = cms.double( 2. )
 )
-pvSrc = cms.InputTag( 'offlinePrimaryVertices' )
+
+goodOfflinePrimaryVertices = cms.EDFilter(
+  "PrimaryVertexObjectFilter" # checks for fake PVs automatically
+, filterParams = pvSelection
+, filter       = cms.bool( False ) # use only as producer
+, src          = cms.InputTag( 'offlinePrimaryVertices' )
+)
 
 step2 = cms.EDFilter(
 #   "VertexSelector"
@@ -14,11 +20,5 @@ step2 = cms.EDFilter(
 # , filter = cms.bool( True )
   "PrimaryVertexFilter" # checks for fake PVs automatically
 , pvSelection
-, pvSrc = pvSrc
-)
-
-goodOfflinePrimaryVertices = cms.EDFilter(
-  "PrimaryVertexObjectFilter" # checks for fake PVs automatically
-, filterParams = pvSelection
-, src          = pvSrc
+, pvSrc = cms.InputTag( 'goodOfflinePrimaryVertices' )
 )

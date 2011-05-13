@@ -217,8 +217,7 @@ process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
                               , 'keep *_hltTriggerSummaryAOD_*_*'
                               # tracks, vertices and beam spot
                               , 'keep *_offlineBeamSpot_*_*'
-                              , 'keep *_offlinePrimaryVertices*_*_*'
-                              , 'keep *_goodPrimaryVertices*_*_*'
+                              , 'keep *_goodOfflinePrimaryVertices*_*_*'
                               ]
 if runOnMC:
   process.out.outputCommands += [ 'keep GenEventInfoProduct_*_*_*'
@@ -311,9 +310,9 @@ if not runOnMC:
   process.p += process.eventCleaning
 if useTrigger:
   process.p += process.step1
+process.p += process.goodOfflinePrimaryVertices
 if useGoodVertex:
   process.p += process.step2
-process.p += process.goodOfflinePrimaryVertices # performs step 2 anyway
 process.p += getattr( process, 'patPF2PATSequence' + postfix )
 process.p += getattr( process, 'patAddOnSequence' + postfix )
 if useLooseMuon:
