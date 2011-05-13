@@ -68,18 +68,18 @@ useNoTau      = True # before MET reconstruction
 # jet energy corrections
 # set
 #jecSetPF = 'AK5PFchs'
+if not usePFnoPU:
+  jecSetPF = 'AK5PF'
 # levels
-jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
-if runOnMC:
-  jecLevels.append( 'L2L3Residual' )
+jecLevelsPF = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
+if not runOnMC:
+  jecLevelsPF.append( 'L2L3Residual' )
 
 ### Input
 
 # list of input files
-inputFiles = [] # overwritten, if "useRelVals" is 'True'
-
-# test with CMSSW_4_2_2 RelVals?
-useRelVals = True # if 'False', "inputFiles" must be defined
+inputFiles = []   # overwritten, if "useRelVals" is 'True'
+useRelVals = True # if 'False', "inputFiles" is used
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
@@ -88,8 +88,8 @@ maxInputEvents = 1000
 ### Conditions
 
 # GlobalTags (w/o suffix '::All')
-globalTagData = 'GR_R_42_V10' # default for CMSSW_4_2_2 RelVals: 'GR_R_42_V10'
-globalTagMC   = 'START42_V11' # default for CMSSW_4_2_2 RelVals: 'START42_V11'
+globalTagData = 'GR_R_42_V12' # default for CMSSW_4_2_2 RelVals: 'GR_R_42_V10'
+globalTagMC   = 'START42_V12' # default for CMSSW_4_2_2 RelVals: 'START42_V11'
 
 ### Output
 
@@ -97,7 +97,7 @@ globalTagMC   = 'START42_V11' # default for CMSSW_4_2_2 RelVals: 'START42_V11'
 outputFile = 'patRefSel_muJets_' + postfix + '.root'
 
 # event frequency of Fwk report
-fwkReportEvery = 100
+fwkReportEvery = 1000
 
 # switch for 'TrigReport'/'TimeReport' at job end
 wantSummary = True
@@ -127,16 +127,17 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_2'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
                                      , relVal        = 'RelValTTbar'
                                      , globalTag     = globalTagMC
                                      , numberOfFiles = 0 # "0" means "all"
                                      )
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_2'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
                                      , relVal        = 'Mu'
                                      , dataTier      = 'RECO'
-                                     , globalTag     = globalTagData + '_RelVal_mu2010B'
+                                     #, globalTag     = globalTagData + '_RelVal_mu2010B'
+                                     , globalTag     = globalTagData + '_mu2010B'
                                      , numberOfFiles = 0 # "0" means "all"
                                      )
 process.source.fileNames = inputFiles
@@ -185,7 +186,7 @@ usePF2PAT( process
          , jetAlgo        = jetAlgo
          , postfix        = postfix
          , jetCorrections = ( jecSetPF
-                            , jecLevels
+                            , jecLevelsPF
                             )
          )
 getattr( process, 'pfNoPileUp'   + postfix ).enable = usePFnoPU
@@ -273,6 +274,10 @@ process.out.outputCommands.append( 'keep *_goodPatJets' + postfix + '_*_*' )
 if usePFnoPU:
   kt6PFJets.src = cms.InputTag( 'pfNoElectron' + postfix )
   setattr( process, 'kt6PFJets' + postfix, kt6PFJets )
+  getattr( process, 'patPF2PATSequence' + postfix).replace( getattr( process, 'pfNoElectron' + postfix )
+                                                          , getattr( process, 'pfNoElectron' + postfix ) * getattr( process, 'kt6PFJets' + postfix )
+                                                          )
+  getattr( process, 'patJetCorrFactors' + postfix ).rho = cms.InputTag( 'kt6PFJets' + postfix, 'rho' )
   process.out.outputCommands.append( 'keep double_*' + postfix + '*_*_' + process.name_() )
 
 process.step6a = step6a.clone( src = cms.InputTag( 'goodPatJets' + postfix ) )
@@ -308,10 +313,8 @@ if useTrigger:
   process.p += process.step1
 if useGoodVertex:
   process.p += process.step2
-process.p += process.goodPrimaryVertices
+process.p += process.goodOfflinePrimaryVertices # performs step 2 anyway
 process.p += getattr( process, 'patPF2PATSequence' + postfix )
-if usePFnoPU:
-  process.p += getattr( process, 'kt6PFJets' + postfix )
 process.p += getattr( process, 'patAddOnSequence' + postfix )
 if useLooseMuon:
   process.p += process.step3b

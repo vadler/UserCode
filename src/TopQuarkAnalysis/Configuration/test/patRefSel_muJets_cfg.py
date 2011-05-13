@@ -56,16 +56,14 @@ from TopQuarkAnalysis.Configuration.patRefSel_refMuJets import *
 #jecSetPF = 'AK5'
 # levels
 jecLevels = [ 'L1Offset', 'L2Relative', 'L3Absolute' ]
-if runOnMC:
+if not runOnMC:
   jecLevels.append( 'L2L3Residual' )
 
 ### Input
 
 # list of input files
-inputFiles = [] # overwritten, if "useRelVals" is 'True'
-
-# test with CMSSW_4_2_2 RelVals?
-useRelVals = True # if 'False', "inputFiles" must be defined
+inputFiles = []   # overwritten, if "useRelVals" is 'True'
+useRelVals = True # if 'False', "inputFiles" is used
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
@@ -74,8 +72,8 @@ maxInputEvents = 1000
 ### Conditions
 
 # GlobalTags (w/o suffix '::All')
-globalTagData = 'GR_R_42_V10' # default for CMSSW_4_2_2 RelVals: 'GR_R_42_V10'
-globalTagMC   = 'START42_V11' # default for CMSSW_4_2_2 RelVals: 'START42_V11'
+globalTagData = 'GR_R_42_V12' # default for CMSSW_4_2_2 RelVals: 'GR_R_42_V10'
+globalTagMC   = 'START42_V12' # default for CMSSW_4_2_2 RelVals: 'START42_V11'
 
 ### Output
 
@@ -83,7 +81,7 @@ globalTagMC   = 'START42_V11' # default for CMSSW_4_2_2 RelVals: 'START42_V11'
 outputFile = 'patRefSel_muJets.root'
 
 # event frequency of Fwk report
-fwkReportEvery = 100
+fwkReportEvery = 1000
 
 # switch for 'TrigReport'/'TimeReport' at job end
 wantSummary = True
@@ -115,16 +113,17 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_2'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
                                      , relVal        = 'RelValTTbar'
                                      , globalTag     = globalTagMC
                                      , numberOfFiles = 0 # "0" means "all"
                                      )
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_2'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
                                      , relVal        = 'Mu'
                                      , dataTier      = 'RECO'
-                                     , globalTag     = globalTagData + '_RelVal_mu2010B'
+                                     #, globalTag     = globalTagData + '_RelVal_mu2010B'
+                                     , globalTag     = globalTagData + '_mu2010B'
                                      , numberOfFiles = 0 # "0" means "all"
                                      )
 process.source.fileNames = inputFiles
@@ -240,7 +239,7 @@ if useTrigger:
   process.p += process.step1
 if useGoodVertex:
   process.p += process.step2
-process.p += process.goodPrimaryVertices
+process.p += process.goodOfflinePrimaryVertices # performs step 2 anyway
 process.p += process.patDefaultSequence
 process.p += process.patAddOnSequence
 if useLooseMuon:

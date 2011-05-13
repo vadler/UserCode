@@ -17,7 +17,7 @@ step2 = cms.EDFilter(
 , pvSrc = pvSrc
 )
 
-goodPrimaryVertices = cms.EDProducer(
+goodOfflinePrimaryVertices = cms.EDFilter(
   "PrimaryVertexObjectFilter" # checks for fake PVs automatically
 , filterParams = pvSelection
 , src          = pvSrc
