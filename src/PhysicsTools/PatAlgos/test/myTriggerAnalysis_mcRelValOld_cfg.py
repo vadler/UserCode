@@ -5,9 +5,9 @@ process = cms.Process( "HLTPROV" )
 # Conditions
 condition = 'startup'
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-from Configuration.AlCa.autoCond import autoCond
+#from Configuration.AlCa.autoCond import autoCond
 #process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
-process.GlobalTag.globaltag = cms.string( 'START42_V7::All' )
+process.GlobalTag.globaltag = cms.string( 'START43_V1::All' )
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
@@ -16,8 +16,8 @@ process.source = cms.Source("PoolSource",
     pickRelValInputFiles( formerVersion = True
                         , relVal        = None
                         , dataTier      = None
-                        , condition     = condition
-                        , globalTag     = 'START42_V7'
+                        #, condition     = condition
+                        , globalTag     = 'START43_V1'
                         , maxVersions   = None
                         , skipFiles     = 0
                         , numberOfFiles = 0
