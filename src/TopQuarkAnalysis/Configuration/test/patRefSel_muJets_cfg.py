@@ -11,6 +11,9 @@ process = cms.Process( 'PAT' )
 ### ======================================================================== ###
 
 
+### Data or MC?
+runOnMC = True
+
 ### Switch on/off selection steps
 
 useTrigger      = True
@@ -43,10 +46,20 @@ from TopQuarkAnalysis.Configuration.patRefSel_refMuJets import *
 #triggerSelection       = triggerSelection_147196
 #triggerObjectSelection = triggerObjectSelection_147196
 
-### Input
+### Reconstruction
 
-# data or MC?
-runOnMC = True
+# jets
+#jetAlgo = 'AK5'
+
+# jet energy corrections
+# set
+#jecSetPF = 'AK5'
+# levels
+jecLevels = [ 'L1Offset', 'L2Relative', 'L3Absolute' ]
+if runOnMC:
+  jecLevels.append( 'L2L3Residual' )
+
+### Input
 
 # list of input files
 inputFiles = [] # overwritten, if "useRelVals" is 'True'

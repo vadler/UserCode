@@ -11,6 +11,9 @@ process = cms.Process( 'PAT' )
 ### ======================================================================== ###
 
 
+### Data or MC?
+runOnMC = True
+
 ### Switch on/off selection steps
 
 useTrigger      = True
@@ -46,6 +49,8 @@ from TopQuarkAnalysis.Configuration.patRefSel_refMuJets import *
 
 ### Particle flow
 
+postfix = 'PF'
+
 # subtract charged hadronic pile-up particles (from wrong PVs)
 usePFnoPU = True # before any reconstruction
 
@@ -55,14 +60,20 @@ useNoElectron = True # before jet reconstruction
 useNoJet      = True # before tau reconstruction
 useNoTau      = True # before MET reconstruction
 
-# labels
-postfix = 'PF'
-jetAlgo = 'AK5'
+### Reconstruction
+
+# jets
+#jetAlgo = 'AK5'
+
+# jet energy corrections
+# set
+#jecSetPF = 'AK5PFchs'
+# levels
+jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
+if runOnMC:
+  jecLevels.append( 'L2L3Residual' )
 
 ### Input
-
-# data or MC?
-runOnMC = False
 
 # list of input files
 inputFiles = [] # overwritten, if "useRelVals" is 'True'
@@ -169,10 +180,13 @@ process.step2 = goodVertex.clone()
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
 usePF2PAT( process
-         , runPF2PAT = True
-         , runOnMC   = runOnMC
-         , jetAlgo   = jetAlgo
-         , postfix   = postfix
+         , runPF2PAT      = True
+         , runOnMC        = runOnMC
+         , jetAlgo        = jetAlgo
+         , postfix        = postfix
+         , jetCorrections = ( jecSetPF
+                            , jecLevels
+                            )
          )
 getattr( process, 'pfNoPileUp'   + postfix ).enable = usePFnoPU
 getattr( process, 'pfNoMuon'     + postfix ).enable = useNoMuon
