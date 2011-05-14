@@ -20,7 +20,7 @@ jecSetBase = 'AK5'
 # standard jets
 jecSet = jecSetBase + 'Calo'
 # PF jets
-jecSetPF = jecSetBase + 'PFchs'
+jecSetPF = jecSetBase + 'PF'
 
 
 ### ------------------------- Reference selection -------------------------- ###
