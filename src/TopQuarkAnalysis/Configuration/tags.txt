@@ -5,6 +5,9 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/TQAF/CMSSW_4_2_3
 AnalysisDataFormats/TopObjects                   V06-07-05      V06-07-05      
 DataFormats/TauReco                              V01-00-07-01   V01-00-06-01   
 PhysicsTools/PatAlgos                            V08-06-23      V08-06-21      
+RecoJets/Configuration                           V02-04-16      V02-04-13      
+RecoJets/JetAlgorithms                           V04-01-00      V04-00-03      
+RecoJets/JetProducers                            V05-05-03      V05-03-06      
 RecoTauTag/TauTagTools                           V01-00-12      V01-00-11      
 TopQuarkAnalysis/Configuration                   NoTag          V05-00-01      
 TopQuarkAnalysis/Examples                        V06-07-09      V06-07-09      
@@ -16,4 +19,4 @@ TopQuarkAnalysis/TopObjectResolutions            V06-07-05      V06-07-05
 TopQuarkAnalysis/TopSkimming                     V06-07-05      V06-07-05      
 TopQuarkAnalysis/TopTools                        V06-07-09      V06-07-09      
 ---------------------------------------
-total packages: 13 (13 displayed)
+total packages: 16 (16 displayed)
