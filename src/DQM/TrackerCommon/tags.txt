@@ -1,0 +1,7 @@
+Test Release based on: CMSSW_3_3_4
+Base Release in: /afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_3_4
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_3_4
+-------- Package --------                        --- Tag ---    --- RelTag --- 
+DQM/TrackerCommon                                V03-01-02      V03-01-01      
+---------------------------------------
+total packages: 1 (1 displayed)
