@@ -12,7 +12,7 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = False
+runOnMC = True
 
 ### Switch on/off selection steps
 
@@ -87,8 +87,13 @@ useL7Parton     = True
 ### Input
 
 # list of input files
-inputFiles = []   # overwritten, if "useRelVals" is 'True'
 useRelVals = True # if 'False', "inputFiles" is used
+inputFiles = [ '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/0635AA67-B37C-E011-B61F-002618943944.root'
+             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/0E153885-B17C-E011-8C7D-001A928116E0.root'
+             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/105E01FE-B57C-E011-9AB4-0018F3D09708.root'
+             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/120718C8-B67C-E011-A070-001A928116D2.root'
+             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/1232DFFA-AF7C-E011-983D-002618943831.root'
+             ]   # overwritten, if "useRelVals" is 'True'
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
@@ -112,6 +117,8 @@ fwkReportEvery = 1000
 wantSummary = True
 
 
+###                              End of constants                            ###
+###                                                                          ###
 ### ======================================================================== ###
 
 
@@ -175,8 +182,7 @@ process.load( 'TopQuarkAnalysis.Configuration.patRefSel_eventCleaning_cff' )
 ### Trigger selection
 from TopQuarkAnalysis.Configuration.patRefSel_triggerSelection_cff import triggerResults
 process.step1 = triggerResults.clone(
-  throw             = False
-, triggerConditions = [ triggerSelection ]
+  triggerConditions = [ triggerSelection ]
 )
 
 ### Good vertex selection
@@ -247,11 +253,12 @@ removeSpecificPATObjects( process
                         , names = [ 'Photons', 'Taus' ]
                         , postfix = postfix
                         ) # includes 'removeCleaning'
-# additional event content has to be added _after_ the call to 'removeCleaning()':
+# additional event content has to be (re-)added _after_ the call to 'removeCleaning()':
 process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
                               , 'keep *_hltTriggerSummaryAOD_*_*'
                               # vertices and beam spot
                               , 'keep *_offlineBeamSpot_*_*'
+                              , 'keep *_offlinePrimaryVertices*_*_*'
                               , 'keep *_goodOfflinePrimaryVertices*_*_*'
                               ]
 if runOnMC:
@@ -289,7 +296,6 @@ process.step4 = step4.clone( src = cms.InputTag( 'selectedPatMuons' + postfix ) 
 
 ### Jets
 
-#applyPostfix( process, 'patJetCorrFactors', postfix ).src             = cms.InputTag( 'pfNoElectron' + postfix )
 applyPostfix( process, 'patJetCorrFactors', postfix ).primaryVertices = cms.InputTag( 'goodOfflinePrimaryVertices' )
 if useL1FastJet:
   if usePFnoPU:
