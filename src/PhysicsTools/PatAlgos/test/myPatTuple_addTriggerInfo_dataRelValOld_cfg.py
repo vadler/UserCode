@@ -9,7 +9,6 @@ process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_2
                                                   , condition     = condition # not needed, if GT explicitely given
                                                   #, globalTag     = 'GR_R_42_V10_RelVal_wzMu2010A'
                                                   , globalTag     = 'GR_R_42_V10_RelVal_wzMu2010B'
-                                                  , numberOfFiles = 0
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
