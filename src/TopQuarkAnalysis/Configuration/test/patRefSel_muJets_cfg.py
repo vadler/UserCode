@@ -130,7 +130,7 @@ if useRelVals:
     inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
                                      , relVal        = 'RelValTTbar'
                                      , globalTag     = globalTagMC
-                                     , numberOfFiles = 0 # "0" means "all"
+                                     , numberOfFiles = -1 # "-1" means "all"
                                      )
   else:
     inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
@@ -138,7 +138,7 @@ if useRelVals:
                                      , dataTier      = 'RECO'
                                      #, globalTag     = globalTagData + '_RelVal_mu2010B'
                                      , globalTag     = globalTagData + '_mu2010B'
-                                     , numberOfFiles = 0 # "0" means "all"
+                                     , numberOfFiles = -1 # "-1" means "all"
                                      )
 process.source.fileNames = inputFiles
 process.maxEvents.input  = maxInputEvents
