@@ -12,7 +12,7 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = True
+runOnMC = False
 
 ### Switch on/off selection steps
 
@@ -60,12 +60,13 @@ from TopQuarkAnalysis.Configuration.patRefSel_refMuJets import *
 ### JEC levels
 
 # levels to be accessible from the jets
-# jets are corrected to L3Absolute (MC), L2L3Residual (data) automatically
+# jets are corrected to L3Absolute (MC), L2L3Residual (data) automatically, if enabled here
+# and remain uncorrected, if none of these levels is enabled here
 useL1FastJet    = True  # needs useL1Offset being off, error otherwise
 useL1Offset     = False # needs useL1FastJet being off, error otherwise
 useL2Relative   = True
 useL3Absolute   = True
-useL2L3Residual = True  # takes effect only on data
+# useL2L3Residual = True  # takes effect only on data; currently disabled for CMSSW_4_2_X GlobalTags!
 useL5Flavor     = True
 useL7Parton     = True
 
@@ -184,21 +185,21 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_goodVertex_cfi" )
 if useL1FastJet and useL1Offset:
   print 'ERROR: switch off either "L1FastJet" or "L1Offset"'
   exit
-jecLevelsPF = []
+jecLevels = []
 if useL1FastJet:
-  jecLevelsPF.append( 'L1FastJet' )
+  jecLevels.append( 'L1FastJet' )
 if useL1Offset:
-  jecLevelsPF.append( 'L1Offset' )
+  jecLevels.append( 'L1Offset' )
 if useL2Relative:
-  jecLevelsPF.append( 'L2Relative' )
+  jecLevels.append( 'L2Relative' )
 if useL3Absolute:
-  jecLevelsPF.append( 'L3Absolute' )
-if useL2L3Residual and not runOnMC:
-  jecLevelsPF.append( 'L2L3Residual' )
+  jecLevels.append( 'L3Absolute' )
+# if useL2L3Residual and not runOnMC:
+#   jecLevels.append( 'L2L3Residual' )
 if useL5Flavor:
-  jecLevelsPF.append( 'L5Flavor' )
+  jecLevels.append( 'L5Flavor' )
 if useL7Parton:
-  jecLevelsPF.append( 'L7Parton' )
+  jecLevels.append( 'L7Parton' )
 
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 
@@ -222,6 +223,8 @@ if runOnMC:
   process.out.outputCommands += [ 'keep GenEventInfoProduct_*_*_*'
                                 , 'keep recoGenParticles_*_*_*'
                                 ]
+
+process.patJetCorrFactors.levels = jecLevels
 
 
 ###

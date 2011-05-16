@@ -12,7 +12,7 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = True
+runOnMC = False
 
 ### Switch on/off selection steps
 
@@ -75,12 +75,13 @@ useNoTau      = True # before MET top projection
 ### JEC levels
 
 # levels to be accessible from the jets
-# jets are corrected to L3Absolute (MC), L2L3Residual (data) automatically
+# jets are corrected to L3Absolute (MC), L2L3Residual (data) automatically, if enabled here
+# and remain uncorrected, if none of these levels is enabled here
 useL1FastJet    = True  # needs useL1Offset being off, error otherwise
 useL1Offset     = False # needs useL1FastJet being off, error otherwise
 useL2Relative   = True
 useL3Absolute   = True
-useL2L3Residual = True  # takes effect only on data
+# useL2L3Residual = True  # takes effect only on data; currently disabled for CMSSW_4_2_X GlobalTags!
 useL5Flavor     = True
 useL7Parton     = True
 
@@ -211,8 +212,8 @@ if useL2Relative:
   jecLevelsPF.append( 'L2Relative' )
 if useL3Absolute:
   jecLevelsPF.append( 'L3Absolute' )
-if useL2L3Residual and not runOnMC:
-  jecLevelsPF.append( 'L2L3Residual' )
+# if useL2L3Residual and not runOnMC:
+#   jecLevelsPF.append( 'L2L3Residual' )
 if useL5Flavor:
   jecLevelsPF.append( 'L5Flavor' )
 if useL7Parton:
