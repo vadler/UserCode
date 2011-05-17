@@ -16,7 +16,7 @@ runOnMC = True
 
 ### Standard and PF reconstruction
 useStandardPAT = True
-usePF2PAT      = True
+runPF2PAT      = True
 
 ### Switch on/off selection steps
 
@@ -63,7 +63,7 @@ from TopQuarkAnalysis.Configuration.patRefSel_refMuJets import *
 #triggerObjectSelection = triggerObjectSelection_147196
 
 ### Particle flow
-### takes effect only, if 'usePF2PAT' = True
+### takes effect only, if 'runPF2PAT' = True
 
 postfix = 'PF' # needs to be a non-empty string, if 'useStandardPAT' = True
 
@@ -201,11 +201,11 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_goodVertex_cfi" )
 ### PAT/PF2PAT configuration
 ###
 
-if useStandardPAT and usePF2PAT:
+if useStandardPAT and runPF2PAT:
   if postfix == '':
     print 'ERROR: running standard PAT and PF2PAT in parallel requires a defined "postfix" for PF2PAT'
     exit
-if not useStandardPAT and not usePF2PAT:
+if not useStandardPAT and not runPF2PAT:
   print 'ERROR: standard PAT and PF2PAT are both switched off'
   exit
 
@@ -242,10 +242,10 @@ if useL7Parton:
 
 ### Switch configuration
 
-if usePF2PAT:
+if runPF2PAT:
   from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
   usePF2PAT( process
-           , runPF2PAT      = True
+           , runPF2PAT      = runPF2PAT
            , runOnMC        = runOnMC
            , jetAlgo        = jetAlgo
            , postfix        = postfix
@@ -271,7 +271,7 @@ if useStandardPAT:
   removeSpecificPATObjects( process
                           , names = [ 'Photons', 'Taus' ]
                           ) # includes 'removeCleaning'
-if usePF2PAT:
+if runPF2PAT:
   if not runOnMC:
     runOnData( process
              , names = [ 'PFAll' ]
@@ -330,7 +330,7 @@ if useStandardPAT:
 
   process.step5 = step5.clone()
 
-if usePF2PAT:
+if runPF2PAT:
 
   ### Muons
 
@@ -424,7 +424,7 @@ if useStandardPAT:
 
   process.selectedPatElectrons.cut = electronCut
 
-if usePF2PAT:
+if runPF2PAT:
 
   applyPostfix( process, 'patMuons', postfix ).usePV      = muonsUsePV
   applyPostfix( process, 'patMuons', postfix ).embedTrack = muonEmbedTrack
@@ -461,7 +461,7 @@ if useStandardPAT:
   * process.loosePatMuons
   * process.tightPatMuons
   )
-if usePF2PAT:
+if runPF2PAT:
   patAddOnSequence = cms.Sequence(
     getattr( process, 'intermediatePatMuons' + postfix )
   * getattr( process, 'goodPatJets' + postfix )
@@ -500,7 +500,7 @@ if useStandardPAT:
     process.p += process.step7
   process.out.SelectEvents.SelectEvents.append( 'p' )
 
-if usePF2PAT:
+if runPF2PAT:
   pPF = cms.Path()
   if not runOnMC:
     pPF += process.eventCleaning
@@ -550,7 +550,7 @@ if addTriggerMatching:
                                  )
     removeCleaningFromTriggerMatching( process )
     process.intermediatePatMuons.src = cms.InputTag( 'selectedPatMuonsTriggerMatch' )
-  if usePF2PAT:
+  if runPF2PAT:
     triggerProducerPF = patTrigger.clone()
     setattr( process, 'patTrigger' + postfix, triggerProducerPF )
     triggerMatchPF = patMuonTriggerMatch.clone( matchedCuts = triggerObjectSelection )
