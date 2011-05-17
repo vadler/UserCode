@@ -5,7 +5,8 @@ process.GlobalTag.globaltag = autoCond[ condition ]
 process.source.fileNames    = pickRelValInputFiles( relVal        = 'Mu'
                                                   , dataTier      = 'RECO'
                                                   , condition     = condition # not needed, if GT explicitely given
-                                                  , globalTag     = 'GR_R_42_V12_RelVal_mu2010B'
+                                                  #, globalTag     = 'GR_R_42_V12_RelVal_mu2010B'
+                                                  , globalTag     = 'GR_R_42_V12_mu2010B'
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
@@ -21,6 +22,13 @@ process.out.outputCommands += [
 
 from PhysicsTools.PatAlgos.tools.coreTools import runOnData
 runOnData( process )
+process.patJetCorrFactors.levels = [ 'L1Offset'
+                                   , 'L2Relative'
+                                   , 'L3Absolute'
+                                   , 'L5Flavor'
+                                   , 'L7Parton'
+                                   ]
+process.patJetCorrFactors.useRho = False
 
 # from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
 # removeCleaning( process )
@@ -54,11 +62,11 @@ switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'moin', 'tach' ], tr
 # print 'Path p'
 # print '--> %s'%( process.p )
 print
-print 'Sequence patTriggerSequence'
-print '--> %s'%( process.patTriggerSequence )
+print 'Sequence patDefaultSequenceTrigger'
+print '--> %s'%( process.patDefaultSequenceTrigger )
 print
-print 'Sequence patTriggerEventSequence'
-print '--> %s'%( process.patTriggerEventSequence )
+print 'Sequence patDefaultSequenceTriggerEvent'
+print '--> %s'%( process.patDefaultSequenceTriggerEvent )
 print
 print 'PoolOutputModule out.outputCommands'
 print '--> %s'%( process.out.outputCommands )

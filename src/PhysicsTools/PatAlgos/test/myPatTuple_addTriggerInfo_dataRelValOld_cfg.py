@@ -24,6 +24,13 @@ process.out.outputCommands += [
 
 from PhysicsTools.PatAlgos.tools.coreTools import runOnData
 runOnData( process )
+process.patJetCorrFactors.levels = [ 'L1Offset'
+                                   , 'L2Relative'
+                                   , 'L3Absolute'
+                                   , 'L5Flavor'
+                                   , 'L7Parton'
+                                   ]
+process.patJetCorrFactors.useRho = False
 
 # from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
 # removeCleaning( process )
@@ -57,11 +64,11 @@ switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'moin', 'tach' ], tr
 # print 'Path p'
 # print '--> %s'%( process.p )
 print
-print 'Sequence patTriggerSequence'
-print '--> %s'%( process.patTriggerSequence )
+print 'Sequence patDefaultSequenceTrigger'
+print '--> %s'%( process.patDefaultSequenceTrigger )
 print
-print 'Sequence patTriggerEventSequence'
-print '--> %s'%( process.patTriggerEventSequence )
+print 'Sequence patDefaultSequenceTriggerEvent'
+print '--> %s'%( process.patDefaultSequenceTriggerEvent )
 print
 print 'PoolOutputModule out.outputCommands'
 print '--> %s'%( process.out.outputCommands )
