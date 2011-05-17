@@ -173,7 +173,7 @@ class SwitchOnTrigger( ConfigToolBase ):
                 index = len( getattr( process, sequence + 'Trigger' ).moduleNames() )
                 getattr( process, sequence + 'TriggerEvent' ).insert( index, trigEvtProdMod )
             else:
-                patTriggerEventSequence = cms.Sequence( trigProdMod )
+                patTriggerEventSequence = cms.Sequence( trigEvtProdMod )
                 setattr( process, sequence + 'TriggerEvent', patTriggerEventSequence )
                 prodSequence *= getattr( process, sequence + 'TriggerEvent' )
 
@@ -660,19 +660,20 @@ class SwitchOnTriggerMatchEmbedding( ConfigToolBase ):
 
         # Build dictionary of matchers and switch on PAT trigger matching if needed
         dictConfig = {}
+        matchingOn = False
         for matcher in triggerMatchers:
             trigMchMod = getattr( process, matcher )
             if trigMchMod.src.value() in dictConfig:
                 dictConfig[ trigMchMod.src.value() ] += [ matcher ]
             else:
                 dictConfig[ trigMchMod.src.value() ] = [ matcher ]
-            if matcher not in _modulesInSequence( process, sequence ):
+            if matcher not in _modulesInSequence( process, sequence ) and not matchingOn:
                 print '%s():'%( self._label )
                 print '    PAT trigger matching switched on automatically using'
                 print '    switchOnTriggerMatchingStandAlone( process, %s, %s, %s, %s, %s )'%( hltProcess, triggerMatchers, triggerProducer, sequence, outputModule )
                 print _longLine
                 switchOnTriggerMatchingStandAlone( process, triggerMatchers, triggerProducer, sequence, hltProcess, '', postfix )
-                break
+                matchingOn = True
 
         # Maintain configurations
         patTriggerEventContent = []
