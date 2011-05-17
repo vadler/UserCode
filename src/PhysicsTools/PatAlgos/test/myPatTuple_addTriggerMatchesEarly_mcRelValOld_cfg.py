@@ -50,7 +50,7 @@ process.p *= process.selectedPatCandidates
 process.p *= process.cleanPatCandidates
 process.p *= process.countPatCandidates
 print
-print process.patTriggerSequence
+print process.patCandidatesTrigger
 print
 print process.patCandidates
 print
