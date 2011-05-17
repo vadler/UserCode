@@ -1,3 +1,5 @@
+import sys
+
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process( 'PAT' )
@@ -203,11 +205,9 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_goodVertex_cfi" )
 
 if useStandardPAT and runPF2PAT:
   if postfix == '':
-    print 'ERROR: running standard PAT and PF2PAT in parallel requires a defined "postfix" for PF2PAT'
-    exit
+    sys.exit( 'ERROR: running standard PAT and PF2PAT in parallel requires a defined "postfix" for PF2PAT' )
 if not useStandardPAT and not runPF2PAT:
-  print 'ERROR: standard PAT and PF2PAT are both switched off'
-  exit
+  sys.exit( 'ERROR: standard PAT and PF2PAT are both switched off' )
 
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 from PhysicsTools.PatAlgos.tools.coreTools import *
@@ -222,8 +222,7 @@ if usePFnoPU:
 
 # JEC levels
 if useL1FastJet and useL1Offset:
-  print 'ERROR: switch off either "L1FastJet" or "L1Offset"'
-  exit
+  sys.exit( 'ERROR: switch off either "L1FastJet" or "L1Offset"' )
 jecLevels = []
 if useL1FastJet:
   jecLevels.append( 'L1FastJet' )
