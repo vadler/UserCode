@@ -26,14 +26,15 @@ jecSetBase = jetAlgo
 
 # HLT selection
 #           run < 147196 (Run2010A)
-triggerSelection_000000 = 'HLT_Mu9'
+triggerSelection_000000   = 'HLT_Mu9'
 # 147196 <= run < 149442 (Run2010B)
-triggerSelection_147196 = 'HLT_Mu15_v*'
+triggerSelection_147196   = 'HLT_Mu15_v*'
 # 160404 <= run < 163269 (Run2011A)
-triggerSelection_160404 = 'HLT_Mu15_v* OR HLT_IsoMu17_v* OR HLT_Mu17_CentralJet30_v* OR HLT_Mu17_DiCentralJet30_v* OR HLT_Mu17_TriCentralJet30_v* OR HLT_Mu17_CentralJet40_BTagIP OR HLT_Mu17_CentralJet40_BTagIP_v* OR HLT_IsoMu17_CentralJet40_BTagIP OR HLT_IsoMu17_CentralJet40_BTagIP'
+triggerSelection_160404   = 'HLT_Mu15_v* OR HLT_IsoMu17_v* OR HLT_Mu17_CentralJet30_v* OR HLT_Mu17_DiCentralJet30_v* OR HLT_Mu17_TriCentralJet30_v* OR HLT_Mu17_CentralJet30_BTagIP OR HLT_Mu17_CentralJet30_BTagIP_v* OR HLT_IsoMu17_CentralJet30_BTagIP OR HLT_IsoMu17_CentralJet30_BTagIP_v*'
 # 163270 <= run < ...    (Run2011A)
-triggerSelection_163270 = 'HLT_IsoMu17_v* OR HLT_Mu17_TriCentralJet30_v* OR HLT_Mu17_CentralJet40_BTagIP OR HLT_Mu17_CentralJet40_BTagIP_v* OR HLT_IsoMu17_CentralJet40_BTagIP OR HLT_IsoMu17_CentralJet40_BTagIP'
-triggerSelection        = triggerSelection_163270
+triggerSelection_163270   = 'HLT_IsoMu17_v* OR HLT_Mu17_TriCentralJet30_v* OR HLT_Mu17_CentralJet30_BTagIP OR HLT_Mu17_CentralJet30_BTagIP_v* OR HLT_IsoMu17_CentralJet30_BTagIP OR HLT_IsoMu17_CentralJet30_BTagIP_v*' # un-prescaled only
+triggerSelection_Spring11 = 'HLT_Mu21_v* OR HLT_Mu25_v* OR HLT_IsoMu17_v*'
+triggerSelection = triggerSelection_163270
 
 ### Muon selection
 
@@ -116,6 +117,13 @@ electronCutPF  = electronCut
 ### Trigger matching
 
 # Trigger object selection
-triggerObjectSelection_000000 = 'type("TriggerMuon") && ( path("HLT_Mu9") )'     #           run < 147196
-triggerObjectSelection_147196 = 'type("TriggerMuon") && ( path("HLT_Mu15_v*") )' # 147196 <= run < ...
-triggerObjectSelection        = triggerObjectSelection_147196
+#           run < 147196 (Run2010A)
+triggerObjectSelection_000000   = 'type("TriggerMuon") && ( path("HLT_Mu9") )'
+# 147196 <= run < 149442 (Run2010B)
+triggerObjectSelection_147196   = 'type("TriggerMuon") && ( path("HLT_Mu15_v*") )'
+# 160404 <= run < 163269 (Run2011A)
+triggerObjectSelection_160404   = 'type("TriggerMuon") && ( path("HLT_Mu15_v*") || path("HLT_IsoMu17_v*") || ( filter("hltL1Mu7CenJetL3MuFiltered17") && ( path("HLT_Mu17_CentralJet30_v*", 0) || path("HLT_Mu17_DiCentralJet30_v*", 0) || path("HLT_Mu17_TriCentralJet30_v*", 0) || path("HLT_Mu17_CentralJet30_BTagIP", 0) || path("HLT_Mu17_CentralJet30_BTagIP_v*", 0) ) ) || ( filter("hltIsoMu17CenJet30L3IsoFiltered17") && ( path("HLT_IsoMu17_CentralJet30_BTagIP", 0) || path("HLT_IsoMu17_CentralJet30_BTagIP_v*", 0) ) ) )'
+# 163270 <= run < ...    (Run2011A)
+triggerObjectSelection_163270   = 'type("TriggerMuon") && ( path("HLT_IsoMu17_v*") || ( filter("hltL1Mu7CenJetL3MuFiltered17") && ( path("HLT_Mu17_TriCentralJet30_v*", 0) || path("HLT_Mu17_CentralJet30_BTagIP", 0) || path("HLT_Mu17_CentralJet30_BTagIP_v*", 0) ) ) || ( filter("hltIsoMu17CenJet30L3IsoFiltered17") && ( path("HLT_IsoMu17_CentralJet30_BTagIP", 0) || path("HLT_IsoMu17_CentralJet30_BTagIP_v*", 0) ) ) )'
+triggerObjectSelection_Spring11 = 'type("TriggerMuon") && ( path("HLT_Mu21_v*") || path("HLT_Mu25_v*") || path("HLT_IsoMu17_v*") )'
+triggerObjectSelection = triggerObjectSelection_163270

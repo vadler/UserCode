@@ -6,6 +6,7 @@ FWCore/GuiBrowsers                               V00-00-53      V00-00-50
 FWCore/ParameterSet                              V12-13-06-01   V12-13-06-01
 FWCore/ParameterSet/python/SequenceTypes.py      -r 1.76
 PhysicsTools/PatAlgos                            V08-06-01-18   V08-06-01-18
+PhysicsTools/PatAlgos/python/tools/trigTools.py  -r 1.22.2.1
 RecoJets/Configuration                           V02-04-16      V02-04-10
 RecoJets/JetAlgorithms                           V04-01-00      V04-00-03
 RecoJets/JetProducers                            V05-05-03-00   V05-01-10
