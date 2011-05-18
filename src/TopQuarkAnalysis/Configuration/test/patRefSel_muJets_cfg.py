@@ -20,7 +20,7 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = False
+runOnMC = True
 
 ### Standard and PF reconstruction
 useStandardPAT = True
@@ -101,7 +101,7 @@ useL7Parton     = True
 ### Input
 
 # list of input files
-useRelVals = False # if 'False', "inputFiles" is used
+useRelVals = True # if 'False', "inputFiles" is used
 inputFiles = [ '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/FE6FA0FF-B676-E011-9456-001617E30D0A.root'
              , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/F609315B-9376-E011-A06F-003048F01E88.root'
              , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/F2A39943-B676-E011-B28A-000423D9A2AE.root'
@@ -147,7 +147,7 @@ inputFiles = [ '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/FE6FA0F
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
-maxInputEvents = 100
+maxInputEvents = 10000
 
 ### Conditions
 
@@ -161,7 +161,7 @@ globalTagMC   = 'START41_V0' # default for CMSSW_4_1_6 RelVals: 'START41_V0'
 outputFile = 'patRefSel_muJets.root'
 
 # event frequency of Fwk report
-fwkReportEvery = 10
+fwkReportEvery = 1000
 
 # switch for 'TrigReport'/'TimeReport' at job end
 wantSummary = True
