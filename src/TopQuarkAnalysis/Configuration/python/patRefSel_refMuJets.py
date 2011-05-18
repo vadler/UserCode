@@ -1,7 +1,7 @@
 #
-# This file contains the Top PAG reference selection for mu + jets analysis
-# the documentation can be found in
-# https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopLeptonPlusJetsRefSel_mu
+# This file contains the Top PAG reference selection for mu + jets analysis.
+# as defined in
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopLeptonPlusJetsRefSel_mu#Selection_Version_SelV4_valid_fr
 #
 
 ### Muon configuration
@@ -25,9 +25,15 @@ jecSetBase = jetAlgo
 ### Trigger selection
 
 # HLT selection
-triggerSelection_000000 = 'HLT_Mu9'     #           run < 147196
-triggerSelection_147196 = 'HLT_Mu15_v*' # 147196 <= run < ...
-triggerSelection        = triggerSelection_147196
+#           run < 147196 (Run2010A)
+triggerSelection_000000 = 'HLT_Mu9'
+# 147196 <= run < 149442 (Run2010B)
+triggerSelection_147196 = 'HLT_Mu15_v*'
+# 160404 <= run < 163269 (Run2011A)
+triggerSelection_160404 = 'HLT_Mu15_v* OR HLT_IsoMu17_v* OR HLT_Mu17_CentralJet30_v* OR HLT_Mu17_DiCentralJet30_v* OR HLT_Mu17_TriCentralJet30_v* OR HLT_Mu17_CentralJet40_BTagIP OR HLT_Mu17_CentralJet40_BTagIP_v* OR HLT_IsoMu17_CentralJet40_BTagIP OR HLT_IsoMu17_CentralJet40_BTagIP'
+# 163270 <= run < ...    (Run2011A)
+triggerSelection_163270 = 'HLT_IsoMu17_v* OR HLT_Mu17_TriCentralJet30_v* OR HLT_Mu17_CentralJet40_BTagIP OR HLT_Mu17_CentralJet40_BTagIP_v* OR HLT_IsoMu17_CentralJet40_BTagIP OR HLT_IsoMu17_CentralJet40_BTagIP'
+triggerSelection        = triggerSelection_163270
 
 ### Muon selection
 

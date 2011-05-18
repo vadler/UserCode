@@ -1,3 +1,9 @@
+#
+# This file contains the Top PAG reference selection work-flow for mu + jets analysis.
+# as defined in
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopLeptonPlusJetsRefSel_mu#Selection_Version_SelV4_valid_fr
+#
+
 import sys
 
 import FWCore.ParameterSet.Config as cms
@@ -14,7 +20,7 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = True
+runOnMC = False
 
 ### Standard and PF reconstruction
 useStandardPAT = True
@@ -43,7 +49,7 @@ use3Jets        = False
 # Step 7
 use4Jets        = False
 
-addTriggerMatching = True
+addTriggerMatching = False
 
 ### Reference selection
 
@@ -61,8 +67,8 @@ from TopQuarkAnalysis.Configuration.patRefSel_refMuJets import *
 # Trigger selection according to run range:
 # lower range limits available as suffix;
 # available are: 000000, 147196 (default)
-#triggerSelection       = triggerSelection_147196
-#triggerObjectSelection = triggerObjectSelection_147196
+#triggerSelection       = triggerSelection_163270
+#triggerObjectSelection = triggerObjectSelection_163270
 
 ### Particle flow
 ### takes effect only, if 'runPF2PAT' = True
@@ -95,23 +101,25 @@ useL7Parton     = True
 ### Input
 
 # list of input files
-useRelVals = True # if 'False', "inputFiles" is used
-inputFiles = [ '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/0635AA67-B37C-E011-B61F-002618943944.root'
-             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/0E153885-B17C-E011-8C7D-001A928116E0.root'
-             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/105E01FE-B57C-E011-9AB4-0018F3D09708.root'
-             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/120718C8-B67C-E011-A070-001A928116D2.root'
-             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/1232DFFA-AF7C-E011-983D-002618943831.root'
+useRelVals = False # if 'False', "inputFiles" is used
+inputFiles = [ '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/103/8AF0C4CD-EE80-E011-96B1-003048F1BF68.root'
+             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/102/1298E7B3-CF80-E011-86E9-001617E30F4C.root'
+             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/099/16D66DF0-D07F-E011-A922-003048F118C4.root'
+             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/098/66526A73-DA7F-E011-84B4-003048F1BF68.root'
+             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/093/2E545F72-C27F-E011-8CC1-003048D2C1C4.root'
+             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/088/DED0B748-E47F-E011-9C6E-0030487C6A66.root'
+             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/071/283C53A0-C37F-E011-A06F-0030487CD6D8.root'
              ]   # overwritten, if "useRelVals" is 'True'
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
-maxInputEvents = 10000
+maxInputEvents = 100
 
 ### Conditions
 
 # GlobalTags (w/o suffix '::All')
-globalTagData = 'GR_R_42_V12' # default for CMSSW_4_2_3 RelVals: 'GR_R_42_V12'
-globalTagMC   = 'START42_V12' # default for CMSSW_4_2_3 RelVals: 'START42_V12'
+globalTagData = 'GR_R_41_V0' # default for CMSSW_4_1_6 RelVals: 'GR_R_41_V0'
+globalTagMC   = 'START41_V0' # default for CMSSW_4_1_6 RelVals: 'START41_V0'
 
 ### Output
 
@@ -119,7 +127,7 @@ globalTagMC   = 'START42_V12' # default for CMSSW_4_2_3 RelVals: 'START42_V12'
 outputFile = 'patRefSel_muJets.root'
 
 # event frequency of Fwk report
-fwkReportEvery = 1000
+fwkReportEvery = 10
 
 # switch for 'TrigReport'/'TimeReport' at job end
 wantSummary = True
@@ -151,18 +159,17 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_1_6'
                                      , relVal        = 'RelValTTbar'
-                                     , globalTag     = globalTagMC
-                                     , numberOfFiles = -1 # "-1" means "all"
+                                     , globalTag     = 'START311_V2'
+                                     , numberOfFiles = 0 # "0" means "all"
                                      )
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_1_6'
                                      , relVal        = 'Mu'
                                      , dataTier      = 'RECO'
-                                     #, globalTag     = globalTagData + '_RelVal_mu2010B'
-                                     , globalTag     = globalTagData + '_mu2010B' # wrong naming scheme in CMSSW_4_2_3
-                                     , numberOfFiles = -1 # "-1" means "all"
+                                     , globalTag     = 'GR_R_311_V2_RelVal_mu2010B'
+                                     , numberOfFiles = 0 # "0" means "all"
                                      )
 process.source.fileNames = inputFiles
 process.maxEvents.input  = maxInputEvents
@@ -244,24 +251,22 @@ if useL7Parton:
 if runPF2PAT:
   from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
   usePF2PAT( process
-           , runPF2PAT      = runPF2PAT
-           , runOnMC        = runOnMC
-           , jetAlgo        = jetAlgo
-           , postfix        = postfix
-           , jetCorrections = ( jecSetPF
-                              , jecLevels
-                              )
+           , runPF2PAT = runPF2PAT
+           , runOnMC   = runOnMC
+           , jetAlgo   = jetAlgo
+           , postfix   = postfix
            )
   applyPostfix( process, 'pfNoPileUp'  , postfix ).enable = usePFnoPU
   applyPostfix( process, 'pfNoMuon'    , postfix ).enable = useNoMuon
   applyPostfix( process, 'pfNoElectron', postfix ).enable = useNoElectron
   applyPostfix( process, 'pfNoJet'     , postfix ).enable = useNoJet
   applyPostfix( process, 'pfNoTau'     , postfix ).enable = useNoTau
+  applyPostfix( process, 'patJetCorrFactors', postfix ).payload = jecSetPF
+  applyPostfix( process, 'patJetCorrFactors', postfix ).levels  = jecLevels
   if useL1FastJet:
     applyPostfix( process, 'pfJets', postfix ).Vertices      = cms.InputTag( 'goodOfflinePrimaryVertices' )
     applyPostfix( process, 'pfJets', postfix ).doAreaFastjet = True
     applyPostfix( process, 'pfJets', postfix ).doRhoFastjet  = False
-    applyPostfix( process, 'pfPileUp', postfix ).checkClosestZVertex = False
 
 # remove MC matching, object cleaning, photons and taus
 if useStandardPAT:
