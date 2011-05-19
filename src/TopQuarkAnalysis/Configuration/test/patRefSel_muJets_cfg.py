@@ -269,10 +269,10 @@ if runPF2PAT:
   applyPostfix( process, 'pfNoJet'     , postfix ).enable = useNoJet
   applyPostfix( process, 'pfNoTau'     , postfix ).enable = useNoTau
   if useL1FastJet:
-    applyPostfix( process, 'pfJets', postfix ).Vertices      = cms.InputTag( 'goodOfflinePrimaryVertices' )
+    applyPostfix( process, 'pfPileUp', postfix ).Vertices            = cms.InputTag( 'goodOfflinePrimaryVertices' )
+    applyPostfix( process, 'pfPileUp', postfix ).checkClosestZVertex = False
     applyPostfix( process, 'pfJets', postfix ).doAreaFastjet = True
     applyPostfix( process, 'pfJets', postfix ).doRhoFastjet  = False
-    applyPostfix( process, 'pfPileUp', postfix ).checkClosestZVertex = False
 
 # remove MC matching, object cleaning, photons and taus
 if useStandardPAT:
