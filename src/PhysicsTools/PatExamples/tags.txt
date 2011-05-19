@@ -5,7 +5,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_3
 DataFormats/PatCandidates                        V06-04-08      V06-04-08      
 DataFormats/TauReco                              V01-00-07-01   V01-00-06-01   
 PhysicsTools/PatAlgos                            V08-06-25      V08-06-21      
-PhysicsTools/PatExamples                         V00-05-16      V00-05-16      
+PhysicsTools/PatExamples                         V00-05-17      V00-05-16      
 RecoJets/Configuration                           V02-04-16      V02-04-13      
 RecoJets/JetAlgorithms                           V04-01-00      V04-00-03      
 RecoJets/JetProducers                            V05-05-03      V05-03-06      
