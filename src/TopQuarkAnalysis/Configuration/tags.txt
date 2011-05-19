@@ -10,6 +10,6 @@ PhysicsTools/PatAlgos/python/tools/trigTools.py  -r 1.22.2.1
 RecoJets/Configuration                           V02-04-16      V02-04-10
 RecoJets/JetAlgorithms                           V04-01-00      V04-00-03
 RecoJets/JetProducers                            V05-05-03-00   V05-01-10
-TopQuarkAnalysis/Configuration                   V06-00-09-01   V05-00-00
+TopQuarkAnalysis/Configuration                   V06-00-09-02   V05-00-00
 ---------------------------------------
 total packages: 7 (7 displayed)
