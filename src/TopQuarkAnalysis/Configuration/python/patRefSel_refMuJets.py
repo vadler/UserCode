@@ -34,7 +34,8 @@ triggerSelection_160404   = 'HLT_Mu15_v* OR HLT_IsoMu17_v* OR HLT_Mu17_CentralJe
 # 163270 <= run < ...    (Run2011A)
 triggerSelection_163270   = 'HLT_IsoMu17_v* OR HLT_Mu17_TriCentralJet30_v* OR HLT_Mu17_CentralJet30_BTagIP_v* OR HLT_IsoMu17_CentralJet30_BTagIP_v*' # un-prescaled only
 triggerSelection_Spring11 = 'HLT_Mu21_v* OR HLT_Mu25_v* OR HLT_IsoMu17_v*'
-triggerSelection = triggerSelection_163270
+triggerSelectionData = triggerSelection_163270
+triggerSelectionMC   = triggerSelection_Spring11
 
 ### Muon selection
 
@@ -126,4 +127,5 @@ triggerObjectSelection_160404   = 'type("TriggerMuon") && ( path("HLT_Mu15_v*") 
 # 163270 <= run < ...    (Run2011A)
 triggerObjectSelection_163270   = 'type("TriggerMuon") && ( path("HLT_IsoMu17_v*") || ( filter("hltL1Mu7CenJetL3MuFiltered17") && ( path("HLT_Mu17_TriCentralJet30_v*", 0) || path("HLT_Mu17_CentralJet30_BTagIP_v*", 0) ) ) || ( filter("hltIsoMu17CenJet30L3IsoFiltered17") && path("HLT_IsoMu17_CentralJet30_BTagIP_v*", 0) ) )'
 triggerObjectSelection_Spring11 = 'type("TriggerMuon") && ( path("HLT_Mu21_v*") || path("HLT_Mu25_v*") || path("HLT_IsoMu17_v*") )'
-triggerObjectSelection = triggerObjectSelection_163270
+triggerObjectSelectionData = triggerObjectSelection_163270
+triggerObjectSelectionMC   = triggerObjectSelection_Spring11

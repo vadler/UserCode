@@ -64,14 +64,15 @@ from TopQuarkAnalysis.Configuration.patRefSel_refMuJets import *
 #jetMuonsDRPF           = 0.1
 #electronCutPF            = ''
 
-# Trigger selection according to run range:
-# lower range limits available as suffix;
-# available are: 000000, 147196, 160404, 163270 (default), Spring11 (default, if 'runOnMC' = True)
-#triggerSelection       = triggerSelection_Spring11
-#triggerObjectSelection = triggerObjectSelection_Spring11
-
-### Particle flow
-### takes effect only, if 'runPF2PAT' = True
+# Trigger selection according to run range resp. MC sample:
+# lower range limits for data available as suffix;
+# available are: 000000, 147196, 160404, 163270 (default)
+# sample name for MC available as suffix;
+# available are: Spring11 (default)
+#triggerSelectionData       = triggerSelection_163270
+#triggerObjectSelectionData = triggerObjectSelection_163270
+#triggerSelectionMC       = triggerSelection_Spring11
+#triggerObjectSelectionMC = triggerObjectSelection_Spring11
 
 postfix = 'PF' # needs to be a non-empty string, if 'useStandardPAT' = True
 
@@ -232,7 +233,9 @@ process.load( 'TopQuarkAnalysis.Configuration.patRefSel_eventCleaning_cff' )
 
 ### Trigger selection
 if runOnMC:
-  triggerSelection = triggerSelection_Spring11
+  triggerSelection = triggerSelectionMC
+else:
+  triggerSelection = triggerSelectionData
 from TopQuarkAnalysis.Configuration.patRefSel_triggerSelection_cff import triggerResults
 process.step1 = triggerResults.clone(
   triggerConditions = [ triggerSelection ]
@@ -300,7 +303,7 @@ if runPF2PAT:
   applyPostfix( process, 'patJetCorrFactors', postfix ).payload = jecSetPF
   applyPostfix( process, 'patJetCorrFactors', postfix ).levels  = jecLevels
   if useL1FastJet:
-    applyPostfix( process, 'pfJets', postfix ).Vertices      = cms.InputTag( 'goodOfflinePrimaryVertices' )
+    applyPostfix( process, 'pfPileUp', postfix ).Vertices = cms.InputTag( 'goodOfflinePrimaryVertices' )
     applyPostfix( process, 'pfJets', postfix ).doAreaFastjet = True
     applyPostfix( process, 'pfJets', postfix ).doRhoFastjet  = False
 
@@ -576,9 +579,10 @@ if runPF2PAT:
 ###
 
 if addTriggerMatching:
-
   if runOnMC:
-    triggerObjectSelection = triggerObjectSelection_Spring11
+    triggerObjectSelection = triggerObjectSelectionMC
+  else:
+    triggerObjectSelection = triggerObjectSelectionData
   ### Trigger matching configuration
   from PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi import patTrigger
   from TopQuarkAnalysis.Configuration.patRefSel_triggerMatching_cfi import patMuonTriggerMatch
