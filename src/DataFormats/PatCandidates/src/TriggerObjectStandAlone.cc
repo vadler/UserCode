@@ -150,7 +150,7 @@ void TriggerObjectStandAlone::addPathOrAlgorithm( const std::string & name, bool
       ++index;
     }
     if ( index < pathNames_.size() ) {
-      pathL3FilterAccepted_[ index ] = pathL3FilterAccepted;
+      pathL3FilterAccepted_.at( index ) = pathL3FilterAccepted;
     }
   }
 }
