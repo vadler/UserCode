@@ -13,15 +13,13 @@ process.options = cms.untracked.PSet(
 ## Source
 process.source = cms.Source( "PoolSource"
 , fileNames = cms.untracked.vstring(
-    '/store/data/Run2011A/SingleMu/RAW/v1/000/161/016/007F6B4D-FB53-E011-90E7-00304879BAB2.root'
-  , '/store/data/Run2011A/SingleMu/RAW/v1/000/161/016/0407FF39-FE53-E011-97DD-0030487C90EE.root'
-  , '/store/data/Run2011A/SingleMu/RAW/v1/000/161/016/1ADCFE2E-0054-E011-895C-001617E30CC8.root'
-  , '/store/data/Run2011A/SingleMu/RAW/v1/000/161/016/20AAEB44-F753-E011-957D-001D09F251D1.root'
-  , '/store/data/Run2011A/SingleMu/RAW/v1/000/161/016/62BD8FE9-F453-E011-92D2-001D09F24498.root'
-  , '/store/data/Run2011A/SingleMu/RAW/v1/000/161/016/9E91218A-F853-E011-AA94-001D09F29114.root'
-  , '/store/data/Run2011A/SingleMu/RAW/v1/000/161/016/AA5CE18E-F353-E011-BC2D-0016177CA778.root'
-  , '/store/data/Run2011A/SingleMu/RAW/v1/000/161/016/C6C1C9F8-F253-E011-950F-0030487CD7E0.root'
-  , '/store/data/Run2011A/SingleMu/RAW/v1/000/161/016/FE09BCDE-F953-E011-B059-001617DBD472.root'
+    '/store/data/Run2011A/MuHad/RAW/v1/000/165/121/30B69E98-C67F-E011-8697-003048D37560.root'
+  , '/store/data/Run2011A/MuHad/RAW/v1/000/165/121/80E66677-C27F-E011-8A15-001D09F29321.root'
+  , '/store/data/Run2011A/MuHad/RAW/v1/000/165/121/8E69B419-B57F-E011-821E-001617C3B65A.root'
+  , '/store/data/Run2011A/MuHad/RAW/v1/000/165/121/A219173E-B07F-E011-ACC8-0030487CD6DA.root'
+  , '/store/data/Run2011A/MuHad/RAW/v1/000/165/121/B028587F-D47F-E011-94FD-0030487CD906.root'
+  , '/store/data/Run2011A/MuHad/RAW/v1/000/165/121/CCCA933C-BE7F-E011-A992-0030486730C6.root'
+  , '/store/data/Run2011A/MuHad/RAW/v1/000/165/121/DCC9E8A9-BA7F-E011-A73A-003048D37580.root'
   )
 )
 process.maxEvents = cms.untracked.PSet(
