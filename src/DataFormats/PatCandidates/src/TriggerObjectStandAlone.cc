@@ -1,5 +1,5 @@
 //
-// $Id: TriggerObjectStandAlone.cc,v 1.10 2011/02/22 18:29:50 vadler Exp $
+// $Id: TriggerObjectStandAlone.cc,v 1.11 2011/05/24 15:56:25 vadler Exp $
 //
 
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
@@ -189,7 +189,7 @@ bool TriggerObjectStandAlone::hasFilterOrCondition( const std::string & name ) c
 bool TriggerObjectStandAlone::hasPathOrAlgorithm( const std::string & name, bool pathLastFilterAccepted, bool pathL3FilterAccepted ) const
 {
   // Move to wild-card parser, if needed
-  if ( name.find( wildcard_ ) != std::string::npos ) return hasAnyName( name, pathsOrAlgorithms( pathLastFilterAccepted ) );
+  if ( name.find( wildcard_ ) != std::string::npos ) return hasAnyName( name, pathsOrAlgorithms( pathLastFilterAccepted, pathL3FilterAccepted ) );
   // Deal with older PAT-tuples, where trigger object usage is not available
   if ( ! hasLastFilter() ) pathLastFilterAccepted = false;
   if ( ! hasL3Filter() ) pathL3FilterAccepted = false;
