@@ -61,15 +61,15 @@ namespace pat {
       /// Adds a new HLT filter label or L1 condition name
       void addFilterOrCondition( const std::string & name ) { if ( ! hasFilterOrCondition( name ) ) filterLabels_.push_back( name ); };
       /// Adds a new HLT path or L1 algorithm name
-      void addPathOrAlgorithm( const std::string & name, bool pathLastFilterAccepted = true, bool pathL3FilterAccepted = false );
+      void addPathOrAlgorithm( const std::string & name, bool pathLastFilterAccepted, bool pathL3FilterAccepted );
       /// Gets all HLT filter labels or L1 condition names
       std::vector< std::string > filtersOrConditions() const { return filterLabels_; };
       /// Gets all HLT path or L1 algorithm names
-      std::vector< std::string > pathsOrAlgorithms( bool pathLastFilterAccepted = false, bool pathL3FilterAccepted = true ) const;
+      std::vector< std::string > pathsOrAlgorithms( bool pathLastFilterAccepted, bool pathL3FilterAccepted ) const;
       /// Checks, if a certain HLT filter label or L1 condition name is assigned
       bool hasFilterOrCondition( const std::string & name ) const;
       /// Checks, if a certain HLT path or L1 algorithm name is assigned
-      bool hasPathOrAlgorithm( const std::string & name, bool pathLastFilterAccepted = false, bool pathL3FilterAccepted = true ) const;
+      bool hasPathOrAlgorithm( const std::string & name, bool pathLastFilterAccepted, bool pathL3FilterAccepted ) const;
       /// Check, if the usage indicator vectors have been filled
       bool hasLastFilter() const { return ( pathLastFilterAccepted_.size() > 0 && pathLastFilterAccepted_.size() == pathNames_.size() ); };
       bool hasL3Filter() const { return ( pathL3FilterAccepted_.size() > 0 && pathL3FilterAccepted_.size() == pathNames_.size() ); };
@@ -100,9 +100,9 @@ namespace pat {
       /// Adds a new L1 condition name
       void addConditionName( const std::string & conditionName ) { addFilterOrCondition( conditionName ); };
       /// Adds a new HLT path name
-      void addPathName( const std::string & pathName, bool pathLastFilterAccepted = true, bool pathL3FilterAccepted = true ) { addPathOrAlgorithm( pathName, pathLastFilterAccepted, pathL3FilterAccepted ); };
+      void addPathName( const std::string & pathName, bool pathLastFilterAccepted, bool pathL3FilterAccepted ) { addPathOrAlgorithm( pathName, pathLastFilterAccepted, pathL3FilterAccepted ); };
       /// Adds a new L1 algorithm name
-      void addAlgorithmName( const std::string & algorithmName, bool algoCondAccepted = true ) { addPathOrAlgorithm( algorithmName, algoCondAccepted ); };
+      void addAlgorithmName( const std::string & algorithmName, bool algoCondAccepted ) { addPathOrAlgorithm( algorithmName, algoCondAccepted, false ); };
       /// Gets all HLT filter labels
       std::vector< std::string > filterLabels() const { return filtersOrConditions(); };
       /// Gets all L1 condition names
