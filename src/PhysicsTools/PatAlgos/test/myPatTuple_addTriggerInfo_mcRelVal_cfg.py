@@ -10,6 +10,7 @@ process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelVal.root
 # , ignoreTotal      = cms.untracked.int32( 0 )
 # )
 
+process.patJetCorrFactors.useRho = False
 process.p = cms.Path(
   process.patDefaultSequence
 )
@@ -51,11 +52,11 @@ switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'moin', 'tach' ], tr
 # print 'Path p'
 # print '--> %s'%( process.p )
 print
-print 'Sequence patTriggerSequence'
-print '--> %s'%( process.patTriggerSequence )
+print 'Sequence patDefaultSequenceTrigger'
+print '--> %s'%( process.patDefaultSequenceTrigger )
 print
-print 'Sequence patTriggerEventSequence'
-print '--> %s'%( process.patTriggerEventSequence )
+print 'Sequence patDefaultSequenceTriggerEvent'
+print '--> %s'%( process.patDefaultSequenceTriggerEvent )
 print
 print 'PoolOutputModule out.outputCommands'
 print '--> %s'%( process.out.outputCommands )
