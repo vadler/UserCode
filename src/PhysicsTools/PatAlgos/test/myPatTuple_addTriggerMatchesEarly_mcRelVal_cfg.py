@@ -7,6 +7,7 @@ process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRel
 process.options.wantSummary = False
 
 ## let it run
+process.patJetCorrFactors.useRho = False
 process.p = cms.Path(
   process.patCandidates
 )
@@ -28,6 +29,8 @@ switchOnTriggerMatchEmbedding( process
                                , 'tauTriggerMatchHLTDoubleIsoPFTau20Trk5'
                                , 'jetTriggerMatchHLTJet240'
                                , 'metTriggerMatchHLTMET100'
+                               , 'cleanMuonTriggerMatchHLTMu17CentralJet30'
+                               , 'cleanJetTriggerMatchHLTMu17CentralJet30'
                                ]
                              , sequence = 'patCandidates'
                              , outputModule = ''
@@ -46,7 +49,7 @@ process.p *= process.selectedPatCandidates
 process.p *= process.cleanPatCandidates
 process.p *= process.countPatCandidates
 print
-print process.patTriggerSequence
+print process.patCandidatesTrigger
 print
 print process.patCandidates
 print
