@@ -32,6 +32,8 @@ switchOnTriggerMatchEmbedding( process
                                , 'tauTriggerMatchHLTDoubleIsoPFTau20Trk5'
                                , 'jetTriggerMatchHLTJet240'
                                , 'metTriggerMatchHLTMET100'
+                               , 'cleanMuonTriggerMatchHLTMu17CentralJet30'
+                               , 'cleanJetTriggerMatchHLTMu17CentralJet30'
                                ]
                              , sequence = 'patCandidates'
                              , outputModule = ''
