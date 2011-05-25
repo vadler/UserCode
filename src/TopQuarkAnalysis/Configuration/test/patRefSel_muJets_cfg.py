@@ -20,7 +20,8 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = True
+runOnMC       = True
+runOnSpring11 = False # takes effect only on MC, overwritten, if "useRelVals" is 'True'
 
 ### Standard and PF reconstruction
 useStandardPAT = True
@@ -102,53 +103,54 @@ useL7Parton     = True
 ### Input
 
 # list of input files
-useRelVals = True # if 'False', "inputFiles" is used
-inputFiles = [ '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/FE6FA0FF-B676-E011-9456-001617E30D0A.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/F609315B-9376-E011-A06F-003048F01E88.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/F2A39943-B676-E011-B28A-000423D9A2AE.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/F03CB9FD-BD76-E011-9078-001617E30D00.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/EC843243-B676-E011-89FF-000423D98950.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/EA829D30-A876-E011-A47D-000423D9997E.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/E86A9D42-C976-E011-909B-0030487CD840.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/DE8B3E69-8676-E011-826B-003048F024DC.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/DA272D6F-8676-E011-A525-003048F1110E.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/D8937201-9076-E011-A6B9-001D09F24498.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/D461BE46-D076-E011-AF9C-0030487CD704.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/C0F87B60-CB76-E011-AE2E-0030487CD840.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/BE0175F3-C976-E011-AE92-003048F1110E.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/BA9FE134-8276-E011-80FE-001D09F241B9.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/B63D9E75-B376-E011-B6C3-000423D9A212.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/ACBCC6DB-B476-E011-97CA-003048F1C836.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/AA1D0A95-7C76-E011-A9D8-003048F024DE.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/A89B4AAE-7E76-E011-B4A1-003048F11C28.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/A08EDA34-8276-E011-8F43-001D09F291D2.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/9E28883B-C276-E011-BDA3-003048F024C2.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/987F96DB-C776-E011-95B8-003048F117EA.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/924A094B-9976-E011-AF39-003048D37560.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/907A87CB-8576-E011-BB72-0030487CD704.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/88C68ACD-4077-E011-B206-0030487CD14E.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/887DE118-C076-E011-A099-001617C3B5F4.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/7EE5B273-E076-E011-9249-0030487C2B86.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/7A6856A0-C376-E011-B99C-003048CFB40C.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/5E734B5A-8F76-E011-A9AF-003048F117B4.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/5032D5B2-9276-E011-92E6-001D09F295FB.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/3AC49569-8676-E011-8A6D-003048F1C424.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/3A50C497-9D76-E011-B64F-000423D996C8.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/36E69F60-9976-E011-8171-003048D2BC42.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/34AA8C4E-BB76-E011-A3BF-001D09F2AF96.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/2EF394CD-8C76-E011-AE4B-003048D2BB90.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/2EC4A6A3-B076-E011-8B6F-000423D9A212.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/2E571281-8E76-E011-89EE-001D09F241B9.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/2C259724-C776-E011-8329-003048F1110E.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/2C012DD4-8776-E011-949C-003048F118AC.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/1E24DE82-AE76-E011-AAA4-003048F11CF0.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/148E2B4A-9976-E011-A201-001D09F24E39.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/0278B64E-AA76-E011-8F0E-003048F024FA.root'
+useRelVals = True # if 'False', "inputFiles" is used; if 'True' "runOnSpring11" is set to 'False'
+#inputFiles = [ '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/FE6FA0FF-B676-E011-9456-001617E30D0A.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/F609315B-9376-E011-A06F-003048F01E88.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/F2A39943-B676-E011-B28A-000423D9A2AE.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/F03CB9FD-BD76-E011-9078-001617E30D00.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/EC843243-B676-E011-89FF-000423D98950.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/EA829D30-A876-E011-A47D-000423D9997E.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/E86A9D42-C976-E011-909B-0030487CD840.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/DE8B3E69-8676-E011-826B-003048F024DC.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/DA272D6F-8676-E011-A525-003048F1110E.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/D8937201-9076-E011-A6B9-001D09F24498.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/D461BE46-D076-E011-AF9C-0030487CD704.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/C0F87B60-CB76-E011-AE2E-0030487CD840.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/BE0175F3-C976-E011-AE92-003048F1110E.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/BA9FE134-8276-E011-80FE-001D09F241B9.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/B63D9E75-B376-E011-B6C3-000423D9A212.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/ACBCC6DB-B476-E011-97CA-003048F1C836.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/AA1D0A95-7C76-E011-A9D8-003048F024DE.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/A89B4AAE-7E76-E011-B4A1-003048F11C28.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/A08EDA34-8276-E011-8F43-001D09F291D2.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/9E28883B-C276-E011-BDA3-003048F024C2.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/987F96DB-C776-E011-95B8-003048F117EA.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/924A094B-9976-E011-AF39-003048D37560.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/907A87CB-8576-E011-BB72-0030487CD704.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/88C68ACD-4077-E011-B206-0030487CD14E.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/887DE118-C076-E011-A099-001617C3B5F4.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/7EE5B273-E076-E011-9249-0030487C2B86.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/7A6856A0-C376-E011-B99C-003048CFB40C.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/5E734B5A-8F76-E011-A9AF-003048F117B4.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/5032D5B2-9276-E011-92E6-001D09F295FB.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/3AC49569-8676-E011-8A6D-003048F1C424.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/3A50C497-9D76-E011-B64F-000423D996C8.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/36E69F60-9976-E011-8171-003048D2BC42.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/34AA8C4E-BB76-E011-A3BF-001D09F2AF96.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/2EF394CD-8C76-E011-AE4B-003048D2BB90.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/2EC4A6A3-B076-E011-8B6F-000423D9A212.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/2E571281-8E76-E011-89EE-001D09F241B9.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/2C259724-C776-E011-8329-003048F1110E.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/2C012DD4-8776-E011-949C-003048F118AC.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/1E24DE82-AE76-E011-AAA4-003048F11CF0.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/148E2B4A-9976-E011-A201-001D09F24E39.root'
+             #, '/store/data/Run2011A/MuHad/AOD/PromptReco-v2/000/163/817/0278B64E-AA76-E011-8F0E-003048F024FA.root'
+inputFiles = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/PAT/data/TTJets_TuneD6T_7TeV-madgraph-tauola__Spring11-PU_S1_START311_V1G1-v1__AODSIM/D42E9BB3-C759-E011-B8DC-00A0D1EE8E74.root'
              ]   # overwritten, if "useRelVals" is 'True'
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
-maxInputEvents = 10000
+maxInputEvents = 1000
 
 ### Conditions
 
@@ -194,11 +196,12 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_1_6'
-                                     , relVal        = 'RelValTTbar'
-                                     , globalTag     = 'START311_V2'
-                                     , numberOfFiles = 0 # "0" means "all"
-                                     )
+    runOnSpring11 = False
+    inputFiles    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_1_6'
+                                        , relVal        = 'RelValTTbar'
+                                        , globalTag     = 'START311_V2'
+                                        , numberOfFiles = 0 # "0" means "all"
+                                        )
   else:
     inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_1_6'
                                      , relVal        = 'Mu'
@@ -232,13 +235,16 @@ process.out.SelectEvents.SelectEvents = []
 process.load( 'TopQuarkAnalysis.Configuration.patRefSel_eventCleaning_cff' )
 
 ### Trigger selection
+from TopQuarkAnalysis.Configuration.patRefSel_triggerSelection_cff import triggerResults, hltTag, hltTagSpring11
 if runOnMC:
   triggerSelection = triggerSelectionMC
+  if runOnSpring11:
+    hltTag = hltTagSpring11
 else:
   triggerSelection = triggerSelectionData
-from TopQuarkAnalysis.Configuration.patRefSel_triggerSelection_cff import triggerResults
 process.step1 = triggerResults.clone(
-  triggerConditions = [ triggerSelection ]
+  hltResults        = hltTag
+, triggerConditions = [ triggerSelection ]
 )
 
 ### Good vertex selection
@@ -593,6 +599,7 @@ if addTriggerMatching:
     process.triggerMatch = patMuonTriggerMatch.clone( matchedCuts = triggerObjectSelection )
     switchOnTriggerMatchEmbedding( process
                                  , triggerMatchers = [ 'triggerMatch' ]
+                                 , hltProcess      = '*'
                                  )
     removeCleaningFromTriggerMatching( process )
     process.intermediatePatMuons.src = cms.InputTag( 'selectedPatMuonsTriggerMatch' )
@@ -606,6 +613,7 @@ if addTriggerMatching:
                                  , triggerMatchers = [ 'triggerMatch' + postfix ]
                                  , sequence        = 'patPF2PATSequence' + postfix
                                  , postfix         = postfix
+                                 , hltProcess      = '*'
                                  )
     removeCleaningFromTriggerMatching( process
                                      , sequence = 'patPF2PATSequence' + postfix
