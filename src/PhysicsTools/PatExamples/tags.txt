@@ -1,11 +1,14 @@
-Test Release based on: CMSSW_4_1_4
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_1_4
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_1_4
+Test Release based on: CMSSW_4_2_3
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_3
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_2_3
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/PatCandidates                        V06-04-01-03   V06-04-01-01   
-FWCore/GuiBrowsers                               V00-00-50      V00-00-46      
-PhysicsTools/PatAlgos                            V08-06-01-17   V08-06-01-14   
-PhysicsTools/PatExamples                         V00-05-16      V00-05-11      
-PhysicsTools/PatUtils                            V03-09-18      V03-09-16      
+DataFormats/PatCandidates                        V06-04-13      V06-04-08      
+ElectroWeakAnalysis/Skimming                     V01-01-10      V01-01-10      
+PhysicsTools/PatAlgos                            V08-06-28      V08-06-21      
+PhysicsTools/PatExamples                         V00-05-17      V00-05-16      
+RecoJets/Configuration                           V02-04-16      V02-04-13      
+RecoJets/JetAlgorithms                           V04-01-00      V04-00-03      
+RecoJets/JetProducers                            V05-05-03      V05-03-06      
+RecoTauTag/TauTagTools                           V01-00-12      V01-00-11      
 ---------------------------------------
-total packages: 5 (5 displayed)
+total packages: 8 (8 displayed)
