@@ -986,10 +986,10 @@ class PickRelValInputFiles( ConfigToolBase ):
                 if numberOfFiles >= 0 and len( filePaths ) >= numberOfFiles:
                     break
             if numberOfFiles > 0:
-              if len( filePaths ) >= numberOfFiles:
+                if len( filePaths ) >= numberOfFiles:
+                  break
+            if validVersion > 0:
                 break
-            elif validVersion > 0:
-              break
 
         if validVersion == 0:
             print '%s INFO : No RelVal file(s) found at all in \'%s*\''%( self._label, argument )
