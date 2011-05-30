@@ -4,7 +4,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_3_0_pre6
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        V06-04-13      V06-04-10      
 ElectroWeakAnalysis/Skimming                     V01-01-10      V01-01-10      
-PhysicsTools/PatAlgos                            V08-07-07      V08-07-06      
+PhysicsTools/PatAlgos                            V08-07-08      V08-07-06      
 PhysicsTools/PatExamples                         V00-05-17      V00-05-16      
 PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
 RecoTauTag/TauTagTools                           V01-00-13      V01-00-11-01   
