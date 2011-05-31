@@ -89,6 +89,21 @@ useNoElectron = True # before jet top projection
 useNoJet      = True # before tau top projection
 useNoTau      = True # before MET top projection
 
+# cuts used in top projections
+from TopQuarkAnalysis.Configuration.patRefSel_PF2PAT import *
+# vertices
+#pfD0Cut   = 0.2
+#pfDzCut   = 0.5
+#pfVertices = 'offlinePrimaryVertices'
+# muons
+#pfMuonSelectionCut = ''
+#pfMuonIsoConeR   = 0.4
+#pfMuonCombIsoCut = 0.15
+# electrons
+#pfElectronSelectionCut  = ''
+#pfElectronIsoConeR   = 0.4
+#pfElectronCombIsoCut = 0.2
+
 ### JEC levels
 
 # levels to be accessible from the jets
@@ -118,7 +133,7 @@ inputFiles = [ '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/129/42DDEE9
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
-maxInputEvents = 10000
+maxInputEvents = 1000
 
 ### Conditions
 
@@ -275,10 +290,26 @@ if runPF2PAT:
   applyPostfix( process, 'pfNoJet'     , postfix ).enable = useNoJet
   applyPostfix( process, 'pfNoTau'     , postfix ).enable = useNoTau
   if useL1FastJet:
-    applyPostfix( process, 'pfPileUp', postfix ).Vertices            = cms.InputTag( 'goodOfflinePrimaryVertices' )
+    applyPostfix( process, 'pfPileUp', postfix ).Vertices            = cms.InputTag( pfVertices )
     applyPostfix( process, 'pfPileUp', postfix ).checkClosestZVertex = False
     applyPostfix( process, 'pfJets', postfix ).doAreaFastjet = True
     applyPostfix( process, 'pfJets', postfix ).doRhoFastjet  = False
+  applyPostfix( process, 'pfMuonsFromVertex'    , postfix ).vertices = cms.InputTag( pfVertices )
+  applyPostfix( process, 'pfMuonsFromVertex'    , postfix ).d0Cut    = pfD0Cut
+  applyPostfix( process, 'pfMuonsFromVertex'    , postfix ).dzCut    = pfDzCut
+  applyPostfix( process, 'pfSelectedMuons'      , postfix ).cut = pfMuonSelectionCut
+  applyPostfix( process, 'isoValMuonWithCharged', postfix ).deposits.deltaR = pfMuonIsoConeR
+  applyPostfix( process, 'isoValMuonWithNeutral', postfix ).deposits.deltaR = pfMuonIsoConeR
+  applyPostfix( process, 'isoValMuonWithPhotons', postfix ).deposits.deltaR = pfMuonIsoConeR
+  applyPostfix( process, 'pfIsolatedMuons'      , postfix ).combinedIsolationCut = pfMuonCombIsoCut
+  applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).vertices = cms.InputTag( pfVertices )
+  applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).d0Cut    = pfD0Cut
+  applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).dzCut    = pfDzCut
+  applyPostfix( process, 'pfSelectedElectronsPF'    , postfix ).cut = pfElectronSelectionCut
+  applyPostfix( process, 'isoValElectronWithCharged', postfix ).deposits.deltaR = pfElectronIsoConeR
+  applyPostfix( process, 'isoValElectronWithNeutral', postfix ).deposits.deltaR = pfElectronIsoConeR
+  applyPostfix( process, 'isoValElectronWithPhotons', postfix ).deposits.deltaR = pfElectronIsoConeR
+  applyPostfix( process, 'pfIsolatedElectronsPF'    , postfix ).combinedIsolationCut = pfElectronCombIsoCut
 
 # remove MC matching, object cleaning, photons and taus
 if useStandardPAT:
