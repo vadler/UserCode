@@ -5,8 +5,9 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/TQAF/CMSSW_4_2_4
 AnalysisDataFormats/TopObjects                   V06-07-07      V06-07-05      
 DataFormats/PatCandidates                        V06-04-14      V06-04-13      
 PhysicsTools/PatAlgos                            V08-06-31      V08-06-29      
+RecoEgamma/ElectronIdentification                V00-03-31      V00-03-26      
 RecoJets/Configuration                           V02-04-16      V02-04-13      
-TopQuarkAnalysis/Configuration                   V06-01-00      V05-00-01      
+TopQuarkAnalysis/Configuration                   V06-01-01      V05-00-01      
 TopQuarkAnalysis/Examples                        V06-07-09      V06-07-09      
 TopQuarkAnalysis/TopEventProducers               V06-07-12      V06-07-12      
 TopQuarkAnalysis/TopEventSelection               V06-07-10      V06-07-10      
@@ -16,4 +17,4 @@ TopQuarkAnalysis/TopObjectResolutions            V06-07-05      V06-07-05
 TopQuarkAnalysis/TopSkimming                     V06-07-05      V06-07-05      
 TopQuarkAnalysis/TopTools                        V06-07-09      V06-07-09      
 ---------------------------------------
-total packages: 13 (13 displayed)
+total packages: 14 (14 displayed)
