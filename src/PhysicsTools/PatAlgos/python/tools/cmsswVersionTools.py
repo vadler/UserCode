@@ -990,7 +990,7 @@ class PickRelValInputFiles( ConfigToolBase ):
                     break
             if numberOfFiles > 0:
                 if len( filePaths ) >= numberOfFiles:
-                  break
+                    break
             if validVersion > 0:
                 break
 
