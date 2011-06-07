@@ -2,7 +2,7 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 process.GlobalTag.globaltag = 'START42_V12::All'
-process.source.fileNames    = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_2_3' # "formerVersion = True" spoiled by SLHC releases
+process.source.fileNames    = pickRelValInputFiles( formerVersion = True
                                                   , globalTag    = 'START42_V12'
                                                   )
 process.options.wantSummary = False

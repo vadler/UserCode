@@ -13,8 +13,7 @@ process.GlobalTag.globaltag = cms.string( 'START42_V12::All' )
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3' # "formerVersion = True" spoiled by SLHC releases
-                          #formerVersion = True
+    pickRelValInputFiles( formerVersion = True
                         , relVal        = None
                         , dataTier      = None
                         , condition     = condition

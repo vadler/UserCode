@@ -877,9 +877,12 @@ class PickRelValInputFiles( ConfigToolBase ):
         filePaths = []
 
         patchId = '_patch'
+        slhcId  = '_SLHC'
         ibId    = '_X_'
         if patchId in cmsswVersion:
             cmsswVersion = cmsswVersion.split( patchId )[ 0 ]
+        elif slhcId in cmsswVersion:
+            cmsswVersion = cmsswVersion.split( slhcId )[ 0 ]
         elif ibId in cmsswVersion or formerVersion:
             outputTuple = Popen( [ 'scram', 'l -c CMSSW' ], stdout = PIPE, stderr = PIPE ).communicate()
             if len( outputTuple[ 1 ] ) != 0:
@@ -897,7 +900,7 @@ class PickRelValInputFiles( ConfigToolBase ):
             for line in outputTuple[ 0 ].splitlines():
                 version = line.split()[ 1 ]
                 if cmsswVersion.split( ibId )[ 0 ] in version or cmsswVersion.rpartition( '_' )[ 0 ] in version:
-                    if not ( patchId in version or ibId in version ):
+                    if not ( patchId in version or slhcId in version or ibId in version ):
                         versions[ 'lastToLast' ] = versions[ 'last' ]
                         versions[ 'last' ]       = version
                         if version == cmsswVersion:
