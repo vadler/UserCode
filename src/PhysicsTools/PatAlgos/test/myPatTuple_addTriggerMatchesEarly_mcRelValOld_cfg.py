@@ -1,9 +1,9 @@
 ## import skeleton process
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-process.GlobalTag.globaltag = 'START42_V11::All'
-process.source.fileNames    = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_2_2'
-                                                  , globalTag    = 'START42_V11'
+process.GlobalTag.globaltag = 'START42_V12::All'
+process.source.fileNames    = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_2_3' # "formerVersion = True" spoiled by SLHC releases
+                                                  , globalTag    = 'START42_V12'
                                                   )
 process.maxEvents.input     = 10
 process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )

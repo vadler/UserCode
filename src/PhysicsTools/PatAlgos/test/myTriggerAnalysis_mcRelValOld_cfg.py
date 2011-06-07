@@ -7,18 +7,18 @@ condition = 'startup'
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.PyReleaseValidation.autoCond import autoCond
 #process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
-process.GlobalTag.globaltag = cms.string( 'START42_V11::All' )
+process.GlobalTag.globaltag = cms.string( 'START42_V12::All' )
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_2'
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3' # "formerVersion = True" spoiled by SLHC releases
                           #formerVersion = True
                         , relVal        = None
                         , dataTier      = None
                         , condition     = condition
-                        , globalTag     = 'START42_V11'
+                        , globalTag     = 'START42_V12'
                         , maxVersions   = None
                         , skipFiles     = None
                         , numberOfFiles = None
