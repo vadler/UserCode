@@ -6,7 +6,7 @@ AnalysisDataFormats/TopObjects                   V06-07-07      V06-07-05
 DataFormats/PatCandidates                        V06-04-14      V06-04-13      
 PhysicsTools/PatAlgos                            V08-06-31      V08-06-29      
 RecoJets/Configuration                           V02-04-16      V02-04-13      
-TopQuarkAnalysis/Configuration                   V06-00-16      V05-00-01      
+TopQuarkAnalysis/Configuration                   V06-01-00      V05-00-01      
 TopQuarkAnalysis/Examples                        V06-07-09      V06-07-09      
 TopQuarkAnalysis/TopEventProducers               V06-07-12      V06-07-12      
 TopQuarkAnalysis/TopEventSelection               V06-07-10      V06-07-10      
