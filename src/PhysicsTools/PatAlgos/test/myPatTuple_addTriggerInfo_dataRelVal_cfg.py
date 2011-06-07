@@ -5,8 +5,7 @@ process.GlobalTag.globaltag = autoCond[ condition ]
 process.source.fileNames    = pickRelValInputFiles( relVal        = 'Mu'
                                                   , dataTier      = 'RECO'
                                                   , condition     = condition # not needed, if GT explicitely given
-                                                  #, globalTag     = 'GR_R_43_V1_RelVal_mu2010B'
-                                                  , globalTag     = 'GR_R_43_V1_RelVal_wzMu2010B'
+                                                  , globalTag     = 'GR_R_43_V3_RelVal_wzMu2010B'
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
