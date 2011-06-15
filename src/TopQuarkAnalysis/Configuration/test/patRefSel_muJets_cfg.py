@@ -327,6 +327,8 @@ if runPF2PAT:
 
 # remove MC matching, object cleaning, objects etc.
 if runStandardPAT:
+  if not runOnMC:
+    runOnData( process )
   if usePFJets:
     from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
     from PhysicsTools.PatAlgos.tools.metTools import addPfMET
@@ -348,8 +350,6 @@ if runStandardPAT:
     addPfMET( process
             , jetAlgo + pfSuffix
             )
-  if not runOnMC:
-    runOnData( process )
   removeSpecificPATObjects( process
                           , names = [ 'Photons', 'Taus' ]
                           ) # includes 'removeCleaning'
@@ -379,6 +379,7 @@ process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
 if runOnMC:
   process.out.outputCommands += [ 'keep GenEventInfoProduct_*_*_*'
                                 , 'keep recoGenParticles_*_*_*'
+                                , 'keep *_addPileupInfo_*_*'
                                 ]
 
 
