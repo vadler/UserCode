@@ -6,8 +6,8 @@ DataFormats/PatCandidates                        V06-04-16      V06-04-13
 PhysicsTools/PatAlgos                            V08-06-33      V08-06-29      
 PhysicsTools/PatExamples                         V00-05-18      V00-05-17      
 RecoJets/Configuration                           V02-04-16      V02-04-13      
-RecoTauTag/Configuration                         RecoTauDAVerticesPatch_V5 V01-00-27      
-RecoTauTag/RecoTau                               RecoTauDAVerticesPatch_V5 V01-00-33-02   
-RecoTauTag/TauTagTools                           RecoTauDAVerticesPatch_V5 V01-00-11      
+RecoTauTag/Configuration                         V01-02-00      V01-00-27      
+RecoTauTag/RecoTau                               V01-02-00      V01-00-33-02   
+RecoTauTag/TauTagTools                           V01-02-00      V01-00-11      
 ---------------------------------------
 total packages: 7 (7 displayed)
