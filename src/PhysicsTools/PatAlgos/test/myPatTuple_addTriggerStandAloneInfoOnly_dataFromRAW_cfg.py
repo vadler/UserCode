@@ -23,7 +23,7 @@ process.source = cms.Source( "PoolSource"
   )
 )
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( 100 )
+  input = cms.untracked.int32( 1000 )
 )
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)

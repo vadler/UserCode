@@ -2,10 +2,9 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 condition = 'com10'
 process.GlobalTag.globaltag = autoCond[ condition ]
-process.source.fileNames    = pickRelValInputFiles( relVal        = 'Mu'
+process.source.fileNames    = pickRelValInputFiles( relVal        = 'SingleMu'
                                                   , dataTier      = 'RECO'
-                                                  , condition     = condition # not needed, if GT explicitely given
-                                                  , globalTag     = 'GR_R_43_V3_RelVal_wzMu2010B'
+                                                  , globalTag     = 'GR_R_43_V3_RelVal_wMu2011A'
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
@@ -21,6 +20,13 @@ process.out.outputCommands += [
 
 from PhysicsTools.PatAlgos.tools.coreTools import runOnData
 runOnData( process )
+process.patJetCorrFactors.levels = [ 'L1Offset'
+                                   , 'L2Relative'
+                                   , 'L3Absolute'
+                                   , 'L5Flavor'
+                                   , 'L7Parton'
+                                   ]
+process.patJetCorrFactors.useRho = cms.bool( False )
 
 # from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
 # removeCleaning( process )
