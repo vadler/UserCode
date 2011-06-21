@@ -3,7 +3,6 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 #include "PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.h"
-#include <iostream> // DEBUG
 
 
 using namespace pat;
