@@ -142,15 +142,15 @@ void TriggerObjectStandAlone::addPathOrAlgorithm( const std::string & name, bool
     // The corresponding usage of the trigger objects
     pathLastFilterAccepted_.push_back( pathLastFilterAccepted );
     pathL3FilterAccepted_.push_back( pathL3FilterAccepted );
-    // Enable update of L3 status
-  } else if ( pathL3FilterAccepted && ! hasPathOrAlgorithm( name, false, pathL3FilterAccepted ) ) {
+  } else if ( pathLastFilterAccepted || pathL3FilterAccepted ) {
     unsigned index( 0 );
     while ( index < pathNames_.size() ) {
       if ( pathNames_.at( index ) == name ) break;
       ++index;
     }
     if ( index < pathNames_.size() ) {
-      pathL3FilterAccepted_.at( index ) = pathL3FilterAccepted;
+      pathLastFilterAccepted_.at( index ) = pathLastFilterAccepted;
+      pathL3FilterAccepted_.at( index )   = pathL3FilterAccepted;
     }
   }
 }
