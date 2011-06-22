@@ -18,7 +18,7 @@ jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute', ]
 muonSelect = ''
 # muon event selection
 muonsCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
-muonsMin = 1
+muonsMin = 0
 
 # electron object selection
 #electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
@@ -26,6 +26,9 @@ electronSelect = ''
 # electron event selection
 electronsCut = 'et > 5. && abs(eta) < 3.0'
 electronsMin = 0
+
+# x-leptons event selection
+leptonsMin = 1
 
 # jet object selection
 #jetSelect = 'pt > 30. && abs(eta) < 2.4' # RefSel
@@ -265,6 +268,9 @@ if runCiC:
   + process.eidSuperTightMC
   + process.eidHyperTight1MC
   )
+
+# X-leptons
+process.countPatLeptons.minNumber = leptonsMin
 
 # Jets
 if 'L1FastJet' in jecLevels:
