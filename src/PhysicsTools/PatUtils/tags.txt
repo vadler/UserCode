@@ -3,7 +3,7 @@ Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_3_0_pre7
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_3_0_pre7
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        V06-04-17      V06-04-14      
-PhysicsTools/PatAlgos                            V08-07-12      V08-07-06      
+PhysicsTools/PatAlgos                            V08-07-13      V08-07-06      
 PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
 PhysicsTools/SelectorUtils                       V00-03-17      V00-03-15      
 ---------------------------------------
