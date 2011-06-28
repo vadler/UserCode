@@ -1,5 +1,5 @@
 //
-// $Id: TriggerObjectStandAlone.cc,v 1.11 2011/05/24 15:56:25 vadler Exp $
+// $Id: TriggerObjectStandAlone.cc,v 1.13 2011/06/27 23:08:45 vadler Exp $
 //
 
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
@@ -142,12 +142,15 @@ void TriggerObjectStandAlone::addPathOrAlgorithm( const std::string & name, bool
     // The corresponding usage of the trigger objects
     pathLastFilterAccepted_.push_back( pathLastFilterAccepted );
     pathL3FilterAccepted_.push_back( pathL3FilterAccepted );
+  // Enable status updates
   } else if ( pathLastFilterAccepted || pathL3FilterAccepted ) {
+    // Search for path
     unsigned index( 0 );
     while ( index < pathNames_.size() ) {
       if ( pathNames_.at( index ) == name ) break;
       ++index;
     }
+    // Status update
     if ( index < pathNames_.size() ) {
       pathLastFilterAccepted_.at( index ) = pathLastFilterAccepted;
       pathL3FilterAccepted_.at( index )   = pathL3FilterAccepted;
@@ -168,7 +171,7 @@ std::vector< std::string > TriggerObjectStandAlone::pathsOrAlgorithms( bool path
   std::vector< std::string > paths;
   // Loop over usage vector and fill corresponding paths into temp vector
   for ( unsigned iPath = 0; iPath < pathNames_.size(); ++iPath ) {
-    if ( ( pathLastFilterAccepted_.at( iPath ) || pathLastFilterAccepted ) && ( pathL3FilterAccepted_.at( iPath ) || pathLastFilterAccepted ) ) paths.push_back( pathNames_.at( iPath ) );
+    if ( ( ! pathLastFilterAccepted || pathLastFilterAccepted_.at( iPath ) ) && ( ! pathL3FilterAccepted || pathL3FilterAccepted_.at( iPath ) ) ) paths.push_back( pathNames_.at( iPath ) ); // order matters in order to protect from empty vectors in old data
   }
   // Return temp vector
   return paths;
