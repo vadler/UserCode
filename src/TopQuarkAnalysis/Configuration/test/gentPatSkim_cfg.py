@@ -193,7 +193,6 @@ process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
                               ]
 if runOnMC:
   process.out.outputCommands += [ 'keep *_addPileupInfo_*_*'
-                                , 'keep *_genEvt_*_*'
                                 ]
   if not runMatch:
     process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'

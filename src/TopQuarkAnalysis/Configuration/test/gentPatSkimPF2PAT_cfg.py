@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 runOnMC   = True
-runMatch  = False
+runMatch  = True
 runCiC    = True
 addGenEvt = False
 
@@ -14,7 +14,7 @@ jetAlgo   = 'AK5'
 jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute', ]
 
 # muon top projection isolation
-#muonsIsoTP = 0.15
+#muonsIsoTP = 0.15 # PF2PAT
 muonsIsoTP = 0.25
 # muon object selection
 #muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
@@ -24,7 +24,7 @@ muonsCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
 muonsMin = 0
 
 # muon top projection isolation
-#electronsIsoTP = 0.2
+#electronsIsoTP = 0.2 # PF2PAT
 electronsIsoTP = 0.25
 # electron object selection
 #electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
