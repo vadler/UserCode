@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 runOnMC   = True
-runMatch  = True
+runMatch  = False
 runCiC    = True
 addGenEvt = False
 
@@ -13,6 +13,9 @@ triggerSelection = ''
 jetAlgo   = 'AK5'
 jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute', ]
 
+# muon top projection isolation
+#muonsIsoTP = 0.15
+muonsIsoTP = 0.25
 # muon object selection
 #muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
 muonSelect = ''
@@ -20,6 +23,9 @@ muonSelect = ''
 muonsCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
 muonsMin = 0
 
+# muon top projection isolation
+#electronsIsoTP = 0.2
+electronsIsoTP = 0.25
 # electron object selection
 #electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
 electronSelect = ''
@@ -78,11 +84,11 @@ process.maxEvents = cms.untracked.PSet(
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
                                                  , globalTag     = 'START42_V12'
                                                  )
 else:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
                                                  , relVal        = 'Mu'
                                                  , dataTier      = 'RECO'
                                                  , globalTag     = 'GR_R_42_V12_mu2010B'
@@ -200,12 +206,15 @@ if not runMatch:
   process.patPF2PATSequence.remove( process.muonMatch )
   process.patElectrons.addGenMatch = False
   process.patPF2PATSequence.remove( process.electronMatch )
-  process.patJets.addGenPartonMatch = False
+  process.patJets.addGenPartonMatch   = False
+  process.patJets.embedGenPartonMatch = False
+  process.patJets.genPartonMatch      = cms.InputTag( '' )
   process.patPF2PATSequence.remove( process.patJetPartonMatch )
-  process.patPF2PATSequence.remove( process.patJetFlavourAssociation )
-  process.patPF2PATSequence.remove( process.patJetPartonAssociation )
-  process.patPF2PATSequence.remove( process.patJetPartons )
+  process.patJets.getJetMCFlavour    = False
+  process.patJets.JetPartonMapSource = cms.InputTag( '' )
+  process.patPF2PATSequence.remove( process.patJetFlavourId )
 process.patJets.addGenJetMatch = False
+process.patJets.genJetMatch    = cms.InputTag( '' )
 process.patPF2PATSequence.remove( process.patJetGenJetMatch )
 process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
 process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )
@@ -222,7 +231,7 @@ process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
                               , 'drop edmTriggerResults_*_*_*NONE*'
                               , 'keep *_hltTriggerSummaryAOD_*_*'
                               , 'keep *_offlineBeamSpot_*_*'
-                              , 'keep *goodOfflinePrimaryVertices_*_*'
+                              , 'keep *_goodOfflinePrimaryVertices_*_*'
                               ]
 if runOnMC:
   process.out.outputCommands += [ 'keep *_addPileupInfo_*_*'
@@ -241,6 +250,7 @@ if 'L1FastJet' in jecLevels:
 process.isoValMuonWithCharged.deposits.delta = 0.3
 process.isoValMuonWithNeutral.deposits.delta = 0.3
 process.isoValMuonWithPhotons.deposits.delta = 0.3
+process.pfIsolatedMuons.combinedIsolationCut = muonsIsoTP
 process.patMuons.embedTrack = True
 process.selectedPatMuons.cut = muonSelect
 process.cleanPatMuons.src           = cms.InputTag( 'patMuons' )
@@ -252,6 +262,7 @@ process.countPatMuons.minNumber = muonsMin
 process.isoValElectronWithCharged.deposits.delta = 0.3
 process.isoValElectronWithNeutral.deposits.delta = 0.3
 process.isoValElectronWithPhotons.deposits.delta = 0.3
+process.pfIsolatedElectrons.combinedIsolationCut = electronsIsoTP
 process.patElectrons.embedTrack = True
 process.selectedPatElectrons.cut = electronSelect
 process.cleanPatElectrons.src           = cms.InputTag( 'patElectrons' )

@@ -78,11 +78,11 @@ process.maxEvents = cms.untracked.PSet(
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
                                                  , globalTag     = 'START42_V12'
                                                  )
 else:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
                                                  , relVal        = 'Mu'
                                                  , dataTier      = 'RECO'
                                                  , globalTag     = 'GR_R_42_V12_mu2010B'
@@ -175,11 +175,8 @@ if not runOnMC:
   runOnData( process )
 elif not runMatch:
   removeMCMatching( process )
-if not runMatch:
-  process.patDefaultSequence.remove( process.patJetFlavourAssociation )
-  process.patDefaultSequence.remove( process.patJetPartonAssociation )
-  process.patDefaultSequence.remove( process.patJetPartons )
 process.patJets.addGenJetMatch = False
+process.patJets.genJetMatch    = cms.InputTag( '' )
 process.patDefaultSequence.remove( process.patJetGenJetMatch )
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PF'
