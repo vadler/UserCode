@@ -1,5 +1,5 @@
 //
-// $Id: TriggerEvent.cc,v 1.17 2011/04/08 16:16:48 vadler Exp $
+// $Id: TriggerEvent.cc,v 1.14.2.2 2011/04/07 09:36:49 vadler Exp $
 //
 
 
@@ -40,19 +40,6 @@ TriggerEvent::TriggerEvent( const std::string & nameL1Menu, const std::string & 
 // Methods
 
 
-// Get a vector of references to all L1 algorithms
-const TriggerAlgorithmRefVector TriggerEvent::algorithmRefs() const
-{
-  TriggerAlgorithmRefVector theAlgorithms;
-  for ( TriggerAlgorithmCollection::const_iterator iAlgorithm = algorithms()->begin(); iAlgorithm != algorithms()->end(); ++iAlgorithm ) {
-    const std::string nameAlgorithm( iAlgorithm->name() );
-    const TriggerAlgorithmRef algorithmRef( algorithms_, indexAlgorithm( nameAlgorithm ) );
-    theAlgorithms.push_back( algorithmRef );
-  }
-  return theAlgorithms;
-}
-
-
 // Get a pointer to a certain L1 algorithm by name
 const TriggerAlgorithm * TriggerEvent::algorithm( const std::string & nameAlgorithm ) const
 {
@@ -60,16 +47,6 @@ const TriggerAlgorithm * TriggerEvent::algorithm( const std::string & nameAlgori
     if ( nameAlgorithm == iAlgorithm->name() ) return &*iAlgorithm;
   }
   return 0;
-}
-
-
-// Get a reference to a certain L1 algorithm by name
-const TriggerAlgorithmRef TriggerEvent::algorithmRef( const std::string & nameAlgorithm ) const
-{
-  for ( TriggerAlgorithmRefVector::const_iterator iAlgorithm = algorithmRefs().begin(); iAlgorithm != algorithmRefs().end(); ++iAlgorithm ) {
-    if ( nameAlgorithm == ( *iAlgorithm )->name() ) return *iAlgorithm;
-  }
-  return TriggerAlgorithmRef();
 }
 
 
@@ -212,19 +189,6 @@ TriggerAlgorithmRefVector TriggerEvent::acceptedPhysAlgorithmsGtl() const
 }
 
 
-// Get a vector of references to all L1 conditions
-const TriggerConditionRefVector TriggerEvent::conditionRefs() const
-{
-  TriggerConditionRefVector theConditions;
-  for ( TriggerConditionCollection::const_iterator iCondition = conditions()->begin(); iCondition != conditions()->end(); ++iCondition ) {
-    const std::string nameCondition( iCondition->name() );
-    const TriggerConditionRef conditionRef( conditions_, indexCondition( nameCondition ) );
-    theConditions.push_back( conditionRef );
-  }
-  return theConditions;
-}
-
-
 // Get a pointer to a certain L1 condition by name
 const TriggerCondition * TriggerEvent::condition( const std::string & nameCondition ) const
 {
@@ -232,16 +196,6 @@ const TriggerCondition * TriggerEvent::condition( const std::string & nameCondit
     if ( nameCondition == iCondition->name() ) return &*iCondition;
   }
   return 0;
-}
-
-
-// Get a reference to a certain L1 condition by name
-const TriggerConditionRef TriggerEvent::conditionRef( const std::string & nameCondition ) const
-{
-  for ( TriggerConditionRefVector::const_iterator iCondition = conditionRefs().begin(); iCondition != conditionRefs().end(); ++iCondition ) {
-    if ( nameCondition == ( *iCondition )->name() ) return *iCondition;
-  }
-  return TriggerConditionRef();
 }
 
 
@@ -269,19 +223,6 @@ TriggerConditionRefVector TriggerEvent::acceptedConditions() const
 }
 
 
-// Get a vector of references to all HLT paths
-const TriggerPathRefVector TriggerEvent::pathRefs() const
-{
-  TriggerPathRefVector thePaths;
-  for ( TriggerPathCollection::const_iterator iPath = paths()->begin(); iPath != paths()->end(); ++iPath ) {
-    const std::string namePath( iPath->name() );
-    const TriggerPathRef pathRef( paths_, indexPath( namePath ) );
-    thePaths.push_back( pathRef );
-  }
-  return thePaths;
-}
-
-
 // Get a pointer to a certain HLT path by name
 const TriggerPath * TriggerEvent::path( const std::string & namePath ) const
 {
@@ -289,16 +230,6 @@ const TriggerPath * TriggerEvent::path( const std::string & namePath ) const
     if ( namePath == iPath->name() ) return &*iPath;
   }
   return 0;
-}
-
-
-// Get a reference to a certain HLT path by name
-const TriggerPathRef TriggerEvent::pathRef( const std::string & namePath ) const
-{
-  for ( TriggerPathRefVector::const_iterator iPath = pathRefs().begin(); iPath != pathRefs().end(); ++iPath ) {
-    if ( namePath == ( *iPath )->name() ) return *iPath;
-  }
-  return TriggerPathRef();
 }
 
 
@@ -326,36 +257,13 @@ TriggerPathRefVector TriggerEvent::acceptedPaths() const
 }
 
 
-// Get a vector of references to all HLT filters
-const TriggerFilterRefVector TriggerEvent::filterRefs() const
-{
-  TriggerFilterRefVector theFilters;
-  for ( TriggerFilterCollection::const_iterator iFilter = filters()->begin(); iFilter != filters()->end(); ++iFilter ) {
-    const std::string labelFilter( iFilter->label() );
-    const TriggerFilterRef filterRef( filters_, indexFilter( labelFilter ) );
-    theFilters.push_back( filterRef );
-  }
-  return theFilters;
-}
-
-
 // Get a pointer to a certain HLT filter by label
 const TriggerFilter * TriggerEvent::filter( const std::string & labelFilter ) const
 {
   for ( TriggerFilterCollection::const_iterator iFilter = filters()->begin(); iFilter != filters()->end(); ++iFilter ) {
-    if ( labelFilter == iFilter->label() ) return &*iFilter;
+    if ( iFilter->label() == labelFilter ) return &*iFilter;
   }
   return 0;
-}
-
-
-// Get a reference to a certain HLT filter by label
-const TriggerFilterRef TriggerEvent::filterRef( const std::string & labelFilter ) const
-{
-  for ( TriggerFilterRefVector::const_iterator iFilter = filterRefs().begin(); iFilter != filterRefs().end(); ++iFilter ) {
-    if ( labelFilter == ( *iFilter )->label() ) return *iFilter;
-  }
-  return TriggerFilterRef();
 }
 
 
@@ -380,18 +288,6 @@ TriggerFilterRefVector TriggerEvent::acceptedFilters() const
     }
   }
   return theAcceptedFilters;
-}
-
-
-// Get a vector of references to all trigger objects
-const TriggerObjectRefVector TriggerEvent::objectRefs() const
-{
-  TriggerObjectRefVector theObjects;
-  for ( unsigned iObject = 0; iObject < objects()->size(); ++iObject ) {
-    const TriggerObjectRef objectRef( objects_, iObject );
-    theObjects.push_back( objectRef );
-  }
-  return theObjects;
 }
 
 
@@ -573,13 +469,13 @@ TriggerFilterRefVector TriggerEvent::pathModules( const std::string & namePath, 
 
 
 // Get a vector of references to all active HLT filters assigned to a certain path given by name
-TriggerFilterRefVector TriggerEvent::pathFilters( const std::string & namePath, bool firing ) const
+TriggerFilterRefVector TriggerEvent::pathFilters( const std::string & namePath ) const
 {
   TriggerFilterRefVector thePathFilters;
   if ( path( namePath ) ) {
     for ( unsigned iF = 0; iF < path( namePath )->filterIndices().size(); ++iF ) {
       const TriggerFilterRef filterRef( filters_, path( namePath )->filterIndices().at( iF ) );
-      if ( ( ! firing ) || filterRef->isFiring() ) thePathFilters.push_back( filterRef );
+      thePathFilters.push_back( filterRef );
     }
   }
   return thePathFilters;
@@ -587,9 +483,9 @@ TriggerFilterRefVector TriggerEvent::pathFilters( const std::string & namePath, 
 
 
 // Checks, if a filter is assigned to and was run in a certain path given by name
-bool TriggerEvent::filterInPath( const TriggerFilterRef & filterRef, const std::string & namePath, bool firing ) const
+bool TriggerEvent::filterInPath( const TriggerFilterRef & filterRef, const std::string & namePath ) const
 {
-  TriggerFilterRefVector theFilters = pathFilters( namePath, firing );
+  TriggerFilterRefVector theFilters = pathFilters( namePath );
   for ( TriggerFilterRefVectorIterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
     if ( filterRef == *iFilter ) return true;
   }
@@ -598,13 +494,13 @@ bool TriggerEvent::filterInPath( const TriggerFilterRef & filterRef, const std::
 
 
 // Get a vector of references to all paths, which have a certain filter assigned
-TriggerPathRefVector TriggerEvent::filterPaths( const TriggerFilterRef & filterRef, bool firing ) const
+TriggerPathRefVector TriggerEvent::filterPaths( const TriggerFilterRef & filterRef ) const
 {
   TriggerPathRefVector theFilterPaths;
   size_t cPaths( 0 );
   for ( TriggerPathCollection::const_iterator iPath = paths()->begin(); iPath != paths()->end(); ++iPath ) {
     const std::string namePath( iPath->name() );
-    if ( filterInPath( filterRef, namePath, firing ) ) {
+    if ( filterInPath( filterRef, namePath ) ) {
       const TriggerPathRef pathRef( paths_, cPaths );
       theFilterPaths.push_back( pathRef );
     }
@@ -663,14 +559,14 @@ bool TriggerEvent::objectInFilter( const TriggerObjectRef & objectRef, const std
 
 
 // Get a vector of references to all filters, which have a certain object assigned
-TriggerFilterRefVector TriggerEvent::objectFilters( const TriggerObjectRef & objectRef, bool firing ) const
+TriggerFilterRefVector TriggerEvent::objectFilters( const TriggerObjectRef & objectRef ) const
 {
   TriggerFilterRefVector theObjectFilters;
   for ( TriggerFilterCollection::const_iterator iFilter = filters()->begin(); iFilter != filters()->end(); ++iFilter ) {
     const std::string labelFilter( iFilter->label() );
     if ( objectInFilter( objectRef, labelFilter ) ) {
       const TriggerFilterRef filterRef( filters_, indexFilter( labelFilter ) );
-      if ( ( ! firing ) || iFilter->isFiring() ) theObjectFilters.push_back( filterRef );
+      theObjectFilters.push_back( filterRef );
     }
   }
   return theObjectFilters;
@@ -678,10 +574,10 @@ TriggerFilterRefVector TriggerEvent::objectFilters( const TriggerObjectRef & obj
 
 
 // Get a vector of references to all objects, which were used in a certain path given by name
-TriggerObjectRefVector TriggerEvent::pathObjects( const std::string & namePath, bool firing ) const
+TriggerObjectRefVector TriggerEvent::pathObjects( const std::string & namePath ) const
 {
   TriggerObjectRefVector thePathObjects;
-  TriggerFilterRefVector theFilters = pathFilters( namePath, firing );
+  TriggerFilterRefVector theFilters = pathFilters( namePath );
   for ( TriggerFilterRefVectorIterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
     const std::string labelFilter( ( *iFilter )->label() );
     TriggerObjectRefVector theObjects = filterObjects( labelFilter );
@@ -694,9 +590,9 @@ TriggerObjectRefVector TriggerEvent::pathObjects( const std::string & namePath, 
 
 
 // Checks, if an object was used in a certain path given by name
-bool TriggerEvent::objectInPath( const TriggerObjectRef & objectRef, const std::string & namePath, bool firing ) const
+bool TriggerEvent::objectInPath( const TriggerObjectRef & objectRef, const std::string & namePath ) const
 {
-  TriggerFilterRefVector theFilters = pathFilters( namePath, firing );
+  TriggerFilterRefVector theFilters = pathFilters( namePath );
   for ( TriggerFilterRefVectorIterator iFilter = theFilters.begin(); iFilter != theFilters.end(); ++iFilter ) {
     if ( objectInFilter( objectRef, ( *iFilter )->label() ) ) return true;
   }
@@ -705,12 +601,12 @@ bool TriggerEvent::objectInPath( const TriggerObjectRef & objectRef, const std::
 
 
 // Get a vector of references to all paths, which have a certain object assigned
-TriggerPathRefVector TriggerEvent::objectPaths( const TriggerObjectRef & objectRef, bool firing ) const
+TriggerPathRefVector TriggerEvent::objectPaths( const TriggerObjectRef & objectRef ) const
 {
   TriggerPathRefVector theObjectPaths;
   for ( TriggerPathCollection::const_iterator iPath = paths()->begin(); iPath != paths()->end(); ++iPath ) {
     const std::string namePath( iPath->name() );
-    if ( objectInPath( objectRef, namePath, firing ) ) {
+    if ( objectInPath( objectRef, namePath ) ) {
       const TriggerPathRef pathRef( paths_, indexPath( namePath ) );
       theObjectPaths.push_back( pathRef );
     }

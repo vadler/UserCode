@@ -1,5 +1,5 @@
 //
-// $Id: TriggerFilter.cc,v 1.6 2011/02/22 18:29:50 vadler Exp $
+// $Id: TriggerFilter.cc,v 1.5 2010/12/16 18:39:17 vadler Exp $
 //
 
 
@@ -16,8 +16,7 @@ using namespace pat;
 TriggerFilter::TriggerFilter() :
   label_(),
   type_(),
-  status_(),
-  saveTags_()
+  status_()
 {
   objectKeys_.clear();
   triggerObjectTypes_.clear();
@@ -25,11 +24,10 @@ TriggerFilter::TriggerFilter() :
 
 
 // Constructor from std::string for filter label
-TriggerFilter::TriggerFilter( const std::string & label, int status, bool saveTags ) :
+TriggerFilter::TriggerFilter( const std::string & label, int status ) :
   label_( label ),
   type_(),
-  status_( status ),
-  saveTags_( saveTags )
+  status_( status )
 {
   objectKeys_.clear();
   triggerObjectTypes_.clear();
@@ -37,11 +35,10 @@ TriggerFilter::TriggerFilter( const std::string & label, int status, bool saveTa
 
 
 // Constructor from edm::InputTag for filter label
-TriggerFilter::TriggerFilter( const edm::InputTag & tag, int status, bool saveTags ) :
+TriggerFilter::TriggerFilter( const edm::InputTag & tag, int status ) :
   label_( tag.label() ),
   type_(),
-  status_( status ),
-  saveTags_( saveTags )
+  status_( status )
 {
   objectKeys_.clear();
   triggerObjectTypes_.clear();
