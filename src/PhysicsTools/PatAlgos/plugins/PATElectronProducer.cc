@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.48 2011/05/31 16:33:30 rwolf Exp $
+// $Id: PATElectronProducer.cc,v 1.51 2011/06/30 21:48:00 rwolf Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
@@ -246,7 +246,7 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 
       beamPoint = reco::TrackBase::Point ( x0, y0, z0 );
     } else {
-      if ( pvHandle.isValid() ) {
+      if ( pvHandle.isValid() && !pvHandle->empty() ) {
 	primaryVertex = pvHandle->at(0);
 	primaryVertexIsValid = true;
       } else {
@@ -361,7 +361,7 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 	  // I don't know what to do with the efficiencyLoader, since I don't know
 	  // what this class is for.
 	  fillElectron2( anElectron,
-			 ptrToPFElectron->sourceCandidatePtr(0),
+			 ptrToPFElectron,
 			 ptrToGsfElectron,
 			 ptrToGsfElectron,
 			 genMatches, deposits, isolationValues );
@@ -593,9 +593,13 @@ void PATElectronProducer::fillElectron2( Electron& anElectron,
       anElectron.setIsoDeposit(isoDepositLabels_[j].first,
  			       (*deposits[j])[candPtrForGenMatch]);
     }
-    else {
+    else if (deposits[j]->contains(candPtrForIsolation.id())) {
       anElectron.setIsoDeposit(isoDepositLabels_[j].first,
  			       (*deposits[j])[candPtrForIsolation]);
+    }
+    else {
+      anElectron.setIsoDeposit(isoDepositLabels_[j].first,
+			       (*deposits[j])[candPtrForIsolation->sourceCandidatePtr(0)]);
     }
   }
 
@@ -606,10 +610,14 @@ void PATElectronProducer::fillElectron2( Electron& anElectron,
       anElectron.setIsolation(isolationValueLabels_[j].first,
  			      (*isolationValues[j])[candPtrForGenMatch]);
     }
-    else {
+    else if (isolationValues[j]->contains(candPtrForIsolation.id())) {
       anElectron.setIsolation(isolationValueLabels_[j].first,
  			      (*isolationValues[j])[candPtrForIsolation]);
     }
+    else {
+      anElectron.setIsolation(isolationValueLabels_[j].first,
+			      (*isolationValues[j])[candPtrForIsolation->sourceCandidatePtr(0)]);
+    }    
   }
 }
 
