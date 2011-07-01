@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.47 2011/03/31 09:52:39 namapane Exp $
+// $Id: PATElectronProducer.cc,v 1.47.2.3 2011/06/30 21:49:44 rwolf Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
@@ -54,9 +54,9 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
   embedTrack_       = iConfig.getParameter<bool>         ( "embedTrack" );
 
   // pflow specific
-  pfElecSrc_           = iConfig.getParameter<edm::InputTag>( "pfElectronSource" );
-  useParticleFlow_        = iConfig.getParameter<bool>( "useParticleFlow" );
-  embedPFCandidate_   = iConfig.getParameter<bool>( "embedPFCandidate" );
+  pfElecSrc_        = iConfig.getParameter<edm::InputTag>( "pfElectronSource" );
+  useParticleFlow_  = iConfig.getParameter<bool>( "useParticleFlow" );
+  embedPFCandidate_ = iConfig.getParameter<bool>( "embedPFCandidate" );
 
 
   // MC matching configurables
@@ -224,10 +224,12 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
     edm::Handle<reco::BeamSpot> beamSpotHandle;
     iEvent.getByLabel(beamLineSrc_, beamSpotHandle);
 
-
     // Get the primary vertex
     edm::Handle< std::vector<reco::Vertex> > pvHandle;
     iEvent.getByLabel( pvSrc_, pvHandle );
+
+    // This is needed by the IPTools methods from the tracking group
+    iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", trackBuilder);
 
     if ( ! usePV_ ) {
       if ( beamSpotHandle.isValid() ){
@@ -244,16 +246,13 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 
       beamPoint = reco::TrackBase::Point ( x0, y0, z0 );
     } else {
-      if ( pvHandle.isValid() ) {
+      if ( pvHandle.isValid() && !pvHandle->empty() ) {
 	primaryVertex = pvHandle->at(0);
 	primaryVertexIsValid = true;
       } else {
 	edm::LogError("DataNotAvailable")
 	  << "No primary vertex available from EventSetup, not adding high level selection \n";
       }
-
-      // This is needed by the IPTools methods from the tracking group
-      iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", trackBuilder);
     }
   }
 
@@ -362,7 +361,7 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 	  // I don't know what to do with the efficiencyLoader, since I don't know
 	  // what this class is for.
 	  fillElectron2( anElectron,
-			 ptrToPFElectron->sourceCandidatePtr(0),
+			 ptrToPFElectron, //->sourceCandidatePtr(0),
 			 ptrToGsfElectron,
 			 ptrToGsfElectron,
 			 genMatches, deposits, isolationValues );
@@ -594,9 +593,13 @@ void PATElectronProducer::fillElectron2( Electron& anElectron,
       anElectron.setIsoDeposit(isoDepositLabels_[j].first,
  			       (*deposits[j])[candPtrForGenMatch]);
     }
-    else {
+    else if (deposits[j]->contains(candPtrForIsolation.id())) {
       anElectron.setIsoDeposit(isoDepositLabels_[j].first,
  			       (*deposits[j])[candPtrForIsolation]);
+    }
+    else {
+      anElectron.setIsoDeposit(isoDepositLabels_[j].first,
+			       (*deposits[j])[candPtrForIsolation->sourceCandidatePtr(0)]);
     }
   }
 
@@ -607,9 +610,13 @@ void PATElectronProducer::fillElectron2( Electron& anElectron,
       anElectron.setIsolation(isolationValueLabels_[j].first,
  			      (*isolationValues[j])[candPtrForGenMatch]);
     }
-    else {
+    else if (isolationValues[j]->contains(candPtrForIsolation.id())) {
       anElectron.setIsolation(isolationValueLabels_[j].first,
  			      (*isolationValues[j])[candPtrForIsolation]);
+    }
+    else {
+      anElectron.setIsolation(isolationValueLabels_[j].first,
+			      (*isolationValues[j])[candPtrForIsolation->sourceCandidatePtr(0)]);
     }
   }
 }
