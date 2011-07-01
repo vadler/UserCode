@@ -105,12 +105,12 @@ from TopQuarkAnalysis.Configuration.patRefSel_PF2PAT import *
 #pfVertices = 'goodOfflinePrimaryVertices'
 # muons
 #pfMuonSelectionCut = ''
-#pfMuonIsoConeR   = 0.4
-#pfMuonCombIsoCut = 0.15
+pfMuonIsoConeR   = 0.4
+#pfMuonCombIsoCut = 0.25
 # electrons
 #pfElectronSelectionCut  = ''
-#pfElectronIsoConeR   = 0.4
-#pfElectronCombIsoCut = 0.2
+#pfElectronIsoConeR   = 0.3
+#pfElectronCombIsoCut = 0.25
 
 ### JEC levels
 
@@ -146,8 +146,8 @@ maxInputEvents = 1000
 ### Conditions
 
 # GlobalTags (w/o suffix '::All')
-globalTagData = 'GR_R_42_V12' # default for CMSSW_4_2_3 RelVals: 'GR_R_42_V12'
-globalTagMC   = 'START42_V12' # default for CMSSW_4_2_3 RelVals: 'START42_V12'
+globalTagData = 'GR_R_42_V14' # default for CMSSW_4_2_5 RelVals: 'GR_R_42_V14'
+globalTagMC   = 'START42_V12' # default for CMSSW_4_2_5 RelVals: 'START42_V12'
 
 ### Output
 
@@ -187,18 +187,17 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
                                      , relVal        = 'RelValTTbar'
                                      , globalTag     = globalTagMC
-                                     , numberOfFiles = -1 # "-1" means "all"
+                                     , numberOfFiles = -1
                                      )
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_3'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
                                      , relVal        = 'Mu'
                                      , dataTier      = 'RECO'
-                                     #, globalTag     = globalTagData + '_RelVal_mu2010B'
-                                     , globalTag     = globalTagData + '_mu2010B' # wrong naming scheme in CMSSW_4_2_3
-                                     , numberOfFiles = -1 # "-1" means "all"
+                                     , globalTag     = globalTagData + '_mu2010B'
+                                     , numberOfFiles = -1
                                      )
 process.source.fileNames = inputFiles
 process.maxEvents.input  = maxInputEvents

@@ -57,7 +57,7 @@ looseMuonCutBase += ' && abs(dB) < 0.02'                                        
 looseMuonCutBase += ' && innerTrack.numberOfValidHits > 10'                      # tracker reconstruction
 looseMuonCutBase += ' && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1'  # tracker reconstruction
 looseMuonCutBase += ' && numberOfMatches > 1'                                    # muon chamber reconstruction
-#looseMuonCut += ' && ()'                                                         # DeltaZ between muon vertex and PV < 1. not accessible via configuration yet
+#looseMuonCut += ' && ...'                                                        # DeltaZ between muon vertex and PV < 1. not accessible via configuration yet
 # standard muon
 looseMuonCut  = looseMuonCutBase
 looseMuonCut += ' && (trackIso+caloIso)/pt < 0.1'                                # relative isolation
