@@ -63,7 +63,7 @@ process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff"
 if runOnMC:
   process.GlobalTag.globaltag = 'START42_V12::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_42_V12::All'
+  process.GlobalTag.globaltag = 'GR_R_42_V14::All'
 
 ### Input
 
@@ -85,7 +85,7 @@ else:
   process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
                                                  , relVal        = 'Mu'
                                                  , dataTier      = 'RECO'
-                                                 , globalTag     = 'GR_R_42_V12_mu2010B'
+                                                 , globalTag     = 'GR_R_42_V14_mu2010B'
                                                  )
 
 ### Output
@@ -107,6 +107,7 @@ process.outpath = cms.EndPath(
 
 # HBHE noise filter
 process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
+process.HBHENoiseFilter.label                       = cms.InputTag( HBHENoiseFilter.label.getModuleLabel() )
 process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
 process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
 process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.

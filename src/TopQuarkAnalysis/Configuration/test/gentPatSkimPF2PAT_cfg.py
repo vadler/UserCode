@@ -13,6 +13,8 @@ triggerSelection = ''
 jetAlgo   = 'AK5'
 jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute', ]
 
+# muon isolation
+muonsIsoR = 0.4
 # muon top projection isolation
 #muonsIsoTP = 0.15 # PF2PAT
 muonsIsoTP = 0.25
@@ -23,7 +25,9 @@ muonSelect = ''
 muonsCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
 muonsMin = 0
 
-# muon top projection isolation
+# electron isolation
+electronsIsoR = 0.3
+# electron top projection isolation
 #electronsIsoTP = 0.2 # PF2PAT
 electronsIsoTP = 0.25
 # electron object selection
@@ -69,7 +73,7 @@ process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff"
 if runOnMC:
   process.GlobalTag.globaltag = 'START42_V12::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_42_V12::All'
+  process.GlobalTag.globaltag = 'GR_R_42_V14::All'
 
 ### Input
 
@@ -91,7 +95,7 @@ else:
   process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
                                                  , relVal        = 'Mu'
                                                  , dataTier      = 'RECO'
-                                                 , globalTag     = 'GR_R_42_V12_mu2010B'
+                                                 , globalTag     = 'GR_R_42_V14_mu2010B'
                                                  )
 
 ### Output
@@ -113,6 +117,7 @@ process.outpath = cms.EndPath(
 
 # HBHE noise filter
 process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
+process.HBHENoiseFilter.label                       = cms.InputTag( HBHENoiseFilter.label.getModuleLabel() )
 process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
 process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
 process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
@@ -247,9 +252,9 @@ if 'L1FastJet' in jecLevels:
   process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
 
 # Muons
-process.isoValMuonWithCharged.deposits.delta = 0.3
-process.isoValMuonWithNeutral.deposits.delta = 0.3
-process.isoValMuonWithPhotons.deposits.delta = 0.3
+process.isoValMuonWithCharged.deposits.delta = muonsIsoR
+process.isoValMuonWithNeutral.deposits.delta = muonsIsoR
+process.isoValMuonWithPhotons.deposits.delta = muonsIsoR
 process.pfIsolatedMuons.combinedIsolationCut = muonsIsoTP
 process.patMuons.embedTrack = True
 process.selectedPatMuons.cut = muonSelect
@@ -259,9 +264,9 @@ process.cleanPatMuons.checkOverlaps = cms.PSet()
 process.countPatMuons.minNumber = muonsMin
 
 # Electrons
-process.isoValElectronWithCharged.deposits.delta = 0.3
-process.isoValElectronWithNeutral.deposits.delta = 0.3
-process.isoValElectronWithPhotons.deposits.delta = 0.3
+process.isoValElectronWithCharged.deposits.delta = electronsIsoR
+process.isoValElectronWithNeutral.deposits.delta = electronsIsoR
+process.isoValElectronWithPhotons.deposits.delta = electronsIsoR
 process.pfIsolatedElectrons.combinedIsolationCut = electronsIsoTP
 process.patElectrons.embedTrack = True
 process.selectedPatElectrons.cut = electronSelect
