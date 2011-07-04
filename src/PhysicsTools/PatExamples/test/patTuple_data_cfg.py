@@ -4,6 +4,7 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
+removeMCMatching(process, ['All'])
 
 ## global tag for data
 process.GlobalTag.globaltag = 'GR_R_42_V14::All'
@@ -39,7 +40,6 @@ inputJetCorrLabel = ('AK5PF', ['L1Offset', 'L2Relative', 'L3Absolute'])
 
 # add pf met
 from PhysicsTools.PatAlgos.tools.metTools import *
-removeMCMatching(process, ['All'])
 addPfMET(process, 'PF')
 
 # Add PF jets
@@ -82,7 +82,10 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
                                     thresh = cms.untracked.double(0.2)
                                     )
 # HB + HE noise filtering
-process.load('CommonTools/RecoAlgos/HBHENoiseFilter_cfi')
+process.load('CommonTools.RecoAlgos.HBHENoiseFilter_cfi')
+process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
+process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
+process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
 
 
 from HLTrigger.HLTfilters.hltHighLevel_cfi import *
@@ -90,12 +93,10 @@ if mytrigs is not None :
     process.hltSelection = hltHighLevel.clone(TriggerResultsTag = 'TriggerResults::HLT', HLTPaths = mytrigs)
     process.hltSelection.throw = False
 
-
-process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
-                                           vertexCollection = cms.InputTag('offlinePrimaryVertices'),
-                                           minimumNDOF = cms.uint32(4) ,
-                                           maxAbsZ = cms.double(24),
-                                           maxd0 = cms.double(2)
+from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
+goodVertexSelection = pvSelector.clone( maxZ = 24. )
+process.primaryVertexFilter = cms.EDFilter("PrimaryVertexFilter",
+                                           goodVertexSelection
                                            )
 
 
