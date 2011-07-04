@@ -6,7 +6,7 @@ CommonTools/RecoAlgos                            V00-03-13      V00-03-11
 DataFormats/PatCandidates                        V06-04-18      V06-04-16      
 FWCore/GuiBrowsers                               V00-00-56      V00-00-54      
 PhysicsTools/PatAlgos                            V08-06-38      V08-06-33      
-PhysicsTools/PatExamples                         V00-05-21      V00-05-18      
+PhysicsTools/PatExamples                         V00-05-22      V00-05-18      
 PhysicsTools/SelectorUtils                       V00-03-17      V00-03-08      
 RecoJets/Configuration                           V02-04-17      V02-04-13      
 RecoTauTag/Configuration                         V01-02-02      V01-00-27      
