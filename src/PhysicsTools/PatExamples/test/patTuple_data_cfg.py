@@ -109,7 +109,6 @@ secFiles = cms.untracked.vstring()
 
 
 readFiles.extend( [
-        '/store/data/Run2011A/Jet/AOD/PromptReco-v4/000/165/121/F022FABD-9981-E011-9258-003048F1110E.root',
         '/store/data/Run2011A/Jet/AOD/PromptReco-v4/000/165/121/E4D2CB53-9881-E011-8D99-003048F024DC.root',
         '/store/data/Run2011A/Jet/AOD/PromptReco-v4/000/165/121/DC453887-7481-E011-89B9-001617E30D0A.root',
         '/store/data/Run2011A/Jet/AOD/PromptReco-v4/000/165/121/DABFB9E8-9B81-E011-9FF7-0030487CD812.root',
