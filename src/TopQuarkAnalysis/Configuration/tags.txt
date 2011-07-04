@@ -3,6 +3,7 @@ Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_5
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/TQAF/CMSSW_4_2_5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-07-07      V06-07-07      
+CommonTools/RecoAlgos                            V00-03-13      V00-03-11      
 DataFormats/PatCandidates                        V06-04-18      V06-04-16      
 PhysicsTools/PatAlgos                            V08-06-36      V08-06-33      
 PhysicsTools/SelectorUtils                       V00-03-17      V00-03-08      
@@ -21,4 +22,4 @@ TopQuarkAnalysis/TopObjectResolutions            V06-07-05      V06-07-05
 TopQuarkAnalysis/TopSkimming                     V06-07-05      V06-07-05      
 TopQuarkAnalysis/TopTools                        V06-07-09      V06-07-09      
 ---------------------------------------
-total packages: 18 (18 displayed)
+total packages: 19 (19 displayed)
