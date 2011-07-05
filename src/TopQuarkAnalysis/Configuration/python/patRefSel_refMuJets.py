@@ -20,6 +20,9 @@ jecSetBase = jetAlgo
 ### ------------------------- Reference selection -------------------------- ###
 
 
+# PF2PAT settings
+from TopQuarkAnalysis.Configuration.patRefSel_PF2PAT import *
+
 ### Trigger selection
 
 # HLT selection
@@ -36,6 +39,9 @@ triggerSelectionData = triggerSelection_163270
 triggerSelectionMC   = triggerSelection_Summer11
 
 ### Muon selection
+
+# PF2PAT top projection settings
+pfMuonIsoConeR = 0.4
 
 # Minimal selection for veto muons, also basis for signal muons
 muonCutBase  =     'isGlobalMuon'                                                # general reconstruction property

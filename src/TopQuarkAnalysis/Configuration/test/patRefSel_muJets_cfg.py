@@ -27,7 +27,7 @@ runOnMC = True
 # Standard
 runStandardPAT = True
 usePFJets      = True
-useCaloJets    = True
+useCaloJets    = False
 
 # PF2PAT
 runPF2PAT = True
@@ -98,14 +98,13 @@ useNoJet      = True # before tau top projection
 useNoTau      = True # before MET top projection
 
 # cuts used in top projections
-from TopQuarkAnalysis.Configuration.patRefSel_PF2PAT import *
 # vertices
 #pfD0Cut   = 0.2
 #pfDzCut   = 0.5
 #pfVertices = 'goodOfflinePrimaryVertices'
 # muons
 #pfMuonSelectionCut = ''
-pfMuonIsoConeR   = 0.4
+#pfMuonIsoConeR   = 0.4
 #pfMuonCombIsoCut = 0.25
 # electrons
 #pfElectronSelectionCut  = ''
