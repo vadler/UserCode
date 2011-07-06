@@ -1,17 +1,22 @@
+import os
 import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-runOnMC   = True
-runMatch  = True
+runOnMC   = False
+runMatch  = False
 runCiC    = True
+runEwk    = True
 addGenEvt = False
 
 hltProcess       = 'HLT'
 triggerSelection = ''
 
 jetAlgo   = 'AK5'
-jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute', ]
+jecLevels = []
+#jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
+#if not runOnMC:
+  #jecLevels.append( 'L2L3Residual' )
 
 # muon isolation
 muonsIsoR = 0.4
@@ -45,7 +50,7 @@ leptonsMin = 1
 jetSelect = ''
 # jet event selection
 jetsCut = 'pt > 15. && abs(eta) < 3.0'
-jetsMin = 2
+jetsMin = 3
 
 ### Initialization
 
@@ -71,9 +76,9 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START42_V12::All'
+  process.GlobalTag.globaltag = 'START42_V13::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_42_V14::All'
+  process.GlobalTag.globaltag = 'GR_R_42_V19::All'
 
 ### Input
 
@@ -93,9 +98,11 @@ if runOnMC:
                                                  )
 else:
   process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
-                                                 , relVal        = 'Mu'
                                                  , dataTier      = 'RECO'
+                                                 , relVal        = 'Mu'
                                                  , globalTag     = 'GR_R_42_V14_mu2010B'
+                                                 #, relVal        = 'Electron'
+                                                 #, globalTag     = 'GR_R_42_V14_electron2010B'
                                                  )
 
 ### Output
@@ -117,7 +124,6 @@ process.outpath = cms.EndPath(
 
 # HBHE noise filter
 process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
-process.HBHENoiseFilter.label                       = cms.InputTag( HBHENoiseFilter.label.getModuleLabel() )
 process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
 process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
 process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
@@ -226,7 +232,7 @@ process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )
 process.patPF2PATSequence.remove( process.iterativeCone5GenJetsNoNu )
 process.patPF2PATSequence.remove( process.genParticlesForJetsNoNu )
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
-process.patJetCorrFactors.payload = jetAlgo + 'PF'
+process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
 process.patJetCorrFactors.levels  = jecLevels
 process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
                               , 'drop recoBaseTagInfosOwned_*_*_*'
@@ -237,6 +243,9 @@ process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
                               , 'keep *_hltTriggerSummaryAOD_*_*'
                               , 'keep *_offlineBeamSpot_*_*'
                               , 'keep *_goodOfflinePrimaryVertices_*_*'
+                              # for conversion rejection
+                              , 'keep recoTracks_generalTracks_*_*'
+                              , 'keep recoGsfTracks_electronGsfTracks_*_*'
                               ]
 if runOnMC:
   process.out.outputCommands += [ 'keep *_addPileupInfo_*_*'
@@ -274,6 +283,23 @@ process.cleanPatElectrons.src           = cms.InputTag( 'patElectrons' )
 process.cleanPatElectrons.preselection  = electronsCut
 process.cleanPatElectrons.checkOverlaps = cms.PSet()
 process.countPatElectrons.minNumber = electronsMin
+if runEwk:
+  process.load( "ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff" )
+  process.patPF2PATSequence.replace( process.patElectrons
+                                   , process.simpleEleIdSequence * process.patElectrons
+                                   )
+  process.patElectrons.electronIDSources.simpleEleId95relIso = cms.InputTag( 'simpleEleId95relIso' )
+  process.patElectrons.electronIDSources.simpleEleId90relIso = cms.InputTag( 'simpleEleId90relIso' )
+  process.patElectrons.electronIDSources.simpleEleId85relIso = cms.InputTag( 'simpleEleId85relIso' )
+  process.patElectrons.electronIDSources.simpleEleId80relIso = cms.InputTag( 'simpleEleId80relIso' )
+  process.patElectrons.electronIDSources.simpleEleId70relIso = cms.InputTag( 'simpleEleId70relIso' )
+  process.patElectrons.electronIDSources.simpleEleId60relIso = cms.InputTag( 'simpleEleId60relIso' )
+  process.patElectrons.electronIDSources.simpleEleId95cIso   = cms.InputTag( 'simpleEleId95cIso' )
+  process.patElectrons.electronIDSources.simpleEleId90cIso   = cms.InputTag( 'simpleEleId90cIso' )
+  process.patElectrons.electronIDSources.simpleEleId85cIso   = cms.InputTag( 'simpleEleId85cIso' )
+  process.patElectrons.electronIDSources.simpleEleId80cIso   = cms.InputTag( 'simpleEleId80cIso' )
+  process.patElectrons.electronIDSources.simpleEleId70cIso   = cms.InputTag( 'simpleEleId70cIso' )
+  process.patElectrons.electronIDSources.simpleEleId60cIso   = cms.InputTag( 'simpleEleId60cIso' )
 if runCiC:
   process.load( "RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_cfi" )
   process.eidCiCSequence = cms.Sequence(
@@ -283,21 +309,39 @@ if runCiC:
   + process.eidTightMC
   + process.eidSuperTightMC
   + process.eidHyperTight1MC
+  + process.eidHyperTight2MC
+  + process.eidHyperTight3MC
+  + process.eidHyperTight4MC
   )
+  process.patPF2PATSequence.replace( process.patElectrons
+                                   , process.eidCiCSequence * process.patElectrons
+                                   )
+  process.patElectrons.electronIDSources.eidVeryLooseMC   = cms.InputTag( 'eidVeryLooseMC' )
+  process.patElectrons.electronIDSources.eidLooseMC       = cms.InputTag( 'eidLooseMC' )
+  process.patElectrons.electronIDSources.eidMediumMC      = cms.InputTag( 'eidMediumMC' )
+  process.patElectrons.electronIDSources.eidTightMC       = cms.InputTag( 'eidTightMC' )
+  process.patElectrons.electronIDSources.eidSuperTightMC  = cms.InputTag( 'eidSuperTightMC' )
+  process.patElectrons.electronIDSources.eidHyperTight1MC = cms.InputTag( 'eidHyperTight1MC' )
+  process.patElectrons.electronIDSources.eidHyperTight2MC = cms.InputTag( 'eidHyperTight2MC' )
+  process.patElectrons.electronIDSources.eidHyperTight3MC = cms.InputTag( 'eidHyperTight3MC' )
+  process.patElectrons.electronIDSources.eidHyperTight4MC = cms.InputTag( 'eidHyperTight4MC' )
 
 # X-leptons
 process.countPatLeptons.minNumber = leptonsMin
 
 # Jets
-if 'L1FastJet' in jecLevels:
+if len( jecLevels ) is 0:
+  process.patJets.addJetCorrFactors = False
+  print 'WARNING: No JECs are stored or applied!'
+elif 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
   process.pfJets.doAreaFastjet = True
   process.pfJets.doRhoFastjet  = False
   process.load( "RecoJets.Configuration.RecoPFJets_cff" )
   process.kt6PFJets.src = cms.InputTag( 'pfNoElectron' )
   process.patPF2PATSequence.replace( process.patJetCorrFactors
-                                    , process.kt6PFJets * process.patJetCorrFactors
-                                    )
+                                   , process.kt6PFJets * process.patJetCorrFactors
+                                   )
 process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
@@ -312,9 +356,9 @@ if addGenEvt:
   process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
 
 ### Path
-process.p = cms.Path( process.eventCleaning )
-if runCiC:
-  process.p *= process.eidCiCSequence
-process.p *= process.patPF2PATSequence
+process.p = cms.Path(
+  process.eventCleaning
+* process.patPF2PATSequence
+)
 if addGenEvt:
   process.p *= process.makeGenEvt
