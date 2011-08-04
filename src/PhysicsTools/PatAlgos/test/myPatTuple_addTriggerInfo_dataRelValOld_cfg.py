@@ -3,7 +3,8 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 condition = 'com10'
 #process.GlobalTag.globaltag = autoCond[ condition ]
 process.GlobalTag.globaltag = 'GR_R_42_V14::All'
-process.source.fileNames    = pickRelValInputFiles( formerVersion = True
+process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
+                                                    #formerVersion = True
                                                   , relVal        = 'Mu'
                                                   , dataTier      = 'RECO'
                                                   , globalTag     = 'GR_R_42_V14_mu2010B'
