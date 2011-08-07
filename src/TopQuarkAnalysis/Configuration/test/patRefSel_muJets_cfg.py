@@ -20,7 +20,7 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = False
+runOnMC = True
 
 ### Standard and PF work flow
 
@@ -310,9 +310,9 @@ if runPF2PAT:
   applyPostfix( process, 'pfMuonsFromVertex'    , postfix ).d0Cut    = pfD0Cut
   applyPostfix( process, 'pfMuonsFromVertex'    , postfix ).dzCut    = pfDzCut
   applyPostfix( process, 'pfSelectedMuons'      , postfix ).cut = pfMuonSelectionCut
-  applyPostfix( process, 'isoValMuonWithCharged', postfix ).deposits.deltaR = pfMuonIsoConeR
-  applyPostfix( process, 'isoValMuonWithNeutral', postfix ).deposits.deltaR = pfMuonIsoConeR
-  applyPostfix( process, 'isoValMuonWithPhotons', postfix ).deposits.deltaR = pfMuonIsoConeR
+  applyPostfix( process, 'isoValMuonWithCharged', postfix ).deposits[0].deltaR = pfMuonIsoConeR
+  applyPostfix( process, 'isoValMuonWithNeutral', postfix ).deposits[0].deltaR = pfMuonIsoConeR
+  applyPostfix( process, 'isoValMuonWithPhotons', postfix ).deposits[0].deltaR = pfMuonIsoConeR
   applyPostfix( process, 'pfIsolatedMuons'      , postfix ).combinedIsolationCut = pfMuonCombIsoCut
   applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).vertices = cms.InputTag( pfVertices )
   applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).d0Cut    = pfD0Cut

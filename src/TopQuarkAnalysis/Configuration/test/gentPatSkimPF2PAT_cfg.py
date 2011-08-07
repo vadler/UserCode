@@ -261,9 +261,9 @@ if 'L1FastJet' in jecLevels:
   process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
 
 # Muons
-process.isoValMuonWithCharged.deposits.delta = muonsIsoR
-process.isoValMuonWithNeutral.deposits.delta = muonsIsoR
-process.isoValMuonWithPhotons.deposits.delta = muonsIsoR
+process.isoValMuonWithCharged.deposits[0].delta = muonsIsoR
+process.isoValMuonWithNeutral.deposits[0].delta = muonsIsoR
+process.isoValMuonWithPhotons.deposits[0].delta = muonsIsoR
 process.pfIsolatedMuons.combinedIsolationCut = muonsIsoTP
 process.patMuons.embedTrack = True
 process.selectedPatMuons.cut = muonSelect
