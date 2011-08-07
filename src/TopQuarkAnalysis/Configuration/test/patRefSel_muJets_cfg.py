@@ -20,14 +20,14 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = True
+runOnMC = False
 
 ### Standard and PF work flow
 
 # Standard
 runStandardPAT = True
 usePFJets      = True
-useCaloJets    = False
+useCaloJets    = True
 
 # PF2PAT
 runPF2PAT = True
@@ -120,7 +120,7 @@ useL1FastJet    = True  # needs useL1Offset being off, error otherwise
 useL1Offset     = False # needs useL1FastJet being off, error otherwise
 useL2Relative   = True
 useL3Absolute   = True
-# useL2L3Residual = True  # takes effect only on data; currently disabled for CMSSW_4_2_X GlobalTags!
+useL2L3Residual = True  # takes effect only on data
 useL5Flavor     = True
 useL7Parton     = True
 
@@ -145,8 +145,8 @@ maxInputEvents = 1000
 ### Conditions
 
 # GlobalTags (w/o suffix '::All')
-globalTagData = 'GR_R_42_V14' # default for CMSSW_4_2_5 RelVals: 'GR_R_42_V14'
-globalTagMC   = 'START42_V12' # default for CMSSW_4_2_5 RelVals: 'START42_V12'
+globalTagData = 'GR_R_42_V19' # default for CMSSW_4_2_8 RelVals: 'GR_R_42_V14'
+globalTagMC   = 'START42_V13' # default for CMSSW_4_2_8 RelVals: 'START42_V12'
 
 ### Output
 
@@ -186,16 +186,16 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
                                      , relVal        = 'RelValTTbar'
-                                     , globalTag     = globalTagMC
+                                     , globalTag     = 'START42_V12'
                                      , numberOfFiles = -1
                                      )
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
                                      , relVal        = 'Mu'
                                      , dataTier      = 'RECO'
-                                     , globalTag     = globalTagData + '_mu2010B'
+                                     , globalTag     = 'GR_R_42_V14_mu2010B'
                                      , numberOfFiles = -1
                                      )
 process.source.fileNames = inputFiles
@@ -276,8 +276,8 @@ if useL2Relative:
   jecLevels.append( 'L2Relative' )
 if useL3Absolute:
   jecLevels.append( 'L3Absolute' )
-# if useL2L3Residual and not runOnMC:
-#   jecLevelsPF.append( 'L2L3Residual' )
+if useL2L3Residual and not runOnMC:
+  jecLevels.append( 'L2L3Residual' )
 if useL5Flavor:
   jecLevels.append( 'L5Flavor' )
 if useL7Parton:
@@ -418,6 +418,9 @@ if runStandardPAT:
     process.patDefaultSequence.replace( process.patJetCorrFactors
                                       , process.kt6PFJets * process.patJetCorrFactors
                                       )
+    process.patJetCorrFactors.useRho = True
+    if usePFJets:
+      getattr( process, 'patJetCorrFactors' + jetAlgo + pfSuffix ).useRho = True
     process.out.outputCommands.append( 'keep double_*_*_' + process.name_() )
 
   process.goodPatJets = goodPatJets.clone()
@@ -625,6 +628,9 @@ process.eidCiCSequence = cms.Sequence(
 + process.eidTightMC
 + process.eidSuperTightMC
 + process.eidHyperTight1MC
++ process.eidHyperTight2MC
++ process.eidHyperTight3MC
++ process.eidHyperTight4MC
 )
 
 # The additional sequence
@@ -713,7 +719,7 @@ if runStandardPAT:
     pAddPF += process.goodOfflinePrimaryVertices
     if useGoodVertex:
       pAddPF += process.step0b
-    pAddPF += process.eidCiCSequence
+    #pAddPF += process.eidCiCSequence
     pAddPF += process.patDefaultSequence
     pAddPF.remove( process.patJetCorrFactors )
     pAddPF.remove( process.patJetCharge )
