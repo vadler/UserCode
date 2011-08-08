@@ -105,11 +105,11 @@ useNoTau      = True # before MET top projection
 # muons
 #pfMuonSelectionCut = ''
 #pfMuonIsoConeR   = 0.4
-#pfMuonCombIsoCut = 0.25
+#pfMuonCombIsoCut = 0.2
 # electrons
 #pfElectronSelectionCut  = ''
 #pfElectronIsoConeR   = 0.3
-#pfElectronCombIsoCut = 0.25
+#pfElectronCombIsoCut = 0.2
 
 ### JEC levels
 
@@ -220,9 +220,6 @@ process.out.SelectEvents.SelectEvents = []
 ### Cleaning and trigger selection configuration
 ###
 
-### Event cleaning
-process.load( 'TopQuarkAnalysis.Configuration.patRefSel_eventCleaning_cff' )
-
 ### Trigger selection
 if runOnMC:
   triggerSelection = triggerSelectionMC
@@ -236,6 +233,13 @@ process.step0a = triggerResults.clone(
 ### Good vertex selection
 process.load( "TopQuarkAnalysis.Configuration.patRefSel_goodVertex_cfi" )
 process.step0b = process.goodOfflinePrimaryVertexFilter.clone()
+
+### Event cleaning
+process.load( 'TopQuarkAnalysis.Configuration.patRefSel_eventCleaning_cff' )
+process.step0c = cms.Sequence(
+  process.HBHENoiseFilter
++ process.scrapingFilter
+)
 
 
 ###
@@ -317,11 +321,11 @@ if runPF2PAT:
   applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).vertices = cms.InputTag( pfVertices )
   applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).d0Cut    = pfD0Cut
   applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).dzCut    = pfDzCut
-  applyPostfix( process, 'pfSelectedElectronsPF'    , postfix ).cut = pfElectronSelectionCut
+  applyPostfix( process, 'pfSelectedElectrons'      , postfix ).cut = pfElectronSelectionCut
   applyPostfix( process, 'isoValElectronWithCharged', postfix ).deposits.deltaR = pfElectronIsoConeR
   applyPostfix( process, 'isoValElectronWithNeutral', postfix ).deposits.deltaR = pfElectronIsoConeR
   applyPostfix( process, 'isoValElectronWithPhotons', postfix ).deposits.deltaR = pfElectronIsoConeR
-  applyPostfix( process, 'pfIsolatedElectronsPF'    , postfix ).combinedIsolationCut = pfElectronCombIsoCut
+  applyPostfix( process, 'pfIsolatedElectrons'      , postfix ).combinedIsolationCut = pfElectronCombIsoCut
 
 # remove MC matching, object cleaning, objects etc.
 if runStandardPAT:
@@ -653,15 +657,17 @@ if runPF2PAT:
 
 # The paths
 if runStandardPAT:
+
   if useCaloJets:
+
     process.p = cms.Path()
-    if not runOnMC:
-      process.p += process.eventCleaning
     if useTrigger:
       process.p += process.step0a
     process.p += process.goodOfflinePrimaryVertices
     if useGoodVertex:
       process.p += process.step0b
+    if not runOnMC:
+      process.p += process.step0c
     process.p += process.eidCiCSequence
     process.p += process.patDefaultSequence
     if usePFJets:
@@ -712,13 +718,13 @@ if runStandardPAT:
   if usePFJets:
 
     pAddPF = cms.Path()
-    if not runOnMC:
-      pAddPF += process.eventCleaning
     if useTrigger:
       pAddPF += process.step0a
     pAddPF += process.goodOfflinePrimaryVertices
     if useGoodVertex:
       pAddPF += process.step0b
+    if not runOnMC:
+      pAddPF += process.step0c
     #pAddPF += process.eidCiCSequence
     pAddPF += process.patDefaultSequence
     pAddPF.remove( process.patJetCorrFactors )
@@ -761,14 +767,15 @@ if runStandardPAT:
     process.out.SelectEvents.SelectEvents.append( 'p' + jetAlgo + pfSuffix )
 
 if runPF2PAT:
+
   pPF = cms.Path()
-  if not runOnMC:
-    pPF += process.eventCleaning
   if useTrigger:
     pPF += process.step0a
   pPF += process.goodOfflinePrimaryVertices
   if useGoodVertex:
     pPF += process.step0b
+  if not runOnMC:
+    pPF += process.step0c
   pPF += process.eidCiCSequence
   pPF += getattr( process, 'patPF2PATSequence' + postfix )
   pPF += getattr( process, 'patAddOnSequence' + postfix )
