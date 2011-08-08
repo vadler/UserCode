@@ -41,7 +41,7 @@ triggerSelectionMC   = triggerSelection_Summer11
 ### Muon selection
 
 # PF2PAT top projection settings
-pfMuonIsoConeR = 0.4
+pfMuonIsoConeR = 0.4 # for mu+jets, default: 0.3
 
 # Minimal selection for veto muons, also basis for signal muons
 muonCutBase  =     'isGlobalMuon'                                                # general reconstruction property
@@ -52,6 +52,7 @@ muonCut  =  muonCutBase
 muonCut += ' && (trackIso+caloIso)/pt < 0.2'                                     # relative isolation
 # PF muon
 muonCutPF  =  muonCutBase
+muonCutPF += ' && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.2'        # relative isolation
 
 # Signal muon selection on top of 'muonCut'
 looseMuonCutBase  =     'isTrackerMuon'                                          # general reconstruction property
@@ -80,7 +81,7 @@ tightMuonCut  = tightMuonCutBase
 tightMuonCut += '(trackIso+caloIso)/pt < 0.05'                                   # relative isolation
 # PF muon
 tightMuonCutPF  = tightMuonCutBase
-tightMuonCutPF += '(chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.05'      # relative isolation
+tightMuonCutPF += '(chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.125'     # relative isolation
 
 ### Jet selection
 
@@ -113,7 +114,7 @@ electronCut  = electronCutBase
 electronCut += ' && (dr03TkSumPt+dr03EcalRecHitSumEt+dr03HcalTowerSumEt)/et < 0.2' # relative isolation
 # PF electron
 electronCutPF  = electronCutBase
-electronCutPF += ' && (chargedHadronIso+neutralHadronIso+photonIso)/et < 0.25'     # relative isolation
+electronCutPF += ' && (chargedHadronIso+neutralHadronIso+photonIso)/et < 0.2'      # relative isolation
 
 ### ------------------------------------------------------------------------ ###
 

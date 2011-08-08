@@ -2,7 +2,6 @@ import FWCore.ParameterSet.Config as cms
 
 from CommonTools.RecoAlgos.HBHENoiseFilter_cfi import *
 # s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1196.html
-HBHENoiseFilter.label                       = cms.InputTag( HBHENoiseFilter.label.getModuleLabel() )
 HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
 HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
 HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
