@@ -22,7 +22,7 @@ jecLevels = []
 muonsIsoR = 0.4
 # muon top projection isolation
 #muonsIsoTP = 0.15 # PF2PAT
-muonsIsoTP = 0.25
+muonsIsoTP = 0.2
 # muon object selection
 #muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
 muonSelect = ''
@@ -34,7 +34,7 @@ muonsMin = 0
 electronsIsoR = 0.3
 # electron top projection isolation
 #electronsIsoTP = 0.2 # PF2PAT
-electronsIsoTP = 0.25
+electronsIsoTP = 0.2
 # electron object selection
 #electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
 electronSelect = ''
@@ -93,11 +93,11 @@ process.maxEvents = cms.untracked.PSet(
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
                                                  , globalTag     = 'START42_V12'
                                                  )
 else:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
                                                  , dataTier      = 'RECO'
                                                  , relVal        = 'Mu'
                                                  , globalTag     = 'GR_R_42_V14_mu2010B'
@@ -257,13 +257,12 @@ if addGenEvt:
   process.out.outputCommands += [ 'keep *_genParticles_*_*'
                                 , 'keep *_genEvt_*_*'
                                 ]
-if 'L1FastJet' in jecLevels:
-  process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
+process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
 
 # Muons
-process.isoValMuonWithCharged.deposits[0].delta = muonsIsoR
-process.isoValMuonWithNeutral.deposits[0].delta = muonsIsoR
-process.isoValMuonWithPhotons.deposits[0].delta = muonsIsoR
+process.isoValMuonWithCharged.deposits[0].deltaR = muonsIsoR
+process.isoValMuonWithNeutral.deposits[0].deltaR = muonsIsoR
+process.isoValMuonWithPhotons.deposits[0].deltaR = muonsIsoR
 process.pfIsolatedMuons.combinedIsolationCut = muonsIsoTP
 process.patMuons.embedTrack = True
 process.selectedPatMuons.cut = muonSelect
@@ -273,9 +272,9 @@ process.cleanPatMuons.checkOverlaps = cms.PSet()
 process.countPatMuons.minNumber = muonsMin
 
 # Electrons
-process.isoValElectronWithCharged.deposits.delta = electronsIsoR
-process.isoValElectronWithNeutral.deposits.delta = electronsIsoR
-process.isoValElectronWithPhotons.deposits.delta = electronsIsoR
+process.isoValElectronWithCharged.deposits[0].deltaR = electronsIsoR
+process.isoValElectronWithNeutral.deposits[0].deltaR = electronsIsoR
+process.isoValElectronWithPhotons.deposits[0].deltaR = electronsIsoR
 process.pfIsolatedElectrons.combinedIsolationCut = electronsIsoTP
 process.patElectrons.embedTrack = True
 process.selectedPatElectrons.cut = electronSelect
@@ -338,10 +337,11 @@ elif 'L1FastJet' in jecLevels:
   process.pfJets.doAreaFastjet = True
   process.pfJets.doRhoFastjet  = False
   process.load( "RecoJets.Configuration.RecoPFJets_cff" )
-  process.kt6PFJets.src = cms.InputTag( 'pfNoElectron' )
-  process.patPF2PATSequence.replace( process.patJetCorrFactors
-                                   , process.kt6PFJets * process.patJetCorrFactors
-                                   )
+process.kt6PFJets.src          = cms.InputTag( 'pfNoElectron' )
+process.kt6PFJets.voronoiRfact = cms.double( -0.9 ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
+process.patPF2PATSequence.replace( process.patJetCorrFactors
+                                 , process.kt6PFJets * process.patJetCorrFactors
+                                 )
 process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
