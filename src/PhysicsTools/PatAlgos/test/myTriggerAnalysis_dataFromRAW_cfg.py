@@ -5,7 +5,7 @@ process = cms.Process( "HLTPROV" )
 # Conditions
 condition = 'com10'
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-from Configuration.AlCa.autoCond import autoCond
+from Configuration.PyReleaseValidation.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
 
 # Source

@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from FWCore.GuiBrowsers.ConfigToolBase import *
 from PhysicsTools.PatAlgos.tools.helpers import *
 from PhysicsTools.PatAlgos.tools.jetTools import *
-from Configuration.AlCa.autoCond import autoCond
+from Configuration.PyReleaseValidation.autoCond import autoCond
 
 import os
 import socket
@@ -930,11 +930,6 @@ class PickRelValInputFiles( ConfigToolBase ):
         domain    = socket.getfqdn().split( '.' )
         if len( domain ) == 0:
             print '%s INFO : Cannot determine domain of this computer'%( self._label )
-            if debug:
-                self.messageEmptyList()
-            return filePaths
-        elif os.uname() == "Darwin":
-            print '%s INFO : Running on MacOSX without direct access to RelVal files.'%( self._label )
             if debug:
                 self.messageEmptyList()
             return filePaths

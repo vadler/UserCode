@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.51 2011/06/30 21:48:00 rwolf Exp $
+// $Id: PATElectronProducer.cc,v 1.47.2.4 2011/07/05 16:25:28 bellan Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
@@ -54,9 +54,10 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
   embedTrack_       = iConfig.getParameter<bool>         ( "embedTrack" );
 
   // pflow specific
-  pfElecSrc_           = iConfig.getParameter<edm::InputTag>( "pfElectronSource" );
-  useParticleFlow_        = iConfig.getParameter<bool>( "useParticleFlow" );
-  embedPFCandidate_   = iConfig.getParameter<bool>( "embedPFCandidate" );
+  pfElecSrc_        = iConfig.getParameter<edm::InputTag>( "pfElectronSource" );
+  useParticleFlow_  = iConfig.getParameter<bool>( "useParticleFlow" );
+  linkToPFSource_   = iConfig.getParameter<edm::InputTag>( "linkToPFSource" );  //SAK
+  embedPFCandidate_ = iConfig.getParameter<bool>( "embedPFCandidate" );
 
 
   // MC matching configurables
@@ -261,6 +262,11 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
   if( useParticleFlow_ ) {
     edm::Handle< reco::PFCandidateCollection >  pfElectrons;
     iEvent.getByLabel(pfElecSrc_, pfElectrons);
+    //-- SAK ------------------------------------------------------------------
+    edm::Handle< reco::PFCandidateCollection >  pfForLinking;
+    if (linkToPFSource_.label().length())
+      iEvent.getByLabel(linkToPFSource_, pfForLinking);
+    //-- SAK ------------------------------------------------------------------
     unsigned index=0;
 
     for( reco::PFCandidateConstIterator i = pfElectrons->begin();
@@ -368,6 +374,17 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 
 	  //COLIN need to use fillElectron2 in the non-pflow case as well, and to test it.
 
+    //-- SAK ------------------------------------------------------------------
+    if (linkToPFSource_.label().length() && anElectron.pfCandidateRef().id() != pfForLinking.id()) {
+      reco::CandidatePtr  source  = anElectron.pfCandidateRef()->sourceCandidatePtr(0);
+      while (source.id() != pfForLinking.id()) {
+        source  = source->sourceCandidatePtr(0);
+        if (source.isNull())
+          throw cms::Exception("InputSource", "Object in "+pfElecSrc_.encode()+" does not link back to "+linkToPFSource_.encode());
+      } // end loop over inheritance chain
+      anElectron.setPFCandidateRef(reco::PFCandidateRef(pfForLinking, source.key()));
+    }
+    //-- SAK ------------------------------------------------------------------
 	  patElectrons->push_back(anElectron);
 	}
       }
@@ -617,7 +634,8 @@ void PATElectronProducer::fillElectron2( Electron& anElectron,
     else {
       anElectron.setIsolation(isolationValueLabels_[j].first,
 			      (*isolationValues[j])[candPtrForIsolation->sourceCandidatePtr(0)]);
-    }    
+    }
+    
   }
 }
 
@@ -640,6 +658,7 @@ void PATElectronProducer::fillDescriptions(edm::ConfigurationDescriptions & desc
   // pf specific parameters
   iDesc.add<edm::InputTag>("pfElectronSource", edm::InputTag("pfElectrons"))->setComment("particle flow input collection");
   iDesc.add<bool>("useParticleFlow", false)->setComment("whether to use particle flow or not");
+  iDesc.add<edm::InputTag>("linkToPFSource", edm::InputTag())->setComment("alternative PF collection to link to (pfCandidateRef) -- traverses inheritance chain up to this");
   iDesc.add<bool>("embedPFCandidate", false)->setComment("embed external particle flow object");
 
   // MC matching configurables
