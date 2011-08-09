@@ -82,11 +82,11 @@ process.maxEvents = cms.untracked.PSet(
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
                                                  , globalTag     = 'START42_V12'
                                                  )
 else:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_5'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
                                                  , dataTier      = 'RECO'
                                                  , relVal        = 'Mu'
                                                  , globalTag     = 'GR_R_42_V14_mu2010B'
@@ -210,8 +210,7 @@ if addGenEvt:
   process.out.outputCommands += [ 'keep *_genParticles_*_*'
                                 , 'keep *_genEvt_*_*'
                                 ]
-if 'L1FastJet' in jecLevels:
-  process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
+process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
 
 # Muons
 process.patMuons.embedTrack = True
@@ -285,11 +284,11 @@ switchJetCollection( process
 if len( jecLevels ) is 0:
   process.patJets.addJetCorrFactors = False
   print 'WARNING: No JECs are stored or applied!'
-elif 'L1FastJet' in jecLevels:
-  process.load( "RecoJets.Configuration.RecoPFJets_cff" )
-  process.patDefaultSequence.replace( process.patJetCorrFactors
-                                    , process.kt6PFJets * process.patJetCorrFactors
-                                    )
+process.load( "RecoJets.Configuration.RecoPFJets_cff" )
+process.kt6PFJets.voronoiRfact = cms.double( -0.9 ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
+process.patDefaultSequence.replace( process.patJetCorrFactors
+                                  , process.kt6PFJets * process.patJetCorrFactors
+                                  )
 process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
