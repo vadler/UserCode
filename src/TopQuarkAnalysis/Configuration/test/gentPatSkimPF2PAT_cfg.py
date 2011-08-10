@@ -336,7 +336,7 @@ elif 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
   process.pfJets.doAreaFastjet = True
   process.pfJets.doRhoFastjet  = False
-  process.load( "RecoJets.Configuration.RecoPFJets_cff" )
+process.load( "RecoJets.Configuration.RecoPFJets_cff" )
 process.kt6PFJets.src          = cms.InputTag( 'pfNoElectron' )
 process.kt6PFJets.voronoiRfact = cms.double( -0.9 ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
 process.patPF2PATSequence.replace( process.patJetCorrFactors
