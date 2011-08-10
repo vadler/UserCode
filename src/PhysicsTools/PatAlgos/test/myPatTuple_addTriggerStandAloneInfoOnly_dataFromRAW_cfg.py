@@ -23,14 +23,14 @@ process.source = cms.Source( "PoolSource"
   )
 )
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( 1000 )
+  input = cms.untracked.int32( 100 )
 )
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-from Configuration.AlCa.autoCond import autoCond
+from Configuration.PyReleaseValidation.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ 'com10' ] )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 
