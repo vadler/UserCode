@@ -6,5 +6,6 @@ DataFormats/PatCandidates                        V06-04-19-01   V06-04-16
 PhysicsTools/PatAlgos                            V08-07-16      V08-07-11      
 PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
 PhysicsTools/SelectorUtils                       V00-03-17      V00-03-15      
+RecoJets/JetProducers                            V05-08-02      V05-08-01      
 ---------------------------------------
-total packages: 4 (4 displayed)
+total packages: 5 (5 displayed)
