@@ -13,7 +13,8 @@ process.GlobalTag.globaltag = cms.string( 'START44_V2::All' )
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    pickRelValInputFiles( formerVersion = True
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_0_pre7'
+                          #formerVersion = True
                         , relVal        = None
                         , dataTier      = None
                         #, condition     = condition
