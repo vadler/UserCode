@@ -23,6 +23,7 @@ runOnData( process )
 process.patJetCorrFactors.levels = [ 'L1Offset'
                                    , 'L2Relative'
                                    , 'L3Absolute'
+                                   , 'L2L3Residual'
                                    , 'L5Flavor'
                                    , 'L7Parton'
                                    ]
