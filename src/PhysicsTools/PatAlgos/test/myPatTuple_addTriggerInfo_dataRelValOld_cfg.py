@@ -3,7 +3,8 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 condition = 'com10'
 process.GlobalTag.globaltag = autoCond[ condition ]
 #process.GlobalTag.globaltag = 'GR_R_44_V1::All'
-process.source.fileNames    = pickRelValInputFiles( formerVersion = True
+process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_0_pre7'
+                                                    #formerVersion = True
                                                   , relVal        = 'SingleMu'
                                                   , dataTier      = 'RECO'
                                                   , globalTag     = 'GR_R_44_V1_RelVal_mu2011A'
@@ -25,6 +26,7 @@ runOnData( process )
 process.patJetCorrFactors.levels = [ 'L1Offset'
                                    , 'L2Relative'
                                    , 'L3Absolute'
+                                   , 'L2L3Residual'
                                    , 'L5Flavor'
                                    , 'L7Parton'
                                    ]
