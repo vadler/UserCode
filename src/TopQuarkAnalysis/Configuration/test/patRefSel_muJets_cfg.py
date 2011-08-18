@@ -344,21 +344,8 @@ if runPF2PAT:
   applyPostfix( process, 'isoValElectronWithNeutral', postfix ).deposits[0].deltaR = pfElectronIsoConeR
   applyPostfix( process, 'isoValElectronWithPhotons', postfix ).deposits[0].deltaR = pfElectronIsoConeR
   applyPostfix( process, 'pfIsolatedElectrons'      , postfix ).combinedIsolationCut = pfElectronCombIsoCut
-  #applyPostfix( process, 'pfTauTagInfoProducer'               , postfix ).PVProducer = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'pfJetsPiZeros'                      , postfix ).builders[1].primaryVertexSrc = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'pfJetsLegacyHPSPiZeros'             , postfix ).builders[0].primaryVertexSrc = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'pfTausBase'                         , postfix ).builders[0].primaryVertexSrc = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'pfTausBaseDiscriminationByIsolation', postfix ).PVProducer = cms.InputTag( pfVertices )
   applyPostfix( process, 'patElectrons', postfix ).pvSrc = cms.InputTag( pfVertices )
   applyPostfix( process, 'patMuons', postfix ).pvSrc = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'shrinkingConePFTauDiscriminationByIsolation'                     , postfix ).PVProducer = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'shrinkingConePFTauDiscriminationByTrackIsolation'                , postfix ).PVProducer = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'shrinkingConePFTauDiscriminationByECALIsolation'                 , postfix ).PVProducer = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'shrinkingConePFTauDiscriminationByIsolationUsingLeadingPion'     , postfix ).PVProducer = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'shrinkingConePFTauDiscriminationByTrackIsolationUsingLeadingPion', postfix ).PVProducer = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'shrinkingConePFTauDiscriminationByECALIsolationUsingLeadingPion' , postfix ).PVProducer = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'impactParameterTagInfosAODPF', postfix ).primaryVertex = cms.InputTag( pfVertices )
-  #applyPostfix( process, 'softMuonTagInfosAODPF'       , postfix ).primaryVertex = cms.InputTag( pfVertices )
 
 from TopQuarkAnalysis.Configuration.patRefSel_refMuJets_cfi import *
 
@@ -479,7 +466,6 @@ if runStandardPAT:
 
   ### Jets
 
-  #process.patJetCorrFactors.primaryVertices = cms.InputTag( pfVertices )
   process.kt6PFJets = kt6PFJets.clone( src          = cms.InputTag( 'particleFlow' )
                                      , doRhoFastjet = True
                                      )
