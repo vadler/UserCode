@@ -111,9 +111,9 @@ useNoTau      = True # before MET top projection
 
 # cuts used in top projections
 # vertices
-#pfD0Cut   = 0.2
-#pfDzCut   = 0.5
-#pfVertices = 'goodOfflinePrimaryVertices'
+#pfVertices  = 'goodOfflinePrimaryVertices'
+#pfD0Cut     = 0.2
+#pfDzCut     = 0.5
 # muons
 #pfMuonSelectionCut = 'pt > 5.'
 useMuonCutBasePF = False # use minimal (veto) muon selection cut on top of 'pfMuonSelectionCut'
@@ -323,8 +323,8 @@ if runPF2PAT:
   applyPostfix( process, 'pfNoElectron', postfix ).enable = useNoElectron
   applyPostfix( process, 'pfNoJet'     , postfix ).enable = useNoJet
   applyPostfix( process, 'pfNoTau'     , postfix ).enable = useNoTau
+  applyPostfix( process, 'pfPileUp', postfix ).Vertices = cms.InputTag( pfVertices )
   if useL1FastJet:
-    applyPostfix( process, 'pfPileUp', postfix ).Vertices            = cms.InputTag( pfVertices )
     applyPostfix( process, 'pfPileUp', postfix ).checkClosestZVertex = False
     applyPostfix( process, 'pfJets', postfix ).doAreaFastjet = True
     applyPostfix( process, 'pfJets', postfix ).doRhoFastjet  = False
@@ -344,6 +344,22 @@ if runPF2PAT:
   applyPostfix( process, 'isoValElectronWithNeutral', postfix ).deposits[0].deltaR = pfElectronIsoConeR
   applyPostfix( process, 'isoValElectronWithPhotons', postfix ).deposits[0].deltaR = pfElectronIsoConeR
   applyPostfix( process, 'pfIsolatedElectrons'      , postfix ).combinedIsolationCut = pfElectronCombIsoCut
+  applyPostfix( process, 'pfTauPileUpVertices'                , postfix ).src = cms.InputTag( pfVertices )
+  applyPostfix( process, 'pfTauTagInfoProducer'               , postfix ).PVProducer = cms.InputTag( pfVertices )
+  applyPostfix( process, 'pfJetsPiZeros'                      , postfix ).builders[1].primaryVertexSrc = cms.InputTag( pfVertices )
+  applyPostfix( process, 'pfJetsLegacyHPSPiZeros'             , postfix ).builders[0].primaryVertexSrc = cms.InputTag( pfVertices )
+  applyPostfix( process, 'pfTausBase'                         , postfix ).builders[0].primaryVertexSrc = cms.InputTag( pfVertices )
+  applyPostfix( process, 'pfTausBaseDiscriminationByIsolation', postfix ).PVProducer = cms.InputTag( pfVertices )
+  applyPostfix( process, 'patElectrons', postfix ).pvSrc = cms.InputTag( pfVertices )
+  applyPostfix( process, 'patMuons', postfix ).pvSrc = cms.InputTag( pfVertices )
+  applyPostfix( process, 'shrinkingConePFTauDiscriminationByIsolation'                     , postfix ).PVProducer = cms.InputTag( pfVertices )
+  applyPostfix( process, 'shrinkingConePFTauDiscriminationByTrackIsolation'                , postfix ).PVProducer = cms.InputTag( pfVertices )
+  applyPostfix( process, 'shrinkingConePFTauDiscriminationByECALIsolation'                 , postfix ).PVProducer = cms.InputTag( pfVertices )
+  applyPostfix( process, 'shrinkingConePFTauDiscriminationByIsolationUsingLeadingPion'     , postfix ).PVProducer = cms.InputTag( pfVertices )
+  applyPostfix( process, 'shrinkingConePFTauDiscriminationByTrackIsolationUsingLeadingPion', postfix ).PVProducer = cms.InputTag( pfVertices )
+  applyPostfix( process, 'shrinkingConePFTauDiscriminationByECALIsolationUsingLeadingPion' , postfix ).PVProducer = cms.InputTag( pfVertices )
+  applyPostfix( process, 'impactParameterTagInfosAODPF', postfix ).primaryVertex = cms.InputTag( pfVertices )
+  applyPostfix( process, 'softMuonTagInfosAODPF'       , postfix ).primaryVertex = cms.InputTag( pfVertices )
 
 from TopQuarkAnalysis.Configuration.patRefSel_refMuJets_cfi import *
 
@@ -464,6 +480,7 @@ if runStandardPAT:
 
   ### Jets
 
+  #process.patJetCorrFactors.primaryVertices = cms.InputTag( pfVertices )
   process.kt6PFJets = kt6PFJets.clone( src          = cms.InputTag( 'particleFlow' )
                                      , doRhoFastjet = True
                                      )
