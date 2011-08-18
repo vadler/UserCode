@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-runOnMC   = False
+runOnMC   = True
 runMatch  = False
 runCiC    = True
 runEwk    = True
@@ -18,11 +18,16 @@ jecLevels = []
 #if not runOnMC:
   #jecLevels.append( 'L2L3Residual' )
 
-# muon isolation
+# vertex collection to use
+# 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
+pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
+
+# muon top projection object selection
+muonSelectTP = 'pt > 5.' # PF2PAT: 'pt > 5.'
+# muon isolation cone
 muonsIsoR = 0.4
 # muon top projection isolation
-#muonsIsoTP = 0.15 # PF2PAT
-muonsIsoTP = 0.2
+muonsIsoTP = 0.2 # PF2PAT: 0.15
 # muon object selection
 #muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
 muonSelect = ''
@@ -30,11 +35,12 @@ muonSelect = ''
 muonsCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
 muonsMin = 0
 
-# electron isolation
+# electron top projection object selection
+electronSelectTP = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2' # PF2PAT: 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
+# electron isolation cone
 electronsIsoR = 0.3
 # electron top projection isolation
-#electronsIsoTP = 0.2 # PF2PAT
-electronsIsoTP = 0.2
+electronsIsoTP = 0.2 # PF2PAT: 0.2
 # electron object selection
 #electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
 electronSelect = ''
@@ -144,25 +150,14 @@ process.triggerResultsFilter.triggerConditions = [ triggerSelection ]
 process.triggerResultsFilter.throw             = False
 
 # Vertices
-pvSelection = cms.PSet(
-  minNdof = cms.double( 4. )
-, maxZ    = cms.double( 24. )
-, maxRho  = cms.double( 2. )
-)
 process.goodOfflinePrimaryVertices = cms.EDFilter(
   "PrimaryVertexObjectFilter"
-, filterParams = pvSelection
-, filter       = cms.bool( False )
+, filterParams = cms.PSet( minNdof = cms.double(  4. )
+                         , maxZ    = cms.double( 24. )
+                         , maxRho  = cms.double(  2. )
+                         )
+, filter       = cms.bool( True )
 , src          = cms.InputTag( 'offlinePrimaryVertices' )
-)
-process.goodOfflinePrimaryVertexFilter = cms.EDFilter(
-  "PrimaryVertexFilter"
-, pvSelection
-, pvSrc = cms.InputTag( 'goodOfflinePrimaryVertices' )
-)
-process.vertexSelection = cms.Sequence(
-  process.goodOfflinePrimaryVertices
-* process.goodOfflinePrimaryVertexFilter
 )
 
 process.eventCleaning = cms.Sequence(
@@ -171,7 +166,7 @@ process.eventCleaning = cms.Sequence(
 )
 if triggerSelection != '':
   process.eventCleaning += process.triggerResultsFilter
-process.eventCleaning += process.vertexSelection
+process.eventCleaning += process.goodOfflinePrimaryVertices
 
 ### PAT
 
@@ -231,9 +226,6 @@ process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
 process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )
 process.patPF2PATSequence.remove( process.iterativeCone5GenJetsNoNu )
 process.patPF2PATSequence.remove( process.genParticlesForJetsNoNu )
-# The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
-process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
-process.patJetCorrFactors.levels  = jecLevels
 process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
                               , 'drop recoBaseTagInfosOwned_*_*_*'
                               , 'drop CaloTowers_*_*_*'
@@ -242,6 +234,7 @@ process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
                               , 'drop edmTriggerResults_*_*_*NONE*'
                               , 'keep *_hltTriggerSummaryAOD_*_*'
                               , 'keep *_offlineBeamSpot_*_*'
+                              , 'keep *_offlinePrimaryVertices_*_*'
                               , 'keep *_goodOfflinePrimaryVertices_*_*'
                               # for conversion rejection
                               , 'keep recoTracks_generalTracks_*_*'
@@ -257,9 +250,19 @@ if addGenEvt:
   process.out.outputCommands += [ 'keep *_genParticles_*_*'
                                 , 'keep *_genEvt_*_*'
                                 ]
-process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
+process.out.outputCommands += [ 'keep double_kt6PFJets_rho_' + process.name_() ]
+
+# Vertices
+pvCollection += '::%s'%( process.name_() )
+process.pfPileUp.Vertices                 = cms.InputTag( pvCollection )
+process.pfMuonsFromVertex.vertices        = cms.InputTag( pvCollection )
+process.pfElectronsFromVertex.vertices    = cms.InputTag( pvCollection )
+process.patElectrons.pvSrc                = cms.InputTag( pvCollection )
+process.patMuons.pvSrc                    = cms.InputTag( pvCollection )
+process.patJetCorrFactors.primaryVertices = cms.InputTag( pvCollection )
 
 # Muons
+process.pfSelectedMuons.cut = muonSelectTP
 process.isoValMuonWithCharged.deposits[0].deltaR = muonsIsoR
 process.isoValMuonWithNeutral.deposits[0].deltaR = muonsIsoR
 process.isoValMuonWithPhotons.deposits[0].deltaR = muonsIsoR
@@ -272,6 +275,7 @@ process.cleanPatMuons.checkOverlaps = cms.PSet()
 process.countPatMuons.minNumber = muonsMin
 
 # Electrons
+process.pfSelectedElectrons.cut = electronSelectTP
 process.isoValElectronWithCharged.deposits[0].deltaR = electronsIsoR
 process.isoValElectronWithNeutral.deposits[0].deltaR = electronsIsoR
 process.isoValElectronWithPhotons.deposits[0].deltaR = electronsIsoR
@@ -342,6 +346,8 @@ process.kt6PFJets.voronoiRfact = cms.double( -0.9 ) # to ensure not to use the V
 process.patPF2PATSequence.replace( process.patJetCorrFactors
                                  , process.kt6PFJets * process.patJetCorrFactors
                                  )
+process.patJetCorrFactors.payload = jetAlgo + 'PFchs' # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
+process.patJetCorrFactors.levels  = jecLevels         # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
