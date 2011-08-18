@@ -4,7 +4,7 @@ condition = 'com10'
 process.GlobalTag.globaltag = autoCond[ condition ]
 process.source.fileNames    = pickRelValInputFiles( relVal        = 'SingleMu'
                                                   , dataTier      = 'RECO'
-                                                  , globalTag     = 'GR_R_44_V1_RelVal_mu2011A'
+                                                  , globalTag     = 'GR_R_44_V2_RelVal_mu2010B'
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
