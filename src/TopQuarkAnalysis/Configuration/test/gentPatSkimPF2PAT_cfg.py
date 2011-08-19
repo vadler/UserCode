@@ -152,12 +152,12 @@ process.triggerResultsFilter.throw             = False
 # Vertices
 process.goodOfflinePrimaryVertices = cms.EDFilter(
   "PrimaryVertexObjectFilter"
+, src          = cms.InputTag( 'offlinePrimaryVertices' )
+, filter       = cms.bool( True )
 , filterParams = cms.PSet( minNdof = cms.double(  4. )
                          , maxZ    = cms.double( 24. )
                          , maxRho  = cms.double(  2. )
                          )
-, filter       = cms.bool( True )
-, src          = cms.InputTag( 'offlinePrimaryVertices' )
 )
 
 process.eventCleaning = cms.Sequence(
