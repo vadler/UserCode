@@ -6,8 +6,8 @@ DataFormats/PatCandidates                        V06-04-19-01   V06-04-18
 PhysicsTools/PatAlgos                            V08-06-41      V08-06-41      
 PhysicsTools/PatExamples                         V00-05-23      V00-05-22      
 PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
-PhysicsTools/SelectorUtils                       V00-03-17      V00-03-17      
-PhysicsTools/UtilAlgos                           V08-02-12      V08-02-12      
+PhysicsTools/SelectorUtils                       V00-03-23      V00-03-17      
+PhysicsTools/UtilAlgos                           V08-02-13      V08-02-12      
 RecoJets/Configuration                           V02-04-17      V02-04-13      
 RecoTauTag/Configuration                         V01-02-02      V01-00-27      
 RecoTauTag/RecoTau                               V01-02-06      V01-00-35      
