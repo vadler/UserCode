@@ -3,11 +3,12 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-runOnMC   = True
-runMatch  = False
-runCiC    = True
-runEwk    = True
-addGenEvt = False
+runOnMC        = True
+runMatch       = False
+runGenJetMatch = False # separate from rets of matches due to rapidly inceasing data volume
+runCiC         = True
+runEwk         = True
+addGenEvt      = False
 
 hltProcess       = 'HLT'
 triggerSelection = ''
@@ -62,8 +63,9 @@ jetsMin = 3
 
 process = cms.Process( 'PF2PAT' )
 
-runMatch  = runMatch  and runOnMC
-addGenEvt = addGenEvt and runOnMC
+runMatch       = runMatch       and runOnMC
+runGenJetMatch = runGenJetMatch and runOnMC
+addGenEvt      = addGenEvt      and runOnMC
 
 ### Logging
 
@@ -219,13 +221,14 @@ if not runMatch:
   process.patJets.getJetMCFlavour    = False
   process.patJets.JetPartonMapSource = cms.InputTag( '' )
   process.patPF2PATSequence.remove( process.patJetFlavourId )
-process.patJets.addGenJetMatch = False
-process.patJets.genJetMatch    = cms.InputTag( '' )
-process.patPF2PATSequence.remove( process.patJetGenJetMatch )
-process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
+if not runGenJetMatch:
+  process.patJets.addGenJetMatch = False
+  process.patJets.genJetMatch    = cms.InputTag( '' )
+  process.patPF2PATSequence.remove( process.patJetGenJetMatch )
+  process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
+  process.patPF2PATSequence.remove( process.genParticlesForJetsNoNu )
 process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )
 process.patPF2PATSequence.remove( process.iterativeCone5GenJetsNoNu )
-process.patPF2PATSequence.remove( process.genParticlesForJetsNoNu )
 process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
                               , 'drop recoBaseTagInfosOwned_*_*_*'
                               , 'drop CaloTowers_*_*_*'
@@ -240,6 +243,9 @@ process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
                               , 'keep recoTracks_generalTracks_*_*'
                               , 'keep recoGsfTracks_electronGsfTracks_*_*'
                               ]
+if runGenJetMatch:
+  process.out.outputCommands += [ 'keep recoGenJets_ak5GenJets_*_*'
+                                ]
 if runOnMC:
   process.out.outputCommands += [ 'keep *_addPileupInfo_*_*'
                                 ]
