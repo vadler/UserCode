@@ -1,12 +1,14 @@
 import FWCore.ParameterSet.Config as cms
 
+
 ### Steering
 
-runOnMC   = True
-runMatch  = True
-runCiC    = True
-runEwk    = True
-addGenEvt = False
+runOnMC        = True
+runMatch       = False
+runGenJetMatch = False # separate from rest of matches due to rapidly inceasing data volume
+runCiC         = True
+runEwk         = True
+addGenEvt      = False
 
 hltProcess       = 'HLT'
 triggerSelection = ''
@@ -16,6 +18,10 @@ jecLevels = []
 #jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
 #if not runOnMC:
   #jecLevels.append( 'L2L3Residual' )
+
+# vertex collection to use
+# 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
+pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
 
 # muon object selection
 #muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
@@ -41,12 +47,14 @@ jetSelect = ''
 jetsCut = 'pt > 15. && abs(eta) < 3.0'
 jetsMin = 3
 
+
 ### Initialization
 
 process = cms.Process( 'PAT' )
 
-runMatch  = runMatch  and runOnMC
-addGenEvt = addGenEvt and runOnMC
+runMatch       = runMatch       and runOnMC
+runGenJetMatch = runGenJetMatch and runOnMC
+ad
 
 ### Logging
 
@@ -59,6 +67,7 @@ process.Timing = cms.Service( "Timing"
 , summaryOnly = cms.untracked.bool( True )
 )
 
+
 ### Conditions
 
 process.load( "Configuration.StandardSequences.Geometry_cff" )
@@ -68,6 +77,7 @@ if runOnMC:
   process.GlobalTag.globaltag = 'START42_V13::All'
 else:
   process.GlobalTag.globaltag = 'GR_R_42_V19::All'
+
 
 ### Input
 
@@ -94,6 +104,7 @@ else:
                                                  #, globalTag     = 'GR_R_42_V14_electron2010B'
                                                  )
 
+
 ### Output
 
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
@@ -108,6 +119,7 @@ process.out = cms.OutputModule( "PoolOutputModule"
 process.outpath = cms.EndPath(
   process.out
 )
+
 
 ### Cleaning
 
@@ -133,25 +145,14 @@ process.triggerResultsFilter.triggerConditions = [ triggerSelection ]
 process.triggerResultsFilter.throw             = False
 
 # Vertices
-pvSelection = cms.PSet(
-  minNdof = cms.double( 4. )
-, maxZ    = cms.double( 24. )
-, maxRho  = cms.double( 2. )
-)
 process.goodOfflinePrimaryVertices = cms.EDFilter(
   "PrimaryVertexObjectFilter"
-, filterParams = pvSelection
-, filter       = cms.bool( False )
 , src          = cms.InputTag( 'offlinePrimaryVertices' )
-)
-process.goodOfflinePrimaryVertexFilter = cms.EDFilter(
-  "PrimaryVertexFilter"
-, pvSelection
-, pvSrc = cms.InputTag( 'goodOfflinePrimaryVertices' )
-)
-process.vertexSelection = cms.Sequence(
-  process.goodOfflinePrimaryVertices
-* process.goodOfflinePrimaryVertexFilter
+, filter       = cms.bool( True )
+, filterParams = cms.PSet( minNdof = cms.double(  4. )
+                         , maxZ    = cms.double( 24. )
+                         , maxRho  = cms.double(  2. )
+                         )
 )
 
 process.eventCleaning = cms.Sequence(
@@ -160,7 +161,8 @@ process.eventCleaning = cms.Sequence(
 )
 if triggerSelection != '':
   process.eventCleaning += process.triggerResultsFilter
-process.eventCleaning += process.vertexSelection
+process.eventCleaning += process.goodOfflinePrimaryVertices
+
 
 ### PAT
 
@@ -179,14 +181,22 @@ process.patDefaultSequence.remove( getattr( process, 'cleanPatTaus' ) )
 process.cleanPatCandidateSummary.candidates.remove( cms.InputTag( 'cleanPatTaus' ) )
 if not runOnMC:
   runOnData( process )
-elif not runMatch:
-  removeMCMatching( process )
-process.patJets.addGenJetMatch = False
-process.patJets.genJetMatch    = cms.InputTag( '' )
-process.patDefaultSequence.remove( process.patJetGenJetMatch )
-# The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
-process.patJetCorrFactors.payload = jetAlgo + 'PF'
-process.patJetCorrFactors.levels  = jecLevels
+if not runMatch:
+  process.patMuons.addGenMatch = False
+  process.patDefaultSequence.remove( process.muonMatch )
+  process.patElectrons.addGenMatch = False
+  process.patDefaultSequence.remove( process.electronMatch )
+  process.patJets.addGenPartonMatch   = False
+  process.patJets.embedGenPartonMatch = False
+  process.patJets.genPartonMatch      = cms.InputTag( '' )
+  process.patDefaultSequence.remove( process.patJetPartonMatch )
+  process.patJets.getJetMCFlavour    = False
+  process.patJets.JetPartonMapSource = cms.InputTag( '' )
+  process.patDefaultSequence.remove( process.patJetFlavourId )
+if not runGenJetMatch:
+  process.patJets.addGenJetMatch = False
+  process.patJets.genJetMatch    = cms.InputTag( '' )
+  process.patDefaultSequence.remove( process.patJetGenJetMatch )
 process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
                               , 'drop recoBaseTagInfosOwned_*_*_*'
                               , 'drop CaloTowers_*_*_*'
@@ -200,17 +210,25 @@ process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
                               , 'keep recoTracks_generalTracks_*_*'
                               , 'keep recoGsfTracks_electronGsfTracks_*_*'
                               ]
+if runGenJetMatch:
+  process.out.outputCommands += [ 'keep recoGenJets_ak5GenJets_*_*'
+                                ]
 if runOnMC:
   process.out.outputCommands += [ 'keep *_addPileupInfo_*_*'
                                 ]
-  if not runMatch:
+  if not runMatch or not runGenJetMatch:
     process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'
                                   ]
 if addGenEvt:
   process.out.outputCommands += [ 'keep *_genParticles_*_*'
                                 , 'keep *_genEvt_*_*'
                                 ]
-process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
+
+# Vertices
+pvCollection += '::%s'%( process.name_() )
+process.patElectrons.pvSrc                = cms.InputTag( pvCollection )
+process.patMuons.pvSrc                    = cms.InputTag( pvCollection )
+process.patJetCorrFactors.primaryVertices = cms.InputTag( pvCollection )
 
 # Muons
 process.patMuons.embedTrack = True
@@ -274,21 +292,30 @@ if runCiC:
 process.countPatLeptons.minNumber = leptonsMin
 
 # Jets
-from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
-switchJetCollection( process
-                   , cms.InputTag( jetAlgo.lower() + 'PFJets' )
-                   , doJTA        = False
-                   , jetCorrLabel = ( jetAlgo + 'PF', jecLevels )
-                   , doType1MET   = False
-                   )
 if len( jecLevels ) is 0:
   process.patJets.addJetCorrFactors = False
   print 'WARNING: No JECs are stored or applied!'
-process.load( "RecoJets.Configuration.RecoPFJets_cff" )
-process.kt6PFJets.voronoiRfact = cms.double( -0.9 ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
-process.patDefaultSequence.replace( process.patJetCorrFactors
-                                  , process.kt6PFJets * process.patJetCorrFactors
-                                  )
+from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
+switchJetCollection( process
+                   , cms.InputTag( jetAlgo.lower() + 'PFJets::' + process.name_() )
+                   , doJTA            = False
+                   , doBTagging       = False
+                   , jetCorrLabel     = ( jetAlgo + 'PF', jecLevels )
+                   , doType1MET       = False
+                   , genJetCollection = cms.InputTag( jetAlgo.lower() + 'GenJets' )
+                   , doJetID          = True
+                   )
+from RecoJets.Configuration.RecoPFJets_cff import ak5PFJets
+process.ak5PFJets = ak5PFJets.clone( doAreaFastjet = True )
+from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
+process.kt6PFJets = kt6PFJets.clone( voronoiRfact = -0.9 ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
+process.out.outputCommands += [ 'keep *_kt6PFJets_rho*_' + process.name_() ]
+process.jetSequence = cms.Sequence(
+  process.ak5PFJets
+* process.kt6PFJets
+)
+process.patJetCorrFactors.payload = jetAlgo + 'PF' # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
+process.patJetCorrFactors.levels  = jecLevels      # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
@@ -306,14 +333,17 @@ process.patDefaultSequence.remove( getattr( process, 'metJESCorAK5CaloJet' ) )
 process.patDefaultSequence.remove( getattr( process, 'metJESCorAK5CaloJetMuons' ) )
 process.patDefaultSequence.remove( getattr( process, 'patMETs' ) )
 
+
 ### TQAF
 
 if addGenEvt:
   process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
 
+
 ### Path
 process.p = cms.Path(
   process.eventCleaning
+* process.jetSequence
 * process.patDefaultSequence
 )
 if addGenEvt:

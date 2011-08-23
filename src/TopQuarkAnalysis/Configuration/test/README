@@ -2,14 +2,16 @@
 Environment:
 ============
 
-cmsrel CMSSW_4_2_5
-cd CMSSW_4_2_5/src
+cmsrel CMSSW_4_2_8
+cd CMSSW_4_2_8/src
 cmsenv
-addpkg CommonTools/RecoAlgos             V00-03-13
-addpkg DataFormats/PatCandidates         V06-04-18
-addpkg PhysicsTools/PatAlgos             V08-06-38
-addpkg RecoEgamma/ElectronIdentification V00-03-31
-addpkg RecoJets/Configuration            V02-04-17
+addpkg DataFormats/PatCandidates                        V06-04-19-01
+addpkg PhysicsTools/PatAlgos                            V08-06-41
+addpkg PhysicsTools/PatUtils                            V03-09-18
+addpkg PhysicsTools/SelectorUtils                       V00-03-24
+addpkg PhysicsTools/UtilAlgos                           V08-02-14
+addpkg RecoEgamma/ElectronIdentification                V00-03-31
+addpkg RecoJets/Configuration                           V02-04-17
 scram b -j 9
 
 Steering:
@@ -18,6 +20,7 @@ Steering:
 Some very basic steering switches are found at the top of the configurations:
 - runOnMC         : self-explaining
 - runMatch        : to switch on/off MC matching
+- runGenJetMatch  : to switch on/off (sepüarately) MC matching for MC jets
 - runCiC          : to switch on/off the addition of the CiC electron ID variables
                     to the electrons
 - runEwk          : to switch on/off the addition of the electron ID variables
@@ -30,7 +33,10 @@ Some very basic steering switches are found at the top of the configurations:
 - jetAlgo         : (pseudo-)identifier of used jet algorithm (others than "AK5"
                     have not been tested -- and will not work)
 - jecLevels       : list of stored JECs
+- pvCollections   : name of primary vertex collection to be used in PF2PAT
 
+- {muon, electron}SelectTP   : selection string cut for objects to be kept in PF2PAT
+                               top projections
 - {muon, electron}IsoR       : radius to compute the isolation
 - {muon, electron}sIsoTP     : cut value for combined isolation of objects to be
                                kept in PF top projection procedure
@@ -68,7 +74,9 @@ The following settings might be objects to optimisation:
 - jet charge  : not added
 - constituents: not added
 
-For MC, the GenJet match is removed in any case.
+For MC, the matching to generator particles match is switched on on demand. Matching
+to jets from generator particles is kept separately, since it increases the data
+volume remarkably.
 
 JEC:
 ----
@@ -94,7 +102,8 @@ This should also be sufficient to reconstruct the TtGenEvent in the TQAF.
 Tests:
 ======
 
-The tests are performed on CMSSW_4_2_5 RelVal samples:
+The tests have been performed with the CMSSW_4_2_5 set-up (s, rev. 1.1 of this file)
+on CMSSW_4_2_5 RelVal samples:
 - MC  : /RelValTTbar/CMSSW_4_2_5-START42_V12-v2/GEN-SIM-RECO (8900 evts.)
 - data: /Mu/CMSSW_4_2_5-GR_R_42_V14_mu2010B-v2/RECO (run over 8900 evts.)
         /Elecktron/CMSSW_4_2_5-GR_R_42_V14_electron2010B-v2/RECO (run over 8900 evts.)

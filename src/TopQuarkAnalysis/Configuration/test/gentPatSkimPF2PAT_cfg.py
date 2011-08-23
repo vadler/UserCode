@@ -1,11 +1,12 @@
 import os
 import FWCore.ParameterSet.Config as cms
 
+
 ### Steering
 
 runOnMC        = True
 runMatch       = False
-runGenJetMatch = False # separate from rets of matches due to rapidly inceasing data volume
+runGenJetMatch = False # separate from rest of matches due to rapidly inceasing data volume
 runCiC         = True
 runEwk         = True
 addGenEvt      = False
@@ -59,6 +60,7 @@ jetSelect = ''
 jetsCut = 'pt > 15. && abs(eta) < 3.0'
 jetsMin = 3
 
+
 ### Initialization
 
 process = cms.Process( 'PF2PAT' )
@@ -66,6 +68,7 @@ process = cms.Process( 'PF2PAT' )
 runMatch       = runMatch       and runOnMC
 runGenJetMatch = runGenJetMatch and runOnMC
 addGenEvt      = addGenEvt      and runOnMC
+
 
 ### Logging
 
@@ -78,6 +81,7 @@ process.Timing = cms.Service( "Timing"
 , summaryOnly = cms.untracked.bool( True )
 )
 
+
 ### Conditions
 
 process.load( "Configuration.StandardSequences.Geometry_cff" )
@@ -87,6 +91,7 @@ if runOnMC:
   process.GlobalTag.globaltag = 'START42_V13::All'
 else:
   process.GlobalTag.globaltag = 'GR_R_42_V19::All'
+
 
 ### Input
 
@@ -113,6 +118,7 @@ else:
                                                  #, globalTag     = 'GR_R_42_V14_electron2010B'
                                                  )
 
+
 ### Output
 
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
@@ -127,6 +133,7 @@ process.out = cms.OutputModule( "PoolOutputModule"
 process.outpath = cms.EndPath(
   process.out
 )
+
 
 ### Cleaning
 
@@ -169,6 +176,7 @@ process.eventCleaning = cms.Sequence(
 if triggerSelection != '':
   process.eventCleaning += process.triggerResultsFilter
 process.eventCleaning += process.goodOfflinePrimaryVertices
+
 
 ### PAT
 
@@ -249,14 +257,13 @@ if runGenJetMatch:
 if runOnMC:
   process.out.outputCommands += [ 'keep *_addPileupInfo_*_*'
                                 ]
-  if not runMatch:
+  if not runMatch or not runGenJetMatch:
     process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'
                                   ]
 if addGenEvt:
   process.out.outputCommands += [ 'keep *_genParticles_*_*'
                                 , 'keep *_genEvt_*_*'
                                 ]
-process.out.outputCommands += [ 'keep double_kt6PFJets_rho_' + process.name_() ]
 
 # Vertices
 pvCollection += '::%s'%( process.name_() )
@@ -346,12 +353,14 @@ elif 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
   process.pfJets.doAreaFastjet = True
   process.pfJets.doRhoFastjet  = False
-process.load( "RecoJets.Configuration.RecoPFJets_cff" )
-process.kt6PFJets.src          = cms.InputTag( 'pfNoElectron' )
-process.kt6PFJets.voronoiRfact = cms.double( -0.9 ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
+from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
+process.kt6PFJets = kt6PFJets.clone( src          = cms.InputTag( 'pfNoElectron' )
+                                   , voronoiRfact = -0.9
+                                   ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
 process.patPF2PATSequence.replace( process.patJetCorrFactors
                                  , process.kt6PFJets * process.patJetCorrFactors
                                  )
+process.out.outputCommands += [ 'keep *_kt6PFJets_rho*_' + process.name_() ]
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs' # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.levels  = jecLevels         # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJets.embedCaloTowers   = False
@@ -362,10 +371,12 @@ process.cleanPatJets.preselection  = jetsCut
 process.cleanPatJets.checkOverlaps = cms.PSet()
 process.countPatJets.minNumber = jetsMin
 
+
 ### TQAF
 
 if addGenEvt:
   process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
+
 
 ### Path
 process.p = cms.Path(
