@@ -5,20 +5,20 @@ process = cms.Process( "HLTPROV" )
 # Conditions
 condition = 'startup'
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-#from Configuration.AlCa.autoCond import autoCond
+from Configuration.PyReleaseValidation.autoCond import autoCond
 #process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
-process.GlobalTag.globaltag = cms.string( 'START44_V2::All' )
+process.GlobalTag.globaltag = cms.string( 'START42_V12::All' )
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_0_pre7'
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
                           #formerVersion = True
                         , relVal        = None
                         , dataTier      = None
-                        #, condition     = condition
-                        , globalTag     = 'START44_V2'
+                        , condition     = condition
+                        , globalTag     = 'START42_V12'
                         , maxVersions   = None
                         , skipFiles     = None
                         , numberOfFiles = None

@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.h,v 1.27 2010/09/14 15:20:20 kukartse Exp $
+// $Id: PATMuonProducer.h,v 1.27.6.1 2011/07/05 16:25:28 bellan Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATMuonProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of reco::Muon.
 
   \author   Steven Lowette, Roger Wolf
-  \version  $Id: PATMuonProducer.h,v 1.27 2010/09/14 15:20:20 kukartse Exp $
+  \version  $Id: PATMuonProducer.h,v 1.27.6.1 2011/07/05 16:25:28 bellan Exp $
 */
 
 #include <string>
@@ -119,6 +119,7 @@ namespace pat {
     pat::helper::KinResolutionsLoader resolutionLoader_;    
     /// switch to use particle flow (PF2PAT) or not
     bool useParticleFlow_;    
+    edm::InputTag linkToPFSource_;  //SAK
     /// input source pfCandidates that will be to be transformed into pat::Muons, when using PF2PAT
     edm::InputTag pfMuonSrc_;
     /// embed pfCandidates into the muon

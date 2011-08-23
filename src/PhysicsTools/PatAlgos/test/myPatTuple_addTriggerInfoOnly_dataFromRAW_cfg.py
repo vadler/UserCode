@@ -33,7 +33,7 @@ process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-from Configuration.AlCa.autoCond import autoCond
+from Configuration.PyReleaseValidation.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ 'com10' ] )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 

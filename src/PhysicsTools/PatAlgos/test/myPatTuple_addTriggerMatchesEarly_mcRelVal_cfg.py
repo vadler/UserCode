@@ -7,6 +7,7 @@ process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRel
 process.options.wantSummary = False
 
 ## let it run
+process.patJetCorrFactors.useRho = False
 process.p = cms.Path(
   process.patCandidates
 )
