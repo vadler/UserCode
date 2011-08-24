@@ -54,7 +54,7 @@ process = cms.Process( 'PAT' )
 
 runMatch       = runMatch       and runOnMC
 runGenJetMatch = runGenJetMatch and runOnMC
-ad
+addGenEvt      = addGenEvt      and runOnMC
 
 ### Logging
 
