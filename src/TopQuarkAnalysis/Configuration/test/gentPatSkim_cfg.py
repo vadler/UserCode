@@ -308,12 +308,14 @@ switchJetCollection( process
 from RecoJets.Configuration.RecoPFJets_cff import ak5PFJets
 process.ak5PFJets = ak5PFJets.clone( doAreaFastjet = True )
 from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
-process.kt6PFJets = kt6PFJets.clone( voronoiRfact = -0.9 ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
+process.kt6PFJets = kt6PFJets.clone( doAreaFastjet = True
+                                   , doRhoFastjet  = True
+                                   , voronoiRfact  = -0.9
+                                   ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
+process.patDefaultSequence.replace( process.patJetCorrFactors
+                                  , process.kt6PFJets * process.patJetCorrFactors
+                                  )
 process.out.outputCommands += [ 'keep *_kt6PFJets_rho*_' + process.name_() ]
-process.jetSequence = cms.Sequence(
-  process.ak5PFJets
-* process.kt6PFJets
-)
 process.patJetCorrFactors.payload = jetAlgo + 'PF' # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.levels  = jecLevels      # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJets.embedCaloTowers   = False
@@ -343,7 +345,7 @@ if addGenEvt:
 ### Path
 process.p = cms.Path(
   process.eventCleaning
-* process.jetSequence
+* process.ak5PFJets
 * process.patDefaultSequence
 )
 if addGenEvt:
