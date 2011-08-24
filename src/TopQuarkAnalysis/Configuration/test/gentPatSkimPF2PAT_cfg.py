@@ -349,13 +349,14 @@ process.countPatLeptons.minNumber = leptonsMin
 if len( jecLevels ) is 0:
   process.patJets.addJetCorrFactors = False
   print 'WARNING: No JECs are stored or applied!'
-elif 'L1FastJet' in jecLevels:
-  process.pfPileUp.checkClosestZVertex = False
-  process.pfJets.doAreaFastjet = True
-  process.pfJets.doRhoFastjet  = False
+process.pfPileUp.checkClosestZVertex = False # for L1FastJet corrections, even if applied later
+process.pfJets.doAreaFastjet = True          # for L1FastJet corrections, even if applied later
+process.pfJets.doRhoFastjet  = False         # for L1FastJet corrections, even if applied later
 from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
-process.kt6PFJets = kt6PFJets.clone( src          = cms.InputTag( 'pfNoElectron' )
-                                   , voronoiRfact = -0.9
+process.kt6PFJets = kt6PFJets.clone( src           = cms.InputTag( 'pfNoElectron' )
+                                   , doAreaFastjet = True
+                                   , doRhoFastjet  = True
+                                   , voronoiRfact  = -0.9
                                    ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
 process.patPF2PATSequence.replace( process.patJetCorrFactors
                                  , process.kt6PFJets * process.patJetCorrFactors
