@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.cc,v 1.44 2011/06/30 16:23:39 rwolf Exp $
+// $Id: PATMuonProducer.cc,v 1.42.2.4 2011/08/25 21:06:09 slava77 Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATMuonProducer.h"
@@ -62,6 +62,7 @@ PATMuonProducer::PATMuonProducer(const edm::ParameterSet & iConfig) : useUserDat
 
   // pflow specific configurables
   useParticleFlow_  = iConfig.getParameter<bool>( "useParticleFlow" );
+  linkToPFSource_   = iConfig.getParameter<edm::InputTag>( "linkToPFSource" );  //SAK
   embedPFCandidate_ = iConfig.getParameter<bool>( "embedPFCandidate" );
   pfMuonSrc_ = iConfig.getParameter<edm::InputTag>( "pfMuonSource" );
 
@@ -200,10 +201,22 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
   // this will be the new object collection
   std::vector<Muon> * patMuons = new std::vector<Muon>();
 
+  // prepare the TeV refit track retrieval
+  edm::Handle<reco::TrackToTrackMap> pickyMap, tpfmsMap;
+  if (addTeVRefits_) {
+    iEvent.getByLabel(pickySrc_, pickyMap);
+    iEvent.getByLabel(tpfmsSrc_, tpfmsMap);
+  }
+  
   if( useParticleFlow_ ){
     // get the PFCandidates of type muons 
     edm::Handle< reco::PFCandidateCollection >  pfMuons;
     iEvent.getByLabel(pfMuonSrc_, pfMuons);
+    //-- SAK ------------------------------------------------------------------
+    edm::Handle< reco::PFCandidateCollection >  pfForLinking;
+    if (linkToPFSource_.label().length())
+      iEvent.getByLabel(linkToPFSource_, pfForLinking);
+    //-- SAK ------------------------------------------------------------------
 
     unsigned index=0;
     for( reco::PFCandidateConstIterator i = pfMuons->begin(); i != pfMuons->end(); ++i, ++index) {
@@ -262,19 +275,46 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
       aMuon.setPFCandidateRef( pfRef  );     
       if( embedPFCandidate_ ) aMuon.embedPFCandidate();
       fillMuon( aMuon, muonBaseRef, pfBaseRef, genMatches, deposits, isolationValues );
+
+      //(SK) add TeV refits
+      // store the TeV refit track refs (only available for globalMuons)
+      if (addTeVRefits_ && muonRef->isGlobalMuon()) {
+	reco::TrackToTrackMap::const_iterator it;
+	const reco::TrackRef& globalTrack = muonRef->globalTrack();
+	
+	// If the getByLabel calls failed above (i.e. if the TeV refit
+	// maps/collections were not in the event), then the TrackRefs
+	// in the Muon object will remain null.
+	if (!pickyMap.failedToGet()) {
+	  it = pickyMap->find(globalTrack);
+	  if (it != pickyMap->end()) aMuon.setPickyMuon(it->val);
+	  if (embedPickyMuon_) aMuon.embedPickyMuon();
+	}
+ 
+	if (!tpfmsMap.failedToGet()) {
+	  it = tpfmsMap->find(globalTrack);
+	  if (it != tpfmsMap->end()) aMuon.setTpfmsMuon(it->val);
+	  if (embedTpfmsMuon_) aMuon.embedTpfmsMuon();
+	}
+      }
+      
+      //-- SAK ----------------------------------------------------------------
+      if (linkToPFSource_.label().length() && aMuon.pfCandidateRef().id() != pfForLinking.id()) {
+        reco::CandidatePtr  source  = aMuon.pfCandidateRef()->sourceCandidatePtr(0);
+        while (source.id() != pfForLinking.id()) {
+          source  = source->sourceCandidatePtr(0);
+          if (source.isNull())
+            throw cms::Exception("InputSource", "Object in "+pfMuonSrc_.encode()+" does not link back to "+linkToPFSource_.encode());
+        } // end loop over inheritance chain
+        aMuon.setPFCandidateRef(reco::PFCandidateRef(pfForLinking, source.key()));
+      }
+      //-- SAK ----------------------------------------------------------------
       patMuons->push_back(aMuon); 
     } 
   }
   else {
     edm::Handle<edm::View<reco::Muon> > muons;
     iEvent.getByLabel(muonSrc_, muons);
-
-    // prepare the TeV refit track retrieval
-    edm::Handle<reco::TrackToTrackMap> pickyMap, tpfmsMap;
-    if (addTeVRefits_) {
-      iEvent.getByLabel(pickySrc_, pickyMap);
-      iEvent.getByLabel(tpfmsSrc_, tpfmsMap);
-    }
 
     // embedding of muon MET corrections
     edm::Handle<edm::ValueMap<reco::MuonMETCorrectionData> > caloMETMuonCorrs;
@@ -480,6 +520,7 @@ void PATMuonProducer::fillDescriptions(edm::ConfigurationDescriptions & descript
   // pf specific parameters
   iDesc.add<edm::InputTag>("pfMuonSource", edm::InputTag("pfMuons"))->setComment("particle flow input collection");
   iDesc.add<bool>("useParticleFlow", false)->setComment("whether to use particle flow or not");
+  iDesc.add<edm::InputTag>("linkToPFSource", edm::InputTag())->setComment("alternative PF collection to link to (pfCandidateRef) -- traverses inheritance chain up to this");
   iDesc.add<bool>("embedPFCandidate", false)->setComment("embed external particle flow object");
 
   // TeV refit 

@@ -10,6 +10,7 @@ process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelVal.root
 # , ignoreTotal      = cms.untracked.int32( 0 )
 # )
 
+process.patJetCorrFactors.useRho = False
 process.p = cms.Path(
   process.patDefaultSequence
 )
