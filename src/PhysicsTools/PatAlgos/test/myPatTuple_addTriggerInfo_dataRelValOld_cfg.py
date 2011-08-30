@@ -1,13 +1,13 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-condition = 'com10'
-process.GlobalTag.globaltag = autoCond[ condition ]
-#process.GlobalTag.globaltag = 'GR_R_44_V1::All'
-process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_0_pre7'
-                                                    #formerVersion = True
+cmsswVersion = 'CMSSW_4_4_0_pre8'
+globalTag    = 'GR_R_44_V2'
+process.GlobalTag.globaltag = '%s::All'%( globalTag )
+process.source.fileNames    = pickRelValInputFiles( formerVersion = True
+                                                    #cmsswVersion  = cmsswVersion
                                                   , relVal        = 'SingleMu'
                                                   , dataTier      = 'RECO'
-                                                  , globalTag     = 'GR_R_44_V1_RelVal_mu2011A'
+                                                  , globalTag     = '%s_RelVal_mu2011A'%( globalTag )
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )

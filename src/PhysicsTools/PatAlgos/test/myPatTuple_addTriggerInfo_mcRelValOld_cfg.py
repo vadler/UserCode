@@ -1,10 +1,12 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
-process.GlobalTag.globaltag = 'START44_V2::All'
-process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_0_pre7'
-                                                    #formerVersion = True
-                                                  , globalTag     = 'START44_V2'
+cmsswVersion = 'CMSSW_4_4_0_pre8'
+globalTag    = 'START44_V3'
+process.GlobalTag.globaltag = '%s::All'%( globalTag )
+process.source.fileNames    = pickRelValInputFiles( formerVersion = True
+                                                    #cmsswVersion  = cmsswVersion
+                                                  , globalTag     = globalTag
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
