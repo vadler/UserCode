@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.cc,v 1.42.2.3 2011/07/05 16:25:28 bellan Exp $
+// $Id: PATMuonProducer.cc,v 1.42.2.4 2011/08/25 21:06:09 slava77 Exp $
 //
 
 #include "PhysicsTools/PatAlgos/plugins/PATMuonProducer.h"
@@ -201,6 +201,13 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
   // this will be the new object collection
   std::vector<Muon> * patMuons = new std::vector<Muon>();
 
+  // prepare the TeV refit track retrieval
+  edm::Handle<reco::TrackToTrackMap> pickyMap, tpfmsMap;
+  if (addTeVRefits_) {
+    iEvent.getByLabel(pickySrc_, pickyMap);
+    iEvent.getByLabel(tpfmsSrc_, tpfmsMap);
+  }
+  
   if( useParticleFlow_ ){
     // get the PFCandidates of type muons 
     edm::Handle< reco::PFCandidateCollection >  pfMuons;
@@ -269,6 +276,28 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
       if( embedPFCandidate_ ) aMuon.embedPFCandidate();
       fillMuon( aMuon, muonBaseRef, pfBaseRef, genMatches, deposits, isolationValues );
 
+      //(SK) add TeV refits
+      // store the TeV refit track refs (only available for globalMuons)
+      if (addTeVRefits_ && muonRef->isGlobalMuon()) {
+	reco::TrackToTrackMap::const_iterator it;
+	const reco::TrackRef& globalTrack = muonRef->globalTrack();
+	
+	// If the getByLabel calls failed above (i.e. if the TeV refit
+	// maps/collections were not in the event), then the TrackRefs
+	// in the Muon object will remain null.
+	if (!pickyMap.failedToGet()) {
+	  it = pickyMap->find(globalTrack);
+	  if (it != pickyMap->end()) aMuon.setPickyMuon(it->val);
+	  if (embedPickyMuon_) aMuon.embedPickyMuon();
+	}
+ 
+	if (!tpfmsMap.failedToGet()) {
+	  it = tpfmsMap->find(globalTrack);
+	  if (it != tpfmsMap->end()) aMuon.setTpfmsMuon(it->val);
+	  if (embedTpfmsMuon_) aMuon.embedTpfmsMuon();
+	}
+      }
+      
       //-- SAK ----------------------------------------------------------------
       if (linkToPFSource_.label().length() && aMuon.pfCandidateRef().id() != pfForLinking.id()) {
         reco::CandidatePtr  source  = aMuon.pfCandidateRef()->sourceCandidatePtr(0);
@@ -286,13 +315,6 @@ void PATMuonProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
   else {
     edm::Handle<edm::View<reco::Muon> > muons;
     iEvent.getByLabel(muonSrc_, muons);
-
-    // prepare the TeV refit track retrieval
-    edm::Handle<reco::TrackToTrackMap> pickyMap, tpfmsMap;
-    if (addTeVRefits_) {
-      iEvent.getByLabel(pickySrc_, pickyMap);
-      iEvent.getByLabel(tpfmsSrc_, tpfmsMap);
-    }
 
     // embedding of muon MET corrections
     edm::Handle<edm::ValueMap<reco::MuonMETCorrectionData> > caloMETMuonCorrs;
