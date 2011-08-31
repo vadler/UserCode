@@ -1,0 +1,7 @@
+<export>
+</export>
+<library name="TopQuarkAnalysisTopmassSemiLeptonic_plugins" file="*.cc">
+  <use name="FWCore/Framework"/>
+  <use name="FWCore/ParameterSet"/>
+  <use name="root"/>
+</library>
