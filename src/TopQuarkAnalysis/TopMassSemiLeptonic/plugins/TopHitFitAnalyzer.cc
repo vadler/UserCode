@@ -3,7 +3,7 @@
 // Package:    TopMassSemiLeptonic
 // Class:      TopHitFitAnalyzer
 //
-// $Id:$
+// $Id: TopHitFitAnalyzer.cc,v 1.1 2011/08/31 14:45:53 vadler Exp $
 //
 /**
   \class    TopHitFitAnalyzer TopHitFitAnalyzer.cc "TopQuarkAnalysis/TopMassSemiLeptonic/plugins/TopHitFitAnalyzer.cc"
@@ -12,7 +12,7 @@
 
 
   \author   Volker Adler
-  \version  $Id:$
+  \version  $Id: TopHitFitAnalyzer.cc,v 1.1 2011/08/31 14:45:53 vadler Exp $
 */
 
 
@@ -27,6 +27,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 
 class TopHitFitAnalyzer : public edm::EDAnalyzer {
@@ -39,16 +40,25 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
     explicit TopHitFitAnalyzer( const edm::ParameterSet & iConfig );
 
     /// Destructor
-    virtual ~TriggerEvent();
+    virtual ~TopHitFitAnalyzer();
 
     /// Methods
+
+    /// Begin job
+    virtual void beginJob();
 
     /// Event loop
     virtual void analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup );
 
+    /// End job
+    virtual void endJob();
+
   private:
 
     /// Data members
+
+    /// Configuration parameters
+    edm::InputTag ttSemiLeptonicEvent_;
 
     /// Histograms
     std::map< std::string, TH1D* > histos1D_;
@@ -57,9 +67,16 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
 };
 
 
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+
+#include "AnalysisDataFormats/TopObjects/interface/TtSemiLeptonicEvent.h"
+
+
 // Default constructor
 TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
-: histos1D_()
+: ttSemiLeptonicEvent_( iConfig.getParameter< edm::InputTag >( "ttSemiLeptonicEvent" ) )
+, histos1D_()
 , histos2D_()
 {
 }
@@ -71,8 +88,35 @@ TopHitFitAnalyzer::~TopHitFitAnalyzer()
 }
 
 
+// Begin job
+void TopHitFitAnalyzer::beginJob()
+{
+
+  edm::Service< TFileService > fileService;
+
+  histos1D_[ "semiLepChan" ] = fileService->make< TH1D >( "semiLepChan", "Semi-leptonic decay channel", 5, -0.5, 4.5 );
+  histos1D_[ "semiLepChan" ]->SetXTitle( "decay channel" );
+  histos1D_[ "semiLepChan" ]->SetYTitle( "events" );
+
+}
+
+
 // Event loop
-TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup )
+void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup )
+{
+
+  // TQAF semi-leptonic event
+  edm::Handle< TtSemiLeptonicEvent > ttSemiLeptonicEvent;
+  iEvent.getByLabel( ttSemiLeptonicEvent_, ttSemiLeptonicEvent );
+
+  const TtGenEvent * ttGenEvent( ttSemiLeptonicEvent->genEvent().get() );
+  histos1D_[ "semiLepChan" ]->Fill( ttGenEvent->semiLeptonicChannel() );
+
+}
+
+
+// End job
+void TopHitFitAnalyzer::endJob()
 {
 }
 

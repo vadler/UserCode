@@ -5,14 +5,15 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process( "TEST" )
 
 process.load( "FWCore.MessageService.MessageLogger_cfi" )
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.options = cms.untracked.PSet(
-  wantSummary = cms.untracked.bool( True )
+  wantSummary = cms.untracked.bool( False )
 )
 
 process.source = cms.Source(
   "PoolSource"
 , fileNames = cms.untracked.vstring(
-    'file:%s/output/gentPatSkimPF2PAT.root'%( os.getenv( "CMSSW_BASE" )
+    'file:%s/output/gentPatSkimPF2PAT.root'%( os.getenv( "CMSSW_BASE" ) )
   )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -21,7 +22,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.TFileService = cms.Service(
   "TFileService"
-, fileName = cms.string( '%s/output/topHitFitAnalyzer.root'%( os.getenv( "CMSSW_BASE" ) )
+, fileName = cms.string( '%s/output/topHitFitAnalyzer.root'%( os.getenv( "CMSSW_BASE" ) ) )
 )
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.topHitFitAnalyzer_cfi" )
