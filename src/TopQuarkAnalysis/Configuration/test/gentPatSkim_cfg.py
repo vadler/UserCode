@@ -315,7 +315,7 @@ process.kt6PFJets = kt6PFJets.clone( doAreaFastjet = True
 process.patDefaultSequence.replace( process.patJetCorrFactors
                                   , process.kt6PFJets * process.patJetCorrFactors
                                   )
-process.out.outputCommands += [ 'keep *_kt6PFJets_rho*_' + process.name_() ]
+process.out.outputCommands += [ 'keep *_kt6PFJets_rho_' + process.name_() ]
 process.patJetCorrFactors.payload = jetAlgo + 'PF' # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.levels  = jecLevels      # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJets.embedCaloTowers   = False

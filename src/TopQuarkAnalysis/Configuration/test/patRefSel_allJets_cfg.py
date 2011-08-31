@@ -144,6 +144,7 @@ inputFiles = [ '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
+maxInputEvents = 1000
 
 ### Conditions
 
@@ -407,7 +408,7 @@ if useStandardPAT:
   process.step3b_3 = step3b_3.clone()
   process.step3b   = cms.Sequence( process.step3b_1 * process.step3b_2 * process.step3b_3 )
 
-  process.out.outputCommands.append( 'keep *_kt6PFJets_rho*_' + process.name_() )
+  process.out.outputCommands.append( 'keep *_kt6PFJets_rho_' + process.name_() )
 
   process.goodPatJets       = goodPatJets.clone()
   process.goodPatJetsMedium = process.goodPatJets.clone()
@@ -449,7 +450,7 @@ if runPF2PAT:
                                                             )
     if useL1FastJet:
       applyPostfix( process, 'patJetCorrFactors', postfix ).rho = cms.InputTag( 'kt6PFJets' + postfix, 'rho' )
-  process.out.outputCommands.append( 'keep *_kt6PFJets' + postfix + '_rho*_' + process.name_() )
+  process.out.outputCommands.append( 'keep *_kt6PFJets' + postfix + '_rho_' + process.name_() )
 
   goodPatJetsPF = goodPatJets.clone( src = cms.InputTag( 'selectedPatJets' + postfix ) )
   setattr( process, 'goodPatJets' + postfix, goodPatJetsPF )

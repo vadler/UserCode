@@ -472,7 +472,7 @@ if runStandardPAT:
   process.patDefaultSequence.replace( process.patJetCorrFactors
                                     , process.kt6PFJets * process.patJetCorrFactors
                                     )
-  process.out.outputCommands.append( 'keep *_kt6PFJets_rho*_' + process.name_() )
+  process.out.outputCommands.append( 'keep *_kt6PFJets_rho_' + process.name_() )
   if useL1FastJet:
     process.patJetCorrFactors.useRho = True
     if usePFJets:
@@ -542,7 +542,7 @@ if runPF2PAT:
                                                             )
     if useL1FastJet:
       applyPostfix( process, 'patJetCorrFactors', postfix ).rho = cms.InputTag( 'kt6PFJets' + postfix, 'rho' )
-  process.out.outputCommands.append( 'keep *_kt6PFJets' + postfix + '_rho*_' + process.name_() )
+  process.out.outputCommands.append( 'keep *_kt6PFJets' + postfix + '_rho_' + process.name_() )
 
   goodPatJetsPF = goodPatJets.clone( src = cms.InputTag( 'selectedPatJets' + postfix ) )
   setattr( process, 'goodPatJets' + postfix, goodPatJetsPF )
