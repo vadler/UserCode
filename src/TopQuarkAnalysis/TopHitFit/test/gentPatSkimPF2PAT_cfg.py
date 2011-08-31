@@ -391,7 +391,14 @@ addTtSemiLepHypotheses( process
 if not runOnMC:
   removeTtSemiLepHypGenMatch( process )
 process.out.outputCommands += [ 'keep *_ttSemiLepEvent_*_*' ]
-process.out.outputCommands += [ 'keep *_pat*_*_%s'%( process.name_() ) ]
+process.out.outputCommands += [ 'keep *_patMuons*_*_*'
+                              , 'keep *_patElectrons*_*_*'
+                              , 'keep *_patJets*_*_*'
+                              , 'drop *_patJets*_genJets_*'
+                              , 'drop *_patJets*_pfCandidates_*'
+                              , 'drop *_patJets*_tagInfos_*'
+                              , 'drop CaloTowers_*_*_*'
+                              ]
 
 
 ### Path
