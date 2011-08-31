@@ -5,10 +5,10 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 runOnMC        = True
-runMatch       = False
-runGenJetMatch = False # separate from rest of matches due to rapidly inceasing data volume
-runCiC         = True
-runEwk         = True
+runMatch       = True
+runGenJetMatch = True # separate from rest of matches due to rapidly inceasing data volume
+runCiC         = False
+runEwk         = False
 
 hltProcess       = 'HLT'
 triggerSelection = ''
@@ -29,8 +29,8 @@ muonsIsoR = 0.4
 # muon top projection isolation
 muonsIsoTP = 0.2 # PF2PAT: 0.15
 # muon object selection
-#muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
-muonSelect = 'abs(eta) < 9.0' # max. eta for HitFit
+muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
+#muonSelect = 'abs(eta) < 9.0' # max. eta for HitFit
 # muon event selection
 muonsCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
 muonsMin = 0
@@ -42,8 +42,8 @@ electronsIsoR = 0.3
 # electron top projection isolation
 electronsIsoTP = 0.2 # PF2PAT: 0.2
 # electron object selection
-#electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
-electronSelect = 'abs(eta) < 2.5' # max. eta for HitFit
+electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
+#electronSelect = 'abs(eta) < 2.5' # max. eta for HitFit
 # electron event selection
 electronsCut = 'et > 5. && abs(eta) < 3.0'
 electronsMin = 0
@@ -52,8 +52,8 @@ electronsMin = 0
 leptonsMin = 1
 
 # jet object selection
-#jetSelect = 'pt > 30. && abs(eta) < 2.4' # RefSel
-jetSelect = 'abs(eta) < 3.0' # max. eta for HitFit
+jetSelect = 'pt > 30. && abs(eta) < 2.4' # RefSel
+#jetSelect = 'abs(eta) < 3.0' # max. eta for HitFit
 # jet event selection
 jetsCut = 'pt > 15. && abs(eta) < 3.0'
 jetsMin = 3
@@ -120,9 +120,11 @@ else:
 
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
 process.out = cms.OutputModule( "PoolOutputModule"
-, fileName       = cms.untracked.string( 'gentPatSkimPF2PAT.root' )
+, fileName       = cms.untracked.string( '%s/output/gentPatSkimPF2PAT.root'%( os.getenv( "CMSSW_BASE" ) ) )
 , SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring( 'p' ) )
-, outputCommands = cms.untracked.vstring( 'drop *', *patEventContentNoCleaning )
+, outputCommands = cms.untracked.vstring( 'drop *'
+                                        , *patEventContentNoCleaning
+                                        )
 , dropMetaData   = cms.untracked.string( 'ALL' )
 )
 
@@ -210,6 +212,7 @@ for m in listModules( process.countPatCandidates ):
 process.countPatLeptons.electronSource = process.countPatLeptons.electronSource.value().replace( 'selectedPat', 'cleanPat' )
 process.countPatLeptons.muonSource     = process.countPatLeptons.muonSource.value().replace( 'selectedPat', 'cleanPat' )
 process.countPatLeptons.tauSource      = process.countPatLeptons.tauSource.value().replace( 'selectedPat', 'cleanPat' )
+process.out.outputCommands            += [ 'keep *_cleanPat*_*_*' ]
 if not runOnMC:
   runOnData( process
            , names = [ 'PFAll' ]
@@ -357,7 +360,7 @@ process.kt6PFJets = kt6PFJets.clone( src           = cms.InputTag( 'pfNoElectron
 process.patPF2PATSequence.replace( process.patJetCorrFactors
                                  , process.kt6PFJets * process.patJetCorrFactors
                                  )
-process.out.outputCommands += [ 'keep *_kt6PFJets_rho*_' + process.name_() ]
+process.out.outputCommands += [ 'keep *_kt6PFJets_rho_' + process.name_() ]
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs' # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.levels  = jecLevels         # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJets.embedCaloTowers   = False
@@ -388,6 +391,7 @@ addTtSemiLepHypotheses( process
 if not runOnMC:
   removeTtSemiLepHypGenMatch( process )
 process.out.outputCommands += [ 'keep *_ttSemiLepEvent_*_*' ]
+process.out.outputCommands += [ 'keep *_pat*_*_%s'%( process.name_() ) ]
 
 
 ### Path
