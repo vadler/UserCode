@@ -260,9 +260,7 @@ if runOnMC:
   if not runMatch or not runGenJetMatch:
     process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'
                                   ]
-  process.out.outputCommands += [ 'keep *_genParticles_*_*'
-                                , 'keep *_genEvt_*_*'
-                                ]
+  process.out.outputCommands += [ 'keep *_genParticles_*_*' ]
 
 # Vertices
 pvCollection += '::%s'%( process.name_() )
@@ -388,7 +386,12 @@ addTtSemiLepHypotheses( process
                         , "kHitFit"
                         ]
                        )
-if not runOnMC:
+if runOnMC:
+  process.out.outputCommands += [ 'keep *_genEvt_*_*'
+                                , 'keep *_initSubset_*_*'
+                                , 'keep *_decaySubset_*_*'
+                                ]
+else:
   removeTtSemiLepHypGenMatch( process )
 process.out.outputCommands += [ 'keep *_ttSemiLepEvent_*_*' ]
 process.out.outputCommands += [ 'keep *_patMuons*_*_*'
