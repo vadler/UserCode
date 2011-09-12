@@ -219,10 +219,6 @@ if runOnMC:
   if not runMatch or not runGenJetMatch:
     process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'
                                   ]
-if addGenEvt:
-  process.out.outputCommands += [ 'keep *_genParticles_*_*'
-                                , 'keep *_genEvt_*_*'
-                                ]
 
 # Vertices
 pvCollection += '::%s'%( process.name_() )
@@ -340,6 +336,11 @@ process.patDefaultSequence.remove( getattr( process, 'patMETs' ) )
 
 if addGenEvt:
   process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
+  process.out.outputCommands += [ 'keep *_genParticles_*_*'
+                                , 'keep *_genEvt_*_*'
+                                , 'keep *_initSubset_*_*'
+                                , 'keep *_decaySubset_*_*'
+                                ]
 
 
 ### Path
