@@ -29,11 +29,13 @@ muonsIsoR = 0.4
 # muon top projection isolation
 muonsIsoTP = 0.2 # PF2PAT: 0.15
 # muon object selection
-muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
-#muonSelect = 'abs(eta) < 9.0' # max. eta for HitFit
+muonHitFitSelect = 'abs(eta) < 9.0' # max. eta for HitFit
+#muonSelect = muonHitFitSelect + ' && isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
+muonSelect = muonHitFitSelect + ' && isGlobalMuon'
 # muon event selection
-muonsCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
-muonsMin = 0
+#muonsCut = muonHitFitSelect + ' && isGlobalMuon && pt > 5. && abs(eta) < 3.0'
+muonsCut = muonSelect
+muonsMin = 1
 
 # electron top projection object selection
 electronSelectTP = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2' # PF2PAT: 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
@@ -42,21 +44,25 @@ electronsIsoR = 0.3
 # electron top projection isolation
 electronsIsoTP = 0.2 # PF2PAT: 0.2
 # electron object selection
-electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
-#electronSelect = 'abs(eta) < 2.5' # max. eta for HitFit
+electronHitFitSelect = 'abs(eta) < 2.5' # max. eta for HitFit
+#electronSelect = electronHitFitSelect + ' && et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
+electronSelect = electronHitFitSelect
 # electron event selection
-electronsCut = 'et > 5. && abs(eta) < 3.0'
+#electronsCut = electronHitFitSelect + ' && et > 5. && abs(eta) < 3.0'
+electronsCut = electronSelect
 electronsMin = 0
 
 # x-leptons event selection
-leptonsMin = 1
+leptonsMin = 0
 
 # jet object selection
-jetSelect = 'pt > 30. && abs(eta) < 2.4' # RefSel
-#jetSelect = 'abs(eta) < 3.0' # max. eta for HitFit
+jetHitFitSelect = 'abs(eta) < 3.0' # max. eta for HitFit
+#jetSelect = jetHitFitSelect + ' && pt > 30. && abs(eta) < 2.4' # RefSel
+jetSelect = jetHitFitSelect
 # jet event selection
-jetsCut = 'pt > 15. && abs(eta) < 3.0'
-jetsMin = 3
+#jetsCut = jetHitFitSelect + ' && pt > 15. && abs(eta) < 3.0'
+jetsCut = jetSelect
+jetsMin = 4
 
 
 ### Initialization
