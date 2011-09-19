@@ -112,7 +112,7 @@ process.source = cms.Source( "PoolSource"
 , fileNames          = cms.untracked.vstring()
 )
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( 1000 )
+  input = cms.untracked.int32( -1 )
 )
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
@@ -142,6 +142,8 @@ process.out = cms.OutputModule( "PoolOutputModule"
                                         )
 , dropMetaData   = cms.untracked.string( 'ALL' )
 )
+print 'Log file:'
+print '%s/output/hitFitPatSkimPF2PAT_%s.log'%( os.getenv( "CMSSW_BASE" ), sample )
 
 # Outpath
 process.outpath = cms.EndPath(
