@@ -1,6 +1,9 @@
 import os
-
 import FWCore.ParameterSet.Config as cms
+
+### Steering
+
+sample = 'RelValTTbar'
 
 process = cms.Process( "TEST" )
 
@@ -13,7 +16,7 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source(
   "PoolSource"
 , fileNames = cms.untracked.vstring(
-    'file:%s/output/gentPatSkimPF2PAT.root'%( os.getenv( "CMSSW_BASE" ) )
+    'rfio:%s/cms/Top/data/hitFitPatSkimPF2PAT_%s.root'%( os.getenv( "CASTOR_HOME" ), sample )
   )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -22,7 +25,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.TFileService = cms.Service(
   "TFileService"
-, fileName = cms.string( '%s/output/topHitFitAnalyzer.root'%( os.getenv( "CMSSW_BASE" ) ) )
+, fileName = cms.string( '%s/output/topHitFitAnalyzer_%s.root'%( os.getenv( "CMSSW_BASE" ), sample ) )
 )
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.topHitFitAnalyzer_cfi" )
