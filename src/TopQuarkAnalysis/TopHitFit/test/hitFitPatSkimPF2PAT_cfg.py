@@ -4,7 +4,13 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-runOnMC        = True
+runOnMC             = True
+relValMC            = 'RelValTTbar'
+relValData          = 'Mu'
+relValDataGlobalTag = 'GR_R_42_V14_mu2010B'
+#relValData          = 'Electron'
+#relValDataGlobalTag = 'GR_R_42_V14_electron2010B'
+
 runMatch       = True
 runGenJetMatch = True # separate from rest of matches due to rapidly inceasing data volume
 runCiC         = False
@@ -69,6 +75,8 @@ jetsMin = 4
 
 process = cms.Process( 'PF2PAT' )
 
+sample = ''
+
 runMatch       = runMatch       and runOnMC
 runGenJetMatch = runGenJetMatch and runOnMC
 
@@ -104,21 +112,22 @@ process.source = cms.Source( "PoolSource"
 , fileNames          = cms.untracked.vstring()
 )
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( -1 )
+  input = cms.untracked.int32( 1000 )
 )
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
+  sample = relValMC
   process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
+                                                 , relVal        = relValMC
                                                  , globalTag     = 'START42_V12'
                                                  )
 else:
+  sample = relValData
   process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
                                                  , dataTier      = 'RECO'
-                                                 , relVal        = 'Mu'
-                                                 , globalTag     = 'GR_R_42_V14_mu2010B'
-                                                 #, relVal        = 'Electron'
-                                                 #, globalTag     = 'GR_R_42_V14_electron2010B'
+                                                 , relVal        = relValData
+                                                 , globalTag     = relValDataGlobalTag
                                                  )
 
 
@@ -126,7 +135,7 @@ else:
 
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
 process.out = cms.OutputModule( "PoolOutputModule"
-, fileName       = cms.untracked.string( '%s/output/gentPatSkimPF2PAT.root'%( os.getenv( "CMSSW_BASE" ) ) )
+, fileName       = cms.untracked.string( '%s/output/hitFitPatSkimPF2PAT_%s.root'%( os.getenv( "CMSSW_BASE" ), sample ) )
 , SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring( 'p' ) )
 , outputCommands = cms.untracked.vstring( 'drop *'
                                         , *patEventContentNoCleaning
