@@ -27,6 +27,8 @@ process.TFileService = cms.Service(
   "TFileService"
 , fileName = cms.string( '%s/output/topHitFitAnalyzer_%s.root'%( os.getenv( "CMSSW_BASE" ), sample ) )
 )
+print 'Log file:'
+print '%s/output/topHitFitAnalyzer_%s.log'%( os.getenv( "CMSSW_BASE" ), sample )
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.topHitFitAnalyzer_cfi" )
 
