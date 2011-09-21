@@ -4,6 +4,11 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 sample = 'RelValTTbar'
+#sample = 'RelValZMM'
+#sample = 'RelValWM'
+#sample = 'Mu'
+#sample = 'Jet'
+#sample = 'Electron'
 
 process = cms.Process( "TEST" )
 
