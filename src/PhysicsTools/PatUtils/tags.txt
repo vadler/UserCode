@@ -6,7 +6,5 @@ DataFormats/MuonReco                             V09-01-05      V09-01-02
 DataFormats/PatCandidates                        V06-04-22      V06-04-21      
 PhysicsTools/PatAlgos                            V08-07-19      V08-07-18      
 PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
-PhysicsTools/SelectorUtils                       V00-03-24      V00-03-24      
-PhysicsTools/UtilAlgos                           V08-02-14      V08-02-14      
 ---------------------------------------
-total packages: 6 (6 displayed)
+total packages: 4 (4 displayed)
