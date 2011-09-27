@@ -10,6 +10,8 @@ topHitFitAnalyzer = cms.EDAnalyzer(
 
   ### Histograms ###
 
+  # HitFit validity
+, binsHitFitNValid = cms.uint32( 6 )
   # HitFit probability
 , binsHitFitProb = cms.uint32( 25 )
 , binsHitFitProbLow = cms.uint32( 25 )
@@ -29,6 +31,13 @@ topHitFitAnalyzer = cms.EDAnalyzer(
   # Relative HitFit top mass uncertainty
 , binsHitFitSigMTRel = cms.uint32( 25 )
 , maxHitFitSigMTRel  = cms.double( 0.25 )
+
+  # GenMatch sum p_t
+, binsGenMatchSumPt = cms.uint32( 50 )
+, maxGenMatchSumPt  = cms.double( 500. )
+  # GenMatch sum Delta R
+, binsGenMatchSumDR = cms.uint32( 20 )
+, maxGenMatchSumDR  = cms.double( 10. )
 
   # Top mass
 , binsTopM = cms.uint32( 100 )  # binsHitFitMT
