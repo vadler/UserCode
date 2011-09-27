@@ -8,7 +8,6 @@ sample = 'RelValTTbar'
 #sample = 'RelValWM'
 #sample = 'Mu'
 #sample = 'Jet'
-#sample = 'Electron'
 
 process = cms.Process( "TEST" )
 
@@ -22,6 +21,7 @@ process.source = cms.Source(
   "PoolSource"
 , fileNames = cms.untracked.vstring(
     'rfio:%s/cms/Top/data/hitFitPatSkimPF2PAT_%s.root'%( os.getenv( "CASTOR_HOME" ), sample )
+    #'file:hitFitPatSkimPF2PAT.root'
   )
 )
 process.maxEvents = cms.untracked.PSet(
@@ -31,6 +31,7 @@ process.maxEvents = cms.untracked.PSet(
 process.TFileService = cms.Service(
   "TFileService"
 , fileName = cms.string( '%s/output/topHitFitAnalyzer_%s.root'%( os.getenv( "CMSSW_BASE" ), sample ) )
+#, fileName = cms.string( 'topHitFitAnalyzer.root' )
 )
 print 'Log file:'
 print '%s/output/topHitFitAnalyzer_%s.log'%( os.getenv( "CMSSW_BASE" ), sample )
