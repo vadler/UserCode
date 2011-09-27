@@ -2,8 +2,11 @@ Test Release based on: CMSSW_4_4_0
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_0
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_4_0
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/PatCandidates                        V06-04-21      V06-04-21      
-PhysicsTools/PatAlgos                            V08-07-18      V08-07-18      
+DataFormats/MuonReco                             V09-01-05      V09-01-02      
+DataFormats/PatCandidates                        V06-04-22      V06-04-21      
+PhysicsTools/PatAlgos                            V08-07-19      V08-07-18      
 PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
+PhysicsTools/SelectorUtils                       V00-03-24      V00-03-24      
+PhysicsTools/UtilAlgos                           V08-02-14      V08-02-14      
 ---------------------------------------
-total packages: 3 (3 displayed)
+total packages: 6 (6 displayed)
