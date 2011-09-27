@@ -6,13 +6,16 @@ import FWCore.ParameterSet.Config as cms
 
 runOnMC             = True
 relValMC            = 'RelValTTbar'
-relValData          = 'Mu'
-relValDataGlobalTag = 'GR_R_42_V14_mu2010B'
-#relValData          = 'Electron'
-#relValDataGlobalTag = 'GR_R_42_V14_electron2010B'
+#relValMC            = 'RelValZMM'
+#relValMC            = 'RelValWM'
+relValMCGlobalTag   = 'START42_V12'
+#relValData          = 'Mu'
+#relValDataGlobalTag = 'GR_R_42_V14_mu2010B'
+relValData          = 'Jet'
+relValDataGlobalTag = 'GR_R_42_V14_jet2010B'
 
 runMatch       = True
-runGenJetMatch = True # separate from rest of matches due to rapidly inceasing data volume
+runGenJetMatch = False # separate from rest of matches due to rapidly inceasing data volume
 runCiC         = False
 runEwk         = False
 
@@ -36,12 +39,13 @@ muonsIsoR = 0.4
 muonsIsoTP = 0.2 # PF2PAT: 0.15
 # muon object selection
 muonHitFitSelect = 'abs(eta) < 9.0' # max. eta for HitFit
-#muonSelect = muonHitFitSelect + ' && isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
-muonSelect = muonHitFitSelect + ' && isGlobalMuon'
+muonSelect = muonHitFitSelect + ' && isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
+#muonSelect = muonHitFitSelect + ' && isGlobalMuon'
 # muon event selection
 #muonsCut = muonHitFitSelect + ' && isGlobalMuon && pt > 5. && abs(eta) < 3.0'
 muonsCut = muonSelect
 muonsMin = 1
+muonsMax = 1
 
 # electron top projection object selection
 electronSelectTP = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2' # PF2PAT: 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
@@ -51,20 +55,22 @@ electronsIsoR = 0.3
 electronsIsoTP = 0.2 # PF2PAT: 0.2
 # electron object selection
 electronHitFitSelect = 'abs(eta) < 2.5' # max. eta for HitFit
-#electronSelect = electronHitFitSelect + ' && et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
-electronSelect = electronHitFitSelect
+electronSelect = electronHitFitSelect + ' && et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
+#electronSelect = electronHitFitSelect
 # electron event selection
 #electronsCut = electronHitFitSelect + ' && et > 5. && abs(eta) < 3.0'
 electronsCut = electronSelect
 electronsMin = 0
+electronsMax = 0
 
 # x-leptons event selection
 leptonsMin = 0
+leptonsMax = 1
 
 # jet object selection
 jetHitFitSelect = 'abs(eta) < 3.0' # max. eta for HitFit
-#jetSelect = jetHitFitSelect + ' && pt > 30. && abs(eta) < 2.4' # RefSel
-jetSelect = jetHitFitSelect
+jetSelect = jetHitFitSelect + ' && pt > 30. && abs(eta) < 2.4' # RefSel
+#jetSelect = jetHitFitSelect
 # jet event selection
 #jetsCut = jetHitFitSelect + ' && pt > 15. && abs(eta) < 3.0'
 jetsCut = jetSelect
@@ -99,7 +105,8 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START42_V13::All'
+  #process.GlobalTag.globaltag = 'START42_V13::All'
+  process.GlobalTag.globaltag = 'MC_42_V13::All'
 else:
   process.GlobalTag.globaltag = 'GR_R_42_V19::All'
 
@@ -113,14 +120,16 @@ process.source = cms.Source( "PoolSource"
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( -1 )
+  #input = cms.untracked.int32( 1000 )
 )
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
   sample = relValMC
   process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
+                                                 , dataTier      = 'GEN-SIM-RECO'
                                                  , relVal        = relValMC
-                                                 , globalTag     = 'START42_V12'
+                                                 , globalTag     = relValMCGlobalTag
                                                  )
 else:
   sample = relValData
@@ -136,6 +145,7 @@ else:
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
 process.out = cms.OutputModule( "PoolOutputModule"
 , fileName       = cms.untracked.string( '%s/output/hitFitPatSkimPF2PAT_%s.root'%( os.getenv( "CMSSW_BASE" ), sample ) )
+#, fileName       = cms.untracked.string( 'hitFitPatSkimPF2PAT.root' )
 , SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring( 'p' ) )
 , outputCommands = cms.untracked.vstring( 'drop *'
                                         , *patEventContentNoCleaning
@@ -246,6 +256,8 @@ if not runMatch:
   process.patJets.getJetMCFlavour    = False
   process.patJets.JetPartonMapSource = cms.InputTag( '' )
   process.patPF2PATSequence.remove( process.patJetFlavourId )
+else:
+  process.patJetPartonMatch.resolveByMatchQuality = True
 if not runGenJetMatch:
   process.patJets.addGenJetMatch = False
   process.patJets.genJetMatch    = cms.InputTag( '' )
@@ -274,10 +286,10 @@ if runGenJetMatch:
 if runOnMC:
   process.out.outputCommands += [ 'keep *_addPileupInfo_*_*'
                                 ]
-  if not runMatch or not runGenJetMatch:
-    process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'
-                                  ]
-  process.out.outputCommands += [ 'keep *_genParticles_*_*' ]
+  #if not runMatch or not runGenJetMatch:
+    #process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'
+                                  #]
+  #process.out.outputCommands += [ 'keep *_genParticles_*_*' ]
 
 # Vertices
 pvCollection += '::%s'%( process.name_() )
@@ -300,6 +312,7 @@ process.cleanPatMuons.src           = cms.InputTag( 'patMuons' )
 process.cleanPatMuons.preselection  = muonsCut
 process.cleanPatMuons.checkOverlaps = cms.PSet()
 process.countPatMuons.minNumber = muonsMin
+process.countPatMuons.maxNumber = muonsMax
 
 # Electrons
 process.pfSelectedElectrons.cut = electronSelectTP
@@ -313,6 +326,7 @@ process.cleanPatElectrons.src           = cms.InputTag( 'patElectrons' )
 process.cleanPatElectrons.preselection  = electronsCut
 process.cleanPatElectrons.checkOverlaps = cms.PSet()
 process.countPatElectrons.minNumber = electronsMin
+process.countPatElectrons.maxNumber = electronsMax
 if runEwk:
   process.load( "ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff" )
   process.patPF2PATSequence.replace( process.patElectrons
@@ -358,6 +372,7 @@ if runCiC:
 
 # X-leptons
 process.countPatLeptons.minNumber = leptonsMin
+process.countPatLeptons.maxNumber = leptonsMax
 
 # Jets
 if len( jecLevels ) is 0:
@@ -392,26 +407,38 @@ process.countPatJets.minNumber = jetsMin
 process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
 process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff" )
 process.ttSemiLepEvent.verbosity = 1
-from TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff import *
+from TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff import addTtSemiLepHypotheses
 addTtSemiLepHypotheses( process
                       , [ "kGeom"
-                        , "kWMassDeltaTopMass"
-                        , "kWMassMaxSumPt"
-                        , "kMaxSumPtWMass"
-                        , "kMVADisc"
+                        #, "kWMassMaxSumPt"
+                        #, "kMaxSumPtWMass"
+                        #, "kMVADisc"
                         , "kKinFit"
+                        #, "kKinSolution"
+                        #, "kWMassDeltaTopMass"
                         , "kHitFit"
                         ]
                        )
-if runOnMC:
+process.hitFitTtSemiLepEventHypothesis.maxNJets           = 6
+process.hitFitTtSemiLepEventHypothesis.maxNComb           = 6
+process.hitFitTtSemiLepEventHypothesis.jetCorrectionLevel = jecLevels[ -1 ]
+if runMatch:
+  addTtSemiLepHypotheses( process
+                        , [ "kGenMatch"
+                        ]
+                       )
+  process.ttSemiLepJetPartonMatch.maxNJets        = 6
+  process.ttSemiLepJetPartonMatch.maxNComb        = 1
+  process.ttSemiLepHypGenMatch.jetCorrectionLevel = jecLevels[ -1 ]
   process.out.outputCommands += [ 'keep *_genEvt_*_*'
                                 , 'keep *_initSubset_*_*'
                                 , 'keep *_decaySubset_*_*'
                                 ]
 else:
+  from TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff import removeTtSemiLepHypGenMatch
   removeTtSemiLepHypGenMatch( process )
-process.out.outputCommands += [ 'keep *_ttSemiLepEvent_*_*' ]
-process.out.outputCommands += [ 'keep *_patMuons*_*_*'
+process.out.outputCommands += [ 'keep *_ttSemiLepEvent_*_*'
+                              , 'keep *_patMuons*_*_*'
                               , 'keep *_patElectrons*_*_*'
                               , 'keep *_patJets*_*_*'
                               , 'drop *_patJets*_genJets_*'
