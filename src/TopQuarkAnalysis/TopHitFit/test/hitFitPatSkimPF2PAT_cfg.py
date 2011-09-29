@@ -44,7 +44,7 @@ muonSelect            = muonSelectHitFit + ' && ' + muonSelectVeto
 muonSelectSignal      = 'isTrackerMuon && pt > 20. && abs(eta) < 2.1 && globalTrack.normalizedChi2 < 10. && globalTrack.hitPattern.numberOfValidMuonHits > 0 && abs(dB) < 0.02 && innerTrack.numberOfValidHits > 10 && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1 && numberOfMatches > 1 && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.125'
 muonSelectSignalJetDR = 0.3
 # counters
-muonsMin = 0
+muonsMin = 1
 muonsMax = 999999
 selectedMuonsMin = 0
 selectedMuonsMax = 1
@@ -95,7 +95,7 @@ jetSelectVeto   = 'pt > 30. && abs(eta) < 2.4 && numberOfDaughters > 1 && charge
 jetSelect       = jetSelectHitFit + ' && ' + jetSelectVeto
 jetSelectSignal = ''
 # counters
-jetsMin = 0
+jetsMin = 4
 jetsMax = 999999
 selectedJetsMin = 0
 selectedJetsMax = 999999
@@ -105,7 +105,7 @@ referenceJetsMax = 999999
 
 ### Initialization
 
-process = cms.Process( 'PF2PAT' )
+process = cms.Process( 'HitFit' )
 
 # MC related
 runPartonMatch = runPartonMatch and runOnMC
@@ -157,15 +157,14 @@ from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
   sample = relValMC
   process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
-                                                 , dataTier      = 'GEN-SIM-RECO'
                                                  , relVal        = relValMC
                                                  , globalTag     = relValMCGlobalTag
                                                  )
 else:
   sample = relValData
   process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
-                                                 , dataTier      = 'RECO'
                                                  , relVal        = relValData
+                                                 , dataTier      = 'RECO'
                                                  , globalTag     = relValDataGlobalTag
                                                  )
 
@@ -178,7 +177,9 @@ if runTest:
 
 process.out = cms.OutputModule( "PoolOutputModule"
 , fileName       = cms.untracked.string( outputFile )
-, SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring( 'p' ) )
+, SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring(
+                                                                 )
+                                     )
 , outputCommands = cms.untracked.vstring( 'drop *'
                                         , 'keep edmTriggerResults_*_*_*'
                                         , 'drop edmTriggerResults_*_*_*RECO*'
@@ -302,7 +303,11 @@ process.patPF2PATSequence.remove( process.selectedPatPFParticles )
 process.patPF2PATSequence.remove( process.countPatPFParticles )
 process.patCandidateSummary.candidates.remove( cms.InputTag( 'patPFParticles' ) ) # FIXME: needed?
 process.selectedPatCandidateSummary.candidates.remove( cms.InputTag( 'selectedPatPFParticles' ) ) # FIXME: needed?
-# Rename counters
+# Restructure counters
+process.patPF2PATSequence.remove( process.countPatMuons )
+process.patPF2PATSequence.remove( process.countPatElectrons )
+process.patPF2PATSequence.remove( process.countPatLeptons )
+process.patPF2PATSequence.remove( process.countPatJets )
 process.countSelectedPatMuons     = process.countPatMuons.clone( minNumber = selectedMuonsMin
                                                                , maxNumber = selectedMuonsMax
                                                                )
@@ -315,18 +320,20 @@ process.countSelectedPatLeptons   = process.countPatLeptons.clone( minNumber = s
 process.countSelectedPatJets      = process.countPatJets.clone( minNumber = selectedJetsMin
                                                               , maxNumber = selectedJetsMax
                                                               )
-process.patPF2PATSequence.replace( process.countPatMuons
-                                 , process.countSelectedPatMuons
-                                 )
-process.patPF2PATSequence.replace( process.countPatElectrons
-                                 , process.countSelectedPatElectrons
-                                 )
-process.patPF2PATSequence.replace( process.countPatLeptons
-                                 , process.countSelectedPatLeptons
-                                 )
-process.patPF2PATSequence.replace( process.countPatJets
-                                 , process.countSelectedPatJets
-                                 )
+process.patPF2PATCounters = cms.Sequence( process.countSelectedPatMuons
+                                        + process.countSelectedPatElectrons
+                                        + process.countSelectedPatLeptons
+                                        + process.countSelectedPatJets
+                                        )
+process.countSelectedPatMuonsHitFit = process.countPatMuons.clone( minNumber = referenceMuonsMin
+                                                                 , maxNumber = referenceMuonsMax
+                                                                 )
+process.countSelectedPatJetsHitFit = process.countPatJets.clone( minNumber = referenceJetsMin
+                                                               , maxNumber = referenceJetsMax
+                                                               )
+process.patPF2PATCountersHitFit = cms.Sequence( process.countSelectedPatMuonsHitFit
+                                              + process.countSelectedPatJetsHitFit
+                                              )
 
 # Final object selection
 process.referencePatMuons     = process.cleanPatMuons.clone( preselection  = ''
@@ -344,14 +351,13 @@ process.referencePatCandidateSummary = process.cleanPatCandidateSummary.clone( l
                                                                                                           , cms.InputTag( 'referencePatJets' )
                                                                                                           )
                                                                              )
-process.patPF2PATSequence.replace(   process.selectedPatCandidateSummary
-                                 ,   process.selectedPatCandidateSummary
-                                   * ( process.referencePatMuons
-                                     + process.referencePatElectrons
-                                     + process.referencePatJets
-                                     )
-                                   * process.referencePatCandidateSummary
-                                 )
+process.patReferenceSequence = cms.Sequence( process.referencePatMuons
+                                           + process.referencePatElectrons
+                                           + process.referencePatJets
+                                           )
+process.patReferenceSequence *= process.referencePatCandidateSummary
+
+# Reference selection counters
 process.countReferencePatMuons     = process.countPatMuons.clone( src       = cms.InputTag( 'referencePatMuons' )
                                                                 , minNumber = referenceMuonsMin
                                                                 , maxNumber = referenceMuonsMax
@@ -370,11 +376,11 @@ process.countReferencePatJets      = process.countPatJets.clone( src = cms.Input
                                                                , minNumber = referenceJetsMin
                                                                , maxNumber = referenceJetsMax
                                                                )
-process.patPF2PATSequence += ( process.countReferencePatMuons
-                             + process.countReferencePatElectrons
-                             + process.countReferencePatLeptons
-                             + process.countReferencePatJets
-                             )
+process.patReferenceCounters = cms.Sequence( process.countReferencePatMuons
+                                           + process.countReferencePatElectrons
+                                           + process.countReferencePatLeptons
+                                           + process.countReferencePatJets
+                                           )
 
 process.out.outputCommands.append( 'keep *_referencePat*_*_*' )
 
@@ -475,12 +481,87 @@ process.referencePatJets.preselection = jetSelectSignal
 ### TQAF
 
 
-### Path
+### Paths
 
-process.p = cms.Path(
-  process.eventCleaning
-* process.patPF2PATSequence
-)
+# Cleaning
+process.HitFit_Cleaning = cms.Path( process.eventCleaning
+                                  )
+# Single cleaning steps
+process.HitFit_Cleaning_HLT = cms.Path( process.triggerResultsFilter
+                                      )
+process.HitFit_Cleaning_Vertex = cms.Path( process.goodOfflinePrimaryVertices
+                                         )
+process.HitFit_Cleaning_HBHE = cms.Path( process.HBHENoiseFilter
+                                       )
+process.HitFit_Cleaning_Scraping = cms.Path( process.scrapingFilter
+                                           )
+
+# PF2PAT
+process.HitFit_PF2PAT = cms.Path( process.eventCleaning
+                                * process.patPF2PATSequence
+                                * process.patPF2PATCounters
+                                )
+# Single counters
+process.HitFit_PF2PAT_MuonVeto = cms.Path( process.eventCleaning
+                                         * process.patPF2PATSequence
+                                         * process.countSelectedPatMuons
+                                         )
+process.HitFit_PF2PAT_ElectronVeto = cms.Path( process.eventCleaning
+                                             * process.patPF2PATSequence
+                                             * process.countSelectedPatElectrons
+                                             )
+# process.HitFit_PF2PAT_LeptonVeto = cms.Path( process.eventCleaning
+#                                            * process.patPF2PATSequence
+#                                            * process.countSelectedPatLeptons
+#                                            )
+# process.HitFit_PF2PAT_JetVeto = cms.Path( process.eventCleaning
+#                                         * process.patPF2PATSequence
+#                                         * process.countSelectedPatJets
+#                                         )
+process.HitFit_PF2PAT_MuonsHitFit = cms.Path( process.eventCleaning
+                                            * process.patPF2PATSequence
+                                            * process.countSelectedPatMuonsHitFit
+                                            )
+process.HitFit_PF2PAT_JetsHitFit = cms.Path( process.eventCleaning
+                                           * process.patPF2PATSequence
+                                           * process.countSelectedPatJetsHitFit
+                                           )
+
+# Reference selection
+process.HitFit_Reference = cms.Path( process.eventCleaning
+                                   * process.patPF2PATSequence
+                                   * process.patPF2PATCounters
+                                   * process.patReferenceSequence
+                                   * process.patReferenceCounters
+                                   )
+# Single counters
+process.HitFit_Reference_Muons = cms.Path( process.eventCleaning
+                                         * process.patPF2PATSequence
+                                         * process.patPF2PATCounters
+                                         * process.patReferenceSequence
+                                         * process.countReferencePatMuons
+                                         )
+# process.HitFit_Reference_Electrons = cms.Path( process.eventCleaning
+#                                              * process.patPF2PATSequence
+#                                              * process.patPF2PATCounters
+#                                              * process.patReferenceSequence
+#                                              * process.countReferencePatElectrons
+#                                              )
+# process.HitFit_Reference_Leptons = cms.Path( process.eventCleaning
+#                                            * process.patPF2PATSequence
+#                                            * process.patPF2PATCounters
+#                                            * process.patReferenceSequence
+#                                            * process.countReferencePatLeptons
+#                                            )
+process.HitFit_Reference_Jets = cms.Path( process.eventCleaning
+                                        * process.patPF2PATSequence
+                                        * process.patPF2PATCounters
+                                        * process.patReferenceSequence
+                                        * process.countReferencePatJets
+                                        )
+
+process.out.SelectEvents.SelectEvents = [ 'HitFit_Cleaning'
+                                        ]
 
 
 ### Messages
