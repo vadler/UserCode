@@ -4,6 +4,9 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
+# Misc
+reportTime = False
+
 # Input
 runTest             = True
 runOnMC             = True
@@ -23,8 +26,7 @@ runEwk         = False
 
 # Trigger
 hltProcess       = 'HLT'
-#triggerSelection = ''
-triggerSelection = 'HLT_IsoMu17_v*'
+triggerSelection = 'HLT_IsoMu17 OR HLT_IsoMu17_v*'
 
 # Vertices
 pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
@@ -116,13 +118,16 @@ if runOnMC and 'L2L3Residual' in jecLevels:
 
 ### Logging
 
+reportEvery = 1000
+if runTest:
+  reportEvery = 1
 process.load( "FWCore.MessageService.MessageLogger_cfi" )
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
 process.Timing = cms.Service( "Timing"
-, summaryOnly = cms.untracked.bool( True )
+, summaryOnly = cms.untracked.bool( not reportTime )
 )
 
 
@@ -202,8 +207,10 @@ process.outpath = cms.EndPath(
 ### Cleaning
 
 # Trigger
+if triggerSelection == '' or triggerSelection == '*':
+  triggerSelection = 'HLT_*'
 process.load( "HLTrigger.HLTfilters.triggerResultsFilter_cfi" )
-process.triggerResultsFilter.hltResults        = cms.InputTag( 'TriggerResults::' + hltProcess )
+process.triggerResultsFilter.hltResults        = cms.InputTag( 'TriggerResults::%s'%( hltProcess ) )
 process.triggerResultsFilter.l1tResults        = cms.InputTag( '' )
 process.triggerResultsFilter.triggerConditions = [ triggerSelection ]
 process.triggerResultsFilter.throw             = False
@@ -234,13 +241,11 @@ process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
 , thresh      = cms.untracked.double( 0.25 )
 )
 
-process.eventCleaning = cms.Sequence()
-if triggerSelection != '':
-  process.eventCleaning += process.triggerResultsFilter
-process.eventCleaning += ( process.goodOfflinePrimaryVertices
-                         + process.HBHENoiseFilter
-                         + process.scrapingFilter
-                         )
+process.eventCleaning = cms.Sequence ( process.triggerResultsFilter
+                                     + process.goodOfflinePrimaryVertices
+                                     + process.HBHENoiseFilter
+                                     + process.scrapingFilter
+                                     )
 
 
 ### PAT
@@ -296,7 +301,12 @@ usePF2PAT( process
                             )
          )
 
-process.out.outputCommands.append( 'keep *_kt6PFJets_rho_' + process.name_() )
+process.out.outputCommands.append( 'drop *_selectedPatJets*_caloTowers_*' )
+process.out.outputCommands.append( 'drop *_selectedPatJets*_tagInfos_*' )
+process.out.outputCommands.append( 'keep *_selectedPatJets*_pfCandidates_*' )
+process.out.outputCommands.append( 'keep *_kt6PFJets_rho_%s'%( process.name_() ) )
+if not runJetMatch:
+  process.out.outputCommands.append( 'drop *_selectedPatJets*_genJets_*' )
 
 process.patPF2PATSequence.remove( process.patPFParticles )
 process.patPF2PATSequence.remove( process.selectedPatPFParticles )
@@ -584,3 +594,5 @@ if runTest:
   print 'hitFitPatSkimPF2PAT.log'
 else:
   print '%s/output/hitFitPatSkimPF2PAT_%s.log'%( os.getenv( "CMSSW_BASE" ), sample )
+print '================================================================================'
+print
