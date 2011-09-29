@@ -32,20 +32,21 @@ pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOf
 
 # Muons
 # muon isolation cone, PF2PAT default: 0.4
-muonsIsoR        = 0.4
+muonsIsoR             = 0.4
 # muon top projection isolation selection, PF2PAT default: 0.15
-muonsSelectIsoPf = 0.2
+muonsSelectIsoPf      = 0.2
 # muon top projection object selection, PF2PAT default: 'pt > 5.'
-muonSelectPf     = 'pt > 5.'
+muonSelectPf          = 'pt > 5.'
 # muon object selection
-muonSelectHitFit = 'abs(eta) < 9.0'
-muonSelectVeto   = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5'
-muonSelect       = muonSelectHitFit + ' && ' + muonSelectVeto
-muonSelectSignal = muonSelect
+muonSelectHitFit      = 'abs(eta) < 9.0'
+muonSelectVeto        = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5 && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.2'
+muonSelect            = muonSelectHitFit + ' && ' + muonSelectVeto
+muonSelectSignal      = 'isTrackerMuon && pt > 20. && abs(eta) < 2.1 && globalTrack.normalizedChi2 < 10. && globalTrack.hitPattern.numberOfValidMuonHits > 0 && abs(dB) < 0.02 && innerTrack.numberOfValidHits > 10 && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1 && numberOfMatches > 1 && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.125'
+muonSelectSignalJetDR = 0.3
 # counters
 muonsMin = 0
 muonsMax = 999999
-selectedMuonsMin = 1
+selectedMuonsMin = 0
 selectedMuonsMax = 1
 referenceMuonsMin = 1
 referenceMuonsMax = 1
@@ -59,9 +60,9 @@ electronsSelectIsoPf = 0.2
 electronSelectPf     = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
 # electron object selection
 electronSelectHitFit = 'abs(eta) < 2.5'
-electronSelectVeto   = 'et > 15. && abs(eta) < 2.5'
+electronSelectVeto   = 'et > 15. && abs(eta) < 2.5 && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.2'
 electronSelect       = electronSelectHitFit + ' && ' + electronSelectVeto
-electronSelectSignal = electronSelect
+electronSelectSignal = ''
 # counters
 electronsMin = 0
 electronsMax = 999999
@@ -75,10 +76,10 @@ embedLeptonTracks = True
 # counters
 leptonsMin = 0
 leptonsMax = 999999
-selectedLeptonsMin = 1
-selectedLeptonsMax = 1
-referenceLeptonsMin = 1
-referenceLeptonsMax = 1
+selectedLeptonsMin = 0
+selectedLeptonsMax = 999999
+referenceLeptonsMin = 0
+referenceLeptonsMax = 999999
 
 # Jets
 # algo & JECs
@@ -90,9 +91,9 @@ jecLevels = [ 'L1FastJet'
             ]
 # jet object selection
 jetSelectHitFit = 'abs(eta) < 3.0'
-#jetSelectVeto   = ''
-jetSelect       = jetSelectHitFit
-jetSelectSignal = 'pt > 30. && abs(eta) < 2.4'
+jetSelectVeto   = 'pt > 30. && abs(eta) < 2.4 && numberOfDaughters > 1 && chargedEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4) && (chargedMultiplicity > 0 || abs(eta) >= 2.4)'
+jetSelect       = jetSelectHitFit + ' && ' + jetSelectVeto
+jetSelectSignal = ''
 # counters
 jetsMin = 0
 jetsMax = 999999
@@ -189,8 +190,7 @@ process.out = cms.OutputModule( "PoolOutputModule"
 , dropMetaData   = cms.untracked.string( 'ALL' )
 )
 if runOnMC:
-  process.out.outputCommands += [ 'keep *_addPileupInfo_*_*'
-                                ]
+  process.out.outputCommands.append( 'keep *_addPileupInfo_*_*' )
 
 # Outpath
 process.outpath = cms.EndPath(
@@ -199,20 +199,6 @@ process.outpath = cms.EndPath(
 
 
 ### Cleaning
-
-# HBHE noise filter
-process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
-process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
-process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
-process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
-
-# Scraping filter
-process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
-, applyfilter = cms.untracked.bool( True )
-, debugOn     = cms.untracked.bool( False )
-, numtrack    = cms.untracked.uint32( 10 )
-, thresh      = cms.untracked.double( 0.25 )
-)
 
 # Trigger
 process.load( "HLTrigger.HLTfilters.triggerResultsFilter_cfi" )
@@ -231,17 +217,29 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
                          , maxRho  = cms.double(  2. )
                          )
 )
+process.out.outputCommands.append( 'keep *_goodOfflinePrimaryVertices_*_*' )
 
-process.eventCleaning = cms.Sequence(
-  process.HBHENoiseFilter
-+ process.scrapingFilter
+# HBHE noise filter
+process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
+process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
+process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
+process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
+
+# Scraping filter
+process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
+, applyfilter = cms.untracked.bool( True )
+, debugOn     = cms.untracked.bool( False )
+, numtrack    = cms.untracked.uint32( 10 )
+, thresh      = cms.untracked.double( 0.25 )
 )
+
+process.eventCleaning = cms.Sequence()
 if triggerSelection != '':
   process.eventCleaning += process.triggerResultsFilter
-process.eventCleaning += process.goodOfflinePrimaryVertices
-
-process.out.outputCommands += [ 'keep *_goodOfflinePrimaryVertices_*_*'
-                              ]
+process.eventCleaning += ( process.goodOfflinePrimaryVertices
+                         + process.HBHENoiseFilter
+                         + process.scrapingFilter
+                         )
 
 
 ### PAT
@@ -296,6 +294,9 @@ usePF2PAT( process
                             , jecLevels
                             )
          )
+
+process.out.outputCommands.append( 'keep *_kt6PFJets_rho_' + process.name_() )
+
 process.patPF2PATSequence.remove( process.patPFParticles )
 process.patPF2PATSequence.remove( process.selectedPatPFParticles )
 process.patPF2PATSequence.remove( process.countPatPFParticles )
@@ -328,9 +329,15 @@ process.patPF2PATSequence.replace( process.countPatJets
                                  )
 
 # Final object selection
-process.referencePatMuons     = process.cleanPatMuons.clone()
-process.referencePatElectrons = process.cleanPatElectrons.clone()
-process.referencePatJets      = process.cleanPatJets.clone()
+process.referencePatMuons     = process.cleanPatMuons.clone( preselection  = ''
+                                                           , checkOverlaps = cms.PSet()
+                                                           )
+process.referencePatElectrons = process.cleanPatElectrons.clone( preselection  = ''
+                                                               , checkOverlaps = cms.PSet()
+                                                               )
+process.referencePatJets      = process.cleanPatJets.clone( preselection  = ''
+                                                          , checkOverlaps = cms.PSet()
+                                                          )
 process.referencePatCandidateSummary = process.cleanPatCandidateSummary.clone( logName = 'referencePatCandidates|PATSummaryTables'
                                                                              , candidates = cms.VInputTag ( cms.InputTag( 'referencePatMuons' )
                                                                                                           , cms.InputTag( 'referencePatElectrons' )
@@ -369,9 +376,7 @@ process.patPF2PATSequence += ( process.countReferencePatMuons
                              + process.countReferencePatJets
                              )
 
-process.out.outputCommands += [ 'keep *_kt6PFJets_rho_' + process.name_()
-                              , 'keep *_cleanPat*_*_*'
-                              ]
+process.out.outputCommands.append( 'keep *_referencePat*_*_*' )
 
 # Vertices
 pvCollection += '::%s'%( process.name_() )
@@ -390,6 +395,16 @@ process.pfIsolatedMuons.combinedIsolationCut = muonsSelectIsoPf
 process.pfSelectedMuons.cut = muonSelectPf
 process.patMuons.embedTrack = embedLeptonTracks
 process.selectedPatMuons.cut = muonSelect
+process.referencePatMuons.preselection = muonSelectSignal
+process.referencePatMuons.checkOverlaps = cms.PSet( jets = cms.PSet( src                 = cms.InputTag( 'selectedPatJets' )
+                                                                   , algorithm           = cms.string( 'byDeltaR' )
+                                                                   , preselection        = cms.string( '' )
+                                                                   , deltaR              = cms.double( muonSelectSignalJetDR )
+                                                                   , checkRecoComponents = cms.bool( False )
+                                                                   , pairCut             = cms.string( '' )
+                                                                   , requireNoOverlaps   = cms.bool( True)
+                                                                   )
+                                                  )
 
 # Electrons
 process.isoValElectronWithCharged.deposits[0].deltaR = electronsIsoR
@@ -399,6 +414,7 @@ process.pfIsolatedElectrons.combinedIsolationCut = electronsSelectIsoPf
 process.pfSelectedElectrons.cut = electronSelectPf
 process.patElectrons.embedTrack = embedLeptonTracks
 process.selectedPatElectrons.cut = electronSelect
+process.referencePatElectrons.preselection = electronSelectSignal
 if runEwk:
   process.load( "ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff" )
   process.patPF2PATSequence.replace( process.patElectrons
@@ -453,6 +469,7 @@ if 'L1FastJet' in jecLevels:
   process.pfJets.doAreaFastjet = True
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
+process.referencePatJets.preselection = jetSelectSignal
 
 
 ### TQAF
