@@ -6,8 +6,9 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 ## ... and modify it according to the needs
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
-process.source.fileNames    = pickRelValInputFiles( relVal    = 'RelValZMM'
-                                                  , globalTag = 'START42_V12'
+process.source.fileNames    = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_2_8'
+                                                  , relVal       = 'RelValZMM'
+                                                  , globalTag    = 'START42_V12'
                                                   )
 process.maxEvents.input     = -1 # reduce number of events for testing.
 process.out.fileName        = '/tmp/%s/patTuple_zjets_trigger.root'%( os.getenv( "USER" ) )
