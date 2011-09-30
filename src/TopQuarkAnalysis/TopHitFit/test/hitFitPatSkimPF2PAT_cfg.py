@@ -5,10 +5,10 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 # Misc
+runTest    = False
 reportTime = False
 
 # Input
-runTest             = True
 runOnMC             = True
 relValMC            = 'RelValTTbar'
 #relValMC            = 'RelValZMM'
@@ -47,7 +47,7 @@ muonSelectSignal      = 'isTrackerMuon && pt > 20. && abs(eta) < 2.1 && globalTr
 muonSelectSignalJetDR = 0.3
 # counters
 muonsMin = 1
-muonsMax = 999999
+muonsMax = 1
 selectedMuonsMin = 0
 selectedMuonsMax = 1
 referenceMuonsMin = 1
@@ -67,7 +67,7 @@ electronSelect       = electronSelectHitFit + ' && ' + electronSelectVeto
 electronSelectSignal = ''
 # counters
 electronsMin = 0
-electronsMax = 999999
+electronsMax = 0
 selectedElectronsMin = 0
 selectedElectronsMax = 0
 referenceElectronsMin = 0
@@ -76,12 +76,12 @@ referenceElectronsMax = 0
 # X-Leptons
 embedLeptonTracks = True
 # counters
-leptonsMin = 0
-leptonsMax = 999999
+leptonsMin = 1
+leptonsMax = 1
 selectedLeptonsMin = 0
-selectedLeptonsMax = 999999
-referenceLeptonsMin = 0
-referenceLeptonsMax = 999999
+selectedLeptonsMax = 1
+referenceLeptonsMin = 1
+referenceLeptonsMax = 1
 
 # Jets
 # algo & JECs
@@ -490,6 +490,54 @@ process.referencePatJets.preselection = jetSelectSignal
 
 ### TQAF
 
+process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff" )
+process.ttSemiLepEvent.verbosity = 1
+from TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff import addTtSemiLepHypotheses
+addTtSemiLepHypotheses( process
+                      , [ "kKinFit"
+                        , "kHitFit"
+                        ]
+                       )
+process.hitFitTtSemiLepEventHypothesis.maxNJets           = 6
+process.hitFitTtSemiLepEventHypothesis.maxNComb           = 24
+process.hitFitTtSemiLepEventHypothesis.jetCorrectionLevel = jecLevels[ -1 ]
+
+if runOnMC:
+  process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
+  addTtSemiLepHypotheses( process
+                        , [ "kGenMatch"
+                        ]
+                       )
+  process.ttSemiLepJetPartonMatch.maxNJets        = 6
+  process.ttSemiLepJetPartonMatch.maxNComb        = 24
+  process.ttSemiLepHypGenMatch.jetCorrectionLevel = jecLevels[ -1 ]
+else:
+  from TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff import removeTtSemiLepHypGenMatch
+  removeTtSemiLepHypGenMatch( process )
+
+process.out.outputCommands.append( 'keep *_*TtSemiLepEventHypothesis*_*_*' )
+process.out.outputCommands.append( 'keep *_ttSemiLep*_*_*' )
+
+if runOnMC:
+  process.out.outputCommands.append( 'keep *_genEvt*_*_*' )
+  process.out.outputCommands.append( 'keep *_initSubset*_*_*' )
+  process.out.outputCommands.append( 'keep *_decaySubset*_*_*' )
+
+from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
+process.makeTtSemiLepEventReference = cloneProcessingSnippet( process
+                                                            , process.makeTtSemiLepEvent
+                                                            , 'Reference'
+                                                            )
+from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag
+massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReference
+                            , 'selectedPatMuons'
+                            , 'referencePatMuons'
+                             )
+massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReference
+                            , 'selectedPatJets'
+                            , 'referencePatJets'
+                             )
+
 
 ### Paths
 
@@ -511,6 +559,9 @@ process.HitFit_PF2PAT = cms.Path( process.eventCleaning
                                 * process.patPF2PATSequence
                                 * process.patPF2PATCounters
                                 )
+if runOnMC:
+  process.HitFit_PF2PAT *= process.makeGenEvt
+process.HitFit_PF2PAT *= process.makeTtSemiLepEvent
 # Single counters
 process.HitFit_PF2PAT_MuonVeto = cms.Path( process.eventCleaning
                                          * process.patPF2PATSequence
@@ -528,6 +579,16 @@ process.HitFit_PF2PAT_ElectronVeto = cms.Path( process.eventCleaning
 #                                         * process.patPF2PATSequence
 #                                         * process.countSelectedPatJets
 #                                         )
+
+# PF2PAT with HitFit
+process.HitFit_PF2PATHitFit = cms.Path( process.eventCleaning
+                                      * process.patPF2PATSequence
+                                      * process.patPF2PATCountersHitFit
+                                      )
+if runOnMC:
+  process.HitFit_PF2PATHitFit *= process.makeGenEvt
+process.HitFit_PF2PATHitFit *= process.makeTtSemiLepEvent
+# Single counters
 process.HitFit_PF2PAT_MuonsHitFit = cms.Path( process.eventCleaning
                                             * process.patPF2PATSequence
                                             * process.countSelectedPatMuonsHitFit
@@ -569,6 +630,17 @@ process.HitFit_Reference_Jets = cms.Path( process.eventCleaning
                                         * process.patReferenceSequence
                                         * process.countReferencePatJets
                                         )
+
+# Reference selection with HitFit
+process.HitFit_ReferenceHitFit = cms.Path( process.eventCleaning
+                                         * process.patPF2PATSequence
+                                         * process.patPF2PATCounters
+                                         * process.patReferenceSequence
+                                         * process.patReferenceCounters
+                                         )
+if runOnMC:
+  process.HitFit_ReferenceHitFit *= process.makeGenEvt
+process.HitFit_ReferenceHitFit *= process.makeTtSemiLepEventReference
 
 process.out.SelectEvents.SelectEvents = [ 'HitFit_Cleaning'
                                         ]
