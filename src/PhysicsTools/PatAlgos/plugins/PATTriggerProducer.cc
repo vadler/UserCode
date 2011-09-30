@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.29 2011/06/22 13:12:32 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.26.2.1 2011/05/24 18:25:05 vadler Exp $
 //
 
 
@@ -354,15 +354,18 @@ void PATTriggerProducer::produce( Event& iEvent, const EventSetup& iSetup )
       const unsigned sizeModulesPath( hltConfig_.size( namePath ) );
       unsigned indexLastFilterPathModules( handleTriggerResults->index( indexPath ) + 1 );
       unsigned indexLastFilterFilters( sizeFilters );
+      bool foundFilter( false );
       while ( indexLastFilterPathModules > 0 ) {
         --indexLastFilterPathModules;
         const std::string labelLastFilterPathModules( hltConfig_.moduleLabel( indexPath, indexLastFilterPathModules ) );
         indexLastFilterFilters = handleTriggerEvent->filterIndex( InputTag( labelLastFilterPathModules, "", nameProcess_ ) );
         if ( indexLastFilterFilters < sizeFilters ) {
           if ( hltConfig_.moduleType( labelLastFilterPathModules ) == "HLTBool" ) continue;
+          foundFilter = true;
           break;
         }
       }
+      assert( foundFilter );
       for ( size_t iM = 0; iM < sizeModulesPath; ++iM ) {
         const std::string nameFilter( hltConfig_.moduleLabel( indexPath, iM ) );
         const unsigned indexFilter( handleTriggerEvent->filterIndex( InputTag( nameFilter, "", nameProcess_ ) ) );
