@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 # Misc
-runTest    = False
+runTest    = True
 reportTime = False
 
 # Input
@@ -14,10 +14,10 @@ relValMC            = 'RelValTTbar'
 #relValMC            = 'RelValZMM'
 #relValMC            = 'RelValWM'
 relValMCGlobalTag   = 'START42_V12'
-#relValData          = 'Mu'
-#relValDataGlobalTag = 'GR_R_42_V14_mu2010B'
-relValData          = 'Jet'
-relValDataGlobalTag = 'GR_R_42_V14_jet2010B'
+relValData          = 'Mu'
+relValDataGlobalTag = 'GR_R_42_V14_mu2010B'
+#relValData          = 'Jet'
+#relValDataGlobalTag = 'GR_R_42_V14_jet2010B'
 
 runPartonMatch = True
 runJetMatch    = False
@@ -642,8 +642,11 @@ if runOnMC:
   process.HitFit_ReferenceHitFit *= process.makeGenEvt
 process.HitFit_ReferenceHitFit *= process.makeTtSemiLepEventReference
 
-process.out.SelectEvents.SelectEvents = [ 'HitFit_Cleaning'
+process.out.SelectEvents.SelectEvents = [ 'HitFit_PF2PATHitFit'
                                         ]
+if runTest or runOnMC:
+  process.out.SelectEvents.SelectEvents = [ 'HitFit_Cleaning'
+                                          ]
 
 
 ### Messages
