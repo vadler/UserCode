@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.h,v 1.25 2011/03/31 09:52:39 namapane Exp $
+// $Id: PATElectronProducer.h,v 1.25.2.1 2011/07/05 16:25:28 bellan Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATElectronProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of reco::GsfElectron.
 
   \author   Steven Lowette, James Lamb\
-  \version  $Id: PATElectronProducer.h,v 1.25 2011/03/31 09:52:39 namapane Exp $
+  \version  $Id: PATElectronProducer.h,v 1.25.2.1 2011/07/05 16:25:28 bellan Exp $
 */
 
 
@@ -77,6 +77,7 @@ namespace pat {
 
       /// pflow specific
       bool          useParticleFlow_;
+      edm::InputTag linkToPFSource_;  //SAK
       edm::InputTag pfElecSrc_;
       bool          embedPFCandidate_;
 

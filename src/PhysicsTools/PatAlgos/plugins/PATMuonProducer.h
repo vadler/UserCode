@@ -1,5 +1,5 @@
 //
-// $Id: PATMuonProducer.h,v 1.28 2011/09/21 03:40:18 tucker Exp $
+// $Id: PATMuonProducer.h,v 1.27.6.1 2011/07/05 16:25:28 bellan Exp $
 //
 
 #ifndef PhysicsTools_PatAlgos_PATMuonProducer_h
@@ -13,7 +13,7 @@
    a collection of objects of reco::Muon.
 
   \author   Steven Lowette, Roger Wolf
-  \version  $Id: PATMuonProducer.h,v 1.28 2011/09/21 03:40:18 tucker Exp $
+  \version  $Id: PATMuonProducer.h,v 1.27.6.1 2011/07/05 16:25:28 bellan Exp $
 */
 
 #include <string>
@@ -97,12 +97,16 @@ namespace pat {
     bool embedTcMETMuonCorrs_;
     /// source of tcMET muon corrections
     edm::InputTag tcMETMuonCorrs_;
+    /// add TeV track refits for the muon
+    bool addTeVRefits_;
+    /// input tag for picky muon refit
+    edm::InputTag pickySrc_;
+    /// input tag for tpfms muon refit
+    edm::InputTag tpfmsSrc_;
     /// embed track from picky muon fit into the muon
     bool embedPickyMuon_;
     /// embed track from tpfms muon fit into the muon
     bool embedTpfmsMuon_;
-    /// embed track from DYT muon fit into the muon
-    bool embedDytMuon_;
     /// add generator match information    
     bool addGenMatch_;
     /// input tags for generator match information
@@ -115,6 +119,7 @@ namespace pat {
     pat::helper::KinResolutionsLoader resolutionLoader_;    
     /// switch to use particle flow (PF2PAT) or not
     bool useParticleFlow_;    
+    edm::InputTag linkToPFSource_;  //SAK
     /// input source pfCandidates that will be to be transformed into pat::Muons, when using PF2PAT
     edm::InputTag pfMuonSrc_;
     /// embed pfCandidates into the muon

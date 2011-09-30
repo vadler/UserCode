@@ -2,23 +2,23 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process( "HLTPROV" )
 
-# Steering
-cmsswVersion = 'CMSSW_4_4_0_pre10'
-globalTag    = 'START44_V5'
-
 # Conditions
+condition = 'startup'
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = '%s::All'%( globalTag )
+from Configuration.PyReleaseValidation.autoCond import autoCond
+#process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
+process.GlobalTag.globaltag = cms.string( 'START42_V12::All' )
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    pickRelValInputFiles( formerVersion = True
-                          #cmsswVersion  = cmsswVersion
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
+                          #formerVersion = True
                         , relVal        = None
                         , dataTier      = None
-                        , globalTag     = globalTag
+                        , condition     = condition
+                        , globalTag     = 'START42_V12'
                         , maxVersions   = None
                         , skipFiles     = None
                         , numberOfFiles = None
