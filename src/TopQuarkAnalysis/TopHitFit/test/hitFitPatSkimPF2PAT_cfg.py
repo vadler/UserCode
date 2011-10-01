@@ -1,3 +1,4 @@
+import sys
 import os
 import FWCore.ParameterSet.Config as cms
 
@@ -20,7 +21,7 @@ relValDataGlobalTag = 'GR_R_42_V14_mu2010B'
 #relValDataGlobalTag = 'GR_R_42_V14_jet2010B'
 
 runPartonMatch = True
-runJetMatch    = False
+runJetMatch    = True
 runCiC         = False
 runEwk         = False
 
@@ -33,8 +34,8 @@ pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOf
                                             # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
 
 # Muons
-# muon isolation cone, PF2PAT default: 0.4
-muonsIsoR             = 0.4
+# switch for muon isolation cone, PF2PAT default: 0.4 (False)
+muonsIsoR03           = False # isolation cone of 0.3, if 'True'
 # muon top projection isolation selection, PF2PAT default: 0.15
 muonsSelectIsoPf      = 0.2
 # muon top projection object selection, PF2PAT default: 'pt > 5.'
@@ -54,8 +55,8 @@ referenceMuonsMin = 1
 referenceMuonsMax = 1
 
 # Electrons
-# electron isolation cone, PF2PAT default: 0.4
-electronsIsoR        = 0.3
+# switch for muon isolation cone, PF2PAT default: 0.4 (False)
+electronsIsoR03      = True # isolation cone of 0.3, if 'True'
 # electron top projection isolation selection, PF2PAT: 0.2
 electronsSelectIsoPf = 0.2
 # electron top projection object selection, PF2PAT default: 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
@@ -108,6 +109,13 @@ referenceJetsMax = 999999
 ### Initialization
 
 process = cms.Process( 'HitFit' )
+
+if len( jecLevels ) == 0:
+  print 'ERROR: No JECs are applied!'
+  print '       HitFit does not allow for that. Exit....'
+  sys.exit( 1 )
+
+pvCollection += '::%s'%( process.name_() )
 
 # MC related
 runPartonMatch = runPartonMatch and runOnMC
@@ -261,10 +269,6 @@ if not runOnMC:
 removeSpecificPATObjects( process
                         , names = [ 'Photons', 'Taus' ]
                         )
-process.patCandidateSummary.candidates.remove( cms.InputTag( 'patPhotons' ) ) # FIXME: needed?
-process.patCandidateSummary.candidates.remove( cms.InputTag( 'patTaus' ) )    # FIXME: needed?
-process.selectedPatCandidateSummary.candidates.remove( cms.InputTag( 'selectedPatPhotons' ) ) # FIXME: needed?
-process.selectedPatCandidateSummary.candidates.remove( cms.InputTag( 'selectedPatTaus' ) )    # FIXME: needed?
 if runOnMC:
   if not runPartonMatch:
     process.patMuons.addGenMatch      = False
@@ -286,10 +290,6 @@ if runOnMC:
     process.patJets.addGenJetMatch = False
     process.patJets.genJetMatch    = ''
     process.patDefaultSequence.remove( process.patJetGenJetMatch )
-    #process.patDefaultSequence.remove( process.ak5GenJetsNoNu )          # Where are these now?
-    #process.patDefaultSequence.remove( process.genParticlesForJetsNoNu ) # Where are these now?
-  #process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )             # Where are these now?
-  #process.patPF2PATSequence.remove( process.iterativeCone5GenJetsNoNu )  # Where are these now?
 
 # PF2PAT
 from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
@@ -299,20 +299,21 @@ usePF2PAT( process
          , jetCorrections = ( '%sPFchs'%( jetAlgo )
                             , jecLevels
                             )
+         , pvCollection   = cms.InputTag( pvCollection )
          )
 
-process.out.outputCommands.append( 'drop *_selectedPatJets*_caloTowers_*' )
-process.out.outputCommands.append( 'drop *_selectedPatJets*_tagInfos_*' )
-process.out.outputCommands.append( 'keep *_selectedPatJets*_pfCandidates_*' )
-process.out.outputCommands.append( 'keep *_kt6PFJets_rho_%s'%( process.name_() ) )
+if jetAlgo != 'AK5' or not runJetMatch:
+  process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
+if jetAlgo != 'AK7' or not runJetMatch:
+  process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )
+if jetAlgo != 'IC5' or not runJetMatch:
+  process.patPF2PATSequence.remove( process.iterativeCone5GenJetsNoNu )
 if not runJetMatch:
-  process.out.outputCommands.append( 'drop *_selectedPatJets*_genJets_*' )
+  process.patPF2PATSequence.remove( process.genParticlesForJetsNoNu )
 
 process.patPF2PATSequence.remove( process.patPFParticles )
 process.patPF2PATSequence.remove( process.selectedPatPFParticles )
 process.patPF2PATSequence.remove( process.countPatPFParticles )
-process.patCandidateSummary.candidates.remove( cms.InputTag( 'patPFParticles' ) ) # FIXME: needed?
-process.selectedPatCandidateSummary.candidates.remove( cms.InputTag( 'selectedPatPFParticles' ) ) # FIXME: needed?
 # Restructure counters
 process.patPF2PATSequence.remove( process.countPatMuons )
 process.patPF2PATSequence.remove( process.countPatElectrons )
@@ -394,21 +395,16 @@ process.patReferenceCounters = cms.Sequence( process.countReferencePatMuons
 
 process.out.outputCommands.append( 'keep *_referencePat*_*_*' )
 
-# Vertices
-pvCollection += '::%s'%( process.name_() )
-process.pfPileUp.Vertices                 = cms.InputTag( pvCollection )
-process.pfMuonsFromVertex.vertices        = cms.InputTag( pvCollection )
-process.pfElectronsFromVertex.vertices    = cms.InputTag( pvCollection )
-process.patElectrons.pvSrc                = cms.InputTag( pvCollection )
-process.patMuons.pvSrc                    = cms.InputTag( pvCollection )
-process.patJetCorrFactors.primaryVertices = cms.InputTag( pvCollection )
-
 # Muons
-process.isoValMuonWithCharged.deposits[0].deltaR = muonsIsoR
-process.isoValMuonWithNeutral.deposits[0].deltaR = muonsIsoR
-process.isoValMuonWithPhotons.deposits[0].deltaR = muonsIsoR
-process.pfIsolatedMuons.combinedIsolationCut = muonsSelectIsoPf
 process.pfSelectedMuons.cut = muonSelectPf
+if muonsIsoR03:
+  process.pfIsolatedMuons.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03' )
+                                                                   )
+  process.pfIsolatedMuons.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03' )
+                                                                   , cms.InputTag( 'muPFIsoValueGamma03' )
+                                                                   )
+  process.pfIsolatedMuons.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03' )
+process.pfIsolatedMuons.isolationCut = muonsSelectIsoPf
 process.patMuons.embedTrack = embedLeptonTracks
 process.selectedPatMuons.cut = muonSelect
 process.referencePatMuons.preselection = muonSelectSignal
@@ -423,11 +419,12 @@ process.referencePatMuons.checkOverlaps = cms.PSet( jets = cms.PSet( src        
                                                   )
 
 # Electrons
-process.isoValElectronWithCharged.deposits[0].deltaR = electronsIsoR
-process.isoValElectronWithNeutral.deposits[0].deltaR = electronsIsoR
-process.isoValElectronWithPhotons.deposits[0].deltaR = electronsIsoR
-process.pfIsolatedElectrons.combinedIsolationCut = electronsSelectIsoPf
 process.pfSelectedElectrons.cut = electronSelectPf
+if electronsIsoR03:
+  process.isoValElectronWithCharged.deposits[0].deltaR = 0.3
+  process.isoValElectronWithNeutral.deposits[0].deltaR = 0.3
+  process.isoValElectronWithPhotons.deposits[0].deltaR = 0.3
+process.pfIsolatedElectrons.isolationCut = electronsSelectIsoPf
 process.patElectrons.embedTrack = embedLeptonTracks
 process.selectedPatElectrons.cut = electronSelect
 process.referencePatElectrons.preselection = electronSelectSignal
@@ -477,15 +474,18 @@ if runCiC:
 # X-leptons
 
 # Jets
-if len( jecLevels ) is 0:
-  process.patJets.addJetCorrFactors = False
-  print 'WARNING: No JECs are stored or applied!'
 if 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
-  process.pfJets.doAreaFastjet = True
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
 process.referencePatJets.preselection = jetSelectSignal
+
+process.out.outputCommands.append( 'drop *_selectedPatJets*_caloTowers_*' )
+process.out.outputCommands.append( 'drop *_selectedPatJets*_tagInfos_*' )
+process.out.outputCommands.append( 'drop *_selectedPatJets*_pfCandidates_*' )
+process.out.outputCommands.append( 'keep *_kt6PFJets_rho_%s'%( process.name_() ) )
+if not runJetMatch:
+  process.out.outputCommands.append( 'drop *_selectedPatJets*_genJets_*' )
 
 
 ### TQAF
