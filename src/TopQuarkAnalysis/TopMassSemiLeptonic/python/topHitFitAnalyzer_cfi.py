@@ -11,7 +11,7 @@ topHitFitAnalyzer = cms.EDAnalyzer(
   ### Histograms ###
 
   # HitFit validity
-, binsHitFitNValid = cms.uint32( 6 )
+, binsHitFitNValid = cms.uint32( 24 )
   # HitFit probability
 , binsHitFitProb = cms.uint32( 25 )
 , binsHitFitProbLow = cms.uint32( 25 )

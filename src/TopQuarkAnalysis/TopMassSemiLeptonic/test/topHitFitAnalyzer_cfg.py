@@ -69,11 +69,15 @@ process.load( "HLTrigger.HLTfilters.hltHighLevel_cfi" )
 process.hltHighLevel.TriggerResultsTag = cms.InputTag( 'TriggerResults::%s'%( hitFitProcess ) )
 process.hltHighLevel.HLTPaths          = [ 'HitFit_PF2PATHitFit'
                                          ]
+process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'HitFit_ReferenceHitFit'
+                                                                        ]
+                                                           )
 
 
 ### Analyzer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.topHitFitAnalyzer_cfi" )
+process.topHitFitAnalyzer_Reference = process.topHitFitAnalyzer.clone()
 
 
 ### Paths
@@ -81,6 +85,11 @@ process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.topHitFitAnalyzer_cfi" )
 process.p = cms.Path(
   process.hltHighLevel
 * process.topHitFitAnalyzer
+)
+
+process.p_Reference = cms.Path(
+  process.hltHighLevel_Reference
+* process.topHitFitAnalyzer_Reference
 )
 
 
