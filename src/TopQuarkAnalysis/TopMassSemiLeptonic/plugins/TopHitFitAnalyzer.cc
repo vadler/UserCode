@@ -7,7 +7,7 @@
 //
 /**
   \class    TopHitFitAnalyzer TopHitFitAnalyzer.cc "TopQuarkAnalysis/TopMassSemiLeptonic/plugins/TopHitFitAnalyzer.cc"
-  \brief    Analyzes
+  \brief    Analyses HitFit performance
 
 
 
@@ -30,6 +30,8 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+
+#include "AnalysisDataFormats/TopObjects/interface/TtSemiLeptonicEvent.h"
 
 
 class TopHitFitAnalyzer : public edm::EDAnalyzer {
@@ -58,10 +60,17 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
   private:
 
     /// Data members
+    // TQAF semi-leptonic event
+    edm::Handle< TtSemiLeptonicEvent > ttSemiLeptonicEvent_;
+    // TQAF MC event
+    TtGenEvent * ttGenEvent_;
+    // decay channel in real (MC) TTbar events
+    unsigned decayChn_;
+    bool     isSignal_;
 
     /// Configuration parameters
-    // TQAF semi-leptonic event
-    edm::InputTag ttSemiLeptonicEvent_;
+    // TQAF semi-leptonic event input tag
+    edm::InputTag ttSemiLeptonicEventTag_;
     // HitFit validity
     unsigned binsHitFitNValid_;
     // HitFit probability
@@ -197,6 +206,23 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
     /// Private functions
 
     void assignDecayChnNames( TAxis * iAxis );
+    // Fill histograms
+    void fill1D_GenMatch( std::map< std::string, TH1D* > & hist1D );
+    void fill2D_GenMatch( std::map< std::string, TH2D* > & hist2D );
+    void fill1D_GenMatch_Valid( std::map< std::string, TH1D* > & hist1D );
+    void fill2D_GenMatch_Valid( std::map< std::string, TH2D* > & hist2D );
+    void fill1D_Gen( std::map< std::string, TH1D* > & hist1D );
+    void fill2D_GenHitFit( std::map< std::string, TH2D* > & hist2D );
+    void fill2D_GenHitFit_Valid( std::map< std::string, TH2D* > & hist2D );
+    void fill2D_GenGenMatch( std::map< std::string, TH2D* > & hist2D );
+    void fill2D_GenGenMatch_Valid( std::map< std::string, TH2D* > & hist2D );
+    void fill1D_Gen_Signal( std::map< std::string, TH1D* > & hist1D );
+    void fill1D_GenHitFitDiff_SignalValid( std::map< std::string, TH1D* > & hist1D );
+    void fill2D_Gen_Signal( std::map< std::string, TH2D* > & hist2D );
+    void fill1D_HitFit( std::map< std::string, TH1D* > & hist1D );
+    void fill2D_HitFit( std::map< std::string, TH2D* > & hist2D );
+    void fill1D_HitFit_Valid( std::map< std::string, TH1D* > & hist1D );
+    void fill2D_HitFit_Valid( std::map< std::string, TH2D* > & hist2D );
 
 };
 
@@ -204,12 +230,15 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
-#include "AnalysisDataFormats/TopObjects/interface/TtSemiLeptonicEvent.h"
-
 
 // Default constructor
 TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
-: ttSemiLeptonicEvent_( iConfig.getParameter< edm::InputTag >( "ttSemiLeptonicEvent" ) )
+: ttSemiLeptonicEvent_()
+, ttGenEvent_()
+, decayChn_( WDecay::kNone )
+, isSignal_( false )
+  // get configuration parameters
+, ttSemiLeptonicEventTag_( iConfig.getParameter< edm::InputTag >( "ttSemiLeptonicEvent" ) )
 , binsHitFitNValid_( iConfig.getParameter< unsigned >( "binsHitFitNValid" ) )
 , binsHitFitProb_( iConfig.getParameter< unsigned >( "binsHitFitProb" ) )
 , binsHitFitProbLow_( iConfig.getParameter< unsigned >( "binsHitFitProbLow" ) )
@@ -274,7 +303,7 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 , maxDiffNuPhi_( iConfig.getParameter< double >( "maxDiffNuPhi" ) )
 , binsDiffNuPz_( iConfig.getParameter< unsigned >( "binsDiffNuPz" ) )
 , maxDiffNuPz_( iConfig.getParameter< double >( "maxDiffNuPz" ) )
-// initialise histo maps
+  // initialise histo maps
 , hist1D_()
 , hist2D_()
 , hist1D_GenMatch_()
@@ -338,7 +367,7 @@ void TopHitFitAnalyzer::beginJob()
 
   // 1-dim
   hist1D_HitFit_[ "nValid" ] = fileService->make< TH1D >( "HitFit_nValid", "HitFit valid hypotheses", binsHitFitNValid_ + 1, -0.5, binsHitFitNValid_ + 0.5 );
-  hist1D_HitFit_[ "nValid" ]->SetXTitle( "hypothesis^{HitFit}" );
+  hist1D_HitFit_[ "nValid" ]->SetXTitle( "valid hypotheses^{HitFit}" );
   hist1D_HitFit_[ "nValid" ]->SetYTitle( "events" );
   hist1D_HitFit_[ "Valid" ] = fileService->make< TH1D >( "HitFit_valid", "HitFit valid hypothesis", 2, -0.5, 1.5 );
   hist1D_HitFit_[ "Valid" ]->SetXTitle( "valid^{HitFit}" );
@@ -367,6 +396,9 @@ void TopHitFitAnalyzer::beginJob()
   hist1D_HitFit_[ "SigMTRel" ] = fileService->make< TH1D >( "HitFit_SigMTRel", "Relative HitFit top mass uncertainty", binsHitFitSigMTRel_, 0., maxHitFitSigMTRel_ );
   hist1D_HitFit_[ "SigMTRel" ]->SetXTitle( "#frac{#sigma_{m_{t}}^{HitFit}}{m_{t}^{HitFit}}" );
   hist1D_HitFit_[ "SigMTRel" ]->SetYTitle( "events" );
+  hist1D_HitFit_[ "TopLepM" ] = fileService->make< TH1D >( "HitFit_TopLepM", "HitFit leptonic top mass", binsHitFitMT_, minHitFitMT_, maxHitFitMT_ );
+  hist1D_HitFit_[ "TopLepM" ]->SetXTitle( "m_{t, l}^{HitFit} (GeV)" );
+  hist1D_HitFit_[ "TopLepM" ]->SetYTitle( "events" );
   hist1D_HitFit_[ "LepM" ] = fileService->make< TH1D >( "HitFit_LepM", "HitFit lepton mass", binsLepM_, -maxLepM_, maxLepM_ );
   hist1D_HitFit_[ "LepM" ]->SetXTitle( "m_{l}^{HitFit} (GeV)" );
   hist1D_HitFit_[ "LepM" ]->SetYTitle( "events" );
@@ -397,6 +429,9 @@ void TopHitFitAnalyzer::beginJob()
   hist1D_HitFit_[ "NuPz" ] = fileService->make< TH1D >( "HitFit_NuPz", "HitFit neutrino longitudinal momentum", binsNuPz_, -maxNuPz_, maxNuPz_ );
   hist1D_HitFit_[ "NuPz" ]->SetXTitle( "p_{z, #nu}^{HitFit} (GeV)" );
   hist1D_HitFit_[ "NuPz" ]->SetYTitle( "events" );
+  hist1D_HitFit_[ "TopHadM" ] = fileService->make< TH1D >( "HitFit_TopHadM", "HitFit hadronic top mass", binsHitFitMT_, minHitFitMT_, maxHitFitMT_ );
+  hist1D_HitFit_[ "TopHadM" ]->SetXTitle( "m_{t, h}^{HitFit} (GeV)" );
+  hist1D_HitFit_[ "TopHadM" ]->SetYTitle( "events" );
   // 2-dim
   hist2D_HitFit_[ "Prob_MT" ] = fileService->make< TH2D >( "HitFit_Prob_MT", "HitFit top mass vs. HitFit probabilty", binsHitFitProb_, 0., 1., binsHitFitMT_, minHitFitMT_, maxHitFitMT_ );
   hist2D_HitFit_[ "Prob_MT" ]->SetXTitle( "P^{HitFit}" );
@@ -434,16 +469,49 @@ void TopHitFitAnalyzer::beginJob()
   hist1D_GenMatch_[ "SumDR" ] = fileService->make< TH1D >( "GenMatch_SumDR", "GenMatch sum of spacial deviations", binsGenMatchSumDR_, 0., maxGenMatchSumDR_ );
   hist1D_GenMatch_[ "SumDR" ]->SetXTitle( "#sum #Delta R^{GenMatch}" );
   hist1D_GenMatch_[ "SumDR" ]->SetYTitle( "events" );
-  hist1D_Gen_[ "DecayChn" ] = fileService->make< TH1D >( "Gen_DecayChn", "Decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1. );
-  hist1D_Gen_[ "DecayChn" ]->SetXTitle( "" );
-  assignDecayChnNames( hist1D_Gen_[ "DecayChn" ]->GetXaxis() );
-  hist1D_Gen_[ "DecayChn" ]->SetYTitle( "events" );
-  hist1D_Gen_[ "TopLepM" ] = fileService->make< TH1D >( "Gen_TopLepM", "HitFit muonic top mass", binsTopM_, minTopM_, maxTopM_ );
+  hist1D_GenMatch_[ "TopLepM" ] = fileService->make< TH1D >( "GenMatch_TopLepM", "GenMatch muonic top mass", binsTopM_, minTopM_, maxTopM_ );
+  hist1D_GenMatch_[ "TopLepM" ]->SetXTitle( "m_{t_{l}}^{gen.} (GeV)" );
+  hist1D_GenMatch_[ "TopLepM" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "LepM" ] = fileService->make< TH1D >( "GenMatch_LepM", "GenMatch lepton mass", binsGenLepM_, 0., maxGenLepM_ );
+  hist1D_GenMatch_[ "LepM" ]->SetXTitle( "m_{l}^{gen.} (GeV)" );
+  hist1D_GenMatch_[ "LepM" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "LepPt" ] = fileService->make< TH1D >( "GenMatch_LepPt", "GenMatch lepton transverse momentum", binsLepPt_, 0., maxLepPt_ );
+  hist1D_GenMatch_[ "LepPt" ]->SetXTitle( "p_{t, l}^{gen.} (GeV)" );
+  hist1D_GenMatch_[ "LepPt" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "LepEta" ] = fileService->make< TH1D >( "GenMatch_LepEta", "GenMatch lepton pseudo-rapidity", binsLepEta_, -maxLepEta_, maxLepEta_ );
+  hist1D_GenMatch_[ "LepEta" ]->SetXTitle( "#eta_{l}^{gen.}" );
+  hist1D_GenMatch_[ "LepEta" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "LepPhi" ] = fileService->make< TH1D >( "GenMatch_LepPhi", "GenMatch lepton azimutal angle", binsLepPhi_, -TMath::Pi(), TMath::Pi() );
+  hist1D_GenMatch_[ "LepPhi" ]->SetXTitle( "#phi_{l}^{gen.}" );
+  hist1D_GenMatch_[ "LepPhi" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "LepPz" ] = fileService->make< TH1D >( "GenMatch_LepPz", "GenMatch lepton longitudinal momentum", binsLepPz_, -maxLepPz_, maxLepPz_ );
+  hist1D_GenMatch_[ "LepPz" ]->SetXTitle( "p_{z, l}^{gen.} (GeV)" );
+  hist1D_GenMatch_[ "LepPz" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "NuM" ] = fileService->make< TH1D >( "GenMatch_NuM", "GenMatch neutrino mass", binsNuM_, -maxNuM_, maxNuM_ );
+  hist1D_GenMatch_[ "NuM" ]->SetXTitle( "m_{#nu}^{gen.} (GeV)" );
+  hist1D_GenMatch_[ "NuM" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "NuPt" ] = fileService->make< TH1D >( "GenMatch_NuPt", "GenMatch neutrino transverse momentum", binsNuPt_, 0., maxNuPt_ );
+  hist1D_GenMatch_[ "NuPt" ]->SetXTitle( "p_{t, #nu}^{gen.} (GeV)" );
+  hist1D_GenMatch_[ "NuPt" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "NuEta" ] = fileService->make< TH1D >( "GenMatch_NuEta", "GenMatch neutrino pseudo-rapidity", binsNuEta_, -maxNuEta_, maxNuEta_ );
+  hist1D_GenMatch_[ "NuEta" ]->SetXTitle( "#eta_{#nu}^{gen.}" );
+  hist1D_GenMatch_[ "NuEta" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "NuPhi" ] = fileService->make< TH1D >( "GenMatch_NuPhi", "GenMatch neutrino azimutal angle", binsNuPhi_, -TMath::Pi(), TMath::Pi() );
+  hist1D_GenMatch_[ "NuPhi" ]->SetXTitle( "#phi_{#nu}^{gen.}" );
+  hist1D_GenMatch_[ "NuPhi" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "NuPz" ] = fileService->make< TH1D >( "GenMatch_NuPz", "GenMatch neutrino longitudinal momentum", binsNuPz_, -maxNuPz_, maxNuPz_ );
+  hist1D_GenMatch_[ "NuPz" ]->SetXTitle( "p_{z, #nu}^{gen.} (GeV)" );
+  hist1D_GenMatch_[ "NuPz" ]->SetYTitle( "events" );
+  hist1D_GenMatch_[ "TopHadM" ] = fileService->make< TH1D >( "GenMatch_TopHadM", "GenMatch hadronic top mass", binsTopM_, minTopM_, maxTopM_ );
+  hist1D_GenMatch_[ "TopHadM" ]->SetXTitle( "m_{t_{h}}^{gen.} (GeV)" );
+  hist1D_GenMatch_[ "TopHadM" ]->SetYTitle( "events" );
+  hist1D_Gen_[ "decayChn_" ] = fileService->make< TH1D >( "Gen_DecayChn", "Decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1. );
+  hist1D_Gen_[ "decayChn_" ]->SetXTitle( "" );
+  assignDecayChnNames( hist1D_Gen_[ "decayChn_" ]->GetXaxis() );
+  hist1D_Gen_[ "decayChn_" ]->SetYTitle( "events" );
+  hist1D_Gen_[ "TopLepM" ] = fileService->make< TH1D >( "Gen_TopLepM", "Generated muonic top mass", binsTopM_, minTopM_, maxTopM_ );
   hist1D_Gen_[ "TopLepM" ]->SetXTitle( "m_{t_{l}}^{gen.} (GeV)" );
   hist1D_Gen_[ "TopLepM" ]->SetYTitle( "events" );
-  hist1D_Gen_[ "TopHadM" ] = fileService->make< TH1D >( "Gen_TopHadM", "HitFit hadronic top mass", binsTopM_, minTopM_, maxTopM_ );
-  hist1D_Gen_[ "TopHadM" ]->SetXTitle( "m_{t_{h}}^{gen.} (GeV)" );
-  hist1D_Gen_[ "TopHadM" ]->SetYTitle( "events" );
   hist1D_Gen_[ "LepM" ] = fileService->make< TH1D >( "Gen_LepM", "Generated lepton mass", binsGenLepM_, 0., maxGenLepM_ );
   hist1D_Gen_[ "LepM" ]->SetXTitle( "m_{l}^{gen.} (GeV)" );
   hist1D_Gen_[ "LepM" ]->SetYTitle( "events" );
@@ -474,12 +542,12 @@ void TopHitFitAnalyzer::beginJob()
   hist1D_Gen_[ "NuPz" ] = fileService->make< TH1D >( "Gen_NuPz", "Generated neutrino longitudinal momentum", binsNuPz_, -maxNuPz_, maxNuPz_ );
   hist1D_Gen_[ "NuPz" ]->SetXTitle( "p_{z, #nu}^{gen.} (GeV)" );
   hist1D_Gen_[ "NuPz" ]->SetYTitle( "events" );
+  hist1D_Gen_[ "TopHadM" ] = fileService->make< TH1D >( "Gen_TopHadM", "Generated hadronic top mass", binsTopM_, minTopM_, maxTopM_ );
+  hist1D_Gen_[ "TopHadM" ]->SetXTitle( "m_{t_{h}}^{gen.} (GeV)" );
+  hist1D_Gen_[ "TopHadM" ]->SetYTitle( "events" );
   hist1D_Diff_[ "TopLepM" ] = fileService->make< TH1D >( "Diff_TopLepM", "HitFit leptonic top mass deviation", binsDiffTopM_, -maxDiffTopM_, maxDiffTopM_ );
   hist1D_Diff_[ "TopLepM" ]->SetXTitle( "#Delta m_{t_{l}} (GeV)" );
   hist1D_Diff_[ "TopLepM" ]->SetYTitle( "events" );
-  hist1D_Diff_[ "TopHadM" ] = fileService->make< TH1D >( "Diff_TopHadM", "HitFit hadronic top mass deviation", binsDiffTopM_, -maxDiffTopM_, maxDiffTopM_ );
-  hist1D_Diff_[ "TopHadM" ]->SetXTitle( "#Delta m_{t_{h}} (GeV)" );
-  hist1D_Diff_[ "TopHadM" ]->SetYTitle( "events" );
   hist1D_Diff_[ "LepM" ] = fileService->make< TH1D >( "Diff_LepM", "HitFit lepton mass deviation", binsDiffLepM_, -maxDiffLepM_, maxDiffLepM_ );
   hist1D_Diff_[ "LepM" ]->SetXTitle( "#Delta m_{l} (GeV)" );
   hist1D_Diff_[ "LepM" ]->SetYTitle( "events" );
@@ -510,6 +578,9 @@ void TopHitFitAnalyzer::beginJob()
   hist1D_Diff_[ "NuPz" ] = fileService->make< TH1D >( "Diff_NuPz", "HitFit neutrino longitudinal momentum deviation", binsDiffNuPz_, -maxDiffNuPz_, maxDiffNuPz_ );
   hist1D_Diff_[ "NuPz" ]->SetXTitle( "#Delta p_{z, #nu} (GeV)" );
   hist1D_Diff_[ "NuPz" ]->SetYTitle( "events" );
+  hist1D_Diff_[ "TopHadM" ] = fileService->make< TH1D >( "Diff_TopHadM", "HitFit hadronic top mass deviation", binsDiffTopM_, -maxDiffTopM_, maxDiffTopM_ );
+  hist1D_Diff_[ "TopHadM" ]->SetXTitle( "#Delta m_{t_{h}} (GeV)" );
+  hist1D_Diff_[ "TopHadM" ]->SetYTitle( "events" );
   for ( std::map< std::string, TH1D* >::const_iterator iHist = hist1D_HitFit_.begin(); iHist != hist1D_HitFit_.end(); ++iHist ) {
     std::string nameSig( iHist->second->GetName() );
     hist1D_HitFit_Sig_[ iHist->first ] = fileService->make< TH1D >( *( ( TH1D* )( iHist->second->Clone( nameSig.replace( 6, 0, "_Sig" ).c_str() ) ) ) );
@@ -560,6 +631,16 @@ void TopHitFitAnalyzer::beginJob()
     std::string nameBkgNoTau( iHist->second->GetName() );
     hist2D_GenMatch_BkgNoTau_[ iHist->first ] = fileService->make< TH2D >( *( ( TH2D* )( iHist->second->Clone( nameBkgNoTau.replace( 8, 0, "_BkgNoTau" ).c_str() ) ) ) );
   }
+  hist2D_GenHitFit_[ "DecayChn_nValid" ] = fileService->make< TH2D >( "DecayChn_HitFit_nValid", "HitFit valid hypotheses vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., binsHitFitNValid_ + 1, -0.5, binsHitFitNValid_ + 0.5 );
+  hist2D_GenHitFit_[ "DecayChn_nValid" ]->SetXTitle( "" );
+  assignDecayChnNames( hist2D_GenHitFit_[ "DecayChn_nValid" ]->GetXaxis() );
+  hist2D_GenHitFit_[ "DecayChn_nValid" ]->SetYTitle( "valid hypotheses^{HitFit}" );
+  hist2D_GenHitFit_[ "DecayChn_nValid" ]->SetZTitle( "events" );
+  hist2D_GenHitFit_[ "DecayChn_Valid" ] = fileService->make< TH2D >( "DecayChn_HitFit_valid", "HitFit valid hypothesis vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., 2, -0.5, 1.5 );
+  hist2D_GenHitFit_[ "DecayChn_Valid" ]->SetXTitle( "" );
+  assignDecayChnNames( hist2D_GenHitFit_[ "DecayChn_Valid" ]->GetXaxis() );
+  hist2D_GenHitFit_[ "DecayChn_Valid" ]->SetYTitle( "valid^{HitFit}" );
+  hist2D_GenHitFit_[ "DecayChn_Valid" ]->SetZTitle( "events" );
   hist2D_GenHitFit_[ "DecayChn_nRealNuSol" ] = fileService->make< TH2D >( "DecayChn_nRealNuSol", "HitFit real #nu solutions vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., 4, -1.5, 2.5 );
   hist2D_GenHitFit_[ "DecayChn_nRealNuSol" ]->SetXTitle( "" );
   assignDecayChnNames( hist2D_GenHitFit_[ "DecayChn_nRealNuSol" ]->GetXaxis() );
@@ -600,6 +681,11 @@ void TopHitFitAnalyzer::beginJob()
   assignDecayChnNames( hist2D_GenHitFit_[ "DecayChn_SigMTRel" ]->GetXaxis() );
   hist2D_GenHitFit_[ "DecayChn_SigMTRel" ]->SetYTitle( "#frac{#sigma_{m_{t}}^{HitFit}}{m_{t}^{HitFit}}" );
   hist2D_GenHitFit_[ "DecayChn_SigMTRel" ]->SetZTitle( "events" );
+  hist2D_GenHitFit_[ "DecayChn_TopLepM" ] = fileService->make< TH2D >( "DecayChn_TopLepM", "HitFit leptonic top mass vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., binsHitFitMT_, minHitFitMT_, maxHitFitMT_ );
+  hist2D_GenHitFit_[ "DecayChn_TopLepM" ]->SetXTitle( "" );
+  assignDecayChnNames( hist2D_GenHitFit_[ "DecayChn_TopLepM" ]->GetXaxis() );
+  hist2D_GenHitFit_[ "DecayChn_TopLepM" ]->SetYTitle( "m_{t, l}^{HitFit} (GeV)" );
+  hist2D_GenHitFit_[ "DecayChn_TopLepM" ]->SetZTitle( "events" );
   hist2D_GenHitFit_[ "DecayChn_LepM" ] = fileService->make< TH2D >( "DecayChn_LepM", "HitFit lepton mass vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., binsLepM_, -maxLepM_, maxLepM_ );
   hist2D_GenHitFit_[ "DecayChn_LepM" ]->SetXTitle( "" );
   assignDecayChnNames( hist2D_GenHitFit_[ "DecayChn_LepM" ]->GetXaxis() );
@@ -650,18 +736,23 @@ void TopHitFitAnalyzer::beginJob()
   assignDecayChnNames( hist2D_GenHitFit_[ "DecayChn_NuPz" ]->GetXaxis() );
   hist2D_GenHitFit_[ "DecayChn_NuPz" ]->SetYTitle( "p_{z, #nu}^{HitFit} (GeV)" );
   hist2D_GenHitFit_[ "DecayChn_NuPz" ]->SetZTitle( "events" );
-  hist2D_GenGenMatch_[ "Valid" ] = fileService->make< TH2D >( "DecayChn_GenMatch_Valid", "GenMatch valid hypothesis vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., 2, -0.5, 1.5 );
-  assignDecayChnNames( hist2D_GenGenMatch_[ "Valid" ]->GetXaxis() );
-  hist2D_GenGenMatch_[ "Valid" ]->SetYTitle( "valid^{GenMatch}" );
-  hist2D_GenGenMatch_[ "Valid" ]->SetZTitle( "events" );
-  hist2D_GenGenMatch_[ "SumPt" ] = fileService->make< TH2D >( "DecayChn_GenMatch_SumPt", "GenMatch sum of transverse momenta vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., binsGenMatchSumPt_, 0., maxGenMatchSumPt_ );
-  assignDecayChnNames( hist2D_GenGenMatch_[ "SumPt" ]->GetXaxis() );
-  hist2D_GenGenMatch_[ "SumPt" ]->SetYTitle( "#sum p_{t}^{GenMatch}" );
-  hist2D_GenGenMatch_[ "SumPt" ]->SetZTitle( "events" );
-  hist2D_GenGenMatch_[ "SumDR" ] = fileService->make< TH2D >( "DecayChn_GenMatch_SumDR", "GenMatch sum of spacial deviations vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., binsGenMatchSumDR_, 0., maxGenMatchSumDR_ );
-  assignDecayChnNames( hist2D_GenGenMatch_[ "SumDR" ]->GetXaxis() );
-  hist2D_GenGenMatch_[ "SumDR" ]->SetYTitle( "#sum #Delta R^{GenMatch}" );
-  hist2D_GenGenMatch_[ "SumDR" ]->SetZTitle( "events" );
+  hist2D_GenHitFit_[ "DecayChn_TopHadM" ] = fileService->make< TH2D >( "DecayChn_TopHadM", "HitFit hadronic top mass vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., binsHitFitMT_, minHitFitMT_, maxHitFitMT_ );
+  hist2D_GenHitFit_[ "DecayChn_TopHadM" ]->SetXTitle( "" );
+  assignDecayChnNames( hist2D_GenHitFit_[ "DecayChn_TopHadM" ]->GetXaxis() );
+  hist2D_GenHitFit_[ "DecayChn_TopHadM" ]->SetYTitle( "m_{t, h}^{HitFit} (GeV)" );
+  hist2D_GenHitFit_[ "DecayChn_TopHadM" ]->SetZTitle( "events" );
+  hist2D_GenGenMatch_[ "DecayChn_Valid" ] = fileService->make< TH2D >( "DecayChn_GenMatch_Valid", "GenMatch valid hypothesis vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., 2, -0.5, 1.5 );
+  assignDecayChnNames( hist2D_GenGenMatch_[ "DecayChn_Valid" ]->GetXaxis() );
+  hist2D_GenGenMatch_[ "DecayChn_Valid" ]->SetYTitle( "valid^{GenMatch}" );
+  hist2D_GenGenMatch_[ "DecayChn_Valid" ]->SetZTitle( "events" );
+  hist2D_GenGenMatch_[ "DecayChn_SumPt" ] = fileService->make< TH2D >( "DecayChn_GenMatch_SumPt", "GenMatch sum of transverse momenta vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., binsGenMatchSumPt_, 0., maxGenMatchSumPt_ );
+  assignDecayChnNames( hist2D_GenGenMatch_[ "DecayChn_SumPt" ]->GetXaxis() );
+  hist2D_GenGenMatch_[ "DecayChn_SumPt" ]->SetYTitle( "#sum p_{t}^{GenMatch}" );
+  hist2D_GenGenMatch_[ "DecayChn_SumPt" ]->SetZTitle( "events" );
+  hist2D_GenGenMatch_[ "DecayChn_SumDR" ] = fileService->make< TH2D >( "DecayChn_GenMatch_SumDR", "GenMatch sum of spacial deviations vs. decay channel", decayChnNames_.size()-1, 0., decayChnNames_.size()-1., binsGenMatchSumDR_, 0., maxGenMatchSumDR_ );
+  assignDecayChnNames( hist2D_GenGenMatch_[ "DecayChn_SumDR" ]->GetXaxis() );
+  hist2D_GenGenMatch_[ "DecayChn_SumDR" ]->SetYTitle( "#sum #Delta R^{GenMatch}" );
+  hist2D_GenGenMatch_[ "DecayChn_SumDR" ]->SetZTitle( "events" );
 
 }
 
@@ -670,109 +761,61 @@ void TopHitFitAnalyzer::beginJob()
 void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup )
 {
 
+  // Reset
+  ttGenEvent_ = 0;
+  isSignal_   = false;
+
   // TQAF semi-leptonic event
-  edm::Handle< TtSemiLeptonicEvent > ttSemiLeptonicEvent;
-  iEvent.getByLabel( ttSemiLeptonicEvent_, ttSemiLeptonicEvent );
+  iEvent.getByLabel( ttSemiLeptonicEventTag_, ttSemiLeptonicEvent_ );
 
   // HitFit event hypothesis
-  const unsigned HitFitNHypos( ttSemiLeptonicEvent->numberOfAvailableHypos( TtEvent::kHitFit ) );
   unsigned HitFitNHyposValid( 0 );
-  for ( unsigned iHypo = 0; iHypo < HitFitNHypos; ++iHypo ) {
-    if ( ttSemiLeptonicEvent->isHypoValid( TtEvent::kHitFit, iHypo ) )
+  for ( unsigned iHypo = 0; iHypo < ttSemiLeptonicEvent_->numberOfAvailableHypos( TtEvent::kHitFit ); ++iHypo ) {
+    if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit, iHypo ) )
       ++HitFitNHyposValid;
   }
   hist1D_HitFit_[ "nValid" ]->Fill( HitFitNHyposValid );
 
-  const bool HitFitValid( ttSemiLeptonicEvent->isHypoValid( TtEvent::kHitFit ) );
-  const reco::CompositeCandidate HitFitHypo( ttSemiLeptonicEvent->eventHypo( TtEvent::kHitFit ) );
-  const reco::Candidate * HitFitTopLep( ttSemiLeptonicEvent->leptonicDecayTop( TtEvent::kHitFit ) );
-  const reco::Candidate * HitFitBLep( ttSemiLeptonicEvent->leptonicDecayB( TtEvent::kHitFit ) );
-  const reco::Candidate * HitFitWLep( ttSemiLeptonicEvent->leptonicDecayW( TtEvent::kHitFit ) );
-  const reco::Candidate * HitFitLep( ttSemiLeptonicEvent->singleLepton( TtEvent::kHitFit ) );
-  const reco::Candidate * HitFitNu( ttSemiLeptonicEvent->singleNeutrino( TtEvent::kHitFit ) );
-  const reco::Candidate * HitFitTopHad( ttSemiLeptonicEvent->hadronicDecayTop( TtEvent::kHitFit ) );
-  const reco::Candidate * HitFitBHad( ttSemiLeptonicEvent->hadronicDecayB( TtEvent::kHitFit ) );
-  const reco::Candidate * HitFitWHad( ttSemiLeptonicEvent->hadronicDecayW( TtEvent::kHitFit ) );
-  const reco::Candidate * HitFitQ( ttSemiLeptonicEvent->hadronicDecayQuark( TtEvent::kHitFit ) );
-  const reco::Candidate * HitFitQbar( ttSemiLeptonicEvent->hadronicDecayQuarkBar( TtEvent::kHitFit ) );
-  const int HitFitNRealNuSol( ttSemiLeptonicEvent->numberOfRealNeutrinoSolutions( TtEvent::kHitFit ) );
-
-  hist1D_HitFit_[ "Valid" ]->Fill( HitFitValid );
-  hist1D_HitFit_[ "nRealNuSol" ]->Fill( HitFitNRealNuSol );
-  hist1D_HitFit_[ "Prob" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-  hist1D_HitFit_[ "ProbLow" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-  hist1D_HitFit_[ "ProbLog" ]->Fill( log10( ttSemiLeptonicEvent->hitFitProb() ) );
-
-  hist2D_HitFit_[ "Prob_Prob1" ]->Fill( ttSemiLeptonicEvent->hitFitProb(), ttSemiLeptonicEvent->hitFitProb( 1 ) );
+  fill1D_HitFit( hist1D_HitFit_ );
 
   // Fill histograms only for converged fits
-  if ( ttSemiLeptonicEvent->hitFitProb() >= 0. ) {
+  if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
 
-    hist1D_HitFit_[ "Chi2" ]->Fill( ttSemiLeptonicEvent->hitFitChi2() );
-    hist1D_HitFit_[ "MT" ]->Fill( ttSemiLeptonicEvent->hitFitMT() );
-    hist1D_HitFit_[ "SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT() );
-    hist1D_HitFit_[ "SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-    hist2D_HitFit_[ "Prob_MT" ]->Fill( ttSemiLeptonicEvent->hitFitProb(), ttSemiLeptonicEvent->hitFitMT() );
-    hist2D_HitFit_[ "Prob_SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitProb(), ttSemiLeptonicEvent->hitFitSigMT() );
-    hist2D_HitFit_[ "Prob_SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitProb(), ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-    hist2D_HitFit_[ "MT_SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT() );
-    hist2D_HitFit_[ "MT_SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-
-    hist1D_HitFit_[ "LepM" ]->Fill( HitFitLep->mass() );
-    hist1D_HitFit_[ "LepPt" ]->Fill( HitFitLep->pt() );
-    hist1D_HitFit_[ "LepEta" ]->Fill( HitFitLep->eta() );
-    hist1D_HitFit_[ "LepPhi" ]->Fill( HitFitLep->phi() );
-    hist1D_HitFit_[ "LepPz" ]->Fill( HitFitLep->pz() );
-    hist1D_HitFit_[ "NuM" ]->Fill( HitFitNu->mass() );
-    hist1D_HitFit_[ "NuPt" ]->Fill( HitFitNu->pt() );
-    hist1D_HitFit_[ "NuEta" ]->Fill( HitFitNu->eta() );
-    hist1D_HitFit_[ "NuPhi" ]->Fill( HitFitNu->phi() );
-    hist1D_HitFit_[ "NuPz" ]->Fill( HitFitNu->pz() );
+    fill1D_HitFit_Valid( hist1D_HitFit_ );
+    fill2D_HitFit_Valid( hist2D_HitFit_ );
 
   }
 
   // MC specific (using true information)
+
   if ( ! iEvent.isRealData() ) {
 
-    // GenMatch event hypothesis
-    const bool GenMatchValid( ttSemiLeptonicEvent->isHypoValid( TtEvent::kGenMatch ) );
-    const reco::CompositeCandidate GenMatchHypo( ttSemiLeptonicEvent->eventHypo( TtEvent::kGenMatch ) );
-    const reco::Candidate * GenMatchTopLep( ttSemiLeptonicEvent->leptonicDecayTop( TtEvent::kGenMatch ) );
-    const reco::Candidate * GenMatchBLep( ttSemiLeptonicEvent->leptonicDecayB( TtEvent::kGenMatch ) );
-    const reco::Candidate * GenMatchWLep( ttSemiLeptonicEvent->leptonicDecayW( TtEvent::kGenMatch ) );
-    const reco::Candidate * GenMatchLep( ttSemiLeptonicEvent->singleLepton( TtEvent::kGenMatch ) );
-    const reco::Candidate * GenMatchNu( ttSemiLeptonicEvent->singleNeutrino( TtEvent::kGenMatch ) );
-    const reco::Candidate * GenMatchTopHad( ttSemiLeptonicEvent->hadronicDecayTop( TtEvent::kGenMatch ) );
-    const reco::Candidate * GenMatchBHad( ttSemiLeptonicEvent->hadronicDecayB( TtEvent::kGenMatch ) );
-    const reco::Candidate * GenMatchWHad( ttSemiLeptonicEvent->hadronicDecayW( TtEvent::kGenMatch ) );
-    const reco::Candidate * GenMatchQ( ttSemiLeptonicEvent->hadronicDecayQuark( TtEvent::kGenMatch ) );
-    const reco::Candidate * GenMatchQbar( ttSemiLeptonicEvent->hadronicDecayQuarkBar( TtEvent::kGenMatch ) );
-    const int HitFitNRealNuSol( ttSemiLeptonicEvent->numberOfRealNeutrinoSolutions( TtEvent::kGenMatch ) );
+    fill1D_GenMatch( hist1D_GenMatch_ );
 
-    hist1D_GenMatch_[ "Valid" ]->Fill( GenMatchValid );
-    hist1D_GenMatch_[ "SumPt" ]->Fill( ttSemiLeptonicEvent->genMatchSumPt() );
-    hist1D_GenMatch_[ "SumDR" ]->Fill( ttSemiLeptonicEvent->genMatchSumDR() );
+    if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
+
+      fill1D_GenMatch_Valid( hist1D_GenMatch_ );
+
+    }
 
     // Generated event
-    const TtGenEvent * ttGenEvent( ttSemiLeptonicEvent->genEvent().get() );
-    bool     isSignal( false );
-    unsigned DecayChn( WDecay::kNone );
+    ttGenEvent_ = const_cast< TtGenEvent* >( ttSemiLeptonicEvent_->genEvent().get() );
     // Proceed only for ttbar events
-    if ( ttGenEvent->isTtBar() ) {
+    if ( ttGenEvent_->isTtBar() ) {
 
       // Decay channels
       // FIXME: This is still muon-specific
       unsigned nTrueOtherMuon( 0 );
-      if ( ttGenEvent->isSemiLeptonic( WDecay::kElec ) ) {
-        DecayChn = ttGenEvent->semiLeptonicChannel();
+      if ( ttGenEvent_->isSemiLeptonic( WDecay::kElec ) ) {
+        decayChn_ = ttGenEvent_->semiLeptonicChannel();
       }
-      else if ( ttGenEvent->isSemiLeptonic( WDecay::kMuon ) ) {
-        DecayChn = ttGenEvent->semiLeptonicChannel();
-        isSignal = true;
+      else if ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) ) {
+        decayChn_ = ttGenEvent_->semiLeptonicChannel();
+        isSignal_ = true;
       }
-      else if ( ttGenEvent->isSemiLeptonic( WDecay::kTau ) ) {
-        DecayChn = ttGenEvent->semiLeptonicChannel();
-        const reco::GenParticle * genSemiTau( ttGenEvent->singleLepton() );
+      else if ( ttGenEvent_->isSemiLeptonic( WDecay::kTau ) ) {
+        decayChn_ = ttGenEvent_->semiLeptonicChannel();
+        const reco::GenParticle * genSemiTau( ttGenEvent_->singleLepton() );
         for ( size_t iD = 0; iD < genSemiTau->numberOfDaughters(); ++iD ) {
           const reco::Candidate * genTauDaughter( genSemiTau->daughter( iD ) );
           // First level daughter is a copy: need to go one level deeper
@@ -781,11 +824,11 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
             if ( fabs( genTauGrandDaughter->pdgId() ) == 13 ) ++nTrueOtherMuon;
           }
         }
-        DecayChn += nTrueOtherMuon;
+        decayChn_ += nTrueOtherMuon;
       }
-      else if ( ttGenEvent->isFullLeptonic() ) {
-        DecayChn = WDecay::kTau + 2;
-        const reco::GenParticle * genFullLep( ttGenEvent->lepton() );
+      else if ( ttGenEvent_->isFullLeptonic() ) {
+        decayChn_ = WDecay::kTau + 2;
+        const reco::GenParticle * genFullLep( ttGenEvent_->lepton() );
         if ( fabs( genFullLep->pdgId() ) == 15 ) {
           for ( size_t iD = 0; iD < genFullLep->numberOfDaughters(); ++iD ) {
             const reco::Candidate * genTauDaughter( genFullLep->daughter( iD ) );
@@ -798,7 +841,7 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
         else if ( fabs( genFullLep->pdgId() ) == 13 ) {
            ++nTrueOtherMuon;
         }
-        const reco::GenParticle * genFullLepBar( ttGenEvent->leptonBar() );
+        const reco::GenParticle * genFullLepBar( ttGenEvent_->leptonBar() );
         if ( fabs( genFullLep->pdgId() ) == 15 ) {
           for ( size_t iD = 0; iD < genFullLepBar->numberOfDaughters(); ++iD ) {
             const reco::Candidate * genTauDaughter( genFullLepBar->daughter( iD ) );
@@ -811,275 +854,153 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
         else if ( fabs( genFullLepBar->pdgId() ) == 13 ) {
            ++nTrueOtherMuon;
         }
-        DecayChn += nTrueOtherMuon;
+        decayChn_ += nTrueOtherMuon;
       }
 
-      hist1D_Gen_[ "DecayChn" ]->Fill( DecayChn );
-      hist2D_GenHitFit_[ "DecayChn_nRealNuSol" ]->Fill( DecayChn, HitFitNRealNuSol );
-      hist2D_GenHitFit_[ "DecayChn_Prob" ]->Fill( DecayChn, ttSemiLeptonicEvent->hitFitProb() );
-      hist2D_GenHitFit_[ "DecayChn_ProbLow" ]->Fill( DecayChn, ttSemiLeptonicEvent->hitFitProb() );
-      hist2D_GenHitFit_[ "DecayChn_ProbLog" ]->Fill( DecayChn, log10( ttSemiLeptonicEvent->hitFitProb() ) );
-      hist2D_GenGenMatch_[ "Valid" ]->Fill( DecayChn, GenMatchValid );
-      hist2D_GenGenMatch_[ "SumPt" ]->Fill( DecayChn, ttSemiLeptonicEvent->genMatchSumPt() );
-      hist2D_GenGenMatch_[ "SumDR" ]->Fill( DecayChn, ttSemiLeptonicEvent->genMatchSumDR() );
+      fill1D_Gen( hist1D_Gen_ );
+      fill2D_GenHitFit( hist2D_GenHitFit_ );
 
       // Fill histograms only for converged fits
-      if ( ttSemiLeptonicEvent->hitFitProb() >= 0. ) {
+      if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
 
-        hist2D_GenHitFit_[ "DecayChn_Chi2" ]->Fill( DecayChn, ttSemiLeptonicEvent->hitFitChi2() );
-        hist2D_GenHitFit_[ "DecayChn_MT" ]->Fill( DecayChn, ttSemiLeptonicEvent->hitFitMT() );
-        hist2D_GenHitFit_[ "DecayChn_SigMT" ]->Fill( DecayChn, ttSemiLeptonicEvent->hitFitSigMT() );
-        hist2D_GenHitFit_[ "DecayChn_SigMTRel" ]->Fill( DecayChn, ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
+        fill2D_GenHitFit_Valid( hist2D_GenHitFit_ );
 
-        hist2D_GenHitFit_[ "DecayChn_LepM" ]->Fill( DecayChn, HitFitLep->mass() );
-        hist2D_GenHitFit_[ "DecayChn_LepPt" ]->Fill( DecayChn, HitFitLep->pt() );
-        hist2D_GenHitFit_[ "DecayChn_LepEta" ]->Fill( DecayChn, HitFitLep->eta() );
-        hist2D_GenHitFit_[ "DecayChn_LepPhi" ]->Fill( DecayChn, HitFitLep->phi() );
-        hist2D_GenHitFit_[ "DecayChn_LepPz" ]->Fill( DecayChn, HitFitLep->pz() );
-        hist2D_GenHitFit_[ "DecayChn_NuM" ]->Fill( DecayChn, HitFitNu->mass() );
-        hist2D_GenHitFit_[ "DecayChn_NuPt" ]->Fill( DecayChn, HitFitNu->pt() );
-        hist2D_GenHitFit_[ "DecayChn_NuEta" ]->Fill( DecayChn, HitFitNu->eta() );
-        hist2D_GenHitFit_[ "DecayChn_NuPhi" ]->Fill( DecayChn, HitFitNu->phi() );
-        hist2D_GenHitFit_[ "DecayChn_NuPz" ]->Fill( DecayChn, HitFitNu->pz() );
+      }
+
+      fill2D_GenGenMatch( hist2D_GenGenMatch_ );
+
+      if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
+
+        fill2D_GenGenMatch_Valid( hist2D_GenGenMatch_ );
 
       }
 
     }
 
     // Signal
-    if ( isSignal ) {
+    if ( isSignal_ ) {
 
-      hist1D_GenMatch_Sig_[ "Valid" ]->Fill( GenMatchValid );
-      hist1D_GenMatch_Sig_[ "SumPt" ]->Fill( ttSemiLeptonicEvent->genMatchSumPt() );
-      hist1D_GenMatch_Sig_[ "SumDR" ]->Fill( ttSemiLeptonicEvent->genMatchSumDR() );
-      hist1D_GenMatch_SigTau_[ "Valid" ]->Fill( GenMatchValid );
-      hist1D_GenMatch_SigTau_[ "SumPt" ]->Fill( ttSemiLeptonicEvent->genMatchSumPt() );
-      hist1D_GenMatch_SigTau_[ "SumDR" ]->Fill( ttSemiLeptonicEvent->genMatchSumDR() );
-
-      // Generator particles
-      const reco::GenParticle * GenTopLep( ttGenEvent->leptonicDecayTop() );
-      const reco::GenParticle * GenBLep( ttGenEvent->leptonicDecayB() );
-      const reco::GenParticle * GenWLep( ttGenEvent->leptonicDecayW() );
-      const reco::GenParticle * GenMu( ttGenEvent->singleLepton() );
-      const reco::GenParticle * GenNu( ttGenEvent->singleNeutrino() );
-      const reco::GenParticle * GenTopHad( ttGenEvent->hadronicDecayTop() );
-      const reco::GenParticle * GenBHad( ttGenEvent->hadronicDecayB() );
-      const reco::GenParticle * GenWHad( ttGenEvent->hadronicDecayW() );
-      const reco::GenParticle * GenQ( ttGenEvent->hadronicDecayQuark() );
-      const reco::GenParticle * GenQbar( ttGenEvent->hadronicDecayQuarkBar() );
-      // Generator radiation
-      const std::vector< const reco::GenParticle* > GenTopRadLep( ttGenEvent->leptonicDecayTopRadiation() );
-      const std::vector< const reco::GenParticle* > GenTopRadHad( ttGenEvent->hadronicDecayTopRadiation() );
-
-      // FIXME: This is still muon-specific
-      hist1D_Gen_[ "TopLepM" ]->Fill( GenTopLep->mass() );
-      hist1D_Gen_[ "TopHadM" ]->Fill( GenTopHad->mass() );
-      hist1D_Gen_[ "LepM" ]->Fill( GenMu->mass() );
-      hist1D_Gen_[ "LepPt" ]->Fill( GenMu->pt() );
-      hist1D_Gen_[ "LepEta" ]->Fill( GenMu->eta() );
-      hist1D_Gen_[ "LepPhi" ]->Fill( GenMu->phi() );
-      hist1D_Gen_[ "LepPz" ]->Fill( GenMu->pz() );
-      hist1D_Gen_[ "NuM" ]->Fill( GenNu->mass() );
-      hist1D_Gen_[ "NuPt" ]->Fill( GenNu->pt() );
-      hist1D_Gen_[ "NuEta" ]->Fill( GenNu->eta() );
-      hist1D_Gen_[ "NuPhi" ]->Fill( GenNu->phi() );
-      hist1D_Gen_[ "NuPz" ]->Fill( GenNu->pz() );
-
-      hist1D_HitFit_Sig_[ "nRealNuSol" ]->Fill( HitFitNRealNuSol );
-      hist1D_HitFit_Sig_[ "Prob" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-      hist1D_HitFit_Sig_[ "ProbLow" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-      hist1D_HitFit_Sig_[ "ProbLog" ]->Fill( log10( ttSemiLeptonicEvent->hitFitProb() ) );
-      hist1D_HitFit_SigTau_[ "nRealNuSol" ]->Fill( HitFitNRealNuSol );
-      hist1D_HitFit_SigTau_[ "Prob" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-      hist1D_HitFit_SigTau_[ "ProbLow" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-      hist1D_HitFit_SigTau_[ "ProbLog" ]->Fill( log10( ttSemiLeptonicEvent->hitFitProb() ) );
-
-      hist2D_HitFit_SigTau_[ "Prob_Prob1" ]->Fill( ttSemiLeptonicEvent->hitFitProb(), ttSemiLeptonicEvent->hitFitProb( 1 ) );
+      fill1D_HitFit( hist1D_HitFit_Sig_ );
+      fill1D_HitFit( hist1D_HitFit_SigTau_ );
 
       // Fill histograms only for converged fits
-      if ( ttSemiLeptonicEvent->hitFitProb() >= 0. ) {
+      if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
 
-        hist1D_Diff_[ "TopLepM" ]->Fill( ttSemiLeptonicEvent->hitFitMT() - GenTopLep->mass() );
-        hist1D_Diff_[ "TopHadM" ]->Fill( ttSemiLeptonicEvent->hitFitMT() - GenTopHad->mass() );
-        hist1D_Diff_[ "LepM" ]->Fill( HitFitLep->mass() - GenMu->mass() );
-        hist1D_Diff_[ "LepPt" ]->Fill( HitFitLep->pt() - GenMu->pt() );
-        hist1D_Diff_[ "LepEta" ]->Fill( HitFitLep->eta() - GenMu->eta() );
-        hist1D_Diff_[ "LepPhi" ]->Fill( HitFitLep->phi() - GenMu->phi() );
-        hist1D_Diff_[ "LepPz" ]->Fill( HitFitLep->pz() - GenMu->pz() );
-        hist1D_Diff_[ "NuM" ]->Fill( HitFitNu->mass() - GenNu->mass() );
-        hist1D_Diff_[ "NuPt" ]->Fill( HitFitNu->pt() - GenNu->pt() );
-        hist1D_Diff_[ "NuEta" ]->Fill( HitFitNu->eta() - GenNu->eta() );
-        hist1D_Diff_[ "NuPhi" ]->Fill( HitFitNu->phi() - GenNu->phi() );
-        hist1D_Diff_[ "NuPz" ]->Fill( HitFitNu->pz() - GenNu->pz() );
+        fill1D_HitFit_Valid( hist1D_HitFit_Sig_ );
+        fill2D_HitFit_Valid( hist2D_HitFit_Sig_ );
 
-        hist1D_HitFit_Sig_[ "Chi2" ]->Fill( ttSemiLeptonicEvent->hitFitChi2() );
-        hist1D_HitFit_Sig_[ "MT" ]->Fill( ttSemiLeptonicEvent->hitFitMT() );
-        hist1D_HitFit_Sig_[ "SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT() );
-        hist1D_HitFit_Sig_[ "SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-        hist2D_HitFit_Sig_[ "MT_SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT() );
-        hist2D_HitFit_Sig_[ "MT_SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-        hist1D_HitFit_SigTau_[ "Chi2" ]->Fill( ttSemiLeptonicEvent->hitFitChi2() );
-        hist1D_HitFit_SigTau_[ "MT" ]->Fill( ttSemiLeptonicEvent->hitFitMT() );
-        hist1D_HitFit_SigTau_[ "SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT() );
-        hist1D_HitFit_SigTau_[ "SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-        hist2D_HitFit_SigTau_[ "MT_SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT() );
-        hist2D_HitFit_SigTau_[ "MT_SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
+        fill1D_HitFit_Valid( hist1D_HitFit_SigTau_ );
+        fill2D_HitFit_Valid( hist2D_HitFit_SigTau_ );
 
-        hist1D_HitFit_Sig_[ "LepM" ]->Fill( HitFitLep->mass() );
-        hist1D_HitFit_Sig_[ "LepPt" ]->Fill( HitFitLep->pt() );
-        hist1D_HitFit_Sig_[ "LepEta" ]->Fill( HitFitLep->eta() );
-        hist1D_HitFit_Sig_[ "LepPhi" ]->Fill( HitFitLep->phi() );
-        hist1D_HitFit_Sig_[ "LepPz" ]->Fill( HitFitLep->pz() );
-        hist1D_HitFit_Sig_[ "NuM" ]->Fill( HitFitNu->mass() );
-        hist1D_HitFit_Sig_[ "NuPt" ]->Fill( HitFitNu->pt() );
-        hist1D_HitFit_Sig_[ "NuEta" ]->Fill( HitFitNu->eta() );
-        hist1D_HitFit_Sig_[ "NuPhi" ]->Fill( HitFitNu->phi() );
-        hist1D_HitFit_Sig_[ "NuPz" ]->Fill( HitFitNu->pz() );
-        hist1D_HitFit_SigTau_[ "LepM" ]->Fill( HitFitLep->mass() );
-        hist1D_HitFit_SigTau_[ "LepPt" ]->Fill( HitFitLep->pt() );
-        hist1D_HitFit_SigTau_[ "LepEta" ]->Fill( HitFitLep->eta() );
-        hist1D_HitFit_SigTau_[ "LepPhi" ]->Fill( HitFitLep->phi() );
-        hist1D_HitFit_SigTau_[ "LepPz" ]->Fill( HitFitLep->pz() );
-        hist1D_HitFit_SigTau_[ "NuM" ]->Fill( HitFitNu->mass() );
-        hist1D_HitFit_SigTau_[ "NuPt" ]->Fill( HitFitNu->pt() );
-        hist1D_HitFit_SigTau_[ "NuEta" ]->Fill( HitFitNu->eta() );
-        hist1D_HitFit_SigTau_[ "NuPhi" ]->Fill( HitFitNu->phi() );
-        hist1D_HitFit_SigTau_[ "NuPz" ]->Fill( HitFitNu->pz() );
+        fill1D_GenHitFitDiff_SignalValid( hist1D_Diff_ );
 
       }
+
+      fill1D_GenMatch( hist1D_GenMatch_Sig_ );
+
+      fill1D_GenMatch( hist1D_GenMatch_SigTau_ );
+
+      if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
+
+        fill1D_GenMatch_Valid( hist1D_GenMatch_Sig_ );
+
+        fill1D_GenMatch_Valid( hist1D_GenMatch_SigTau_ );
+
+      }
+
+      fill1D_Gen_Signal( hist1D_Gen_ );
 
     }
     // Background
     else {
 
-      hist1D_HitFit_Bkg_[ "nRealNuSol" ]->Fill( HitFitNRealNuSol );
-      hist1D_HitFit_Bkg_[ "Prob" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-      hist1D_HitFit_Bkg_[ "ProbLow" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-      hist1D_HitFit_Bkg_[ "ProbLog" ]->Fill( log10( ttSemiLeptonicEvent->hitFitProb() ) );
+      fill1D_HitFit( hist1D_HitFit_Bkg_ );
 
-      hist2D_HitFit_Bkg_[ "Prob_Prob1" ]->Fill( ttSemiLeptonicEvent->hitFitProb(), ttSemiLeptonicEvent->hitFitProb( 1 ) );
+      if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
 
-      hist1D_GenMatch_Bkg_[ "Valid" ]->Fill( GenMatchValid );
-      hist1D_GenMatch_Bkg_[ "SumPt" ]->Fill( ttSemiLeptonicEvent->genMatchSumPt() );
-      hist1D_GenMatch_Bkg_[ "SumDR" ]->Fill( ttSemiLeptonicEvent->genMatchSumDR() );
+        fill1D_HitFit_Valid( hist1D_HitFit_Bkg_ );
+        fill2D_HitFit_Valid( hist2D_HitFit_Bkg_ );
+
+      }
+
+      fill1D_GenMatch( hist1D_GenMatch_Bkg_ );
+
+      if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
+
+        fill1D_GenMatch_Valid( hist1D_GenMatch_Bkg_ );
+
+      }
 
       // Semi-tau to mu
-      if ( DecayChn == WDecay::kTau + 1 ) {
+      if ( decayChn_ == WDecay::kTau + 1 ) {
 
-        hist1D_GenMatch_Tau_[ "Valid" ]->Fill( GenMatchValid );
-        hist1D_GenMatch_Tau_[ "SumPt" ]->Fill( ttSemiLeptonicEvent->genMatchSumPt() );
-        hist1D_GenMatch_Tau_[ "SumDR" ]->Fill( ttSemiLeptonicEvent->genMatchSumDR() );
-        hist1D_GenMatch_SigTau_[ "Valid" ]->Fill( GenMatchValid );
-        hist1D_GenMatch_SigTau_[ "SumPt" ]->Fill( ttSemiLeptonicEvent->genMatchSumPt() );
-        hist1D_GenMatch_SigTau_[ "SumDR" ]->Fill( ttSemiLeptonicEvent->genMatchSumDR() );
+        fill1D_HitFit( hist1D_HitFit_Tau_ );
+        fill1D_HitFit( hist1D_HitFit_SigTau_ );
 
-        hist1D_HitFit_Tau_[ "nRealNuSol" ]->Fill( HitFitNRealNuSol );
-        hist1D_HitFit_Tau_[ "Prob" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-        hist1D_HitFit_Tau_[ "ProbLow" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-        hist1D_HitFit_Tau_[ "ProbLog" ]->Fill( log10( ttSemiLeptonicEvent->hitFitProb() ) );
-        hist1D_HitFit_SigTau_[ "nRealNuSol" ]->Fill( HitFitNRealNuSol );
-        hist1D_HitFit_SigTau_[ "Prob" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-        hist1D_HitFit_SigTau_[ "ProbLow" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-        hist1D_HitFit_SigTau_[ "ProbLog" ]->Fill( log10( ttSemiLeptonicEvent->hitFitProb() ) );
+        if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
 
-        hist2D_HitFit_SigTau_[ "Prob_Prob1" ]->Fill( ttSemiLeptonicEvent->hitFitProb(), ttSemiLeptonicEvent->hitFitProb( 1 ) );
+          fill1D_HitFit_Valid( hist1D_HitFit_Tau_ );
+          fill2D_HitFit_Valid( hist2D_HitFit_Tau_ );
+
+          fill1D_HitFit_Valid( hist1D_HitFit_SigTau_ );
+          fill2D_HitFit_Valid( hist2D_HitFit_SigTau_ );
+
+        }
+
+        fill1D_GenMatch( hist1D_GenMatch_Tau_ );
+
+        fill1D_GenMatch( hist1D_GenMatch_SigTau_ );
+
+        if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
+
+          fill1D_GenMatch_Valid( hist1D_GenMatch_Tau_ );
+
+          fill1D_GenMatch_Valid( hist1D_GenMatch_SigTau_ );
+
+        }
 
       }
       else {
 
-        hist1D_GenMatch_BkgNoTau_[ "Valid" ]->Fill( GenMatchValid );
-        hist1D_GenMatch_BkgNoTau_[ "SumPt" ]->Fill( ttSemiLeptonicEvent->genMatchSumPt() );
-        hist1D_GenMatch_BkgNoTau_[ "SumDR" ]->Fill( ttSemiLeptonicEvent->genMatchSumDR() );
+        fill1D_HitFit( hist1D_HitFit_BkgNoTau_ );
 
-        hist1D_HitFit_BkgNoTau_[ "nRealNuSol" ]->Fill( HitFitNRealNuSol );
-        hist1D_HitFit_BkgNoTau_[ "Prob" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-        hist1D_HitFit_BkgNoTau_[ "ProbLow" ]->Fill( ttSemiLeptonicEvent->hitFitProb() );
-        hist1D_HitFit_BkgNoTau_[ "ProbLog" ]->Fill( log10( ttSemiLeptonicEvent->hitFitProb() ) );
+        if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
 
-        hist2D_HitFit_BkgNoTau_[ "Prob_Prob1" ]->Fill( ttSemiLeptonicEvent->hitFitProb(), ttSemiLeptonicEvent->hitFitProb( 1 ) );
+          fill1D_HitFit_Valid( hist1D_HitFit_BkgNoTau_ );
+          fill2D_HitFit_Valid( hist2D_HitFit_BkgNoTau_ );
+
+        }
+
+        fill1D_GenMatch( hist1D_GenMatch_BkgNoTau_ );
+
+        if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
+
+          fill1D_GenMatch_Valid( hist1D_GenMatch_BkgNoTau_ );
+
+        }
 
       }
 
       // Fill histograms only for converged fits
-      if ( ttSemiLeptonicEvent->hitFitProb() >= 0. ) {
+      if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
 
-        hist1D_HitFit_Bkg_[ "Chi2" ]->Fill( ttSemiLeptonicEvent->hitFitChi2() );
-        hist1D_HitFit_Bkg_[ "MT" ]->Fill( ttSemiLeptonicEvent->hitFitMT() );
-        hist1D_HitFit_Bkg_[ "SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT() );
-        hist1D_HitFit_Bkg_[ "SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-        hist2D_HitFit_Bkg_[ "MT_SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT() );
-        hist2D_HitFit_Bkg_[ "MT_SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-
-        hist1D_HitFit_Bkg_[ "LepM" ]->Fill( HitFitLep->mass() );
-        hist1D_HitFit_Bkg_[ "LepPt" ]->Fill( HitFitLep->pt() );
-        hist1D_HitFit_Bkg_[ "LepEta" ]->Fill( HitFitLep->eta() );
-        hist1D_HitFit_Bkg_[ "LepPhi" ]->Fill( HitFitLep->phi() );
-        hist1D_HitFit_Bkg_[ "LepPz" ]->Fill( HitFitLep->pz() );
-        hist1D_HitFit_Bkg_[ "NuM" ]->Fill( HitFitNu->mass() );
-        hist1D_HitFit_Bkg_[ "NuPt" ]->Fill( HitFitNu->pt() );
-        hist1D_HitFit_Bkg_[ "NuEta" ]->Fill( HitFitNu->eta() );
-        hist1D_HitFit_Bkg_[ "NuPhi" ]->Fill( HitFitNu->phi() );
-        hist1D_HitFit_Bkg_[ "NuPz" ]->Fill( HitFitNu->pz() );
+        fill1D_HitFit_Valid( hist1D_HitFit_Bkg_ );
+        fill2D_HitFit_Valid( hist2D_HitFit_Bkg_ );
 
         // Semi-tau to mu
-        if ( DecayChn == WDecay::kTau + 1 ) {
+        if ( decayChn_ == WDecay::kTau + 1 ) {
 
-          hist1D_HitFit_Tau_[ "Chi2" ]->Fill( ttSemiLeptonicEvent->hitFitChi2() );
-          hist1D_HitFit_Tau_[ "MT" ]->Fill( ttSemiLeptonicEvent->hitFitMT() );
-          hist1D_HitFit_Tau_[ "SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT() );
-          hist1D_HitFit_Tau_[ "SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-          hist2D_HitFit_Tau_[ "MT_SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT() );
-          hist2D_HitFit_Tau_[ "MT_SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
+          fill1D_HitFit_Valid( hist1D_HitFit_Tau_ );
+          fill2D_HitFit_Valid( hist2D_HitFit_Tau_ );
 
-          hist1D_HitFit_Tau_[ "LepM" ]->Fill( HitFitLep->mass() );
-          hist1D_HitFit_Tau_[ "LepPt" ]->Fill( HitFitLep->pt() );
-          hist1D_HitFit_Tau_[ "LepEta" ]->Fill( HitFitLep->eta() );
-          hist1D_HitFit_Tau_[ "LepPhi" ]->Fill( HitFitLep->phi() );
-          hist1D_HitFit_Tau_[ "LepPz" ]->Fill( HitFitLep->pz() );
-          hist1D_HitFit_Tau_[ "NuM" ]->Fill( HitFitNu->mass() );
-          hist1D_HitFit_Tau_[ "NuPt" ]->Fill( HitFitNu->pt() );
-          hist1D_HitFit_Tau_[ "NuEta" ]->Fill( HitFitNu->eta() );
-          hist1D_HitFit_Tau_[ "NuPhi" ]->Fill( HitFitNu->phi() );
-          hist1D_HitFit_Tau_[ "NuPz" ]->Fill( HitFitNu->pz() );
-
-          hist1D_HitFit_SigTau_[ "Chi2" ]->Fill( ttSemiLeptonicEvent->hitFitChi2() );
-          hist1D_HitFit_SigTau_[ "MT" ]->Fill( ttSemiLeptonicEvent->hitFitMT() );
-          hist1D_HitFit_SigTau_[ "SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT() );
-          hist1D_HitFit_SigTau_[ "SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-          hist2D_HitFit_SigTau_[ "MT_SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT() );
-          hist2D_HitFit_SigTau_[ "MT_SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-
-          hist1D_HitFit_SigTau_[ "LepM" ]->Fill( HitFitLep->mass() );
-          hist1D_HitFit_SigTau_[ "LepPt" ]->Fill( HitFitLep->pt() );
-          hist1D_HitFit_SigTau_[ "LepEta" ]->Fill( HitFitLep->eta() );
-          hist1D_HitFit_SigTau_[ "LepPhi" ]->Fill( HitFitLep->phi() );
-          hist1D_HitFit_SigTau_[ "LepPz" ]->Fill( HitFitLep->pz() );
-          hist1D_HitFit_SigTau_[ "NuM" ]->Fill( HitFitNu->mass() );
-          hist1D_HitFit_SigTau_[ "NuPt" ]->Fill( HitFitNu->pt() );
-          hist1D_HitFit_SigTau_[ "NuEta" ]->Fill( HitFitNu->eta() );
-          hist1D_HitFit_SigTau_[ "NuPhi" ]->Fill( HitFitNu->phi() );
-          hist1D_HitFit_SigTau_[ "NuPz" ]->Fill( HitFitNu->pz() );
+          fill1D_HitFit_Valid( hist1D_HitFit_SigTau_ );
+          fill2D_HitFit_Valid( hist2D_HitFit_SigTau_ );
 
         }
         else {
 
-          hist1D_HitFit_BkgNoTau_[ "Chi2" ]->Fill( ttSemiLeptonicEvent->hitFitChi2() );
-          hist1D_HitFit_BkgNoTau_[ "MT" ]->Fill( ttSemiLeptonicEvent->hitFitMT() );
-          hist1D_HitFit_BkgNoTau_[ "SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT() );
-          hist1D_HitFit_BkgNoTau_[ "SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-          hist2D_HitFit_BkgNoTau_[ "MT_SigMT" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT() );
-          hist2D_HitFit_BkgNoTau_[ "MT_SigMTRel" ]->Fill( ttSemiLeptonicEvent->hitFitMT(), ttSemiLeptonicEvent->hitFitSigMT()/ttSemiLeptonicEvent->hitFitMT() );
-
-          hist1D_HitFit_BkgNoTau_[ "LepM" ]->Fill( HitFitLep->mass() );
-          hist1D_HitFit_BkgNoTau_[ "LepPt" ]->Fill( HitFitLep->pt() );
-          hist1D_HitFit_BkgNoTau_[ "LepEta" ]->Fill( HitFitLep->eta() );
-          hist1D_HitFit_BkgNoTau_[ "LepPhi" ]->Fill( HitFitLep->phi() );
-          hist1D_HitFit_BkgNoTau_[ "LepPz" ]->Fill( HitFitLep->pz() );
-          hist1D_HitFit_BkgNoTau_[ "NuM" ]->Fill( HitFitNu->mass() );
-          hist1D_HitFit_BkgNoTau_[ "NuPt" ]->Fill( HitFitNu->pt() );
-          hist1D_HitFit_BkgNoTau_[ "NuEta" ]->Fill( HitFitNu->eta() );
-          hist1D_HitFit_BkgNoTau_[ "NuPhi" ]->Fill( HitFitNu->phi() );
-          hist1D_HitFit_BkgNoTau_[ "NuPz" ]->Fill( HitFitNu->pz() );
+          fill1D_HitFit_Valid( hist1D_HitFit_BkgNoTau_ );
+          fill2D_HitFit_Valid( hist2D_HitFit_BkgNoTau_ );
 
         }
 
@@ -1104,6 +1025,204 @@ void TopHitFitAnalyzer::assignDecayChnNames( TAxis * iAxis )
   for ( unsigned i = 1; i < decayChnNames_.size(); ++i ) {
     iAxis->SetBinLabel( i, decayChnNames_.at( i ).c_str() );
   }
+
+}
+
+
+void TopHitFitAnalyzer::fill1D_GenMatch( std::map< std::string, TH1D* > & hist1D )
+{
+
+  hist1D[ "Valid" ]->Fill( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) );
+
+}
+
+
+void TopHitFitAnalyzer::fill2D_GenMatch( std::map< std::string, TH2D* > & hist2D )
+{
+
+  return;
+
+}
+
+
+void TopHitFitAnalyzer::fill1D_GenMatch_Valid( std::map< std::string, TH1D* > & hist1D )
+{
+
+  hist1D[ "SumPt" ]->Fill( ttSemiLeptonicEvent_->genMatchSumPt() );
+  hist1D[ "SumDR" ]->Fill( ttSemiLeptonicEvent_->genMatchSumDR() );
+
+}
+
+
+void TopHitFitAnalyzer::fill2D_GenMatch_Valid( std::map< std::string, TH2D* > & hist2D )
+{
+
+  return;
+
+}
+
+
+void TopHitFitAnalyzer::fill1D_Gen( std::map< std::string, TH1D* > & hist1D )
+{
+
+  hist1D[ "decayChn_" ]->Fill( decayChn_ );
+
+}
+
+
+void TopHitFitAnalyzer::fill2D_GenHitFit( std::map< std::string, TH2D* > & hist2D )
+{
+
+  hist2D[ "DecayChn_Valid" ]->Fill( decayChn_, ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) );
+
+}
+
+
+void TopHitFitAnalyzer::fill2D_GenHitFit_Valid( std::map< std::string, TH2D* > & hist2D )
+{
+
+  hist2D[ "DecayChn_nRealNuSol" ]->Fill( decayChn_, ttSemiLeptonicEvent_->numberOfRealNeutrinoSolutions( TtEvent::kHitFit ) );
+  hist2D[ "DecayChn_Prob" ]->Fill( decayChn_, ttSemiLeptonicEvent_->hitFitProb() );
+  hist2D[ "DecayChn_ProbLow" ]->Fill( decayChn_, ttSemiLeptonicEvent_->hitFitProb() );
+  hist2D[ "DecayChn_ProbLog" ]->Fill( decayChn_, log10( ttSemiLeptonicEvent_->hitFitProb() ) );
+  hist2D[ "DecayChn_Chi2" ]->Fill( decayChn_, ttSemiLeptonicEvent_->hitFitChi2() );
+  hist2D[ "DecayChn_MT" ]->Fill( decayChn_, ttSemiLeptonicEvent_->hitFitMT() );
+  hist2D[ "DecayChn_SigMT" ]->Fill( decayChn_, ttSemiLeptonicEvent_->hitFitSigMT() );
+  hist2D[ "DecayChn_SigMTRel" ]->Fill( decayChn_, ttSemiLeptonicEvent_->hitFitMT(), ttSemiLeptonicEvent_->hitFitSigMT()/ttSemiLeptonicEvent_->hitFitMT() );
+
+  hist2D[ "DecayChn_TopLepM" ]->Fill( decayChn_, ttSemiLeptonicEvent_->leptonicDecayTop( TtEvent::kHitFit )->mass() );
+  hist2D[ "DecayChn_LepM" ]->Fill( decayChn_, ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->mass() );
+  hist2D[ "DecayChn_LepPt" ]->Fill( decayChn_, ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->pt() );
+  hist2D[ "DecayChn_LepEta" ]->Fill( decayChn_, ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->eta() );
+  hist2D[ "DecayChn_LepPhi" ]->Fill( decayChn_, ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->phi() );
+  hist2D[ "DecayChn_LepPz" ]->Fill( decayChn_, ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->pz() );
+  hist2D[ "DecayChn_NuM" ]->Fill( decayChn_, ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->mass() );
+  hist2D[ "DecayChn_NuPt" ]->Fill( decayChn_, ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->pt() );
+  hist2D[ "DecayChn_NuEta" ]->Fill( decayChn_, ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->eta() );
+  hist2D[ "DecayChn_NuPhi" ]->Fill( decayChn_, ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->phi() );
+  hist2D[ "DecayChn_NuPz" ]->Fill( decayChn_, ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->pz() );
+  hist2D[ "DecayChn_TopHadM" ]->Fill( decayChn_, ttSemiLeptonicEvent_->hadronicDecayTop( TtEvent::kHitFit )->mass() );
+
+}
+
+
+void TopHitFitAnalyzer::fill2D_GenGenMatch( std::map< std::string, TH2D* > & hist2D )
+{
+
+  hist2D[ "DecayChn_Valid" ]->Fill( decayChn_, ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) );
+
+}
+
+
+void TopHitFitAnalyzer::fill2D_GenGenMatch_Valid( std::map< std::string, TH2D* > & hist2D )
+{
+
+  hist2D[ "DecayChn_SumPt" ]->Fill( decayChn_, ttSemiLeptonicEvent_->genMatchSumPt() );
+  hist2D[ "DecayChn_SumDR" ]->Fill( decayChn_, ttSemiLeptonicEvent_->genMatchSumDR() );
+
+}
+
+
+void TopHitFitAnalyzer::fill1D_Gen_Signal( std::map< std::string, TH1D* > & hist1D )
+{
+
+  // FIXME: This is still muon-specific
+  hist1D[ "TopLepM" ]->Fill( ttGenEvent_->leptonicDecayTop()->mass() );
+  hist1D[ "LepM" ]->Fill( ttGenEvent_->singleLepton()->mass() );
+  hist1D[ "LepPt" ]->Fill( ttGenEvent_->singleLepton()->pt() );
+  hist1D[ "LepEta" ]->Fill( ttGenEvent_->singleLepton()->eta() );
+  hist1D[ "LepPhi" ]->Fill( ttGenEvent_->singleLepton()->phi() );
+  hist1D[ "LepPz" ]->Fill( ttGenEvent_->singleLepton()->pz() );
+  hist1D[ "NuM" ]->Fill( ttGenEvent_->singleNeutrino()->mass() );
+  hist1D[ "NuPt" ]->Fill( ttGenEvent_->singleNeutrino()->pt() );
+  hist1D[ "NuEta" ]->Fill( ttGenEvent_->singleNeutrino()->eta() );
+  hist1D[ "NuPhi" ]->Fill( ttGenEvent_->singleNeutrino()->phi() );
+  hist1D[ "NuPz" ]->Fill( ttGenEvent_->singleNeutrino()->pz() );
+  hist1D[ "TopHadM" ]->Fill( ttGenEvent_->hadronicDecayTop()->mass() );
+
+}
+
+
+void TopHitFitAnalyzer::fill1D_GenHitFitDiff_SignalValid( std::map< std::string, TH1D* > & hist1D )
+{
+
+  hist1D[ "TopLepM" ]->Fill( ttSemiLeptonicEvent_->hitFitMT() - ttGenEvent_->leptonicDecayTop()->mass() );
+  hist1D[ "LepM" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->mass() - ttGenEvent_->singleLepton()->mass() );
+  hist1D[ "LepPt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->pt() - ttGenEvent_->singleLepton()->pt() );
+  hist1D[ "LepEta" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->eta() - ttGenEvent_->singleLepton()->eta() );
+  hist1D[ "LepPhi" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->phi() - ttGenEvent_->singleLepton()->phi() );
+  hist1D[ "LepPz" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->pz() - ttGenEvent_->singleLepton()->pz() );
+  hist1D[ "NuM" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->mass() - ttGenEvent_->singleNeutrino()->mass() );
+  hist1D[ "NuPt" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->pt() - ttGenEvent_->singleNeutrino()->pt() );
+  hist1D[ "NuEta" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->eta() - ttGenEvent_->singleNeutrino()->eta() );
+  hist1D[ "NuPhi" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->phi() - ttGenEvent_->singleNeutrino()->phi() );
+  hist1D[ "NuPz" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->pz() - ttGenEvent_->singleNeutrino()->pz() );
+  hist1D[ "TopHadM" ]->Fill( ttSemiLeptonicEvent_->hitFitMT() - ttGenEvent_->hadronicDecayTop()->mass() );
+
+}
+
+
+void TopHitFitAnalyzer::fill2D_Gen_Signal( std::map< std::string, TH2D* > & hist2D )
+{
+
+  return;
+
+}
+
+
+void TopHitFitAnalyzer::fill1D_HitFit( std::map< std::string, TH1D* > & hist1D )
+{
+
+  hist1D[ "Valid" ]->Fill( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) );
+
+}
+
+
+void TopHitFitAnalyzer::fill2D_HitFit( std::map< std::string, TH2D* > & hist2D )
+{
+
+  return;
+
+}
+
+
+void TopHitFitAnalyzer::fill1D_HitFit_Valid( std::map< std::string, TH1D* > & hist1D )
+{
+
+  hist1D[ "nRealNuSol" ]->Fill( ttSemiLeptonicEvent_->numberOfRealNeutrinoSolutions( TtEvent::kHitFit ) );
+  hist1D[ "Prob" ]->Fill( ttSemiLeptonicEvent_->hitFitProb() );
+  hist1D[ "ProbLow" ]->Fill( ttSemiLeptonicEvent_->hitFitProb() );
+  hist1D[ "ProbLog" ]->Fill( log10( ttSemiLeptonicEvent_->hitFitProb() ) );
+  hist1D[ "Chi2" ]->Fill( ttSemiLeptonicEvent_->hitFitChi2() );
+  hist1D[ "MT" ]->Fill( ttSemiLeptonicEvent_->hitFitMT() );
+  hist1D[ "SigMT" ]->Fill( ttSemiLeptonicEvent_->hitFitSigMT() );
+  hist1D[ "SigMTRel" ]->Fill( ttSemiLeptonicEvent_->hitFitSigMT()/ttSemiLeptonicEvent_->hitFitMT() );
+
+  hist1D[ "TopLepM" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayTop( TtEvent::kHitFit )->mass() );
+  hist1D[ "LepM" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->mass() );
+  hist1D[ "LepPt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->pt() );
+  hist1D[ "LepEta" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->eta() );
+  hist1D[ "LepPhi" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->phi() );
+  hist1D[ "LepPz" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kHitFit )->pz() );
+  hist1D[ "NuM" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->mass() );
+  hist1D[ "NuPt" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->pt() );
+  hist1D[ "NuEta" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->eta() );
+  hist1D[ "NuPhi" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->phi() );
+  hist1D[ "NuPz" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->pz() );
+  hist1D[ "TopHadM" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayTop( TtEvent::kHitFit )->mass() );
+
+}
+
+
+void TopHitFitAnalyzer::fill2D_HitFit_Valid( std::map< std::string, TH2D* > & hist2D )
+{
+
+  hist2D[ "Prob_MT" ]->Fill( ttSemiLeptonicEvent_->hitFitProb(), ttSemiLeptonicEvent_->hitFitMT() );
+  hist2D[ "Prob_SigMT" ]->Fill( ttSemiLeptonicEvent_->hitFitProb(), ttSemiLeptonicEvent_->hitFitSigMT() );
+  hist2D[ "Prob_SigMTRel" ]->Fill( ttSemiLeptonicEvent_->hitFitProb(), ttSemiLeptonicEvent_->hitFitSigMT()/ttSemiLeptonicEvent_->hitFitMT() );
+  hist2D[ "MT_SigMT" ]->Fill( ttSemiLeptonicEvent_->hitFitMT(), ttSemiLeptonicEvent_->hitFitSigMT() );
+  hist2D[ "MT_SigMTRel" ]->Fill( ttSemiLeptonicEvent_->hitFitMT(), ttSemiLeptonicEvent_->hitFitSigMT()/ttSemiLeptonicEvent_->hitFitMT() );
+  hist2D[ "Prob_Prob1" ]->Fill( ttSemiLeptonicEvent_->hitFitProb(), ttSemiLeptonicEvent_->hitFitProb( 1 ) );
 
 }
 
