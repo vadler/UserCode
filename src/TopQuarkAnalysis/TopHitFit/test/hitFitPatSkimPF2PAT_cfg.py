@@ -190,21 +190,13 @@ if runTest:
 
 process.out = cms.OutputModule( "PoolOutputModule"
 , fileName       = cms.untracked.string( outputFile )
-, SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring(
-                                                                 )
-                                     )
-, outputCommands = cms.untracked.vstring( 'drop *'
-                                        , 'keep edmTriggerResults_*_*_*'
-                                        , 'drop edmTriggerResults_*_*_*RECO*'
-                                        , 'drop edmTriggerResults_*_*_*NONE*'
-                                        , 'keep *_hltTriggerSummaryAOD_*_*'
-                                        , 'keep *_offlineBeamSpot_*_*'
-                                        , 'keep *_offlinePrimaryVertices_*_*'
-                                        )
+, SelectEvents   = cms.untracked.PSet(
+    SelectEvents = cms.vstring(
+                              )
+  )
+, outputCommands = cms.untracked.vstring() # screwed up by PAT tolls lateron anyway :-(
 , dropMetaData   = cms.untracked.string( 'ALL' )
 )
-if runOnMC:
-  process.out.outputCommands.append( 'keep *_addPileupInfo_*_*' )
 
 # Outpath
 process.outpath = cms.EndPath(
@@ -228,10 +220,11 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
   "PrimaryVertexObjectFilter"
 , src          = cms.InputTag( 'offlinePrimaryVertices' )
 , filter       = cms.bool( True )
-, filterParams = cms.PSet( minNdof = cms.double(  4. )
-                         , maxZ    = cms.double( 24. )
-                         , maxRho  = cms.double(  2. )
-                         )
+, filterParams = cms.PSet(
+    minNdof = cms.double(  4. )
+  , maxZ    = cms.double( 24. )
+  , maxRho  = cms.double(  2. )
+  )
 )
 process.out.outputCommands.append( 'keep *_goodOfflinePrimaryVertices_*_*' )
 
@@ -301,6 +294,15 @@ usePF2PAT( process
                             )
          , pvCollection   = cms.InputTag( pvCollection )
          )
+# still need to fix event content afterwards :-(
+process.out.outputCommands.append( 'keep edmTriggerResults_*_*_*' )
+process.out.outputCommands.append( 'drop edmTriggerResults_*_*_*RECO*' )
+process.out.outputCommands.append( 'drop edmTriggerResults_*_*_*NONE*' )
+process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
+process.out.outputCommands.append( 'keep *_offlineBeamSpot_*_*' )
+process.out.outputCommands.append( 'keep *_offlinePrimaryVertices_*_*' )
+if not runOnMC:
+  process.out.outputCommands.append( 'keep *_addPileupInfo_*_*' )
 
 if jetAlgo != 'AK5' or not runJetMatch:
   process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
@@ -408,15 +410,17 @@ process.pfIsolatedMuons.isolationCut = muonsSelectIsoPf
 process.patMuons.embedTrack = embedLeptonTracks
 process.selectedPatMuons.cut = muonSelect
 process.referencePatMuons.preselection = muonSelectSignal
-process.referencePatMuons.checkOverlaps = cms.PSet( jets = cms.PSet( src                 = cms.InputTag( 'selectedPatJets' )
-                                                                   , algorithm           = cms.string( 'byDeltaR' )
-                                                                   , preselection        = cms.string( '' )
-                                                                   , deltaR              = cms.double( muonSelectSignalJetDR )
-                                                                   , checkRecoComponents = cms.bool( False )
-                                                                   , pairCut             = cms.string( '' )
-                                                                   , requireNoOverlaps   = cms.bool( True)
-                                                                   )
-                                                  )
+process.referencePatMuons.checkOverlaps = cms.PSet(
+  jets = cms.PSet(
+    src                 = cms.InputTag( 'selectedPatJets' )
+  , algorithm           = cms.string( 'byDeltaR' )
+  , preselection        = cms.string( '' )
+  , deltaR              = cms.double( muonSelectSignalJetDR )
+  , checkRecoComponents = cms.bool( False )
+  , pairCut             = cms.string( '' )
+  , requireNoOverlaps   = cms.bool( True)
+  )
+)
 
 # Electrons
 process.pfSelectedElectrons.cut = electronSelectPf
