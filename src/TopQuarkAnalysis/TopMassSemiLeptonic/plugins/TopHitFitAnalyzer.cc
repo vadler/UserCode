@@ -67,6 +67,7 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
     // decay channel in real (MC) TTbar events
     unsigned decayChn_;
     bool     isSignal_;
+    bool     isSignalTau_;
 
     /// Configuration parameters
     // TQAF semi-leptonic event input tag
@@ -92,6 +93,8 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
     // Relative HitFit top mass uncertainty
     unsigned binsHitFitSigMTRel_;
     double   maxHitFitSigMTRel_;
+    // GenMatch validity
+    unsigned binsGenMatchNValid_;
     // GenMatch sum p_t
     unsigned binsGenMatchSumPt_;
     double   maxGenMatchSumPt_;
@@ -237,6 +240,7 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 , ttGenEvent_()
 , decayChn_( WDecay::kNone )
 , isSignal_( false )
+, isSignalTau_( false )
   // get configuration parameters
 , ttSemiLeptonicEventTag_( iConfig.getParameter< edm::InputTag >( "ttSemiLeptonicEvent" ) )
 , binsHitFitNValid_( iConfig.getParameter< unsigned >( "binsHitFitNValid" ) )
@@ -254,6 +258,7 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 , maxHitFitSigMT_( iConfig.getParameter< double >( "maxHitFitSigMT" ) )
 , binsHitFitSigMTRel_( iConfig.getParameter< unsigned >( "binsHitFitSigMTRel" ) )
 , maxHitFitSigMTRel_( iConfig.getParameter< double >( "maxHitFitSigMTRel" ) )
+, binsGenMatchNValid_( iConfig.getParameter< unsigned >( "binsGenMatchNValid" ) )
 , binsGenMatchSumPt_( iConfig.getParameter< unsigned >( "binsGenMatchSumPt" ) )
 , maxGenMatchSumPt_( iConfig.getParameter< double >( "maxGenMatchSumPt" ) )
 , binsGenMatchSumDR_( iConfig.getParameter< unsigned >( "binsGenMatchSumDR" ) )
@@ -367,10 +372,10 @@ void TopHitFitAnalyzer::beginJob()
 
   // 1-dim
   hist1D_HitFit_[ "nValid" ] = fileService->make< TH1D >( "HitFit_nValid", "HitFit valid hypotheses", binsHitFitNValid_ + 1, -0.5, binsHitFitNValid_ + 0.5 );
-  hist1D_HitFit_[ "nValid" ]->SetXTitle( "valid hypotheses^{HitFit}" );
+  hist1D_HitFit_[ "nValid" ]->SetXTitle( "valid HitFit hypotheses" );
   hist1D_HitFit_[ "nValid" ]->SetYTitle( "events" );
   hist1D_HitFit_[ "Valid" ] = fileService->make< TH1D >( "HitFit_valid", "HitFit valid hypothesis", 2, -0.5, 1.5 );
-  hist1D_HitFit_[ "Valid" ]->SetXTitle( "valid^{HitFit}" );
+  hist1D_HitFit_[ "Valid" ]->SetXTitle( "HitFit validity" );
   hist1D_HitFit_[ "Valid" ]->SetYTitle( "events" );
   hist1D_HitFit_[ "nRealNuSol" ] = fileService->make< TH1D >( "HitFit_nRealNuSol", "HitFit real #nu solutions", 4, -1.5, 2.5 );
   hist1D_HitFit_[ "nRealNuSol" ]->SetXTitle( "solutions_{real #nu}^{HitFit}" );
@@ -460,8 +465,11 @@ void TopHitFitAnalyzer::beginJob()
 
   // MC specific (using true information)
   // 1-dim
+  hist1D_GenMatch_[ "nValid" ] = fileService->make< TH1D >( "GenMatch_nValid", "GenMatch valid hypotheses", binsGenMatchNValid_ + 1, -0.5, binsGenMatchNValid_ + 0.5 );
+  hist1D_GenMatch_[ "nValid" ]->SetXTitle( "valid GenMatch hypotheses" );
+  hist1D_GenMatch_[ "nValid" ]->SetYTitle( "events" );
   hist1D_GenMatch_[ "Valid" ] = fileService->make< TH1D >( "GenMatch_Valid", "GenMatch valid hypothesis", 2, -0.5, 1.5 );
-  hist1D_GenMatch_[ "Valid" ]->SetXTitle( "valid^{GenMatch}" );
+  hist1D_GenMatch_[ "Valid" ]->SetXTitle( "GenMatch validity" );
   hist1D_GenMatch_[ "Valid" ]->SetYTitle( "events" );
   hist1D_GenMatch_[ "SumPt" ] = fileService->make< TH1D >( "GenMatch_SumPt", "GenMatch sum of transverse momenta", binsGenMatchSumPt_, 0., maxGenMatchSumPt_ );
   hist1D_GenMatch_[ "SumPt" ]->SetXTitle( "#sum p_{t}^{GenMatch}" );
@@ -762,45 +770,44 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
 {
 
   // Reset
-  ttGenEvent_ = 0;
-  isSignal_   = false;
+  ttGenEvent_  = 0;
+  isSignal_    = false;
+  isSignalTau_ = false;
 
   // TQAF semi-leptonic event
   iEvent.getByLabel( ttSemiLeptonicEventTag_, ttSemiLeptonicEvent_ );
 
-  // HitFit event hypothesis
   unsigned HitFitNHyposValid( 0 );
   for ( unsigned iHypo = 0; iHypo < ttSemiLeptonicEvent_->numberOfAvailableHypos( TtEvent::kHitFit ); ++iHypo ) {
     if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit, iHypo ) )
       ++HitFitNHyposValid;
   }
   hist1D_HitFit_[ "nValid" ]->Fill( HitFitNHyposValid );
-
   fill1D_HitFit( hist1D_HitFit_ );
-
-  // Fill histograms only for converged fits
   if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
-
     fill1D_HitFit_Valid( hist1D_HitFit_ );
     fill2D_HitFit_Valid( hist2D_HitFit_ );
-
   }
 
   // MC specific (using true information)
 
   if ( ! iEvent.isRealData() ) {
 
+    unsigned GenMatchNHyposValid( 0 );
+    for ( unsigned iHypo = 0; iHypo < ttSemiLeptonicEvent_->numberOfAvailableHypos( TtEvent::kGenMatch ); ++iHypo ) {
+      if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch, iHypo ) )
+        ++GenMatchNHyposValid;
+    }
+    hist1D_GenMatch_[ "nValid" ]->Fill( GenMatchNHyposValid );
     fill1D_GenMatch( hist1D_GenMatch_ );
-
     if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
-
       fill1D_GenMatch_Valid( hist1D_GenMatch_ );
-
     }
 
     // Generated event
     ttGenEvent_ = const_cast< TtGenEvent* >( ttSemiLeptonicEvent_->genEvent().get() );
-    // Proceed only for ttbar events
+
+    // TTbar specific
     if ( ttGenEvent_->isTtBar() ) {
 
       // Decay channels
@@ -808,11 +815,11 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
       unsigned nTrueOtherMuon( 0 );
       if ( ttGenEvent_->isSemiLeptonic( WDecay::kElec ) ) {
         decayChn_ = ttGenEvent_->semiLeptonicChannel();
-      }
+      } // if ( ttGenEvent_->isSemiLeptonic( WDecay::kElec ) )
       else if ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) ) {
         decayChn_ = ttGenEvent_->semiLeptonicChannel();
         isSignal_ = true;
-      }
+      } // if ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) )
       else if ( ttGenEvent_->isSemiLeptonic( WDecay::kTau ) ) {
         decayChn_ = ttGenEvent_->semiLeptonicChannel();
         const reco::GenParticle * genSemiTau( ttGenEvent_->singleLepton() );
@@ -821,33 +828,41 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
           // First level daughter is a copy: need to go one level deeper
           for ( size_t iDD = 0; iDD < genTauDaughter->numberOfDaughters(); ++iDD ) {
             const reco::Candidate * genTauGrandDaughter( genTauDaughter->daughter( iDD ) );
-            if ( fabs( genTauGrandDaughter->pdgId() ) == 13 ) ++nTrueOtherMuon;
+//             if ( fabs( genTauGrandDaughter->pdgId() ) == 13 ) ++nTrueOtherMuon;
+            if ( reco::isMuon( *genTauGrandDaughter ) ) ++nTrueOtherMuon;
           }
         }
         decayChn_ += nTrueOtherMuon;
-      }
+      } // if ( ttGenEvent_->isSemiLeptonic( WDecay::kTau ) )
       else if ( ttGenEvent_->isFullLeptonic() ) {
         decayChn_ = WDecay::kTau + 2;
         const reco::GenParticle * genFullLep( ttGenEvent_->lepton() );
-        if ( fabs( genFullLep->pdgId() ) == 15 ) {
+//         if ( fabs( genFullLep->pdgId() ) == 15 ) {
+        if ( reco::isTau( *genFullLep ) ) {
           for ( size_t iD = 0; iD < genFullLep->numberOfDaughters(); ++iD ) {
             const reco::Candidate * genTauDaughter( genFullLep->daughter( iD ) );
+            // First level daughter is a copy: need to go one level deeper
             for ( size_t iDD = 0; iDD < genTauDaughter->numberOfDaughters(); ++iDD ) {
               const reco::Candidate * genTauGrandDaughter( genTauDaughter->daughter( iDD ) );
-              if ( fabs( genTauGrandDaughter->pdgId() ) == 13 ) ++nTrueOtherMuon;
+//               if ( fabs( genTauGrandDaughter->pdgId() ) == 13 ) ++nTrueOtherMuon;
+              if ( reco::isMuon( *genTauGrandDaughter ) ) ++nTrueOtherMuon;
             }
           }
         }
-        else if ( fabs( genFullLep->pdgId() ) == 13 ) {
+//         else if ( fabs( genFullLep->pdgId() ) == 13 ) {
+        else if ( reco::isMuon( *genFullLep ) ) {
            ++nTrueOtherMuon;
         }
         const reco::GenParticle * genFullLepBar( ttGenEvent_->leptonBar() );
-        if ( fabs( genFullLep->pdgId() ) == 15 ) {
+//         if ( fabs( genFullLep->pdgId() ) == 15 ) {
+        if ( reco::isTau( *genFullLep ) ) {
           for ( size_t iD = 0; iD < genFullLepBar->numberOfDaughters(); ++iD ) {
             const reco::Candidate * genTauDaughter( genFullLepBar->daughter( iD ) );
+            // First level daughter is a copy: need to go one level deeper
             for ( size_t iDD = 0; iDD < genTauDaughter->numberOfDaughters(); ++iDD ) {
               const reco::Candidate * genTauGrandDaughter( genTauDaughter->daughter( iDD ) );
-              if ( fabs( genTauGrandDaughter->pdgId() ) == 13 ) ++nTrueOtherMuon;
+//               if ( fabs( genTauGrandDaughter->pdgId() ) == 13 ) ++nTrueOtherMuon;
+              if ( reco::isMuon( *genTauGrandDaughter ) ) ++nTrueOtherMuon;
             }
           }
         }
@@ -855,158 +870,110 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
            ++nTrueOtherMuon;
         }
         decayChn_ += nTrueOtherMuon;
-      }
+      } // if ( ttGenEvent_->isFullLeptonic() )
+      if ( decayChn_ == WDecay::kTau + 1 ) isSignalTau_ = true;
 
       fill1D_Gen( hist1D_Gen_ );
       fill2D_GenHitFit( hist2D_GenHitFit_ );
-
-      // Fill histograms only for converged fits
       if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
-
         fill2D_GenHitFit_Valid( hist2D_GenHitFit_ );
-
       }
 
       fill2D_GenGenMatch( hist2D_GenGenMatch_ );
-
       if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
-
         fill2D_GenGenMatch_Valid( hist2D_GenGenMatch_ );
-
       }
 
-    }
+    } // if ( ttGenEvent_->isTtBar() )
 
-    // Signal
     if ( isSignal_ ) {
 
       fill1D_HitFit( hist1D_HitFit_Sig_ );
       fill1D_HitFit( hist1D_HitFit_SigTau_ );
-
-      // Fill histograms only for converged fits
       if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
-
         fill1D_HitFit_Valid( hist1D_HitFit_Sig_ );
         fill2D_HitFit_Valid( hist2D_HitFit_Sig_ );
-
         fill1D_HitFit_Valid( hist1D_HitFit_SigTau_ );
         fill2D_HitFit_Valid( hist2D_HitFit_SigTau_ );
-
         fill1D_GenHitFitDiff_SignalValid( hist1D_Diff_ );
-
       }
 
       fill1D_GenMatch( hist1D_GenMatch_Sig_ );
-
       fill1D_GenMatch( hist1D_GenMatch_SigTau_ );
-
       if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
-
         fill1D_GenMatch_Valid( hist1D_GenMatch_Sig_ );
-
         fill1D_GenMatch_Valid( hist1D_GenMatch_SigTau_ );
-
       }
 
       fill1D_Gen_Signal( hist1D_Gen_ );
 
-    }
-    // Background
+    } // if ( isSignal_ )
     else {
 
       fill1D_HitFit( hist1D_HitFit_Bkg_ );
-
       if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
-
         fill1D_HitFit_Valid( hist1D_HitFit_Bkg_ );
         fill2D_HitFit_Valid( hist2D_HitFit_Bkg_ );
-
       }
 
       fill1D_GenMatch( hist1D_GenMatch_Bkg_ );
-
       if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
-
         fill1D_GenMatch_Valid( hist1D_GenMatch_Bkg_ );
-
       }
 
-      // Semi-tau to mu
-      if ( decayChn_ == WDecay::kTau + 1 ) {
+      if ( isSignalTau_ ) {
 
         fill1D_HitFit( hist1D_HitFit_Tau_ );
         fill1D_HitFit( hist1D_HitFit_SigTau_ );
-
         if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
-
           fill1D_HitFit_Valid( hist1D_HitFit_Tau_ );
           fill2D_HitFit_Valid( hist2D_HitFit_Tau_ );
-
           fill1D_HitFit_Valid( hist1D_HitFit_SigTau_ );
           fill2D_HitFit_Valid( hist2D_HitFit_SigTau_ );
-
         }
 
         fill1D_GenMatch( hist1D_GenMatch_Tau_ );
-
         fill1D_GenMatch( hist1D_GenMatch_SigTau_ );
-
         if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
-
           fill1D_GenMatch_Valid( hist1D_GenMatch_Tau_ );
-
           fill1D_GenMatch_Valid( hist1D_GenMatch_SigTau_ );
-
         }
 
-      }
+      } // if ( isSignalTau_ )
       else {
 
         fill1D_HitFit( hist1D_HitFit_BkgNoTau_ );
-
         if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
-
           fill1D_HitFit_Valid( hist1D_HitFit_BkgNoTau_ );
           fill2D_HitFit_Valid( hist2D_HitFit_BkgNoTau_ );
-
         }
 
         fill1D_GenMatch( hist1D_GenMatch_BkgNoTau_ );
-
         if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
-
           fill1D_GenMatch_Valid( hist1D_GenMatch_BkgNoTau_ );
-
         }
 
-      }
+      } // else ( isSignalTau_ )
 
-      // Fill histograms only for converged fits
       if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
 
         fill1D_HitFit_Valid( hist1D_HitFit_Bkg_ );
         fill2D_HitFit_Valid( hist2D_HitFit_Bkg_ );
 
-        // Semi-tau to mu
         if ( decayChn_ == WDecay::kTau + 1 ) {
-
           fill1D_HitFit_Valid( hist1D_HitFit_Tau_ );
           fill2D_HitFit_Valid( hist2D_HitFit_Tau_ );
-
           fill1D_HitFit_Valid( hist1D_HitFit_SigTau_ );
           fill2D_HitFit_Valid( hist2D_HitFit_SigTau_ );
-
-        }
+        } // if ( decayChn_ == WDecay::kTau + 1 )
         else {
-
           fill1D_HitFit_Valid( hist1D_HitFit_BkgNoTau_ );
           fill2D_HitFit_Valid( hist2D_HitFit_BkgNoTau_ );
+        } // else ( decayChn_ == WDecay::kTau + 1 )
 
-        }
+      } // if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) )
 
-      }
-
-    }
+    } // else ( isSignal_ )
 
   }
 

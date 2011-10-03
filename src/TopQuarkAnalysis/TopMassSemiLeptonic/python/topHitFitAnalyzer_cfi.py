@@ -32,6 +32,8 @@ topHitFitAnalyzer = cms.EDAnalyzer(
 , binsHitFitSigMTRel = cms.uint32( 25 )
 , maxHitFitSigMTRel  = cms.double( 0.25 )
 
+  # GenMatch validity
+, binsGenMatchNValid = cms.uint32( 24 )
   # GenMatch sum p_t
 , binsGenMatchSumPt = cms.uint32( 50 )
 , maxGenMatchSumPt  = cms.double( 500. )

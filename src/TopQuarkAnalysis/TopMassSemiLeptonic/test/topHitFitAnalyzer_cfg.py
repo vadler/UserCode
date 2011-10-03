@@ -77,7 +77,7 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'HitFi
 ### Analyzer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.topHitFitAnalyzer_cfi" )
-process.topHitFitAnalyzer_Reference = process.topHitFitAnalyzer.clone()
+process.topHitFitAnalyzer_Reference = process.topHitFitAnalyzer.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReference' )
 
 
 ### Paths
@@ -98,8 +98,8 @@ process.p_Reference = cms.Path(
 print
 print 'Log file:'
 if runTest:
-  print '%s/output/topHitFitAnalyzer_%s.log'%( os.getenv( "CMSSW_BASE" ), sample )
-else:
   print 'topHitFitAnalyzer.log'
+else:
+  print '%s/output/topHitFitAnalyzer_%s.log'%( os.getenv( "CMSSW_BASE" ), sample )
 print '================================================================================'
 print

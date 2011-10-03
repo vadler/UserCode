@@ -118,6 +118,10 @@ if len( jecLevels ) == 0:
 
 pvCollection += '::%s'%( process.name_() )
 
+process.Timing = cms.Service( "Timing"
+, summaryOnly = cms.untracked.bool( not reportTime )
+)
+
 # MC related
 runPartonMatch = runPartonMatch and runOnMC
 runJetMatch    = runJetMatch    and runOnMC
@@ -135,9 +139,12 @@ process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
-process.Timing = cms.Service( "Timing"
-, summaryOnly = cms.untracked.bool( not reportTime )
-)
+if runTest:
+  process.MessageLogger.cerr.threshold = 'INFO'
+  process.MessageLogger.categories.append('JetPartonMatching')
+  process.MessageLogger.cerr.JetPartonMatching = cms.untracked.PSet(
+    limit = cms.untracked.int32( -1 )
+  )
 
 
 ### Conditions
@@ -494,8 +501,8 @@ process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_
 process.ttSemiLepEvent.verbosity = 1
 from TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff import addTtSemiLepHypotheses
 addTtSemiLepHypotheses( process
-                      , [ "kKinFit"
-                        , "kHitFit"
+                      , [ "kHitFit"
+#                         , "kFitFit"
                         ]
                        )
 process.hitFitTtSemiLepEventHypothesis.maxNJets           = 6
@@ -508,8 +515,10 @@ if runOnMC:
                         , [ "kGenMatch"
                         ]
                        )
-  process.ttSemiLepJetPartonMatch.maxNJets        = 6
-  process.ttSemiLepJetPartonMatch.maxNComb        = 24
+  process.ttSemiLepJetPartonMatch.maxNJets = 6
+  process.ttSemiLepJetPartonMatch.maxNComb = 24
+  if runTest:
+    process.ttSemiLepJetPartonMatch.verbosity = 1
   process.ttSemiLepHypGenMatch.jetCorrectionLevel = jecLevels[ -1 ]
 else:
   from TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff import removeTtSemiLepHypGenMatch
