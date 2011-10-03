@@ -301,7 +301,7 @@ process.out.outputCommands.append( 'drop edmTriggerResults_*_*_*NONE*' )
 process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
 process.out.outputCommands.append( 'keep *_offlineBeamSpot_*_*' )
 process.out.outputCommands.append( 'keep *_offlinePrimaryVertices_*_*' )
-process.out.outputCommands.append( 'keep *_%s_*_*'%( process.goodOfflinePrimaryVertices.label_() ) )
+process.out.outputCommands.append( 'keep *_goodOfflinePrimaryVertices_*_*' )
 if not runOnMC:
   process.out.outputCommands.append( 'keep *_addPileupInfo_*_*' )
 
