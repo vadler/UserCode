@@ -789,7 +789,7 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
     fill2D_HitFit_Valid( hist2D_HitFit_ );
   }
 
-  // MC specific (using true information)
+  // MC specific
 
   if ( ! iEvent.isRealData() ) {
 
@@ -804,10 +804,11 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
       fill1D_GenMatch_Valid( hist1D_GenMatch_ );
     }
 
-    // Generated event
+    // TQAF MC event
     ttGenEvent_ = const_cast< TtGenEvent* >( ttSemiLeptonicEvent_->genEvent().get() );
 
     // TTbar specific
+
     if ( ttGenEvent_->isTtBar() ) {
 
       // Decay channels
@@ -828,7 +829,6 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
           // First level daughter is a copy: need to go one level deeper
           for ( size_t iDD = 0; iDD < genTauDaughter->numberOfDaughters(); ++iDD ) {
             const reco::Candidate * genTauGrandDaughter( genTauDaughter->daughter( iDD ) );
-//             if ( fabs( genTauGrandDaughter->pdgId() ) == 13 ) ++nTrueOtherMuon;
             if ( reco::isMuon( *genTauGrandDaughter ) ) ++nTrueOtherMuon;
           }
         }
@@ -837,31 +837,26 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
       else if ( ttGenEvent_->isFullLeptonic() ) {
         decayChn_ = WDecay::kTau + 2;
         const reco::GenParticle * genFullLep( ttGenEvent_->lepton() );
-//         if ( fabs( genFullLep->pdgId() ) == 15 ) {
         if ( reco::isTau( *genFullLep ) ) {
           for ( size_t iD = 0; iD < genFullLep->numberOfDaughters(); ++iD ) {
             const reco::Candidate * genTauDaughter( genFullLep->daughter( iD ) );
             // First level daughter is a copy: need to go one level deeper
             for ( size_t iDD = 0; iDD < genTauDaughter->numberOfDaughters(); ++iDD ) {
               const reco::Candidate * genTauGrandDaughter( genTauDaughter->daughter( iDD ) );
-//               if ( fabs( genTauGrandDaughter->pdgId() ) == 13 ) ++nTrueOtherMuon;
               if ( reco::isMuon( *genTauGrandDaughter ) ) ++nTrueOtherMuon;
             }
           }
         }
-//         else if ( fabs( genFullLep->pdgId() ) == 13 ) {
         else if ( reco::isMuon( *genFullLep ) ) {
            ++nTrueOtherMuon;
         }
         const reco::GenParticle * genFullLepBar( ttGenEvent_->leptonBar() );
-//         if ( fabs( genFullLep->pdgId() ) == 15 ) {
         if ( reco::isTau( *genFullLep ) ) {
           for ( size_t iD = 0; iD < genFullLepBar->numberOfDaughters(); ++iD ) {
             const reco::Candidate * genTauDaughter( genFullLepBar->daughter( iD ) );
             // First level daughter is a copy: need to go one level deeper
             for ( size_t iDD = 0; iDD < genTauDaughter->numberOfDaughters(); ++iDD ) {
               const reco::Candidate * genTauGrandDaughter( genTauDaughter->daughter( iDD ) );
-//               if ( fabs( genTauGrandDaughter->pdgId() ) == 13 ) ++nTrueOtherMuon;
               if ( reco::isMuon( *genTauGrandDaughter ) ) ++nTrueOtherMuon;
             }
           }
