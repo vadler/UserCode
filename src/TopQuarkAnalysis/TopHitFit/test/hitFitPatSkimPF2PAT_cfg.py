@@ -199,11 +199,6 @@ process.out = cms.OutputModule( "PoolOutputModule"
 , dropMetaData   = cms.untracked.string( 'ALL' )
 )
 
-# Outpath
-process.outpath = cms.EndPath(
-  process.out
-)
-
 
 ### Cleaning
 
@@ -487,7 +482,7 @@ process.referencePatJets.preselection = jetSelectSignal
 
 process.out.outputCommands.append( 'drop *_selectedPatJets*_caloTowers_*' )
 process.out.outputCommands.append( 'drop *_selectedPatJets*_tagInfos_*' )
-process.out.outputCommands.append( 'drop *_selectedPatJets*_pfCandidates_*' )
+process.out.outputCommands.append( 'drop *_selectedPatJets*_pfCandidates_*' ) # to save space
 process.out.outputCommands.append( 'keep *_kt6PFJets_rho_%s'%( process.name_() ) )
 if not runJetMatch:
   process.out.outputCommands.append( 'drop *_selectedPatJets*_genJets_*' )
@@ -560,13 +555,6 @@ process.HitFit_Cleaning_Scraping = cms.Path( process.scrapingFilter
                                            )
 
 # PF2PAT
-process.HitFit_PF2PAT = cms.Path( process.eventCleaning
-                                * process.patPF2PATSequence
-                                * process.patPF2PATCounters
-                                )
-if runOnMC:
-  process.HitFit_PF2PAT *= process.makeGenEvt
-process.HitFit_PF2PAT *= process.makeTtSemiLepEvent
 # Single counters
 process.HitFit_PF2PAT_MuonVeto = cms.Path( process.eventCleaning
                                          * process.patPF2PATSequence
@@ -584,64 +572,61 @@ process.HitFit_PF2PAT_ElectronVeto = cms.Path( process.eventCleaning
 #                                         * process.patPF2PATSequence
 #                                         * process.countSelectedPatJets
 #                                         )
+# Complete path
+process.Sequence_PF2PAT = cms.Sequence( process.eventCleaning
+                                      * process.patPF2PATSequence
+                                      * process.patPF2PATCounters
+                                      )
+process.HitFit_PF2PAT = cms.Path( process.Sequence_PF2PAT
+                                )
+if runOnMC:
+  process.HitFit_PF2PAT *= process.makeGenEvt
+process.HitFit_PF2PAT *= process.makeTtSemiLepEvent
 
 # PF2PAT with HitFit
-process.HitFit_PF2PATHitFit = cms.Path( process.eventCleaning
-                                      * process.patPF2PATSequence
+# Single counters
+process.HitFit_PF2PAT_MuonsHitFit = cms.Path( process.Sequence_PF2PAT
+                                            * process.countSelectedPatMuonsHitFit
+                                            )
+process.HitFit_PF2PAT_JetsHitFit = cms.Path( process.Sequence_PF2PAT
+                                           * process.countSelectedPatJetsHitFit
+                                           )
+# Complete path
+process.HitFit_PF2PATHitFit = cms.Path( process.Sequence_PF2PAT
                                       * process.patPF2PATCountersHitFit
                                       )
 if runOnMC:
   process.HitFit_PF2PATHitFit *= process.makeGenEvt
 process.HitFit_PF2PATHitFit *= process.makeTtSemiLepEvent
-# Single counters
-process.HitFit_PF2PAT_MuonsHitFit = cms.Path( process.eventCleaning
-                                            * process.patPF2PATSequence
-                                            * process.countSelectedPatMuonsHitFit
-                                            )
-process.HitFit_PF2PAT_JetsHitFit = cms.Path( process.eventCleaning
-                                           * process.patPF2PATSequence
-                                           * process.countSelectedPatJetsHitFit
-                                           )
 
 # Reference selection
-process.HitFit_Reference = cms.Path( process.eventCleaning
-                                   * process.patPF2PATSequence
-                                   * process.patPF2PATCounters
-                                   * process.patReferenceSequence
-                                   * process.patReferenceCounters
-                                   )
 # Single counters
-process.HitFit_Reference_Muons = cms.Path( process.eventCleaning
-                                         * process.patPF2PATSequence
-                                         * process.patPF2PATCounters
+process.HitFit_Reference_Muons = cms.Path( process.Sequence_PF2PAT
                                          * process.patReferenceSequence
                                          * process.countReferencePatMuons
                                          )
-# process.HitFit_Reference_Electrons = cms.Path( process.eventCleaning
-#                                              * process.patPF2PATSequence
-#                                              * process.patPF2PATCounters
+# process.HitFit_Reference_Electrons = cms.Path( process.Sequence_PF2PAT
 #                                              * process.patReferenceSequence
 #                                              * process.countReferencePatElectrons
 #                                              )
-# process.HitFit_Reference_Leptons = cms.Path( process.eventCleaning
-#                                            * process.patPF2PATSequence
-#                                            * process.patPF2PATCounters
+# process.HitFit_Reference_Leptons = cms.Path( process.Sequence_PF2PAT
 #                                            * process.patReferenceSequence
 #                                            * process.countReferencePatLeptons
 #                                            )
-process.HitFit_Reference_Jets = cms.Path( process.eventCleaning
-                                        * process.patPF2PATSequence
-                                        * process.patPF2PATCounters
+process.HitFit_Reference_Jets = cms.Path( process.Sequence_PF2PAT
                                         * process.patReferenceSequence
                                         * process.countReferencePatJets
                                         )
-
-# Reference selection with HitFit
-process.HitFit_ReferenceHitFit = cms.Path( process.eventCleaning
-                                         * process.patPF2PATSequence
-                                         * process.patPF2PATCounters
+# Complete path
+process.Sequence_Reference = cms.Sequence( process.Sequence_PF2PAT
                                          * process.patReferenceSequence
                                          * process.patReferenceCounters
+                                         )
+process.HitFit_Reference = cms.Path( process.Sequence_Reference
+                                   )
+
+# Reference selection with HitFit
+process.HitFit_ReferenceHitFit = cms.Path( process.Sequence_Reference
                                          )
 if runOnMC:
   process.HitFit_ReferenceHitFit *= process.makeGenEvt
@@ -652,6 +637,30 @@ process.out.SelectEvents.SelectEvents = [ 'HitFit_PF2PATHitFit'
 if runTest or runOnMC:
   process.out.SelectEvents.SelectEvents = [ 'HitFit_Cleaning'
                                           ]
+
+# Outpath
+process.outPath = cms.EndPath(
+  process.out
+)
+
+process.schedule = cms.Schedule(
+  process.HitFit_Cleaning_HLT
+, process.HitFit_Cleaning_Vertex
+, process.HitFit_Cleaning_HBHE
+, process.HitFit_Cleaning_Scraping
+, process.HitFit_Cleaning
+, process.HitFit_PF2PAT_MuonVeto
+, process.HitFit_PF2PAT_ElectronVeto
+, process.HitFit_PF2PAT
+, process.HitFit_PF2PAT_MuonsHitFit
+, process.HitFit_PF2PAT_JetsHitFit
+, process.HitFit_PF2PATHitFit
+, process.HitFit_Reference_Muons
+, process.HitFit_Reference_Jets
+, process.HitFit_Reference
+, process.HitFit_ReferenceHitFit
+, process.outPath
+)
 
 
 ### Messages
