@@ -77,7 +77,8 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'HitFi
 ### Analyzer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.topHitFitAnalyzer_cfi" )
-process.topHitFitAnalyzer_Reference = process.topHitFitAnalyzer.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReference' )
+process.topHitFitAnalyzer_Reference = process.topHitFitAnalyzer.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReference'
+                                                                     )
 
 
 ### Paths
