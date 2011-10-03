@@ -27,7 +27,8 @@ runEwk         = False
 
 # Trigger
 hltProcess       = 'HLT'
-triggerSelection = 'HLT_IsoMu17 OR HLT_IsoMu17_v*'
+#triggerSelection = 'HLT_IsoMu17 OR HLT_IsoMu17_v*'
+triggerSelection = 'HLT_IsoMu17_v*'
 
 # Vertices
 pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
@@ -226,7 +227,6 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
   , maxRho  = cms.double(  2. )
   )
 )
-process.out.outputCommands.append( 'keep *_goodOfflinePrimaryVertices_*_*' )
 
 # HBHE noise filter
 process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
@@ -301,6 +301,7 @@ process.out.outputCommands.append( 'drop edmTriggerResults_*_*_*NONE*' )
 process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
 process.out.outputCommands.append( 'keep *_offlineBeamSpot_*_*' )
 process.out.outputCommands.append( 'keep *_offlinePrimaryVertices_*_*' )
+process.out.outputCommands.append( 'keep *_%s_*_*'%( process.goodOfflinePrimaryVertices.label_() ) )
 if not runOnMC:
   process.out.outputCommands.append( 'keep *_addPileupInfo_*_*' )
 
