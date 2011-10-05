@@ -506,7 +506,7 @@ addTtSemiLepHypotheses( process
                         ]
                        )
 process.hitFitTtSemiLepEventHypothesis.maxNJets           = 6
-process.hitFitTtSemiLepEventHypothesis.maxNComb           = 24
+process.hitFitTtSemiLepEventHypothesis.maxNComb           = -1
 process.hitFitTtSemiLepEventHypothesis.jetCorrectionLevel = jecLevels[ -1 ]
 
 if runOnMC:
@@ -516,7 +516,7 @@ if runOnMC:
                         ]
                        )
   process.ttSemiLepJetPartonMatch.maxNJets = 6
-  process.ttSemiLepJetPartonMatch.maxNComb = 24
+  process.ttSemiLepJetPartonMatch.maxNComb = 1 # no knobs to turn to get several solutions
   if runTest:
     process.ttSemiLepJetPartonMatch.verbosity = 1
   process.ttSemiLepHypGenMatch.jetCorrectionLevel = jecLevels[ -1 ]
