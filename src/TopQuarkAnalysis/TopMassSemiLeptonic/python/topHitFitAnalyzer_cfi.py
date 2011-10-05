@@ -3,10 +3,18 @@ import FWCore.ParameterSet.Config as cms
 topHitFitAnalyzer = cms.EDAnalyzer(
   "TopHitFitAnalyzer"
 
+  ### Misc ###
+
+  # Verbosity #
+, verbosity = cms.uint32( 0 )
+
   ### Input ###
 
   # TQAF semi-leptonic event
 , ttSemiLeptonicEvent = cms.InputTag( 'ttSemiLepEvent' )
+, patMuons            = cms.InputTag( 'selectedPatMuons' )
+, patJets             = cms.InputTag( 'selectedPatJets' )
+, patMETs             = cms.InputTag( 'patMETs' )
 
   ### Histograms ###
 
