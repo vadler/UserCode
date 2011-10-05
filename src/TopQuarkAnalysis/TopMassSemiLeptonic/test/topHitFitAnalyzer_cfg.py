@@ -33,6 +33,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
+process.MessageLogger.cerr.threshold = 'INFO'
+process.MessageLogger.categories.append('TtSemiLeptonicEvent')
+process.MessageLogger.cerr.TtSemiLeptonicEvent = cms.untracked.PSet(
+  limit = cms.untracked.int32( -1 )
+)
 
 
 ### Input
@@ -77,7 +82,12 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'HitFi
 ### Analyzer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.topHitFitAnalyzer_cfi" )
+process.topHitFitAnalyzer.verbosity = 1
+if runTest:
+  process.topHitFitAnalyzer.verbosity = 11
 process.topHitFitAnalyzer_Reference = process.topHitFitAnalyzer.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReference'
+                                                                     , patMuons            = 'referencePatMuons'
+                                                                     , patJets             = 'referencePatJets'
                                                                      )
 
 
