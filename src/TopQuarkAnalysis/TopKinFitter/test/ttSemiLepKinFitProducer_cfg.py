@@ -1,43 +1,6 @@
-import os
-
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("TEST")
-
-## configure geometry & conditions
-process.load("Configuration.StandardSequences.Geometry_cff")
-process.load("Configuration.StandardSequences.MagneticField_cff")
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-
-condition = 'mc'
-from Configuration.PyReleaseValidation.autoCond import autoCond
-process.GlobalTag.globaltag = autoCond[condition]
-
-## define input
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-        pickRelValInputFiles( cmsswVersion = 'CMSSW_3_9_9'
-                            , condition    = condition
-                            )
-    )
-)
-
-## define maximal number of events to loop over
-process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
-)
-
-## std sequence for pat
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
-
-## std sequence to produce the kinematic fit for semi-leptonic events
-process.load("TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Muons_cfi")
-
-## process path
-process.p = cms.Path(process.patDefaultSequence *
-                     process.kinFitTtSemiLepEvent
-                     )
 
 ## add message logger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -50,15 +13,46 @@ process.MessageLogger.cerr.TtSemiLepKinFitter = cms.untracked.PSet(
 process.MessageLogger.cerr.KinFitter = cms.untracked.PSet(
     limit = cms.untracked.int32(-1)
 )
+
+## define input
+from TopQuarkAnalysis.TopEventProducers.tqafInputFiles_cff import relValTTbar
+process.source = cms.Source("PoolSource",
+    fileNames = cms.untracked.vstring(relValTTbar)
+)
+
+## define maximal number of events to loop over
+process.maxEvents = cms.untracked.PSet(
+    input = cms.untracked.int32(50)
+
+)
 ## configure process options
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(False)
 )
 
+## configure geometry & conditions
+process.load("Configuration.StandardSequences.Geometry_cff")
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+
+from Configuration.AlCa.autoCond import autoCond
+process.GlobalTag.globaltag = autoCond['mc']
+
+## std sequence for pat
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
+
+## std sequence to produce the kinematic fit for semi-leptonic events
+process.load("TopQuarkAnalysis.TopKinFitter.TtSemiLepKinFitProducer_Muons_cfi")
+
+## process path
+process.p = cms.Path(process.patDefaultSequence *
+                     process.kinFitTtSemiLepEvent
+                     )
+
 ## configure output module
 process.out = cms.OutputModule("PoolOutputModule",
-    SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('p') ),
-    fileName = cms.untracked.string('%s/output/ttSemiLepKinFitProducer.root'%( os.getenv( "CMSSW_BASE" ))),
+    SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('p') ),                               
+    fileName = cms.untracked.string('ttSemiLepKinFitProducer.root'),
     outputCommands = cms.untracked.vstring('drop *')
 )
 process.out.outputCommands += ['keep *_kinFitTtSemiLepEvent_*_*']
