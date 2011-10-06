@@ -6,7 +6,7 @@ CommonTools/ParticleFlow                         V00-03-00      V00-02-07
 DataFormats/MuonReco                             V09-01-05      V09-01-02      
 DataFormats/ParticleFlowReco                     V15-00-04-02   V15-00-04-01   
 DataFormats/PatCandidates                        V06-04-23      V06-04-21      
-PhysicsTools/PatAlgos                            V08-07-22      V08-07-18      
+PhysicsTools/PatAlgos                            V08-07-23      V08-07-18      
 PhysicsTools/PatExamples                         V00-05-24      V00-05-18      
 PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
 RecoMuon/MuonIsolation                           V02-04-00      V02-03-01      
