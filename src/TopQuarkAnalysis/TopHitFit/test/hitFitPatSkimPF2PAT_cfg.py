@@ -98,6 +98,9 @@ jetSelectHitFit = 'abs(eta) < 3.0'
 jetSelectVeto   = 'pt > 30. && abs(eta) < 2.4 && numberOfDaughters > 1 && chargedEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4) && (chargedMultiplicity > 0 || abs(eta) >= 2.4)'
 jetSelect       = jetSelectHitFit + ' && ' + jetSelectVeto
 jetSelectSignal = ''
+jetBTagAlgo          = '' # empty string switches the use of b-Tagging off
+jetMinBDiscBJets     = 1.
+jetMaxBDiscLightJets = 3.
 # counters
 jetsMin = 4
 jetsMax = 999999
@@ -502,7 +505,7 @@ process.ttSemiLepEvent.verbosity = 1
 from TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff import addTtSemiLepHypotheses
 addTtSemiLepHypotheses( process
                       , [ "kHitFit"
-#                         , "kFitFit"
+#                         , "kKinFit"
                         ]
                        )
 process.hitFitTtSemiLepEventHypothesis.maxNJets           = 6
@@ -532,12 +535,12 @@ if runOnMC:
   process.out.outputCommands.append( 'keep *_initSubset*_*_*' )
   process.out.outputCommands.append( 'keep *_decaySubset*_*_*' )
 
+from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag
 from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
 process.makeTtSemiLepEventReference = cloneProcessingSnippet( process
                                                             , process.makeTtSemiLepEvent
                                                             , 'Reference'
                                                             )
-from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag
 massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReference
                             , 'selectedPatMuons'
                             , 'referencePatMuons'
@@ -546,6 +549,15 @@ massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReference
                             , 'selectedPatJets'
                             , 'referencePatJets'
                              )
+process.makeTtSemiLepEventReference = cloneProcessingSnippet( process
+                                                            , process.makeTtSemiLepEventReference
+                                                            , 'BTag'
+                                                            )
+if jetBTagAlgo != '':
+  process.hitFitTtSemiLepEventHypothesisReferenceBTag.useBTagging       = True
+  process.hitFitTtSemiLepEventHypothesisReferenceBTag.bTagAlgo          = jetBTagAlgo
+  process.hitFitTtSemiLepEventHypothesisReferenceBTag.minBDiscBJets     = jetMinBDiscBJets
+  process.hitFitTtSemiLepEventHypothesisReferenceBTag.maxBDiscLightJets = jetMaxBDiscLightJets
 
 
 ### Paths
