@@ -20,10 +20,12 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <sstream>
 
 #include "TMath.h"
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TF1.h"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -40,6 +42,8 @@
 
 typedef std::map< std::string, TH1D* > MapTH1D;
 typedef std::map< std::string, TH2D* > MapTH2D;
+
+typedef std::map< std::string, TF1* > MapTF1;
 
 
 class TopHitFitAnalyzer : public edm::EDAnalyzer {
@@ -230,6 +234,12 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
     MapTH1D hist1D_GenMatch_HitFitGood__Signal_;
     MapTH2D hist2D_GenMatch_HitFitGood__Signal_;
 
+    /// Resolution functions
+    MapTF1 func_LeptonResolution_;
+    MapTF1 func_UdscJetResolution_;
+    MapTF1 func_BJetResolution_;
+    MapTF1 func_METResolution_;
+
     /// Constants
     std::vector< std::string > decayChnLabels_;
     std::vector< std::string > patMatchPartonLabels_;
@@ -268,6 +278,11 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "AnalysisDataFormats/TopObjects/interface/TtSemiLepEvtPartons.h"
+
+#include "TopQuarkAnalysis/TopHitFit/interface/LeptonTranslatorBase.h"
+#include "TopQuarkAnalysis/TopHitFit/interface/JetTranslatorBase.h"
+#include "TopQuarkAnalysis/TopHitFit/interface/METTranslatorBase.h"
+#include "TopQuarkAnalysis/TopHitFit/interface/EtaDepResolution.h"
 
 
 // Default constructor
@@ -389,6 +404,10 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 , hist2D_Generator_HitFitGood__Signal_()
 , hist1D_GenMatch_HitFitGood__Signal_()
 , hist2D_GenMatch_HitFitGood__Signal_()
+, func_LeptonResolution_()
+, func_UdscJetResolution_()
+, func_BJetResolution_()
+, func_METResolution_()
 {
 
   // Axis labels
@@ -430,14 +449,272 @@ TopHitFitAnalyzer::~TopHitFitAnalyzer()
 }
 
 
+template < typename T >
+std::string to_string( T const & value ) {
+    std::stringstream sstr;
+    sstr << value;
+    return sstr.str();
+}
+
+
 // Begin job
 void TopHitFitAnalyzer::beginJob()
 {
 
+  edm::Service< TFileService > fileService;
+
+  // Determine HitFit resolution functions
+
+  const std::string funcRes( "sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])" );
+  const std::string funcResInv( "sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])" );
+
+  TFileDirectory dir_Resolution( fileService->mkdir( "Resolution", "HitFit resolution functions" ) );
+
+  // Lepton resolutions
+
+  TFileDirectory dir_MuonResolution( dir_Resolution.mkdir( "MuonResolution", "HitFit resolution functions for muons" ) );
+  TFileDirectory dir_MuonResolutionP( dir_MuonResolution.mkdir( "MuonResolutionP", "HitFit momentum resolution functions for muons" ) );
+  TFileDirectory dir_MuonResolutionEta( dir_MuonResolution.mkdir( "MuonResolutionEta", "HitFit eta resolution functions for muons" ) );
+  TFileDirectory dir_MuonResolutionPhi( dir_MuonResolution.mkdir( "MuonResolutionPhi", "HitFit phi resolution functions for muons" ) );
+
+  const edm::FileInPath muonResFile( "TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution.txt" );
+  const hitfit::EtaDepResolution muonRes( muonResFile.fullPath() );
+  const std::vector< hitfit::EtaDepResElement > muonResElems( muonRes.GetEtaDepResElement() );
+
+  for ( unsigned iResEl = 0; iResEl < muonResElems.size(); ++iResEl ) {
+
+    const double etaMin( muonResElems.at( iResEl ).EtaMin() );
+    const double etaMax( muonResElems.at( iResEl ).EtaMax() );
+    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+
+    const hitfit::Vector_Resolution vecRes( muonResElems.at( iResEl ).GetResolution() );
+
+    // Momentum
+    const hitfit::Resolution pRes( vecRes.p_res() );
+    std::string key( "P_" + to_string( iResEl ) );
+    std::string name( "Lepton_" + key );
+    func_LeptonResolution_[ key ] = dir_MuonResolutionP.make< TF1 >( name.c_str(), pRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_LeptonResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N() );
+    func_LeptonResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_LeptonResolution_[ key ]->SetMinimum( 0. );
+//     func_LeptonResolution_[ key ]->SetMaximum( 0.2 );
+    func_LeptonResolution_[ key ]->SetTitle( title.c_str() );
+    func_LeptonResolution_[ key ]->GetXaxis()->SetTitle( "p_{t}" );
+    func_LeptonResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{p_{t}}" );
+
+    // Eta
+    const hitfit::Resolution etaRes( vecRes.eta_res() );
+    key  = "Eta_" + to_string( iResEl );
+    name = "Lepton_" + key;
+    func_LeptonResolution_[ key ] = dir_MuonResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_LeptonResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
+    func_LeptonResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_LeptonResolution_[ key ]->SetMinimum( 0. );
+//     func_LeptonResolution_[ key ]->SetMaximum( 0.2 );
+    func_LeptonResolution_[ key ]->SetTitle( title.c_str() );
+    func_LeptonResolution_[ key ]->GetXaxis()->SetTitle( "#eta" );
+    func_LeptonResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
+
+    // Phi
+    const hitfit::Resolution phiRes( vecRes.phi_res() );
+    key  = "Phi_" + to_string( iResEl );
+    name = "Lepton_" + key;
+    func_LeptonResolution_[ key ] = dir_MuonResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_LeptonResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
+    func_LeptonResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_LeptonResolution_[ key ]->SetMinimum( 0. );
+//     func_LeptonResolution_[ key ]->SetMaximum( 0.2 );
+    func_LeptonResolution_[ key ]->SetTitle( title.c_str() );
+    func_LeptonResolution_[ key ]->GetXaxis()->SetTitle( "#phi" );
+    func_LeptonResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
+
+  }
+
+  // Light jet resolutions
+
+  TFileDirectory dir_UdscJetResolution( dir_Resolution.mkdir( "UdscJetResolution", "HitFit resolution functions for light jets" ) );
+  TFileDirectory dir_UdscJetResolutionP( dir_UdscJetResolution.mkdir( "UdscJetResolutionP", "HitFit momentum resolution functions for light jets" ) );
+  TFileDirectory dir_UdscJetResolutionEta( dir_UdscJetResolution.mkdir( "UdscJetResolutionEta", "HitFit eta resolution functions for light jets" ) );
+  TFileDirectory dir_UdscJetResolutionPhi( dir_UdscJetResolution.mkdir( "UdscJetResolutionPhi", "HitFit phi resolution functions for light jets" ) );
+
+  const edm::FileInPath udscJetResFile( "TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution.txt" );
+  const hitfit::EtaDepResolution udscJetRes( udscJetResFile.fullPath() );
+  const std::vector< hitfit::EtaDepResElement > udscJetResElems( udscJetRes.GetEtaDepResElement() );
+
+  for ( unsigned iResEl = 0; iResEl < udscJetResElems.size(); ++iResEl ) {
+
+    const double etaMin( udscJetResElems.at( iResEl ).EtaMin() );
+    const double etaMax( udscJetResElems.at( iResEl ).EtaMax() );
+    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+
+    const hitfit::Vector_Resolution vecRes( udscJetResElems.at( iResEl ).GetResolution() );
+
+    // Momentum
+    const hitfit::Resolution pRes( vecRes.p_res() );
+    std::string key( "P_" + to_string( iResEl ) );
+    std::string name( "UdscJet_" + key );
+    func_UdscJetResolution_[ key ] = dir_UdscJetResolutionP.make< TF1 >( name.c_str(), pRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_UdscJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N() );
+    func_UdscJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_UdscJetResolution_[ key ]->SetMinimum( 0. );
+//     func_UdscJetResolution_[ key ]->SetMaximum( 0.2 );
+    func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
+    func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( "p_{t}" );
+    func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{p_{t}}" );
+
+    // Eta
+    const hitfit::Resolution etaRes( vecRes.eta_res() );
+    key  = "Eta_" + to_string( iResEl );
+    name = "UdscJet_" + key;
+    func_UdscJetResolution_[ key ] = dir_UdscJetResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_UdscJetResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
+    func_UdscJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_UdscJetResolution_[ key ]->SetMinimum( 0. );
+//     func_UdscJetResolution_[ key ]->SetMaximum( 0.2 );
+    func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
+    func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( "#eta" );
+    func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
+
+    // Phi
+    const hitfit::Resolution phiRes( vecRes.phi_res() );
+    key  = "Phi_" + to_string( iResEl );
+    name = "UdscJet_" + key;
+    func_UdscJetResolution_[ key ] = dir_UdscJetResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_UdscJetResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
+    func_UdscJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_UdscJetResolution_[ key ]->SetMinimum( 0. );
+//     func_UdscJetResolution_[ key ]->SetMaximum( 0.2 );
+    func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
+    func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( "#phi" );
+    func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
+
+  }
+
+  // B-jet resolutions
+
+  TFileDirectory dir_BJetResolution( dir_Resolution.mkdir( "BJetResolution", "HitFit resolution functions for b-jets" ) );
+  TFileDirectory dir_BJetResolutionP( dir_BJetResolution.mkdir( "BJetResolutionP", "HitFit momentum resolution functions for b-jets" ) );
+  TFileDirectory dir_BJetResolutionEta( dir_BJetResolution.mkdir( "BJetResolutionEta", "HitFit eta resolution functions for b-jets" ) );
+  TFileDirectory dir_BJetResolutionPhi( dir_BJetResolution.mkdir( "BJetResolutionPhi", "HitFit phi resolution functions for b-jets" ) );
+
+  const edm::FileInPath bJetResFile( "TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution.txt" );
+  const hitfit::EtaDepResolution bJetRes( bJetResFile.fullPath() );
+  const std::vector< hitfit::EtaDepResElement > bJetResElems( bJetRes.GetEtaDepResElement() );
+
+  for ( unsigned iResEl = 0; iResEl < bJetResElems.size(); ++iResEl ) {
+
+    const double etaMin( bJetResElems.at( iResEl ).EtaMin() );
+    const double etaMax( bJetResElems.at( iResEl ).EtaMax() );
+    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+
+    const hitfit::Vector_Resolution vecRes( bJetResElems.at( iResEl ).GetResolution() );
+
+    // Momentum
+    const hitfit::Resolution pRes( vecRes.p_res() );
+    std::string key( "P_" + to_string( iResEl ) );
+    std::string name( "BJet_" + key );
+    func_BJetResolution_[ key ] = dir_BJetResolutionP.make< TF1 >( name.c_str(), pRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_BJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N() );
+    func_BJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_BJetResolution_[ key ]->SetMinimum( 0. );
+//     func_BJetResolution_[ key ]->SetMaximum( 0.2 );
+    func_BJetResolution_[ key ]->SetTitle( title.c_str() );
+    func_BJetResolution_[ key ]->GetXaxis()->SetTitle( "p_{t}" );
+    func_BJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{p_{t}}" );
+
+    // Eta
+    const hitfit::Resolution etaRes( vecRes.eta_res() );
+    key  = "Eta_" + to_string( iResEl );
+    name = "BJet_" + key;
+    func_BJetResolution_[ key ] = dir_BJetResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_BJetResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
+    func_BJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_BJetResolution_[ key ]->SetMinimum( 0. );
+//     func_BJetResolution_[ key ]->SetMaximum( 0.2 );
+    func_BJetResolution_[ key ]->SetTitle( title.c_str() );
+    func_BJetResolution_[ key ]->GetXaxis()->SetTitle( "#eta" );
+    func_BJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
+
+    // Phi
+    const hitfit::Resolution phiRes( vecRes.phi_res() );
+    key  = "Phi_" + to_string( iResEl );
+    name = "BJet_" + key;
+    func_BJetResolution_[ key ] = dir_BJetResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_BJetResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
+    func_BJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_BJetResolution_[ key ]->SetMinimum( 0. );
+//     func_BJetResolution_[ key ]->SetMaximum( 0.2 );
+    func_BJetResolution_[ key ]->SetTitle( title.c_str() );
+    func_BJetResolution_[ key ]->GetXaxis()->SetTitle( "#phi" );
+    func_BJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
+
+  }
+
+  // MET resolutions
+
+  TFileDirectory dir_METResolution( dir_Resolution.mkdir( "METResolution", "HitFit resolution functions for MET" ) );
+  TFileDirectory dir_METResolutionP( dir_METResolution.mkdir( "METResolutionP", "HitFit momentum resolution functions for MET" ) );
+  TFileDirectory dir_METResolutionEta( dir_METResolution.mkdir( "METResolutionEta", "HitFit eta resolution functions for MET" ) );
+  TFileDirectory dir_METResolutionPhi( dir_METResolution.mkdir( "METResolutionPhi", "HitFit phi resolution functions forMET" ) );
+
+  const edm::FileInPath metResFile( "TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution.txt" );
+  const hitfit::EtaDepResolution metRes( metResFile.fullPath() );
+  const std::vector< hitfit::EtaDepResElement > metResElems( metRes.GetEtaDepResElement() );
+
+  for ( unsigned iResEl = 0; iResEl < metResElems.size(); ++iResEl ) {
+
+    const double etaMin( metResElems.at( iResEl ).EtaMin() );
+    const double etaMax( metResElems.at( iResEl ).EtaMax() );
+    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+
+    const hitfit::Vector_Resolution vecRes( metResElems.at( iResEl ).GetResolution() );
+
+    // Momentum
+    const hitfit::Resolution pRes( vecRes.p_res() );
+    std::string key( "P_" + to_string( iResEl ) );
+    std::string name( "MET_" + key );
+    func_METResolution_[ key ] = dir_METResolutionP.make< TF1 >( name.c_str(), pRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_METResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N() );
+    func_METResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_METResolution_[ key ]->SetMinimum( 0. );
+//     func_METResolution_[ key ]->SetMaximum( 0.2 );
+    func_METResolution_[ key ]->SetTitle( title.c_str() );
+    func_METResolution_[ key ]->GetXaxis()->SetTitle( "p_{t}" );
+    func_METResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{p_{t}}" );
+
+    // Eta
+    const hitfit::Resolution etaRes( vecRes.eta_res() );
+    key  = "Eta_" + to_string( iResEl );
+    name = "MET_" + key;
+    func_METResolution_[ key ] = dir_METResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_METResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
+    func_METResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_METResolution_[ key ]->SetMinimum( 0. );
+//     func_METResolution_[ key ]->SetMaximum( 0.2 );
+    func_METResolution_[ key ]->SetTitle( title.c_str() );
+    func_METResolution_[ key ]->GetXaxis()->SetTitle( "#eta" );
+    func_METResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
+
+    // Phi
+    const hitfit::Resolution phiRes( vecRes.phi_res() );
+    key  = "Phi_" + to_string( iResEl );
+    name = "MET_" + key;
+    func_METResolution_[ key ] = dir_METResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_METResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
+    func_METResolution_[ key ]->SetRange( 20., maxLepPt_ );
+//     func_METResolution_[ key ]->SetMinimum( 0. );
+//     func_METResolution_[ key ]->SetMaximum( 0.2 );
+    func_METResolution_[ key ]->SetTitle( title.c_str() );
+    func_METResolution_[ key ]->GetXaxis()->SetTitle( "#phi" );
+    func_METResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
+
+  }
+
+
+  // Define histograms
+
   const std::string strHitFit( "HitFit_" );
   const std::string strHitFitValid( "HitFitValid_" );
-
-  edm::Service< TFileService > fileService;
 
   // Generator histograms
 
@@ -808,31 +1085,31 @@ void TopHitFitAnalyzer::beginJob()
       hist1D_Generator_HitFitGood__Signal_[ iHist->first ] = dir_Generator_HitFitGoodValid__Signal.make< TH1D >( *( ( TH1D* )( iHist->second->Clone( nameGood.replace( 16, 0, "Good" ).c_str() ) ) ) );
   }
 
-  TFileDirectory dir_GenMatch_HitFitGood__Signal( fileService->mkdir( "GenMatch_HitFitGood__Signal", "HitFit vs. GenMatch for valid hypotheses" ) );
+  TFileDirectory dir_GenMatch_HitFitFound__Signal( fileService->mkdir( "GenMatch_HitFitFound__Signal", "HitFit vs. GenMatch for valid hypotheses" ) );
 
   // 2-dim
-  hist2D_GenMatch_HitFitGood__Signal_[ "Prob_ProbFound" ] = dir_GenMatch_HitFitGood__Signal.make< TH2D >( "GenMatch_HitFit_Prob_ProbFound__Signal", "HitFit probabilty GenMatch hypothesis vs. best HitFit probabilty", binsHitFitProb_, 0., 1., binsHitFitProb_, 0., 1. );
+  hist2D_GenMatch_HitFitGood__Signal_[ "Prob_ProbFound" ] = dir_GenMatch_HitFitFound__Signal.make< TH2D >( "GenMatch_HitFit_Prob_ProbFound__Signal", "HitFit probabilty GenMatch hypothesis vs. best HitFit probabilty", binsHitFitProb_, 0., 1., binsHitFitProb_, 0., 1. );
   hist2D_GenMatch_HitFitGood__Signal_[ "Prob_ProbFound" ]->SetXTitle( "P^{HitFit}" );
   hist2D_GenMatch_HitFitGood__Signal_[ "Prob_ProbFound" ]->SetYTitle( "P_{GenMatch}^{HitFit}" );
-  hist2D_GenMatch_HitFitGood__Signal_[ "Chi2_Chi2Found" ] = dir_GenMatch_HitFitGood__Signal.make< TH2D >( "GenMatch_HitFit_Chi2_Chi2Found__Signal", "HitFit #chi^{2} GenMatch hypothesis vs. best HitFit #chi^{2}", binsHitFitChi2_, 0., maxHitFitChi2_, binsHitFitChi2_, 0., maxHitFitChi2_ );
+  hist2D_GenMatch_HitFitGood__Signal_[ "Chi2_Chi2Found" ] = dir_GenMatch_HitFitFound__Signal.make< TH2D >( "GenMatch_HitFit_Chi2_Chi2Found__Signal", "HitFit #chi^{2} GenMatch hypothesis vs. best HitFit #chi^{2}", binsHitFitChi2_, 0., maxHitFitChi2_, binsHitFitChi2_, 0., maxHitFitChi2_ );
   hist2D_GenMatch_HitFitGood__Signal_[ "Chi2_Chi2Found" ]->SetXTitle( "(#chi^{2})^{HitFit}" );
   hist2D_GenMatch_HitFitGood__Signal_[ "Chi2_Chi2Found" ]->SetYTitle( "(#chi^{2})_{GenMatch}^{HitFit}" );
-  hist2D_GenMatch_HitFitGood__Signal_[ "MT_MTFound" ] = dir_GenMatch_HitFitGood__Signal.make< TH2D >( "GenMatch_HitFit_MT_MTFound__Signal", "HitFit top mass GenMatch hypothesis vs. best HitFit top mass", binsHitFitMT_/4, minHitFitMT_, maxHitFitMT_, binsHitFitMT_/4, minHitFitMT_, maxHitFitMT_ );
+  hist2D_GenMatch_HitFitGood__Signal_[ "MT_MTFound" ] = dir_GenMatch_HitFitFound__Signal.make< TH2D >( "GenMatch_HitFit_MT_MTFound__Signal", "HitFit top mass GenMatch hypothesis vs. best HitFit top mass", binsHitFitMT_/4, minHitFitMT_, maxHitFitMT_, binsHitFitMT_/4, minHitFitMT_, maxHitFitMT_ );
   hist2D_GenMatch_HitFitGood__Signal_[ "MT_MTFound" ]->SetXTitle( "m_{top}^{HitFit}" );
   hist2D_GenMatch_HitFitGood__Signal_[ "MT_MTFound" ]->SetYTitle( "m_{top}_{GenMatch}^{HitFit}" );
-  hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_MTFound" ] = dir_GenMatch_HitFitGood__Signal.make< TH2D >( "GenMatch_HitFit_ProbFound_MTFound", "HitFit top mass GenMatch hypothesis vs. probabilty", binsHitFitProb_, 0., 1. , binsHitFitMT_, minHitFitMT_, maxHitFitMT_ );
+  hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_MTFound" ] = dir_GenMatch_HitFitFound__Signal.make< TH2D >( "GenMatch_HitFit_ProbFound_MTFound", "HitFit top mass GenMatch hypothesis vs. probabilty", binsHitFitProb_, 0., 1. , binsHitFitMT_, minHitFitMT_, maxHitFitMT_ );
   hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_MTFound" ]->SetXTitle( "P_{GenMatch}^{HitFit}" );
   hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_MTFound" ]->SetYTitle( "m_{top}_{GenMatch}^{HitFit}" );
-  hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_LepPtFound" ] = dir_GenMatch_HitFitGood__Signal.make< TH2D >( "GenMatch_HitFit_ProbFound_LepPtFound", "HitFit top mass GenMatch hypothesis vs. lepton transverse momentum", binsHitFitProb_, 0., 1. , binsLepPt_, 0., maxLepPt_ );
+  hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_LepPtFound" ] = dir_GenMatch_HitFitFound__Signal.make< TH2D >( "GenMatch_HitFit_ProbFound_LepPtFound", "HitFit top mass GenMatch hypothesis vs. lepton transverse momentum", binsHitFitProb_, 0., 1. , binsLepPt_, 0., maxLepPt_ );
   hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_LepPtFound" ]->SetXTitle( "P_{GenMatch}^{HitFit}" );
   hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_LepPtFound" ]->SetYTitle( "p_{t, l}_{GenMatch}^{HitFit} (GeV)" );
-  hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_NuPtFound" ] = dir_GenMatch_HitFitGood__Signal.make< TH2D >( "GenMatch_HitFit_ProbFound_NuPtFound", "HitFit top mass GenMatch hypothesis vs. neutrino transverse momentum", binsHitFitProb_, 0., 1. , binsNuPt_, 0., maxNuPt_ );
+  hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_NuPtFound" ] = dir_GenMatch_HitFitFound__Signal.make< TH2D >( "GenMatch_HitFit_ProbFound_NuPtFound", "HitFit top mass GenMatch hypothesis vs. neutrino transverse momentum", binsHitFitProb_, 0., 1. , binsNuPt_, 0., maxNuPt_ );
   hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_NuPtFound" ]->SetXTitle( "P_{GenMatch}^{HitFit}" );
   hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_NuPtFound" ]->SetYTitle( "p_{t, #nu}_{GenMatch}^{HitFit} (GeV)" );
-  hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_LepPtRecoFound" ] = dir_GenMatch_HitFitGood__Signal.make< TH2D >( "GenMatch_HitFit_ProbFound_LepPtRecoFound", "HitFit top mass GenMatch hypothesis vs. reconstructed lepton transverse momentum", binsHitFitProb_, 0., 1. , binsLepPt_, 0., maxLepPt_ );
+  hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_LepPtRecoFound" ] = dir_GenMatch_HitFitFound__Signal.make< TH2D >( "GenMatch_HitFit_ProbFound_LepPtRecoFound", "HitFit top mass GenMatch hypothesis vs. reconstructed lepton transverse momentum", binsHitFitProb_, 0., 1. , binsLepPt_, 0., maxLepPt_ );
   hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_LepPtRecoFound" ]->SetXTitle( "P_{GenMatch}^{HitFit}" );
   hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_LepPtRecoFound" ]->SetYTitle( "p_{t, l}^{Reco} (GeV)" );
-  hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_METRecoFound" ] = dir_GenMatch_HitFitGood__Signal.make< TH2D >( "GenMatch_HitFit_ProbFound_METRecoFound", "HitFit top mass GenMatch hypothesis vs. reconstructed missing transverse momentum", binsHitFitProb_, 0., 1. , binsNuPt_, 0., maxNuPt_ );
+  hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_METRecoFound" ] = dir_GenMatch_HitFitFound__Signal.make< TH2D >( "GenMatch_HitFit_ProbFound_METRecoFound", "HitFit top mass GenMatch hypothesis vs. reconstructed missing transverse momentum", binsHitFitProb_, 0., 1. , binsNuPt_, 0., maxNuPt_ );
   hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_METRecoFound" ]->SetXTitle( "P_{GenMatch}^{HitFit}" );
   hist2D_GenMatch_HitFitGood__Signal_[ "ProbFound_METRecoFound" ]->SetYTitle( "E_{t, miss.}^{Reco} (GeV)" );
   for ( MapTH2D::const_iterator iHist = hist2D_GenMatch_HitFitGood__Signal_.begin(); iHist != hist2D_GenMatch_HitFitGood__Signal_.end(); ++iHist ) {
@@ -959,19 +1236,10 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
 
     if ( isSignal_ ) {
 
-      fill1D_GeneratorValid( hist1D_Generator__Signal_ );
-      fill2D_GeneratorValid( hist2D_Generator__Signal_ );
-
       for ( unsigned iHypo = 0; iHypo < ttSemiLeptonicEvent_->numberOfAvailableHypos( TtEvent::kGenMatch ); ++iHypo ) {
         if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch, iHypo ) ) {
           ++nGenMatchHyposValid_;
         }
-      }
-      fill1D_GenMatch( hist1D_GenMatch__Signal_ );
-      fill2D_GenMatch( hist2D_GenMatch__Signal_ );
-      if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
-        fill1D_GenMatchValid( hist1D_GenMatch__Signal_ );
-        fill2D_GenMatchValid( hist2D_GenMatch__Signal_ );
       }
 
       // Determine corresponding HitFit hypotheses
@@ -979,11 +1247,11 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
         if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch, iHypo ) ) {
           if ( hitFitHypoFound_1_ == -1 ) {
             const int hitFitHypoFound( ttSemiLeptonicEvent_->correspondingHypo( TtEvent::kGenMatch, iHypo, TtEvent::kHitFit ) );
-            if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit, hitFitHypoFound ) ) hitFitHypoFound_1_ = hitFitHypoFound;
+            if ( hitFitHypoFound >= 0 && ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit, hitFitHypoFound ) ) hitFitHypoFound_1_ = hitFitHypoFound;
           }
           if ( hitFitHypoFound_2_ == -1 ) {
             const int hitFitHypoFound( correspondingAltHypo( TtEvent::kGenMatch, iHypo, TtEvent::kHitFit ) );
-            if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit, hitFitHypoFound ) ) hitFitHypoFound_2_ = hitFitHypoFound;
+            if ( hitFitHypoFound >= 0 && ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit, hitFitHypoFound ) ) hitFitHypoFound_2_ = hitFitHypoFound;
           }
        } // if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch, iHypo ) )
       } // iHypo
@@ -995,6 +1263,16 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
       }
       else {
         hitFitHypoFound_ = std::min( hitFitHypoFound_1_, hitFitHypoFound_2_ );
+      }
+
+      fill1D_GeneratorValid( hist1D_Generator__Signal_ );
+      fill2D_GeneratorValid( hist2D_Generator__Signal_ );
+
+      fill1D_GenMatch( hist1D_GenMatch__Signal_ );
+      fill2D_GenMatch( hist2D_GenMatch__Signal_ );
+      if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
+        fill1D_GenMatchValid( hist1D_GenMatch__Signal_ );
+        fill2D_GenMatchValid( hist2D_GenMatch__Signal_ );
       }
 
       fill1D_HitFit( hist1D_HitFit__Signal_ );
