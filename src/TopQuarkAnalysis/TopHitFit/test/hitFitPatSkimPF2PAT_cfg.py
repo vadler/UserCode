@@ -98,7 +98,8 @@ jetSelectHitFit = 'abs(eta) < 3.0'
 jetSelectVeto   = 'pt > 30. && abs(eta) < 2.4 && numberOfDaughters > 1 && chargedEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4) && (chargedMultiplicity > 0 || abs(eta) >= 2.4)'
 jetSelect       = jetSelectHitFit + ' && ' + jetSelectVeto
 jetSelectSignal = ''
-jetBTagAlgo          = '' # empty string switches the use of b-Tagging off
+#jetBTagAlgo          = '' # empty string switches the use of b-Tagging off
+jetBTagAlgo          = 'trackCountingHighPurBJetTags' # empty string switches the use of b-Tagging off
 jetMinBDiscBJets     = 1.
 jetMaxBDiscLightJets = 3.
 # counters
@@ -490,6 +491,7 @@ process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
 process.referencePatJets.preselection = jetSelectSignal
 
+
 process.out.outputCommands.append( 'drop *_selectedPatJets*_caloTowers_*' )
 process.out.outputCommands.append( 'drop *_selectedPatJets*_tagInfos_*' )
 process.out.outputCommands.append( 'drop *_selectedPatJets*_pfCandidates_*' ) # to save space
@@ -549,10 +551,10 @@ massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReference
                             , 'selectedPatJets'
                             , 'referencePatJets'
                              )
-process.makeTtSemiLepEventReference = cloneProcessingSnippet( process
-                                                            , process.makeTtSemiLepEventReference
-                                                            , 'BTag'
-                                                            )
+process.makeTtSemiLepEventReferenceBTag = cloneProcessingSnippet( process
+                                                                , process.makeTtSemiLepEventReference
+                                                                , 'BTag'
+                                                                )
 if jetBTagAlgo != '':
   process.hitFitTtSemiLepEventHypothesisReferenceBTag.useBTagging       = True
   process.hitFitTtSemiLepEventHypothesisReferenceBTag.bTagAlgo          = jetBTagAlgo
@@ -653,6 +655,13 @@ if runOnMC:
   process.HitFit_ReferenceHitFit *= process.makeGenEvt
 process.HitFit_ReferenceHitFit *= process.makeTtSemiLepEventReference
 
+# Reference selection with HitFit, incl. b-tagging
+process.HitFit_ReferenceHitFitBTag = cms.Path( process.Sequence_Reference
+                                             )
+if runOnMC:
+  process.HitFit_ReferenceHitFitBTag *= process.makeGenEvt
+process.HitFit_ReferenceHitFitBTag *= process.makeTtSemiLepEventReferenceBTag
+
 process.out.SelectEvents.SelectEvents = [ 'HitFit_PF2PATHitFit'
                                         ]
 if runTest or runOnMC:
@@ -680,6 +689,7 @@ process.schedule = cms.Schedule(
 , process.HitFit_Reference_Jets
 , process.HitFit_Reference
 , process.HitFit_ReferenceHitFit
+, process.HitFit_ReferenceHitFitBTag
 , process.outPath
 )
 

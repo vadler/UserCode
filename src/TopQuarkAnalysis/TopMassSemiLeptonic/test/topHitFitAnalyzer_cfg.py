@@ -89,6 +89,10 @@ process.topHitFitAnalyzer_Reference = process.topHitFitAnalyzer.clone( ttSemiLep
                                                                      , patMuons            = 'referencePatMuons'
                                                                      , patJets             = 'referencePatJets'
                                                                      )
+process.topHitFitAnalyzer_ReferenceBTag = process.topHitFitAnalyzer.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReferenceBTag'
+                                                                         , patMuons            = 'referencePatMuons'
+                                                                         , patJets             = 'referencePatJets'
+                                                                         )
 
 
 ### Paths
@@ -101,6 +105,11 @@ process.p = cms.Path(
 process.p_Reference = cms.Path(
   process.hltHighLevel_Reference
 * process.topHitFitAnalyzer_Reference
+)
+
+process.p_ReferenceBTag = cms.Path(
+  process.hltHighLevel_Reference
+* process.topHitFitAnalyzer_ReferenceBTag
 )
 
 
