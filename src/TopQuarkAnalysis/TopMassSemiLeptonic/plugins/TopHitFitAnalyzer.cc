@@ -235,7 +235,8 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
     MapTH2D hist2D_GenMatch_HitFitGood__Signal_;
 
     /// Resolution functions
-    MapTF1 func_LeptonResolution_;
+    MapTF1 func_MuonResolution_;
+    MapTF1 func_ElectronResolution_;
     MapTF1 func_UdscJetResolution_;
     MapTF1 func_BJetResolution_;
     MapTF1 func_METResolution_;
@@ -404,7 +405,8 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 , hist2D_Generator_HitFitGood__Signal_()
 , hist1D_GenMatch_HitFitGood__Signal_()
 , hist2D_GenMatch_HitFitGood__Signal_()
-, func_LeptonResolution_()
+, func_MuonResolution_()
+, func_ElectronResolution_()
 , func_UdscJetResolution_()
 , func_BJetResolution_()
 , func_METResolution_()
@@ -450,7 +452,8 @@ TopHitFitAnalyzer::~TopHitFitAnalyzer()
 
 
 template < typename T >
-std::string to_string( T const & value ) {
+std::string to_string( T const & value )
+{
     std::stringstream sstr;
     sstr << value;
     return sstr.str();
@@ -465,12 +468,14 @@ void TopHitFitAnalyzer::beginJob()
 
   // Determine HitFit resolution functions
 
-  const std::string funcRes( "sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])" );
-  const std::string funcResInv( "sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])" );
+  const std::string funcRes(      "sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])" );
+  const std::string funcResInv(   "sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])" );
+  const std::string funcResEt(    "sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])*cosh([3])" );
+  const std::string funcResEtInv( "sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])/cosh([3])" );
 
   TFileDirectory dir_Resolution( fileService->mkdir( "Resolution", "HitFit resolution functions" ) );
 
-  // Lepton resolutions
+  // Muon resolutions
 
   TFileDirectory dir_MuonResolution( dir_Resolution.mkdir( "MuonResolution", "HitFit resolution functions for muons" ) );
   TFileDirectory dir_MuonResolutionP( dir_MuonResolution.mkdir( "MuonResolutionP", "HitFit momentum resolution functions for muons" ) );
@@ -481,52 +486,153 @@ void TopHitFitAnalyzer::beginJob()
   const hitfit::EtaDepResolution muonRes( muonResFile.fullPath() );
   const std::vector< hitfit::EtaDepResElement > muonResElems( muonRes.GetEtaDepResElement() );
 
+  unsigned count( 0 );
   for ( unsigned iResEl = 0; iResEl < muonResElems.size(); ++iResEl ) {
-
-    const double etaMin( muonResElems.at( iResEl ).EtaMin() );
-    const double etaMax( muonResElems.at( iResEl ).EtaMax() );
-    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
 
     const hitfit::Vector_Resolution vecRes( muonResElems.at( iResEl ).GetResolution() );
 
+    const double etaMin( muonResElems.at( iResEl ).EtaMin() );
+    const double etaMax( muonResElems.at( iResEl ).EtaMax() );
+    // positive eta only, since everything is symmetric
+    if ( etaMin < 0. && etaMax <= 0. ) continue;
+
+    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+    std::string xAxisTitle( "p" );
+    if ( vecRes.use_et() ) xAxisTitle += "_{t}";
+
     // Momentum
     const hitfit::Resolution pRes( vecRes.p_res() );
-    std::string key( "P_" + to_string( iResEl ) );
-    std::string name( "Lepton_" + key );
-    func_LeptonResolution_[ key ] = dir_MuonResolutionP.make< TF1 >( name.c_str(), pRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
-    func_LeptonResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N() );
-    func_LeptonResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_LeptonResolution_[ key ]->SetMinimum( 0. );
-//     func_LeptonResolution_[ key ]->SetMaximum( 0.2 );
-    func_LeptonResolution_[ key ]->SetTitle( title.c_str() );
-    func_LeptonResolution_[ key ]->GetXaxis()->SetTitle( "p_{t}" );
-    func_LeptonResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{p_{t}}" );
+    std::string key( "P_" + to_string( count ) );
+    std::string name( "Muon_" + key );
+    std::string yAxisTitle( "#sigma_{" + xAxisTitle + "}" );
+    std::string function;
+    if ( pRes.inverse() ) function = vecRes.use_et() ? funcResEtInv : funcResInv;
+    else                  function = vecRes.use_et() ? funcResEt    : funcRes;
+    func_MuonResolution_[ key ] = dir_MuonResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxLepPt_ );
+    func_MuonResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
+    func_MuonResolution_[ key ]->SetMinimum( 0. );
+//     func_MuonResolution_[ key ]->SetMaximum( 0.2 );
+    func_MuonResolution_[ key ]->SetTitle( title.c_str() );
+    func_MuonResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_MuonResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
+    key  += "_Rel";
+    name += "_Rel";
+    yAxisTitle = "#frac{" + yAxisTitle + "}{" + xAxisTitle + "}";
+    function = "(" + function + ")/x";
+    func_MuonResolution_[ key ] = dir_MuonResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxLepPt_ );
+    func_MuonResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
+    func_MuonResolution_[ key ]->SetMinimum( 0. );
+    func_MuonResolution_[ key ]->SetMaximum( 1. );
+    func_MuonResolution_[ key ]->SetTitle( title.c_str() );
+    func_MuonResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_MuonResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
 
     // Eta
     const hitfit::Resolution etaRes( vecRes.eta_res() );
-    key  = "Eta_" + to_string( iResEl );
-    name = "Lepton_" + key;
-    func_LeptonResolution_[ key ] = dir_MuonResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
-    func_LeptonResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
-    func_LeptonResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_LeptonResolution_[ key ]->SetMinimum( 0. );
-//     func_LeptonResolution_[ key ]->SetMaximum( 0.2 );
-    func_LeptonResolution_[ key ]->SetTitle( title.c_str() );
-    func_LeptonResolution_[ key ]->GetXaxis()->SetTitle( "#eta" );
-    func_LeptonResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
+    key  = "Eta_" + to_string( count );
+    name = "Muon_" + key;
+    func_MuonResolution_[ key ] = dir_MuonResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
+    func_MuonResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
+    func_MuonResolution_[ key ]->SetMinimum( 0. );
+    func_MuonResolution_[ key ]->SetMaximum( 0.005 );
+    func_MuonResolution_[ key ]->SetTitle( title.c_str() );
+    func_MuonResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_MuonResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
 
     // Phi
     const hitfit::Resolution phiRes( vecRes.phi_res() );
-    key  = "Phi_" + to_string( iResEl );
-    name = "Lepton_" + key;
-    func_LeptonResolution_[ key ] = dir_MuonResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
-    func_LeptonResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
-    func_LeptonResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_LeptonResolution_[ key ]->SetMinimum( 0. );
-//     func_LeptonResolution_[ key ]->SetMaximum( 0.2 );
-    func_LeptonResolution_[ key ]->SetTitle( title.c_str() );
-    func_LeptonResolution_[ key ]->GetXaxis()->SetTitle( "#phi" );
-    func_LeptonResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
+    key  = "Phi_" + to_string( count );
+    name = "Muon_" + key;
+    func_MuonResolution_[ key ] = dir_MuonResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
+    func_MuonResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
+    func_MuonResolution_[ key ]->SetMinimum( 0. );
+    func_MuonResolution_[ key ]->SetMaximum( 0.005 );
+    func_MuonResolution_[ key ]->SetTitle( title.c_str() );
+    func_MuonResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_MuonResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
+
+    ++count;
+
+  }
+
+  // Electron resolutions
+
+  TFileDirectory dir_ElectronResolution( dir_Resolution.mkdir( "ElectronResolution", "HitFit resolution functions for electrons" ) );
+  TFileDirectory dir_ElectronResolutionP( dir_ElectronResolution.mkdir( "ElectronResolutionP", "HitFit momentum resolution functions for electrons" ) );
+  TFileDirectory dir_ElectronResolutionEta( dir_ElectronResolution.mkdir( "ElectronResolutionEta", "HitFit eta resolution functions for electrons" ) );
+  TFileDirectory dir_ElectronResolutionPhi( dir_ElectronResolution.mkdir( "ElectronResolutionPhi", "HitFit phi resolution functions for electrons" ) );
+
+  const edm::FileInPath electronResFile( "TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution.txt" );
+  const hitfit::EtaDepResolution electronRes( electronResFile.fullPath() );
+  const std::vector< hitfit::EtaDepResElement > electronResElems( electronRes.GetEtaDepResElement() );
+
+  count = 0;
+  for ( unsigned iResEl = 0; iResEl < electronResElems.size(); ++iResEl ) {
+
+    const hitfit::Vector_Resolution vecRes( electronResElems.at( iResEl ).GetResolution() );
+
+    const double etaMin( electronResElems.at( iResEl ).EtaMin() );
+    const double etaMax( electronResElems.at( iResEl ).EtaMax() );
+    // positive eta only, since everything is symmetric
+    if ( etaMin < 0. && etaMax <= 0. ) continue;
+
+    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+
+    // Momentum
+    const hitfit::Resolution pRes( vecRes.p_res() );
+    std::string key( "P_" + to_string( count ) );
+    std::string name( "Elec_" + key );
+    std::string xAxisTitle( "p" );
+    if ( vecRes.use_et() ) xAxisTitle += "_{t}";
+    std::string yAxisTitle( "#sigma_{" + xAxisTitle + "}" );
+    xAxisTitle += " (GeV)";
+    std::string function;
+    if ( pRes.inverse() ) function = vecRes.use_et() ? funcResEtInv : funcResInv;
+    else                  function = vecRes.use_et() ? funcResEt    : funcRes;
+    func_ElectronResolution_[ key ] = dir_ElectronResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxLepPt_ );
+    func_ElectronResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
+    func_ElectronResolution_[ key ]->SetMinimum(  0. );
+    func_ElectronResolution_[ key ]->SetMaximum( 50. );
+    func_ElectronResolution_[ key ]->SetTitle( title.c_str() );
+    func_ElectronResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_ElectronResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
+    key  += "_Rel";
+    name += "_Rel";
+    yAxisTitle = "#frac{" + yAxisTitle + "}{" + xAxisTitle + "}";
+    function = "(" + function + ")/x";
+    func_ElectronResolution_[ key ] = dir_ElectronResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxLepPt_ );
+    func_ElectronResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
+    func_ElectronResolution_[ key ]->SetMinimum( 0. );
+    func_ElectronResolution_[ key ]->SetMaximum( 1. );
+    func_ElectronResolution_[ key ]->SetTitle( title.c_str() );
+    func_ElectronResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_ElectronResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
+
+    // Eta
+    const hitfit::Resolution etaRes( vecRes.eta_res() );
+    key  = "Eta_" + to_string( count );
+    name = "Elec_" + key;
+    func_ElectronResolution_[ key ] = dir_ElectronResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
+    func_ElectronResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
+    func_ElectronResolution_[ key ]->SetMinimum( 0. );
+    func_ElectronResolution_[ key ]->SetMaximum( 0.005 );
+    func_ElectronResolution_[ key ]->SetTitle( title.c_str() );
+    func_ElectronResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_ElectronResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
+
+    // Phi
+    const hitfit::Resolution phiRes( vecRes.phi_res() );
+    key  = "Phi_" + to_string( count );
+    name = "Elec_" + key;
+    func_ElectronResolution_[ key ] = dir_ElectronResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
+    func_ElectronResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
+    func_ElectronResolution_[ key ]->SetMinimum( 0. );
+    func_ElectronResolution_[ key ]->SetMaximum( 0.005 );
+    func_ElectronResolution_[ key ]->SetTitle( title.c_str() );
+    func_ElectronResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_ElectronResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
+
+    ++count;
 
   }
 
@@ -541,52 +647,77 @@ void TopHitFitAnalyzer::beginJob()
   const hitfit::EtaDepResolution udscJetRes( udscJetResFile.fullPath() );
   const std::vector< hitfit::EtaDepResElement > udscJetResElems( udscJetRes.GetEtaDepResElement() );
 
+  count = 0;
   for ( unsigned iResEl = 0; iResEl < udscJetResElems.size(); ++iResEl ) {
-
-    const double etaMin( udscJetResElems.at( iResEl ).EtaMin() );
-    const double etaMax( udscJetResElems.at( iResEl ).EtaMax() );
-    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
 
     const hitfit::Vector_Resolution vecRes( udscJetResElems.at( iResEl ).GetResolution() );
 
+    const double etaMin( udscJetResElems.at( iResEl ).EtaMin() );
+    const double etaMax( udscJetResElems.at( iResEl ).EtaMax() );
+    // positive eta only, since everything is symmetric
+    if ( etaMin < 0. && etaMax <= 0. ) continue;
+
+    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+
     // Momentum
     const hitfit::Resolution pRes( vecRes.p_res() );
-    std::string key( "P_" + to_string( iResEl ) );
+    std::string key( "P_" + to_string( count ) );
     std::string name( "UdscJet_" + key );
-    func_UdscJetResolution_[ key ] = dir_UdscJetResolutionP.make< TF1 >( name.c_str(), pRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
-    func_UdscJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N() );
-    func_UdscJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_UdscJetResolution_[ key ]->SetMinimum( 0. );
-//     func_UdscJetResolution_[ key ]->SetMaximum( 0.2 );
+    std::string xAxisTitle( "p" );
+    if ( vecRes.use_et() ) xAxisTitle += "_{t}";
+    std::string yAxisTitle( "#sigma_{" + xAxisTitle + "}" );
+    xAxisTitle += " (GeV)";
+    std::string function;
+    if ( pRes.inverse() ) function = vecRes.use_et() ? funcResEtInv : funcResInv;
+    else                  function = vecRes.use_et() ? funcResEt    : funcRes;
+    func_UdscJetResolution_[ key ] = dir_UdscJetResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., 500. ); // FIXME lack of config
+    func_UdscJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
+//     func_UdscJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
+    func_UdscJetResolution_[ key ]->SetMinimum(   0. );
+    func_UdscJetResolution_[ key ]->SetMaximum( 250. );
     func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
-    func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( "p_{t}" );
-    func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{p_{t}}" );
+    func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
+    key  += "_Rel";
+    name += "_Rel";
+    yAxisTitle = "#frac{" + yAxisTitle + "}{" + xAxisTitle + "}";
+    function = "(" + function + ")/x";
+    func_UdscJetResolution_[ key ] = dir_UdscJetResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., 500. ); // FIXME lack of config
+    func_UdscJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
+//     func_UdscJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
+    func_UdscJetResolution_[ key ]->SetMinimum( 0. );
+    func_UdscJetResolution_[ key ]->SetMaximum( 1. );
+    func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
+    func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
 
     // Eta
     const hitfit::Resolution etaRes( vecRes.eta_res() );
-    key  = "Eta_" + to_string( iResEl );
+    key  = "Eta_" + to_string( count );
     name = "UdscJet_" + key;
-    func_UdscJetResolution_[ key ] = dir_UdscJetResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_UdscJetResolution_[ key ] = dir_UdscJetResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., 500. ); // FIXME lack of config
     func_UdscJetResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
-    func_UdscJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_UdscJetResolution_[ key ]->SetMinimum( 0. );
-//     func_UdscJetResolution_[ key ]->SetMaximum( 0.2 );
+//     func_UdscJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
+    func_UdscJetResolution_[ key ]->SetMinimum( 0. );
+    func_UdscJetResolution_[ key ]->SetMaximum( 0.1 );
     func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
-    func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( "#eta" );
+    func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
 
     // Phi
     const hitfit::Resolution phiRes( vecRes.phi_res() );
-    key  = "Phi_" + to_string( iResEl );
+    key  = "Phi_" + to_string( count );
     name = "UdscJet_" + key;
-    func_UdscJetResolution_[ key ] = dir_UdscJetResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_UdscJetResolution_[ key ] = dir_UdscJetResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., 500. ); // FIXME lack of config
     func_UdscJetResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
-    func_UdscJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_UdscJetResolution_[ key ]->SetMinimum( 0. );
-//     func_UdscJetResolution_[ key ]->SetMaximum( 0.2 );
+//     func_UdscJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
+    func_UdscJetResolution_[ key ]->SetMinimum( 0. );
+    func_UdscJetResolution_[ key ]->SetMaximum( 0.1 );
     func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
-    func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( "#phi" );
+    func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
+
+    ++count;
 
   }
 
@@ -601,56 +732,81 @@ void TopHitFitAnalyzer::beginJob()
   const hitfit::EtaDepResolution bJetRes( bJetResFile.fullPath() );
   const std::vector< hitfit::EtaDepResElement > bJetResElems( bJetRes.GetEtaDepResElement() );
 
+  count = 0;
   for ( unsigned iResEl = 0; iResEl < bJetResElems.size(); ++iResEl ) {
-
-    const double etaMin( bJetResElems.at( iResEl ).EtaMin() );
-    const double etaMax( bJetResElems.at( iResEl ).EtaMax() );
-    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
 
     const hitfit::Vector_Resolution vecRes( bJetResElems.at( iResEl ).GetResolution() );
 
+    const double etaMin( bJetResElems.at( iResEl ).EtaMin() );
+    const double etaMax( bJetResElems.at( iResEl ).EtaMax() );
+    // positive eta only, since everything is symmetric
+    if ( etaMin < 0. && etaMax <= 0. ) continue;
+
+    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+
     // Momentum
     const hitfit::Resolution pRes( vecRes.p_res() );
-    std::string key( "P_" + to_string( iResEl ) );
+    std::string key( "P_" + to_string( count ) );
     std::string name( "BJet_" + key );
-    func_BJetResolution_[ key ] = dir_BJetResolutionP.make< TF1 >( name.c_str(), pRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
-    func_BJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N() );
-    func_BJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_BJetResolution_[ key ]->SetMinimum( 0. );
-//     func_BJetResolution_[ key ]->SetMaximum( 0.2 );
+    std::string xAxisTitle( "p" );
+    if ( vecRes.use_et() ) xAxisTitle += "_{t}";
+    std::string yAxisTitle( "#sigma_{" + xAxisTitle + "}" );
+    xAxisTitle += " (GeV)";
+    std::string function;
+    if ( pRes.inverse() ) function = vecRes.use_et() ? funcResEtInv : funcResInv;
+    else                  function = vecRes.use_et() ? funcResEt    : funcRes;
+    func_BJetResolution_[ key ] = dir_BJetResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., 500. ); // FIXME lack of config
+    func_BJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
+//     func_BJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
+    func_BJetResolution_[ key ]->SetMinimum(   0. );
+    func_BJetResolution_[ key ]->SetMaximum( 250. );
     func_BJetResolution_[ key ]->SetTitle( title.c_str() );
-    func_BJetResolution_[ key ]->GetXaxis()->SetTitle( "p_{t}" );
-    func_BJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{p_{t}}" );
+    func_BJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_BJetResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
+    key  += "_Rel";
+    name += "_Rel";
+    yAxisTitle = "#frac{" + yAxisTitle + "}{" + xAxisTitle + "}";
+    function = "(" + function + ")/x";
+    func_BJetResolution_[ key ] = dir_BJetResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., 500. ); // FIXME lack of config
+    func_BJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
+//     func_BJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
+    func_BJetResolution_[ key ]->SetMinimum( 0. );
+    func_BJetResolution_[ key ]->SetMaximum( 1. );
+    func_BJetResolution_[ key ]->SetTitle( title.c_str() );
+    func_BJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_BJetResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
 
     // Eta
     const hitfit::Resolution etaRes( vecRes.eta_res() );
-    key  = "Eta_" + to_string( iResEl );
+    key  = "Eta_" + to_string( count );
     name = "BJet_" + key;
-    func_BJetResolution_[ key ] = dir_BJetResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_BJetResolution_[ key ] = dir_BJetResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., 500. ); // FIXME lack of config
     func_BJetResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
-    func_BJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_BJetResolution_[ key ]->SetMinimum( 0. );
-//     func_BJetResolution_[ key ]->SetMaximum( 0.2 );
+//     func_BJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
+    func_BJetResolution_[ key ]->SetMinimum( 0. );
+    func_BJetResolution_[ key ]->SetMaximum( 0.1 );
     func_BJetResolution_[ key ]->SetTitle( title.c_str() );
-    func_BJetResolution_[ key ]->GetXaxis()->SetTitle( "#eta" );
+    func_BJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_BJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
 
     // Phi
     const hitfit::Resolution phiRes( vecRes.phi_res() );
-    key  = "Phi_" + to_string( iResEl );
+    key  = "Phi_" + to_string( count );
     name = "BJet_" + key;
-    func_BJetResolution_[ key ] = dir_BJetResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_BJetResolution_[ key ] = dir_BJetResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., 500. ); // FIXME lack of config
     func_BJetResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
-    func_BJetResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_BJetResolution_[ key ]->SetMinimum( 0. );
-//     func_BJetResolution_[ key ]->SetMaximum( 0.2 );
+//     func_BJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
+    func_BJetResolution_[ key ]->SetMinimum( 0. );
+    func_BJetResolution_[ key ]->SetMaximum( 0.1 );
     func_BJetResolution_[ key ]->SetTitle( title.c_str() );
-    func_BJetResolution_[ key ]->GetXaxis()->SetTitle( "#phi" );
+    func_BJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_BJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
+
+    ++count;
 
   }
 
-  // MET resolutions
+  // MET resolutions FIXME
 
   TFileDirectory dir_METResolution( dir_Resolution.mkdir( "METResolution", "HitFit resolution functions for MET" ) );
   TFileDirectory dir_METResolutionP( dir_METResolution.mkdir( "METResolutionP", "HitFit momentum resolution functions for MET" ) );
@@ -661,52 +817,73 @@ void TopHitFitAnalyzer::beginJob()
   const hitfit::EtaDepResolution metRes( metResFile.fullPath() );
   const std::vector< hitfit::EtaDepResElement > metResElems( metRes.GetEtaDepResElement() );
 
+  count = 0;
   for ( unsigned iResEl = 0; iResEl < metResElems.size(); ++iResEl ) {
-
-    const double etaMin( metResElems.at( iResEl ).EtaMin() );
-    const double etaMax( metResElems.at( iResEl ).EtaMax() );
-    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
 
     const hitfit::Vector_Resolution vecRes( metResElems.at( iResEl ).GetResolution() );
 
+    const double etaMin( metResElems.at( iResEl ).EtaMin() );
+    const double etaMax( metResElems.at( iResEl ).EtaMax() );
+    // positive eta only, since everything is symmetric
+    if ( etaMin < 0. && etaMax <= 0. ) continue;
+
+    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+
     // Momentum
     const hitfit::Resolution pRes( vecRes.p_res() );
-    std::string key( "P_" + to_string( iResEl ) );
+    std::string key( "P_" + to_string( count ) );
     std::string name( "MET_" + key );
-    func_METResolution_[ key ] = dir_METResolutionP.make< TF1 >( name.c_str(), pRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
-    func_METResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N() );
-    func_METResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_METResolution_[ key ]->SetMinimum( 0. );
+    std::string xAxisTitle( "p" );
+    if ( vecRes.use_et() ) xAxisTitle += "_{t}";
+    std::string yAxisTitle( "#sigma_{" + xAxisTitle + "}" );
+    xAxisTitle += " (GeV)";
+    std::string function;
+    if ( pRes.inverse() ) function = vecRes.use_et() ? funcResEtInv : funcResInv;
+    else                  function = vecRes.use_et() ? funcResEt    : funcRes;
+    func_METResolution_[ key ] = dir_METResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxNuPt_ );
+    func_METResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
+    func_METResolution_[ key ]->SetMinimum( 0. );
 //     func_METResolution_[ key ]->SetMaximum( 0.2 );
     func_METResolution_[ key ]->SetTitle( title.c_str() );
-    func_METResolution_[ key ]->GetXaxis()->SetTitle( "p_{t}" );
-    func_METResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{p_{t}}" );
+    func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_METResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
+    key  += "_Rel";
+    name += "_Rel";
+    yAxisTitle = "#frac{" + yAxisTitle + "}{" + xAxisTitle + "}";
+    function = "(" + function + ")/x";
+    func_METResolution_[ key ] = dir_METResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxNuPt_ );
+    func_METResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
+    func_METResolution_[ key ]->SetMinimum( 0. );
+    func_METResolution_[ key ]->SetMaximum( 1. );
+    func_METResolution_[ key ]->SetTitle( title.c_str() );
+    func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
+    func_METResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
 
     // Eta
     const hitfit::Resolution etaRes( vecRes.eta_res() );
-    key  = "Eta_" + to_string( iResEl );
+    key  = "Eta_" + to_string( count );
     name = "MET_" + key;
-    func_METResolution_[ key ] = dir_METResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_METResolution_[ key ] = dir_METResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxNuPt_ );
     func_METResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
-    func_METResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_METResolution_[ key ]->SetMinimum( 0. );
+    func_METResolution_[ key ]->SetMinimum( 0. );
 //     func_METResolution_[ key ]->SetMaximum( 0.2 );
     func_METResolution_[ key ]->SetTitle( title.c_str() );
-    func_METResolution_[ key ]->GetXaxis()->SetTitle( "#eta" );
+    func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_METResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
 
     // Phi
     const hitfit::Resolution phiRes( vecRes.phi_res() );
-    key  = "Phi_" + to_string( iResEl );
+    key  = "Phi_" + to_string( count );
     name = "MET_" + key;
-    func_METResolution_[ key ] = dir_METResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str() );
+    func_METResolution_[ key ] = dir_METResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxNuPt_ );
     func_METResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
-    func_METResolution_[ key ]->SetRange( 20., maxLepPt_ );
-//     func_METResolution_[ key ]->SetMinimum( 0. );
+    func_METResolution_[ key ]->SetMinimum( 0. );
 //     func_METResolution_[ key ]->SetMaximum( 0.2 );
     func_METResolution_[ key ]->SetTitle( title.c_str() );
-    func_METResolution_[ key ]->GetXaxis()->SetTitle( "#phi" );
+    func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_METResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
+
+    ++count;
 
   }
 
