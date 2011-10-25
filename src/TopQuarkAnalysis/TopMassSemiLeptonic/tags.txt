@@ -1,19 +1,15 @@
-Test Release based on: CMSSW_4_2_9_HLT1
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_9_HLT1
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_2_9_HLT1
+Test Release based on: CMSSW_4_4_1
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_1
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-AnalysisDataFormats/TopObjects                   V06-08-02      V06-07-07      
-CommonTools/ParticleFlow                         B4_2_X_V00-03-00 V00-01-06      
-DataFormats/PatCandidates                        V06-04-19-02   V06-04-18      
-PhysicsTools/PatAlgos                            V08-06-45      V08-06-41      
-PhysicsTools/SelectorUtils                       V00-03-24      V00-03-17      
-PhysicsTools/UtilAlgos                           V08-02-14      V08-02-12      
-RecoEgamma/ElectronIdentification                V00-03-31      V00-03-26      
-TopQuarkAnalysis/TopEventProducers               V06-08-00      V06-07-13      
-TopQuarkAnalysis/TopEventSelection               V06-07-13      V06-07-12      
-TopQuarkAnalysis/TopHitFit                       NoTag                         
-TopQuarkAnalysis/TopJetCombination               V06-08-00      V06-07-09      
-TopQuarkAnalysis/TopKinFitter                    V06-07-11      V06-07-10      
+AnalysisDataFormats/TopObjects                   V06-08-04      V06-07-07      
+PhysicsTools/PatAlgos                            V08-07-25      V08-07-24      
+TopQuarkAnalysis/TopEventProducers               V06-08-01      V06-07-13      
+TopQuarkAnalysis/TopHitFit                       V00-00-01                     
+TopQuarkAnalysis/TopJetCombination               V06-08-01      V06-07-09      
+TopQuarkAnalysis/TopKinFitter                    V06-07-12      V06-07-11      
 TopQuarkAnalysis/TopMassSemiLeptonic             NoCVS                         
+TopQuarkAnalysis/TopObjectResolutions            V06-07-06      V06-07-05      
+TopQuarkAnalysis/TopTools                        V06-07-10      V06-07-09      
 ---------------------------------------
-total packages: 13 (13 displayed)
+total packages: 9 (9 displayed)
