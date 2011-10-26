@@ -7,7 +7,7 @@
 //
 /**
   \class    TopHitFitResolutionFunctions TopHitFitResolutionFunctions.cc "TopQuarkAnalysis/TopMassSemiLeptonic/plugins/TopHitFitResolutionFunctions.cc"
-  \brief    Extract HitFit resolution functions
+  \brief    Extract HitFit resolution functions from parameter files
 
 
 
@@ -21,7 +21,6 @@
 #include <string>
 #include <iostream>
 
-#include "TMath.h"
 #include "TF1.h"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -89,8 +88,6 @@ class TopHitFitResolutionFunctions : public edm::EDAnalyzer {
     MapTF1 func_UdscJetResolution_;
     MapTF1 func_BJetResolution_;
     MapTF1 func_METResolution_;
-
-    /// Private functions
 
 };
 
