@@ -20,7 +20,6 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <sstream>
 
 #include "TMath.h"
 #include "TH1D.h"
@@ -433,15 +432,6 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 // Destructor
 TopHitFitAnalyzer::~TopHitFitAnalyzer()
 {
-}
-
-
-template < typename T >
-std::string to_string( T const & value )
-{
-    std::stringstream sstr;
-    sstr << value;
-    return sstr.str();
 }
 
 

@@ -20,7 +20,6 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <sstream>
 
 #include "TMath.h"
 #include "TF1.h"
@@ -94,6 +93,8 @@ class TopHitFitResolutionFunctions : public edm::EDAnalyzer {
 #include "TopQuarkAnalysis/TopHitFit/interface/METTranslatorBase.h"
 #include "TopQuarkAnalysis/TopHitFit/interface/EtaDepResolution.h"
 
+#include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/Helpers.h"
+
 
 // Default constructor
 TopHitFitResolutionFunctions::TopHitFitResolutionFunctions( const edm::ParameterSet & iConfig )
@@ -116,15 +117,6 @@ TopHitFitResolutionFunctions::TopHitFitResolutionFunctions( const edm::Parameter
 // Destructor
 TopHitFitResolutionFunctions::~TopHitFitResolutionFunctions()
 {
-}
-
-
-template < typename T >
-std::string to_string( T const & value )
-{
-    std::stringstream sstr;
-    sstr << value;
-    return sstr.str();
 }
 
 
@@ -165,13 +157,13 @@ void TopHitFitResolutionFunctions::beginJob()
     // positive eta only, since everything is symmetric
     if ( etaMin < 0. && etaMax <= 0. ) continue;
 
-    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+    std::string title( my::helpers::to_string( etaMin ) + " #leq #eta #leq " + my::helpers::to_string( etaMax ) );
     std::string xAxisTitle( "p" );
     if ( vecRes.use_et() ) xAxisTitle += "_{t}";
 
     // Momentum
     const hitfit::Resolution pRes( vecRes.p_res() );
-    std::string key( "P_" + to_string( count ) );
+    std::string key( "P_" + my::helpers::to_string( count ) );
     std::string name( "Muon_" + key );
     std::string yAxisTitle( "#sigma_{" + xAxisTitle + "}" );
 //     std::string function;
@@ -199,7 +191,7 @@ void TopHitFitResolutionFunctions::beginJob()
 
     // Eta
     const hitfit::Resolution etaRes( vecRes.eta_res() );
-    key  = "Eta_" + to_string( count );
+    key  = "Eta_" + my::helpers::to_string( count );
     name = "Muon_" + key;
     func_MuonResolution_[ key ] = dir_MuonResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
     func_MuonResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
@@ -211,7 +203,7 @@ void TopHitFitResolutionFunctions::beginJob()
 
     // Phi
     const hitfit::Resolution phiRes( vecRes.phi_res() );
-    key  = "Phi_" + to_string( count );
+    key  = "Phi_" + my::helpers::to_string( count );
     name = "Muon_" + key;
     func_MuonResolution_[ key ] = dir_MuonResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
     func_MuonResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
@@ -245,11 +237,11 @@ void TopHitFitResolutionFunctions::beginJob()
     // positive eta only, since everything is symmetric
     if ( etaMin < 0. && etaMax <= 0. ) continue;
 
-    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+    std::string title( my::helpers::to_string( etaMin ) + " #leq #eta #leq " + my::helpers::to_string( etaMax ) );
 
     // Momentum
     const hitfit::Resolution pRes( vecRes.p_res() );
-    std::string key( "P_" + to_string( count ) );
+    std::string key( "P_" + my::helpers::to_string( count ) );
     std::string name( "Elec_" + key );
     std::string xAxisTitle( "p" );
     if ( vecRes.use_et() ) xAxisTitle += "_{t}";
@@ -280,7 +272,7 @@ void TopHitFitResolutionFunctions::beginJob()
 
     // Eta
     const hitfit::Resolution etaRes( vecRes.eta_res() );
-    key  = "Eta_" + to_string( count );
+    key  = "Eta_" + my::helpers::to_string( count );
     name = "Elec_" + key;
     func_ElectronResolution_[ key ] = dir_ElectronResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
     func_ElectronResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
@@ -292,7 +284,7 @@ void TopHitFitResolutionFunctions::beginJob()
 
     // Phi
     const hitfit::Resolution phiRes( vecRes.phi_res() );
-    key  = "Phi_" + to_string( count );
+    key  = "Phi_" + my::helpers::to_string( count );
     name = "Elec_" + key;
     func_ElectronResolution_[ key ] = dir_ElectronResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
     func_ElectronResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
@@ -326,11 +318,11 @@ void TopHitFitResolutionFunctions::beginJob()
     // positive eta only, since everything is symmetric
     if ( etaMin < 0. && etaMax <= 0. ) continue;
 
-    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+    std::string title( my::helpers::to_string( etaMin ) + " #leq #eta #leq " + my::helpers::to_string( etaMax ) );
 
     // Momentum
     const hitfit::Resolution pRes( vecRes.p_res() );
-    std::string key( "P_" + to_string( count ) );
+    std::string key( "P_" + my::helpers::to_string( count ) );
     std::string name( "UdscJet_" + key );
     std::string xAxisTitle( "p" );
     if ( vecRes.use_et() ) xAxisTitle += "_{t}";
@@ -363,7 +355,7 @@ void TopHitFitResolutionFunctions::beginJob()
 
     // Eta
     const hitfit::Resolution etaRes( vecRes.eta_res() );
-    key  = "Eta_" + to_string( count );
+    key  = "Eta_" + my::helpers::to_string( count );
     name = "UdscJet_" + key;
     func_UdscJetResolution_[ key ] = dir_UdscJetResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxJetPt_ );
     func_UdscJetResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
@@ -376,7 +368,7 @@ void TopHitFitResolutionFunctions::beginJob()
 
     // Phi
     const hitfit::Resolution phiRes( vecRes.phi_res() );
-    key  = "Phi_" + to_string( count );
+    key  = "Phi_" + my::helpers::to_string( count );
     name = "UdscJet_" + key;
     func_UdscJetResolution_[ key ] = dir_UdscJetResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxJetPt_ );
     func_UdscJetResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
@@ -411,11 +403,11 @@ void TopHitFitResolutionFunctions::beginJob()
     // positive eta only, since everything is symmetric
     if ( etaMin < 0. && etaMax <= 0. ) continue;
 
-    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+    std::string title( my::helpers::to_string( etaMin ) + " #leq #eta #leq " + my::helpers::to_string( etaMax ) );
 
     // Momentum
     const hitfit::Resolution pRes( vecRes.p_res() );
-    std::string key( "P_" + to_string( count ) );
+    std::string key( "P_" + my::helpers::to_string( count ) );
     std::string name( "BJet_" + key );
     std::string xAxisTitle( "p" );
     if ( vecRes.use_et() ) xAxisTitle += "_{t}";
@@ -448,7 +440,7 @@ void TopHitFitResolutionFunctions::beginJob()
 
     // Eta
     const hitfit::Resolution etaRes( vecRes.eta_res() );
-    key  = "Eta_" + to_string( count );
+    key  = "Eta_" + my::helpers::to_string( count );
     name = "BJet_" + key;
     func_BJetResolution_[ key ] = dir_BJetResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxJetPt_ );
     func_BJetResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
@@ -461,7 +453,7 @@ void TopHitFitResolutionFunctions::beginJob()
 
     // Phi
     const hitfit::Resolution phiRes( vecRes.phi_res() );
-    key  = "Phi_" + to_string( count );
+    key  = "Phi_" + my::helpers::to_string( count );
     name = "BJet_" + key;
     func_BJetResolution_[ key ] = dir_BJetResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxJetPt_ );
     func_BJetResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
@@ -496,11 +488,11 @@ void TopHitFitResolutionFunctions::beginJob()
     // positive eta only, since everything is symmetric
     if ( etaMin < 0. && etaMax <= 0. ) continue;
 
-    std::string title( to_string( etaMin ) + " #leq #eta #leq " + to_string( etaMax ) );
+    std::string title( my::helpers::to_string( etaMin ) + " #leq #eta #leq " + my::helpers::to_string( etaMax ) );
 
     // Momentum
     const hitfit::Resolution pRes( vecRes.p_res() );
-    std::string key( "P_" + to_string( count ) );
+    std::string key( "P_" + my::helpers::to_string( count ) );
     std::string name( "MET_" + key );
     std::string xAxisTitle( "p" );
     if ( vecRes.use_et() ) xAxisTitle += "_{t}";
@@ -531,7 +523,7 @@ void TopHitFitResolutionFunctions::beginJob()
 
     // Eta
     const hitfit::Resolution etaRes( vecRes.eta_res() );
-    key  = "Eta_" + to_string( count );
+    key  = "Eta_" + my::helpers::to_string( count );
     name = "MET_" + key;
     func_METResolution_[ key ] = dir_METResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxNuPt_ );
     func_METResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
@@ -543,7 +535,7 @@ void TopHitFitResolutionFunctions::beginJob()
 
     // Phi
     const hitfit::Resolution phiRes( vecRes.phi_res() );
-    key  = "Phi_" + to_string( count );
+    key  = "Phi_" + my::helpers::to_string( count );
     name = "MET_" + key;
     func_METResolution_[ key ] = dir_METResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxNuPt_ );
     func_METResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
