@@ -68,15 +68,30 @@ class TopHitFitResolutionFunctions : public edm::EDAnalyzer {
     std::string bJetResolutions_;
     // MET resolution file
     std::string metResolutions_;
-    // Lepton p_t
+    // Lepton
     unsigned binsLepPt_;
     double   maxLepPt_;
-    // Jet p_t
+    double   maxDiffLepPt_;
+    double   maxDiffLepPtInv_;
+    double   maxDiffLepPtInvRel_;
+    double   maxDiffLepEta_;
+    double   maxDiffLepPhi_;
+    // Jet
     unsigned binsJetPt_;
     double   maxJetPt_;
-    // Neutrino p_t
+    double   maxDiffJetPt_;
+    double   maxDiffJetPtInv_;
+    double   maxDiffJetPtInvRel_;
+    double   maxDiffJetEta_;
+    double   maxDiffJetPhi_;
+    // Neutrino
     unsigned binsNuPt_;
     double   maxNuPt_;
+    double   maxDiffNuPt_;
+    double   maxDiffNuPtInv_;
+    double   maxDiffNuPtInvRel_;
+    double   maxDiffNuEta_;
+    double   maxDiffNuPhi_;
 
     /// Resolution functions
     MapTF1 func_MuonResolution_;
@@ -108,10 +123,25 @@ TopHitFitResolutionFunctions::TopHitFitResolutionFunctions( const edm::Parameter
 , metResolutions_( iConfig.getParameter< std::string >( "metResolutions" ) )
 , binsLepPt_( iConfig.getParameter< unsigned >( "binsLepPt" ) )
 , maxLepPt_( iConfig.getParameter< double >( "maxLepPt" ) )
+, maxDiffLepPt_( iConfig.getParameter< double >( "maxDiffLepPt" ) )
+, maxDiffLepPtInv_( iConfig.getParameter< double >( "maxDiffLepPtInv" ) )
+, maxDiffLepPtInvRel_( iConfig.getParameter< double >( "maxDiffLepPtInvRel" ) )
+, maxDiffLepEta_( iConfig.getParameter< double >( "maxDiffLepEta" ) )
+, maxDiffLepPhi_( iConfig.getParameter< double >( "maxDiffLepPhi" ) )
 , binsJetPt_( iConfig.getParameter< unsigned >( "binsJetPt" ) )
 , maxJetPt_( iConfig.getParameter< double >( "maxJetPt" ) )
+, maxDiffJetPt_( iConfig.getParameter< double >( "maxDiffJetPt" ) )
+, maxDiffJetPtInv_( iConfig.getParameter< double >( "maxDiffJetPtInv" ) )
+, maxDiffJetPtInvRel_( iConfig.getParameter< double >( "maxDiffJetPtInvRel" ) )
+, maxDiffJetEta_( iConfig.getParameter< double >( "maxDiffJetEta" ) )
+, maxDiffJetPhi_( iConfig.getParameter< double >( "maxDiffJetPhi" ) )
 , binsNuPt_( iConfig.getParameter< unsigned >( "binsNuPt" ) )
 , maxNuPt_ ( iConfig.getParameter< double >( "maxNuPt" ) )
+, maxDiffNuPt_ ( iConfig.getParameter< double >( "maxDiffNuPt" ) )
+, maxDiffNuPtInv_ ( iConfig.getParameter< double >( "maxDiffNuPtInv" ) )
+, maxDiffNuPtInvRel_ ( iConfig.getParameter< double >( "maxDiffNuPtInvRel" ) )
+, maxDiffNuEta_ ( iConfig.getParameter< double >( "maxDiffNuEta" ) )
+, maxDiffNuPhi_ ( iConfig.getParameter< double >( "maxDiffNuPhi" ) )
   // initialise function maps
 , func_MuonResolution_()
 , func_ElectronResolution_()
@@ -181,7 +211,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_MuonResolution_[ key ] = dir_MuonResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxLepPt_ );
     func_MuonResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
     func_MuonResolution_[ key ]->SetMinimum( 0. );
-//     func_MuonResolution_[ key ]->SetMaximum( 0.2 );
+    func_MuonResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffLepPtInv_ : maxDiffLepPt_ );
     func_MuonResolution_[ key ]->SetTitle( title.c_str() );
     func_MuonResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_MuonResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
@@ -192,7 +222,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_MuonResolution_[ key ] = dir_MuonResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxLepPt_ );
     func_MuonResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
     func_MuonResolution_[ key ]->SetMinimum( 0. );
-    func_MuonResolution_[ key ]->SetMaximum( pRes.inverse() ? 0.0025 : 1. );
+    func_MuonResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffLepPtInvRel_ : 1. );
     func_MuonResolution_[ key ]->SetTitle( title.c_str() );
     func_MuonResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_MuonResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
@@ -204,7 +234,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_MuonResolution_[ key ] = dir_MuonResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
     func_MuonResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
     func_MuonResolution_[ key ]->SetMinimum( 0. );
-    func_MuonResolution_[ key ]->SetMaximum( 0.005 );
+    func_MuonResolution_[ key ]->SetMaximum( maxDiffLepEta_ );
     func_MuonResolution_[ key ]->SetTitle( title.c_str() );
     func_MuonResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_MuonResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
@@ -216,7 +246,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_MuonResolution_[ key ] = dir_MuonResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
     func_MuonResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
     func_MuonResolution_[ key ]->SetMinimum( 0. );
-    func_MuonResolution_[ key ]->SetMaximum( 0.005 );
+    func_MuonResolution_[ key ]->SetMaximum( maxDiffLepPhi_ );
     func_MuonResolution_[ key ]->SetTitle( title.c_str() );
     func_MuonResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_MuonResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
@@ -262,7 +292,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_ElectronResolution_[ key ] = dir_ElectronResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxLepPt_ );
     func_ElectronResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
     func_ElectronResolution_[ key ]->SetMinimum(  0. );
-    func_ElectronResolution_[ key ]->SetMaximum( 50. );
+    func_ElectronResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffLepPtInv_ : maxDiffLepPt_ );
     func_ElectronResolution_[ key ]->SetTitle( title.c_str() );
     func_ElectronResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_ElectronResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
@@ -273,7 +303,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_ElectronResolution_[ key ] = dir_ElectronResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxLepPt_ );
     func_ElectronResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
     func_ElectronResolution_[ key ]->SetMinimum( 0. );
-    func_ElectronResolution_[ key ]->SetMaximum( pRes.inverse() ? 0.0025 : 1. );
+    func_ElectronResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffLepPtInvRel_ : 1. );
     func_ElectronResolution_[ key ]->SetTitle( title.c_str() );
     func_ElectronResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_ElectronResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
@@ -285,7 +315,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_ElectronResolution_[ key ] = dir_ElectronResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
     func_ElectronResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
     func_ElectronResolution_[ key ]->SetMinimum( 0. );
-    func_ElectronResolution_[ key ]->SetMaximum( 0.005 );
+    func_ElectronResolution_[ key ]->SetMaximum( maxDiffLepEta_ );
     func_ElectronResolution_[ key ]->SetTitle( title.c_str() );
     func_ElectronResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_ElectronResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
@@ -297,7 +327,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_ElectronResolution_[ key ] = dir_ElectronResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxLepPt_ );
     func_ElectronResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
     func_ElectronResolution_[ key ]->SetMinimum( 0. );
-    func_ElectronResolution_[ key ]->SetMaximum( 0.005 );
+    func_ElectronResolution_[ key ]->SetMaximum( maxDiffLepPhi_ );
     func_ElectronResolution_[ key ]->SetTitle( title.c_str() );
     func_ElectronResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_ElectronResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
@@ -344,7 +374,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_UdscJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
 //     func_UdscJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
     func_UdscJetResolution_[ key ]->SetMinimum(   0. );
-    func_UdscJetResolution_[ key ]->SetMaximum( 250. );
+    func_UdscJetResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffJetPtInv_ : maxDiffJetPt_ );
     func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
     func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
@@ -356,7 +386,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_UdscJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
 //     func_UdscJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
     func_UdscJetResolution_[ key ]->SetMinimum( 0. );
-    func_UdscJetResolution_[ key ]->SetMaximum( pRes.inverse() ? 0.0025 : 1. );
+    func_UdscJetResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffJetPtInvRel_ : 1. );
     func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
     func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
@@ -369,7 +399,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_UdscJetResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
 //     func_UdscJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
     func_UdscJetResolution_[ key ]->SetMinimum( 0. );
-    func_UdscJetResolution_[ key ]->SetMaximum( 0.1 );
+    func_UdscJetResolution_[ key ]->SetMaximum( maxDiffJetEta_ );
     func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
     func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
@@ -382,7 +412,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_UdscJetResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
 //     func_UdscJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
     func_UdscJetResolution_[ key ]->SetMinimum( 0. );
-    func_UdscJetResolution_[ key ]->SetMaximum( 0.1 );
+    func_UdscJetResolution_[ key ]->SetMaximum( maxDiffJetPhi_ );
     func_UdscJetResolution_[ key ]->SetTitle( title.c_str() );
     func_UdscJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_UdscJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
@@ -429,7 +459,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_BJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
 //     func_BJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
     func_BJetResolution_[ key ]->SetMinimum(   0. );
-    func_BJetResolution_[ key ]->SetMaximum( 250. );
+    func_BJetResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffJetPtInv_ : maxDiffJetPt_ );
     func_BJetResolution_[ key ]->SetTitle( title.c_str() );
     func_BJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_BJetResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
@@ -441,7 +471,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_BJetResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
 //     func_BJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
     func_BJetResolution_[ key ]->SetMinimum( 0. );
-    func_BJetResolution_[ key ]->SetMaximum( pRes.inverse() ? 0.0025 : 1. );
+    func_BJetResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffJetPtInvRel_ : 1. );
     func_BJetResolution_[ key ]->SetTitle( title.c_str() );
     func_BJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_BJetResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
@@ -454,7 +484,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_BJetResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
 //     func_BJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
     func_BJetResolution_[ key ]->SetMinimum( 0. );
-    func_BJetResolution_[ key ]->SetMaximum( 0.1 );
+    func_BJetResolution_[ key ]->SetMaximum( maxDiffJetEta_ );
     func_BJetResolution_[ key ]->SetTitle( title.c_str() );
     func_BJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_BJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
@@ -467,7 +497,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_BJetResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
 //     func_BJetResolution_[ key ]->SetRange( 0., maxJetPt_ );
     func_BJetResolution_[ key ]->SetMinimum( 0. );
-    func_BJetResolution_[ key ]->SetMaximum( 0.1 );
+    func_BJetResolution_[ key ]->SetMaximum( maxDiffJetPhi_ );
     func_BJetResolution_[ key ]->SetTitle( title.c_str() );
     func_BJetResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_BJetResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
@@ -513,7 +543,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_METResolution_[ key ] = dir_METResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxNuPt_ );
     func_METResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
     func_METResolution_[ key ]->SetMinimum( 0. );
-//     func_METResolution_[ key ]->SetMaximum( 0.2 );
+    func_METResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffNuPtInv_ : maxDiffNuPt_ );
     func_METResolution_[ key ]->SetTitle( title.c_str() );
     func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_METResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
@@ -524,7 +554,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_METResolution_[ key ] = dir_METResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxNuPt_ );
     func_METResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
     func_METResolution_[ key ]->SetMinimum( 0. );
-    func_METResolution_[ key ]->SetMaximum( pRes.inverse() ? 0.0025 : 1. );
+    func_METResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffNuPtInvRel_ : 1. );
     func_METResolution_[ key ]->SetTitle( title.c_str() );
     func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_METResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
@@ -536,7 +566,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_METResolution_[ key ] = dir_METResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxNuPt_ );
     func_METResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
     func_METResolution_[ key ]->SetMinimum( 0. );
-//     func_METResolution_[ key ]->SetMaximum( 0.2 );
+    func_METResolution_[ key ]->SetMaximum( maxDiffNuEta_ );
     func_METResolution_[ key ]->SetTitle( title.c_str() );
     func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_METResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
@@ -548,7 +578,7 @@ void TopHitFitResolutionFunctions::beginJob()
     func_METResolution_[ key ] = dir_METResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxNuPt_ );
     func_METResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
     func_METResolution_[ key ]->SetMinimum( 0. );
-//     func_METResolution_[ key ]->SetMaximum( 0.2 );
+    func_METResolution_[ key ]->SetMaximum( maxDiffNuPhi_ );
     func_METResolution_[ key ]->SetTitle( title.c_str() );
     func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
     func_METResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );

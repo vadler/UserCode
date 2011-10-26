@@ -91,8 +91,9 @@ topHitFitAnalyzer = cms.EDAnalyzer(
 , binsDiffLepM = cms.uint32( 50 )
 , maxDiffLepM  = cms.double( 1. ) # maxGenLepM
   # Lepton p_t deviation
-, binsDiffLepPt = cms.uint32( 50 )
-, maxDiffLepPt  = cms.double( 20. )
+, binsDiffLepPt   = cms.uint32( 50 )
+, maxDiffLepPt    = cms.double( 20. )
+, maxDiffLepPtInv = cms.double( 0.008 )
   # Lepton eta deviation
 , binsDiffLepEta = cms.uint32( 50 )
 , maxDiffLepEta  = cms.double( 0.05 )
