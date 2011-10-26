@@ -63,6 +63,16 @@ class TopHitFitResolutionFunctions : public edm::EDAnalyzer {
     /// Data members
 
     /// Configuration parameters
+    // Muon resolution file
+    std::string muonResolutions_;
+    // Electron resolution file
+    std::string electronResolutions_;
+    // Light jet resolution file
+    std::string udscJetResolutions_;
+    // b-jet resolution file
+    std::string bJetResolutions_;
+    // MET resolution file
+    std::string metResolutions_;
     // Lepton p_t
     unsigned binsLepPt_;
     double   maxLepPt_;
@@ -98,7 +108,12 @@ class TopHitFitResolutionFunctions : public edm::EDAnalyzer {
 
 // Default constructor
 TopHitFitResolutionFunctions::TopHitFitResolutionFunctions( const edm::ParameterSet & iConfig )
-: binsLepPt_( iConfig.getParameter< unsigned >( "binsLepPt" ) )
+: muonResolutions_( iConfig.getParameter< std::string >( "muonResolutions" ) )
+, electronResolutions_( iConfig.getParameter< std::string >( "electronResolutions" ) )
+, udscJetResolutions_( iConfig.getParameter< std::string >( "udscJetResolutions" ) )
+, bJetResolutions_( iConfig.getParameter< std::string >( "bJetResolutions" ) )
+, metResolutions_( iConfig.getParameter< std::string >( "metResolutions" ) )
+, binsLepPt_( iConfig.getParameter< unsigned >( "binsLepPt" ) )
 , maxLepPt_( iConfig.getParameter< double >( "maxLepPt" ) )
 , binsJetPt_( iConfig.getParameter< unsigned >( "binsJetPt" ) )
 , maxJetPt_( iConfig.getParameter< double >( "maxJetPt" ) )
@@ -143,7 +158,7 @@ void TopHitFitResolutionFunctions::beginJob()
   TFileDirectory dir_MuonResolutionEta( dir_MuonResolution.mkdir( "MuonResolutionEta", "HitFit eta resolution functions for muons" ) );
   TFileDirectory dir_MuonResolutionPhi( dir_MuonResolution.mkdir( "MuonResolutionPhi", "HitFit phi resolution functions for muons" ) );
 
-  const edm::FileInPath muonResFile( "TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution.txt" );
+  const edm::FileInPath muonResFile( muonResolutions_ );
   const hitfit::EtaDepResolution muonRes( muonResFile.fullPath() );
   const std::vector< hitfit::EtaDepResElement > muonResElems( muonRes.GetEtaDepResElement() );
 
@@ -223,7 +238,7 @@ void TopHitFitResolutionFunctions::beginJob()
   TFileDirectory dir_ElectronResolutionEta( dir_ElectronResolution.mkdir( "ElectronResolutionEta", "HitFit eta resolution functions for electrons" ) );
   TFileDirectory dir_ElectronResolutionPhi( dir_ElectronResolution.mkdir( "ElectronResolutionPhi", "HitFit phi resolution functions for electrons" ) );
 
-  const edm::FileInPath electronResFile( "TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution.txt" );
+  const edm::FileInPath electronResFile( electronResolutions_ );
   const hitfit::EtaDepResolution electronRes( electronResFile.fullPath() );
   const std::vector< hitfit::EtaDepResElement > electronResElems( electronRes.GetEtaDepResElement() );
 
@@ -304,7 +319,7 @@ void TopHitFitResolutionFunctions::beginJob()
   TFileDirectory dir_UdscJetResolutionEta( dir_UdscJetResolution.mkdir( "UdscJetResolutionEta", "HitFit eta resolution functions for light jets" ) );
   TFileDirectory dir_UdscJetResolutionPhi( dir_UdscJetResolution.mkdir( "UdscJetResolutionPhi", "HitFit phi resolution functions for light jets" ) );
 
-  const edm::FileInPath udscJetResFile( "TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution.txt" );
+  const edm::FileInPath udscJetResFile( udscJetResolutions_ );
   const hitfit::EtaDepResolution udscJetRes( udscJetResFile.fullPath() );
   const std::vector< hitfit::EtaDepResElement > udscJetResElems( udscJetRes.GetEtaDepResElement() );
 
@@ -389,7 +404,7 @@ void TopHitFitResolutionFunctions::beginJob()
   TFileDirectory dir_BJetResolutionEta( dir_BJetResolution.mkdir( "BJetResolutionEta", "HitFit eta resolution functions for b-jets" ) );
   TFileDirectory dir_BJetResolutionPhi( dir_BJetResolution.mkdir( "BJetResolutionPhi", "HitFit phi resolution functions for b-jets" ) );
 
-  const edm::FileInPath bJetResFile( "TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution.txt" );
+  const edm::FileInPath bJetResFile( bJetResolutions_ );
   const hitfit::EtaDepResolution bJetRes( bJetResFile.fullPath() );
   const std::vector< hitfit::EtaDepResElement > bJetResElems( bJetRes.GetEtaDepResElement() );
 
@@ -474,7 +489,7 @@ void TopHitFitResolutionFunctions::beginJob()
   TFileDirectory dir_METResolutionEta( dir_METResolution.mkdir( "METResolutionEta", "HitFit eta resolution functions for MET" ) );
   TFileDirectory dir_METResolutionPhi( dir_METResolution.mkdir( "METResolutionPhi", "HitFit phi resolution functions forMET" ) );
 
-  const edm::FileInPath metResFile( "TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution.txt" );
+  const edm::FileInPath metResFile( metResolutions_ );
   const hitfit::EtaDepResolution metRes( metResFile.fullPath() );
   const std::vector< hitfit::EtaDepResElement > metResElems( metRes.GetEtaDepResElement() );
 

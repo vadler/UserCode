@@ -3,6 +3,19 @@ import FWCore.ParameterSet.Config as cms
 topHitFitResolutionFunctions = cms.EDAnalyzer(
   "TopHitFitResolutionFunctions"
 
+  ### Input ###
+
+  # Muon resolution file
+, muonResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution.txt' )
+  # Electron resolution file
+, electronResolutions = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution.txt' )
+  # Light jet resolution file
+, udscJetResolutions  = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution.txt' )
+  # b-jet resolution file
+, bJetResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution.txt' )
+  # MET resolution file
+, metResolutions      = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution.txt' )
+
   ### Functions ###
 
   # Lepton p_t
