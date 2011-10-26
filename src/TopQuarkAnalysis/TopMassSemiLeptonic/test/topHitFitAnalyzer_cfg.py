@@ -1,6 +1,7 @@
 import os
 import FWCore.ParameterSet.Config as cms
 
+
 ### Steering
 
 # Misc
@@ -45,7 +46,18 @@ process.MessageLogger.cerr.TtSemiLeptonicEvent = cms.untracked.PSet(
 inputFiles = [ 'rfio:%s/cms/Top/data/hitFitPatSkimPF2PAT_%s.root'%( os.getenv( "CASTOR_HOME" ), sample )
              ]
 if runTest:
-  inputFiles = [ 'file:hitFitPatSkimPF2PAT.root'
+  #inputFiles = [ 'file:hitFitPatSkimPF2PAT.root'
+               #]
+  inputFiles = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/v2/hitFitPatSkimPF2PAT_1_2_rku.root'
+               , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/v2/hitFitPatSkimPF2PAT_2_1_hGY.root'
+               , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/v2/hitFitPatSkimPF2PAT_3_1_W60.root'
+               , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/v2/hitFitPatSkimPF2PAT_4_1_oYI.root'
+               , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/v2/hitFitPatSkimPF2PAT_5_1_9Gv.root'
+               , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/v2/hitFitPatSkimPF2PAT_6_1_C1R.root'
+               , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/v2/hitFitPatSkimPF2PAT_7_1_YR9.root'
+               , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/v2/hitFitPatSkimPF2PAT_8_1_WtQ.root'
+               , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/v2/hitFitPatSkimPF2PAT_9_3_BrI.root'
+               , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/v2/hitFitPatSkimPF2PAT_10_2_tBm.root'
                ]
 process.source = cms.Source(
   "PoolSource"

@@ -14,11 +14,12 @@ runOnMC             = True
 relValMC            = 'RelValTTbar'
 #relValMC            = 'RelValZMM'
 #relValMC            = 'RelValWM'
-relValMCGlobalTag   = 'START42_V12'
+relValMCGlobalTag   = 'START44_V5'
 relValData          = 'Mu'
-relValDataGlobalTag = 'GR_R_42_V14_mu2010B'
+relValDataGlobalTag = 'GR_R_44_V5_RelVal_mu2010B'
+#relValDataGlobalTag = 'GR_R_44_V5_RelVal_wzMu2010B'
 #relValData          = 'Jet'
-#relValDataGlobalTag = 'GR_R_42_V14_jet2010B'
+#relValDataGlobalTag = 'GR_R_44_V5_jet2010B'
 
 runPartonMatch = True
 runJetMatch    = True
@@ -156,10 +157,11 @@ if runTest:
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
+from "Configuration.AlCa.autoCond" import autoCond
 if runOnMC:
-  process.GlobalTag.globaltag = 'START42_V13::All'
+  process.GlobalTag.globaltag = autoCond[ 'startup' ]
 else:
-  process.GlobalTag.globaltag = 'GR_R_42_V19::All'
+  process.GlobalTag.globaltag = autoCond[ 'com10' ]
 
 
 ### Input
@@ -181,13 +183,13 @@ sample = ''
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
   sample = relValMC
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_0'
                                                  , relVal        = relValMC
                                                  , globalTag     = relValMCGlobalTag
                                                  )
 else:
   sample = relValData
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_0'
                                                  , relVal        = relValData
                                                  , dataTier      = 'RECO'
                                                  , globalTag     = relValDataGlobalTag
