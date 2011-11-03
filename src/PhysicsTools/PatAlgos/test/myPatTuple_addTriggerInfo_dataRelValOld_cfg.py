@@ -1,7 +1,7 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-cmsswVersion = 'CMSSW_4_4_0'
-globalTag    = 'GR_R_44_V5'
+cmsswVersion = 'CMSSW_4_4_1'
+globalTag    = 'GR_R_44_V6'
 process.GlobalTag.globaltag = '%s::All'%( globalTag )
 process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                     cmsswVersion  = cmsswVersion
