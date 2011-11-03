@@ -4,8 +4,8 @@ from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 cmsswVersion = 'CMSSW_4_4_0'
 globalTag    = 'START44_V5'
 process.GlobalTag.globaltag = '%s::All'%( globalTag )
-process.source.fileNames    = pickRelValInputFiles( formerVersion = True
-                                                    #cmsswVersion  = cmsswVersion
+process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
+                                                    cmsswVersion  = cmsswVersion
                                                   , globalTag     = globalTag
                                                   )
 process.options.wantSummary = False

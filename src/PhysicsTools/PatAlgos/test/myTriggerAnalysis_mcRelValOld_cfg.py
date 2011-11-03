@@ -14,8 +14,8 @@ process.GlobalTag.globaltag = '%s::All'%( globalTag )
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    pickRelValInputFiles( formerVersion = True
-                          #cmsswVersion  = cmsswVersion
+    pickRelValInputFiles( #formerVersion = True
+                          cmsswVersion  = cmsswVersion
                         , relVal        = None
                         , dataTier      = None
                         , globalTag     = globalTag
