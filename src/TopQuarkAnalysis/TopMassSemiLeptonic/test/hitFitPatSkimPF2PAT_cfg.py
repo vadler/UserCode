@@ -14,12 +14,12 @@ runOnMC             = True
 relValMC            = 'RelValTTbar'
 #relValMC            = 'RelValZMM'
 #relValMC            = 'RelValWM'
-relValMCGlobalTag   = 'START44_V5'
+relValMCGlobalTag   = 'START44_V7'
 relValData          = 'Mu'
-relValDataGlobalTag = 'GR_R_44_V5_RelVal_mu2010B'
-#relValDataGlobalTag = 'GR_R_44_V5_RelVal_wzMu2010B'
+relValDataGlobalTag = 'GR_R_44_V7_RelVal_mu2010B'
+#relValDataGlobalTag = 'GR_R_44_V7_RelVal_wzMu2010B'
 #relValData          = 'Jet'
-#relValDataGlobalTag = 'GR_R_44_V5_jet2010B'
+#relValDataGlobalTag = 'GR_R_44_V7_jet2010B'
 
 runPartonMatch = True
 runJetMatch    = True
@@ -28,8 +28,8 @@ runEwk         = False
 
 # Trigger
 hltProcess       = 'HLT'
-#triggerSelection = 'HLT_IsoMu17 OR HLT_IsoMu17_v*'
-triggerSelection = 'HLT_IsoMu17_v*'
+#triggerSelection = 'HLT_IsoMu24 OR HLT_IsoMu24_v*'
+triggerSelection = 'HLT_IsoMu24_v*'
 
 # Vertices
 pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
@@ -157,7 +157,7 @@ if runTest:
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-from "Configuration.AlCa.autoCond" import autoCond
+from Configuration.AlCa.autoCond import autoCond
 if runOnMC:
   process.GlobalTag.globaltag = autoCond[ 'startup' ]
 else:
@@ -183,13 +183,13 @@ sample = ''
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
   sample = relValMC
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_0'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_2'
                                                  , relVal        = relValMC
                                                  , globalTag     = relValMCGlobalTag
                                                  )
 else:
   sample = relValData
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_0'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_2'
                                                  , relVal        = relValData
                                                  , dataTier      = 'RECO'
                                                  , globalTag     = relValDataGlobalTag
@@ -200,7 +200,8 @@ else:
 
 outputFile = '%s/output/hitFitPatSkimPF2PAT_%s.root'%( os.getenv( "CMSSW_BASE" ), sample )
 if runTest:
-  outputFile = 'hitFitPatSkimPF2PAT.root'
+  outputFile = outputFile.replace( 'root', 'test.root' )
+logFile = outputFile.replace( 'root', 'log' )
 
 process.out = cms.OutputModule( "PoolOutputModule"
 , fileName       = cms.untracked.string( outputFile )
@@ -712,9 +713,6 @@ print outputFile
 print
 print 'Log file destination:'
 print '---------------------'
-if runTest:
-  print 'hitFitPatSkimPF2PAT.log'
-else:
-  print '%s/output/hitFitPatSkimPF2PAT_%s.log'%( os.getenv( "CMSSW_BASE" ), sample )
+print logFile
 print '================================================================================'
 print
