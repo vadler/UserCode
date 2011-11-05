@@ -9,6 +9,8 @@ import os
 import socket
 from subprocess import *
 
+# Needed for loading DAS module
+# FIXME: Obsolete as soon as DAS module available vie "normal" 'import' statement (hopefully)
 import imp
 import urllib2
 import sys
@@ -884,11 +886,19 @@ class PickRelValInputFiles( ConfigToolBase ):
 
         filePaths = []
 
-        patchId = '_patch'
-        slhcId  = '_SLHC'
-        ibId    = '_X_'
+        # Determine corresponding CMSSW version for RelVals
+        preId      = '_pre'
+        patchId    = '_patch'    # patch releases
+        hltPatchId = '_hltpatch' # HLT patch releases
+        dqmPatchId = '_dqmpatch' # DQM patch releases
+        slhcId     = '_SLHC'     # SLHC releases
+        ibId       = '_X_'       # IBs
         if patchId in cmsswVersion:
             cmsswVersion = cmsswVersion.split( patchId )[ 0 ]
+        elif hltPatchId in cmsswVersion:
+            cmsswVersion = cmsswVersion.split( hltPatchId )[ 0 ]
+        elif dqmPatchId in cmsswVersion:
+            cmsswVersion = cmsswVersion.split( dqmPatchId )[ 0 ]
         elif slhcId in cmsswVersion:
             cmsswVersion = cmsswVersion.split( slhcId )[ 0 ]
         elif ibId in cmsswVersion or formerVersion:
@@ -908,16 +918,36 @@ class PickRelValInputFiles( ConfigToolBase ):
             for line in outputTuple[ 0 ].splitlines():
                 version = line.split()[ 1 ]
                 if cmsswVersion.split( ibId )[ 0 ] in version or cmsswVersion.rpartition( '_' )[ 0 ] in version:
-                    if not ( patchId in version or slhcId in version or ibId in version ):
+                    if not ( patchId in version or hltPatchId in version or dqmPatchId in version or slhcId in version or ibId in version ):
                         versions[ 'lastToLast' ] = versions[ 'last' ]
                         versions[ 'last' ]       = version
+                        print 'MYDEBUG: last       \'%s\''%( versions[ 'last' ] )
+                        print '         lastToLast \'%s\''%( versions[ 'lastToLast' ] )
                         if version == cmsswVersion:
                             break
+            # FIXME: ordering of output problematic ('XYZ_pre10' before 'XYZ_pre2', no "formerVersion" for 'XYZ_pre1')
             if formerVersion:
+                # Don't use pre-releases as "former version" for other releases than CMSSW_X_Y_0
+                if preId in versions[ 'lastToLast' ] and not preId in versions[ 'last' ] and not versions[ 'last' ].endswith( '_0' ):
+                    versions[ 'lastToLast' ] = versions[ 'lastToLast' ].split( preId )[ 0 ] # works only, if 'CMSSW_X_Y_0' esists ;-)
+                # Use pre-release as "former version" for CMSSW_X_Y_0
+                elif versions[ 'last' ].endswith( '_0' ) and not ( preId in versions[ 'lastToLast' ] and versions[ 'lastToLast' ].startswith( versions[ 'last' ] ) ):
+                    versions[ 'lastToLast' ] = ''
+                    for line in outputTuple[ 0 ].splitlines():
+                        version      = line.split()[ 1 ]
+                        versionParts = version.partition( preId )
+                        if versionParts[ 0 ] == versions[ 'last' ] and versionParts[ 1 ] == preId:
+                            versions[ 'lastToLast' ] = version
+                        elif versions[ 'lastToLast' ] != '':
+                            break
+                # Don't use CMSSW_X_Y_0 as "former version" for pre-releases
+                elif preId in versions[ 'last' ] and not preId in versions[ 'lastToLast' ] and versions[ 'lastToLast' ].endswith( '_0' ):
+                    versions[ 'lastToLast' ] = '' # no alternative :-(
                 cmsswVersion = versions[ 'lastToLast' ]
             else:
                 cmsswVersion = versions[ 'last' ]
 
+        # Debugging output
         if debug:
             print '%s DEBUG: Called with...'%( self._label )
             for key in self._parameters.keys():
@@ -933,6 +963,7 @@ class PickRelValInputFiles( ConfigToolBase ):
                    else:
                        print '    ==> modified to last valid release %s'%( cmsswVersion )
 
+        # Check domain
         domain = socket.getfqdn().split( '.' )
         if len( domain ) == 0:
             print '%s INFO : Cannot determine domain of this computer'%( self._label )
@@ -957,10 +988,13 @@ class PickRelValInputFiles( ConfigToolBase ):
         if debug:
             print '%s DEBUG: Running at site \'%s.%s\''%( self._label, domain[ -2 ], domain[ -1 ] )
 
+        # Load DAS module
+        # FIXME: Soon available vie "normal" 'import' statement
         das = imp.new_module( 'das' )
         exec urllib2.urlopen( 'http://cmsweb.cern.ch/das/cli' ).read() in globals(), das.__dict__
         sys.modules[ 'das' ] = das
 
+        # Find files
         dasLimit = numberOfFiles
         if dasLimit <= 0:
             dasLimit += 1
@@ -990,23 +1024,23 @@ class PickRelValInputFiles( ConfigToolBase ):
                             print '%s DEBUG: Valid version set to \'v%i\''%( self._label, validVersion )
                     if numberOfFiles == 0:
                         break
-                    # protect from double entries ( 'unique' flag does not work here)
+                    # protect from double entries ( 'unique' flag in query does not work here)
                     if not filePath in filePathsTmp:
                         filePathsTmp.append( filePath )
                         if debug:
                             print '%s DEBUG: File \'%s\' found'%( self._label, filePath )
                         fileCount += 1
-                        # needed, since "idx" and "limit" interact in 'get_data'
+                        # needed, since and "limit" overrides "idx" in 'get_data' (==> "idx" set to '0' rather than "skipFiles")
                         if fileCount > skipFiles:
                             filePaths.append( filePath )
-                    else:
-                        if debug:
-                            print '%s DEBUG: File \'%s\' found again'%( self._label, filePath )
+                    elif debug:
+                        print '%s DEBUG: File \'%s\' found again'%( self._label, filePath )
             if validVersion > 0:
                 if numberOfFiles == 0 and debug:
                     print '%s DEBUG: No files requested'%( self._label )
                 break
 
+        # Check output and return
         if validVersion == 0:
             print '%s INFO : No RelVal file(s) found at all in datasets \'%s*\''%( self._label, datasetAll )
             if debug:
