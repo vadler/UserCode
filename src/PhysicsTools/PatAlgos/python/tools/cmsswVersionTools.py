@@ -9,6 +9,14 @@ import os
 import socket
 from subprocess import *
 
+import imp
+import urllib2
+import sys
+import re
+import time
+import json
+import urllib
+
 
 ## ------------------------------------------------------
 ## Deal with backweard incompatibilities of conditions
@@ -807,7 +815,7 @@ class PickRelValInputFiles( ConfigToolBase ):
         self.addParameter( self._defaultParameters, 'dataTier'     , 'GEN-SIM-RECO'                                                      , '' )
         self.addParameter( self._defaultParameters, 'condition'    , 'startup'                                                           , '' )
         self.addParameter( self._defaultParameters, 'globalTag'    , autoCond[ self.getDefaultParameters()[ 'condition' ].value ][ : -5 ], 'auto from \'condition\'' )
-        self.addParameter( self._defaultParameters, 'maxVersions'  , 9                                                                   , '' )
+        self.addParameter( self._defaultParameters, 'maxVersions'  , 3                                                                   , '' )
         self.addParameter( self._defaultParameters, 'skipFiles'    , 0                                                                   , '' )
         self.addParameter( self._defaultParameters, 'numberOfFiles', -1                                                                  , 'all' )
         self.addParameter( self._defaultParameters, 'debug'        , False                                                               , '' )
@@ -925,9 +933,7 @@ class PickRelValInputFiles( ConfigToolBase ):
                    else:
                        print '    ==> modified to last valid release %s'%( cmsswVersion )
 
-        command   = ''
-        storage   = ''
-        domain    = socket.getfqdn().split( '.' )
+        domain = socket.getfqdn().split( '.' )
         if len( domain ) == 0:
             print '%s INFO : Cannot determine domain of this computer'%( self._label )
             if debug:
@@ -943,80 +949,150 @@ class PickRelValInputFiles( ConfigToolBase ):
             if debug:
                 self.messageEmptyList()
             return filePaths
-        if domain[ -2 ] == 'cern' and domain[ -1 ] == 'ch':
-            command = '/afs/cern.ch/project/eos/installation/pro/bin/eos.select'
-            storage = 'ls /eos/cms'
-        elif domain[ -2 ] == 'fnal' and domain[ -1 ] == 'gov':
-            command = 'ls'
-            storage = '/pnfs/cms/WAX/11'
-        else:
+        if not ( domain[ -2 ] == 'cern' and domain[ -1 ] == 'ch' ) or ( domain[ -2 ] == 'fnal' and domain[ -1 ] == 'gov' ):
             print '%s INFO : Running on site \'%s.%s\' without direct access to RelVal files'%( self._label, domain[ -2 ], domain[ -1 ] )
             if debug:
                 self.messageEmptyList()
             return filePaths
-        rfdirPath    = '/store/relval/%s/%s/%s/%s-v'%( cmsswVersion, relVal, dataTier, globalTag )
-        argument     = '%s%s'%( storage, rfdirPath )
-        validVersion = 0
         if debug:
             print '%s DEBUG: Running at site \'%s.%s\''%( self._label, domain[ -2 ], domain[ -1 ] )
-            print '    using command     \'%s\''%( command )
-            print '    on storage path   \'%s\''%( storage )
-            print '    with logical path \'%s*\''%( rfdirPath )
 
+        das = imp.new_module( 'das' )
+        exec urllib2.urlopen( 'http://cmsweb.cern.ch/das/cli' ).read() in globals(), das.__dict__
+        sys.modules[ 'das' ] = das
+
+        dasLimit = numberOfFiles
+        if dasLimit <= 0:
+            dasLimit += 1
+        validVersion = 0
+        dataset    = ''
+        datasetAll = '/%s/%s-%s-v*/%s'%( relVal, cmsswVersion, globalTag, dataTier )
         for version in range( maxVersions, 0, -1 ):
-            filePaths = []
-            fileCount = 0
+            filePaths    = []
+            filePathsTmp = []
+            fileCount    = 0
+            dataset = '/%s/%s-%s-v%i/%s'%( relVal, cmsswVersion, globalTag, version, dataTier )
             if debug:
-                print '%s DEBUG: Checking directory \'%s%i\''%( self._label, argument, version )
-            directories = Popen( [ command, '%s%i'%( argument, version ) ], stdout = PIPE, stderr = PIPE ).communicate()[0]
-            for directory in directories.splitlines():
-                if len( directory ) == 0:
-                    continue
-                if debug:
-                    print '%s DEBUG: Checking sub-directory \'%s\''%( self._label, directory )
-                files = Popen( [ command, '%s%i/%s'%( argument, version, directory ) ], stdout = PIPE, stderr = PIPE ).communicate()[0]
-                for file in files.splitlines():
-                    if len( file ) > 0 and validVersion != version:
+                print '%s DEBUG: Querying dataset \'%s\''%( self._label, dataset )
+            dasData = das.get_data( 'https://cmsweb.cern.ch', 'file dataset=%s | grep file.name'%( dataset ), 0, dasLimit, False )
+            # partially stolen from das_client.py for option '--format=plain', needs filter ("grep") in the query
+            jsondict    = json.loads( dasData )
+            mongo_query = jsondict[ 'mongo_query' ]
+            filters = mongo_query[ 'filters' ]
+            data    = jsondict[ 'data' ]
+            rows = []
+            for row in data:
+                filePath = [ r for r in das.get_value( row, filters ) ][ 0 ]
+                if len( filePath ) > 0:
+                    if validVersion != version:
                         validVersion = version
                         if debug:
                             print '%s DEBUG: Valid version set to \'v%i\''%( self._label, validVersion )
                     if numberOfFiles == 0:
                         break
-                    if len( file ) > 0:
+                    # protect from double entries ( 'unique' flag does not work here)
+                    if not filePath in filePathsTmp:
+                        filePathsTmp.append( filePath )
                         if debug:
-                            print '%s DEBUG: File \'%s\' found'%( self._label, file )
+                            print '%s DEBUG: File \'%s\' found'%( self._label, filePath )
                         fileCount += 1
+                        # needed, since "idx" and "limit" interact in 'get_data'
                         if fileCount > skipFiles:
-                            filePath = '%s%i/%s/%s'%( rfdirPath, version, directory, file )
                             filePaths.append( filePath )
-                    if numberOfFiles > 0 and len( filePaths ) >= numberOfFiles:
-                        break
-                if debug:
-                    if numberOfFiles != 0:
-                        print '%s DEBUG: %i file(s) found so far'%( self._label, fileCount )
                     else:
-                        print '%s DEBUG: No files requested'%( self._label )
-                if numberOfFiles >= 0 and len( filePaths ) >= numberOfFiles:
-                    break
-            if numberOfFiles > 0:
-                if len( filePaths ) >= numberOfFiles:
-                    break
+                        if debug:
+                            print '%s DEBUG: File \'%s\' found again'%( self._label, filePath )
             if validVersion > 0:
+                if numberOfFiles == 0 and debug:
+                    print '%s DEBUG: No files requested'%( self._label )
                 break
 
         if validVersion == 0:
-            print '%s INFO : No RelVal file(s) found at all in \'%s*\''%( self._label, argument )
+            print '%s INFO : No RelVal file(s) found at all in datasets \'%s*\''%( self._label, datasetAll )
             if debug:
                 self.messageEmptyList()
         elif len( filePaths ) == 0:
-            print '%s INFO : No RelVal file(s) picked up in \'%s%i\''%( self._label, argument, validVersion )
+            print '%s INFO : No RelVal file(s) picked up in dataset \'%s\''%( self._label, dataset )
             if debug:
                 self.messageEmptyList()
         elif len( filePaths ) < numberOfFiles:
-            print '%s INFO : Only %i RelVal files picked up in \'%s%i\''%( self._label, len( filePaths ), argument, validVersion )
+            print '%s INFO : Only %i RelVal file(s) instead of %i picked up in dataset \'%s\''%( self._label, len( filePaths ), numberOfFiles, dataset )
 
         if debug:
-            print '%s DEBUG: returning %i file(s)\n%s'%( self._label, len( filePaths ), filePaths )
+            print '%s DEBUG: returning %i file(s):\n%s'%( self._label, len( filePaths ), filePaths )
         return filePaths
+
+        #command   = ''
+        #storage   = ''
+        #if domain[ -2 ] == 'cern' and domain[ -1 ] == 'ch':
+            #command = '/afs/cern.ch/project/eos/installation/pro/bin/eos.select'
+            #storage = 'ls /eos/cms'
+        #elif domain[ -2 ] == 'fnal' and domain[ -1 ] == 'gov':
+            #command = 'ls'
+            #storage = '/pnfs/cms/WAX/11'
+        #rfdirPath    = '/store/relval/%s/%s/%s/%s-v'%( cmsswVersion, relVal, dataTier, globalTag )
+        #argument     = '%s%s'%( storage, rfdirPath )
+        #if debug:
+            #print '%s DEBUG: Running at site \'%s.%s\''%( self._label, domain[ -2 ], domain[ -1 ] )
+            #print '    using command     \'%s\''%( command )
+            #print '    on storage path   \'%s\''%( storage )
+            #print '    with logical path \'%s*\''%( rfdirPath )
+
+        #validVersion = 0
+        #for version in range( maxVersions, 0, -1 ):
+            #filePaths = []
+            #fileCount = 0
+            #if debug:
+                #print '%s DEBUG: Checking directory \'%s%i\''%( self._label, argument, version )
+            #directories = Popen( [ command, '%s%i'%( argument, version ) ], stdout = PIPE, stderr = PIPE ).communicate()[0]
+            #for directory in directories.splitlines():
+                #if len( directory ) == 0:
+                    #continue
+                #if debug:
+                    #print '%s DEBUG: Checking sub-directory \'%s\''%( self._label, directory )
+                #files = Popen( [ command, '%s%i/%s'%( argument, version, directory ) ], stdout = PIPE, stderr = PIPE ).communicate()[0]
+                #for file in files.splitlines():
+                    #if len( file ) > 0 and validVersion != version:
+                        #validVersion = version
+                        #if debug:
+                            #print '%s DEBUG: Valid version set to \'v%i\''%( self._label, validVersion )
+                    #if numberOfFiles == 0:
+                        #break
+                    #if len( file ) > 0:
+                        #if debug:
+                            #print '%s DEBUG: File \'%s\' found'%( self._label, file )
+                        #fileCount += 1
+                        #if fileCount > skipFiles:
+                            #filePath = '%s%i/%s/%s'%( rfdirPath, version, directory, file )
+                            #filePaths.append( filePath )
+                    #if numberOfFiles > 0 and len( filePaths ) >= numberOfFiles:
+                        #break
+                #if debug:
+                    #if numberOfFiles != 0:
+                        #print '%s DEBUG: %i file(s) found so far'%( self._label, fileCount )
+                    #else:
+                        #print '%s DEBUG: No files requested'%( self._label )
+                #if numberOfFiles >= 0 and len( filePaths ) >= numberOfFiles:
+                    #break
+            #if numberOfFiles > 0:
+                #if len( filePaths ) >= numberOfFiles:
+                    #break
+            #if validVersion > 0:
+                #break
+
+        #if validVersion == 0:
+            #print '%s INFO : No RelVal file(s) found at all in \'%s*\''%( self._label, argument )
+            #if debug:
+                #self.messageEmptyList()
+        #elif len( filePaths ) == 0:
+            #print '%s INFO : No RelVal file(s) picked up in \'%s%i\''%( self._label, argument, validVersion )
+            #if debug:
+                #self.messageEmptyList()
+        #elif len( filePaths ) < numberOfFiles:
+            #print '%s INFO : Only %i RelVal file(s) instead of %i picked up in dataset \'%s%i\''%( self._label, len( filePaths ), numberOfFiles, argument, validVersion )
+
+        #if debug:
+            #print '%s DEBUG: returning %i file(s):\n%s'%( self._label, len( filePaths ), filePaths )
+        #return filePaths
 
 pickRelValInputFiles = PickRelValInputFiles()
