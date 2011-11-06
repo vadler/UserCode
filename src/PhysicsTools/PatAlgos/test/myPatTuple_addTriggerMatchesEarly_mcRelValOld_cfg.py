@@ -1,7 +1,7 @@
 ## import skeleton process
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-cmsswVersion = 'CMSSW_5_0_0_pre3'
+cmsswVersion = 'CMSSW_5_0_0_pre4'
 globalTag    = 'START50_V3'
 process.GlobalTag.globaltag = '%s::All'%( globalTag )
 process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
