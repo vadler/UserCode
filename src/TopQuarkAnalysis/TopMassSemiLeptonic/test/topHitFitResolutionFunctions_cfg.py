@@ -2,12 +2,6 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 
-### Steering
-
-# Misc
-runTest = True
-
-
 ### Initialization
 
 process = cms.Process( "TEST" )
@@ -26,8 +20,6 @@ process.maxEvents = cms.untracked.PSet(
 ### Output
 
 outputFile = '%s/output/topHitFitResolutionFunctions.root'%( os.getenv( "CMSSW_BASE" ) )
-if runTest:
-  outputFile = 'topHitFitResolutionFunctions.root'
 process.TFileService = cms.Service(
   "TFileService"
 , fileName = cms.string( outputFile )
