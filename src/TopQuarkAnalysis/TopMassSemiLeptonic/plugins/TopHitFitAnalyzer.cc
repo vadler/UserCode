@@ -258,9 +258,9 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
     void fill2D_GenMatchValid( MapTH2D & hist2D, unsigned iCombi = 0 );
     void fill2D_Generator_HitFit( MapTH2D & hist2D, unsigned iCombi = 0 );
     void fill2D_Generator_HitFitValid( MapTH2D & hist2D, unsigned iCombi = 0 );
-    void fill1D_Generator_GenMatchValid( MapTH1D & hist1D, unsigned iCombi = 0 );
-    void fill2D_Generator_GenMatchValid( MapTH2D & hist2D, unsigned iCombi = 0 );
     void fill1D_GeneratorValid_HitFitValid( MapTH1D & hist1D, unsigned iCombi = 0 );
+    void fill1D_GeneratorValid_GenMatchValid( MapTH1D & hist1D, unsigned iCombi = 0 );
+    void fill2D_GeneratorValid_GenMatchValid( MapTH2D & hist2D, unsigned iCombi = 0 );
     void fill2D_GenMatch_HitFitValid( MapTH2D & hist2D, unsigned iCombi = 0 );
 
 };
@@ -821,7 +821,7 @@ void TopHitFitAnalyzer::beginJob()
   }
 
   // 2-dim
-  for ( MapTH2D::const_iterator iHist = hist2D_HitFit_.begin(); iHist != hist2D_HitFit_.end(); ++iHist ) {
+  for ( MapTH2D::const_iterator iHist = hist2D_Generator_HitFit_.begin(); iHist != hist2D_Generator_HitFit_.end(); ++iHist ) {
     std::string name__Signal( iHist->second->GetName() );
     if ( std::string( iHist->second->GetName() ).substr( 10, strHitFit.size() ) == strHitFit )
       hist2D_Generator_HitFit__Signal_[ iHist->first ] = dir_Generator_HitFit__Signal.make< TH2D >( *( ( TH2D* )( iHist->second->Clone( name__Signal.append( "__Signal" ).c_str() ) ) ) );
@@ -1063,8 +1063,8 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
         fill1D_GenMatchValid( hist1D_GenMatch__Signal_ );
         fill2D_GenMatchValid( hist2D_GenMatch__Signal_ );
         // Filling histos for GenMatch (valid), comparing to generator info
-        fill1D_Generator_GenMatchValid( hist1D_Generator_GenMatch__Signal_ );
-        fill2D_Generator_GenMatchValid( hist2D_Generator_GenMatch__Signal_ );
+        fill1D_GeneratorValid_GenMatchValid( hist1D_Generator_GenMatch__Signal_ );
+        fill2D_GeneratorValid_GenMatchValid( hist2D_Generator_GenMatch__Signal_ );
       }
 
       // Fill HitFit histos for signal
@@ -1076,13 +1076,13 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
       if ( hitFitHypoFound_ >= 0 ) {
         fill1D_HitFit( hist1D_HitFitFound__Signal_, hitFitHypoFound_ );
         // Filling HitFit histos for signal, using generator info
-//         fill2D_Generator_HitFit( hist2D_Generator_HitFitFound__Signal_, hitFitHypoFound_ );
+        fill2D_Generator_HitFit( hist2D_Generator_HitFitFound__Signal_, hitFitHypoFound_ );
       }
       // Best HitFit hypo corresponding to GenMatch
       if ( hitFitHypoFound_ == 0 ) {
         fill1D_HitFit( hist1D_HitFitGood__Signal_ );
         // Filling HitFit histos for signal, using generator info
-//         fill2D_Generator_HitFit( hist2D_Generator_HitFitGood__Signal_ );
+        fill2D_Generator_HitFit( hist2D_Generator_HitFitGood__Signal_ );
       }
       // Fill HitFit histos for signal and valid hypo
       if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kHitFit ) ) {
@@ -1092,7 +1092,7 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
         fill2D_HitFitValid( hist2D_HitFit__SignalTau_ );
         // Filling HitFit (valid) histos, using generator info
         fill1D_GeneratorValid_HitFitValid( hist1D_Generator_HitFit__Signal_ );
-//         fill2D_Generator_HitFitValid( hist2D_Generator_HitFit__Signal_ );
+        fill2D_Generator_HitFitValid( hist2D_Generator_HitFit__Signal_ );
         // Any valid HitFit hypo corresponding to GenMatch
         if ( hitFitHypoFound_ >= 0 ) {
           fill1D_HitFitValid( hist1D_HitFitFound__Signal_, hitFitHypoFound_ );
@@ -1101,7 +1101,7 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
           fill2D_GenMatch_HitFitValid( hist2D_GenMatch_HitFitGood__Signal_, hitFitHypoFound_ );
           // Filling HitFit (valid) histos, using generator info
           fill1D_GeneratorValid_HitFitValid( hist1D_Generator_HitFitFound__Signal_, hitFitHypoFound_ );
-//           fill2D_Generator_HitFitValid( hist2D_Generator_HitFitFound__Signal_, hitFitHypoFound_ );
+          fill2D_Generator_HitFitValid( hist2D_Generator_HitFitFound__Signal_, hitFitHypoFound_ );
         }
         // Best valid HitFit hypo corresponding to GenMatch
         if ( hitFitHypoFound_ == 0 ) {
@@ -1109,7 +1109,7 @@ void TopHitFitAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSetu
           fill2D_HitFitValid( hist2D_HitFitGood__Signal_ );
           // Filling HitFit (valid) histos, using generator info
           fill1D_GeneratorValid_HitFitValid( hist1D_Generator_HitFitGood__Signal_ );
-//           fill2D_Generator_HitFitValid( hist2D_Generator_HitFitGood__Signal_ );
+          fill2D_Generator_HitFitValid( hist2D_Generator_HitFitGood__Signal_ );
         }
       }
 
@@ -1489,32 +1489,6 @@ void TopHitFitAnalyzer::fill2D_Generator_HitFitValid( MapTH2D & hist2D, unsigned
 
 }
 
-// Filling 1D histos for GenMatch (valid), comparing to generator info
-void TopHitFitAnalyzer::fill1D_Generator_GenMatchValid( MapTH1D & hist1D, unsigned iCombi )
-{
-
-  // Differenz of reconstructed lepton p_T from generated one
-  hist1D[ "DiffLepPt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleLepton()->pt() );
-  // Differenz of reconstructed  inverse lepton p_T from generated one
-  hist1D[ "DiffLepPtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->singleLepton()->pt() ) );
-
-  return;
-
-}
-
-// Filling 2D histos for GenMatch (valid), comparing to generator info
-void TopHitFitAnalyzer::fill2D_Generator_GenMatchValid( MapTH2D & hist2D, unsigned iCombi )
-{
-
-  // Differenz of reconstructed lepton p_T from generated one vs. reconstructed one
-  hist2D[ "LepPt_DiffLepPt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleLepton()->pt() );
-  // Differenz of reconstructed  inverse lepton p_T from generated one vs. reconstructed one
-  hist2D[ "LepPt_DiffLepPtInv" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), 1./( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->singleLepton()->pt() ) );
-
-  return;
-
-}
-
 // Filling 1D HitFit (valid) histos, comparing to generator signal info
 void TopHitFitAnalyzer::fill1D_GeneratorValid_HitFitValid( MapTH1D & hist1D, unsigned iCombi )
 {
@@ -1532,6 +1506,32 @@ void TopHitFitAnalyzer::fill1D_GeneratorValid_HitFitValid( MapTH1D & hist1D, uns
   hist1D[ "DiffNuPhi" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->phi() - ttGenEvent_->singleNeutrino()->phi() );
   hist1D[ "DiffNuPz" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kHitFit )->pz() - ttGenEvent_->singleNeutrino()->pz() );
   hist1D[ "DiffTopHadM" ]->Fill( ttSemiLeptonicEvent_->hitFitMT( iCombi ) - ttGenEvent_->hadronicDecayTop()->mass() );
+
+  return;
+
+}
+
+// Filling 1D histos for GenMatch (valid), comparing to generator info
+void TopHitFitAnalyzer::fill1D_GeneratorValid_GenMatchValid( MapTH1D & hist1D, unsigned iCombi )
+{
+
+  // Differenz of reconstructed lepton p_T from generated one
+  hist1D[ "DiffLepPt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleLepton()->pt() );
+  // Differenz of reconstructed  inverse lepton p_T from generated one
+  hist1D[ "DiffLepPtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->singleLepton()->pt() ) );
+
+  return;
+
+}
+
+// Filling 2D histos for GenMatch (valid), comparing to generator info
+void TopHitFitAnalyzer::fill2D_GeneratorValid_GenMatchValid( MapTH2D & hist2D, unsigned iCombi )
+{
+
+  // Differenz of reconstructed lepton p_T from generated one vs. reconstructed one
+  hist2D[ "LepPt_DiffLepPt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleLepton()->pt() );
+  // Differenz of reconstructed  inverse lepton p_T from generated one vs. reconstructed one
+  hist2D[ "LepPt_DiffLepPtInv" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), 1./( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->singleLepton()->pt() ) );
 
   return;
 
