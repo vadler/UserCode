@@ -44,9 +44,9 @@ topHitFitResolutionFunctions = cms.EDAnalyzer(
 
   # Neutrino #
 , binsNuPt = cms.uint32(  50 )
-, maxNuPt  = cms.double( 250. )
+, maxNuPt  = cms.double( 500. )
   # Neutrino p_t
-, maxDiffNuPt       = cms.double( 50. )
+, maxDiffNuPt       = cms.double( 25. )
 , maxDiffNuPtInv    = cms.double(  0.004 )
 , maxDiffNuPtInvRel = cms.double(  0.0025 )
   # Neutrino eta

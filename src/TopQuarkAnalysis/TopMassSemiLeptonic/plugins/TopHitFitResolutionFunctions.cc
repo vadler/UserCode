@@ -509,82 +509,38 @@ void TopHitFitResolutionFunctions::beginJob()
 
   TFileDirectory dir_METResolution( dir_Resolution.mkdir( "METResolution", "HitFit resolution functions for MET" ) );
   TFileDirectory dir_METResolutionP( dir_METResolution.mkdir( "METResolutionP", "HitFit momentum resolution functions for MET" ) );
-  TFileDirectory dir_METResolutionEta( dir_METResolution.mkdir( "METResolutionEta", "HitFit eta resolution functions for MET" ) );
-  TFileDirectory dir_METResolutionPhi( dir_METResolution.mkdir( "METResolutionPhi", "HitFit phi resolution functions forMET" ) );
 
   const edm::FileInPath metResFile( metResolutions_ );
-  const hitfit::EtaDepResolution metRes( metResFile.fullPath() );
-  const std::vector< hitfit::EtaDepResElement > metResElems( metRes.GetEtaDepResElement() );
-
-  count = 0;
-  for ( unsigned iResEl = 0; iResEl < metResElems.size(); ++iResEl ) {
-
-    const hitfit::Vector_Resolution vecRes( metResElems.at( iResEl ).GetResolution() );
-
-    const double etaMin( metResElems.at( iResEl ).EtaMin() );
-    const double etaMax( metResElems.at( iResEl ).EtaMax() );
-    // positive eta only, since everything is symmetric
-    if ( etaMin < 0. && etaMax <= 0. ) continue;
-
-    std::string title( my::helpers::to_string( etaMin ) + " #leq #eta #leq " + my::helpers::to_string( etaMax ) );
-
-    // Momentum
-    const hitfit::Resolution pRes( vecRes.p_res() );
-    std::string key( "P_" + my::helpers::to_string( count ) );
-    std::string name( "MET_" + key );
-    std::string xAxisTitle( "p" );
-    if ( vecRes.use_et() ) xAxisTitle += "_{t}";
-    std::string yAxisTitle( "#sigma_{" + xAxisTitle + "}" );
-    xAxisTitle += " (GeV)";
-//     std::string function;
-//     if ( pRes.inverse() ) function = vecRes.use_et() ? funcResEtInv : funcResInv;
-//     else                  function = vecRes.use_et() ? funcResEt    : funcRes;
-    std::string function( pRes.inverse() ? funcResInv : funcRes );
-    func_METResolution_[ key ] = dir_METResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxNuPt_ );
-    func_METResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
-    func_METResolution_[ key ]->SetMinimum( 0. );
-    func_METResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffNuPtInv_ : maxDiffNuPt_ );
-    func_METResolution_[ key ]->SetTitle( title.c_str() );
-    func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
-    func_METResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
-    key  += "_Rel";
-    name += "_Rel";
-    yAxisTitle = "#frac{" + yAxisTitle + "}{" + xAxisTitle + "}";
-    function = "(" + function + ( pRes.inverse() ? ")*x" : ")/x" );
-    func_METResolution_[ key ] = dir_METResolutionP.make< TF1 >( name.c_str(), function.c_str(), 0., maxNuPt_ );
-    func_METResolution_[ key ]->SetParameters( pRes.C(), pRes.R(), pRes.N(), std::min( std::fabs( etaMin ), std::fabs( etaMax ) ) );
-    func_METResolution_[ key ]->SetMinimum( 0. );
-    func_METResolution_[ key ]->SetMaximum( pRes.inverse() ? maxDiffNuPtInvRel_ : 1. );
-    func_METResolution_[ key ]->SetTitle( title.c_str() );
-    func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
-    func_METResolution_[ key ]->GetYaxis()->SetTitle( yAxisTitle.c_str() );
-
-    // Eta
-    const hitfit::Resolution etaRes( vecRes.eta_res() );
-    key  = "Eta_" + my::helpers::to_string( count );
-    name = "MET_" + key;
-    func_METResolution_[ key ] = dir_METResolutionEta.make< TF1 >( name.c_str(), etaRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxNuPt_ );
-    func_METResolution_[ key ]->SetParameters( etaRes.C(), etaRes.R(), etaRes.N() );
-    func_METResolution_[ key ]->SetMinimum( 0. );
-    func_METResolution_[ key ]->SetMaximum( maxDiffNuEta_ );
-    func_METResolution_[ key ]->SetTitle( title.c_str() );
-    func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
-    func_METResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#eta}" );
-
-    // Phi
-    const hitfit::Resolution phiRes( vecRes.phi_res() );
-    key  = "Phi_" + my::helpers::to_string( count );
-    name = "MET_" + key;
-    func_METResolution_[ key ] = dir_METResolutionPhi.make< TF1 >( name.c_str(), phiRes.inverse() ? funcResInv.c_str() : funcRes.c_str(), 0., maxNuPt_ );
-    func_METResolution_[ key ]->SetParameters( phiRes.C(), phiRes.R(), phiRes.N() );
-    func_METResolution_[ key ]->SetMinimum( 0. );
-    func_METResolution_[ key ]->SetMaximum( maxDiffNuPhi_ );
-    func_METResolution_[ key ]->SetTitle( title.c_str() );
-    func_METResolution_[ key ]->GetXaxis()->SetTitle( xAxisTitle.c_str() );
-    func_METResolution_[ key ]->GetYaxis()->SetTitle( "#sigma_{#phi}" );
-
-    ++count;
-  }
+  const hitfit::Defaults_Text metDefs( metResFile.fullPath() );
+  const hitfit::Resolution metRes( metDefs.get_string( "met_resolution" ) );
+  std::string metTitle( "no #eta-dependence" );
+  std::string metKey( "P" );
+  std::string metName( "MET_" + metKey );
+  std::string metXAxisTitle( "p_{t}" );
+  std::string metYAxisTitle( "#sigma_{" + metXAxisTitle + "}" );
+  metXAxisTitle += " (GeV)";
+//   std::string metFunction;
+//   if ( metRes.inverse() ) metFunction = vecRes.use_et() ? funcResEtInv : funcResInv;
+//   else                  metFunction = vecRes.use_et() ? funcResEt    : funcRes;
+  std::string metFunction( metRes.inverse() ? funcResInv : funcRes );
+  func_METResolution_[ metKey ] = dir_METResolutionP.make< TF1 >( metName.c_str(), metFunction.c_str(), 0., maxNuPt_ );
+  func_METResolution_[ metKey ]->SetParameters( metRes.C(), metRes.R(), metRes.N() );
+  func_METResolution_[ metKey ]->SetMinimum( 0. );
+  func_METResolution_[ metKey ]->SetMaximum( metRes.inverse() ? maxDiffNuPtInv_ : maxDiffNuPt_ );
+  func_METResolution_[ metKey ]->SetTitle( metTitle.c_str() );
+  func_METResolution_[ metKey ]->GetXaxis()->SetTitle( metXAxisTitle.c_str() );
+  func_METResolution_[ metKey ]->GetYaxis()->SetTitle( metYAxisTitle.c_str() );
+  metKey  += "_Rel";
+  metName += "_Rel";
+  metYAxisTitle = "#frac{" + metYAxisTitle + "}{" + metXAxisTitle + "}";
+  metFunction = "(" + metFunction + ( metRes.inverse() ? ")*x" : ")/x" );
+  func_METResolution_[ metKey ] = dir_METResolutionP.make< TF1 >( metName.c_str(), metFunction.c_str(), 0., maxNuPt_ );
+  func_METResolution_[ metKey ]->SetParameters( metRes.C(), metRes.R(), metRes.N() );
+  func_METResolution_[ metKey ]->SetMinimum( 0. );
+  func_METResolution_[ metKey ]->SetMaximum( metRes.inverse() ? maxDiffNuPtInvRel_ : 1. );
+  func_METResolution_[ metKey ]->SetTitle( metTitle.c_str() );
+  func_METResolution_[ metKey ]->GetXaxis()->SetTitle( metXAxisTitle.c_str() );
+  func_METResolution_[ metKey ]->GetYaxis()->SetTitle( metYAxisTitle.c_str() );
 
 }
 
