@@ -1,422 +1,422 @@
 import os
 import FWCore.ParameterSet.Config as cms
 
-filesCastor = [ 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_100_1_Ppd.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_100_3_1g7.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_101_1_yyx.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_102_2_akm.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_103_0_5Rf.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_104_1_xPB.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_105_1_Mb2.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_105_4_ufm.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_106_1_hGw.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_107_2_63J.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_107_4_YeP.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_108_1_XCb.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_109_0_sBp.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_10_1_bzq.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_110_0_ob9.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_111_0_0RS.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_112_2_Lse.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_113_0_jZo.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_114_0_BvD.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_115_0_i72.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_116_0_aNw.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_117_0_gmd.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_118_0_Wfj.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_118_0_zfB.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_119_0_btG.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_11_1_1ja.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_120_0_0CG.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_121_0_2yk.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_122_0_yxm.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_123_0_Aqi.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_124_0_TOo.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_125_0_HBG.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_126_0_DFl.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_127_0_KFr.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_128_0_CRR.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_129_0_iNZ.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_12_0_Zin.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_130_0_UU6.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_131_0_Sot.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_132_0_f4H.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_133_0_TF6.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_134_0_y0l.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_135_0_TzR.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_136_0_qj0.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_137_0_b2O.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_137_0_vIi.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_138_0_hWz.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_139_0_9Bq.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_13_2_xgM.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_13_5_RbH.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_140_0_g0a.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_141_0_Zdz.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_142_0_zUc.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_143_0_1YI.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_144_0_BaK.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_145_0_Ab5.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_146_0_2CB.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_147_0_9Hs.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_148_0_Dwc.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_148_0_Wab.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_149_0_lNm.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_14_0_2jl.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_150_0_qKR.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_151_0_2Tg.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_151_0_AlO.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_152_0_dPp.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_153_0_2YE.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_154_0_tek.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_155_0_q49.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_156_0_es6.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_156_0_iJI.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_157_0_pTU.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_158_0_lf2.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_159_0_4Yq.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_15_0_7pf.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_160_0_q5H.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_161_0_ZJx.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_162_0_6vX.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_163_0_oYh.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_164_0_q9f.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_165_0_gW2.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_166_0_80c.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_167_0_zgr.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_168_0_7V6.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_169_0_l8Q.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_16_1_cq7.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_170_0_b5z.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_171_0_ANQ.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_172_0_5F9.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_173_0_2El.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_174_0_v4e.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_175_0_vf3.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_176_0_Ajo.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_176_0_Vdk.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_177_0_S29.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_178_0_gGE.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_179_0_43w.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_17_0_FBR.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_180_0_hG9.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_181_0_26M.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_182_0_W9O.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_183_0_HvX.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_184_0_QcZ.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_185_0_DKL.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_186_0_RV7.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_187_0_ipo.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_188_0_oXZ.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_189_0_ZFX.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_18_1_zZp.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_190_0_NwZ.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_191_0_nou.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_192_0_8Zh.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_193_0_6iM.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_193_0_vaA.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_194_0_PlZ.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_195_0_bM5.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_196_0_qB8.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_197_0_71Z.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_198_0_Ish.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_199_0_Bgw.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_19_2_O5Y.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_1_1_F7S.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_200_0_Prj.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_200_0_i0T.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_201_0_fub.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_202_0_vCh.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_203_0_Me5.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_204_0_MtZ.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_204_0_Xk7.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_205_1_WC8.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_206_0_ca5.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_207_0_SGl.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_208_0_ioB.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_209_0_H6b.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_209_0_q9V.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_20_1_vkr.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_210_0_vpa.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_211_0_wT3.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_212_0_v93.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_213_0_VA5.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_214_0_17O.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_215_0_h9e.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_216_0_9J9.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_217_0_mQM.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_218_0_Af0.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_219_0_jDC.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_21_0_opV.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_220_0_6XH.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_221_0_vnP.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_222_0_Vp0.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_223_0_H6y.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_224_0_dmi.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_225_0_EZf.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_226_0_5Ga.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_227_0_tP9.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_228_0_ZEY.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_229_0_ZED.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_22_0_HRj.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_230_0_el7.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_231_0_8LF.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_232_0_i9c.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_233_0_Vjf.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_234_0_i0y.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_235_0_32J.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_236_0_I5P.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_237_0_rZq.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_238_0_wn9.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_239_0_52L.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_23_1_Tpg.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_23_3_AQC.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_240_0_ZOd.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_241_0_kdI.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_242_0_xRB.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_243_0_8mI.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_244_0_Nq3.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_245_0_VUu.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_246_0_AIN.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_247_0_dtA.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_248_0_ksh.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_249_0_XLW.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_24_0_3vO.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_250_0_CTk.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_251_0_e7c.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_252_0_Be5.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_253_0_qRw.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_254_0_o44.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_255_0_uia.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_256_0_vFW.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_257_0_FUx.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_258_0_Xn9.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_259_0_qhh.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_25_1_xn1.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_260_0_ug5.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_261_0_Mh4.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_262_0_Mmc.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_263_0_AwF.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_264_0_dpL.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_265_0_vx8.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_266_0_sha.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_267_0_1uD.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_268_0_zDW.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_269_0_uFJ.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_26_0_LSU.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_270_0_AzR.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_271_0_cfb.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_272_0_WMX.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_273_0_Wni.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_274_0_IdJ.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_275_0_3Vg.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_276_0_OJB.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_277_0_UmO.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_278_0_PFP.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_279_0_rJm.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_27_1_GUf.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_27_2_2xV.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_280_0_Aj2.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_281_0_74i.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_282_0_vYF.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_283_0_MPB.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_284_0_eU5.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_285_0_50e.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_286_0_QV6.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_287_0_RnI.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_288_0_BAp.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_289_0_49h.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_28_2_Czx.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_28_4_gWg.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_290_0_0VA.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_291_0_xZj.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_292_0_EI5.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_293_0_mDS.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_294_0_oCh.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_295_0_qUo.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_296_0_4ag.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_297_0_PJn.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_298_0_bup.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_299_0_k77.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_29_0_N7J.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_2_1_SNG.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_300_0_d45.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_301_0_Ccw.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_302_0_eA9.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_303_0_R5c.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_304_0_EUP.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_305_0_6Ph.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_306_0_3Pj.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_307_0_yMe.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_308_0_t9p.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_309_0_62o.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_30_0_hr9.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_310_0_oRt.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_311_0_d40.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_312_0_fnJ.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_312_0_kMh.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_313_0_qn3.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_314_0_6E8.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_315_0_HEj.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_316_0_pe1.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_317_0_nMG.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_318_0_0ex.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_318_0_7Qa.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_319_0_S5A.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_31_1_Fcl.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_320_0_0Tp.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_321_0_zUa.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_322_0_HAe.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_323_0_TJ6.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_324_0_jCG.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_325_0_L4H.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_326_1_Ae5.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_327_0_0BS.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_328_0_YJ2.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_329_0_S4E.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_32_1_vqa.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_330_0_SK3.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_331_0_Gn4.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_332_0_DR8.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_333_0_Kmt.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_334_0_fE0.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_335_0_ptL.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_336_0_SJb.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_337_0_roL.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_338_0_e6M.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_339_0_zh4.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_33_1_7mF.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_340_0_yX1.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_341_0_Q9O.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_342_0_YcI.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_343_0_ir9.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_344_0_Eqj.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_345_0_jkP.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_346_0_Plq.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_347_0_SiS.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_348_0_Gmm.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_349_0_H6r.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_349_0_JWU.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_34_2_10X.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_350_0_Nk7.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_351_0_Trv.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_352_0_4YG.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_353_0_UY3.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_354_0_EsL.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_355_0_vez.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_356_0_yf8.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_357_0_hLd.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_358_0_sbr.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_359_0_R0j.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_35_0_bxU.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_360_0_E7G.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_361_0_kdA.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_362_0_Gy4.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_363_0_Y1D.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_364_0_Inw.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_365_0_ACA.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_366_0_G15.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_367_0_sD9.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_368_0_S5U.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_369_0_uur.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_36_1_S3D.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_370_0_unC.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_371_1_P39.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_372_0_RGe.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_373_0_tPR.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_374_0_SBx.roo'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_37_0_BvE.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_38_1_uSY.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_39_2_EoD.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_3_2_WiX.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_40_2_iuU.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_40_5_jve.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_41_0_CcR.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_42_0_0oE.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_43_0_Qer.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_44_1_hBg.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_44_4_2G9.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_45_0_1LD.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_46_3_u8z.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_47_0_haS.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_48_0_3hZ.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_49_0_jQG.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_4_2_36N.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_50_1_ANp.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_51_0_gnc.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_52_0_rDY.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_53_2_BKv.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_54_2_Txx.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_55_2_1tW.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_56_0_lpV.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_57_2_bhc.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_57_4_DGe.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_58_3_kUP.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_59_2_lcM.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_5_0_M7E.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_60_5_4SD.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_61_2_I6e.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_62_2_fkQ.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_62_6_yOK.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_63_0_Xka.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_64_0_XSw.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_65_1_Rlt.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_66_0_h1e.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_67_2_FQB.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_67_4_Og3.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_68_2_P55.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_68_4_ai7.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_69_5_gxA.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_6_0_X5s.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_70_1_q9A.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_70_2_aL8.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_71_0_EZP.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_72_1_mby.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_73_0_Bhg.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_74_0_rEO.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_75_2_kaC.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_75_4_viU.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_76_2_zhL.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_76_4_N8G.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_77_1_Ech.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_78_1_4yy.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_79_2_F7L.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_7_5_yrO.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_80_0_lDi.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_81_1_drn.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_81_3_R7J.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_82_1_LDc.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_83_1_DCI.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_84_0_ofO.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_85_0_UIP.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_86_2_7Pl.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_87_1_zWe.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_88_0_J5o.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_89_1_JNN.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_8_2_TKC.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_90_2_Adz.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_90_6_62d.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_91_1_6sD.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_92_1_uhA.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_92_2_Zah.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_93_0_EnT.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_94_2_mkJ.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_95_1_se8.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_96_0_YSq.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_97_1_qOM.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_98_1_y4O.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_99_0_kTo.root'%( os.getenv( "CASTOR_HOME" ) )
-              , 'rfio:%s/cms/Top/CMSSW_4_4_1/hitFitPatSkimPF2PAT_9_0_bMJ.root'%( os.getenv( "CASTOR_HOME" ) )
+filesCastor = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_100_1_Ppd.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_100_3_1g7.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_101_1_yyx.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_102_2_akm.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_103_0_5Rf.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_104_1_xPB.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_105_1_Mb2.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_105_4_ufm.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_106_1_hGw.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_107_2_63J.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_107_4_YeP.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_108_1_XCb.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_109_0_sBp.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_10_1_bzq.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_110_0_ob9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_111_0_0RS.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_112_2_Lse.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_113_0_jZo.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_114_0_BvD.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_115_0_i72.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_116_0_aNw.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_117_0_gmd.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_118_0_Wfj.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_118_0_zfB.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_119_0_btG.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_11_1_1ja.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_120_0_0CG.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_121_0_2yk.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_122_0_yxm.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_123_0_Aqi.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_124_0_TOo.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_125_0_HBG.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_126_0_DFl.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_127_0_KFr.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_128_0_CRR.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_129_0_iNZ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_12_0_Zin.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_130_0_UU6.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_131_0_Sot.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_132_0_f4H.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_133_0_TF6.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_134_0_y0l.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_135_0_TzR.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_136_0_qj0.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_137_0_b2O.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_137_0_vIi.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_138_0_hWz.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_139_0_9Bq.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_13_2_xgM.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_13_5_RbH.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_140_0_g0a.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_141_0_Zdz.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_142_0_zUc.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_143_0_1YI.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_144_0_BaK.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_145_0_Ab5.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_146_0_2CB.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_147_0_9Hs.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_148_0_Dwc.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_148_0_Wab.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_149_0_lNm.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_14_0_2jl.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_150_0_qKR.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_151_0_2Tg.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_151_0_AlO.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_152_0_dPp.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_153_0_2YE.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_154_0_tek.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_155_0_q49.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_156_0_es6.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_156_0_iJI.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_157_0_pTU.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_158_0_lf2.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_159_0_4Yq.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_15_0_7pf.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_160_0_q5H.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_161_0_ZJx.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_162_0_6vX.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_163_0_oYh.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_164_0_q9f.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_165_0_gW2.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_166_0_80c.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_167_0_zgr.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_168_0_7V6.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_169_0_l8Q.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_16_1_cq7.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_170_0_b5z.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_171_0_ANQ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_172_0_5F9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_173_0_2El.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_174_0_v4e.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_175_0_vf3.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_176_0_Ajo.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_176_0_Vdk.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_177_0_S29.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_178_0_gGE.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_179_0_43w.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_17_0_FBR.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_180_0_hG9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_181_0_26M.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_182_0_W9O.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_183_0_HvX.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_184_0_QcZ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_185_0_DKL.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_186_0_RV7.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_187_0_ipo.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_188_0_oXZ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_189_0_ZFX.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_18_1_zZp.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_190_0_NwZ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_191_0_nou.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_192_0_8Zh.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_193_0_6iM.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_193_0_vaA.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_194_0_PlZ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_195_0_bM5.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_196_0_qB8.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_197_0_71Z.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_198_0_Ish.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_199_0_Bgw.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_19_2_O5Y.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_1_1_F7S.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_200_0_Prj.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_200_0_i0T.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_201_0_fub.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_202_0_vCh.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_203_0_Me5.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_204_0_MtZ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_204_0_Xk7.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_205_1_WC8.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_206_0_ca5.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_207_0_SGl.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_208_0_ioB.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_209_0_H6b.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_209_0_q9V.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_20_1_vkr.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_210_0_vpa.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_211_0_wT3.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_212_0_v93.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_213_0_VA5.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_214_0_17O.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_215_0_h9e.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_216_0_9J9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_217_0_mQM.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_218_0_Af0.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_219_0_jDC.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_21_0_opV.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_220_0_6XH.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_221_0_vnP.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_222_0_Vp0.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_223_0_H6y.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_224_0_dmi.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_225_0_EZf.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_226_0_5Ga.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_227_0_tP9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_228_0_ZEY.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_229_0_ZED.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_22_0_HRj.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_230_0_el7.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_231_0_8LF.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_232_0_i9c.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_233_0_Vjf.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_234_0_i0y.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_235_0_32J.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_236_0_I5P.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_237_0_rZq.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_238_0_wn9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_239_0_52L.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_23_1_Tpg.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_23_3_AQC.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_240_0_ZOd.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_241_0_kdI.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_242_0_xRB.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_243_0_8mI.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_244_0_Nq3.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_245_0_VUu.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_246_0_AIN.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_247_0_dtA.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_248_0_ksh.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_249_0_XLW.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_24_0_3vO.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_250_0_CTk.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_251_0_e7c.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_252_0_Be5.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_253_0_qRw.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_254_0_o44.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_255_0_uia.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_256_0_vFW.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_257_0_FUx.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_258_0_Xn9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_259_0_qhh.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_25_1_xn1.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_260_0_ug5.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_261_0_Mh4.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_262_0_Mmc.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_263_0_AwF.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_264_0_dpL.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_265_0_vx8.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_266_0_sha.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_267_0_1uD.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_268_0_zDW.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_269_0_uFJ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_26_0_LSU.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_270_0_AzR.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_271_0_cfb.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_272_0_WMX.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_273_0_Wni.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_274_0_IdJ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_275_0_3Vg.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_276_0_OJB.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_277_0_UmO.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_278_0_PFP.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_279_0_rJm.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_27_1_GUf.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_27_2_2xV.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_280_0_Aj2.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_281_0_74i.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_282_0_vYF.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_283_0_MPB.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_284_0_eU5.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_285_0_50e.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_286_0_QV6.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_287_0_RnI.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_288_0_BAp.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_289_0_49h.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_28_2_Czx.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_28_4_gWg.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_290_0_0VA.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_291_0_xZj.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_292_0_EI5.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_293_0_mDS.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_294_0_oCh.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_295_0_qUo.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_296_0_4ag.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_297_0_PJn.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_298_0_bup.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_299_0_k77.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_29_0_N7J.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_2_1_SNG.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_300_0_d45.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_301_0_Ccw.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_302_0_eA9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_303_0_R5c.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_304_0_EUP.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_305_0_6Ph.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_306_0_3Pj.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_307_0_yMe.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_308_0_t9p.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_309_0_62o.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_30_0_hr9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_310_0_oRt.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_311_0_d40.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_312_0_fnJ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_312_0_kMh.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_313_0_qn3.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_314_0_6E8.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_315_0_HEj.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_316_0_pe1.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_317_0_nMG.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_318_0_0ex.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_318_0_7Qa.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_319_0_S5A.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_31_1_Fcl.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_320_0_0Tp.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_321_0_zUa.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_322_0_HAe.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_323_0_TJ6.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_324_0_jCG.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_325_0_L4H.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_326_1_Ae5.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_327_0_0BS.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_328_0_YJ2.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_329_0_S4E.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_32_1_vqa.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_330_0_SK3.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_331_0_Gn4.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_332_0_DR8.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_333_0_Kmt.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_334_0_fE0.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_335_0_ptL.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_336_0_SJb.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_337_0_roL.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_338_0_e6M.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_339_0_zh4.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_33_1_7mF.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_340_0_yX1.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_341_0_Q9O.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_342_0_YcI.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_343_0_ir9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_344_0_Eqj.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_345_0_jkP.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_346_0_Plq.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_347_0_SiS.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_348_0_Gmm.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_349_0_H6r.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_349_0_JWU.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_34_2_10X.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_350_0_Nk7.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_351_0_Trv.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_352_0_4YG.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_353_0_UY3.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_354_0_EsL.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_355_0_vez.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_356_0_yf8.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_357_0_hLd.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_358_0_sbr.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_359_0_R0j.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_35_0_bxU.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_360_0_E7G.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_361_0_kdA.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_362_0_Gy4.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_363_0_Y1D.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_364_0_Inw.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_365_0_ACA.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_366_0_G15.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_367_0_sD9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_368_0_S5U.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_369_0_uur.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_36_1_S3D.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_370_0_unC.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_371_1_P39.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_372_0_RGe.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_373_0_tPR.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_374_0_SBx.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_37_0_BvE.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_38_1_uSY.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_39_2_EoD.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_3_2_WiX.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_40_2_iuU.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_40_5_jve.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_41_0_CcR.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_42_0_0oE.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_43_0_Qer.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_44_1_hBg.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_44_4_2G9.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_45_0_1LD.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_46_3_u8z.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_47_0_haS.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_48_0_3hZ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_49_0_jQG.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_4_2_36N.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_50_1_ANp.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_51_0_gnc.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_52_0_rDY.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_53_2_BKv.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_54_2_Txx.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_55_2_1tW.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_56_0_lpV.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_57_2_bhc.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_57_4_DGe.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_58_3_kUP.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_59_2_lcM.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_5_0_M7E.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_60_5_4SD.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_61_2_I6e.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_62_2_fkQ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_62_6_yOK.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_63_0_Xka.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_64_0_XSw.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_65_1_Rlt.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_66_0_h1e.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_67_2_FQB.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_67_4_Og3.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_68_2_P55.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_68_4_ai7.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_69_5_gxA.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_6_0_X5s.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_70_1_q9A.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_70_2_aL8.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_71_0_EZP.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_72_1_mby.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_73_0_Bhg.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_74_0_rEO.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_75_2_kaC.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_75_4_viU.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_76_2_zhL.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_76_4_N8G.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_77_1_Ech.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_78_1_4yy.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_79_2_F7L.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_7_5_yrO.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_80_0_lDi.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_81_1_drn.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_81_3_R7J.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_82_1_LDc.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_83_1_DCI.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_84_0_ofO.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_85_0_UIP.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_86_2_7Pl.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_87_1_zWe.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_88_0_J5o.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_89_1_JNN.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_8_2_TKC.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_90_2_Adz.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_90_6_62d.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_91_1_6sD.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_92_1_uhA.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_92_2_Zah.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_93_0_EnT.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_94_2_mkJ.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_95_1_se8.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_96_0_YSq.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_97_1_qOM.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_98_1_y4O.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_99_0_kTo.root'
+              , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/hitFitPatSkimPF2PAT_9_0_bMJ.root'
               ]
 
-filesCastorTest = [ 'rfio:%s/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_1_2_rku.root'%( os.getenv( "CASTOR_HOME" ) )
-                  , 'rfio:%s/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_2_1_hGY.root'%( os.getenv( "CASTOR_HOME" ) )
-                  , 'rfio:%s/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_3_1_W60.root'%( os.getenv( "CASTOR_HOME" ) )
-                  , 'rfio:%s/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_4_1_oYI.root'%( os.getenv( "CASTOR_HOME" ) )
-                  , 'rfio:%s/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_5_1_9Gv.root'%( os.getenv( "CASTOR_HOME" ) )
-                  , 'rfio:%s/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_6_1_C1R.root'%( os.getenv( "CASTOR_HOME" ) )
-                  , 'rfio:%s/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_7_1_YR9.root'%( os.getenv( "CASTOR_HOME" ) )
-                  , 'rfio:%s/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_8_1_WtQ.root'%( os.getenv( "CASTOR_HOME" ) )
-                  , 'rfio:%s/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_9_3_BrI.root'%( os.getenv( "CASTOR_HOME" ) )
-                  , 'rfio:%s/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_10_2_tBm.root'%( os.getenv( "CASTOR_HOME" ) )
+filesCastorTest = [ 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_1_2_rku.root'
+                  , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_2_1_hGY.root'
+                  , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_3_1_W60.root'
+                  , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_4_1_oYI.root'
+                  , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_5_1_9Gv.root'
+                  , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_6_1_C1R.root'
+                  , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_7_1_YR9.root'
+                  , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_8_1_WtQ.root'
+                  , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_9_3_BrI.root'
+                  , 'rfio:/castor/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1/data/test/hitFitPatSkimPF2PAT_10_2_tBm.root'
                   ]
