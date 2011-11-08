@@ -157,6 +157,17 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
     // Neutrino p_z
     unsigned binsNuPz_;
     double   maxNuPz_;
+    // Jet p_t
+    unsigned binsJetPt_;
+    double   maxJetPt_;
+    // Jet eta
+    unsigned binsJetEta_;
+    double   maxJetEta_;
+    // Jet phi
+    unsigned binsJetPhi_;
+    // Jet p_z
+    unsigned binsJetPz_;
+    double   maxJetPz_;
     // Top mass deviation
     unsigned binsDiffTopM_;
     double   maxDiffTopM_;
@@ -191,6 +202,18 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
     // Neutrino p_z  deviation
     unsigned binsDiffNuPz_;
     double   maxDiffNuPz_;
+    // Jet p_t  deviation
+    unsigned binsDiffJetPt_;
+    double   maxDiffJetPt_;
+    // Jet eta deviation
+    unsigned binsDiffJetEta_;
+    double   maxDiffJetEta_;
+    // Jet phi deviation
+    unsigned binsDiffJetPhi_;
+    double   maxDiffJetPhi_;
+    // Jet p_z  deviation
+    unsigned binsDiffJetPz_;
+    double   maxDiffJetPz_;
 
     /// Histograms
     // Generatzor
@@ -847,18 +870,52 @@ void TopHitFitAnalyzer::beginJob()
   hist1D_Generator_GenMatch__Signal_[ "DiffLepPt" ]->SetXTitle( "#Delta p_{t, l} (GeV)" );
   hist1D_Generator_GenMatch__Signal_[ "DiffLepPtInv" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffLepPtInv__Signal", "Reconstructed lepton inverse transverse momentum deviation", binsDiffLepPt_, -maxDiffLepPtInv_, maxDiffLepPtInv_ );
   hist1D_Generator_GenMatch__Signal_[ "DiffLepPtInv" ]->SetXTitle( "#Delta #frac{1}{p_{t, l}} (GeV^{-1})" );
+  hist1D_Generator_GenMatch__Signal_[ "DiffLepEta" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffLepEta__Signal", "Reconstructed lepton pseudo-rapidity deviation", binsDiffLepEta_, -maxDiffLepEta_, maxDiffLepEta_ );
+  hist1D_Generator_GenMatch__Signal_[ "DiffLepEta" ]->SetXTitle( "#Delta #eta_{l}" );
+  hist1D_Generator_GenMatch__Signal_[ "DiffLepPhi" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffLepPhi__Signal", "Reconstructed lepton azimutal angle deviation", binsDiffLepPhi_, -maxDiffLepPhi_, maxDiffLepPhi_ );
+  hist1D_Generator_GenMatch__Signal_[ "DiffLepPhi" ]->SetXTitle( "#Delta #phi_{l}" );
+  hist1D_Generator_GenMatch__Signal_[ "DiffNuPt" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffNuPt__Signal", "Reconstructed neutrino transverse momentum deviation", binsDiffNuPt_, -maxDiffNuPt_, maxDiffNuPt_ );
+  hist1D_Generator_GenMatch__Signal_[ "DiffNuPt" ]->SetXTitle( "#Delta p_{t, #nu} (GeV)" );
+  hist1D_Generator_GenMatch__Signal_[ "DiffUdscJetPt" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffUdscJetPt__Signal", "Reconstructed light jet transverse momentum deviation", binsDiffJetPt_, -maxDiffJetPt_, maxDiffJetPt_ );
+  hist1D_Generator_GenMatch__Signal_[ "DiffUdscJetPt" ]->SetXTitle( "#Delta p_{t, j} (GeV)" );
+  hist1D_Generator_GenMatch__Signal_[ "DiffUdscJetEta" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffUdscJetEta__Signal", "Reconstructed light jet pseudo-rapidity deviation", binsDiffJetEta_, -maxDiffJetEta_, maxDiffJetEta_ );
+  hist1D_Generator_GenMatch__Signal_[ "DiffUdscJetEta" ]->SetXTitle( "#Delta #eta_{j}" );
+  hist1D_Generator_GenMatch__Signal_[ "DiffUdscJetPhi" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffUdscJetPhi__Signal", "Reconstructed light jet azimutal angle deviation", binsDiffJetPhi_, -maxDiffJetPhi_, maxDiffJetPhi_ );
+  hist1D_Generator_GenMatch__Signal_[ "DiffUdscJetPhi" ]->SetXTitle( "#Delta #phi_{j}" );
   for ( MapTH1D::const_iterator iHist = hist1D_Generator_GenMatch__Signal_.begin(); iHist != hist1D_Generator_GenMatch__Signal_.end(); ++iHist ) {
     iHist->second->SetYTitle( "events" );
-  }
-  // 2-dim
-  hist2D_Generator_GenMatch__Signal_[ "LepPt_DiffLepPt" ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( "Generator_GenMatch_LepPt_DiffLepPt__Signal", "Reconstructed lepton transverse momentum deviation vs. reconstructed lepton transverse momentum", binsLepPt_, 0., maxLepPt_, binsDiffLepPt_, -maxDiffLepPt_, maxDiffLepPt_ );
-  hist2D_Generator_GenMatch__Signal_[ "LepPt_DiffLepPt" ]->SetXTitle( "p_{t, l} (GeV)" );
-  hist2D_Generator_GenMatch__Signal_[ "LepPt_DiffLepPt" ]->SetYTitle( "#Delta p_{t, l} (GeV)" );
-  hist2D_Generator_GenMatch__Signal_[ "LepPt_DiffLepPtInv" ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( "Generator_GenMatch_LepPt_DiffLepPtInv__Signal", "Reconstructed lepton inverse transverse momentum deviation vs. reconstructed lepton transverse momentum", binsLepPt_, 0., maxLepPt_, binsDiffLepPt_, -maxDiffLepPtInv_, maxDiffLepPtInv_ );
-  hist2D_Generator_GenMatch__Signal_[ "LepPt_DiffLepPtInv" ]->SetXTitle( "p_{t, l} (GeV)" );
-  hist2D_Generator_GenMatch__Signal_[ "LepPt_DiffLepPtInv" ]->SetYTitle( "#Delta #frac{1}{p_{t, l}} (GeV^{-1})" );
-  for ( MapTH2D::const_iterator iHist = hist2D_Generator_GenMatch__Signal_.begin(); iHist != hist2D_Generator_GenMatch__Signal_.end(); ++iHist ) {
-    iHist->second->SetZTitle( "events" );
+    // 2-dim
+    std::string key_Diff( iHist->first );
+    std::string name_Diff( iHist->second->GetName() );
+    std::string title_Diff( iHist->second->GetTitle() );
+    if ( iHist->first.substr( 4, 3 ) == "Lep" ) {
+      key_Diff.insert( 0, "LepPt_" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "LepPt_" ).c_str(), title_Diff.append( " vs. reconstructed lepton transverse momentum").c_str(), binsLepPt_, 0., maxLepPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, l} (GeV)" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
+    }
+    else if ( iHist->first.substr( 4, 2 ) == "Nu" ) {
+      key_Diff.insert( 0, "NuPt_" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "NuPt_" ).c_str(), title_Diff.append( " vs. reconstructed missing transverse momentum").c_str(), binsNuPt_, 0., maxNuPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, miss} (GeV)" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
+    }
+    else if ( iHist->first.substr( 4, 7 ) == "UdscJet" ) {
+      key_Diff.insert( 0, "UdscJetPt_" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "UdscJetPt_" ).c_str(), title_Diff.append( " vs. reconstructed light jet transverse momentum").c_str(), binsJetPt_, 0., maxJetPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, j} (GeV)" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
+    }
+    else if ( iHist->first.substr( 4, 4 ) == "BJet" ) {
+      key_Diff.insert( 0, "BJetPt_" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "BJetPt_" ).c_str(), title_Diff.append( " vs. reconstructed b-jet transverse momentum").c_str(), binsJetPt_, 0., maxJetPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, b} (GeV)" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
+    }
   }
 
   TFileDirectory dir_GenMatch_HitFitFound__Signal( fileService->mkdir( "GenMatch_HitFitFound__Signal", "HitFit vs. GenMatch for valid hypotheses" ) );
@@ -1519,6 +1576,21 @@ void TopHitFitAnalyzer::fill1D_GeneratorValid_GenMatchValid( MapTH1D & hist1D, u
   hist1D[ "DiffLepPt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleLepton()->pt() );
   // Differenz of reconstructed  inverse lepton p_T from generated one
   hist1D[ "DiffLepPtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->singleLepton()->pt() ) );
+  // Differenz of reconstructed lepton eta from generated one
+  hist1D[ "DiffLepEta" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() - ttGenEvent_->singleLepton()->eta() );
+  // Differenz of reconstructed lepton phi from generated one
+  hist1D[ "DiffLepPhi" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() - ttGenEvent_->singleLepton()->phi() );
+  // Differenz of reconstructed neutrino p_T from generated one
+  hist1D[ "DiffNuPt" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleNeutrino()->pt() );
+  // Differenz of reconstructed light jet p_T from generated one
+  hist1D[ "DiffUdscJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayQuark()->pt() );
+  hist1D[ "DiffUdscJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayQuarkBar()->pt() );
+  // Differenz of reconstructed light jet eta from generated one
+  hist1D[ "DiffUdscJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayQuark()->eta() );
+  hist1D[ "DiffUdscJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayQuarkBar()->eta() );
+  // Differenz of reconstructed light jet phi from generated one
+  hist1D[ "DiffUdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuark()->phi() );
+  hist1D[ "DiffUdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuarkBar()->phi() );
 
   return;
 
@@ -1530,8 +1602,23 @@ void TopHitFitAnalyzer::fill2D_GeneratorValid_GenMatchValid( MapTH2D & hist2D, u
 
   // Differenz of reconstructed lepton p_T from generated one vs. reconstructed one
   hist2D[ "LepPt_DiffLepPt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleLepton()->pt() );
-  // Differenz of reconstructed  inverse lepton p_T from generated one vs. reconstructed one
+  // Differenz of reconstructed inverse lepton p_T from generated one vs. reconstructed one
   hist2D[ "LepPt_DiffLepPtInv" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), 1./( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->singleLepton()->pt() ) );
+  // Differenz of reconstructed lepton eta from generated one vs. reconstructed p_T
+  hist2D[ "LepPt_DiffLepEta" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() - ttGenEvent_->singleLepton()->eta() );
+  // Differenz of reconstructed lepton phi from generated one vs. reconstructed p_T
+  hist2D[ "LepPt_DiffLepPhi" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() - ttGenEvent_->singleLepton()->phi() );
+  // Differenz of reconstructed neutrino p_T from generated one vs. reconstructed one
+  hist2D[ "NuPt_DiffNuPt" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleNeutrino()->pt() );
+  // Differenz of reconstructed light jet p_T from generated one vs. reconstructed one
+  hist2D[ "UdscJetPt_DiffUdscJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayQuark()->pt() );
+  hist2D[ "UdscJetPt_DiffUdscJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayQuarkBar()->pt() );
+  // Differenz of reconstructed light jet eta from generated one vs. reconstructed p_T
+  hist2D[ "UdscJetPt_DiffUdscJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayQuark()->eta() );
+  hist2D[ "UdscJetPt_DiffUdscJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayQuarkBar()->eta() );
+  // Differenz of reconstructed light jet phi from generated one vs. reconstructed p_T
+  hist2D[ "UdscJetPt_DiffUdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuark()->phi() );
+  hist2D[ "UdscJetPt_DiffUdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuarkBar()->phi() );
 
   return;
 

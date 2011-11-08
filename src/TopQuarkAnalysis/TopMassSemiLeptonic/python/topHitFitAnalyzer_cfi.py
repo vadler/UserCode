@@ -83,6 +83,17 @@ topHitFitAnalyzer = cms.EDAnalyzer(
   # Neutrino p_z
 , binsNuPz = cms.uint32( 50 )
 , maxNuPz  = cms.double( 750. )
+  # Jet p_t
+, binsJetPt = cms.uint32( 50 )
+, maxJetPt  = cms.double( 250. )
+  # Jet eta
+, binsJetEta = cms.uint32( 50 )
+, maxJetEta  = cms.double( 4. )
+  # Jet phi
+, binsJetPhi = cms.uint32( 50 )
+  # Jet p_z
+, binsJetPz = cms.uint32( 50 )
+, maxJetPz  = cms.double( 750. )
 
   # Top mass deviation
 , binsDiffTopM = cms.uint32( 50 )
@@ -118,5 +129,17 @@ topHitFitAnalyzer = cms.EDAnalyzer(
   # Neutrino p_z  deviation
 , binsDiffNuPz = cms.uint32( 50 )   # binsDiffLepPz
 , maxDiffNuPz  = cms.double( 500. ) # maxDiffLepPz
+  # Jet p_t  deviation
+, binsDiffJetPt = cms.uint32( 50 )
+, maxDiffJetPt  = cms.double( 25. )
+  # Jet eta deviation
+, binsDiffJetEta = cms.uint32( 50 )
+, maxDiffJetEta  = cms.double( 1. )
+  # Jet phi deviation
+, binsDiffJetPhi = cms.uint32( 50 )
+, maxDiffJetPhi  = cms.double( 1. )
+  # Jet p_z  deviation
+, binsDiffJetPz = cms.uint32( 50 )
+, maxDiffJetPz  = cms.double( 500. )
 
 )
