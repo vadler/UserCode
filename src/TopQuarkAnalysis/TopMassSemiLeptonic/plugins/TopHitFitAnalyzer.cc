@@ -364,6 +364,13 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 , binsNuPhi_( iConfig.getParameter< unsigned >( "binsNuPhi" ) )
 , binsNuPz_( iConfig.getParameter< unsigned >( "binsNuPz" ) )
 , maxNuPz_( iConfig.getParameter< double >( "maxNuPz" ) )
+, binsJetPt_( iConfig.getParameter< unsigned >( "binsJetPt" ) )
+, maxJetPt_ ( iConfig.getParameter< double >( "maxJetPt" ) )
+, binsJetEta_( iConfig.getParameter< unsigned >( "binsJetEta" ) )
+, maxJetEta_( iConfig.getParameter< double >( "maxJetEta" ) )
+, binsJetPhi_( iConfig.getParameter< unsigned >( "binsJetPhi" ) )
+, binsJetPz_( iConfig.getParameter< unsigned >( "binsJetPz" ) )
+, maxJetPz_( iConfig.getParameter< double >( "maxJetPz" ) )
 , binsDiffTopM_( iConfig.getParameter< unsigned >( "binsDiffTopM" ) )
 , maxDiffTopM_( iConfig.getParameter< double >( "maxDiffTopM" ) )
 , binsDiffLepM_( iConfig.getParameter< unsigned >( "binsDiffLepM" ) )
@@ -387,6 +394,14 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 , maxDiffNuPhi_( iConfig.getParameter< double >( "maxDiffNuPhi" ) )
 , binsDiffNuPz_( iConfig.getParameter< unsigned >( "binsDiffNuPz" ) )
 , maxDiffNuPz_( iConfig.getParameter< double >( "maxDiffNuPz" ) )
+, binsDiffJetPt_( iConfig.getParameter< unsigned >( "binsDiffJetPt" ) )
+, maxDiffJetPt_( iConfig.getParameter< double >( "maxDiffJetPt" ) )
+, binsDiffJetEta_( iConfig.getParameter< unsigned >( "binsDiffJetEta" ) )
+, maxDiffJetEta_( iConfig.getParameter< double >( "maxDiffJetEta" ) )
+, binsDiffJetPhi_( iConfig.getParameter< unsigned >( "binsDiffJetPhi" ) )
+, maxDiffJetPhi_( iConfig.getParameter< double >( "maxDiffJetPhi" ) )
+, binsDiffJetPz_( iConfig.getParameter< unsigned >( "binsDiffJetPz" ) )
+, maxDiffJetPz_( iConfig.getParameter< double >( "maxDiffJetPz" ) )
   // initialise histo maps
 , hist1D_Generator_()
 , hist1D_Generator__Signal_()
@@ -460,6 +475,42 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 // Destructor
 TopHitFitAnalyzer::~TopHitFitAnalyzer()
 {
+
+//   for ( MapTH1D::const_iterator iHist = hist1D_Generator_.begin(); iHist != hist1D_Generator_.end(); ++iHist ) delete iHist->second;
+// //   hist1D_Generator__Signal_;
+// //   hist2D_Generator_;
+// //   hist2D_Generator__Signal_;
+// //   hist1D_HitFit_;
+// //   hist1D_HitFit__Signal_;
+// //   hist1D_HitFit__Tau_;
+// //   hist1D_HitFit__SignalTau_;
+// //   hist1D_HitFit__Bkg_;
+// //   hist1D_HitFit__BkgNoTau_;
+// //   hist2D_HitFit_;
+// //   hist2D_HitFit__Signal_;
+// //   hist2D_HitFit__Tau_;
+// //   hist2D_HitFit__SignalTau_;
+// //   hist2D_HitFit__Bkg_;
+// //   hist2D_HitFit__BkgNoTau_;
+// //   hist1D_HitFitFound__Signal_;
+// //   hist1D_HitFitGood__Signal_;
+// //   hist2D_HitFitFound__Signal_;
+// //   hist2D_HitFitGood__Signal_;
+// //   hist1D_GenMatch__Signal_;
+// //   hist2D_GenMatch__Signal_;
+// //   hist1D_Generator_HitFit_;
+// //   hist1D_Generator_HitFit__Signal_;
+// //   hist2D_Generator_HitFit_;
+// //   hist2D_Generator_HitFit__Signal_;
+// //   hist1D_Generator_HitFitFound__Signal_;
+// //   hist1D_Generator_HitFitGood__Signal_;
+// //   hist2D_Generator_HitFitFound__Signal_;
+// //   hist2D_Generator_HitFitGood__Signal_;
+// //   hist1D_Generator_GenMatch__Signal_;
+// //   hist2D_Generator_GenMatch__Signal_;
+// //   hist1D_GenMatch_HitFitGood__Signal_;
+// //   hist2D_GenMatch_HitFitGood__Signal_;
+
 }
 
 
@@ -882,34 +933,40 @@ void TopHitFitAnalyzer::beginJob()
   hist1D_Generator_GenMatch__Signal_[ "DiffUdscJetEta" ]->SetXTitle( "#Delta #eta_{j}" );
   hist1D_Generator_GenMatch__Signal_[ "DiffUdscJetPhi" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffUdscJetPhi__Signal", "Reconstructed light jet azimutal angle deviation", binsDiffJetPhi_, -maxDiffJetPhi_, maxDiffJetPhi_ );
   hist1D_Generator_GenMatch__Signal_[ "DiffUdscJetPhi" ]->SetXTitle( "#Delta #phi_{j}" );
+  hist1D_Generator_GenMatch__Signal_[ "DiffBJetPt" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffBJetPt__Signal", "Reconstructed b-jet transverse momentum deviation", binsDiffJetPt_, -maxDiffJetPt_, maxDiffJetPt_ );
+  hist1D_Generator_GenMatch__Signal_[ "DiffBJetPt" ]->SetXTitle( "#Delta p_{t, b} (GeV)" );
+  hist1D_Generator_GenMatch__Signal_[ "DiffBJetEta" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffBJetEta__Signal", "Reconstructed b-jet pseudo-rapidity deviation", binsDiffJetEta_, -maxDiffJetEta_, maxDiffJetEta_ );
+  hist1D_Generator_GenMatch__Signal_[ "DiffBJetEta" ]->SetXTitle( "#Delta #eta_{b}" );
+  hist1D_Generator_GenMatch__Signal_[ "DiffBJetPhi" ] = dir_Generator_GenMatchValid__Signal.make< TH1D >( "Generator_GenMatch_DiffBJetPhi__Signal", "Reconstructed b-jet azimutal angle deviation", binsDiffJetPhi_, -maxDiffJetPhi_, maxDiffJetPhi_ );
+  hist1D_Generator_GenMatch__Signal_[ "DiffBJetPhi" ]->SetXTitle( "#Delta #phi_{b}" );
   for ( MapTH1D::const_iterator iHist = hist1D_Generator_GenMatch__Signal_.begin(); iHist != hist1D_Generator_GenMatch__Signal_.end(); ++iHist ) {
     iHist->second->SetYTitle( "events" );
     // 2-dim
     std::string key_Diff( iHist->first );
     std::string name_Diff( iHist->second->GetName() );
     std::string title_Diff( iHist->second->GetTitle() );
-    if ( iHist->first.substr( 4, 3 ) == "Lep" ) {
+    if ( key_Diff.substr( 4, 3 ) == "Lep" ) {
       key_Diff.insert( 0, "LepPt_" );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "LepPt_" ).c_str(), title_Diff.append( " vs. reconstructed lepton transverse momentum").c_str(), binsLepPt_, 0., maxLepPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, l} (GeV)" );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
     }
-    else if ( iHist->first.substr( 4, 2 ) == "Nu" ) {
+    else if ( key_Diff.substr( 4, 2 ) == "Nu" ) {
       key_Diff.insert( 0, "NuPt_" );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "NuPt_" ).c_str(), title_Diff.append( " vs. reconstructed missing transverse momentum").c_str(), binsNuPt_, 0., maxNuPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, miss} (GeV)" );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
     }
-    else if ( iHist->first.substr( 4, 7 ) == "UdscJet" ) {
+    else if ( key_Diff.substr( 4, 7 ) == "UdscJet" ) {
       key_Diff.insert( 0, "UdscJetPt_" );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "UdscJetPt_" ).c_str(), title_Diff.append( " vs. reconstructed light jet transverse momentum").c_str(), binsJetPt_, 0., maxJetPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, j} (GeV)" );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
     }
-    else if ( iHist->first.substr( 4, 4 ) == "BJet" ) {
+    else if ( key_Diff.substr( 4, 4 ) == "BJet" ) {
       key_Diff.insert( 0, "BJetPt_" );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "BJetPt_" ).c_str(), title_Diff.append( " vs. reconstructed b-jet transverse momentum").c_str(), binsJetPt_, 0., maxJetPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, b} (GeV)" );
@@ -1591,6 +1648,15 @@ void TopHitFitAnalyzer::fill1D_GeneratorValid_GenMatchValid( MapTH1D & hist1D, u
   // Differenz of reconstructed light jet phi from generated one
   hist1D[ "DiffUdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuark()->phi() );
   hist1D[ "DiffUdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuarkBar()->phi() );
+  // Differenz of reconstructed b-jet p_T from generated one
+  hist1D[ "DiffBJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayB()->pt() );
+  hist1D[ "DiffBJetPt" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt() - ttGenEvent_->leptonicDecayB()->pt() );
+  // Differenz of reconstructed b-jet eta from generated one
+  hist1D[ "DiffBJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayB()->eta() );
+  hist1D[ "DiffBJetEta" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->eta() - ttGenEvent_->leptonicDecayB()->eta() );
+  // Differenz of reconstructed b-jet phi from generated one
+  hist1D[ "DiffBJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayB()->phi() );
+  hist1D[ "DiffBJetPhi" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->phi() - ttGenEvent_->leptonicDecayB()->phi() );
 
   return;
 
@@ -1619,6 +1685,15 @@ void TopHitFitAnalyzer::fill2D_GeneratorValid_GenMatchValid( MapTH2D & hist2D, u
   // Differenz of reconstructed light jet phi from generated one vs. reconstructed p_T
   hist2D[ "UdscJetPt_DiffUdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuark()->phi() );
   hist2D[ "UdscJetPt_DiffUdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuarkBar()->phi() );
+  // Differenz of reconstructed b-jet p_T from generated one vs. reconstructed p_T
+  hist2D[ "BJetPt_DiffBJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayB()->pt() );
+  hist2D[ "BJetPt_DiffBJetPt" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt() - ttGenEvent_->leptonicDecayB()->pt() );
+  // Differenz of reconstructed b-jet eta from generated one vs. reconstructed p_T
+  hist2D[ "BJetPt_DiffBJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayB()->eta() );
+  hist2D[ "BJetPt_DiffBJetEta" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->eta() - ttGenEvent_->leptonicDecayB()->eta() );
+  // Differenz of reconstructed b-jet phi from generated one vs. reconstructed p_T
+  hist2D[ "BJetPt_DiffBJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayB()->phi() );
+  hist2D[ "BJetPt_DiffBJetPhi" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->phi() - ttGenEvent_->leptonicDecayB()->phi() );
 
   return;
 
