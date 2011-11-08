@@ -9,6 +9,5 @@ PhysicsTools/PatExamples                         V00-05-24      V00-05-22
 PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
 PhysicsTools/SelectorUtils                       V00-03-24      V00-03-17      
 PhysicsTools/UtilAlgos                           V08-02-14      V08-02-12      
-RecoJets/Configuration                           V02-04-17      V02-04-13      
 ---------------------------------------
-total packages: 8 (8 displayed)
+total packages: 7 (7 displayed)
