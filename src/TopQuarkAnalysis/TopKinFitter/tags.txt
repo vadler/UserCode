@@ -1,15 +1,18 @@
-Test Release based on: CMSSW_4_4_1
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_1
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_1
+Test Release based on: CMSSW_4_4_2
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_2
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_2
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-08-04      V06-07-07      
-PhysicsTools/PatAlgos                            V08-07-25      V08-07-24      
+DataFormats/PatCandidates                        V06-04-29      V06-04-27      
+PhysicsTools/KinFitter                           V00-03-06      V00-03-04      
+PhysicsTools/PatAlgos                            V08-07-30      V08-07-24-01   
+PhysicsTools/PatUtils                            V03-09-18-02   V03-09-18      
 TopQuarkAnalysis/TopEventProducers               V06-08-01      V06-07-13      
 TopQuarkAnalysis/TopHitFit                       V00-00-01                     
 TopQuarkAnalysis/TopJetCombination               V06-08-01      V06-07-09      
-TopQuarkAnalysis/TopKinFitter                    V06-07-12      V06-07-11      
+TopQuarkAnalysis/TopKinFitter                    V06-07-15      V06-07-11      
 TopQuarkAnalysis/TopMassSemiLeptonic             NoCVS                         
-TopQuarkAnalysis/TopObjectResolutions            V06-07-06      V06-07-05      
+TopQuarkAnalysis/TopObjectResolutions            V06-07-08      V06-07-05      
 TopQuarkAnalysis/TopTools                        V06-07-10      V06-07-09      
 ---------------------------------------
-total packages: 9 (9 displayed)
+total packages: 12 (12 displayed)
