@@ -476,40 +476,40 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 TopHitFitAnalyzer::~TopHitFitAnalyzer()
 {
 
-//   for ( MapTH1D::const_iterator iHist = hist1D_Generator_.begin(); iHist != hist1D_Generator_.end(); ++iHist ) delete iHist->second;
-// //   hist1D_Generator__Signal_;
-// //   hist2D_Generator_;
-// //   hist2D_Generator__Signal_;
-// //   hist1D_HitFit_;
-// //   hist1D_HitFit__Signal_;
-// //   hist1D_HitFit__Tau_;
-// //   hist1D_HitFit__SignalTau_;
-// //   hist1D_HitFit__Bkg_;
-// //   hist1D_HitFit__BkgNoTau_;
-// //   hist2D_HitFit_;
-// //   hist2D_HitFit__Signal_;
-// //   hist2D_HitFit__Tau_;
-// //   hist2D_HitFit__SignalTau_;
-// //   hist2D_HitFit__Bkg_;
-// //   hist2D_HitFit__BkgNoTau_;
-// //   hist1D_HitFitFound__Signal_;
-// //   hist1D_HitFitGood__Signal_;
-// //   hist2D_HitFitFound__Signal_;
-// //   hist2D_HitFitGood__Signal_;
-// //   hist1D_GenMatch__Signal_;
-// //   hist2D_GenMatch__Signal_;
-// //   hist1D_Generator_HitFit_;
-// //   hist1D_Generator_HitFit__Signal_;
-// //   hist2D_Generator_HitFit_;
-// //   hist2D_Generator_HitFit__Signal_;
-// //   hist1D_Generator_HitFitFound__Signal_;
-// //   hist1D_Generator_HitFitGood__Signal_;
-// //   hist2D_Generator_HitFitFound__Signal_;
-// //   hist2D_Generator_HitFitGood__Signal_;
-// //   hist1D_Generator_GenMatch__Signal_;
-// //   hist2D_Generator_GenMatch__Signal_;
-// //   hist1D_GenMatch_HitFitGood__Signal_;
-// //   hist2D_GenMatch_HitFitGood__Signal_;
+  for ( MapTH1D::const_iterator iHist = hist1D_Generator_.begin(); iHist != hist1D_Generator_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_Generator__Signal_.begin(); iHist != hist1D_Generator__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_Generator_.begin(); iHist != hist2D_Generator_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_Generator__Signal_.begin(); iHist != hist2D_Generator__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_HitFit_.begin(); iHist != hist1D_HitFit_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_HitFit__Signal_.begin(); iHist != hist1D_HitFit__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_HitFit__Tau_.begin(); iHist != hist1D_HitFit__Tau_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_HitFit__SignalTau_.begin(); iHist != hist1D_HitFit__SignalTau_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_HitFit__Bkg_.begin(); iHist != hist1D_HitFit__Bkg_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_HitFit__BkgNoTau_.begin(); iHist != hist1D_HitFit__BkgNoTau_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_HitFit_.begin(); iHist != hist2D_HitFit_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_HitFit__Signal_.begin(); iHist != hist2D_HitFit__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_HitFit__Tau_.begin(); iHist != hist2D_HitFit__Tau_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_HitFit__SignalTau_.begin(); iHist != hist2D_HitFit__SignalTau_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_HitFit__Bkg_.begin(); iHist != hist2D_HitFit__Bkg_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_HitFit__BkgNoTau_.begin(); iHist != hist2D_HitFit__BkgNoTau_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_HitFitFound__Signal_.begin(); iHist != hist1D_HitFitFound__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_HitFitGood__Signal_.begin(); iHist != hist1D_HitFitGood__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_HitFitFound__Signal_.begin(); iHist != hist2D_HitFitFound__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_HitFitGood__Signal_.begin(); iHist != hist2D_HitFitGood__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_GenMatch__Signal_.begin(); iHist != hist1D_GenMatch__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_GenMatch__Signal_.begin(); iHist != hist2D_GenMatch__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_Generator_HitFit_.begin(); iHist != hist1D_Generator_HitFit_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_Generator_HitFit__Signal_.begin(); iHist != hist1D_Generator_HitFit__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_Generator_HitFit_.begin(); iHist != hist2D_Generator_HitFit_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_Generator_HitFit__Signal_.begin(); iHist != hist2D_Generator_HitFit__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_Generator_HitFitFound__Signal_.begin(); iHist != hist1D_Generator_HitFitFound__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_Generator_HitFitGood__Signal_.begin(); iHist != hist1D_Generator_HitFitGood__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_Generator_HitFitFound__Signal_.begin(); iHist != hist2D_Generator_HitFitFound__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_Generator_HitFitGood__Signal_.begin(); iHist != hist2D_Generator_HitFitGood__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_Generator_GenMatch__Signal_.begin(); iHist != hist1D_Generator_GenMatch__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_Generator_GenMatch__Signal_.begin(); iHist != hist2D_Generator_GenMatch__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH1D::const_iterator iHist = hist1D_GenMatch_HitFitGood__Signal_.begin(); iHist != hist1D_GenMatch_HitFitGood__Signal_.end(); ++iHist ) delete iHist->second;
+  for ( MapTH2D::const_iterator iHist = hist2D_GenMatch_HitFitGood__Signal_.begin(); iHist != hist2D_GenMatch_HitFitGood__Signal_.end(); ++iHist ) delete iHist->second;
 
 }
 
