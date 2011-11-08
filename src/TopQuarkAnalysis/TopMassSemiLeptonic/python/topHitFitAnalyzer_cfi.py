@@ -10,6 +10,12 @@ topHitFitAnalyzer = cms.EDAnalyzer(
 
   ### Input ###
 
+  # HitFit resolution file paths
+, lepResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution.txt' )
+#, lwpResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution.txt' )
+, udscJetResolutions = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution.txt' )
+, bJetResolutions    = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution.txt' )
+
   # TQAF semi-leptonic event
 , ttSemiLeptonicEvent = cms.InputTag( 'ttSemiLepEvent' )
 , patMuons            = cms.InputTag( 'selectedPatMuons' )

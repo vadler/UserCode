@@ -513,6 +513,7 @@ void TopHitFitResolutionFunctions::beginJob()
   const edm::FileInPath metResFile( metResolutions_ );
   const hitfit::Defaults_Text metDefs( metResFile.fullPath() );
   const hitfit::Resolution metRes( metDefs.get_string( "met_resolution" ) );
+
   std::string metTitle( "no #eta-dependence" );
   std::string metKey( "P" );
   std::string metName( "MET_" + metKey );
