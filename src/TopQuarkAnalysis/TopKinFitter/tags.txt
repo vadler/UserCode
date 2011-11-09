@@ -5,7 +5,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_2
 AnalysisDataFormats/TopObjects                   V06-08-04      V06-07-07      
 DataFormats/PatCandidates                        V06-04-29      V06-04-27      
 PhysicsTools/KinFitter                           V00-03-06      V00-03-04      
-PhysicsTools/PatAlgos                            V08-07-30      V08-07-24-01   
+PhysicsTools/PatAlgos                            V08-07-31      V08-07-24-01   
 PhysicsTools/PatUtils                            V03-09-18-02   V03-09-18      
 TopQuarkAnalysis/TopEventProducers               V06-08-01      V06-07-13      
 TopQuarkAnalysis/TopHitFit                       V00-00-01                     
