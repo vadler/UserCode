@@ -541,7 +541,7 @@ class AddJetCollection35X(ConfigToolBase):
                 ## as L2L3 if possible, as combined from L2 and L3 otherwise
                 if not hasattr( process, '%s%sL2L3' % (jetCorrLabel[0].swapcase(), jetCorrLabel[1]) ):
                     setattr( process, '%s%sL2L3' % (jetCorrLabel[0].swapcase(), jetCorrLabel[1]),
-                             cms.ESSource("JetCorrectionServiceChain",
+                             cms.ESProducer("JetCorrectionESChain",
                                           correctors = cms.vstring('%s%sL2Relative' % (jetCorrLabel[0].swapcase(), jetCorrLabel[1]),
                                                                    '%s%sL3Absolute' % (jetCorrLabel[0].swapcase(), jetCorrLabel[1])
                                                                    )
@@ -746,7 +746,7 @@ class SwitchJetCollection35X(ConfigToolBase):
                 ## as L2L3 if possible, as combined from L2 and L3 otherwise
                 if not hasattr( process, '%s%sL2L3' % (jetCorrLabel[0].swapcase(), jetCorrLabel[1]) ):
                     setattr( process, '%s%sL2L3' % (jetCorrLabel[0].swapcase(), jetCorrLabel[1]),
-                             cms.ESSource("JetCorrectionServiceChain",
+                             cms.ESProducer("JetCorrectionESChain",
                                           correctors = cms.vstring('%s%sL2Relative' % (jetCorrLabel[0].swapcase(), jetCorrLabel[1]),
                                                                    '%s%sL3Absolute' % (jetCorrLabel[0].swapcase(), jetCorrLabel[1])
                                                                    )
@@ -1040,7 +1040,7 @@ class PickRelValInputFiles( ConfigToolBase ):
                                 break
                         if not foundSE:
                             if debug:
-                                print '%s DEBUG: Possible version \'%s\' not available on SE \'%s\''%( self._label, version, domainSE )
+                                print '%s DEBUG: Possible version \'v%s\' not available on SE \'%s\''%( self._label, version, domainSE )
                             break
                         validVersion = version
                         if debug:
