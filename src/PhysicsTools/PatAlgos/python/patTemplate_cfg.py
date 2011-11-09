@@ -13,7 +13,7 @@ from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
     pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_0_0_pre5'
-                        , relVal        = 'RelValProdTTbar'
+                        , relVal        = 'RelValTTbar'
                         , globalTag     = 'START50_V3'
                         , numberOfFiles = 1
                         )
