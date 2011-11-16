@@ -982,7 +982,7 @@ class PickRelValInputFiles( ConfigToolBase ):
             if debug:
                 self.messageEmptyList()
             return filePaths
-        if not ( domain[ -2 ] == 'cern' and domain[ -1 ] == 'ch' ) or ( domain[ -2 ] == 'fnal' and domain[ -1 ] == 'gov' ):
+        if not ( ( domain[ -2 ] == 'cern' and domain[ -1 ] == 'ch' ) or ( domain[ -2 ] == 'fnal' and domain[ -1 ] == 'gov' ) ):
             print '%s INFO : Running on site \'%s.%s\' without direct access to RelVal files'%( self._label, domain[ -2 ], domain[ -1 ] )
             if debug:
                 self.messageEmptyList()
