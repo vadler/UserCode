@@ -4,6 +4,6 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_5_0_0_pre5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 HLTrigger/HLTcore                                V02-17-00      V02-16-11      
 L1Trigger/GlobalTriggerAnalyzer                  V02-00-01      V01-08-02      
-PhysicsTools/PatAlgos                            V08-08-01      V08-07-28      
+PhysicsTools/PatAlgos                            V08-08-02      V08-07-28      
 ---------------------------------------
 total packages: 3 (3 displayed)
