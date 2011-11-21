@@ -20,6 +20,24 @@ sample  = 'RelValTTbar'
 process = cms.Process( "TEST" )
 
 
+### Logging
+
+reportEvery = 1000
+if runTest:
+  reportEvery = 1
+process.load( "FWCore.MessageService.MessageLogger_cfi" )
+process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
+process.options = cms.untracked.PSet(
+  wantSummary = cms.untracked.bool( True )
+)
+if runTest:
+  process.MessageLogger.cerr.threshold = 'INFO'
+  process.MessageLogger.categories.append('TopHitFitResolutionFunctions')
+  process.MessageLogger.cerr.TopHitFitResolutionFunctions = cms.untracked.PSet(
+    limit = cms.untracked.int32( -1 )
+  )
+
+
 ### Input
 
 from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import *

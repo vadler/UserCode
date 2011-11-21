@@ -98,10 +98,10 @@ class TopHitFitResolutionFunctions : public edm::EDAnalyzer {
 
     /// Private functions
 
-    void fill1D( unsigned objCat, MapTH1D & histMap1D, unsigned iCombi = 0 );
-    void fill2D( unsigned objCat, MapTH2D & histMap2D, unsigned iCombi = 0 );
-    void fill1D( unsigned objCat, unsigned iBin, VecMapTH1D & histVecMap1D, unsigned iCombi = 0 );
-    void fill2D( unsigned objCat, unsigned iBin, VecMapTH2D & histVecMap2D, unsigned iCombi = 0 );
+    void fill1D( unsigned iCat, MapTH1D & histMap1D );
+    void fill2D( unsigned iCat, MapTH2D & histMap2D );
+    void fill1D( unsigned iCat, VecMapTH1D & histVecMap1D, unsigned iBin = 0 );
+    void fill2D( unsigned iCat, VecMapTH2D & histVecMap2D, unsigned iBin = 0 );
 
 };
 
@@ -325,18 +325,18 @@ void TopHitFitResolutionFunctions::analyze( const edm::Event & iEvent, const edm
       if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
         for ( unsigned iCat = 0; iCat < objCat_.size(); ++iCat ) {
           const std::string objCat( objCat_.at( iCat ) );
-          const unsigned nBins( res_[ objCat ].GetEtaDepResElement().size() );
           fill1D( iCat, histMap1D_ );
           fill2D( iCat, histMap2D_ );
           if ( iCat < fileNames_.size() ) {
+            const unsigned nBins( res_[ objCat ].GetEtaDepResElement().size() );
             for ( unsigned iBin = 0; iBin < nBins; ++iBin ) {
-              fill1D( iCat, iBin, histVecMap1D_ );
-              fill2D( iCat, iBin, histVecMap2D_ );
+              fill1D( iCat, histVecMap1D_, iBin );
+              fill2D( iCat, histVecMap2D_, iBin );
             }
           }
           else {
-            fill1D( iCat, 0, histVecMap1D_ );
-            fill2D( iCat, 0, histVecMap2D_ );
+            fill1D( iCat, histVecMap1D_ );
+            fill2D( iCat, histVecMap2D_ );
           }
         }
       }
@@ -355,55 +355,58 @@ void TopHitFitResolutionFunctions::endJob()
 
 
 // Filling deviations of RECO from GEN for kinematic properties of object types
-void TopHitFitResolutionFunctions::fill1D( unsigned objCat, MapTH1D & histMap1D, unsigned iCombi )
+void TopHitFitResolutionFunctions::fill1D( unsigned iCat, MapTH1D & histMap1D )
 {
 
-  switch ( objCat ) {
+  const unsigned nCats( objCat_.size() );
+  const std::string objCat( objCat_.at( iCat ) );
+  switch ( iCat ) {
     case 0:
-      histMap1D[ "LepPt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->singleLepton()->pt() );
-      histMap1D[ "LepPtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->singleLepton()->pt() ) );
-      histMap1D[ "LepEta" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->singleLepton()->eta() );
-      histMap1D[ "LepPhi" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->singleLepton()->phi() );
-      histMap1D[ "LepPz" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->singleLepton()->pz() );
-      histMap1D[ "LepM" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->singleLepton()->mass() );
+      histMap1D[ objCat + "Pt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleLepton()->pt() );
+      histMap1D[ objCat + "PtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->singleLepton()->pt() ) );
+      histMap1D[ objCat + "Eta" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() - ttGenEvent_->singleLepton()->eta() );
+      histMap1D[ objCat + "Phi" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() - ttGenEvent_->singleLepton()->phi() );
+      histMap1D[ objCat + "Pz" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pz() - ttGenEvent_->singleLepton()->pz() );
+      histMap1D[ objCat + "M" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->mass() - ttGenEvent_->singleLepton()->mass() );
       break;
     case 1:
-      histMap1D[ "UdscJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->hadronicDecayQuark()->pt() );
-      histMap1D[ "UdscJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->hadronicDecayQuarkBar()->pt() );
-      histMap1D[ "UdscJetPtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->hadronicDecayQuark()->pt() ) );
-      histMap1D[ "UdscJetPtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->hadronicDecayQuarkBar()->pt() ) );
-      histMap1D[ "UdscJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->hadronicDecayQuark()->eta() );
-      histMap1D[ "UdscJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->hadronicDecayQuarkBar()->eta() );
-      histMap1D[ "UdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->hadronicDecayQuark()->phi() );
-      histMap1D[ "UdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->hadronicDecayQuarkBar()->phi() );
-      histMap1D[ "UdscJetPz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->hadronicDecayQuark()->pz() );
-      histMap1D[ "UdscJetPz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->hadronicDecayQuarkBar()->pz() );
-      histMap1D[ "UdscJetM" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->hadronicDecayQuark()->mass() );
-      histMap1D[ "UdscJetM" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->hadronicDecayQuarkBar()->mass() );
+      histMap1D[ objCat + "Pt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayQuark()->pt() );
+      histMap1D[ objCat + "Pt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayQuarkBar()->pt() );
+      histMap1D[ objCat + "PtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->hadronicDecayQuark()->pt() ) );
+      histMap1D[ objCat + "PtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->hadronicDecayQuarkBar()->pt() ) );
+      histMap1D[ objCat + "Eta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayQuark()->eta() );
+      histMap1D[ objCat + "Eta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayQuarkBar()->eta() );
+      histMap1D[ objCat + "Phi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuark()->phi() );
+      histMap1D[ objCat + "Phi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuarkBar()->phi() );
+      histMap1D[ objCat + "Pz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pz() - ttGenEvent_->hadronicDecayQuark()->pz() );
+      histMap1D[ objCat + "Pz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pz() - ttGenEvent_->hadronicDecayQuarkBar()->pz() );
+      histMap1D[ objCat + "M" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->mass() - ttGenEvent_->hadronicDecayQuark()->mass() );
+      histMap1D[ objCat + "M" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->mass() - ttGenEvent_->hadronicDecayQuarkBar()->mass() );
       break;
     case 2:
-      histMap1D[ "BJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->hadronicDecayB()->pt() );
-      histMap1D[ "BJetPt" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->leptonicDecayB()->pt() );
-      histMap1D[ "BJetPtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->hadronicDecayB()->pt() ) );
-      histMap1D[ "BJetPtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->leptonicDecayB()->pt() ) );
-      histMap1D[ "BJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->hadronicDecayB()->eta() );
-      histMap1D[ "BJetEta" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->leptonicDecayB()->eta() );
-      histMap1D[ "BJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->hadronicDecayB()->phi() );
-      histMap1D[ "BJetPhi" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->leptonicDecayB()->phi() );
-      histMap1D[ "BJetPz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->hadronicDecayB()->pz() );
-      histMap1D[ "BJetPz" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->leptonicDecayB()->pz() );
-      histMap1D[ "BJetM" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->hadronicDecayB()->mass() );
-      histMap1D[ "BJetM" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->leptonicDecayB()->mass() );
+      histMap1D[ objCat + "Pt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayB()->pt() );
+      histMap1D[ objCat + "Pt" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt() - ttGenEvent_->leptonicDecayB()->pt() );
+      histMap1D[ objCat + "PtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->hadronicDecayB()->pt() ) );
+      histMap1D[ objCat + "PtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->leptonicDecayB()->pt() ) );
+      histMap1D[ objCat + "Eta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayB()->eta() );
+      histMap1D[ objCat + "Eta" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->eta() - ttGenEvent_->leptonicDecayB()->eta() );
+      histMap1D[ objCat + "Phi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayB()->phi() );
+      histMap1D[ objCat + "Phi" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->phi() - ttGenEvent_->leptonicDecayB()->phi() );
+      histMap1D[ objCat + "Pz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pz() - ttGenEvent_->hadronicDecayB()->pz() );
+      histMap1D[ objCat + "Pz" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pz() - ttGenEvent_->leptonicDecayB()->pz() );
+      histMap1D[ objCat + "M" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->mass() - ttGenEvent_->hadronicDecayB()->mass() );
+      histMap1D[ objCat + "M" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->mass() - ttGenEvent_->leptonicDecayB()->mass() );
       break;
     case 3:
-      histMap1D[ "NuPt" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->singleNeutrino()->pt() );
-      histMap1D[ "NuPtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->singleNeutrino()->pt() ) );
-      histMap1D[ "NuEta" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->singleNeutrino()->eta() );
-      histMap1D[ "NuPhi" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->singleNeutrino()->phi() );
-      histMap1D[ "NuPz" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->singleNeutrino()->pz() );
-      histMap1D[ "NuM" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->singleNeutrino()->mass() );
+      histMap1D[ objCat + "Pt" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleNeutrino()->pt() );
+      histMap1D[ objCat + "PtInv" ]->Fill( 1./( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->singleNeutrino()->pt() ) );
+      histMap1D[ objCat + "Eta" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->eta() - ttGenEvent_->singleNeutrino()->eta() );
+      histMap1D[ objCat + "Phi" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() - ttGenEvent_->singleNeutrino()->phi() );
+      histMap1D[ objCat + "Pz" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pz() - ttGenEvent_->singleNeutrino()->pz() );
+      histMap1D[ objCat + "M" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->mass() - ttGenEvent_->singleNeutrino()->mass() );
       break;
     default:
+      edm::LogError( "TopHitFitResolutionFunctions" ) << "Trying to access object category " << iCat << " (" << nCats << " categories)";
       break;
   }
 
@@ -411,55 +414,58 @@ void TopHitFitResolutionFunctions::fill1D( unsigned objCat, MapTH1D & histMap1D,
 
 }
 
-void TopHitFitResolutionFunctions::fill2D( unsigned objCat, MapTH2D & histMap2D, unsigned iCombi )
+void TopHitFitResolutionFunctions::fill2D( unsigned iCat, MapTH2D & histMap2D )
 {
 
-  switch ( objCat ) {
+  const unsigned nCats( objCat_.size() );
+  const std::string objCat( objCat_.at( iCat ) );
+  switch ( iCat ) {
     case 0:
-      histMap2D[ "LepPt_LepPt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->singleLepton()->pt() );
-      histMap2D[ "LepPt_LepPtInv" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pt(), 1./( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->singleLepton()->pt() ) );
-      histMap2D[ "LepPt_LepEta" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->singleLepton()->eta() );
-      histMap2D[ "LepPt_LepPhi" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->singleLepton()->phi() );
-      histMap2D[ "LepPt_LepPz" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->singleLepton()->pz() );
-      histMap2D[ "LepPt_LepM" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->singleLepton()->mass() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pt" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleLepton()->pt() );
+      histMap2D[ objCat + "Pt_" +objCat  + "PtInv" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), 1./( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->singleLepton()->pt() ) );
+      histMap2D[ objCat + "Pt_" +objCat  + "Eta" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() - ttGenEvent_->singleLepton()->eta() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Phi" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() - ttGenEvent_->singleLepton()->phi() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pz" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pz() - ttGenEvent_->singleLepton()->pz() );
+      histMap2D[ objCat + "Pt_" +objCat  + "M" ]->Fill( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->mass() - ttGenEvent_->singleLepton()->mass() );
       break;
     case 1:
-      histMap2D[ "UdscJetPt_UdscJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->hadronicDecayQuark()->pt() );
-      histMap2D[ "UdscJetPt_UdscJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->hadronicDecayQuarkBar()->pt() );
-      histMap2D[ "UdscJetPt_UdscJetPtInv" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pt(), 1./( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->hadronicDecayQuark()->pt() ) );
-      histMap2D[ "UdscJetPt_UdscJetPtInv" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pt(), 1./( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->hadronicDecayQuarkBar()->pt() ) );
-      histMap2D[ "UdscJetPt_UdscJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->hadronicDecayQuark()->eta() );
-      histMap2D[ "UdscJetPt_UdscJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->hadronicDecayQuarkBar()->eta() );
-      histMap2D[ "UdscJetPt_UdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->hadronicDecayQuark()->phi() );
-      histMap2D[ "UdscJetPt_UdscJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->hadronicDecayQuarkBar()->phi() );
-      histMap2D[ "UdscJetPt_UdscJetPz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->hadronicDecayQuark()->pz() );
-      histMap2D[ "UdscJetPt_UdscJetPz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->hadronicDecayQuarkBar()->pz() );
-      histMap2D[ "UdscJetPt_UdscJetM" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->hadronicDecayQuark()->mass() );
-      histMap2D[ "UdscJetPt_UdscJetM" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->hadronicDecayQuarkBar()->mass() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayQuark()->pt() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayQuarkBar()->pt() );
+      histMap2D[ objCat + "Pt_" +objCat  + "PtInv" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt(), 1./( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->hadronicDecayQuark()->pt() ) );
+      histMap2D[ objCat + "Pt_" +objCat  + "PtInv" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt(), 1./( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->hadronicDecayQuarkBar()->pt() ) );
+      histMap2D[ objCat + "Pt_" +objCat  + "Eta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayQuark()->eta() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Eta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayQuarkBar()->eta() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Phi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuark()->phi() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Phi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayQuarkBar()->phi() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pz() - ttGenEvent_->hadronicDecayQuark()->pz() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pz() - ttGenEvent_->hadronicDecayQuarkBar()->pz() );
+      histMap2D[ objCat + "Pt_" +objCat  + "M" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuark( TtEvent::kGenMatch )->mass() - ttGenEvent_->hadronicDecayQuark()->mass() );
+      histMap2D[ objCat + "Pt_" +objCat  + "M" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayQuarkBar( TtEvent::kGenMatch )->mass() - ttGenEvent_->hadronicDecayQuarkBar()->mass() );
       break;
     case 2:
-      histMap2D[ "BJetPt_BJetPt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->hadronicDecayB()->pt() );
-      histMap2D[ "BJetPt_BJetPt" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->leptonicDecayB()->pt() );
-      histMap2D[ "BJetPt_BJetPtInv" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pt(), 1./( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->hadronicDecayB()->pt() ) );
-      histMap2D[ "BJetPt_BJetPtInv" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pt(), 1./( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->leptonicDecayB()->pt() ) );
-      histMap2D[ "BJetPt_BJetEta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->hadronicDecayB()->eta() );
-      histMap2D[ "BJetPt_BJetEta" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->leptonicDecayB()->eta() );
-      histMap2D[ "BJetPt_BJetPhi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->hadronicDecayB()->phi() );
-      histMap2D[ "BJetPt_BJetPhi" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->leptonicDecayB()->phi() );
-      histMap2D[ "BJetPt_BJetPz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->hadronicDecayB()->pz() );
-      histMap2D[ "BJetPt_BJetPz" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->leptonicDecayB()->pz() );
-      histMap2D[ "BJetPt_BJetM" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->hadronicDecayB()->mass() );
-      histMap2D[ "BJetPt_BJetM" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->leptonicDecayB()->mass() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pt" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt() - ttGenEvent_->hadronicDecayB()->pt() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pt" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt() - ttGenEvent_->leptonicDecayB()->pt() );
+      histMap2D[ objCat + "Pt_" +objCat  + "PtInv" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt(), 1./( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->hadronicDecayB()->pt() ) );
+      histMap2D[ objCat + "Pt_" +objCat  + "PtInv" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt(), 1./( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->leptonicDecayB()->pt() ) );
+      histMap2D[ objCat + "Pt_" +objCat  + "Eta" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->eta() - ttGenEvent_->hadronicDecayB()->eta() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Eta" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->eta() - ttGenEvent_->leptonicDecayB()->eta() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Phi" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->phi() - ttGenEvent_->hadronicDecayB()->phi() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Phi" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->phi() - ttGenEvent_->leptonicDecayB()->phi() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pz" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pz() - ttGenEvent_->hadronicDecayB()->pz() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pz" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pz() - ttGenEvent_->leptonicDecayB()->pz() );
+      histMap2D[ objCat + "Pt_" +objCat  + "M" ]->Fill( ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->hadronicDecayB( TtEvent::kGenMatch )->mass() - ttGenEvent_->hadronicDecayB()->mass() );
+      histMap2D[ objCat + "Pt_" +objCat  + "M" ]->Fill( ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->leptonicDecayB( TtEvent::kGenMatch )->mass() - ttGenEvent_->leptonicDecayB()->mass() );
       break;
     case 3:
-      histMap2D[ "NuPt_NuPt" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pt() - ttGenEvent_->singleNeutrino()->pt() );
-      histMap2D[ "NuPt_NuPtInv" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pt(), 1./( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pt() ) - 1./( ttGenEvent_->singleNeutrino()->pt() ) );
-      histMap2D[ "NuPt_NuEta" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->eta() - ttGenEvent_->singleNeutrino()->eta() );
-      histMap2D[ "NuPt_NuPhi" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->phi() - ttGenEvent_->singleNeutrino()->phi() );
-      histMap2D[ "NuPt_NuPz" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pz() - ttGenEvent_->singleNeutrino()->pz() );
-      histMap2D[ "NuPt_NuM" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch, iCombi )->mass() - ttGenEvent_->singleNeutrino()->mass() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pt" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() - ttGenEvent_->singleNeutrino()->pt() );
+      histMap2D[ objCat + "Pt_" +objCat  + "PtInv" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt(), 1./( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() ) - 1./( ttGenEvent_->singleNeutrino()->pt() ) );
+      histMap2D[ objCat + "Pt_" +objCat  + "Eta" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->eta() - ttGenEvent_->singleNeutrino()->eta() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Phi" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() - ttGenEvent_->singleNeutrino()->phi() );
+      histMap2D[ objCat + "Pt_" +objCat  + "Pz" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pz() - ttGenEvent_->singleNeutrino()->pz() );
+      histMap2D[ objCat + "Pt_" +objCat  + "M" ]->Fill( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt(), ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->mass() - ttGenEvent_->singleNeutrino()->mass() );
       break;
     default:
+      edm::LogError( "TopHitFitResolutionFunctions" ) << "Trying to access object category " << iCat << " (" << nCats << " categories)";
       break;
   }
 
@@ -467,27 +473,57 @@ void TopHitFitResolutionFunctions::fill2D( unsigned objCat, MapTH2D & histMap2D,
 
 }
 
-void TopHitFitResolutionFunctions::fill1D( unsigned objCat, unsigned iBin, VecMapTH1D & histVecMap1D, unsigned iCombi )
+void TopHitFitResolutionFunctions::fill1D( unsigned iCat, VecMapTH1D & histVecMap1D, unsigned iBin )
 {
 
+  const std::string objCat( objCat_.at( iCat ) );
   MapTH1D histMap1D;
   for ( VecMapTH1D::const_iterator iMap = histVecMap1D.begin(); iMap != histVecMap1D.end(); ++iMap ) {
-    histMap1D[ iMap->first ] = iMap->second.at( iBin );
+    if ( iMap->first.substr( 0, objCat.size() ) == objCat ) {
+      const unsigned nBins( iMap->second.size() );
+      if ( iBin < nBins ) {
+        histMap1D[ iMap->first ] = iMap->second.at( iBin );
+      }
+      else {
+        edm::LogWarning( "TopHitFitResolutionFunctions" ) << "Trying to access bin " << iBin << " for object category " << objCat << " (" << nBins << " bins)";
+        continue;
+      }
+    }
   }
-  fill1D( objCat, histMap1D, iCombi );
+  if ( histMap1D.size() == kinProp_.size() ) {
+    fill1D( iCat, histMap1D );
+  }
+  else {
+    edm::LogError( "TopHitFitResolutionFunctions" ) << "Found " << histMap1D.size() << " histos in object category " << objCat << " instead of " << kinProp_.size();
+  }
 
   return;
 
 }
 
-void TopHitFitResolutionFunctions::fill2D( unsigned objCat, unsigned iBin, VecMapTH2D & histVecMap2D, unsigned iCombi )
+void TopHitFitResolutionFunctions::fill2D( unsigned iCat, VecMapTH2D & histVecMap2D, unsigned iBin )
 {
 
+  const std::string objCat( objCat_.at( iCat ) );
   MapTH2D histMap2D;
   for ( VecMapTH2D::const_iterator iMap = histVecMap2D.begin(); iMap != histVecMap2D.end(); ++iMap ) {
-    histMap2D[ iMap->first ] = iMap->second.at( iBin );
+    if ( iMap->first.substr( 0, objCat.size() ) == objCat ) {
+      const unsigned nBins( iMap->second.size() );
+      if ( iBin < nBins ) {
+        histMap2D[ iMap->first ] = iMap->second.at( iBin );
+      }
+      else {
+        edm::LogWarning( "TopHitFitResolutionFunctions" ) << "Trying to access bin " << iBin << " for object category " << objCat << " (" << nBins << " bins)";
+        continue;
+      }
+    }
   }
-  fill2D( objCat, histMap2D, iCombi );
+  if ( histMap2D.size() == kinProp_.size() ) {
+    fill2D( iCat, histMap2D );
+  }
+  else {
+    edm::LogError( "TopHitFitResolutionFunctions" ) << "Found " << histMap2D.size() << " histos in object category " << objCat << " instead of " << kinProp_.size();
+  }
 
   return;
 
