@@ -35,11 +35,12 @@ process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
-process.MessageLogger.cerr.threshold = 'INFO'
-process.MessageLogger.categories.append('TtSemiLeptonicEvent')
-process.MessageLogger.cerr.TtSemiLeptonicEvent = cms.untracked.PSet(
-  limit = cms.untracked.int32( -1 )
-)
+if runTest:
+  process.MessageLogger.cerr.threshold = 'INFO'
+  process.MessageLogger.categories.append('TopHitFitAnalyzer')
+  process.MessageLogger.cerr.TopHitFitAnalyzer = cms.untracked.PSet(
+    limit = cms.untracked.int32( -1 )
+  )
 
 
 ### Input
@@ -70,6 +71,8 @@ if runTest:
 outputFile = '%s/output/topHitFitAnalyzer_%s.root'%( os.getenv( "CMSSW_BASE" ), sample )
 if runTest:
   outputFile = outputFile.replace( 'root', 'test.root' )
+if not rfioInput:
+  outputFile = outputFile.replace( 'root', 'local.root' )
 process.TFileService = cms.Service(
   "TFileService"
 , fileName = cms.string( outputFile )
@@ -126,7 +129,12 @@ process.p_ReferenceBTag = cms.Path(
 ### Messages
 
 print
-print 'Log file:'
+print 'Output file:'
+print '------------'
+print outputFile
+print
+print 'Log file destination:'
+print '---------------------'
 print logFile
 print '================================================================================'
 print

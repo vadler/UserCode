@@ -3,7 +3,7 @@
 // Package:    TopMassSemiLeptonic
 // Class:      TopHitFitAnalyzer
 //
-// $Id: TopHitFitAnalyzer.cc,v 1.1 2011/08/31 14:45:53 vadler Exp $
+// $Id: TopHitFitAnalyzer.cc,v 1.23 2011/11/08 18:04:58 vadler Exp $
 //
 /**
   \class    TopHitFitAnalyzer TopHitFitAnalyzer.cc "TopQuarkAnalysis/TopMassSemiLeptonic/plugins/TopHitFitAnalyzer.cc"
@@ -12,13 +12,14 @@
 
 
   \author   Volker Adler
-  \version  $Id: TopHitFitAnalyzer.cc,v 1.1 2011/08/31 14:45:53 vadler Exp $
+  \version  $Id: TopHitFitAnalyzer.cc,v 1.23 2011/11/08 18:04:58 vadler Exp $
 */
 
 
 #include <map>
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include "TMath.h"
 #include "TH1D.h"
@@ -36,12 +37,9 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
 
-#include "TopQuarkAnalysis/TopHitFit/interface/EtaDepResolution.h"
-
 
 typedef std::map< std::string, TH1D* > MapTH1D;
 typedef std::map< std::string, TH2D* > MapTH2D;
-typedef std::map< std::string, std::vector< TH2D* > > VectorMapTH2D;
 
 
 class TopHitFitAnalyzer : public edm::EDAnalyzer {
@@ -255,18 +253,11 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
     // GenMatch vs. Generator
     MapTH1D hist1D_Generator_GenMatch__Signal_;
     MapTH2D hist2D_Generator_GenMatch__Signal_;
-    // GenMatch vs. Generator for resolution function
-    VectorMapTH2D histVec2D_Generator_GenMatch__Signal_;
     // HitFit vs. GenMatch
     MapTH1D hist1D_GenMatch_HitFitGood__Signal_;
     MapTH2D hist2D_GenMatch_HitFitGood__Signal_;
 
-    /// Resolutions
-    std::map< std::string, hitfit::EtaDepResolution > res_;
-
     /// Constants
-    std::vector< std::string > resCat_;
-    std::vector< std::string > fileNames_;
     std::vector< std::string > decayChnLabels_;
     std::vector< std::string > patMatchPartonLabels_;
     std::vector< std::string > tqafMatchPartonLabels_;
@@ -298,8 +289,6 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
 };
 
 
-#include <iostream>
-
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
@@ -308,8 +297,7 @@ class TopHitFitAnalyzer : public edm::EDAnalyzer {
 #include "TopQuarkAnalysis/TopHitFit/interface/LeptonTranslatorBase.h"
 #include "TopQuarkAnalysis/TopHitFit/interface/JetTranslatorBase.h"
 #include "TopQuarkAnalysis/TopHitFit/interface/METTranslatorBase.h"
-
-#include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/Helpers.h"
+#include "TopQuarkAnalysis/TopHitFit/interface/EtaDepResolution.h"
 
 
 // Default constructor
@@ -447,34 +435,9 @@ TopHitFitAnalyzer::TopHitFitAnalyzer( const edm::ParameterSet & iConfig )
 , hist2D_Generator_HitFitGood__Signal_()
 , hist1D_Generator_GenMatch__Signal_()
 , hist2D_Generator_GenMatch__Signal_()
-, histVec2D_Generator_GenMatch__Signal_()
 , hist1D_GenMatch_HitFitGood__Signal_()
 , hist2D_GenMatch_HitFitGood__Signal_()
 {
-
-  // Resolutions
-
-  // Resolution categories
-  resCat_.clear();
-  resCat_.push_back( "Lep" );
-  resCat_.push_back( "UdscJet" );
-  resCat_.push_back( "BJet" );
-  resCat_.push_back( "Nu" );
-
-  // File name parameter names
-  fileNames_.clear();
-  fileNames_.push_back( "lepResolutions" );
-  fileNames_.push_back( "udscJetResolutions" );
-  fileNames_.push_back( "bJetResolutions" );
-
-  for ( unsigned iCat = 0; iCat < fileNames_.size(); ++iCat ) {
-    const std::string resolutionFile = iConfig.getParameter< std::string >( fileNames_.at( iCat ) );
-    // Eta-dependent resolutions
-    res_[ resCat_.at( iCat ) ] = hitfit::EtaDepResolution( edm::FileInPath( resolutionFile ).fullPath() );
-    // Initialize size of histogram vectors
-    histVec2D_Generator_GenMatch__Signal_[ resCat_.at( iCat ) ] = std::vector< TH2D* >( res_[ resCat_.at( iCat ) ].GetEtaDepResElement().size() );
-  }
-  histVec2D_Generator_GenMatch__Signal_[ resCat_.at( fileNames_.size() )] = std::vector< TH2D* >( 1 );
 
   // Axis labels
 
@@ -946,32 +909,33 @@ void TopHitFitAnalyzer::beginJob()
     std::string key_Diff( iHist->first );
     std::string name_Diff( iHist->second->GetName() );
     std::string title_Diff( iHist->second->GetTitle() );
-    bool foundCat( false );
-    for ( unsigned iCat = 0; iCat < fileNames_.size(); ++iCat ) {
-      if ( key_Diff.substr( 4, resCat_.at( iCat ).size() ) == resCat_.at( iCat ) ) {
-        key_Diff.insert( 0, resCat_.at( iCat ) + "Pt_" );
-        hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, resCat_.at( iCat ) + "Pt_" ).c_str(), title_Diff.append( " vs. reconstructed transverse momentum").c_str(), binsLepPt_, 0., maxLepPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() ); // FIXME bins constant
-        hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t} (GeV)" );
-        hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
-        hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
-        for ( unsigned iBin = 0; iBin < histVec2D_Generator_GenMatch__Signal_[ resCat_.at( iCat ) ].size(); ++iBin ) {
-          std::string name_Diff_Bin( name_Diff );
-          std::string title_Diff_Bin( title_Diff );
-          title_Diff_Bin.append( ", " + my::helpers::to_string( res_[ resCat_.at( iCat ) ].GetEtaDepResElement().at( iBin ).EtaMin() ) + " #leq #eta #leq " + my::helpers::to_string( res_[ resCat_.at( iCat ) ].GetEtaDepResElement().at( iBin ).EtaMax() ) );
-          histVec2D_Generator_GenMatch__Signal_[ resCat_.at( iCat ) ][ iBin ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( *( ( TH2D* )( hist2D_Generator_GenMatch__Signal_[ key_Diff ]->Clone( name_Diff_Bin.append( "_" ).append( my::helpers::to_string( iBin ) ).c_str() ) ) ) );
-          histVec2D_Generator_GenMatch__Signal_[ resCat_.at( iCat ) ][ iBin ]->SetTitle( title_Diff_Bin.c_str() );
-        }
-        foundCat = true;
-        break;
-      }
+    if ( key_Diff.substr( 4, 3 ) == "Lep" ) {
+      key_Diff.insert( 0, "LepPt_" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "LepPt_" ).c_str(), title_Diff.append( " vs. reconstructed lepton transverse momentum").c_str(), binsLepPt_, 0., maxLepPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, l} (GeV)" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
     }
-    if ( ! foundCat && key_Diff.substr( 4, resCat_.at( fileNames_.size() ).size() ) == resCat_.at( fileNames_.size() ) ) {
-      key_Diff.insert( 0, resCat_.at( fileNames_.size() ) + "Pt_" );
-      hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, resCat_.at( fileNames_.size() ) + "Pt_" ).c_str(), title_Diff.append( " vs. reconstructed missing transverse momentum").c_str(), binsNuPt_, 0., maxNuPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
+    else if ( key_Diff.substr( 4, 2 ) == "Nu" ) {
+      key_Diff.insert( 0, "NuPt_" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "NuPt_" ).c_str(), title_Diff.append( " vs. reconstructed missing transverse momentum").c_str(), binsNuPt_, 0., maxNuPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, miss} (GeV)" );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
       hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
-      foundCat = true;
+    }
+    else if ( key_Diff.substr( 4, 7 ) == "UdscJet" ) {
+      key_Diff.insert( 0, "UdscJetPt_" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "UdscJetPt_" ).c_str(), title_Diff.append( " vs. reconstructed light jet transverse momentum").c_str(), binsJetPt_, 0., maxJetPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, j} (GeV)" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
+    }
+    else if ( key_Diff.substr( 4, 4 ) == "BJet" ) {
+      key_Diff.insert( 0, "BJetPt_" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ] = dir_Generator_GenMatchValid__Signal.make< TH2D >( name_Diff.replace( 19, 0, "BJetPt_" ).c_str(), title_Diff.append( " vs. reconstructed b-jet transverse momentum").c_str(), binsJetPt_, 0., maxJetPt_, iHist->second->GetXaxis()->GetNbins(), iHist->second->GetXaxis()->GetXmin(), iHist->second->GetXaxis()->GetXmax() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetXTitle( "p_{t, b} (GeV)" );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetYTitle( iHist->second->GetXaxis()->GetTitle() );
+      hist2D_Generator_GenMatch__Signal_[ key_Diff ]->SetZTitle( iHist->second->GetYaxis()->GetTitle() );
     }
   }
 
