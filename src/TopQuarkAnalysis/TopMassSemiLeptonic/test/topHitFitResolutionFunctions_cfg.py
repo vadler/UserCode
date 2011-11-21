@@ -15,6 +15,9 @@ sample  = 'RelValTTbar'
 #sample  = 'Mu'
 #sample  = 'Jet'
 
+# Event selection
+hitFitProcess = 'HitFit'
+
 ### Initialization
 
 process = cms.Process( "TEST" )
@@ -34,6 +37,10 @@ if runTest:
   process.MessageLogger.cerr.threshold = 'INFO'
   process.MessageLogger.categories.append('TopHitFitResolutionFunctions')
   process.MessageLogger.cerr.TopHitFitResolutionFunctions = cms.untracked.PSet(
+    limit = cms.untracked.int32( -1 )
+  )
+  process.MessageLogger.categories.append('TtSemiLeptonicEvent')
+  process.MessageLogger.cerr.TtSemiLeptonicEvent = cms.untracked.PSet(
     limit = cms.untracked.int32( -1 )
   )
 
@@ -75,15 +82,38 @@ process.TFileService = cms.Service(
 logFile = outputFile.replace( 'root', 'log' )
 
 
+### Event selection
+
+# Trigger
+process.load( "HLTrigger.HLTfilters.hltHighLevel_cfi" )
+process.hltHighLevel.TriggerResultsTag = cms.InputTag( 'TriggerResults::%s'%( hitFitProcess ) )
+process.hltHighLevel.HLTPaths          = [ 'HitFit_PF2PATHitFit'
+                                         ]
+process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'HitFit_ReferenceHitFit'
+                                                                        ]
+                                                           )
+
+
 ### Analyzer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.topHitFitResolutionFunctions_cfi" )
+process.topHitFitResolutionFunctions.verbosity = 1
+if runTest:
+  process.topHitFitResolutionFunctions.verbosity = 11
+process.topHitFitResolutionFunctions_Reference = process.topHitFitResolutionFunctions.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReference'
+                                                                                           )
 
 
 ### Paths
 
 process.p = cms.Path(
-  process.topHitFitResolutionFunctions
+  process.hltHighLevel
+* process.topHitFitResolutionFunctions
+)
+
+process.p_Reference = cms.Path(
+  process.hltHighLevel_Reference
+* process.topHitFitResolutionFunctions_Reference
 )
 
 

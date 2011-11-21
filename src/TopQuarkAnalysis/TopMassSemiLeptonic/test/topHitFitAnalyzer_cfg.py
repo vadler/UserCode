@@ -41,6 +41,10 @@ if runTest:
   process.MessageLogger.cerr.TopHitFitAnalyzer = cms.untracked.PSet(
     limit = cms.untracked.int32( -1 )
   )
+  process.MessageLogger.categories.append('TtSemiLeptonicEvent')
+  process.MessageLogger.cerr.TtSemiLeptonicEvent = cms.untracked.PSet(
+    limit = cms.untracked.int32( -1 )
+  )
 
 
 ### Input
