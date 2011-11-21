@@ -70,7 +70,7 @@ if runTest:
 
 ### Output
 
-outputFile = '%s/output/topHitFitResolutionFunctions%s.root'%( os.getenv( "CMSSW_BASE" ), sample )
+outputFile = '%s/output/topHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), sample )
 if runTest:
   outputFile = outputFile.replace( 'root', 'test.root' )
 if not rfioInput:
