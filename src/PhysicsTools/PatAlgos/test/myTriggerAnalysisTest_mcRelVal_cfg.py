@@ -2,20 +2,17 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process( "HLTPROV" )
 
-# Steering
-cmsswVersion = 'CMSSW_5_0_0_pre4'
-globalTag    = 'START50_V3'
-
 # Conditions
+condition = 'startup'
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = '%s::All'%( globalTag )
+from Configuration.AlCa.autoCond import autoCond
+process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-
-    pickRelValInputFiles( formerVersion = True
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_0_0_pre5'
                         , relVal        = 'RelValProdTTbar'
                         , dataTier      = 'AODSIM'
                         , condition     = None
@@ -31,7 +28,7 @@ process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 1 )
 )
 
-# HLT analyzers
+# Trigger analyzers
 process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
 process.hltEventAnalyzerAOD.triggerName = cms.string( '@' )
 process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )

@@ -3,9 +3,10 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 condition                   = 'com10'
 globalTag                   = autoCond[ condition ][ : -5 ]
 process.GlobalTag.globaltag = autoCond[ condition ]
-process.source.fileNames    = pickRelValInputFiles( relVal    = 'SingleMu'
-                                                  , dataTier  = 'RECO'
-                                                  , globalTag = '%s_RelVal_mu2011A'%( globalTag )
+process.source.fileNames    = pickRelValInputFiles( relVal      = 'SingleMu'
+                                                  , dataTier    = 'RECO'
+                                                  , globalTag   = '%s_RelVal_mu2011A'%( globalTag )
+                                                  , maxVersions = 1
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
