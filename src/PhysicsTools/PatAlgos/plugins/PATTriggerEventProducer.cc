@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerEventProducer.cc,v 1.16 2011/11/30 12:23:31 vadler Exp $
+// $Id: PATTriggerEventProducer.cc,v 1.17 2011/11/30 12:36:40 vadler Exp $
 //
 
 
@@ -33,8 +33,7 @@ PATTriggerEventProducer::PATTriggerEventProducer( const ParameterSet & iConfig )
   tagsTriggerMatcher_(),
   // L1 configuration parameters
   tagL1Gt_(),
-  // HLTConfigProvide
-  hltConfig_(),
+  // HLTConfigProvider
   hltConfigInit_( false ),
   // HLT configuration parameters
   tagTriggerResults_( "TriggerResults" ),
