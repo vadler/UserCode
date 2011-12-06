@@ -1,10 +1,11 @@
-Test Release based on: CMSSW_4_4_2
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_2
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_4_2
+Test Release based on: CMSSW_4_4_X_2011-12-06-0200
+Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_amd64_gcc434/tue/4.4-tue-02/CMSSW_4_4_X_2011-12-06-0200
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_4_X_2011-12-06-0200
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/PatCandidates                        V06-04-29      V06-04-27      
-PhysicsTools/PatAlgos                            V08-07-28      V08-07-24-01   
-PhysicsTools/PatExamples                         V00-05-24      V00-05-24      
-PhysicsTools/PatUtils                            V03-09-18-01   V03-09-18      
+CommonTools/ParticleFlow                         V00-03-02      V00-03-00      
+DataFormats/PatCandidates                        V06-04-30      V06-04-27      
+PhysicsTools/PatAlgos                            V08-07-34      V08-07-24-01   
+PhysicsTools/PatUtils                            V03-09-18-02   V03-09-18      
+RecoParticleFlow/PFProducer                      V14-07-13      V14-07-07-03   
 ---------------------------------------
-total packages: 4 (4 displayed)
+total packages: 5 (5 displayed)
