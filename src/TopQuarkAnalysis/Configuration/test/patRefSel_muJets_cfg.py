@@ -117,13 +117,13 @@ useNoTau      = True # before MET top projection
 # muons
 #pfMuonSelectionCut = 'pt > 5.'
 useMuonCutBasePF = False # use minimal (veto) muon selection cut on top of 'pfMuonSelectionCut'
-#pfMuonIsoConeR   = 0.4
+#pfMuonIsoConeR03 = False
 #pfMuonCombIsoCut = 0.2
 # electrons
 #pfElectronSelectionCut  = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
-useElectronCutBasePF = False # use minimal (veto) electron selection cut on top of 'pfElectronSelectionCut'
-#pfElectronIsoConeR   = 0.3
-#pfElectronCombIsoCut = 0.2
+useElectronCutBasePF  = False # use minimal (veto) electron selection cut on top of 'pfElectronSelectionCut'
+#pfElectronnIsoConeR03 = False
+#pfElectronCombIsoCut  = 0.2
 
 ### JEC levels
 
@@ -154,13 +154,12 @@ inputFiles = [ '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/129/42DDEE9
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
-maxInputEvents = 1000
 
 ### Conditions
 
 # GlobalTags (w/o suffix '::All')
-globalTagData = 'GR_R_42_V19' # default for CMSSW_4_2_8 RelVals: 'GR_R_42_V14'
-globalTagMC   = 'START42_V13' # default for CMSSW_4_2_8 RelVals: 'START42_V12'
+globalTagData = 'GR_R_42_V21'  # default for CMSSW_4_2_9_HLT1 RelVals: 'GR_R_42_V14'
+globalTagMC   = 'START42_V14B' # default for CMSSW_4_2_9_HLT1 RelVals: 'START42_V14A'
 
 ### Output
 
@@ -200,16 +199,16 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_9_HLT1'
                                      , relVal        = 'RelValTTbar'
-                                     , globalTag     = 'START42_V12'
+                                     , globalTag     = 'START42_V14A'
                                      , numberOfFiles = -1
                                      )
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_9_HLT1'
                                      , relVal        = 'Mu'
                                      , dataTier      = 'RECO'
-                                     , globalTag     = 'GR_R_42_V14_mu2010B'
+                                     , globalTag     = 'GR_R_42_V14_RelVal_mu2010B'
                                      , numberOfFiles = -1
                                      )
 process.source.fileNames = inputFiles
@@ -332,18 +331,27 @@ if runPF2PAT:
   applyPostfix( process, 'pfMuonsFromVertex'    , postfix ).d0Cut    = pfD0Cut
   applyPostfix( process, 'pfMuonsFromVertex'    , postfix ).dzCut    = pfDzCut
   applyPostfix( process, 'pfSelectedMuons'      , postfix ).cut = pfMuonSelectionCut
-  applyPostfix( process, 'isoValMuonWithCharged', postfix ).deposits[0].deltaR = pfMuonIsoConeR
-  applyPostfix( process, 'isoValMuonWithNeutral', postfix ).deposits[0].deltaR = pfMuonIsoConeR
-  applyPostfix( process, 'isoValMuonWithPhotons', postfix ).deposits[0].deltaR = pfMuonIsoConeR
-  applyPostfix( process, 'pfIsolatedMuons'      , postfix ).combinedIsolationCut = pfMuonCombIsoCut
+  applyPostfix( process, 'pfIsolatedMuons'      , postfix ).isolationCut = pfMuonCombIsoCut
+  if pfMuonIsoConeR03:
+    applyPostfix( process, 'pfIsolatedMuons', postfix ).isolationValueMapsCharged  = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03' + postfix )
+                                                                                                  )
+    applyPostfix( process, 'pfIsolatedMuons', postfix ).deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03' + postfix )
+    applyPostfix( process, 'pfIsolatedMuons', postfix ).isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03' + postfix )
+                                                                                                  , cms.InputTag( 'muPFIsoValueGamma03' + postfix )
+                                                                                                  )
+    applyPostfix( process, 'patMuons', postfix ).isolationValues.pfNeutralHadrons   = cms.InputTag( 'muPFIsoValueNeutral03' + postfix )
+    applyPostfix( process, 'patMuons', postfix ).isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03' + postfix )
+    applyPostfix( process, 'patMuons', postfix ).isolationValues.pfPhotons          = cms.InputTag( 'muPFIsoValueGamma03' + postfix )
+    applyPostfix( process, 'patMuons', postfix ).isolationValues.pfChargedHadrons   = cms.InputTag( 'muPFIsoValueCharged03' + postfix )
   applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).vertices = cms.InputTag( pfVertices )
   applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).d0Cut    = pfD0Cut
   applyPostfix( process, 'pfElectronsFromVertex'    , postfix ).dzCut    = pfDzCut
   applyPostfix( process, 'pfSelectedElectrons'      , postfix ).cut = pfElectronSelectionCut
-  applyPostfix( process, 'isoValElectronWithCharged', postfix ).deposits[0].deltaR = pfElectronIsoConeR
-  applyPostfix( process, 'isoValElectronWithNeutral', postfix ).deposits[0].deltaR = pfElectronIsoConeR
-  applyPostfix( process, 'isoValElectronWithPhotons', postfix ).deposits[0].deltaR = pfElectronIsoConeR
-  applyPostfix( process, 'pfIsolatedElectrons'      , postfix ).combinedIsolationCut = pfElectronCombIsoCut
+  applyPostfix( process, 'pfIsolatedElectrons'      , postfix ).isolationCut = pfElectronCombIsoCut
+  if pfElectronIsoConeR03:
+    applyPostfix( process, 'isoValElectronWithCharged', postfix ).deposits[0].deltaR = 0.3
+    applyPostfix( process, 'isoValElectronWithNeutral', postfix ).deposits[0].deltaR = 0.3
+    applyPostfix( process, 'isoValElectronWithPhotons', postfix ).deposits[0].deltaR = 0.3
   applyPostfix( process, 'patElectrons', postfix ).pvSrc = cms.InputTag( pfVertices )
   applyPostfix( process, 'patMuons', postfix ).pvSrc = cms.InputTag( pfVertices )
 
@@ -472,7 +480,7 @@ if runStandardPAT:
   process.patDefaultSequence.replace( process.patJetCorrFactors
                                     , process.kt6PFJets * process.patJetCorrFactors
                                     )
-  process.out.outputCommands.append( 'keep *_kt6PFJets_rho_' + process.name_() )
+  process.out.outputCommands.append( 'keep double_kt6PFJets_*_' + process.name_() )
   if useL1FastJet:
     process.patJetCorrFactors.useRho = True
     if usePFJets:
@@ -542,7 +550,7 @@ if runPF2PAT:
                                                             )
     if useL1FastJet:
       applyPostfix( process, 'patJetCorrFactors', postfix ).rho = cms.InputTag( 'kt6PFJets' + postfix, 'rho' )
-  process.out.outputCommands.append( 'keep *_kt6PFJets' + postfix + '_rho_' + process.name_() )
+  process.out.outputCommands.append( 'keep double_kt6PFJets' + postfix + '_*_' + process.name_() )
 
   goodPatJetsPF = goodPatJets.clone( src = cms.InputTag( 'selectedPatJets' + postfix ) )
   setattr( process, 'goodPatJets' + postfix, goodPatJetsPF )
