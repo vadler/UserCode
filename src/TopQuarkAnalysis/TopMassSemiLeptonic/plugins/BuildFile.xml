@@ -1,4 +1,4 @@
-<library name="TopQuarkAnalysisTopmassSemiLeptonic_plugins" file="*.cc">
+<library name="TopQuarkAnalysisTopMassSemiLeptonic_plugins" file="*.cc">
   <use name="FWCore/Framework"/>
   <use name="FWCore/ParameterSet"/>
   <use name="CommonTools/UtilAlgos"/>

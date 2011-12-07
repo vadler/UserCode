@@ -6,30 +6,17 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 # Misc
-runTest    = True
+runCrab    = False
+runTest    = False
 reportTime = False
 
 # Input
-runOnMC             = True
-relValMC            = 'RelValTTbar'
-#relValMC            = 'RelValZMM'
-#relValMC            = 'RelValWM'
-relValMCGlobalTag   = 'START44_V7'
-relValData          = 'Mu'
-relValDataGlobalTag = 'GR_R_44_V7_RelVal_mu2010B'
-#relValDataGlobalTag = 'GR_R_44_V7_RelVal_wzMu2010B'
-#relValData          = 'Jet'
-#relValDataGlobalTag = 'GR_R_44_V7_jet2010B'
-
-runPartonMatch = True
-runJetMatch    = True
-runCiC         = False
-runEwk         = False
+relVal   = 'RelValProdTTbar'
+dataTier = 'AODSIM'
 
 # Trigger
 hltProcess       = 'HLT'
-#triggerSelection = 'HLT_IsoMu24 OR HLT_IsoMu24_v*'
-triggerSelection = 'HLT_IsoMu24_v*'
+triggerSelection = 'HLT_IsoMu15_v*'
 
 # Vertices
 pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
@@ -37,7 +24,7 @@ pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOf
 
 # Muons
 # switch for muon isolation cone, PF2PAT default: 0.4 (False)
-muonsIsoR03           = False # isolation cone of 0.3, if 'True'
+muonsIsoR03           = True # isolation cone of 0.3, if 'True'
 # muon top projection isolation selection, PF2PAT default: 0.15
 muonsSelectIsoPf      = 0.2
 # muon top projection object selection, PF2PAT default: 'pt > 5.'
@@ -77,7 +64,7 @@ referenceElectronsMin = 0
 referenceElectronsMax = 0
 
 # X-Leptons
-embedLeptonTracks = True
+embedLeptonTracks = False
 # counters
 leptonsMin = 1
 leptonsMax = 1
@@ -92,7 +79,8 @@ jetAlgo   = 'AK5'
 jecLevels = [ 'L1FastJet'
             , 'L2Relative'
             , 'L3Absolute'
-            , 'L2L3Residual'
+            , 'L5Flavor'
+            , 'L7Parton'
             ]
 # jet object selection
 jetSelectHitFit = 'abs(eta) < 3.0'
@@ -100,9 +88,15 @@ jetSelectVeto   = 'pt > 30. && abs(eta) < 2.4 && numberOfDaughters > 1 && charge
 jetSelect       = jetSelectHitFit + ' && ' + jetSelectVeto
 jetSelectSignal = ''
 #jetBTagAlgo          = '' # empty string switches the use of b-Tagging off
-jetBTagAlgo          = 'trackCountingHighPurBJetTags' # empty string switches the use of b-Tagging off
-jetMinBDiscBJets     = 1.
-jetMaxBDiscLightJets = 3.
+#jetBTagAlgo          = 'trackCountingHighPurBJetTags' # empty string switches the use of b-Tagging off
+jetBTagAlgo          = 'simpleSecondaryVertexHighEffBJetTags'
+# working points from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagPerformanceOP:
+#jetMinBDiscBJets     = 1.93 # TCHPM
+#jetMaxBDiscLightJets = 1.93 # should it be the same?
+#jetMinBDiscBJets     = 3.14 # TCHPT
+#jetMaxBDiscLightJets = 3.14 # should it be the same?
+jetMinBDiscBJets     = 1.74 # SSVHEM
+jetMaxBDiscLightJets = 1.74 # should it be the same?
 # counters
 jetsMin = 4
 jetsMax = 999999
@@ -114,7 +108,7 @@ referenceJetsMax = 999999
 
 ### Initialization
 
-process = cms.Process( 'HitFit' )
+process = cms.Process( 'SKIM' )
 
 if len( jecLevels ) == 0:
   print 'ERROR: No JECs are applied!'
@@ -123,15 +117,10 @@ if len( jecLevels ) == 0:
 
 pvCollection += '::%s'%( process.name_() )
 
-process.Timing = cms.Service( "Timing"
-, summaryOnly = cms.untracked.bool( not reportTime )
-)
-
-# MC related
-runPartonMatch = runPartonMatch and runOnMC
-runJetMatch    = runJetMatch    and runOnMC
-if runOnMC and 'L2L3Residual' in jecLevels:
-  jecLevels.remove( 'L2L3Residual' )
+if runTest:
+  process.Timing = cms.Service( "Timing"
+  , summaryOnly = cms.untracked.bool( not reportTime )
+  )
 
 
 ### Logging
@@ -144,12 +133,6 @@ process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
-if runTest:
-  process.MessageLogger.cerr.threshold = 'INFO'
-  process.MessageLogger.categories.append('JetPartonMatching')
-  process.MessageLogger.cerr.JetPartonMatching = cms.untracked.PSet(
-    limit = cms.untracked.int32( -1 )
-  )
 
 
 ### Conditions
@@ -158,10 +141,7 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 from Configuration.AlCa.autoCond import autoCond
-if runOnMC:
-  process.GlobalTag.globaltag = autoCond[ 'startup' ]
-else:
-  process.GlobalTag.globaltag = autoCond[ 'com10' ]
+process.GlobalTag.globaltag = autoCond[ 'startup' ]
 
 
 ### Input
@@ -179,39 +159,34 @@ process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( inputEvents )
 )
 
-sample = ''
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-if runOnMC:
-  sample = relValMC
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_2'
-                                                 , relVal        = relValMC
-                                                 , globalTag     = relValMCGlobalTag
-                                                 )
-else:
-  sample = relValData
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_2'
-                                                 , relVal        = relValData
-                                                 , dataTier      = 'RECO'
-                                                 , globalTag     = relValDataGlobalTag
+if not runCrab:
+  from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
+  process.source.fileNames = pickRelValInputFiles( relVal      = relVal
+                                                 , dataTier    = dataTier
+                                                 , maxVersions = 1
                                                  )
 
 
 ### Output
 
-outputFile = '%s/output/hitFitPatSkimPF2PAT_%s.root'%( os.getenv( "CMSSW_BASE" ), sample )
-if runTest:
-  outputFile = outputFile.replace( 'root', 'test.root' )
-logFile = outputFile.replace( 'root', 'log' )
 
 process.out = cms.OutputModule( "PoolOutputModule"
-, fileName       = cms.untracked.string( outputFile )
+, fileName       = cms.untracked.string( 'skimHitFitResolutionFunctions.root' )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
                               )
   )
-, outputCommands = cms.untracked.vstring() # screwed up by PAT tolls lateron anyway :-(
+, outputCommands = cms.untracked.vstring() # screwed up by PAT tools later on anyway :-(
 , dropMetaData   = cms.untracked.string( 'ALL' )
 )
+
+outputFile = '%s/output/skimHitFitResolutionFunctions.root'%( os.getenv( "CMSSW_BASE" ) )
+if runTest:
+  outputFile = outputFile.replace( 'root', 'test.root' )
+if not runCrab:
+  outputFile = outputFile.replace( 'root', 'local.root' )
+  process.out.fileName = outputFile
+logFile = outputFile.replace( 'root', 'log' )
 
 
 ### Cleaning
@@ -264,39 +239,17 @@ process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 
 # Misc
 from PhysicsTools.PatAlgos.tools.coreTools import *
-if not runOnMC:
-  runOnData( process
-           , names = [ 'All' ]
-           )
 removeSpecificPATObjects( process
                         , names = [ 'Photons', 'Taus' ]
                         )
-if runOnMC:
-  if not runPartonMatch:
-    process.patMuons.addGenMatch      = False
-    process.patMuons.embedGenMatch    = False
-    process.patMuons.genParticleMatch = ''
-    process.patDefaultSequence.remove( process.muonMatch )
-    process.patElectrons.addGenMatch      = False
-    process.patElectrons.embedGenMatch    = False
-    process.patElectrons.genParticleMatch = ''
-    process.patDefaultSequence.remove( process.electronMatch )
-    process.patJets.addGenPartonMatch   = False
-    process.patJets.embedGenPartonMatch = False
-    process.patJets.genPartonMatch      = ''
-    process.patDefaultSequence.remove( process.patJetPartonMatch )
-    process.patJets.getJetMCFlavour    = False
-    process.patJets.JetPartonMapSource = ''
-    process.patDefaultSequence.remove( process.patJetFlavourId )
-  if not runJetMatch:
-    process.patJets.addGenJetMatch = False
-    process.patJets.genJetMatch    = ''
-    process.patDefaultSequence.remove( process.patJetGenJetMatch )
+process.patJets.addGenJetMatch = False
+process.patJets.genJetMatch    = ''
+process.patDefaultSequence.remove( process.patJetGenJetMatch )
 
 # PF2PAT
 from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
 usePF2PAT( process
-         , runOnMC        = runOnMC
+         , runOnMC        = True
          , jetAlgo        = jetAlgo
          , jetCorrections = ( '%sPFchs'%( jetAlgo )
                             , jecLevels
@@ -304,24 +257,13 @@ usePF2PAT( process
          , pvCollection   = cms.InputTag( pvCollection )
          )
 # still need to fix event content afterwards :-(
-process.out.outputCommands.append( 'keep edmTriggerResults_*_*_*' )
-process.out.outputCommands.append( 'drop edmTriggerResults_*_*_*RECO*' )
-process.out.outputCommands.append( 'drop edmTriggerResults_*_*_*NONE*' )
-process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
-process.out.outputCommands.append( 'keep *_offlineBeamSpot_*_*' )
-process.out.outputCommands.append( 'keep *_offlinePrimaryVertices_*_*' )
-process.out.outputCommands.append( 'keep *_goodOfflinePrimaryVertices_*_*' )
-if not runOnMC:
-  process.out.outputCommands.append( 'keep *_addPileupInfo_*_*' )
+process.out.outputCommands.append( 'drop edmTriggerResults_*_*_*' )
+process.out.outputCommands.append( 'keep edmTriggerResults_*_*_%s'%( process.name_() ) )
 
-if jetAlgo != 'AK5' or not runJetMatch:
-  process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
-if jetAlgo != 'AK7' or not runJetMatch:
-  process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )
-if jetAlgo != 'IC5' or not runJetMatch:
-  process.patPF2PATSequence.remove( process.iterativeCone5GenJetsNoNu )
-if not runJetMatch:
-  process.patPF2PATSequence.remove( process.genParticlesForJetsNoNu )
+process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
+process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )
+process.patPF2PATSequence.remove( process.iterativeCone5GenJetsNoNu )
+process.patPF2PATSequence.remove( process.genParticlesForJetsNoNu )
 
 process.patPF2PATSequence.remove( process.patPFParticles )
 process.patPF2PATSequence.remove( process.selectedPatPFParticles )
@@ -418,6 +360,11 @@ if muonsIsoR03:
   process.pfIsolatedMuons.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03' )
 process.pfIsolatedMuons.isolationCut = muonsSelectIsoPf
 process.patMuons.embedTrack = embedLeptonTracks
+if muonsIsoR03:
+  process.patMuons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'muPFIsoValueNeutral03' )
+  process.patMuons.isolationValues.pfPhotons          = cms.InputTag( 'muPFIsoValueGamma03' )
+  process.patMuons.isolationValues.pfChargedHadrons   = cms.InputTag( 'muPFIsoValueCharged03' )
+  process.patMuons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03' )
 process.selectedPatMuons.cut = muonSelect
 process.referencePatMuons.preselection = muonSelectSignal
 process.referencePatMuons.checkOverlaps = cms.PSet(
@@ -435,55 +382,21 @@ process.referencePatMuons.checkOverlaps = cms.PSet(
 # Electrons
 process.pfSelectedElectrons.cut = electronSelectPf
 if electronsIsoR03:
-  process.isoValElectronWithCharged.deposits[0].deltaR = 0.3
-  process.isoValElectronWithNeutral.deposits[0].deltaR = 0.3
-  process.isoValElectronWithPhotons.deposits[0].deltaR = 0.3
+  process.pfIsolatedElectrons.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03' )
+                                                                       )
+  process.pfIsolatedElectrons.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03' )
+                                                                       , cms.InputTag( 'elPFIsoValueGamma03' )
+                                                                       )
+  process.pfIsolatedElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03' )
 process.pfIsolatedElectrons.isolationCut = electronsSelectIsoPf
 process.patElectrons.embedTrack = embedLeptonTracks
+if electronsIsoR03:
+  process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03' )
+  process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03' )
+  process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03' )
+  process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03' )
 process.selectedPatElectrons.cut = electronSelect
 process.referencePatElectrons.preselection = electronSelectSignal
-if runEwk:
-  process.load( "ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff" )
-  process.patPF2PATSequence.replace( process.patElectrons
-                                   , process.simpleEleIdSequence * process.patElectrons
-                                   )
-  process.patElectrons.electronIDSources.simpleEleId95relIso = cms.InputTag( 'simpleEleId95relIso' )
-  process.patElectrons.electronIDSources.simpleEleId90relIso = cms.InputTag( 'simpleEleId90relIso' )
-  process.patElectrons.electronIDSources.simpleEleId85relIso = cms.InputTag( 'simpleEleId85relIso' )
-  process.patElectrons.electronIDSources.simpleEleId80relIso = cms.InputTag( 'simpleEleId80relIso' )
-  process.patElectrons.electronIDSources.simpleEleId70relIso = cms.InputTag( 'simpleEleId70relIso' )
-  process.patElectrons.electronIDSources.simpleEleId60relIso = cms.InputTag( 'simpleEleId60relIso' )
-  process.patElectrons.electronIDSources.simpleEleId95cIso   = cms.InputTag( 'simpleEleId95cIso' )
-  process.patElectrons.electronIDSources.simpleEleId90cIso   = cms.InputTag( 'simpleEleId90cIso' )
-  process.patElectrons.electronIDSources.simpleEleId85cIso   = cms.InputTag( 'simpleEleId85cIso' )
-  process.patElectrons.electronIDSources.simpleEleId80cIso   = cms.InputTag( 'simpleEleId80cIso' )
-  process.patElectrons.electronIDSources.simpleEleId70cIso   = cms.InputTag( 'simpleEleId70cIso' )
-  process.patElectrons.electronIDSources.simpleEleId60cIso   = cms.InputTag( 'simpleEleId60cIso' )
-if runCiC:
-  process.load( "RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_cfi" )
-  process.eidCiCSequence = cms.Sequence(
-    process.eidVeryLooseMC
-  + process.eidLooseMC
-  + process.eidMediumMC
-  + process.eidTightMC
-  + process.eidSuperTightMC
-  + process.eidHyperTight1MC
-  + process.eidHyperTight2MC
-  + process.eidHyperTight3MC
-  + process.eidHyperTight4MC
-  )
-  process.patPF2PATSequence.replace( process.patElectrons
-                                   , process.eidCiCSequence * process.patElectrons
-                                   )
-  process.patElectrons.electronIDSources.eidVeryLooseMC   = cms.InputTag( 'eidVeryLooseMC' )
-  process.patElectrons.electronIDSources.eidLooseMC       = cms.InputTag( 'eidLooseMC' )
-  process.patElectrons.electronIDSources.eidMediumMC      = cms.InputTag( 'eidMediumMC' )
-  process.patElectrons.electronIDSources.eidTightMC       = cms.InputTag( 'eidTightMC' )
-  process.patElectrons.electronIDSources.eidSuperTightMC  = cms.InputTag( 'eidSuperTightMC' )
-  process.patElectrons.electronIDSources.eidHyperTight1MC = cms.InputTag( 'eidHyperTight1MC' )
-  process.patElectrons.electronIDSources.eidHyperTight2MC = cms.InputTag( 'eidHyperTight2MC' )
-  process.patElectrons.electronIDSources.eidHyperTight3MC = cms.InputTag( 'eidHyperTight3MC' )
-  process.patElectrons.electronIDSources.eidHyperTight4MC = cms.InputTag( 'eidHyperTight4MC' )
 
 # X-leptons
 
@@ -494,51 +407,36 @@ process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
 process.referencePatJets.preselection = jetSelectSignal
 
-
 process.out.outputCommands.append( 'drop *_selectedPatJets*_caloTowers_*' )
 process.out.outputCommands.append( 'drop *_selectedPatJets*_tagInfos_*' )
-process.out.outputCommands.append( 'drop *_selectedPatJets*_pfCandidates_*' ) # to save space
-process.out.outputCommands.append( 'keep *_kt6PFJets_rho_%s'%( process.name_() ) )
-if not runJetMatch:
-  process.out.outputCommands.append( 'drop *_selectedPatJets*_genJets_*' )
+process.out.outputCommands.append( 'drop *_selectedPatJets*_pfCandidates_*' )
+process.out.outputCommands.append( 'drop *_kt6PFJets_*_*' )
+process.out.outputCommands.append( 'drop *_selectedPatJets*_genJets_*' )
 
 
 ### TQAF
 
 process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff" )
-process.ttSemiLepEvent.verbosity = 1
+if not runCrab:
+  process.ttSemiLepEvent.verbosity = 1
 from TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff import addTtSemiLepHypotheses
+process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
 addTtSemiLepHypotheses( process
-                      , [ "kHitFit"
-#                         , "kKinFit"
+                      , [ "kGenMatch"
                         ]
                        )
-process.hitFitTtSemiLepEventHypothesis.maxNJets           = 6
-process.hitFitTtSemiLepEventHypothesis.maxNComb           = -1
-process.hitFitTtSemiLepEventHypothesis.jetCorrectionLevel = jecLevels[ -1 ]
-
-if runOnMC:
-  process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
-  addTtSemiLepHypotheses( process
-                        , [ "kGenMatch"
-                        ]
-                       )
-  process.ttSemiLepJetPartonMatch.maxNJets = 6
-  process.ttSemiLepJetPartonMatch.maxNComb = 1 # no knobs to turn to get several solutions
-  if runTest:
-    process.ttSemiLepJetPartonMatch.verbosity = 1
-  process.ttSemiLepHypGenMatch.jetCorrectionLevel = jecLevels[ -1 ]
-else:
-  from TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff import removeTtSemiLepHypGenMatch
-  removeTtSemiLepHypGenMatch( process )
+process.ttSemiLepJetPartonMatch.maxNJets = 6
+process.ttSemiLepJetPartonMatch.maxNComb = 1 # no knobs to turn to get several solutions
+if runTest and not runCrab:
+  process.ttSemiLepJetPartonMatch.verbosity = 1
+process.ttSemiLepHypGenMatch.jetCorrectionLevel = jecLevels[ -1 ]
 
 process.out.outputCommands.append( 'keep *_*TtSemiLepEventHypothesis*_*_*' )
 process.out.outputCommands.append( 'keep *_ttSemiLep*_*_*' )
 
-if runOnMC:
-  process.out.outputCommands.append( 'keep *_genEvt*_*_*' )
-  process.out.outputCommands.append( 'keep *_initSubset*_*_*' )
-  process.out.outputCommands.append( 'keep *_decaySubset*_*_*' )
+process.out.outputCommands.append( 'keep *_genEvt*_*_*' )
+process.out.outputCommands.append( 'keep *_initSubset*_*_*' )
+process.out.outputCommands.append( 'keep *_decaySubset*_*_*' )
 
 from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag
 from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
@@ -554,122 +452,29 @@ massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReference
                             , 'selectedPatJets'
                             , 'referencePatJets'
                              )
-process.makeTtSemiLepEventReferenceBTag = cloneProcessingSnippet( process
-                                                                , process.makeTtSemiLepEventReference
-                                                                , 'BTag'
-                                                                )
-if jetBTagAlgo != '':
-  process.hitFitTtSemiLepEventHypothesisReferenceBTag.useBTagging       = True
-  process.hitFitTtSemiLepEventHypothesisReferenceBTag.bTagAlgo          = jetBTagAlgo
-  process.hitFitTtSemiLepEventHypothesisReferenceBTag.minBDiscBJets     = jetMinBDiscBJets
-  process.hitFitTtSemiLepEventHypothesisReferenceBTag.maxBDiscLightJets = jetMaxBDiscLightJets
 
 
 ### Paths
 
-# Cleaning
-process.HitFit_Cleaning = cms.Path( process.eventCleaning
-                                  )
-# Single cleaning steps
-process.HitFit_Cleaning_HLT = cms.Path( process.triggerResultsFilter
-                                      )
-process.HitFit_Cleaning_Vertex = cms.Path( process.goodOfflinePrimaryVertices
-                                         )
-process.HitFit_Cleaning_HBHE = cms.Path( process.HBHENoiseFilter
-                                       )
-process.HitFit_Cleaning_Scraping = cms.Path( process.scrapingFilter
-                                           )
-
-# PF2PAT
-# Single counters
-process.HitFit_PF2PAT_MuonVeto = cms.Path( process.eventCleaning
-                                         * process.patPF2PATSequence
-                                         * process.countSelectedPatMuons
-                                         )
-process.HitFit_PF2PAT_ElectronVeto = cms.Path( process.eventCleaning
-                                             * process.patPF2PATSequence
-                                             * process.countSelectedPatElectrons
-                                             )
-# process.HitFit_PF2PAT_LeptonVeto = cms.Path( process.eventCleaning
-#                                            * process.patPF2PATSequence
-#                                            * process.countSelectedPatLeptons
-#                                            )
-# process.HitFit_PF2PAT_JetVeto = cms.Path( process.eventCleaning
-#                                         * process.patPF2PATSequence
-#                                         * process.countSelectedPatJets
-#                                         )
-# Complete path
-process.Sequence_PF2PAT = cms.Sequence( process.eventCleaning
-                                      * process.patPF2PATSequence
-                                      * process.patPF2PATCounters
-                                      )
-process.HitFit_PF2PAT = cms.Path( process.Sequence_PF2PAT
-                                )
-if runOnMC:
-  process.HitFit_PF2PAT *= process.makeGenEvt
-process.HitFit_PF2PAT *= process.makeTtSemiLepEvent
-
-# PF2PAT with HitFit
-# Single counters
-process.HitFit_PF2PAT_MuonsHitFit = cms.Path( process.Sequence_PF2PAT
-                                            * process.countSelectedPatMuonsHitFit
-                                            )
-process.HitFit_PF2PAT_JetsHitFit = cms.Path( process.Sequence_PF2PAT
-                                           * process.countSelectedPatJetsHitFit
-                                           )
-# Complete path
-process.HitFit_PF2PATHitFit = cms.Path( process.Sequence_PF2PAT
-                                      * process.patPF2PATCountersHitFit
-                                      )
-if runOnMC:
-  process.HitFit_PF2PATHitFit *= process.makeGenEvt
-process.HitFit_PF2PATHitFit *= process.makeTtSemiLepEvent
-
-# Reference selection
-# Single counters
-process.HitFit_Reference_Muons = cms.Path( process.Sequence_PF2PAT
-                                         * process.patReferenceSequence
-                                         * process.countReferencePatMuons
-                                         )
-# process.HitFit_Reference_Electrons = cms.Path( process.Sequence_PF2PAT
-#                                              * process.patReferenceSequence
-#                                              * process.countReferencePatElectrons
-#                                              )
-# process.HitFit_Reference_Leptons = cms.Path( process.Sequence_PF2PAT
-#                                            * process.patReferenceSequence
-#                                            * process.countReferencePatLeptons
-#                                            )
-process.HitFit_Reference_Jets = cms.Path( process.Sequence_PF2PAT
-                                        * process.patReferenceSequence
-                                        * process.countReferencePatJets
-                                        )
-# Complete path
-process.Sequence_Reference = cms.Sequence( process.Sequence_PF2PAT
-                                         * process.patReferenceSequence
-                                         * process.patReferenceCounters
-                                         )
-process.HitFit_Reference = cms.Path( process.Sequence_Reference
-                                   )
+# Cleaning + PF2PAT
+process.pf2PatSequence = cms.Sequence( process.eventCleaning
+                                     * process.patPF2PATSequence
+                                     * process.patPF2PATCounters
+                                     * process.makeGenEvt
+                                     )
+process.pf2PatPath = cms.Path( process.pf2PatSequence
+                             * process.makeTtSemiLepEvent
+                             )
 
 # Reference selection with HitFit
-process.HitFit_ReferenceHitFit = cms.Path( process.Sequence_Reference
-                                         )
-if runOnMC:
-  process.HitFit_ReferenceHitFit *= process.makeGenEvt
-process.HitFit_ReferenceHitFit *= process.makeTtSemiLepEventReference
+process.referencePath = cms.Path( process.pf2PatSequence
+                                * process.patReferenceSequence
+                                * process.patReferenceCounters
+                                * process.makeTtSemiLepEventReference
+                                )
 
-# Reference selection with HitFit, incl. b-tagging
-process.HitFit_ReferenceHitFitBTag = cms.Path( process.Sequence_Reference
-                                             )
-if runOnMC:
-  process.HitFit_ReferenceHitFitBTag *= process.makeGenEvt
-process.HitFit_ReferenceHitFitBTag *= process.makeTtSemiLepEventReferenceBTag
-
-process.out.SelectEvents.SelectEvents = [ 'HitFit_PF2PATHitFit'
+process.out.SelectEvents.SelectEvents = [ 'pf2PatPath'
                                         ]
-if runTest or runOnMC:
-  process.out.SelectEvents.SelectEvents = [ 'HitFit_Cleaning'
-                                          ]
 
 # Outpath
 process.outPath = cms.EndPath(
@@ -677,42 +482,29 @@ process.outPath = cms.EndPath(
 )
 
 process.schedule = cms.Schedule(
-  process.HitFit_Cleaning_HLT
-, process.HitFit_Cleaning_Vertex
-, process.HitFit_Cleaning_HBHE
-, process.HitFit_Cleaning_Scraping
-, process.HitFit_Cleaning
-, process.HitFit_PF2PAT_MuonVeto
-, process.HitFit_PF2PAT_ElectronVeto
-, process.HitFit_PF2PAT
-, process.HitFit_PF2PAT_MuonsHitFit
-, process.HitFit_PF2PAT_JetsHitFit
-, process.HitFit_PF2PATHitFit
-, process.HitFit_Reference_Muons
-, process.HitFit_Reference_Jets
-, process.HitFit_Reference
-, process.HitFit_ReferenceHitFit
-, process.HitFit_ReferenceHitFitBTag
+  process.pf2PatPath
+, process.referencePath
 , process.outPath
 )
 
 
 ### Messages
 
-print
-print 'Input:'
-print '------'
-if inputEvents == -1:
-  print 'all events of %s'%( sample )
-else:
-  print '%i events of %s'%( inputEvents, sample )
-print
-print 'Output file:'
-print '------------'
-print outputFile
-print
-print 'Log file destination:'
-print '---------------------'
-print logFile
-print '================================================================================'
-print
+if not runCrab:
+  print
+  print 'Input:'
+  print '------'
+  if inputEvents == -1:
+    print 'all events'
+  else:
+    print '%i events'%( inputEvents )
+  print
+  print 'Output file:'
+  print '------------'
+  print outputFile
+  print
+  print 'Log file destination:'
+  print '---------------------'
+  print logFile
+  print '================================================================================'
+  print
