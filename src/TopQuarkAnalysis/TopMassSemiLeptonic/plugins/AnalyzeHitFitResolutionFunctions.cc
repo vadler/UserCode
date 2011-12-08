@@ -105,10 +105,6 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     TH2DVecMap histos_RecoInv_;
     // Kinematic quantities GEN inverted
     TH2DVecMap histos_GenInv_;
-    // Kinematic quantities RECO inverted
-    TH2DVecMap histos_RecoInv2_;
-    // Kinematic quantities GEN inverted
-    TH2DVecMap histos_GenInv2_;
     // Kinematic quantities RECO, symmetric in eta
     TH2DVecMap histos_RecoSymm_;
     // Kinematic quantities GEN, symmetric in eta
@@ -117,10 +113,6 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     TH2DVecMap histos_RecoInvSymm_;
     // Kinematic quantities GEN inverted, symmetric in eta
     TH2DVecMap histos_GenInvSymm_;
-    // Kinematic quantities RECO inverted, symmetric in eta
-    TH2DVecMap histos_RecoInv2Symm_;
-    // Kinematic quantities GEN inverted, symmetric in eta
-    TH2DVecMap histos_GenInv2Symm_;
 
     /// Private functions
 
@@ -312,10 +304,6 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
   yTitlesInv.push_back( "#Delta#frac{1}{p_{t}} (#frac{1}{GeV})" );
   yTitlesInv.push_back( "#Delta#frac{1}{#eta}" );
   yTitlesInv.push_back( "#Delta#frac{1}{#phi}" );
-  std::vector< std::string > yTitlesInv2;
-  yTitlesInv2.push_back( "#frac{1}{#Delta#frac{1}{p_{t}}} (GeV)" );
-  yTitlesInv2.push_back( "#frac{1}{#Delta#frac{1}{#eta}}" );
-  yTitlesInv2.push_back( "#frac{1}{#Delta#frac{1}{#phi}}" );
   const std::string zTitle( "events" );
 
   for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
@@ -342,7 +330,6 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
       const std::string prop( kinProps_.at( iProp ) );
       const std::string yTitle( yTitles.at( iProp ) );
       const std::string yTitleInv( yTitlesInv.at( iProp ) );
-      const std::string yTitleInv2( yTitlesInv2.at( iProp ) );
       TFileDirectory subDir( dir.mkdir( prop.c_str(), "" ) );
 
       TFileDirectory subDirReco( subDir.mkdir( "Reco", "" ) );
@@ -353,10 +340,6 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
       TH2DVec histos_RecoInv;
       TFileDirectory subDirInvGen( subDir.mkdir( "GenInv", "" ) );
       TH2DVec histos_GenInv;
-      TFileDirectory subDirInv2Reco( subDir.mkdir( "RecoInv2", "" ) );
-      TH2DVec histos_RecoInv2;
-      TFileDirectory subDirInv2Gen( subDir.mkdir( "GenInv2", "" ) );
-      TH2DVec histos_GenInv2;
       for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
         const std::string title( my::helpers::to_string( etaBins_.at( iCat ).at( iEta ) ) + " #leq #eta #leq " + my::helpers::to_string( etaBins_.at( iCat ).at( iEta + 1 ) ) );
         const std::string name_Reco( cat + "_" + prop + "_Reco_" + my::helpers::to_string( iEta ) );
@@ -379,23 +362,11 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
         histos_GenInv.back()->SetXTitle( xTitleGen.c_str() );
         histos_GenInv.back()->SetYTitle( yTitleInv.c_str() );
         histos_GenInv.back()->SetZTitle( zTitle.c_str() );
-        const std::string name_RecoInv2( cat + "_" + prop + "_RecoInv2_" + my::helpers::to_string( iEta ) );
-        histos_RecoInv2.push_back( subDirInv2Reco.make< TH2D >( name_RecoInv2.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
-        histos_RecoInv2.back()->SetXTitle( xTitleReco.c_str() );
-        histos_RecoInv2.back()->SetYTitle( yTitleInv2.c_str() );
-        histos_RecoInv2.back()->SetZTitle( zTitle.c_str() );
-        const std::string name_GenInv2( cat + "_" + prop + "_GenInv2_" + my::helpers::to_string( iEta ) );
-        histos_GenInv2.push_back( subDirInv2Gen.make< TH2D >( name_GenInv2.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
-        histos_GenInv2.back()->SetXTitle( xTitleGen.c_str() );
-        histos_GenInv2.back()->SetYTitle( yTitleInv2.c_str() );
-        histos_GenInv2.back()->SetZTitle( zTitle.c_str() );
       }
       histos_Reco_[ cat + "_" + prop ] = histos_Reco;
       histos_Gen_[ cat + "_" + prop ] = histos_Gen;
       histos_RecoInv_[ cat + "_" + prop ] = histos_RecoInv;
       histos_GenInv_[ cat + "_" + prop ] = histos_GenInv;
-      histos_RecoInv2_[ cat + "_" + prop ] = histos_RecoInv2;
-      histos_GenInv2_[ cat + "_" + prop ] = histos_GenInv2;
 
       TFileDirectory subDirRecoSymm( subDir.mkdir( "RecoSymm", "" ) );
       TH2DVec histos_RecoSymm;
@@ -405,10 +376,6 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
       TH2DVec histos_RecoInvSymm;
       TFileDirectory subDirGenInvSymm( subDir.mkdir( "GenInvSymm", "" ) );
       TH2DVec histos_GenInvSymm;
-      TFileDirectory subDirRecoInv2Symm( subDir.mkdir( "RecoInv2Symm", "" ) );
-      TH2DVec histos_RecoInv2Symm;
-      TFileDirectory subDirGenInv2Symm( subDir.mkdir( "GenInv2Symm", "" ) );
-      TH2DVec histos_GenInv2Symm;
       for ( unsigned iEtaSymm = 0; iEtaSymm < etaSymmBins_.at( iCat ).size() - 1; ++iEtaSymm ) {
         const std::string title( my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm ) ) + " #leq |#eta| #leq " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm + 1 ) ) );
         const std::string name_RecoSymm( cat + "_" + prop + "_RecoSymm_" + my::helpers::to_string( iEtaSymm ) );
@@ -431,23 +398,11 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
         histos_GenInvSymm.back()->SetXTitle( xTitleGen.c_str() );
         histos_GenInvSymm.back()->SetYTitle( yTitleInv.c_str() );
         histos_GenInvSymm.back()->SetZTitle( zTitle.c_str() );
-        const std::string name_RecoInv2Symm( cat + "_" + prop + "_RecoInv2Symm_" + my::helpers::to_string( iEtaSymm ) );
-        histos_RecoInv2Symm.push_back( subDirRecoInv2Symm.make< TH2D >( name_RecoInv2Symm.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
-        histos_RecoInv2Symm.back()->SetXTitle( xTitleReco.c_str() );
-        histos_RecoInv2Symm.back()->SetYTitle( yTitleInv2.c_str() );
-        histos_RecoInv2Symm.back()->SetZTitle( zTitle.c_str() );
-        const std::string name_GenInv2Symm( cat + "_" + prop + "_GenInv2Symm_" + my::helpers::to_string( iEtaSymm ) );
-        histos_GenInv2Symm.push_back( subDirGenInv2Symm.make< TH2D >( name_GenInv2Symm.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
-        histos_GenInv2Symm.back()->SetXTitle( xTitleGen.c_str() );
-        histos_GenInv2Symm.back()->SetYTitle( yTitleInv2.c_str() );
-        histos_GenInv2Symm.back()->SetZTitle( zTitle.c_str() );
       }
       histos_RecoSymm_[ cat + "_" + prop ] = histos_RecoSymm;
       histos_GenSymm_[ cat + "_" + prop ] = histos_GenSymm;
       histos_RecoInvSymm_[ cat + "_" + prop ] = histos_RecoInvSymm;
       histos_GenInvSymm_[ cat + "_" + prop ] = histos_GenInvSymm;
-      histos_RecoInv2Symm_[ cat + "_" + prop ] = histos_RecoInv2Symm;
-      histos_GenInv2Symm_[ cat + "_" + prop ] = histos_GenInv2Symm;
 
     }
 
@@ -550,27 +505,21 @@ void AnalyzeHitFitResolutionFunctions::fillLepton( unsigned iCat, unsigned iProp
     if ( prop == "Pt" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, pt - ttGenEvent_->singleLepton()->pt() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / pt - 1. / ttGenEvent_->singleLepton()->pt() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->singleLepton()->pt() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, pt - ttGenEvent_->singleLepton()->pt() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / pt - 1. / ttGenEvent_->singleLepton()->pt() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->singleLepton()->pt() ) );
     }
     else if ( prop == "Eta" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, eta - ttGenEvent_->singleLepton()->eta() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / eta - 1. / ttGenEvent_->singleLepton()->eta() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->singleLepton()->eta() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - ttGenEvent_->singleLepton()->eta() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / eta - 1. / ttGenEvent_->singleLepton()->eta() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->singleLepton()->eta() ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() );
       histos_Reco_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->singleLepton()->phi() ) );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / phi - 1. / ttGenEvent_->singleLepton()->phi() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->singleLepton()->phi() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->singleLepton()->phi() ) );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / phi - 1. / ttGenEvent_->singleLepton()->phi() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->singleLepton()->phi() ) );
     }
   }
 
@@ -582,27 +531,21 @@ void AnalyzeHitFitResolutionFunctions::fillLepton( unsigned iCat, unsigned iProp
     if ( prop == "Pt" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - pt );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - 1. / pt );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - 1. / pt ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - pt );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - 1. / pt );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() - 1. / pt ) );
     }
     else if ( prop == "Eta" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() - eta );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() - 1. / eta );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() - 1. / eta ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() - eta );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() - 1. / eta );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() - 1. / eta ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( ttGenEvent_->singleLepton()->phi() );
       histos_Gen_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() - phi ) );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() - 1. / phi );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() - 1. / phi ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() - phi ) );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() - 1. / phi );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() - 1. / phi ) );
     }
   }
 
@@ -626,27 +569,21 @@ void AnalyzeHitFitResolutionFunctions::fillUdscJet( unsigned iCat, unsigned iPro
     if ( prop == "Pt" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, pt - ttGenEvent_->hadronicDecayQuark()->pt() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / pt - 1. / ttGenEvent_->hadronicDecayQuark()->pt() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->hadronicDecayQuark()->pt() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, pt - ttGenEvent_->hadronicDecayQuark()->pt() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / pt - 1. / ttGenEvent_->hadronicDecayQuark()->pt() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->hadronicDecayQuark()->pt() ) );
     }
     else if ( prop == "Eta" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, eta - ttGenEvent_->hadronicDecayQuark()->eta() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / eta - 1. / ttGenEvent_->hadronicDecayQuark()->eta() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->hadronicDecayQuark()->eta() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - ttGenEvent_->hadronicDecayQuark()->eta() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / eta - 1. / ttGenEvent_->hadronicDecayQuark()->eta() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->hadronicDecayQuark()->eta() ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( qJet.phi() );
       histos_Reco_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->hadronicDecayQuark()->phi() ) );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / phi - 1. / ttGenEvent_->hadronicDecayQuark()->phi() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->hadronicDecayQuark()->phi() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->hadronicDecayQuark()->phi() ) );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / phi - 1. / ttGenEvent_->hadronicDecayQuark()->phi() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->hadronicDecayQuark()->phi() ) );
     }
   }
 
@@ -658,27 +595,21 @@ void AnalyzeHitFitResolutionFunctions::fillUdscJet( unsigned iCat, unsigned iPro
     if ( prop == "Pt" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, qJet.pt() - pt );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / qJet.pt() - 1. / pt );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / qJet.pt() - 1. / pt ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, qJet.pt() - pt );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / qJet.pt() - 1. / pt );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / qJet.pt() - 1. / pt ) );
     }
     else if ( prop == "Eta" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, qJet.eta() - eta );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / qJet.eta() - 1. / eta );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / qJet.eta() - 1. / eta ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, qJet.eta() - eta );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / qJet.eta() - 1. / eta );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / qJet.eta() - 1. / eta ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( ttGenEvent_->hadronicDecayQuark()->phi() );
       histos_Gen_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( qJet.phi() - phi ) );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / qJet.phi() - 1. / phi );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / qJet.phi() - 1. / phi ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( qJet.phi() - phi ) );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / qJet.phi() - 1. / phi );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / qJet.phi() - 1. / phi ) );
     }
   }
 
@@ -692,27 +623,21 @@ void AnalyzeHitFitResolutionFunctions::fillUdscJet( unsigned iCat, unsigned iPro
     if ( prop == "Pt" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, pt - ttGenEvent_->hadronicDecayQuarkBar()->pt() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / pt - 1. / ttGenEvent_->hadronicDecayQuarkBar()->pt() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->hadronicDecayQuarkBar()->pt() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, pt - ttGenEvent_->hadronicDecayQuarkBar()->pt() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / pt - 1. / ttGenEvent_->hadronicDecayQuarkBar()->pt() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->hadronicDecayQuarkBar()->pt() ) );
     }
     else if ( prop == "Eta" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, eta - ttGenEvent_->hadronicDecayQuarkBar()->eta() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / eta - 1. / ttGenEvent_->hadronicDecayQuarkBar()->eta() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->hadronicDecayQuarkBar()->eta() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - ttGenEvent_->hadronicDecayQuarkBar()->eta() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / eta - 1. / ttGenEvent_->hadronicDecayQuarkBar()->eta() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->hadronicDecayQuarkBar()->eta() ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( qBarJet.phi() );
       histos_Reco_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->hadronicDecayQuarkBar()->phi() ) );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / phi - 1. / ttGenEvent_->hadronicDecayQuarkBar()->phi() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->hadronicDecayQuarkBar()->phi() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->hadronicDecayQuarkBar()->phi() ) );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / phi - 1. / ttGenEvent_->hadronicDecayQuarkBar()->phi() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->hadronicDecayQuarkBar()->phi() ) );
     }
   }
 
@@ -724,27 +649,21 @@ void AnalyzeHitFitResolutionFunctions::fillUdscJet( unsigned iCat, unsigned iPro
     if ( prop == "Pt" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, qBarJet.pt() - pt );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / qBarJet.pt() - 1. / pt );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / qBarJet.pt() - 1. / pt ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, qBarJet.pt() - pt );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / qBarJet.pt() - 1. / pt );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / qBarJet.pt() - 1. / pt ) );
     }
     else if ( prop == "Eta" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, qBarJet.eta() - eta );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / qBarJet.eta() - 1. / eta );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / qBarJet.eta() - 1. / eta ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, qBarJet.eta() - eta );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / qBarJet.eta() - 1. / eta );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / qBarJet.eta() - 1. / eta ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( ttGenEvent_->hadronicDecayQuarkBar()->phi() );
       histos_Gen_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( qBarJet.phi() - phi ) );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / qBarJet.phi() - 1. / phi );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / qBarJet.phi() - 1. / phi ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( qBarJet.phi() - phi ) );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / qBarJet.phi() - 1. / phi );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / qBarJet.phi() - 1. / phi ) );
     }
   }
 
@@ -768,27 +687,21 @@ void AnalyzeHitFitResolutionFunctions::fillBJet( unsigned iCat, unsigned iProp )
     if ( prop == "Pt" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, pt - ttGenEvent_->hadronicDecayB()->pt() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / pt - 1. / ttGenEvent_->hadronicDecayB()->pt() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->hadronicDecayB()->pt() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, pt - ttGenEvent_->hadronicDecayB()->pt() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / pt - 1. / ttGenEvent_->hadronicDecayB()->pt() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->hadronicDecayB()->pt() ) );
     }
     else if ( prop == "Eta" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, eta - ttGenEvent_->hadronicDecayB()->eta() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / eta - 1. / ttGenEvent_->hadronicDecayB()->eta() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->hadronicDecayB()->eta() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - ttGenEvent_->hadronicDecayB()->eta() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / eta - 1. / ttGenEvent_->hadronicDecayB()->eta() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->hadronicDecayB()->eta() ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( hadBJet.phi() );
       histos_Reco_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->hadronicDecayB()->phi() ) );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / phi - 1. / ttGenEvent_->hadronicDecayB()->phi() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->hadronicDecayB()->phi() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->hadronicDecayB()->phi() ) );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / phi - 1. / ttGenEvent_->hadronicDecayB()->phi() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->hadronicDecayB()->phi() ) );
     }
   }
 
@@ -800,27 +713,21 @@ void AnalyzeHitFitResolutionFunctions::fillBJet( unsigned iCat, unsigned iProp )
     if ( prop == "Pt" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, hadBJet.pt() - pt );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / hadBJet.pt() - 1. / pt );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / hadBJet.pt() - 1. / pt ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, hadBJet.pt() - pt );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / hadBJet.pt() - 1. / pt );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / hadBJet.pt() - 1. / pt ) );
     }
     else if ( prop == "Eta" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, hadBJet.eta() - eta );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / hadBJet.eta() - 1. / eta );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / hadBJet.eta() - 1. / eta ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, hadBJet.eta() - eta );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / hadBJet.eta() - 1. / eta );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / hadBJet.eta() - 1. / eta ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( ttGenEvent_->hadronicDecayB()->phi() );
       histos_Gen_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( hadBJet.phi() - phi ) );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / hadBJet.phi() - 1. / phi );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / hadBJet.phi() - 1. / phi ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( hadBJet.phi() - phi ) );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / hadBJet.phi() - 1. / phi );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / hadBJet.phi() - 1. / phi ) );
     }
   }
 
@@ -834,27 +741,21 @@ void AnalyzeHitFitResolutionFunctions::fillBJet( unsigned iCat, unsigned iProp )
     if ( prop == "Pt" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, pt - ttGenEvent_->leptonicDecayB()->pt() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / pt - 1. / ttGenEvent_->leptonicDecayB()->pt() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->leptonicDecayB()->pt() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, pt - ttGenEvent_->leptonicDecayB()->pt() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / pt - 1. / ttGenEvent_->leptonicDecayB()->pt() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->leptonicDecayB()->pt() ) );
     }
     else if ( prop == "Eta" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, eta - ttGenEvent_->leptonicDecayB()->eta() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / eta - 1. / ttGenEvent_->leptonicDecayB()->eta() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->leptonicDecayB()->eta() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - ttGenEvent_->leptonicDecayB()->eta() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / eta - 1. / ttGenEvent_->leptonicDecayB()->eta() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->leptonicDecayB()->eta() ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( lepBJet.phi() );
       histos_Reco_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->leptonicDecayB()->phi() ) );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / phi - 1. / ttGenEvent_->leptonicDecayB()->phi() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->leptonicDecayB()->phi() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->leptonicDecayB()->phi() ) );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / phi - 1. / ttGenEvent_->leptonicDecayB()->phi() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->leptonicDecayB()->phi() ) );
     }
   }
 
@@ -866,27 +767,21 @@ void AnalyzeHitFitResolutionFunctions::fillBJet( unsigned iCat, unsigned iProp )
     if ( prop == "Pt" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, lepBJet.pt() - pt );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / lepBJet.pt() - 1. / pt );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / lepBJet.pt() - 1. / pt ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, lepBJet.pt() - pt );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / lepBJet.pt() - 1. / pt );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / lepBJet.pt() - 1. / pt ) );
     }
     else if ( prop == "Eta" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, lepBJet.eta() - eta );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / lepBJet.eta() - 1. / eta );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / lepBJet.eta() - 1. / eta ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, lepBJet.eta() - eta );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / lepBJet.eta() - 1. / eta );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / lepBJet.eta() - 1. / eta ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( ttGenEvent_->leptonicDecayB()->phi() );
       histos_Gen_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( lepBJet.phi() - phi ) );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / lepBJet.phi() - 1. / phi );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / lepBJet.phi() - 1. / phi ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( lepBJet.phi() - phi ) );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / lepBJet.phi() - 1. / phi );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / lepBJet.phi() - 1. / phi ) );
     }
   }
 
@@ -907,27 +802,21 @@ void AnalyzeHitFitResolutionFunctions::fillMET( unsigned iCat, unsigned iProp )
     if ( prop == "Pt" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, pt - ttGenEvent_->singleNeutrino()->pt() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / pt - 1. / ttGenEvent_->singleNeutrino()->pt() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->singleNeutrino()->pt() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, pt - ttGenEvent_->singleNeutrino()->pt() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / pt - 1. / ttGenEvent_->singleNeutrino()->pt() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / pt - 1. / ttGenEvent_->singleNeutrino()->pt() ) );
     }
     else if ( prop == "Eta" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, eta - ttGenEvent_->singleNeutrino()->eta() );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / eta - 1. / ttGenEvent_->singleNeutrino()->eta() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->singleNeutrino()->eta() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - ttGenEvent_->singleNeutrino()->eta() );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / eta - 1. / ttGenEvent_->singleNeutrino()->eta() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / eta - 1. / ttGenEvent_->singleNeutrino()->eta() ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() );
       histos_Reco_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->singleNeutrino()->phi() ) );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / phi - 1. / ttGenEvent_->singleNeutrino()->phi() );
-      histos_RecoInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->singleNeutrino()->phi() ) );
       histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - ttGenEvent_->singleNeutrino()->phi() ) );
       histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / phi - 1. / ttGenEvent_->singleNeutrino()->phi() );
-      histos_RecoInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / phi - 1. / ttGenEvent_->singleNeutrino()->phi() ) );
     }
   }
 
@@ -939,27 +828,21 @@ void AnalyzeHitFitResolutionFunctions::fillMET( unsigned iCat, unsigned iProp )
     if ( prop == "Pt" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() - pt );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() - 1. / pt );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() - 1. / pt ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() - pt );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() - 1. / pt );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() - 1. / pt ) );
     }
     else if ( prop == "Eta" ) {
       histos_Gen_[ index ].at( iEta )->Fill( pt, ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->eta() - eta );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->eta() - 1. / eta );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->eta() - 1. / eta ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->eta() - eta );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->eta() - 1. / eta );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->eta() - 1. / eta ) );
     }
     else if ( prop == "Phi" ) {
       const double phi( ttGenEvent_->singleNeutrino()->phi() );
       histos_Gen_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() - phi ) );
       histos_GenInv_[ index ].at( iEta )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() - 1. / phi );
-      histos_GenInv2_[ index ].at( iEta )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() - 1. / phi ) );
       histos_GenSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() - phi ) );
       histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() - 1. / phi );
-      histos_GenInv2Symm_[ index ].at( iEtaSymm )->Fill( pt, 1. / ( 1. / ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() - 1. / phi ) );
     }
   }
 
