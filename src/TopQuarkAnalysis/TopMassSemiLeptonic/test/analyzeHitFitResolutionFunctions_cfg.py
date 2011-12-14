@@ -116,10 +116,11 @@ process.standardPath = cms.Path(
 # * process.analyzeHitFitResolutionFunctions_L7Parton
 # )
 
-process.referencePath = cms.Path(
-  process.hltHighLevel_Reference
-* process.analyzeHitFitResolutionFunctions_Reference
-)
+if not runTest:
+  process.referencePath = cms.Path(
+    process.hltHighLevel_Reference
+  * process.analyzeHitFitResolutionFunctions_Reference
+  )
 
 
 ### Messages
