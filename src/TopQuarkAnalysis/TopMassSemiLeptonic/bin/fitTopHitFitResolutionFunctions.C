@@ -95,16 +95,16 @@ int main(  int argc, char * argv[] )
       // Eta binning
       std::vector< double > etaBins;
       TH1D * hist_EtaBins( ( TH1D* )( gDirectory->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
-      for ( int iBin = 1; iBin <= hist_EtaBins->GetNbinsX(); ++iBin ) {
-        etaBins.push_back( hist_EtaBins->GetBinLowEdge( iBin ) );
+      for ( int iEta = 1; iEta <= hist_EtaBins->GetNbinsX(); ++iEta ) {
+        etaBins.push_back( hist_EtaBins->GetBinLowEdge( iEta ) );
       }
       etaBins.push_back( hist_EtaBins->GetBinLowEdge( hist_EtaBins->GetNbinsX() ) + hist_EtaBins->GetBinWidth( hist_EtaBins->GetNbinsX() ) );
       if ( iSel == 0 ) etaBins_.push_back( etaBins );
       // Pt binning
       std::vector< double > ptBins;
       TH1D * hist_PtBins( ( TH1D* )( gDirectory->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
-      for ( int iBin = 1; iBin <= hist_PtBins->GetNbinsX(); ++iBin ) {
-        ptBins.push_back( hist_PtBins->GetBinLowEdge( iBin ) );
+      for ( int iPt = 1; iPt <= hist_PtBins->GetNbinsX(); ++iPt ) {
+        ptBins.push_back( hist_PtBins->GetBinLowEdge( iPt ) );
       }
       ptBins.push_back( hist_PtBins->GetBinLowEdge( hist_PtBins->GetNbinsX() ) + hist_PtBins->GetBinWidth( hist_PtBins->GetNbinsX() ) );
       if ( iSel == 0 ) ptBins_.push_back( ptBins );
@@ -124,19 +124,50 @@ int main(  int argc, char * argv[] )
           gDirectory->pwd();
           TDirectory * curFit( gDirectory );
 
-          for ( unsigned iBin = 0; iBin < etaBins.size() - 1; ++iBin ) {
-            const std::string bin( my::helpers::to_string( iBin ) );
+          for ( unsigned iEta = 0; iEta < etaBins.size() - 1; ++iEta ) {
+            const std::string binEta( my::helpers::to_string( iEta ) );
 
-            const std::string name( objCat + "_" + kinProp + "_" + subFit + "_" + bin );
+            const std::string name( objCat + "_" + kinProp + "_" + subFit + "_" + binEta );
             TH2D * hist2D( ( TH2D* )( gDirectory->Get( name.c_str() ) ) );
             hist2D->FitSlicesY( 0, 1, hist2D->GetNbinsX(), 1 );
 
-            TH1D * hist1D( ( TH1D* )( gDirectory->Get( std::string( name + "_2" ).c_str() ) ) ); // sigmas of the slice fits
+            TH1D * histSigma( ( TH1D* )( gDirectory->Get( std::string( name + "_2" ).c_str() ) ) ); // sigmas of the slice fits
             const std::string nameFunc( "fit_" + name );
             const std::string formula( inverse ? resFuncInv_ : resFunc_ );
             TF1 * func( new TF1( nameFunc.c_str(), formula.c_str() ) );
-            func->SetRange( hist1D->GetXaxis()->GetXmin(), hist1D->GetXaxis()->GetXmax() );
-            hist1D->Fit( func, "QR" );
+            func->SetRange( histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() );
+            histSigma->Fit( func, "QR" );
+
+            const std::string nameSigma( name + "_Sigma" );
+            TH1D * histSigmaPt( new TH1D( *( ( TH1D* )( histSigma->Clone( nameSigma.c_str() ) ) ) ) );
+            for ( Int_t iPt = 1; iPt < hist2D->GetNbinsX(); ++iPt ) {
+              const std::string binPt( my::helpers::to_string( iPt ) );
+
+              const std::string namePt( name + "_Pt_" + binPt );
+              const std::string titlePt( std::string( hist2D->GetTitle() ) + ", " + my::helpers::to_string( hist2D->GetXaxis()->GetBinLowEdge( iPt ) ) + " GeV #leq p_{t} #lt " + my::helpers::to_string( hist2D->GetXaxis()->GetBinUpEdge( iPt ) ) + " GeV" );
+//               const std::string titlePt( std::string( hist2D->GetTitle() ) + ", " + binPt );
+              const Int_t nBins( hist2D->GetNbinsY() );
+              TH1D * hist1D( new TH1D( namePt.c_str(), titlePt.c_str(), nBins, hist2D->GetYaxis()->GetXmin(), hist2D->GetYaxis()->GetXmax() ) );
+              hist1D->SetXTitle( hist2D->GetYaxis()->GetTitle() );
+              hist1D->SetYTitle( hist2D->GetZaxis()->GetTitle() );
+              for ( Int_t iBin = 1; iBin <= nBins; ++iBin ) {
+                hist1D->SetBinContent( iBin, hist2D->GetBinContent( iPt, iBin ) );
+              }
+
+              const std::string nameFuncGauss( "gauss_" + namePt );
+              TF1 * funcGauss( new TF1( nameFuncGauss.c_str(), "gaus", hist1D->GetXaxis()->GetXmin(), hist1D->GetXaxis()->GetXmax() ) );
+              Int_t fitStatus( hist1D->Fit( nameFuncGauss.c_str(), "QRS" ) );
+              TF1 * funcFit( hist1D->GetFunction( nameFuncGauss.c_str() ) );
+              if ( fitStatus == 0 ) {
+                histSigmaPt->SetBinContent( iPt, funcFit->GetParameter( 2 ) );
+                histSigmaPt->SetBinError( iPt, funcFit->GetParError( 2 ) );
+              }
+            }
+            const std::string nameFuncSigma( "fit_" + nameSigma );
+            const std::string formulaSigma( inverse ? resFuncInv_ : resFunc_ );
+            TF1 * funcSigma( new TF1( nameFuncSigma.c_str(), formula.c_str() ) );
+            funcSigma->SetRange( histSigmaPt->GetXaxis()->GetXmin(), histSigmaPt->GetXaxis()->GetXmax() );
+            histSigmaPt->Fit( funcSigma, "QR" );
 
           }
 

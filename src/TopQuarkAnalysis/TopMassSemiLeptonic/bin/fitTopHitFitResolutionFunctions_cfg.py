@@ -15,7 +15,7 @@ process.resolutionFunctionInverse = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*
 process.fitter = cms.PSet(
   inputFile = cms.string( 'file:%s/output/inputHitFitResolutionFunctions.root'%( os.getenv( "CMSSW_BASE" ) ) )
 , selections = cms.vstring( 'analyzeHitFitResolutionFunctions'
-                          , 'analyzeHitFitResolutionFunctions_Reference'
+                          #, 'analyzeHitFitResolutionFunctions_Reference'
                           )
 )
 
