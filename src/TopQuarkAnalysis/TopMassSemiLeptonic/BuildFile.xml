@@ -1,0 +1,7 @@
+<use name="FWCore/Framework"/>
+<use name="FWCore/ParameterSet"/>
+<use name="AnalysisDataFormats/TopObjects"/>
+<use name="TopQuarkAnalysis/TopMassSemiLeptonic"/>
+<export>
+  <lib name="1"/>
+</export>
