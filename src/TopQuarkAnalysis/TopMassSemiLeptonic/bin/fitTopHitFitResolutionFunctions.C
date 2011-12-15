@@ -127,6 +127,11 @@ int main(  int argc, char * argv[] )
           for ( unsigned iEta = 0; iEta < etaBins.size() - 1; ++iEta ) {
             const std::string binEta( my::helpers::to_string( iEta ) );
 
+            const std::string binEtaDir( subFit + "_" + binEta );
+            curFit->cd(); curFit->Cd( binEtaDir.c_str() );
+            gDirectory->pwd();
+            TDirectory * curFitEta( gDirectory );
+
             const std::string name( objCat + "_" + kinProp + "_" + subFit + "_" + binEta );
             TH2D * hist2D( ( TH2D* )( gDirectory->Get( name.c_str() ) ) );
             hist2D->FitSlicesY( 0, 1, hist2D->GetNbinsX(), 1 );
@@ -144,8 +149,7 @@ int main(  int argc, char * argv[] )
               const std::string binPt( my::helpers::to_string( iPt ) );
 
               const std::string namePt( name + "_Pt_" + binPt );
-              const std::string titlePt( std::string( hist2D->GetTitle() ) + ", " + my::helpers::to_string( hist2D->GetXaxis()->GetBinLowEdge( iPt ) ) + " GeV #leq p_{t} #lt " + my::helpers::to_string( hist2D->GetXaxis()->GetBinUpEdge( iPt ) ) + " GeV" );
-//               const std::string titlePt( std::string( hist2D->GetTitle() ) + ", " + binPt );
+              const std::string titlePt( std::string( hist2D->GetTitle() ) + ", " + my::helpers::to_string( hist2D->GetXaxis()->GetBinLowEdge( iPt ) ) + " GeV #leq p_{t} < " + my::helpers::to_string( hist2D->GetXaxis()->GetBinUpEdge( iPt ) ) + " GeV" );
               const Int_t nBins( hist2D->GetNbinsY() );
               TH1D * hist1D( new TH1D( namePt.c_str(), titlePt.c_str(), nBins, hist2D->GetYaxis()->GetXmin(), hist2D->GetYaxis()->GetXmax() ) );
               hist1D->SetXTitle( hist2D->GetYaxis()->GetTitle() );
