@@ -22,8 +22,10 @@
 #include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/Helpers.h"
 
 
-int main(  int argc, char * argv[] )
+int main( int argc, char * argv[] )
 {
+
+  int returnStatus_( 0 );
 
   // Load libraries
   gSystem->Load( "libFWCoreFWLite" );
@@ -33,16 +35,19 @@ int main(  int argc, char * argv[] )
   if ( argc < 2 ) {
     std::cout << argv[ 0 ] << " --> Usage:" << std::endl
               << "    " << argv[ 0 ] << " [CONFIG_FILE.py]" << std::endl;
-    return 0;
+    returnStatus_ += 0x1;
+    return returnStatus_;
   }
   if ( ! edm::readPSetsFrom( argv[ 1 ] )->existsAs< edm::ParameterSet >( "process" ) ) {
     std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
               << "   cms.PSet 'process' missing in " << argv[ 1 ] << std::endl;
-    return 1;
+    returnStatus_ += 0x2;
+    return returnStatus_;
   }
 
   // Get the configurations
   const edm::ParameterSet & process_( edm::readPSetsFrom( argv[ 1 ] )->getParameter< edm::ParameterSet >( "process" ) );
+  const bool verbose_( process_.getParameter< bool >( "verbose" ) );
   const std::vector< std::string > objCats_( process_.getParameter< std::vector< std::string > >( "objectCategories" ) );   // object categories
   const std::string resFunc_( process_.getParameter< std::string >( "resolutionFunction" ) );
   const std::string resFuncInv_( process_.getParameter< std::string >( "resolutionFunctionInverse" ) );
@@ -72,65 +77,176 @@ int main(  int argc, char * argv[] )
 
   // Open input file
   TFile * inFile( TFile::Open( inFile_.c_str(), "UPDATE" ) );
+  if ( ! inFile ) {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "   input file '" << inFile_ << "' missing" << std::endl;
+    returnStatus_ += 0x10;
+    return returnStatus_;
+  }
 
-  // Loop over objects, quantities and bins
+  // Get binning (has to be identical for selections)
+
+  if ( verbose_ )
+    std::cout << std::endl
+              << argv[ 0 ] << " --> INFO:" << std::endl
+              << "   extract binning from input file '" << inFile_ << "'" << std::endl;
 
   std::vector< std::vector< double > > etaBins_;
   std::vector< std::vector< double > > ptBins_;
 
+  inFile->cd();
+  inFile->Cd( evtSels_.at( 0 ).c_str() );
+  if ( verbose_ ) gDirectory->pwd();
+  TDirectory * curSel( gDirectory );
+
+  for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
+    const std::string objCat( objCats_.at( iCat ) );
+
+    curSel->cd();
+    curSel->Cd( objCat.c_str() );
+    if ( verbose_ ) gDirectory->pwd();
+
+    // Eta binning
+    std::vector< double > etaBins;
+    TH1D * hist_EtaBins( ( TH1D* )( gDirectory->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
+    for ( int iEta = 1; iEta <= hist_EtaBins->GetNbinsX(); ++iEta ) {
+      etaBins.push_back( hist_EtaBins->GetBinLowEdge( iEta ) );
+    }
+    etaBins.push_back( hist_EtaBins->GetBinLowEdge( hist_EtaBins->GetNbinsX() ) + hist_EtaBins->GetBinWidth( hist_EtaBins->GetNbinsX() ) );
+    etaBins_.push_back( etaBins );
+    // Pt binning
+    std::vector< double > ptBins;
+    TH1D * hist_PtBins( ( TH1D* )( gDirectory->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
+    for ( int iPt = 1; iPt <= hist_PtBins->GetNbinsX(); ++iPt ) {
+      ptBins.push_back( hist_PtBins->GetBinLowEdge( iPt ) );
+    }
+    ptBins.push_back( hist_PtBins->GetBinLowEdge( hist_PtBins->GetNbinsX() ) + hist_PtBins->GetBinWidth( hist_PtBins->GetNbinsX() ) );
+    ptBins_.push_back( ptBins );
+
+  }
+
+  // Get existing resolution functions
+
+  if ( useExisting_ ) {
+
+    // Configuration for existing resolution functions
+    const edm::ParameterSet & exist_( process_.getParameter< edm::ParameterSet >( "existing" ) );
+    const std::string resolutionFile_( exist_.getParameter< std::string >( "resolutionFile" ) );
+
+    if ( verbose_ )
+      std::cout << std::endl
+                << argv[ 0 ] << " --> INFO:" << std::endl
+                << "   accessing existing resolution functions from resolution file '" << resolutionFile_ << "'" << std::endl;
+
+    // Open output file
+    TFile * resolutionFile( TFile::Open( resolutionFile_.c_str() ) );
+    if ( resolutionFile ) {
+
+      // Loop over objects and quantities
+
+      for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
+        const std::string objCat( objCats_.at( iCat ) );
+
+        resolutionFile->cd();
+        gDirectory->Cd( objCat.c_str() );
+        TDirectory * curCat( gDirectory );
+        if ( verbose_ ) gDirectory->pwd();
+
+        for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
+          std::string kinProp( kinProps_.at( iProp ) );
+
+          curCat->cd();
+          TDirectory * curProp( ( TDirectory* )( gDirectory->Get( kinProp.c_str() ) ) );
+          if ( ! curProp ) {
+            kinProp.append( std::string( "Inv" ) );
+            curProp = ( TDirectory* )( gDirectory->Get( kinProp.c_str() ) );
+            if ( ! curProp ) {
+              std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                        << "   resolution file '" << resolutionFile_ << "' does not have directory for" << std::endl
+                        << "   object category " << objCat << std::endl
+                        << "   quantity        " << kinProps_.at( iProp ) << std::endl;
+              returnStatus_ += 0x200;
+            }
+          }
+
+          for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
+            const std::string binEta( "Eta" + my::helpers::to_string( iEta ) );
+
+            curProp->cd();
+            gDirectory->Cd( std::string( binEta ).c_str() );
+            if ( verbose_ ) gDirectory->pwd();
+
+            const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
+            TF1 * func( ( TF1* )( gDirectory->Get( name.c_str() ) ) );
+            if ( ! func ) {
+              std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                        << "   resolution function '" << name << "' not found" << std::endl;
+              returnStatus_ += 0x300;
+            }
+
+          }
+        }
+
+      }
+
+    }
+    else {
+      std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                << "   resolution file '" << resolutionFile_ << "' missing" << std::endl;
+      returnStatus_ += 0x100;
+    }
+
+    // Close output file
+    resolutionFile->Close();
+
+  }
+
+  // Loop over objects, quantities and bins
+
+  if ( verbose_ )
+    std::cout << std::endl
+              << argv[ 0 ] << " --> INFO:" << std::endl
+              << "   fitting resolution functions from input file '" << inFile_ << "'" << std::endl;
+
   for ( unsigned iSel = 0; iSel < evtSels_.size(); ++iSel ) {
     const std::string evtSel( evtSels_.at( iSel ) );
 
-    inFile->cd(); inFile->Cd( evtSel.c_str() );
-    gDirectory->pwd();
+    inFile->cd();
+    inFile->Cd( evtSel.c_str() );
+    if ( verbose_ ) gDirectory->pwd();
     TDirectory * curSel( gDirectory );
 
     for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
       const std::string objCat( objCats_.at( iCat ) );
 
-      curSel->cd(); curSel->Cd( objCat.c_str() );
-      gDirectory->pwd();
+      curSel->cd();
+      curSel->Cd( objCat.c_str() );
+      if ( verbose_ ) gDirectory->pwd();
       TDirectory * curCat( gDirectory );
-
-      // Eta binning
-      std::vector< double > etaBins;
-      TH1D * hist_EtaBins( ( TH1D* )( gDirectory->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
-      for ( int iEta = 1; iEta <= hist_EtaBins->GetNbinsX(); ++iEta ) {
-        etaBins.push_back( hist_EtaBins->GetBinLowEdge( iEta ) );
-      }
-      etaBins.push_back( hist_EtaBins->GetBinLowEdge( hist_EtaBins->GetNbinsX() ) + hist_EtaBins->GetBinWidth( hist_EtaBins->GetNbinsX() ) );
-      if ( iSel == 0 ) etaBins_.push_back( etaBins );
-      // Pt binning
-      std::vector< double > ptBins;
-      TH1D * hist_PtBins( ( TH1D* )( gDirectory->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
-      for ( int iPt = 1; iPt <= hist_PtBins->GetNbinsX(); ++iPt ) {
-        ptBins.push_back( hist_PtBins->GetBinLowEdge( iPt ) );
-      }
-      ptBins.push_back( hist_PtBins->GetBinLowEdge( hist_PtBins->GetNbinsX() ) + hist_PtBins->GetBinWidth( hist_PtBins->GetNbinsX() ) );
-      if ( iSel == 0 ) ptBins_.push_back( ptBins );
 
       for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
         const std::string kinProp( kinProps_.at( iProp ) );
 
-        curCat->cd(); curCat->Cd( kinProp.c_str() );
-        gDirectory->pwd();
+        curCat->cd();
+        curCat->Cd( kinProp.c_str() );
+        if ( verbose_ ) gDirectory->pwd();
         TDirectory * curProp( gDirectory );
 
         for ( unsigned iFit = 0; iFit < subFits_.size(); ++iFit ) {
           const std::string subFit( subFits_.at( iFit ) );
           const bool inverse( subFit.substr( subFit.size() - 3 ) == "Inv" );
 
-          curProp->cd(); curProp->Cd( subFit.c_str() );
-          gDirectory->pwd();
+          curProp->cd();
+          curProp->Cd( subFit.c_str() );
+          if ( verbose_ ) gDirectory->pwd();
           TDirectory * curFit( gDirectory );
 
-          for ( unsigned iEta = 0; iEta < etaBins.size() - 1; ++iEta ) {
-            const std::string binEta( my::helpers::to_string( iEta ) );
+          for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
+            const std::string binEta( "Eta" + my::helpers::to_string( iEta ) );
 
-            const std::string binEtaDir( subFit + "_" + binEta );
-            curFit->cd(); curFit->Cd( binEtaDir.c_str() );
-            gDirectory->pwd();
-            TDirectory * curFitEta( gDirectory );
+            curFit->cd();
+            curFit->Cd( binEta.c_str() );
+            if ( verbose_ ) gDirectory->pwd();
 
             const std::string name( objCat + "_" + kinProp + "_" + subFit + "_" + binEta );
             TH2D * hist2D( ( TH2D* )( gDirectory->Get( name.c_str() ) ) );
@@ -145,7 +261,7 @@ int main(  int argc, char * argv[] )
 
             const std::string nameSigma( name + "_Sigma" );
             TH1D * histSigmaPt( new TH1D( *( ( TH1D* )( histSigma->Clone( nameSigma.c_str() ) ) ) ) );
-            for ( Int_t iPt = 1; iPt < hist2D->GetNbinsX(); ++iPt ) {
+            for ( unsigned iPt = 1; iPt < ptBins_.at( iCat ).size() - 1; ++iPt ) {
               const std::string binPt( my::helpers::to_string( iPt ) );
 
               const std::string namePt( name + "_Pt_" + binPt );
@@ -187,64 +303,10 @@ int main(  int argc, char * argv[] )
   inFile->Write();
   inFile->Close();
 
-  // Get existing resolution functions
-
-  if ( useExisting_ ) {
-
-    // Configuration for existing resolution functions
-    const edm::ParameterSet & exist_( process_.getParameter< edm::ParameterSet >( "existing" ) );
-    const std::string outFile_( exist_.getParameter< std::string >( "outputFile" ) );
-    const std::vector< std::string > resFiles_( exist_.getParameter< std::vector< std::string > >( "resolutionFiles" ) ); // "file-in-path" location of input resolution files
-    assert( objCats_.size() == resFiles_.size() );
-
-    // Open output file
-    TFile * outFile( TFile::Open( outFile_.c_str(), "RECREATE" ) );
-
-    // Loop over objects and quantities
-
-    for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
-      const std::string objCat( objCats_.at( iCat ) );
-
-      const edm::FileInPath resFile( resFiles_.at( iCat ) );
-      const hitfit::EtaDepResolution res( resFile.fullPath() );
-      const std::vector< hitfit::EtaDepResElement > resElems( res.GetEtaDepResElement() );
-
-      for ( unsigned iResElem = 0; iResElem < resElems.size(); ++iResElem ) {
-
-        const hitfit::Vector_Resolution vecRes( resElems.at( iResElem ).GetResolution() );
-
-        for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
-          const std::string kinProp( kinProps_.at( iProp ) );
-
-          hitfit::Resolution res;
-          if ( kinProp == "Pt" ) {
-            res = hitfit::Resolution( vecRes.p_res() );
-          }
-          else if ( kinProp == "Eta" ) {
-            res = hitfit::Resolution( vecRes.eta_res() );
-          }
-          else if ( kinProp == "Phi" ) {
-            res = hitfit::Resolution( vecRes.phi_res() );
-          }
-
-          std::string name( "fitExist_" + objCat + "_" + kinProp + "_" );
-          if ( res.inverse() ) name.append( "Inv_" );
-          name.append( my::helpers::to_string( iResElem ) );
-          TF1 * func = new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., ptBins_.at( iCat ).back() );
-          func->SetParameters( res.C(), res.R(), res.N() );
-          func->Write();
-
-        }
-      }
-
-    }
-
-    // Close output file
-    outFile->Write();
-    outFile->Close();
-
-  }
-
-  return 0;
+  if ( verbose_ )
+    std::cout << std::endl
+              << argv[ 0 ] << " --> INFO:" << std::endl
+              << "   return status " << returnStatus_ << std::endl;
+  return returnStatus_;
 
 }

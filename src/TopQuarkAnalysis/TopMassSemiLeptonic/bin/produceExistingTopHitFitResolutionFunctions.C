@@ -72,7 +72,7 @@ int main(  int argc, char * argv[] )
 
     outFile->cd();
     gDirectory->pwd();
-    TDirectory * curCat( outFile->mkdir( objCat.c_str(), objCat.c_str() ) );
+    TDirectory * curCat( gDirectory->mkdir( objCat.c_str(), objCat.c_str() ) );
 
     const edm::FileInPath resFile( resFiles_.at( iCat ) );
     const hitfit::EtaDepResolution res( resFile.fullPath() );
@@ -99,18 +99,16 @@ int main(  int argc, char * argv[] )
 
         curCat->cd();
         gDirectory->pwd();
-        std::string dirName( objCat + "_" + kinProp );
-        if ( iResElem == 0 ) gDirectory->mkdir( dirName.c_str(), kinProp.c_str() );
-        gDirectory->Cd( dirName.c_str() );
+        if ( iResElem == 0 ) gDirectory->mkdir( kinProp.c_str(), kinProp.c_str() );
+        gDirectory->Cd( kinProp.c_str() );
         gDirectory->pwd();
 
-        kinProp.append( "_" + resElem );
-        dirName = objCat + "_" + kinProp;
-        gDirectory->mkdir( dirName.c_str(), kinProp.c_str() );
-        gDirectory->Cd( dirName.c_str() );
+        const std::string binEta( "Eta" + resElem );
+        gDirectory->mkdir( binEta.c_str(), binEta.c_str() );
+        gDirectory->Cd( binEta.c_str() );
         gDirectory->pwd();
 
-        std::string name( "fitExist_" + objCat + "_" + kinProp );
+        std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
         TF1 * func = new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
         func->SetParameters( res.C(), res.R(), res.N() );
         func->Write();

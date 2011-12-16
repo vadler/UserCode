@@ -3,15 +3,18 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-runTest   = True
-rfioInput = False
+runTest   = False
+rfioInput = True
 
 process = cms.PSet()
+process.verbose = cms.bool( False )
+if runTest:
+  process.verbose = True
 process.objectCategories = cms.vstring( 'Mu'
                                       #, 'Elec'
                                       , 'UdscJet'
                                       , 'BJet'
-                                      , 'MET'
+                                      #, 'MET'
                                       )
 process.resolutionFunction        = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])' )
 process.resolutionFunctionInverse = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
@@ -21,6 +24,8 @@ if runTest:
   inputFile = inputFile.replace( 'root', 'test.root' )
 if not rfioInput:
   inputFile = inputFile.replace( 'root', 'local.root' )
+logFile = inputFile.replace( 'root', 'log' )
+logFile = inputFile.replace( 'input', 'fit' )
 process.fitter = cms.PSet(
   inputFile = cms.string( inputFile )
 , selections = cms.vstring( 'analyzeHitFitResolutionFunctions'
@@ -29,13 +34,18 @@ process.fitter = cms.PSet(
 if not runTest:
   process.fitter.selections.append( 'analyzeHitFitResolutionFunctions_Reference' )
 
-process.useExisting = cms.bool( False )
+process.useExisting = cms.bool( True )
 process.existing = cms.PSet(
-  outputFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions.root'%( os.getenv( "CMSSW_BASE" ) ) )
-, resolutionFiles = cms.vstring( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution.txt'
-                                 #'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution.txt'
-                               , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution.txt'
-                               , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution.txt'
-                               , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution.txt'
-                               )
+  resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions.root'%( os.getenv( "CMSSW_BASE" ) ) )
 )
+
+print
+print 'Input file:'
+print '------------'
+print inputFile
+print
+print 'Log file destination:'
+print '---------------------'
+print logFile
+print '================================================================================'
+print

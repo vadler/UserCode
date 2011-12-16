@@ -6,19 +6,19 @@ process = cms.PSet()
 
 process.existing = cms.PSet(
   objectCategories = cms.vstring( 'Mu'
-                                #, 'Elec'
+                                , 'Elec'
                                 , 'UdscJet'
                                 , 'BJet'
                                 , 'MET'
                                 )
 , objectPtLimits = cms.vdouble( 400.
-                              #, 400.
+                              , 400.
                               , 500.
                               , 500.
                               , 300.
                               )
 , resolutionFiles = cms.vstring( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution.txt'
-                                 #'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution.txt'
+                               , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution.txt'
                                , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution.txt'
                                , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution.txt'
                                , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution.txt'
