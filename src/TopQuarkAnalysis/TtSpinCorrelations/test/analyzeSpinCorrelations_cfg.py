@@ -114,6 +114,8 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'refer
 ### Analyzer
 
 process.load( "TopQuarkAnalysis.TtSpinCorrelations.analyzeSpinCorrelations_cfi" )
+process.analyzeSpinCorrelations_Reference = process.analyzeSpinCorrelations.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReference'
+                                                                                           )
 
 
 ### Paths
@@ -126,7 +128,7 @@ process.standardPath = cms.Path(
 if not runTest:
   process.referencePath = cms.Path(
     process.hltHighLevel_Reference
-  * process.analyzeSpinCorrelations
+  * process.analyzeSpinCorrelations_Reference
   )
 
 ### Messages
