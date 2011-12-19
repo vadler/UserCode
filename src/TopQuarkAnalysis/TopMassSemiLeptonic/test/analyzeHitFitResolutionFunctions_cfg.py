@@ -9,7 +9,7 @@ runTest   = True
 rfioInput = False
 
 # Event selection
-hitFitProcess = 'SKIM'
+skimProcess = 'SKIM'
 
 ### Initialization
 
@@ -79,7 +79,7 @@ logFile = outputFile.replace( 'root', 'log' )
 
 # Trigger
 process.load( "HLTrigger.HLTfilters.hltHighLevel_cfi" )
-process.hltHighLevel.TriggerResultsTag = cms.InputTag( 'TriggerResults::%s'%( hitFitProcess ) )
+process.hltHighLevel.TriggerResultsTag = cms.InputTag( 'TriggerResults::%s'%( skimProcess ) )
 process.hltHighLevel.HLTPaths          = [ 'pf2PatPath'
                                          ]
 process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'referencePath'

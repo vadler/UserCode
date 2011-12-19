@@ -4,8 +4,11 @@
 <use   name="DataFormats/FWLite"/>
 <use   name="FWCore/ParameterSet"/>
 <use   name="FWCore/PythonParameterSet"/>
+<use   name="TopQuarkAnalysis/TopHitFit"/>
 <environment>
-  <use   name="TopQuarkAnalysis/TopHitFit"/>
+  <bin   file="produceExistingTopHitFitResolutionFunctions.C"></bin>
+</environment>
+<environment>
   <bin   file="fitTopHitFitResolutionFunctions.C"></bin>
 </environment>
 <environment>

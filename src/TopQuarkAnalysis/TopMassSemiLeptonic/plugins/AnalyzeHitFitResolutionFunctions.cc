@@ -47,7 +47,7 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     explicit AnalyzeHitFitResolutionFunctions( const edm::ParameterSet & iConfig );
 
     /// Destructor
-    virtual ~AnalyzeHitFitResolutionFunctions();
+    virtual ~AnalyzeHitFitResolutionFunctions() {};
 
     /// Methods
 
@@ -279,12 +279,6 @@ AnalyzeHitFitResolutionFunctions::AnalyzeHitFitResolutionFunctions( const edm::P
   edm::LogInfo( "AnalyzeHitFitResolutionFunctions" ) << "Eta binning\n" << sstrEta.str();
   edm::LogInfo( "AnalyzeHitFitResolutionFunctions" ) << "Pt binning\n" << sstrPt.str();
 
-}
-
-
-// Destructor
-AnalyzeHitFitResolutionFunctions::~AnalyzeHitFitResolutionFunctions()
-{
 }
 
 
