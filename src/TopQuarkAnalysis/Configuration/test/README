@@ -5,13 +5,20 @@ Environment:
 cmsrel CMSSW_4_2_8
 cd CMSSW_4_2_8/src
 cmsenv
-addpkg DataFormats/PatCandidates                        V06-04-19-01
-addpkg PhysicsTools/PatAlgos                            V08-06-41
-addpkg PhysicsTools/PatUtils                            V03-09-18
-addpkg PhysicsTools/SelectorUtils                       V00-03-24
-addpkg PhysicsTools/UtilAlgos                           V08-02-14
-addpkg RecoEgamma/ElectronIdentification                V00-03-31
-addpkg RecoJets/Configuration                           V02-04-17
+addpkg AnalysisDataFormats/TopObjects                   V06-08-04
+addpkg CommonTools/ParticleFlow                         V00-03-02
+addpkg DataFormats/PatCandidates                        V06-04-30
+addpkg PhysicsTools/KinFitter                           V00-03-06
+addpkg PhysicsTools/PatAlgos                            V08-07-31-00
+addpkg PhysicsTools/PatUtils                            V03-09-18-02
+addpkg RecoParticleFlow/PFProducer                      V14-07-13
+addpkg TopQuarkAnalysis/Configuration                   V06-01-14
+addpkg TopQuarkAnalysis/TopEventProducers               V06-08-01
+addpkg TopQuarkAnalysis/TopHitFit                       V00-00-01
+addpkg TopQuarkAnalysis/TopJetCombination               V06-08-01
+addpkg TopQuarkAnalysis/TopKinFitter                    V06-07-16
+addpkg TopQuarkAnalysis/TopObjectResolutions            V06-07-08
+addpkg TopQuarkAnalysis/TopTools                        V06-07-10
 scram b -j 9
 
 Steering:
@@ -35,11 +42,12 @@ Some very basic steering switches are found at the top of the configurations:
 - jecLevels       : list of stored JECs
 - pvCollections   : name of primary vertex collection to be used in PF2PAT
 
-- {muon, electron}SelectTP   : selection string cut for objects to be kept in PF2PAT
-                               top projections
-- {muon, electron}IsoR       : radius to compute the isolation
-- {muon, electron}sIsoTP     : cut value for combined isolation of objects to be
-                               kept in PF top projection procedure
+- pf{muon, electron}Select       : selection string cut for objects to be kept in PF2PAT
+                                   top projections
+- usePf{Muon, Electron}IsoConeR03: switch to use an isolation cone of radius 0.3 instead
+                                    of the default 0.4 in PF2PAT top projections
+- pf{muon, electron}Iso          : cut value for combined isolation of objects to be
+                                   kept in PF top projection procedure
 - {muon, electron, jet}Select: selection string cut for objects to be stored in the
                                output
 - {muon, electron, jet}sCut  : selection string cut for objects used in the event
@@ -102,14 +110,13 @@ This should also be sufficient to reconstruct the TtGenEvent in the TQAF.
 Tests:
 ======
 
-The tests have been performed with the CMSSW_4_2_5 set-up (s, rev. 1.1 of this file)
-on CMSSW_4_2_5 RelVal samples:
-- MC  : /RelValTTbar/CMSSW_4_2_5-START42_V12-v2/GEN-SIM-RECO (8900 evts.)
-- data: /Mu/CMSSW_4_2_5-GR_R_42_V14_mu2010B-v2/RECO (run over 8900 evts.)
-        /Elecktron/CMSSW_4_2_5-GR_R_42_V14_electron2010B-v2/RECO (run over 8900 evts.)
+The tests have been performed with the CMSSW_4_4_2_patch9 set-up on CMSSW_4_4_2 RelVal samples:
+- MC  : /RelValTTbar/CMSSW_4_4_2-START44_V7-v1/GEN-SIM-RECO (8900 evts.)
+- data: /SingleMu/CMSSW_4_4_2-GR_R_44_V7_RelVal_mu2011A-v1/RECO (run over 8900 evts.)
+#        /Electron/CMSSW_4_2_5-GR_R_42_V14_electron2010B-v2/RECO (run over 8900 evts.)
 There are no Run2011A data samples available as RelVal in CMSSW_4_2_X (but in CMSSW_4_3_X).
 
-The CMSSW timing service has been added and its summary is found at the end of the
-Fwk output.
+# The CMSSW timing service has been added and its summary is found at the end of the
+# Fwk output.
 
-Additional information on the event size from 'edmEventSize' is also added.
+# Additional information on the event size from 'edmEventSize' is also added.
