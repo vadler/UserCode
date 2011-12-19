@@ -74,9 +74,9 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START42_V13::All'
+  process.GlobalTag.globaltag = 'START44_V7::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_42_V19::All'
+  process.GlobalTag.globaltag = 'GR_R_44_V12::All'
 
 
 ### Input
@@ -92,16 +92,18 @@ process.maxEvents = cms.untracked.PSet(
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
-                                                 , globalTag     = 'START42_V12'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_2'
+                                                 , globalTag     = 'START44_V7'
+                                                 , maxVersions   = 1
                                                  )
 else:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_2'
                                                  , dataTier      = 'RECO'
-                                                 , relVal        = 'Mu'
-                                                 , globalTag     = 'GR_R_42_V14_mu2010B'
+                                                 , relVal        = 'SingleMu'
+                                                 , globalTag     = 'GR_R_44_V7_mu2011A'
                                                  #, relVal        = 'Electron'
-                                                 #, globalTag     = 'GR_R_42_V14_electron2010B'
+                                                 #, globalTag     = 'GR_R_42_V14_electron2011A'
+                                                 , maxVersions   = 1
                                                  )
 
 
