@@ -1,13 +1,15 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
-cmsswVersion = 'CMSSW_5_0_0_pre5'
-globalTag    = 'START50_V3'
+cmsswVersion = 'CMSSW_5_0_0_pre6'
+globalTag    = 'START50_V5'
 process.GlobalTag.globaltag = '%s::All'%( globalTag )
-process.source.fileNames    = pickRelValInputFiles( formerVersion = True
-                                                    #cmsswVersion  = cmsswVersion
+process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
+                                                    cmsswVersion  = cmsswVersion
                                                   , relVal        = 'RelValProdTTbar'
+                                                  , dataTier      = 'AODSIM'
                                                   , globalTag     = globalTag
+                                                  , maxVersions   = 1
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
@@ -34,8 +36,9 @@ process.out.outputCommands += [
 from PhysicsTools.PatAlgos.tools.trigTools import *
 from PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff import *
 process.hallo                     = patTrigger.clone()
-process.hallo.saveL1Refs          = cms.bool( True )
 process.hallo.addL1Algos          = cms.bool( True )
+process.hallo.l1ExtraMu           = cms.InputTag( 'l1extraParticles' )
+process.hallo.saveL1Refs          = cms.bool( True )
 process.hallo.addPathModuleLabels = cms.bool( True )
 process.tschuess           = patTriggerEvent.clone()
 process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
