@@ -1,6 +1,6 @@
-Test Release based on: CMSSW_4_4_X_2011-12-13-0200
-Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_amd64_gcc434/tue/4.4-tue-02/CMSSW_4_4_X_2011-12-13-0200
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_4_X_2011-12-13-0200
+Test Release based on: CMSSW_4_4_X_2011-12-19-0200
+Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_amd64_gcc434/mon/4.4-mon-02/CMSSW_4_4_X_2011-12-19-0200
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_4_X_2011-12-19-0200
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 CommonTools/ParticleFlow                         V00-03-02      V00-03-00      
 DataFormats/PatCandidates                        V06-04-30      V06-04-27      
