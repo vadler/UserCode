@@ -3,8 +3,8 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process( "HLTPROV" )
 
 # Steering
-cmsswVersion = 'CMSSW_5_0_0_pre6'
-globalTag    = 'START50_V5'
+cmsswVersion = 'CMSSW_5_0_0_pre7'
+globalTag    = 'START50_V7'
 
 # Conditions
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
