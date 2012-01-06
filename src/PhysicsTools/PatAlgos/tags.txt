@@ -2,7 +2,7 @@ Test Release based on: CMSSW_5_0_0
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_5_0_0
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_5_0_0
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-PhysicsTools/PatAlgos                            V08-08-06-01   V08-08-06      
+PhysicsTools/PatAlgos                            V08-08-07      V08-08-06      
 PhysicsTools/SelectorUtils                       V00-03-24-01   V00-03-24      
 ---------------------------------------
 total packages: 2 (2 displayed)
