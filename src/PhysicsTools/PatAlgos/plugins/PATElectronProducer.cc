@@ -1,6 +1,3 @@
-//
-// $Id: PATElectronProducer.cc,v 1.47.2.4 2011/07/05 16:25:28 bellan Exp $
-//
 
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
 
@@ -685,6 +682,7 @@ void PATElectronProducer::fillDescriptions(edm::ConfigurationDescriptions & desc
   isoDepositsPSet.addOptional<edm::InputTag>("hcal");
   isoDepositsPSet.addOptional<edm::InputTag>("pfAllParticles");
   isoDepositsPSet.addOptional<edm::InputTag>("pfChargedHadrons");
+  isoDepositsPSet.addOptional<edm::InputTag>("pfPUChargedHadrons");
   isoDepositsPSet.addOptional<edm::InputTag>("pfNeutralHadrons");
   isoDepositsPSet.addOptional<edm::InputTag>("pfPhotons");
   isoDepositsPSet.addOptional<std::vector<edm::InputTag> >("user");
@@ -697,6 +695,7 @@ void PATElectronProducer::fillDescriptions(edm::ConfigurationDescriptions & desc
   isolationValuesPSet.addOptional<edm::InputTag>("hcal");
   isolationValuesPSet.addOptional<edm::InputTag>("pfAllParticles");
   isolationValuesPSet.addOptional<edm::InputTag>("pfChargedHadrons");
+  isolationValuesPSet.addOptional<edm::InputTag>("pfPUChargedHadrons");
   isolationValuesPSet.addOptional<edm::InputTag>("pfNeutralHadrons");
   isolationValuesPSet.addOptional<edm::InputTag>("pfPhotons");
   isolationValuesPSet.addOptional<std::vector<edm::InputTag> >("user");
@@ -759,6 +758,9 @@ void PATElectronProducer::readIsolationLabels( const edm::ParameterSet & iConfig
     }
     if (depconf.exists("pfChargedHadrons"))  {
       labels.push_back(std::make_pair(pat::PfChargedHadronIso, depconf.getParameter<edm::InputTag>("pfChargedHadrons")));
+    }
+    if (depconf.exists("pfPUChargedHadrons"))  {
+      labels.push_back(std::make_pair(pat::PfPUChargedHadronIso, depconf.getParameter<edm::InputTag>("pfPUChargedHadrons")));
     }
     if (depconf.exists("pfNeutralHadrons"))  {
       labels.push_back(std::make_pair(pat::PfNeutralHadronIso, depconf.getParameter<edm::InputTag>("pfNeutralHadrons")));
