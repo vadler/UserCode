@@ -270,6 +270,7 @@ process.pfElectronsFromVertex.vertices    = cms.InputTag( pvCollection )
 process.patElectrons.pvSrc                = cms.InputTag( pvCollection )
 process.patMuons.pvSrc                    = cms.InputTag( pvCollection )
 process.patJetCorrFactors.primaryVertices = cms.InputTag( pvCollection )
+
 # Muons
 process.pfSelectedMuons.cut = pfMuonSelect
 if usePfMuonIsoConeR03:
