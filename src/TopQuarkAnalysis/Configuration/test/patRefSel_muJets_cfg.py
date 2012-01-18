@@ -86,13 +86,13 @@ from TopQuarkAnalysis.Configuration.patRefSel_refMuJets import *
 
 # Trigger selection according to run range resp. MC sample:
 # lower range limits for data available as suffix;
-# available are: 000000, 147196, 160404, 163270 (default)
+# available are: 000000, 147196, 160404, 163270, 173236, 175832 (default)
 # sample name for MC available as suffix;
-# available are: Summer11 (default)
-#triggerSelectionData       = triggerSelection_163270
-#triggerObjectSelectionData = triggerObjectSelection_163270
-#triggerSelectionMC       = triggerSelection_Summer11
-#triggerObjectSelectionMC = triggerObjectSelection_Summer11
+# available are: Summer11, Fall11 (default)
+#triggerSelectionData       = triggerSelection_175832
+#triggerObjectSelectionData = triggerObjectSelection_175832
+#triggerSelectionMC       = triggerSelection_Fall11
+#triggerObjectSelectionMC = triggerObjectSelection_Fall11
 
 ### Particle flow
 ### takes effect only, if 'runPF2PAT' = True
@@ -244,7 +244,7 @@ process.out.SelectEvents.SelectEvents = []
 if runOnMC:
   triggerSelection = triggerSelectionMC
 else:
-  triggerSelection = 'HLT_IsoMu24_eta2p1_v*'
+  triggerSelection = triggerSelectionData
 from TopQuarkAnalysis.Configuration.patRefSel_triggerSelection_cff import triggerResults
 process.step0a = triggerResults.clone(
   triggerConditions = [ triggerSelection ]
