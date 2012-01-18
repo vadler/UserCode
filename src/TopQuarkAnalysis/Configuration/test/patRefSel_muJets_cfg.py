@@ -168,8 +168,8 @@ maxInputEvents = 1000
 ### Conditions
 
 # GlobalTags (w/o suffix '::All')
-globalTagData = 'GR_R_42_V19'
-globalTagMC   = 'START42_V13'
+globalTagData = 'GR_R_42_V23'
+globalTagMC   = 'START42_V17'
 
 ### Output
 

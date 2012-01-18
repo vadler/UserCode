@@ -74,9 +74,9 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START42_V13::All'
+  process.GlobalTag.globaltag = 'START42_V17::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_42_V19::All'
+  process.GlobalTag.globaltag = 'GR_R_42_V23::All'
 
 
 ### Input
