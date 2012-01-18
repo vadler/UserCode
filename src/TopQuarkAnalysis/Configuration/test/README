@@ -2,8 +2,8 @@
 Environment:
 ============
 
-cmsrel CMSSW_4_2_8
-cd CMSSW_4_2_8/src
+cmsrel CMSSW_4_2_8_patch7
+cd CMSSW_4_2_8_patch7/src
 cmsenv
 cvs co -r B4_2_X_V00-03-01 CommonTools/ParticleFlow
 cvs co -r V06-04-19-02     DataFormats/PatCandidates
