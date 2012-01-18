@@ -27,14 +27,14 @@ pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVe
 #muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
 muonSelect = ''
 # muon event selection
-muonsCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
+muonCut  = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
 muonsMin = 0
 
 # electron object selection
 #electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
 electronSelect = ''
 # electron event selection
-electronsCut = 'et > 5. && abs(eta) < 3.0'
+electronCut  = 'et > 5. && abs(eta) < 3.0'
 electronsMin = 0
 
 # x-leptons event selection
@@ -44,7 +44,7 @@ leptonsMin = 1
 #jetSelect = 'pt > 30. && abs(eta) < 2.4' # RefSel
 jetSelect = ''
 # jet event selection
-jetsCut = 'pt > 15. && abs(eta) < 3.0'
+jetCut  = 'pt > 15. && abs(eta) < 3.0'
 jetsMin = 3
 
 
@@ -230,7 +230,7 @@ process.patJetCorrFactors.primaryVertices = cms.InputTag( pvCollection )
 process.patMuons.embedTrack = True
 process.selectedPatMuons.cut = muonSelect
 process.cleanPatMuons.src           = cms.InputTag( 'patMuons' )
-process.cleanPatMuons.preselection  = muonsCut
+process.cleanPatMuons.preselection  = muonCut
 process.cleanPatMuons.checkOverlaps = cms.PSet()
 process.countPatMuons.minNumber = muonsMin
 
@@ -238,7 +238,7 @@ process.countPatMuons.minNumber = muonsMin
 process.patElectrons.embedTrack = True
 process.selectedPatElectrons.cut = electronSelect
 process.cleanPatElectrons.src           = cms.InputTag( 'patElectrons' )
-process.cleanPatElectrons.preselection  = electronsCut
+process.cleanPatElectrons.preselection  = electronCut
 process.cleanPatElectrons.checkOverlaps = cms.PSet()
 process.countPatElectrons.minNumber = electronsMin
 if runEwk:
@@ -318,7 +318,7 @@ process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
 process.cleanPatJets.src           = cms.InputTag( 'patJets' )
-process.cleanPatJets.preselection  = jetsCut
+process.cleanPatJets.preselection  = jetCut
 process.cleanPatJets.checkOverlaps = cms.PSet()
 process.countPatJets.minNumber = jetsMin
 

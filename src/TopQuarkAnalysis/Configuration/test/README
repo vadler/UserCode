@@ -104,13 +104,9 @@ This should also be sufficient to reconstruct the TtGenEvent in the TQAF.
 Tests:
 ======
 
-The tests have been performed with the CMSSW_4_2_5 set-up (s, rev. 1.1 of this file)
-on CMSSW_4_2_5 RelVal samples:
-- MC  : /RelValTTbar/CMSSW_4_2_5-START42_V12-v2/GEN-SIM-RECO (8900 evts.)
-- data: /Mu/CMSSW_4_2_5-GR_R_42_V14_mu2010B-v2/RECO (run over 8900 evts.)
-        /Elecktron/CMSSW_4_2_5-GR_R_42_V14_electron2010B-v2/RECO (run over 8900 evts.)
+The tests have been performed with the CMSSW_4_2_8_patch7 set-up on CMSSW_4_2_6 RelVal samples:
+- MC  : /RelValTTbar/CMSSW_4_2_6-START42_V12-v2/GEN-SIM-RECO (run over 1000 evts.)
 There are no Run2011A data samples available as RelVal in CMSSW_4_2_X (but in CMSSW_4_4_X).
-Changes in the current version of the configuration are not expected.
 
 The CMSSW timing service has been added and its summary is found at the end of the
 Fwk output.
