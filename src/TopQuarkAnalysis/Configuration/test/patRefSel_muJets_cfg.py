@@ -142,24 +142,34 @@ useL7Parton     = True
 
 # list of input files
 useRelVals = True # if 'False', "inputFiles" is used
-inputFiles = [ '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/129/42DDEE9E-7B81-E011-AF29-003048F024DC.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/103/8AF0C4CD-EE80-E011-96B1-003048F1BF68.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/102/1298E7B3-CF80-E011-86E9-001617E30F4C.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/099/16D66DF0-D07F-E011-A922-003048F118C4.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/098/66526A73-DA7F-E011-84B4-003048F1BF68.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/093/2E545F72-C27F-E011-8CC1-003048D2C1C4.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/088/DED0B748-E47F-E011-9C6E-0030487C6A66.root'
-             , '/store/data/Run2011A/MuHad/AOD/PromptReco-v4/000/165/071/283C53A0-C37F-E011-A06F-0030487CD6D8.root'
+inputFiles = [ '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/179/411/E6068DCF-61FE-E011-B2C4-0019B9F72CE5.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/04C16888-52FB-E011-8321-0030486730C6.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/06B5F82F-57FB-E011-93CD-001D09F23A84.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/14675371-FBFA-E011-92EE-00215AEDFCCC.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/160F73C0-BAFA-E011-ADD0-001D09F2A465.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/2C9D2B89-B3FA-E011-AF19-001D09F24303.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/3A176EDF-BFFA-E011-90EA-003048CFB40C.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/4A2BDEC2-51FB-E011-9A27-BCAEC532971A.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/4AA63498-50FB-E011-A4E4-0025B32035BC.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/66B2E464-C0FA-E011-AFD8-BCAEC5329702.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/6C4DF9D2-BFFA-E011-BDCC-0019B9F709A4.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/6E3F588A-C4FA-E011-A20F-001D09F2527B.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/ACD7155F-B6FA-E011-95A9-BCAEC5329726.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/AEB720EB-46FB-E011-A1BE-003048F117F6.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/B4353A8A-C4FA-E011-BE51-0019B9F709A4.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/CCE2406E-FBFA-E011-9BCB-BCAEC53296FC.root'
+             , '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/178/866/D8F22FD9-B2FA-E011-8D39-BCAEC518FF8A.root '
              ] # overwritten, if "useRelVals" is 'True'
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
+maxInputEvents = 1000
 
 ### Conditions
 
 # GlobalTags (w/o suffix '::All')
-globalTagData = 'GR_R_42_V21'  # default for CMSSW_4_2_9_HLT1 RelVals: 'GR_R_42_V14'
-globalTagMC   = 'START42_V14B' # default for CMSSW_4_2_9_HLT1 RelVals: 'START42_V14A'
+globalTagData = 'GR_R_42_V19'
+globalTagMC   = 'START42_V13'
 
 ### Output
 
@@ -199,17 +209,14 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_9_HLT1'
-                                     , relVal        = 'RelValTTbar'
-                                     , globalTag     = 'START42_V14A'
-                                     , numberOfFiles = -1
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
+                                     , globalTag     = 'START42_V12'
                                      )
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_9_HLT1'
-                                     , relVal        = 'Mu'
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
                                      , dataTier      = 'RECO'
-                                     , globalTag     = 'GR_R_42_V14_RelVal_mu2010B'
-                                     , numberOfFiles = -1
+                                     , relVal        = 'Mu'
+                                     , globalTag     = 'GR_R_42_V14_wzMu2010B'
                                      )
 process.source.fileNames = inputFiles
 process.maxEvents.input  = maxInputEvents
@@ -237,7 +244,7 @@ process.out.SelectEvents.SelectEvents = []
 if runOnMC:
   triggerSelection = triggerSelectionMC
 else:
-  triggerSelection = triggerSelectionData
+  triggerSelection = 'HLT_IsoMu24_eta2p1_v*'
 from TopQuarkAnalysis.Configuration.patRefSel_triggerSelection_cff import triggerResults
 process.step0a = triggerResults.clone(
   triggerConditions = [ triggerSelection ]

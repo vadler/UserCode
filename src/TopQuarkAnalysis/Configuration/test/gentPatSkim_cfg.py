@@ -92,16 +92,16 @@ process.maxEvents = cms.untracked.PSet(
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
                                                  , globalTag     = 'START42_V12'
                                                  )
 else:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_8'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
                                                  , dataTier      = 'RECO'
                                                  , relVal        = 'Mu'
-                                                 , globalTag     = 'GR_R_42_V14_mu2010B'
+                                                 , globalTag     = 'GR_R_42_V14_wzMu2010B'
                                                  #, relVal        = 'Electron'
-                                                 #, globalTag     = 'GR_R_42_V14_electron2010B'
+                                                 #, globalTag     = 'GR_R_42_V14_wzEG2010B'
                                                  )
 
 
@@ -171,8 +171,8 @@ process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 # Misc
 from PhysicsTools.PatAlgos.tools.coreTools import *
 removeSpecificPATObjects( process
-                        , names           = [ 'Photons', 'Taus' ]
-                        , outputInProcess = False
+                        , names         = [ 'Photons', 'Taus' ]
+                        , outputModules = []
                         )
 # The following is not performed (properly) by 'removeSpecificPATObjects()'
 process.patDefaultSequence.remove( getattr( process, 'cleanPatPhotons' ) )

@@ -129,27 +129,40 @@ useL7Parton     = True
 
 # list of input files
 useRelVals = False # if 'False', "inputFiles" is used
-inputFiles = [ '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/0635AA67-B37C-E011-B61F-002618943944.root'
-             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/0E153885-B17C-E011-8C7D-001A928116E0.root'
-             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/105E01FE-B57C-E011-9AB4-0018F3D09708.root'
-             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/120718C8-B67C-E011-A070-001A928116D2.root'
-             , '/store/relval/CMSSW_4_2_3/RelValTTbar/GEN-SIM-DIGI-RECO/START42_V12_FastSim_PU_156BxLumiPileUp-v1/0072/1232DFFA-AF7C-E011-983D-002618943831.root'
+inputFiles = [ '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/122CC36B-32FB-E011-9C29-001D09F295FB.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/16F98CC4-BCFA-E011-AF7C-BCAEC532971A.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/1A167592-53FB-E011-B28B-E0CB4E4408E7.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/1A2F8D37-C4FA-E011-9A03-0030486780B4.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/328E6513-BCFA-E011-94CB-BCAEC5329732.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/421E8A85-52FB-E011-90CF-001D09F2426D.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/46ED9F2E-57FB-E011-960E-003048D3C944.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/507FC650-B9FA-E011-9BB1-003048D3C944.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/543952D1-C6FA-E011-83E8-BCAEC532971E.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/62CD468E-54FB-E011-BCC4-003048D374CA.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/76F69435-BEFA-E011-A7C1-BCAEC532972D.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/8E080FBC-56FB-E011-AB40-BCAEC518FF8D.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/969EA6B0-31FB-E011-B27D-BCAEC53296F7.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/984FD744-55FB-E011-973E-E0CB4E55367F.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/9E73F7B3-BFFA-E011-B9C1-BCAEC5329711.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/A64B1990-54FB-E011-A661-003048D3756A.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/AA9F05F6-B4FA-E011-882B-003048D2BE06.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/D2D261A4-B8FA-E011-B835-485B3962633D.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/E05FD2AF-55FB-E011-ACBC-BCAEC532972D.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/E4FFA75D-C0FA-E011-862A-E0CB4E55367F.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/FA2EBD16-BCFA-E011-8AA9-BCAEC532972D.root'
+             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/FE5D18FE-2CFB-E011-8EFA-BCAEC5329730.root'
              ]   # overwritten, if "useRelVals" is 'True'
-
-             #['/store/mc/Summer11/QCD_Pt-15to3000_TuneD6T_Flat_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0000/023735A8-297E-E011-A8B0-0026189438AD.root',
-             # '/store/mc/Summer11/QCD_Pt-15to3000_TuneD6T_Flat_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0000/56FA5813-387E-E011-B48D-001A928116D6.root',
-             # '/store/mc/Summer11/QCD_Pt-15to3000_TuneD6T_Flat_7TeV_pythia6/AODSIM/PU_S3_START42_V11-v2/0000/84488536-2B7E-E011-989D-001A92810A94.root'
-             # ]   # overwritten, if "useRelVals" is 'True'
 
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
+maxInputEvents = 1000
 
 ### Conditions
 
 # GlobalTags (w/o suffix '::All')
-globalTagData = 'GR_R_42_V21'  # default for CMSSW_4_2_9_HLT1 RelVals: 'GR_R_42_V14'
-globalTagMC   = 'START42_V14B' # default for CMSSW_4_2_9_HLT1 RelVals: 'START42_V14A'
+globalTagData = 'GR_R_42_V19'
+globalTagMC   = 'START42_V13'
 
 ### Output
 
@@ -189,10 +202,8 @@ process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_9_HLT1'
-                                     , relVal        = 'RelValTTbar'
-                                     , globalTag     = 'START42_V14A'
-                                     , numberOfFiles = -1
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
+                                     , globalTag     = 'START42_V12'
                                      )
   else:
     print 'running on *Jet* data stream (instead of MultiJet) as no better stream exists as RelVal'
@@ -201,6 +212,7 @@ if useRelVals:
                                      , dataTier      = 'RECO'
                                      , globalTag     = 'GR_R_42_V14_RelVal_jet2010B'
                                      , numberOfFiles = -1
+                                     )
 process.source.fileNames = inputFiles
 process.maxEvents.input  = maxInputEvents
 
@@ -230,7 +242,7 @@ process.load( 'TopQuarkAnalysis.Configuration.patRefSel_eventCleaning_cff' )
 if runOnMC:
   triggerSelection = triggerSelectionMC
 else:
-  triggerSelection = triggerSelectionData
+  triggerSelection = 'HLT_QuadJet40_v*'
 from TopQuarkAnalysis.Configuration.patRefSel_triggerSelection_cff import triggerResults
 process.step1 = triggerResults.clone(
   triggerConditions = [ triggerSelection ]
@@ -277,7 +289,7 @@ if useL2Relative:
 if useL3Absolute:
   jecLevels.append( 'L3Absolute' )
 if useL2L3Residual and not runOnMC:
-  jecLevelsPF.append( 'L2L3Residual' )
+  jecLevels.append( 'L2L3Residual' )
 if useL5Flavor:
   jecLevels.append( 'L5Flavor' )
 if useL7Parton:
