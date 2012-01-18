@@ -5,13 +5,14 @@ Environment:
 cmsrel CMSSW_4_2_8
 cd CMSSW_4_2_8/src
 cmsenv
-addpkg DataFormats/PatCandidates                        V06-04-19-01
-addpkg PhysicsTools/PatAlgos                            V08-06-41
-addpkg PhysicsTools/PatUtils                            V03-09-18
-addpkg PhysicsTools/SelectorUtils                       V00-03-24
-addpkg PhysicsTools/UtilAlgos                           V08-02-14
-addpkg RecoEgamma/ElectronIdentification                V00-03-31
-addpkg RecoJets/Configuration                           V02-04-17
+cvs co -r B4_2_X_V00-03-01 CommonTools/ParticleFlow
+cvs co -r V06-04-19-02     DataFormats/PatCandidates
+cvs co -r V08-06-53        PhysicsTools/PatAlgos
+cvs co -r V03-09-18        PhysicsTools/PatUtils
+cvs co -r V00-03-24        PhysicsTools/SelectorUtils
+cvs co -r V08-02-14        PhysicsTools/UtilAlgos
+cvs co -r V00-03-31        RecoEgamma/ElectronIdentification
+cvs co -r V02-04-17        RecoJets/Configuration
 scram b -j 9
 
 Steering:
@@ -35,19 +36,20 @@ Some very basic steering switches are found at the top of the configurations:
 - jecLevels       : list of stored JECs
 - pvCollections   : name of primary vertex collection to be used in PF2PAT
 
-- {muon, electron}SelectTP   : selection string cut for objects to be kept in PF2PAT
-                               top projections
-- {muon, electron}IsoR       : radius to compute the isolation
-- {muon, electron}sIsoTP     : cut value for combined isolation of objects to be
-                               kept in PF top projection procedure
-- {muon, electron, jet}Select: selection string cut for objects to be stored in the
-                               output
-- {muon, electron, jet}sCut  : selection string cut for objects used in the event
-                               selection
-- {muon, electron, jet}sMin  : minimum number of objects fulfilling the event
-                               selection cut
-- leptonsMin                 : minimum number of sum of leptons fulfilling the event
-                               selection cut
+- pf{Muon, Electron}Select           : selection string cut for objects to be kept in PF2PAT
+                                       top projections
+- usePf{Muon, Electron}IsoConeR03IsoR: to switch on/off the use of radius 0.3 to compute the
+                                       isolation; "off" uses the radius 0.4 instead
+- pf{Muon, Electron}Iso              : cut value for combined isolation of objects to be
+                                       kept in PF top projection procedure
+- {muon, electron, jet}Select        : selection string cut for objects to be stored in the
+                                       output
+- {muon, electron, jet}Cut           : selection string cut for objects used in the event
+                                       selection
+- {muon, electron, jet}sMin          : minimum number of objects fulfilling the event
+                                       selection cut
+- leptonsMin                         : minimum number of sum of leptons fulfilling the event
+                                       selection cut
 
 Remarks:
 ========
@@ -107,7 +109,8 @@ on CMSSW_4_2_5 RelVal samples:
 - MC  : /RelValTTbar/CMSSW_4_2_5-START42_V12-v2/GEN-SIM-RECO (8900 evts.)
 - data: /Mu/CMSSW_4_2_5-GR_R_42_V14_mu2010B-v2/RECO (run over 8900 evts.)
         /Elecktron/CMSSW_4_2_5-GR_R_42_V14_electron2010B-v2/RECO (run over 8900 evts.)
-There are no Run2011A data samples available as RelVal in CMSSW_4_2_X (but in CMSSW_4_3_X).
+There are no Run2011A data samples available as RelVal in CMSSW_4_2_X (but in CMSSW_4_4_X).
+Changes in the current version of the configuration are not expected.
 
 The CMSSW timing service has been added and its summary is found at the end of the
 Fwk output.
