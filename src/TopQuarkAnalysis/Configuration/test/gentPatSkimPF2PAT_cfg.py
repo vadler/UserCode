@@ -4,12 +4,12 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-runOnMC        = False
+runOnMC        = True
 runMatch       = False
 runGenJetMatch = False # separate from rest of matches due to rapidly inceasing data volume
 runCiC         = True
 runEwk         = True
-addGenEvt      = True
+addGenEvt      = False
 
 hltProcess       = 'HLT'
 triggerSelection = ''
@@ -34,7 +34,7 @@ pfMuonIso = 0.2 # PF2PAT: 0.15
 #muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
 muonSelect = ''
 # muon event selection
-muonsCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
+muonCut  = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
 muonsMin = 0
 
 # electron top projection object selection
@@ -47,7 +47,7 @@ pfElectronIso = 0.2 # PF2PAT: 0.2
 #electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
 electronSelect = ''
 # electron event selection
-electronsCut = 'et > 5. && abs(eta) < 3.0'
+electronCut  = 'et > 5. && abs(eta) < 3.0'
 electronsMin = 0
 
 # x-leptons event selection
@@ -57,7 +57,7 @@ leptonsMin = 1
 #jetSelect = 'pt > 30. && abs(eta) < 2.4' # RefSel
 jetSelect = ''
 # jet event selection
-jetsCut = 'pt > 15. && abs(eta) < 3.0'
+jetCut  = 'pt > 15. && abs(eta) < 3.0'
 jetsMin = 3
 
 
@@ -88,9 +88,9 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START44_V7::All'
+  process.GlobalTag.globaltag = 'START44_V12::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_44_V12::All'
+  process.GlobalTag.globaltag = 'GR_R_44_V13::All'
 
 
 ### Input
@@ -113,10 +113,10 @@ if runOnMC:
 else:
   process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_2'
                                                  , relVal        = 'SingleMu'
-                                                 , dataTier      = 'RECO'
                                                  , globalTag     = 'GR_R_44_V7_RelVal_mu2011A'
-                                                 #, relVal        = 'Electron'
-                                                 #, globalTag     = 'GR_R_42_V14_electron2011A'
+                                                 #, relVal        = 'SingleElectron'
+                                                 #, globalTag     = 'GR_R_44_V7_RelVal_electron2011A'
+                                                 , dataTier      = 'RECO'
                                                  , maxVersions   = 1
                                                  )
 
@@ -198,7 +198,8 @@ process.patPF2PATSequence.remove( process.selectedPatPFParticles )
 process.patPF2PATSequence.remove( process.countPatPFParticles )
 from PhysicsTools.PatAlgos.tools.coreTools import *
 removeSpecificPATObjects( process
-                        , names = [ 'Photons', 'Taus' ]
+                        , names         = [ 'Photons', 'Taus' ]
+                        , outputModules = []
                         )
 # The following is not performed (properly) by 'removeSpecificPATObjects()'
 process.cleanPatCandidateSummary.candidates.remove( cms.InputTag( 'cleanPatPhotons' ) )
@@ -290,7 +291,7 @@ if usePfMuonIsoConeR03:
   process.patMuons.isolationValues.pfChargedHadrons   = cms.InputTag( 'muPFIsoValueCharged03' )
 process.selectedPatMuons.cut = muonSelect
 process.cleanPatMuons.src           = cms.InputTag( 'patMuons' )
-process.cleanPatMuons.preselection  = muonsCut
+process.cleanPatMuons.preselection  = muonCut
 process.cleanPatMuons.checkOverlaps = cms.PSet()
 process.countPatMuons.minNumber = muonsMin
 
@@ -312,7 +313,7 @@ if usePfElectronIsoConeR03:
   process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03' )
 process.selectedPatElectrons.cut = electronSelect
 process.cleanPatElectrons.src           = cms.InputTag( 'patElectrons' )
-process.cleanPatElectrons.preselection  = electronsCut
+process.cleanPatElectrons.preselection  = electronCut
 process.cleanPatElectrons.checkOverlaps = cms.PSet()
 process.countPatElectrons.minNumber = electronsMin
 if runEwk:
@@ -384,7 +385,7 @@ process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
 process.cleanPatJets.src           = cms.InputTag( 'patJets' )
-process.cleanPatJets.preselection  = jetsCut
+process.cleanPatJets.preselection  = jetCut
 process.cleanPatJets.checkOverlaps = cms.PSet()
 process.countPatJets.minNumber = jetsMin
 
