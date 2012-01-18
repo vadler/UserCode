@@ -10,6 +10,6 @@ PhysicsTools/SelectorUtils                       V00-03-24      V00-03-17
 PhysicsTools/UtilAlgos                           V08-02-14      V08-02-12      
 RecoEgamma/ElectronIdentification                V00-03-31      V00-03-26      
 RecoJets/Configuration                           V02-04-17      V02-04-13      
-TopQuarkAnalysis/Configuration                   V06-01-14      V05-00-01      
+TopQuarkAnalysis/Configuration                   V06-01-14-01   V05-00-01      
 ---------------------------------------
 total packages: 9 (9 displayed)
