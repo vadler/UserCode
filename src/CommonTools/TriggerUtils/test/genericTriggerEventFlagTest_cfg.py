@@ -5,7 +5,7 @@ process = cms.Process( "TEST" )
 ## Logging
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.categories.append( 'GenericTriggerEventFlag' )
-process.MessageLogger.cerr.threshold = 'DEBUG'
+process.MessageLogger.cerr.threshold = 'INFO'
 process.MessageLogger.cerr.GenericTriggerEventFlag = cms.untracked.PSet( limit = cms.untracked.int32( -1 ) )
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool( True ) )
 
@@ -56,8 +56,9 @@ process.genericTriggerEventFlagPass = cms.EDFilter( "GenericTriggerEventFlagTest
                              )
 , errorReplyHlt = cms.bool( False )
 )
-process.genericTriggerEventFlagFail = process.genericTriggerEventFlagPass.clone( hltPaths = [ 'HLT_IsoMu24_eta2p1' ] )
-process.genericTriggerEventFlagTest = process.genericTriggerEventFlagPass.clone( hltPaths = [ 'HLT_IsoMu24_eta2p1_v*' ] )
+process.genericTriggerEventFlagFail      = process.genericTriggerEventFlagPass.clone( hltPaths = [ 'HLT_IsoMu24_eta2p1' ] )
+process.genericTriggerEventFlagTestTight = process.genericTriggerEventFlagPass.clone( hltPaths = [ 'HLT_IsoMu24_eta2p1_v*' ] )
+process.genericTriggerEventFlagTestLoose = process.genericTriggerEventFlagPass.clone( hltPaths = [ 'HLT_IsoMu24_*' ] )
 
 # Paths
 #process.p = cms.Path(
@@ -69,6 +70,9 @@ process.pPass = cms.Path(
 process.pFail = cms.Path(
   process.genericTriggerEventFlagFail
 )
-process.pTest = cms.Path(
-  process.genericTriggerEventFlagTest
+process.pTestTight = cms.Path(
+  process.genericTriggerEventFlagTestTight
+)
+process.pTestLoose = cms.Path(
+  process.genericTriggerEventFlagTestLoose
 )
