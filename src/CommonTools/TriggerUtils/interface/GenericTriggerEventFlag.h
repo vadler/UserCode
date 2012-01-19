@@ -62,6 +62,7 @@ class GenericTriggerEventFlag {
     bool                       andOrHlt_;
     edm::InputTag              hltInputTag_;
     std::string                hltDBKey_;
+    std::vector< std::string > hltLogicalExpressionsCache_;
     std::vector< std::string > hltLogicalExpressions_;
     bool                       errorReplyHlt_;
     // Switches
