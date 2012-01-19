@@ -682,6 +682,7 @@ void PATElectronProducer::fillDescriptions(edm::ConfigurationDescriptions & desc
   isoDepositsPSet.addOptional<edm::InputTag>("hcal");
   isoDepositsPSet.addOptional<edm::InputTag>("pfAllParticles");
   isoDepositsPSet.addOptional<edm::InputTag>("pfChargedHadrons");
+  isoDepositsPSet.addOptional<edm::InputTag>("pfChargedAll");
   isoDepositsPSet.addOptional<edm::InputTag>("pfPUChargedHadrons");
   isoDepositsPSet.addOptional<edm::InputTag>("pfNeutralHadrons");
   isoDepositsPSet.addOptional<edm::InputTag>("pfPhotons");
@@ -695,6 +696,7 @@ void PATElectronProducer::fillDescriptions(edm::ConfigurationDescriptions & desc
   isolationValuesPSet.addOptional<edm::InputTag>("hcal");
   isolationValuesPSet.addOptional<edm::InputTag>("pfAllParticles");
   isolationValuesPSet.addOptional<edm::InputTag>("pfChargedHadrons");
+  isolationValuesPSet.addOptional<edm::InputTag>("pfChargedAll");
   isolationValuesPSet.addOptional<edm::InputTag>("pfPUChargedHadrons");
   isolationValuesPSet.addOptional<edm::InputTag>("pfNeutralHadrons");
   isolationValuesPSet.addOptional<edm::InputTag>("pfPhotons");
@@ -758,6 +760,9 @@ void PATElectronProducer::readIsolationLabels( const edm::ParameterSet & iConfig
     }
     if (depconf.exists("pfChargedHadrons"))  {
       labels.push_back(std::make_pair(pat::PfChargedHadronIso, depconf.getParameter<edm::InputTag>("pfChargedHadrons")));
+    }
+    if (depconf.exists("pfChargedAll"))  {
+      labels.push_back(std::make_pair(pat::PfChargedAllIso, depconf.getParameter<edm::InputTag>("pfChargedAll")));
     }
     if (depconf.exists("pfPUChargedHadrons"))  {
       labels.push_back(std::make_pair(pat::PfPUChargedHadronIso, depconf.getParameter<edm::InputTag>("pfPUChargedHadrons")));
