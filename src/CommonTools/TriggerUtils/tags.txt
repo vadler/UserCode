@@ -2,6 +2,6 @@ Test Release based on: CMSSW_5_0_0
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_5_0_0
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/DQM/CMSSW_5_0_0
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CommonTools/TriggerUtils                         V00-03-01      V00-02-03      
+CommonTools/TriggerUtils                         V00-03-02      V00-02-03      
 ---------------------------------------
 total packages: 1 (1 displayed)
