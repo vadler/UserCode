@@ -6,8 +6,8 @@ cmsrel CMSSW_4_2_8_patch7
 cd CMSSW_4_2_8_patch7/src
 cmsenv
 cvs co -r B4_2_X_V00-03-01 CommonTools/ParticleFlow
-cvs co -r V06-04-19-02     DataFormats/PatCandidates
-cvs co -r V08-06-53        PhysicsTools/PatAlgos
+cvs co -r V06-04-19-03     DataFormats/PatCandidates
+cvs co -r V08-06-54        PhysicsTools/PatAlgos
 cvs co -r V03-09-18        PhysicsTools/PatUtils
 cvs co -r V00-03-24        PhysicsTools/SelectorUtils
 cvs co -r V08-02-14        PhysicsTools/UtilAlgos

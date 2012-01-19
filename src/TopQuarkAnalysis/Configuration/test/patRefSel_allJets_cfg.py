@@ -128,7 +128,7 @@ useL7Parton     = True
 ### Input
 
 # list of input files
-useRelVals = False # if 'False', "inputFiles" is used
+useRelVals = True # if 'False', "inputFiles" is used
 inputFiles = [ '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/122CC36B-32FB-E011-9C29-001D09F295FB.root'
              , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/16F98CC4-BCFA-E011-AF7C-BCAEC532971A.root'
              , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/1A167592-53FB-E011-B28B-E0CB4E4408E7.root'
