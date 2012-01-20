@@ -2,14 +2,13 @@ Test Release based on: CMSSW_4_2_8_patch7
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw-patch/CMSSW_4_2_8_patch7
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/TQAF/CMSSW_4_2_8_patch7
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CommonTools/ParticleFlow                         B4_2_X_V00-03-01 V00-01-06      
-DataFormats/PatCandidates                        V06-04-19-03   V06-04-18      
+CommonTools/ParticleFlow                         B4_2_X_cbern_eNoVeto_18Jan12 V00-01-06      
+DataFormats/PatCandidates                        V06-04-19-04   V06-04-18      
 PhysicsTools/PatAlgos                            V08-06-54      V08-06-41      
-PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
 PhysicsTools/SelectorUtils                       V00-03-24      V00-03-17      
 PhysicsTools/UtilAlgos                           V08-02-14      V08-02-12      
 RecoEgamma/ElectronIdentification                V00-03-31      V00-03-26      
 RecoJets/Configuration                           V02-04-17      V02-04-13      
 TopQuarkAnalysis/Configuration                   V06-01-14-01   V05-00-01      
 ---------------------------------------
-total packages: 9 (9 displayed)
+total packages: 8 (8 displayed)
