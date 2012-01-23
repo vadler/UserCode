@@ -7,7 +7,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Misc
 runCrab    = False
-runTest    = False
+runTest    = True
 reportTime = False
 
 # Input
@@ -16,7 +16,7 @@ dataTier = 'AODSIM'
 
 # Trigger
 hltProcess       = 'HLT'
-triggerSelection = 'HLT_IsoMu15_v*'
+triggerSelection = 'HLT_IsoMu17_v*'
 
 # Vertices
 pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
@@ -140,8 +140,9 @@ process.options = cms.untracked.PSet(
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-from Configuration.AlCa.autoCond import autoCond
-process.GlobalTag.globaltag = autoCond[ 'startup' ]
+# from Configuration.AlCa.autoCond import autoCond
+# process.GlobalTag.globaltag = autoCond[ 'startup' ]
+process.GlobalTag.globaltag = 'START44_V12::All' # JEC2011V12 as in https://hypernews.cern.ch/HyperNews/CMS/get/jes/303.html
 
 
 ### Input
@@ -165,6 +166,7 @@ if not runCrab:
                                                  , dataTier    = dataTier
                                                  , maxVersions = 1
                                                  )
+  triggerSelection = 'HLT_IsoMu24_v*'
 
 
 ### Output
@@ -257,6 +259,7 @@ usePF2PAT( process
          , pvCollection   = cms.InputTag( pvCollection )
          )
 # still need to fix event content afterwards :-(
+process.out.outputCommands.append( 'keep *_addPileupInfo_*_*' )
 process.out.outputCommands.append( 'drop edmTriggerResults_*_*_*' )
 process.out.outputCommands.append( 'keep edmTriggerResults_*_*_%s'%( process.name_() ) )
 
