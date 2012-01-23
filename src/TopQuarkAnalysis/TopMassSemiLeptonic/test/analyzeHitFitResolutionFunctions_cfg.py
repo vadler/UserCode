@@ -91,10 +91,10 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'refer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.analyzeHitFitResolutionFunctions_cfi" )
 process.analyzeHitFitResolutionFunctions.jecLevel = 'L3Absolute'
-process.analyzeHitFitResolutionFunctions_L5Flavor = process.analyzeHitFitResolutionFunctions.clone( jecLevel = 'L5Flavor'
-                                                                                           )
-process.analyzeHitFitResolutionFunctions_L7Parton = process.analyzeHitFitResolutionFunctions.clone( jecLevel = 'L7Parton'
-                                                                                           )
+# process.analyzeHitFitResolutionFunctions_L5Flavor = process.analyzeHitFitResolutionFunctions.clone( jecLevel = 'L5Flavor'
+#                                                                                            )
+# process.analyzeHitFitResolutionFunctions_L7Parton = process.analyzeHitFitResolutionFunctions.clone( jecLevel = 'L7Parton'
+#                                                                                            )
 process.analyzeHitFitResolutionFunctions_Reference = process.analyzeHitFitResolutionFunctions.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReference'
                                                                                            )
 
