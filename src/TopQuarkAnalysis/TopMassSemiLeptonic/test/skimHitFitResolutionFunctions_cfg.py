@@ -79,8 +79,7 @@ jetAlgo   = 'AK5'
 jecLevels = [ 'L1FastJet'
             , 'L2Relative'
             , 'L3Absolute'
-            , 'L5Flavor'
-            , 'L7Parton'
+            #, 'L2L3Residual'
             ]
 # jet object selection
 jetSelectHitFit = 'abs(eta) < 3.0'
@@ -143,6 +142,8 @@ process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff"
 # from Configuration.AlCa.autoCond import autoCond
 # process.GlobalTag.globaltag = autoCond[ 'startup' ]
 process.GlobalTag.globaltag = 'START44_V12::All' # JEC2011V12 as in https://hypernews.cern.ch/HyperNews/CMS/get/jes/303.html
+if runCrab:
+  process.GlobalTag.globaltag = 'START44_V5D::All' # Fall11_R3
 
 
 ### Input
@@ -166,7 +167,8 @@ if not runCrab:
                                                  , dataTier    = dataTier
                                                  , maxVersions = 1
                                                  )
-  triggerSelection = 'HLT_IsoMu24_v*'
+  if runTest:
+    triggerSelection = 'HLT_IsoMu24_v*'
 
 
 ### Output
