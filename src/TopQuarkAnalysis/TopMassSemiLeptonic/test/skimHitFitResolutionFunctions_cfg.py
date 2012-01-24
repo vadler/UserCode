@@ -167,8 +167,7 @@ if not runCrab:
                                                  , dataTier    = dataTier
                                                  , maxVersions = 1
                                                  )
-  if runTest:
-    triggerSelection = 'HLT_IsoMu24_v*'
+  triggerSelection = 'HLT_IsoMu24_v*'
 
 
 ### Output

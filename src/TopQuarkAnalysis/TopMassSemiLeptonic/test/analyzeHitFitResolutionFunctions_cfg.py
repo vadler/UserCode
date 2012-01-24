@@ -47,9 +47,11 @@ if runTest:
                ]
 if rfioInput:
   from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import *
-  inputFiles = filesEos
+  #inputFiles = files_Summer11
+  inputFiles = files_Fall11_R3
   if runTest:
-    inputFiles = filesEosTest
+    #inputFiles = filesTest_Summer11
+    inputFiles = filesTest_Fall11_R3
 process.source = cms.Source(
   "PoolSource"
 , fileNames = cms.untracked.vstring( inputFiles )
@@ -57,8 +59,6 @@ process.source = cms.Source(
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( -1 )
 )
-# if runTest:
-#   process.maxEvents.input = 100
 
 
 ### Output
