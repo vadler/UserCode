@@ -1,6 +1,6 @@
-Test Release based on: CMSSW_4_4_X_2012-01-25-0200
-Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_amd64_gcc434/wed/4.4-wed-02/CMSSW_4_4_X_2012-01-25-0200
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_4_X_2012-01-25-0200
+Test Release based on: CMSSW_4_4_3
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_3
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_4_3
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 PhysicsTools/PatAlgos                            V08-07-37      V08-07-37      
 PhysicsTools/PatExamples                         NoTag          V00-05-29      
