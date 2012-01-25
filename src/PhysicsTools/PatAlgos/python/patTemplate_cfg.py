@@ -15,6 +15,7 @@ process.source = cms.Source("PoolSource",
     pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_2'
                         , relVal        = 'RelValTTbar'
                         , globalTag     = 'START44_V7'
+                        , maxVersions   = 1
                         , numberOfFiles = 1
                         )
     )
