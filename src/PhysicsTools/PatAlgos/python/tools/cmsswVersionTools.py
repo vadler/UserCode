@@ -1028,7 +1028,6 @@ class PickRelValInputFiles( ConfigToolBase ):
                 print '%s DEBUG: Data in JSON dictionary:'%( self._label )
                 print '    \'%s\''%( data )
             for row in data:
-                print 'MYDEBUG: %s'%( [ r for r in das_client.get_value( row, filters ) ] )
                 filePath = [ r for r in das_client.get_value( row, filters ) ][ 0 ]
                 if debug:
                     print '%s DEBUG: Testing file entry \'%s\''%( self._label, filePath )
@@ -1052,7 +1051,6 @@ class PickRelValInputFiles( ConfigToolBase ):
                             print '    \'%s\''%( testdata )
                         foundSE = False
                         for testrow in testdata:
-                            print 'MYDEBUG: %s'%( [ tr for tr in das_client.get_value( testrow, testfilters ) ] )
                             siteName = [ tr for tr in das_client.get_value( testrow, testfilters ) ][ 0 ]
                             if siteName == domainSE:
                                 foundSE = True
