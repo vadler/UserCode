@@ -4,6 +4,5 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_4_3
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 PhysicsTools/PatAlgos                            V08-07-37      V08-07-37      
 PhysicsTools/PatExamples                         NoTag          V00-05-29      
-RecoParticleFlow/PFProducer                      V14-07-13      V14-07-07-03   
 ---------------------------------------
-total packages: 3 (3 displayed)
+total packages: 2 (2 displayed)
