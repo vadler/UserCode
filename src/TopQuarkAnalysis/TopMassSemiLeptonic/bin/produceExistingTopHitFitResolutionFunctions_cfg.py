@@ -8,18 +8,21 @@ era = 'Summer11'
 process = cms.PSet()
 
 process.existing = cms.PSet(
+  # Object categories to use, available: 'Mu', 'Elec', 'UdscJet', 'BJet', 'MET'
   objectCategories = cms.vstring( 'Mu'
                                 , 'Elec'
                                 , 'UdscJet'
                                 , 'BJet'
                                 , 'MET'
                                 )
+  # P_t limits for the plots, in line with the categories in "objectCategories"
 , objectPtLimits = cms.vdouble( 400.
                               , 400.
                               , 500.
                               , 500.
                               , 300.
                               )
+  # Text file sources, in line with the categories in "objectCategories"
 , resolutionFiles = cms.vstring( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution_%s.txt'%( era )
                                , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution_%s.txt'%( era )
                                , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution_%s.txt'%( era )

@@ -75,45 +75,73 @@ int main(  int argc, char * argv[] )
     TDirectory * curCat( gDirectory->mkdir( objCat.c_str(), objCat.c_str() ) );
 
     const edm::FileInPath resFile( resFiles_.at( iCat ) );
-    const hitfit::EtaDepResolution res( resFile.fullPath() );
-    const std::vector< hitfit::EtaDepResElement > resElems( res.GetEtaDepResElement() );
 
-    for ( unsigned iResElem = 0; iResElem < resElems.size(); ++iResElem ) {
-      const std::string resElem( my::helpers::to_string( iResElem ) );
+    if ( objCat == "MET" ) {
 
-      const hitfit::Vector_Resolution vecRes( resElems.at( iResElem ).GetResolution() );
+      const hitfit::Defaults_Text text( resFile.fullPath() );
+      const hitfit::Resolution res( text.get_string( "met_resolution" ) );
+      std::string kinProp( kinProps_.at( 0 ) );
 
-      for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
-        std::string kinProp( kinProps_.at( iProp ) );
-        hitfit::Resolution res;
-        if ( kinProp == "Pt" ) {
-          res = hitfit::Resolution( vecRes.p_res() );
+      curCat->cd();
+      gDirectory->pwd();
+      gDirectory->mkdir( kinProp.c_str(), kinProp.c_str() );
+      gDirectory->Cd( kinProp.c_str() );
+      gDirectory->pwd();
+
+      const std::string name( "fitExist_" + objCat + "_" + kinProp );
+      const std::string title( objCat + ", " + kinProp + ( res.inverse() ? ", inv." : "" ) );
+      TF1 * func = new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
+      func->SetParameters( res.C(), res.R(), res.N() );
+      func->Write();
+
+    }
+
+    else {
+
+      const hitfit::EtaDepResolution res( resFile.fullPath() );
+      const std::vector< hitfit::EtaDepResElement > resElems( res.GetEtaDepResElement() );
+
+      for ( unsigned iResElem = 0; iResElem < resElems.size(); ++iResElem ) {
+        const std::string resElem( my::helpers::to_string( iResElem ) );
+
+        const hitfit::Vector_Resolution vecRes( resElems.at( iResElem ).GetResolution() );
+        const double etaMin( resElems.at( iResElem ).EtaMin() );
+        const double etaMax( resElems.at( iResElem ).EtaMax() );
+
+        for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
+          std::string kinProp( kinProps_.at( iProp ) );
+          hitfit::Resolution res;
+          if ( kinProp == "Pt" ) {
+            res = hitfit::Resolution( vecRes.p_res() );
+          }
+          else if ( kinProp == "Eta" ) {
+            res = hitfit::Resolution( vecRes.eta_res() );
+          }
+          else if ( kinProp == "Phi" ) {
+            res = hitfit::Resolution( vecRes.phi_res() );
+          }
+          if ( res.inverse() ) kinProp.append( std::string( "Inv" ) );
+
+          curCat->cd();
+          gDirectory->pwd();
+          if ( iResElem == 0 ) gDirectory->mkdir( kinProp.c_str(), kinProp.c_str() );
+          gDirectory->Cd( kinProp.c_str() );
+          gDirectory->pwd();
+
+          const std::string binEta( "Eta" + resElem );
+          gDirectory->mkdir( binEta.c_str(), binEta.c_str() );
+          gDirectory->Cd( binEta.c_str() );
+          gDirectory->pwd();
+
+          const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
+          const std::string title( objCat + ", " + kinProp + ", " + my::helpers::to_string( etaMin ) + " #leq #eta #leq " + my::helpers::to_string( etaMax ) + ( res.inverse() ? ", inv." : "" ) );
+          TF1 * func = new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
+          func->SetParameters( res.C(), res.R(), res.N() );
+          func->Write();
+
         }
-        else if ( kinProp == "Eta" ) {
-          res = hitfit::Resolution( vecRes.eta_res() );
-        }
-        else if ( kinProp == "Phi" ) {
-          res = hitfit::Resolution( vecRes.phi_res() );
-        }
-        if ( res.inverse() ) kinProp.append( std::string( "Inv" ) );
-
-        curCat->cd();
-        gDirectory->pwd();
-        if ( iResElem == 0 ) gDirectory->mkdir( kinProp.c_str(), kinProp.c_str() );
-        gDirectory->Cd( kinProp.c_str() );
-        gDirectory->pwd();
-
-        const std::string binEta( "Eta" + resElem );
-        gDirectory->mkdir( binEta.c_str(), binEta.c_str() );
-        gDirectory->Cd( binEta.c_str() );
-        gDirectory->pwd();
-
-        std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
-        TF1 * func = new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
-        func->SetParameters( res.C(), res.R(), res.N() );
-        func->Write();
-
       }
+
     }
 
   }
