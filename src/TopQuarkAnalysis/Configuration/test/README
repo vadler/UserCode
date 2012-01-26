@@ -2,16 +2,11 @@
 Environment:
 ============
 
-cmsrel CMSSW_4_4_2_patch10
-cd CMSSW_4_4_2_patch10/src
+cmsrel CMSSW_4_4_3
+cd CMSSW_4_4_3/src
 cmsenv
-cvs co -r V00-03-04    CommonTools/ParticleFlow
-cvs co -r V06-04-30    DataFormats/PatCandidates
 cvs co -r V00-03-06    PhysicsTools/KinFitter
-cvs co -r V08-07-31-05 PhysicsTools/PatAlgos
-cvs co -r V03-09-18-02 PhysicsTools/PatUtils
-cvs co -r V00-03-24-01 PhysicsTools/SelectorUtils
-cvs co -r V14-07-13    RecoParticleFlow/PFProducer
+cvs co -r V08-07-38-02 PhysicsTools/PatAlgos
 scram b -j 9
 
 Steering:
