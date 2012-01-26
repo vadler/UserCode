@@ -11,8 +11,9 @@ runTest    = True
 reportTime = False
 
 # Input
-relVal   = 'RelValProdTTbar'
-dataTier = 'AODSIM'
+relVal    = 'RelValProdTTbar'
+dataTier  = 'AODSIM'
+globalTag = 'START44_V7'
 
 # Trigger
 hltProcess       = 'HLT'
@@ -164,14 +165,12 @@ process.maxEvents = cms.untracked.PSet(
 
 if not runCrab:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-  #process.source.fileNames = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_4_2'
-                                                 #, relVal       = relVal
-                                                 #, dataTier     = dataTier
-                                                 #, maxVersions  = 1
-                                                 #)
-  process.source.fileNames = [ '/store/relval/CMSSW_4_4_2/RelValProdTTbar/AODSIM/START44_V7-v1/0061/26AF83AA-D502-E111-9FED-00304867BFF2.root'
-                             , '/store/relval/CMSSW_4_4_2/RelValProdTTbar/AODSIM/START44_V7-v1/0061/52DB95A2-E102-E111-A2F8-001A928116F0.root'
-                             ]
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_4_2'
+                                                 , relVal       = relVal
+                                                 , dataTier     = dataTier
+                                                 , globalTag    = globalTag
+                                                 , maxVersions  = 1
+                                                 )
   triggerSelection = 'HLT_IsoMu24_v*'
 
 
