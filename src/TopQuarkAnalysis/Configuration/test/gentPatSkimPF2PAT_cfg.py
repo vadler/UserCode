@@ -369,6 +369,7 @@ if len( jecLevels ) is 0:
 process.pfPileUp.checkClosestZVertex = False # for L1FastJet corrections, even if applied later
 process.pfJets.doAreaFastjet = True          # for L1FastJet corrections, even if applied later
 process.pfJets.doRhoFastjet  = False         # for L1FastJet corrections, even if applied later
+process.pfPileUpIso.checkClosestZVertex = True # for L1FastJet corrections in isolations, even if applied later
 from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
 process.kt6PFJets = kt6PFJets.clone( src           = cms.InputTag( 'pfNoElectron' )
                                    , doAreaFastjet = True
