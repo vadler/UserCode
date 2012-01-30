@@ -101,7 +101,8 @@ postfix = 'PF' # needs to be a non-empty string, if 'runStandardPAT' = True
 
 # subtract charged hadronic pile-up particles (from wrong PVs)
 # effects also JECs
-usePFnoPU = True # before any top projection
+usePFnoPU       = True  # before any top projection
+usePfIsoLessCHS = False # switch to new PF isolation with L1Fastjet CHS
 
 # other switches for PF top projections (default: all 'True')
 useNoMuon     = True # before electron top projection
@@ -135,8 +136,8 @@ useL1Offset     = False # needs useL1FastJet being off, error otherwise
 useL2Relative   = True
 useL3Absolute   = True
 useL2L3Residual = True  # takes effect only on data
-useL5Flavor     = True
-useL7Parton     = True
+useL5Flavor     = False
+useL7Parton     = False
 
 ### Input
 
@@ -211,12 +212,14 @@ if useRelVals:
   if runOnMC:
     inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
                                      , globalTag     = 'START42_V12'
+                                     , maxVersions   = 1
                                      )
   else:
     inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
                                      , dataTier      = 'RECO'
                                      , relVal        = 'Mu'
                                      , globalTag     = 'GR_R_42_V14_wzMu2010B'
+                                     , maxVersions   = 1
                                      )
 process.source.fileNames = inputFiles
 process.maxEvents.input  = maxInputEvents
@@ -331,7 +334,8 @@ if runPF2PAT:
   applyPostfix( process, 'pfNoTau'     , postfix ).enable = useNoTau
   applyPostfix( process, 'pfPileUp', postfix ).Vertices = cms.InputTag( pfVertices )
   if useL1FastJet:
-    applyPostfix( process, 'pfPileUp', postfix ).checkClosestZVertex = False
+    applyPostfix( process, 'pfPileUp'   , postfix ).checkClosestZVertex = False
+    applyPostfix( process, 'pfPileUpIso', postfix ).checkClosestZVertex = usePfIsoLessCHS
     applyPostfix( process, 'pfJets', postfix ).doAreaFastjet = True
     applyPostfix( process, 'pfJets', postfix ).doRhoFastjet  = False
   applyPostfix( process, 'pfMuonsFromVertex'    , postfix ).vertices = cms.InputTag( pfVertices )
