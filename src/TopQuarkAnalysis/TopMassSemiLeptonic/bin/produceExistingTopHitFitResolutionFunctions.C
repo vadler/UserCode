@@ -9,8 +9,6 @@
 #include <TSystem.h>
 #include <TFile.h>
 #include <TDirectory.h>
-#include <TH1F.h>
-#include <TH2F.h>
 #include <TF1.h>
 
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
@@ -110,9 +108,11 @@ int main(  int argc, char * argv[] )
 
         for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
           std::string kinProp( kinProps_.at( iProp ) );
+          bool inverse( false );
           hitfit::Resolution res;
           if ( kinProp == "Pt" ) {
             res = hitfit::Resolution( vecRes.p_res() );
+            if ( res.inverse() ) inverse = true;
           }
           else if ( kinProp == "Eta" ) {
             res = hitfit::Resolution( vecRes.eta_res() );
@@ -120,7 +120,7 @@ int main(  int argc, char * argv[] )
           else if ( kinProp == "Phi" ) {
             res = hitfit::Resolution( vecRes.phi_res() );
           }
-          if ( res.inverse() ) kinProp.append( std::string( "Inv" ) );
+          if ( inverse ) kinProp.append( std::string( "Inv" ) );
 
           curCat->cd();
           gDirectory->pwd();
@@ -134,8 +134,8 @@ int main(  int argc, char * argv[] )
           gDirectory->pwd();
 
           const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
-          const std::string title( objCat + ", " + kinProp + ", " + my::helpers::to_string( etaMin ) + " #leq #eta #leq " + my::helpers::to_string( etaMax ) + ( res.inverse() ? ", inv." : "" ) );
-          TF1 * func = new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
+          const std::string title( objCat + ", " + kinProp + ", " + my::helpers::to_string( etaMin ) + " #leq #eta #leq " + my::helpers::to_string( etaMax ) + ( inverse ? ", inv." : "" ) );
+          TF1 * func = new TF1( name.c_str(), inverse ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
           func->SetParameters( res.C(), res.R(), res.N() );
           func->Write();
 
