@@ -22,13 +22,12 @@ process.objectCategories = cms.vstring( 'Mu'
 process.resolutionFunction        = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])' )
 process.resolutionFunctionInverse = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
 
-inputFile = 'file:%s/output/inputHitFitResolutionFunctions.root'%( os.getenv( "CMSSW_BASE" ) )
+inputFile = 'file:%s/output/fitHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 if runTest:
   inputFile = inputFile.replace( 'root', 'test.root' )
 if not rfioInput:
   inputFile = inputFile.replace( 'root', 'local.root' )
 logFile = inputFile.replace( 'root', 'log' )
-logFile = inputFile.replace( 'input', 'fit' )
 process.fitter = cms.PSet(
   inputFile = cms.string( inputFile )
 , selections = cms.vstring( 'analyzeHitFitResolutionFunctions'
