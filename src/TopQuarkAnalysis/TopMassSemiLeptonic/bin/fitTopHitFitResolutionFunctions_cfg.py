@@ -3,8 +3,11 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-runTest   = False
-rfioInput = True
+runTest   = True
+rfioInput = False
+
+# era = 'Spring10'
+era = 'Summer11'
 
 process = cms.PSet()
 process.verbose = cms.bool( False )
@@ -36,7 +39,7 @@ if not runTest:
 
 process.useExisting = cms.bool( True )
 process.existing = cms.PSet(
-  resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions.root'%( os.getenv( "CMSSW_BASE" ) ) )
+  resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era ) )
 )
 
 print
