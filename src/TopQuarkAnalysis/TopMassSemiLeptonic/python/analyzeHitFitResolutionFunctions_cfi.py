@@ -2,9 +2,6 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 
-# era = 'Spring10'
-era = 'Summer11'
-
 analyzeHitFitResolutionFunctions = cms.EDAnalyzer(
   "AnalyzeHitFitResolutionFunctions"
 
@@ -29,11 +26,11 @@ analyzeHitFitResolutionFunctions = cms.EDAnalyzer(
 , metEtaBins      = cms.vdouble()
 
   # HitFit resolution file paths (only used, if eta binning empty per objects category)
-, muonResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution_%s.txt'%( era ) )
-, electronResolutions = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution_%s.txt'%( era ) )
-, udscJetResolutions  = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution_%s.txt'%( era ) )
-, bJetResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution_%s.txt'%( era ) )
-, metResolutions      = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution_%s.txt'%( era ) )
+, muonResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution.txt' )
+, electronResolutions = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution.txt' )
+, udscJetResolutions  = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution.txt' )
+, bJetResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution.txt' )
+, metResolutions      = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution.txt' )
 
   # P_t binning (overrides input from resolution files, if not empty)
 , muonPtBins     = cms.vdouble( 20., 27., 33., 40., 47., 54., 62.,  73.,  86., 109., 200., 400. )

@@ -8,6 +8,9 @@ import FWCore.ParameterSet.Config as cms
 runTest   = True
 rfioInput = False
 
+# era = 'Spring10'
+era = 'Summer11'
+
 # Event selection
 skimProcess = 'SKIM'
 
@@ -91,6 +94,11 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'refer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.analyzeHitFitResolutionFunctions_cfi" )
 process.analyzeHitFitResolutionFunctions.jecLevel = 'L3Absolute'
+process.muonResolutions     = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution_%s.txt'%( era )
+process.electronResolutions = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution_%s.txt'%( era )
+process.udscJetResolutions  = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution_%s.txt'%( era )
+process.bJetResolutions     = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution_%s.txt'%( era )
+process.metResolutions      = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution_%s.txt'%( era )
 # process.analyzeHitFitResolutionFunctions_L5Flavor = process.analyzeHitFitResolutionFunctions.clone( jecLevel = 'L5Flavor'
 #                                                                                            )
 # process.analyzeHitFitResolutionFunctions_L7Parton = process.analyzeHitFitResolutionFunctions.clone( jecLevel = 'L7Parton'
