@@ -4,5 +4,6 @@
   <use name="CommonTools/UtilAlgos"/>
   <use name="AnalysisDataFormats/TopObjects"/>
   <use name="TopQuarkAnalysis/TopHitFit"/>
+  <use name="boost"/>
   <use name="root"/>
 </library>

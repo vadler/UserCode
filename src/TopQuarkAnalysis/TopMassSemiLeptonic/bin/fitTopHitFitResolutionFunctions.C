@@ -152,8 +152,8 @@ int main( int argc, char * argv[] )
         TDirectory * curCat( gDirectory );
         if ( verbose_ ) gDirectory->pwd();
 
-        for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
-          std::string kinProp( kinProps_.at( iProp ) );
+        if ( objCat == "MET" ) {
+          std::string kinProp( kinProps_.at( 0 ) );
 
           curCat->cd();
           TDirectory * curProp( ( TDirectory* )( gDirectory->Get( kinProp.c_str() ) ) );
@@ -164,27 +164,61 @@ int main( int argc, char * argv[] )
               std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
                         << "   resolution file '" << resolutionFile_ << "' does not have directory for" << std::endl
                         << "   object category " << objCat << std::endl
-                        << "   quantity        " << kinProps_.at( iProp ) << std::endl;
+                        << "   quantity        " << kinProp << std::endl;
               returnStatus_ += 0x200;
             }
           }
 
-          for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
-            const std::string binEta( "Eta" + my::helpers::to_string( iEta ) );
+          curProp->cd();
+          if ( verbose_ ) gDirectory->pwd();
 
-            curProp->cd();
-            gDirectory->Cd( std::string( binEta ).c_str() );
-            if ( verbose_ ) gDirectory->pwd();
+          const std::string name( "fitExist_" + objCat + "_" + kinProp );
+          TF1 * func( ( TF1* )( gDirectory->Get( name.c_str() ) ) );
+          if ( ! func ) {
+            std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                      << "   resolution function '" << name << "' not found" << std::endl;
+            returnStatus_ += 0x300;
+          }
 
-            const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
-            TF1 * func( ( TF1* )( gDirectory->Get( name.c_str() ) ) );
-            if ( ! func ) {
-              std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                        << "   resolution function '" << name << "' not found" << std::endl;
-              returnStatus_ += 0x300;
+        }
+
+        else {
+
+          for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
+            std::string kinProp( kinProps_.at( iProp ) );
+
+            curCat->cd();
+            TDirectory * curProp( ( TDirectory* )( gDirectory->Get( kinProp.c_str() ) ) );
+            if ( ! curProp ) {
+              kinProp.append( std::string( "Inv" ) );
+              curProp = ( TDirectory* )( gDirectory->Get( kinProp.c_str() ) );
+              if ( ! curProp ) {
+                std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                          << "   resolution file '" << resolutionFile_ << "' does not have directory for" << std::endl
+                          << "   object category " << objCat << std::endl
+                          << "   quantity        " << kinProp << std::endl;
+                returnStatus_ += 0x200;
+              }
             }
 
+            for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
+              const std::string binEta( "Eta" + my::helpers::to_string( iEta ) );
+
+              curProp->cd();
+              gDirectory->Cd( std::string( binEta ).c_str() );
+              if ( verbose_ ) gDirectory->pwd();
+
+              const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
+              TF1 * func( ( TF1* )( gDirectory->Get( name.c_str() ) ) );
+              if ( ! func ) {
+                std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                          << "   resolution function '" << name << "' not found" << std::endl;
+                returnStatus_ += 0x300;
+              }
+
+            }
           }
+
         }
 
       }
@@ -261,6 +295,8 @@ int main( int argc, char * argv[] )
 
             const std::string nameSigma( name + "_Sigma" );
             TH1D * histSigmaPt( new TH1D( *( ( TH1D* )( histSigma->Clone( nameSigma.c_str() ) ) ) ) );
+//             const std::string nameSigmaRebin( nameSigma + "_Rebin" );
+//             TH1D * histSigmaPtRebin( new TH1D( *( ( TH1D* )( histSigma->Clone( nameSigmaRebin.c_str() ) ) ) ) );
             for ( unsigned iPt = 1; iPt < ptBins_.at( iCat ).size() - 1; ++iPt ) {
               const std::string binPt( my::helpers::to_string( iPt ) );
 
@@ -276,18 +312,37 @@ int main( int argc, char * argv[] )
 
               const std::string nameFuncGauss( "gauss_" + namePt );
               TF1 * funcGauss( new TF1( nameFuncGauss.c_str(), "gaus", hist1D->GetXaxis()->GetXmin(), hist1D->GetXaxis()->GetXmax() ) );
-              Int_t fitStatus( hist1D->Fit( nameFuncGauss.c_str(), "QRS" ) );
+              Int_t fitStatus( hist1D->Fit( funcGauss, "QRS" ) );
               TF1 * funcFit( hist1D->GetFunction( nameFuncGauss.c_str() ) );
               if ( fitStatus == 0 ) {
                 histSigmaPt->SetBinContent( iPt, funcFit->GetParameter( 2 ) );
                 histSigmaPt->SetBinError( iPt, funcFit->GetParError( 2 ) );
               }
+
+//               const std::string namePtRebin( namePt + "_Rebin" );
+//               const std::string titlePtRebin( titlePt + " (rebinned)" );
+//               TH1D * hist1DRebin( new TH1D( namePtRebin.c_str(), titlePtRebin.c_str(), nBins, hist1D->GetMean() - 4. * hist1D->GetRMS(), hist1D->GetMean() + 4. * hist1D->GetRMS() ) );
+//               hist1DRebin->SetXTitle( hist2D->GetYaxis()->GetTitle() );
+//               hist1DRebin->SetYTitle( hist2D->GetZaxis()->GetTitle() );
+//               hist1DRebin->Adopt( hist1D->GetSize(), hist1D->GetArray() );
+//
+//               const std::string nameFuncGaussRebin( nameFuncGauss + "_Rebin" );
+//               TF1 * funcGaussRebin( new TF1( nameFuncGaussRebin.c_str(), "gaus", hist1DRebin->GetXaxis()->GetXmin(), hist1DRebin->GetXaxis()->GetXmax() ) );
+//               Int_t fitStatusRebin( hist1DRebin->Fit( funcGaussRebin, "QRS" ) );
+//               TF1 * funcFitRebin( hist1DRebin->GetFunction( nameFuncGaussRebin.c_str() ) );
+//               if ( fitStatusRebin == 0 ) {
+//                 histSigmaPtRebin->SetBinContent( iPt, funcFitRebin->GetParameter( 2 ) );
+//                 histSigmaPtRebin->SetBinError( iPt, funcFitRebin->GetParError( 2 ) );
+//               }
             }
             const std::string nameFuncSigma( "fit_" + nameSigma );
-            const std::string formulaSigma( inverse ? resFuncInv_ : resFunc_ );
             TF1 * funcSigma( new TF1( nameFuncSigma.c_str(), formula.c_str() ) );
             funcSigma->SetRange( histSigmaPt->GetXaxis()->GetXmin(), histSigmaPt->GetXaxis()->GetXmax() );
             histSigmaPt->Fit( funcSigma, "QR" );
+//             const std::string nameFuncSigmaRebin( "fit_" + nameSigmaRebin );
+//             TF1 * funcSigmaRebin( new TF1( nameFuncSigmaRebin.c_str(), formula.c_str() ) );
+//             funcSigmaRebin->SetRange( histSigmaPtRebin->GetXaxis()->GetXmin(), histSigmaPtRebin->GetXaxis()->GetXmax() );
+//             histSigmaPtRebin->Fit( funcSigmaRebin, "QR" );
 
           }
 

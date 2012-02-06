@@ -4,25 +4,32 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 runTest   = True
-rfioInput = False
+rfioInput = True
 
+# Origin of existing resolution functions
 # era = 'Spring10'
 era = 'Summer11'
+
+# Settings
+useJetEt = False
 
 process = cms.PSet()
 process.verbose = cms.bool( False )
 if runTest:
   process.verbose = True
 process.objectCategories = cms.vstring( 'Mu'
-                                      #, 'Elec'
-                                      , 'UdscJet'
-                                      , 'BJet'
-                                      #, 'MET'
+#process.objectCategories = cms.vstring( 'Elec'
                                       )
+if not runTest:
+  process.objectCategories.append( 'UdscJet' )
+  process.objectCategories.append( 'BJet' )
+  process.objectCategories.append( 'MET' )
 process.resolutionFunction        = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])' )
 process.resolutionFunctionInverse = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
 
-inputFile = 'file:%s/output/fitHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era )
+inputFile = 'file:%s/output/fitHitFitResolutionFunctions_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
+if useJetEt:
+  inputFile = inputFile.replace( '.root', '_jetEt.root' )
 if runTest:
   inputFile = inputFile.replace( 'root', 'test.root' )
 if not rfioInput:

@@ -14,6 +14,9 @@ analyzeHitFitResolutionFunctions = cms.EDAnalyzer(
 , useMuons     = cms.bool( True )
 , useElectrons = cms.bool( False )
 
+  # Jet p_t/E_t switch
+, useJetEt = cms.bool( False )
+
   # JEC level to be considered
 , patJets  = cms.InputTag( 'selectedPatJets' )
 , jecLevel = cms.string( 'L3Absolute' )

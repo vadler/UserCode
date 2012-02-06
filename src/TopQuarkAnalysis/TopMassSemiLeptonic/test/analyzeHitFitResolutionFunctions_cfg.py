@@ -8,11 +8,15 @@ import FWCore.ParameterSet.Config as cms
 runTest   = True
 rfioInput = False
 
+# Origin of existing resolution functions
 # era = 'Spring10'
 era = 'Summer11'
 
 # Event selection
 skimProcess = 'SKIM'
+
+# Settings
+useJetEt = False
 
 ### Initialization
 
@@ -67,6 +71,8 @@ process.maxEvents = cms.untracked.PSet(
 ### Output
 
 outputFile = '%s/output/analyzeHitFitResolutionFunctions_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
+if useJetEt:
+  outputFile = outputFile.replace( '.root', '_jetEt.root' )
 if runTest:
   outputFile = outputFile.replace( 'root', 'test.root' )
 if not rfioInput:
@@ -93,6 +99,7 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'refer
 ### Analyzer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.analyzeHitFitResolutionFunctions_cfi" )
+process.analyzeHitFitResolutionFunctions.useJetEt            = useJetEt
 process.analyzeHitFitResolutionFunctions.jecLevel            = 'L3Absolute'
 process.analyzeHitFitResolutionFunctions.muonResolutions     = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution_%s.txt'%( era )
 process.analyzeHitFitResolutionFunctions.electronResolutions = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution_%s.txt'%( era )
