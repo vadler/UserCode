@@ -7,8 +7,8 @@ process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                     cmsswVersion  = cmsswVersion
                                                   , relVal        = 'SingleMu'
                                                   , dataTier      = 'RECO'
-                                                  , globalTag     = '%s_RelVal_mu2011A'%( globalTag )
-                                                  , maxVersions   = 1
+                                                  , globalTag     = '%s_RelVal_mu2011B'%( globalTag )
+                                                  , maxVersions   = 3
                                                   )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
