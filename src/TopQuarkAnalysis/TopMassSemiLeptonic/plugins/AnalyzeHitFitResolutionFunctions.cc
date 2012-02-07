@@ -7,7 +7,7 @@
 //
 /**
   \class    AnalyzeHitFitResolutionFunctions AnalyzeHitFitResolutionFunctions.cc "TopQuarkAnalysis/TopMassSemiLeptonic/plugins/AnalyzeHitFitResolutionFunctions.cc"
-  \brief    Fill histograms for HitFit resolution function determination
+  \brief    Fill histograms and n-tuples for HitFit resolution function determination
 
 
 
@@ -22,6 +22,7 @@
 
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TTree.h"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -97,6 +98,21 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     // Kinematic properties
     std::vector< std::string > kinProps_;
 
+    /// Data
+    std::vector< TTree* > data_;
+    // reconstructed
+    Double_t momE_;          // used momentum term, can be: E, p, E_t, p_t
+    Double_t eta_;
+    Double_t phi_;
+    Int_t    binEta_;        // eta bin number as determined by 'getEtaBin'
+    Int_t    binEtaSymm_;    // symmetrised eta bin number as determined by 'getEtaBin'
+    // generated
+    Double_t momEGen_;       // used momentum term, can be: E, p, E_t, p_t
+    Double_t etaGen_;
+    Double_t phiGen_;
+    Int_t    binEtaGen_;     // eta bin number as determined by 'getEtaBin'
+    Int_t    binEtaSymmGen_; // symmetrised eta bin number as determined by 'getEtaBin'
+
     /// Histograms
     // Binning
     std::vector< TH1D* > histos_EtaBins_;
@@ -122,7 +138,7 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
 
     unsigned getEtaBin( unsigned iCat, double eta, bool symm = false );
 
-    // Fill histograms
+    // Fill histograms and n-tuples
     // Main function
     void fill( unsigned iCat, unsigned iProp );
     // Object categories
@@ -315,7 +331,7 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
   yTitles.push_back( "#Delta#phi" );
   std::vector< std::string > yTitlesInv;
   if ( usePtRel_ ) yTitlesInv.push_back( "#frac{#Deltap_{t}}{p_{t}}" );
-  else            yTitlesInv.push_back( "#Delta#frac{1}{p_{t}} (#frac{1}{GeV})" );
+  else             yTitlesInv.push_back( "#Delta#frac{1}{p_{t}} (#frac{1}{GeV})" );
   yTitlesInv.push_back( "#Delta#frac{1}{#eta}" );
   yTitlesInv.push_back( "#Delta#frac{1}{#phi}" );
   const std::string zTitle( "events" );
@@ -324,6 +340,18 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
     const std::string cat( objCats_.at( iCat ) );
     const bool useEt( ( cat == "UdscJet" || cat == "BJet" ) && useJetEt_ );
     TFileDirectory dir( fileService->mkdir( cat.c_str(), "" ) );
+    // N-tuple
+    data_.push_back( dir.make< TTree >( std::string( cat + "_data" ).c_str(), std::string( cat + " data" ).c_str() ) );
+    data_.back()->Branch( "MomE", &momE_, "momE/D" );
+    data_.back()->Branch( "Eta", &eta_, "eta/D" );
+    data_.back()->Branch( "Phi", &phi_, "phi/D" );
+    data_.back()->Branch( "BinEta", &binEta_, "binEta/I" );
+    data_.back()->Branch( "BinEtaSymm", &binEtaSymm_, "binEtaSymm/I" );
+    data_.back()->Branch( "MomEGen", &momEGen_, "momEGen/D" );
+    data_.back()->Branch( "EtaGen", &etaGen_, "etaGen/D" );
+    data_.back()->Branch( "PhiGen", &phiGen_, "phiGen/D" );
+    data_.back()->Branch( "BinEtaGen", &binEtaGen_, "binEtaGen/I" );
+    data_.back()->Branch( "BinEtaSymmGen", &binEtaSymmGen_, "binEtaSymmGen/I" );
     // Eta binning
     histos_EtaBins_.push_back( dir.make< TH1D >( std::string( cat + "_binsEta" ).c_str(), cat.c_str(), etaBins_.at( iCat ).size() - 1, etaBins_.at( iCat ).data() ) );
     histos_EtaBins_.back()->SetXTitle( "#eta" );
@@ -506,8 +534,10 @@ void AnalyzeHitFitResolutionFunctions::analyze( const edm::Event & iEvent, const
         }
 
       } // Valid TTbar MC matching
+      else edm::LogInfo( "AnalyzeHitFitResolutionFunctions" ) << "...no valid MC match";
 
     } // Semi-leptonic signal event
+    else edm::LogInfo( "AnalyzeHitFitResolutionFunctions" ) << "...no signal event";
 
   } // MC
 
@@ -667,10 +697,23 @@ void AnalyzeHitFitResolutionFunctions::fillMET( unsigned iCat, unsigned iProp )
 void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, unsigned iCat, unsigned iProp, double pt, double ptGen, double eta, double etaGen, double phi, double phiGen )
 {
 
+  // Fill n-tuple
+   momE_          = pt;
+   eta_           = eta;
+   phi_           = phi;
+   binEta_        = -1; // initialise
+   binEtaSymm_    = -1; // initialise
+   momEGen_       = ptGen;
+   etaGen_        = etaGen;
+   phiGen_        = phiGen;
+   binEtaGen_     = -1; // initialise
+   binEtaSymmGen_ = -1; // initialise
+
   const std::string prop( kinProps_.at( iProp ) );
   unsigned iEta( getEtaBin( iCat, eta ) );
 
   if ( iEta < etaBins_.at( iCat ).size() ) {
+    binEta_ = iEta;
     if ( prop == "Pt" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, pt - ptGen );
       if ( usePtRel_ ) histos_RecoInv_[ index ].at( iEta )->Fill( pt, ( pt - ptGen ) / pt );
@@ -687,8 +730,11 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
   }
 
   if ( refGen_ ) {
+
     iEta = getEtaBin( iCat, etaGen );
+
     if ( iEta < etaBins_.at( iCat ).size() ) {
+      binEtaGen_ = iEta;
       if ( prop == "Pt" ) {
         histos_Gen_[ index ].at( iEta )->Fill( ptGen, ptGen - pt );
         if ( usePtRel_ ) histos_GenInv_[ index ].at( iEta )->Fill( ptGen, ( ptGen - pt ) / ptGen );
@@ -710,6 +756,7 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
     unsigned iEtaSymm( getEtaBin( iCat, eta, true ) );
 
     if ( iEtaSymm < etaSymmBins_.at( iCat ).size() ) {
+      binEtaSymm_ = iEtaSymm;
       if ( prop == "Pt" ) {
         histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, pt - ptGen );
         if ( usePtRel_ ) histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, ( pt - ptGen ) / pt );
@@ -726,8 +773,11 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
     }
 
     if ( refGen_ ) {
+
       iEtaSymm = getEtaBin( iCat, etaGen, true );
+
       if ( iEtaSymm < etaSymmBins_.at( iCat ).size() ) {
+        binEtaSymmGen_ = iEtaSymm;
         if ( prop == "Pt" ) {
           histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ptGen - pt );
           if ( usePtRel_ ) histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ( ptGen - pt ) / ptGen );
@@ -745,6 +795,9 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
     }
 
   }
+
+  // Finally, fill tree
+  data_.at( iCat )->Fill();
 
 }
 
