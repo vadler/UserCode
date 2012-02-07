@@ -3,8 +3,7 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-runTest   = False
-rfioInput = True
+runTest = True
 
 # Origin of existing resolution functions
 # era = 'Spring10'
@@ -35,8 +34,6 @@ if useJetEt:
   inputFile = inputFile.replace( '.root', '_jetEt.root' )
 if runTest:
   inputFile = inputFile.replace( 'root', 'test.root' )
-if not rfioInput:
-  inputFile = inputFile.replace( 'root', 'local.root' )
 logFile = inputFile.replace( 'root', 'log' )
 process.fitter = cms.PSet(
   inputFile = cms.string( inputFile )
