@@ -14,7 +14,8 @@ analyzeHitFitResolutionFunctions = cms.EDAnalyzer(
 , useMuons     = cms.bool( True )
 , useElectrons = cms.bool( False )
 
-  # Jet p_t/E_t switch
+  # Switches for kinematic variables
+, usePtRel = cms.bool( False )
 , useJetEt = cms.bool( False )
 
   # JEC level to be considered

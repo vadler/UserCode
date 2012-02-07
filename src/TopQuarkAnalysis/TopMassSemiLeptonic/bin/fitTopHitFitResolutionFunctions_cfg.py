@@ -3,7 +3,7 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-runTest   = True
+runTest   = False
 rfioInput = True
 
 # Origin of existing resolution functions
@@ -11,6 +11,7 @@ rfioInput = True
 era = 'Summer11'
 
 # Settings
+usePtRel = False # ( Delta p_t ) / p_t instead of Delta ( 1 / p_t ) in inverse p_t
 useJetEt = False
 
 process = cms.PSet()
@@ -28,6 +29,8 @@ process.resolutionFunction        = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*
 process.resolutionFunctionInverse = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
 
 inputFile = 'file:%s/output/fitHitFitResolutionFunctions_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
+if usePtRel:
+  inputFile = inputFile.replace( '.root', '_ptRel.root' )
 if useJetEt:
   inputFile = inputFile.replace( '.root', '_jetEt.root' )
 if runTest:
