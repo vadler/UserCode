@@ -72,10 +72,12 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
 
     /// Configuration parameters
     edm::InputTag ttSemiLeptonicEventTag_;
-    bool useMuons_;
-    bool useElecs_;
+    bool refGen_;
+    bool useSymm_;
     bool usePtRel_;
     bool useJetEt_;
+    bool useMuons_;
+    bool useElecs_;
     edm::InputTag patJetsTag_;
     std::string jecLevel_;
     // Eta binning
@@ -101,18 +103,18 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     std::vector< TH1D* > histos_PtBins_;
     // Kinematic quantities RECO
     TH2DVecMap histos_Reco_;
-    // Kinematic quantities GEN
-    TH2DVecMap histos_Gen_;
     // Kinematic quantities RECO inverted
     TH2DVecMap histos_RecoInv_;
+    // Kinematic quantities GEN
+    TH2DVecMap histos_Gen_;
     // Kinematic quantities GEN inverted
     TH2DVecMap histos_GenInv_;
     // Kinematic quantities RECO, symmetric in eta
     TH2DVecMap histos_RecoSymm_;
-    // Kinematic quantities GEN, symmetric in eta
-    TH2DVecMap histos_GenSymm_;
     // Kinematic quantities RECO inverted, symmetric in eta
     TH2DVecMap histos_RecoInvSymm_;
+    // Kinematic quantities GEN, symmetric in eta
+    TH2DVecMap histos_GenSymm_;
     // Kinematic quantities GEN inverted, symmetric in eta
     TH2DVecMap histos_GenInvSymm_;
 
@@ -158,13 +160,17 @@ AnalyzeHitFitResolutionFunctions::AnalyzeHitFitResolutionFunctions( const edm::P
 , ttGenEvent_()
 , patJets_()
 , ttSemiLeptonicEventTag_( iConfig.getParameter< edm::InputTag >( "ttSemiLeptonicEvent" ) )
-, useMuons_( iConfig.getParameter< bool >( "useMuons" ) )
-, useElecs_( iConfig.getParameter< bool >( "useElectrons" ) )
+, refGen_( iConfig.getParameter< bool >( "refGen" ) )
+, useSymm_( iConfig.getParameter< bool >( "useSymm" ) )
 , usePtRel_( iConfig.getParameter< bool >( "usePtRel" ) )
 , useJetEt_( iConfig.getParameter< bool >( "useJetEt" ) )
+, useMuons_( iConfig.getParameter< bool >( "useMuons" ) )
+, useElecs_( iConfig.getParameter< bool >( "useElectrons" ) )
 , patJetsTag_( iConfig.getParameter< edm::InputTag >( "patJets" ) )
 , jecLevel_( iConfig.getParameter< std::string >( "jecLevel" ) )
 {
+
+  // Constants
 
   objCats_.clear();
   if ( useMuons_ ) objCats_.push_back( "Mu" );
@@ -234,18 +240,20 @@ AnalyzeHitFitResolutionFunctions::AnalyzeHitFitResolutionFunctions( const edm::P
       etaBins_.push_back( iConfig.getParameter< std::vector< double > >( etaBinParams.at( iCat ) ) );
     }
 
-    std::vector< double > etaSymmBins;
-    for ( unsigned iEta = 0; iEta < etaBins_.back().size() - 1; ++iEta ) {
-      if ( etaBins_.back().at( iEta + 1 ) <= 0. ) continue;
-      if ( etaBins_.back().at( iEta ) < 0. )
-        etaSymmBins.push_back( 0. );
-      else
-        etaSymmBins.push_back( etaBins_.back().at( iEta ) );
+    if ( useSymm_ ) {
+      std::vector< double > etaSymmBins;
+      for ( unsigned iEta = 0; iEta < etaBins_.back().size() - 1; ++iEta ) {
+        if ( etaBins_.back().at( iEta + 1 ) <= 0. ) continue;
+        if ( etaBins_.back().at( iEta ) < 0. )
+          etaSymmBins.push_back( 0. );
+        else
+          etaSymmBins.push_back( etaBins_.back().at( iEta ) );
+      }
+      if ( etaBins_.back().size() > 0 && etaBins_.back().back() > 0. ) {
+        etaSymmBins.push_back( etaBins_.back().back() );
+      }
+      etaSymmBins_.push_back( etaSymmBins );
     }
-    if ( etaBins_.back().size() > 0 && etaBins_.back().back() > 0. ) {
-      etaSymmBins.push_back( etaBins_.back().back() );
-    }
-    etaSymmBins_.push_back( etaSymmBins );
 
     ptBins_.push_back( iConfig.getParameter< std::vector< double > >( ptBinParams.at( iCat ) ) );
 
@@ -353,15 +361,9 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
       const std::string nameDirReco( "Reco" );
       TFileDirectory subDirReco( subDir.mkdir( nameDirReco.c_str(), "" ) );
       TH2DVec histos_Reco;
-      const std::string nameDirGen( "Gen" );
-      TFileDirectory subDirGen( subDir.mkdir( nameDirGen.c_str(), "" ) );
-      TH2DVec histos_Gen;
       const std::string nameDirRecoInv( "RecoInv" );
       TFileDirectory subDirRecoInv( subDir.mkdir( nameDirRecoInv.c_str(), "" ) );
       TH2DVec histos_RecoInv;
-      const std::string nameDirGenInv( "GenInv" );
-      TFileDirectory subDirGenInv( subDir.mkdir( nameDirGenInv.c_str(), "" ) );
-      TH2DVec histos_GenInv;
       for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
         const std::string eta( "Eta" + my::helpers::to_string( iEta ) );
         const std::string title( cat + ", " + my::helpers::to_string( etaBins_.at( iCat ).at( iEta ) ) + " #leq #eta #leq " + my::helpers::to_string( etaBins_.at( iCat ).at( iEta + 1 ) ) );
@@ -371,74 +373,97 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
         histos_Reco.back()->SetXTitle( xTitleRecoProp.c_str() );
         histos_Reco.back()->SetYTitle( yTitle.c_str() );
         histos_Reco.back()->SetZTitle( zTitle.c_str() );
-        TFileDirectory subDirGenEta( subDirGen.mkdir( eta.c_str(), title.c_str() ) );
-        const std::string nameGenEta( cat + "_" + prop + "_Gen_" + eta );
-        histos_Gen.push_back( subDirGenEta.make< TH2D >( nameGenEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
-        histos_Gen.back()->SetXTitle( xTitleGenProp.c_str() );
-        histos_Gen.back()->SetYTitle( yTitle.c_str() );
-        histos_Gen.back()->SetZTitle( zTitle.c_str() );
         TFileDirectory subDirRecoInvEta( subDirRecoInv.mkdir( eta.c_str(), title.c_str() ) );
         const std::string nameRecoInvEta( cat + "_" + prop + "_RecoInv_" + eta );
         histos_RecoInv.push_back( subDirRecoInvEta.make< TH2D >( nameRecoInvEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
         histos_RecoInv.back()->SetXTitle( xTitleRecoProp.c_str() );
         histos_RecoInv.back()->SetYTitle( yTitleInv.c_str() );
         histos_RecoInv.back()->SetZTitle( zTitle.c_str() );
-        TFileDirectory subDirGenInvEta( subDirGenInv.mkdir( eta.c_str(), title.c_str() ) );
-        const std::string nameGenInvEta( cat + "_" + prop + "_GenInv_" + eta );
-        histos_GenInv.push_back( subDirGenInvEta.make< TH2D >( nameGenInvEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
-        histos_GenInv.back()->SetXTitle( xTitleGenProp.c_str() );
-        histos_GenInv.back()->SetYTitle( yTitleInv.c_str() );
-        histos_GenInv.back()->SetZTitle( zTitle.c_str() );
       }
       histos_Reco_[ cat + "_" + prop ] = histos_Reco;
-      histos_Gen_[ cat + "_" + prop ] = histos_Gen;
       histos_RecoInv_[ cat + "_" + prop ] = histos_RecoInv;
-      histos_GenInv_[ cat + "_" + prop ] = histos_GenInv;
 
-      const std::string nameDirRecoSymm( "RecoSymm" );
-      TFileDirectory subDirRecoSymm( subDir.mkdir( nameDirRecoSymm.c_str(), "" ) );
-      TH2DVec histos_RecoSymm;
-      const std::string nameDirGenSymm( "GenSymm" );
-      TFileDirectory subDirGenSymm( subDir.mkdir( nameDirGenSymm.c_str(), "" ) );
-      TH2DVec histos_GenSymm;
-      const std::string nameDirRecoInvSymm( "RecoInvSymm" );
-      TFileDirectory subDirRecoInvSymm( subDir.mkdir( nameDirRecoInvSymm.c_str(), "" ) );
-      TH2DVec histos_RecoInvSymm;
-      const std::string nameDirGenInvSymm( "GenInvSymm" );
-      TFileDirectory subDirGenInvSymm( subDir.mkdir( nameDirGenInvSymm.c_str(), "" ) );
-      TH2DVec histos_GenInvSymm;
-      for ( unsigned iEtaSymm = 0; iEtaSymm < etaSymmBins_.at( iCat ).size() - 1; ++iEtaSymm ) {
-        const std::string etaSymm( "Eta" + my::helpers::to_string( iEtaSymm ) );
-        const std::string title( cat + ", " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm ) ) + " #leq |#eta| #leq " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm + 1 ) ) );
-        TFileDirectory subDirRecoSymmEta( subDirRecoSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
-        const std::string nameRecoSymmEta( cat + "_" + prop + "_RecoSymm_" + etaSymm );
-        histos_RecoSymm.push_back( subDirRecoSymmEta.make< TH2D >( nameRecoSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
-        histos_RecoSymm.back()->SetXTitle( xTitleRecoProp.c_str() );
-        histos_RecoSymm.back()->SetYTitle( yTitle.c_str() );
-        histos_RecoSymm.back()->SetZTitle( zTitle.c_str() );
-        TFileDirectory subDirGenSymmEta( subDirGenSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
-        const std::string nameGenSymmEta( cat + "_" + prop + "_GenSymm_" + etaSymm );
-        histos_GenSymm.push_back( subDirGenSymmEta.make< TH2D >( nameGenSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
-        histos_GenSymm.back()->SetXTitle( xTitleGenProp.c_str() );
-        histos_GenSymm.back()->SetYTitle( yTitle.c_str() );
-        histos_GenSymm.back()->SetZTitle( zTitle.c_str() );
-        TFileDirectory subDirRecoInvSymmEta( subDirRecoInvSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
-        const std::string nameRecoInvSymmEta( cat + "_" + prop + "_RecoInvSymm_" + etaSymm );
-        histos_RecoInvSymm.push_back( subDirRecoInvSymmEta.make< TH2D >( nameRecoInvSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
-        histos_RecoInvSymm.back()->SetXTitle( xTitleRecoProp.c_str() );
-        histos_RecoInvSymm.back()->SetYTitle( yTitleInv.c_str() );
-        histos_RecoInvSymm.back()->SetZTitle( zTitle.c_str() );
-        TFileDirectory subDirGenInvSymmEta( subDirGenInvSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
-        const std::string nameGenInvSymmEta( cat + "_" + prop + "_GenInvSymm_" + etaSymm );
-        histos_GenInvSymm.push_back( subDirGenInvSymmEta.make< TH2D >( nameGenInvSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
-        histos_GenInvSymm.back()->SetXTitle( xTitleGenProp.c_str() );
-        histos_GenInvSymm.back()->SetYTitle( yTitleInv.c_str() );
-        histos_GenInvSymm.back()->SetZTitle( zTitle.c_str() );
+      if ( refGen_ ) {
+        const std::string nameDirGen( "Gen" );
+        TFileDirectory subDirGen( subDir.mkdir( nameDirGen.c_str(), "" ) );
+        TH2DVec histos_Gen;
+        const std::string nameDirGenInv( "GenInv" );
+        TFileDirectory subDirGenInv( subDir.mkdir( nameDirGenInv.c_str(), "" ) );
+        TH2DVec histos_GenInv;
+        for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
+          const std::string eta( "Eta" + my::helpers::to_string( iEta ) );
+          const std::string title( cat + ", " + my::helpers::to_string( etaBins_.at( iCat ).at( iEta ) ) + " #leq #eta #leq " + my::helpers::to_string( etaBins_.at( iCat ).at( iEta + 1 ) ) );
+          TFileDirectory subDirGenEta( subDirGen.mkdir( eta.c_str(), title.c_str() ) );
+          const std::string nameGenEta( cat + "_" + prop + "_Gen_" + eta );
+          histos_Gen.push_back( subDirGenEta.make< TH2D >( nameGenEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
+          histos_Gen.back()->SetXTitle( xTitleGenProp.c_str() );
+          histos_Gen.back()->SetYTitle( yTitle.c_str() );
+          histos_Gen.back()->SetZTitle( zTitle.c_str() );
+          TFileDirectory subDirGenInvEta( subDirGenInv.mkdir( eta.c_str(), title.c_str() ) );
+          const std::string nameGenInvEta( cat + "_" + prop + "_GenInv_" + eta );
+          histos_GenInv.push_back( subDirGenInvEta.make< TH2D >( nameGenInvEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
+          histos_GenInv.back()->SetXTitle( xTitleGenProp.c_str() );
+          histos_GenInv.back()->SetYTitle( yTitleInv.c_str() );
+          histos_GenInv.back()->SetZTitle( zTitle.c_str() );
+        }
+        histos_Gen_[ cat + "_" + prop ] = histos_Gen;
+        histos_GenInv_[ cat + "_" + prop ] = histos_GenInv;
       }
-      histos_RecoSymm_[ cat + "_" + prop ] = histos_RecoSymm;
-      histos_GenSymm_[ cat + "_" + prop ] = histos_GenSymm;
-      histos_RecoInvSymm_[ cat + "_" + prop ] = histos_RecoInvSymm;
-      histos_GenInvSymm_[ cat + "_" + prop ] = histos_GenInvSymm;
+
+      if ( useSymm_ ) {
+        const std::string nameDirRecoSymm( "RecoSymm" );
+        TFileDirectory subDirRecoSymm( subDir.mkdir( nameDirRecoSymm.c_str(), "" ) );
+        TH2DVec histos_RecoSymm;
+        const std::string nameDirRecoInvSymm( "RecoInvSymm" );
+        TFileDirectory subDirRecoInvSymm( subDir.mkdir( nameDirRecoInvSymm.c_str(), "" ) );
+        TH2DVec histos_RecoInvSymm;
+        for ( unsigned iEtaSymm = 0; iEtaSymm < etaSymmBins_.at( iCat ).size() - 1; ++iEtaSymm ) {
+          const std::string etaSymm( "Eta" + my::helpers::to_string( iEtaSymm ) );
+          const std::string title( cat + ", " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm ) ) + " #leq |#eta| #leq " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm + 1 ) ) );
+          TFileDirectory subDirRecoSymmEta( subDirRecoSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
+          const std::string nameRecoSymmEta( cat + "_" + prop + "_RecoSymm_" + etaSymm );
+          histos_RecoSymm.push_back( subDirRecoSymmEta.make< TH2D >( nameRecoSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
+          histos_RecoSymm.back()->SetXTitle( xTitleRecoProp.c_str() );
+          histos_RecoSymm.back()->SetYTitle( yTitle.c_str() );
+          histos_RecoSymm.back()->SetZTitle( zTitle.c_str() );
+          TFileDirectory subDirRecoInvSymmEta( subDirRecoInvSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
+          const std::string nameRecoInvSymmEta( cat + "_" + prop + "_RecoInvSymm_" + etaSymm );
+          histos_RecoInvSymm.push_back( subDirRecoInvSymmEta.make< TH2D >( nameRecoInvSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
+          histos_RecoInvSymm.back()->SetXTitle( xTitleRecoProp.c_str() );
+          histos_RecoInvSymm.back()->SetYTitle( yTitleInv.c_str() );
+          histos_RecoInvSymm.back()->SetZTitle( zTitle.c_str() );
+        }
+        histos_RecoSymm_[ cat + "_" + prop ] = histos_RecoSymm;
+        histos_RecoInvSymm_[ cat + "_" + prop ] = histos_RecoInvSymm;
+
+        if ( refGen_ ) {
+          const std::string nameDirGenSymm( "GenSymm" );
+          TFileDirectory subDirGenSymm( subDir.mkdir( nameDirGenSymm.c_str(), "" ) );
+          TH2DVec histos_GenSymm;
+          const std::string nameDirGenInvSymm( "GenInvSymm" );
+          TFileDirectory subDirGenInvSymm( subDir.mkdir( nameDirGenInvSymm.c_str(), "" ) );
+          TH2DVec histos_GenInvSymm;
+          for ( unsigned iEtaSymm = 0; iEtaSymm < etaSymmBins_.at( iCat ).size() - 1; ++iEtaSymm ) {
+            const std::string etaSymm( "Eta" + my::helpers::to_string( iEtaSymm ) );
+            const std::string title( cat + ", " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm ) ) + " #leq |#eta| #leq " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm + 1 ) ) );
+            TFileDirectory subDirGenSymmEta( subDirGenSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
+            const std::string nameGenSymmEta( cat + "_" + prop + "_GenSymm_" + etaSymm );
+            histos_GenSymm.push_back( subDirGenSymmEta.make< TH2D >( nameGenSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
+            histos_GenSymm.back()->SetXTitle( xTitleGenProp.c_str() );
+            histos_GenSymm.back()->SetYTitle( yTitle.c_str() );
+            histos_GenSymm.back()->SetZTitle( zTitle.c_str() );
+            TFileDirectory subDirGenInvSymmEta( subDirGenInvSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
+            const std::string nameGenInvSymmEta( cat + "_" + prop + "_GenInvSymm_" + etaSymm );
+            histos_GenInvSymm.push_back( subDirGenInvSymmEta.make< TH2D >( nameGenInvSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
+            histos_GenInvSymm.back()->SetXTitle( xTitleGenProp.c_str() );
+            histos_GenInvSymm.back()->SetYTitle( yTitleInv.c_str() );
+            histos_GenInvSymm.back()->SetZTitle( zTitle.c_str() );
+          }
+          histos_GenSymm_[ cat + "_" + prop ] = histos_GenSymm;
+          histos_GenInvSymm_[ cat + "_" + prop ] = histos_GenInvSymm;
+        }
+
+      }
 
     }
 
@@ -644,55 +669,81 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
 
   const std::string prop( kinProps_.at( iProp ) );
   unsigned iEta( getEtaBin( iCat, eta ) );
-  unsigned iEtaSymm( getEtaBin( iCat, eta, true ) );
 
-  if ( iEta < etaBins_.at( iCat ).size() && iEtaSymm < etaSymmBins_.at( iCat ).size() ) {
+  if ( iEta < etaBins_.at( iCat ).size() ) {
     if ( prop == "Pt" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, pt - ptGen );
       if ( usePtRel_ ) histos_RecoInv_[ index ].at( iEta )->Fill( pt, ( pt - ptGen ) / pt );
       else             histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / pt - 1. / ptGen );
-      histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, pt - ptGen );
-      if ( usePtRel_ ) histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, ( pt - ptGen ) / pt );
-      else             histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / pt - 1. / ptGen );
     }
     else if ( prop == "Eta" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, eta - etaGen );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / eta - 1. / etaGen );
-      histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - etaGen );
-      histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / eta - 1. / etaGen );
     }
     else if ( prop == "Phi" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - phiGen ) );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / phi - 1. / phiGen );
-      histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - phiGen ) );
-      histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / phi - 1. / phiGen );
     }
   }
 
-  iEta     = getEtaBin( iCat, etaGen );
-  iEtaSymm = getEtaBin( iCat, etaGen, true );
-  if ( iEta < etaBins_.at( iCat ).size() && iEtaSymm < etaSymmBins_.at( iCat ).size() ) {
-    if ( prop == "Pt" ) {
-      histos_Gen_[ index ].at( iEta )->Fill( ptGen, ptGen - pt );
-      if ( usePtRel_ ) histos_GenInv_[ index ].at( iEta )->Fill( ptGen, ( ptGen - pt ) / ptGen );
-      else             histos_GenInv_[ index ].at( iEta )->Fill( ptGen, 1. / ptGen - 1. / pt );
-      histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ptGen - pt );
-      if ( usePtRel_ ) histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ( ptGen - pt ) / ptGen );
-      else             histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / ptGen - 1. / pt );
+  if ( refGen_ ) {
+    iEta = getEtaBin( iCat, etaGen );
+    if ( iEta < etaBins_.at( iCat ).size() ) {
+      if ( prop == "Pt" ) {
+        histos_Gen_[ index ].at( iEta )->Fill( ptGen, ptGen - pt );
+        if ( usePtRel_ ) histos_GenInv_[ index ].at( iEta )->Fill( ptGen, ( ptGen - pt ) / ptGen );
+        else             histos_GenInv_[ index ].at( iEta )->Fill( ptGen, 1. / ptGen - 1. / pt );
+      }
+      else if ( prop == "Eta" ) {
+        histos_Gen_[ index ].at( iEta )->Fill( ptGen, etaGen - eta );
+        histos_GenInv_[ index ].at( iEta )->Fill( ptGen, 1. / etaGen - 1. / eta );
+      }
+      else if ( prop == "Phi" ) {
+        histos_Gen_[ index ].at( iEta )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
+        histos_GenInv_[ index ].at( iEta )->Fill( ptGen, 1. / phiGen - 1. / phi );
+      }
     }
-    else if ( prop == "Eta" ) {
-      histos_Gen_[ index ].at( iEta )->Fill( ptGen, etaGen - eta );
-      histos_GenInv_[ index ].at( iEta )->Fill( ptGen, 1. / etaGen - 1. / eta );
-      histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, etaGen - eta );
-      histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / etaGen - 1. / eta );
+  }
+
+  if ( useSymm_ ) {
+
+    unsigned iEtaSymm( getEtaBin( iCat, eta, true ) );
+
+    if ( iEtaSymm < etaSymmBins_.at( iCat ).size() ) {
+      if ( prop == "Pt" ) {
+        histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, pt - ptGen );
+        if ( usePtRel_ ) histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, ( pt - ptGen ) / pt );
+        else             histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / pt - 1. / ptGen );
+      }
+      else if ( prop == "Eta" ) {
+        histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - etaGen );
+        histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / eta - 1. / etaGen );
+      }
+      else if ( prop == "Phi" ) {
+        histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - phiGen ) );
+        histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / phi - 1. / phiGen );
+      }
     }
-    else if ( prop == "Phi" ) {
-      const double phi( ttGenEvent_->singleLepton()->phi() );
-      histos_Gen_[ index ].at( iEta )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
-      histos_GenInv_[ index ].at( iEta )->Fill( ptGen, 1. / phiGen - 1. / phi );
-      histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
-      histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / phiGen - 1. / phi );
+
+    if ( refGen_ ) {
+      iEtaSymm = getEtaBin( iCat, etaGen, true );
+      if ( iEtaSymm < etaSymmBins_.at( iCat ).size() ) {
+        if ( prop == "Pt" ) {
+          histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ptGen - pt );
+          if ( usePtRel_ ) histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ( ptGen - pt ) / ptGen );
+          else             histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / ptGen - 1. / pt );
+        }
+        else if ( prop == "Eta" ) {
+          histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, etaGen - eta );
+          histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / etaGen - 1. / eta );
+        }
+        else if ( prop == "Phi" ) {
+          histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
+          histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / phiGen - 1. / phi );
+        }
+      }
     }
+
   }
 
 }

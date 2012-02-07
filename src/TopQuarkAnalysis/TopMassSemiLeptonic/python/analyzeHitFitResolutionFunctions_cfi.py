@@ -10,13 +10,17 @@ analyzeHitFitResolutionFunctions = cms.EDAnalyzer(
   # TQAF semi-leptonic event
 , ttSemiLeptonicEvent = cms.InputTag( 'ttSemiLepEvent' )
 
-  # Leptons to use
-, useMuons     = cms.bool( True )
-, useElectrons = cms.bool( False )
+  # Switches for eta symmetric distribution
+, refGen  = cms.bool( False ) # add histograms with generated kinematics as reference
+, useSymm = cms.bool( False ) # add histograms adding up symmetric bins in eta
 
   # Switches for kinematic variables
 , usePtRel = cms.bool( False )
 , useJetEt = cms.bool( False )
+
+  # Leptons to use
+, useMuons     = cms.bool( True )
+, useElectrons = cms.bool( False )
 
   # JEC level to be considered
 , patJets  = cms.InputTag( 'selectedPatJets' )

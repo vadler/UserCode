@@ -16,6 +16,8 @@ era = 'Summer11'
 skimProcess = 'SKIM'
 
 # Settings
+refGen   = False
+useSymm  = False
 usePtRel = False # ( Delta p_t ) / p_t instead of Delta ( 1 / p_t ) in inverse p_t
 useJetEt = False
 
@@ -102,6 +104,8 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'refer
 ### Analyzer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.analyzeHitFitResolutionFunctions_cfi" )
+process.analyzeHitFitResolutionFunctions.refGen              = refGen
+process.analyzeHitFitResolutionFunctions.useSymm             = useSymm
 process.analyzeHitFitResolutionFunctions.usePtRel            = usePtRel
 process.analyzeHitFitResolutionFunctions.useJetEt            = useJetEt
 process.analyzeHitFitResolutionFunctions.jecLevel            = 'L3Absolute'
