@@ -5,6 +5,8 @@
 #include <vector>
 #include <iostream>
 
+#include "boost/lexical_cast.hpp"
+
 #include <TROOT.h>
 #include <TSystem.h>
 #include <TFile.h>
@@ -16,8 +18,6 @@
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
 #include "TopQuarkAnalysis/TopHitFit/interface/EtaDepResolution.h"
-
-#include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/Helpers.h"
 
 
 int main(  int argc, char * argv[] )
@@ -100,7 +100,7 @@ int main(  int argc, char * argv[] )
       const std::vector< hitfit::EtaDepResElement > resElems( res.GetEtaDepResElement() );
 
       for ( unsigned iResElem = 0; iResElem < resElems.size(); ++iResElem ) {
-        const std::string resElem( my::helpers::to_string( iResElem ) );
+        const std::string resElem( boost::lexical_cast< std::string >( iResElem ) );
 
         const hitfit::Vector_Resolution vecRes( resElems.at( iResElem ).GetResolution() );
         const double etaMin( resElems.at( iResElem ).EtaMin() );
@@ -134,7 +134,7 @@ int main(  int argc, char * argv[] )
           gDirectory->pwd();
 
           const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
-          const std::string title( objCat + ", " + kinProp + ", " + my::helpers::to_string( etaMin ) + " #leq #eta #leq " + my::helpers::to_string( etaMax ) + ( inverse ? ", inv." : "" ) );
+          const std::string title( objCat + ", " + kinProp + ", " + boost::lexical_cast< std::string >( etaMin ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaMax ) + ( inverse ? ", inv." : "" ) );
           TF1 * func = new TF1( name.c_str(), inverse ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
           func->SetParameters( res.C(), res.R(), res.N() );
           func->Write();

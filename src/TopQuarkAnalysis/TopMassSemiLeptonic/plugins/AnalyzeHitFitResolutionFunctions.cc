@@ -156,6 +156,7 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
 #include <iostream>
 #include <sstream>
 
+#include "boost/lexical_cast.hpp"
 #include "boost/algorithm/string/replace.hpp"
 
 #include "Math/GenVector/VectorUtil.h"
@@ -166,8 +167,6 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
 
 #include "AnalysisDataFormats/TopObjects/interface/TtSemiLepEvtPartons.h"
 #include "TopQuarkAnalysis/TopHitFit/interface/EtaDepResolution.h"
-
-#include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/Helpers.h"
 
 
 // Default constructor
@@ -393,8 +392,8 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
       TFileDirectory subDirRecoInv( subDir.mkdir( nameDirRecoInv.c_str(), "" ) );
       TH2DVec histos_RecoInv;
       for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
-        const std::string eta( "Eta" + my::helpers::to_string( iEta ) );
-        const std::string title( cat + ", " + my::helpers::to_string( etaBins_.at( iCat ).at( iEta ) ) + " #leq #eta #leq " + my::helpers::to_string( etaBins_.at( iCat ).at( iEta + 1 ) ) );
+        const std::string eta( "Eta" + boost::lexical_cast< std::string >( iEta ) );
+        const std::string title( cat + ", " + boost::lexical_cast< std::string >( etaBins_.at( iCat ).at( iEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( iCat ).at( iEta + 1 ) ) );
         TFileDirectory subDirRecoEta( subDirReco.mkdir( eta.c_str(), title.c_str() ) );
         const std::string nameRecoEta( cat + "_" + prop + "_Reco_" + eta );
         histos_Reco.push_back( subDirRecoEta.make< TH2D >( nameRecoEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
@@ -419,8 +418,8 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
         TFileDirectory subDirGenInv( subDir.mkdir( nameDirGenInv.c_str(), "" ) );
         TH2DVec histos_GenInv;
         for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
-          const std::string eta( "Eta" + my::helpers::to_string( iEta ) );
-          const std::string title( cat + ", " + my::helpers::to_string( etaBins_.at( iCat ).at( iEta ) ) + " #leq #eta #leq " + my::helpers::to_string( etaBins_.at( iCat ).at( iEta + 1 ) ) );
+          const std::string eta( "Eta" + boost::lexical_cast< std::string >( iEta ) );
+          const std::string title( cat + ", " + boost::lexical_cast< std::string >( etaBins_.at( iCat ).at( iEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( iCat ).at( iEta + 1 ) ) );
           TFileDirectory subDirGenEta( subDirGen.mkdir( eta.c_str(), title.c_str() ) );
           const std::string nameGenEta( cat + "_" + prop + "_Gen_" + eta );
           histos_Gen.push_back( subDirGenEta.make< TH2D >( nameGenEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
@@ -446,8 +445,8 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
         TFileDirectory subDirRecoInvSymm( subDir.mkdir( nameDirRecoInvSymm.c_str(), "" ) );
         TH2DVec histos_RecoInvSymm;
         for ( unsigned iEtaSymm = 0; iEtaSymm < etaSymmBins_.at( iCat ).size() - 1; ++iEtaSymm ) {
-          const std::string etaSymm( "Eta" + my::helpers::to_string( iEtaSymm ) );
-          const std::string title( cat + ", " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm ) ) + " #leq |#eta| #leq " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm + 1 ) ) );
+          const std::string etaSymm( "Eta" + boost::lexical_cast< std::string >( iEtaSymm ) );
+          const std::string title( cat + ", " + boost::lexical_cast< std::string >( etaSymmBins_.at( iCat ).at( iEtaSymm ) ) + " #leq |#eta| #leq " + boost::lexical_cast< std::string >( etaSymmBins_.at( iCat ).at( iEtaSymm + 1 ) ) );
           TFileDirectory subDirRecoSymmEta( subDirRecoSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
           const std::string nameRecoSymmEta( cat + "_" + prop + "_RecoSymm_" + etaSymm );
           histos_RecoSymm.push_back( subDirRecoSymmEta.make< TH2D >( nameRecoSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
@@ -472,8 +471,8 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
           TFileDirectory subDirGenInvSymm( subDir.mkdir( nameDirGenInvSymm.c_str(), "" ) );
           TH2DVec histos_GenInvSymm;
           for ( unsigned iEtaSymm = 0; iEtaSymm < etaSymmBins_.at( iCat ).size() - 1; ++iEtaSymm ) {
-            const std::string etaSymm( "Eta" + my::helpers::to_string( iEtaSymm ) );
-            const std::string title( cat + ", " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm ) ) + " #leq |#eta| #leq " + my::helpers::to_string( etaSymmBins_.at( iCat ).at( iEtaSymm + 1 ) ) );
+            const std::string etaSymm( "Eta" + boost::lexical_cast< std::string >( iEtaSymm ) );
+            const std::string title( cat + ", " + boost::lexical_cast< std::string >( etaSymmBins_.at( iCat ).at( iEtaSymm ) ) + " #leq |#eta| #leq " + boost::lexical_cast< std::string >( etaSymmBins_.at( iCat ).at( iEtaSymm + 1 ) ) );
             TFileDirectory subDirGenSymmEta( subDirGenSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
             const std::string nameGenSymmEta( cat + "_" + prop + "_GenSymm_" + etaSymm );
             histos_GenSymm.push_back( subDirGenSymmEta.make< TH2D >( nameGenSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );

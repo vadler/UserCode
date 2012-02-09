@@ -5,6 +5,8 @@
 #include <vector>
 #include <iostream>
 
+#include "boost/lexical_cast.hpp"
+
 #include <TROOT.h>
 #include <TSystem.h>
 #include <TFile.h>
@@ -18,8 +20,6 @@
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
 #include "TopQuarkAnalysis/TopHitFit/interface/EtaDepResolution.h"
-
-#include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/Helpers.h"
 
 
 int main( int argc, char * argv[] )
@@ -62,119 +62,121 @@ int main( int argc, char * argv[] )
   const std::string dirClassName( "TDirectoryFile" );
 
 
-  // Get existing resolution functions
+//   // Get existing resolution functions
+//
+//   if ( useExisting_ ) {
+//
+//     // Configuration for existing resolution functions
+//     const edm::ParameterSet & exist_( process_.getParameter< edm::ParameterSet >( "existing" ) );
+//     const std::string resolutionFile_( exist_.getParameter< std::string >( "resolutionFile" ) );
+//
+//     if ( verbose_ > 0 )
+//       std::cout << std::endl
+//                 << argv[ 0 ] << " --> INFO:" << std::endl
+//                 << "   accessing existing resolution functions from resolution file '" << resolutionFile_ << "'" << std::endl;
+//
+//     // Open output file
+//     TFile * resolutionFile( TFile::Open( resolutionFile_.c_str() ) );
+//     if ( resolutionFile ) {
+//       if ( verbose_ > 2 ) gDirectory->pwd();
+//
+//       // Loop over objects and quantities
+//
+//       for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
+//         const std::string objCat( objCats_.at( iCat ) );
+//         TDirectory * dirCat = ( TDirectory* )( resolutionFile->Get( objCat.c_str() ) );
+//         if ( ! dirCat ) {
+//           std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+//                     << "   object category '" << objCat << "' does not exist in resolution file" << std::endl;
+//           continue;
+//         }
+//
+//         if ( objCat == "MET" ) {
+//
+//           TList * listCat( dirCat->GetListOfKeys() );
+//           if ( verbose_ > 3 ) listCat->Print();
+//           TIter nextInListCat( listCat );
+//           TKey * keyProp( ( TKey* )nextInListCat() );
+//           const std::string kinProp( keyProp->GetName() );
+//           TDirectory * dirProp( ( TDirectory* )( dirCat->Get( kinProp.c_str() ) ) );
+//           if ( ! dirProp ) {
+//             std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+//                       << "   resolution file '" << resolutionFile_ << "' does not have directory for" << std::endl
+//                       << "   object category " << objCat << std::endl
+//                       << "   quantity        " << kinProp << std::endl;
+//             returnStatus_ += 0x200;
+//             continue;
+//           }
+//
+//           const std::string name( "fitExist_" + objCat + "_" + kinProp );
+//           TF1 * func( ( TF1* )( dirProp->Get( name.c_str() ) ) );
+//           if ( ! func ) {
+//             std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+//                       << "   resolution function '" << name << "' not found" << std::endl;
+//             returnStatus_ += 0x300;
+//             continue;
+//           }
+//
+//         } // objCat == "MET"
+//
+//         else {
+//
+//           TList * listCat( dirCat->GetListOfKeys() );
+//           TIter nextInListCat( listCat );
+//           if ( verbose_ > 3 ) listCat->Print();
+//           while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
+//             if ( std::string( keyProp->GetClassName() ) != dirClassName ) continue;
+//             const std::string kinProp( keyProp->GetName() );
+//             TDirectory * dirProp( ( TDirectory* )( dirCat->Get( kinProp.c_str() ) ) );
+//             if ( ! dirProp ) {
+//               std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+//                         << "   resolution file '" << resolutionFile_ << "' does not have directory for" << std::endl
+//                         << "   object category " << objCat << std::endl
+//                         << "   quantity        " << kinProp << std::endl;
+//               returnStatus_ += 0x200;
+//               continue;
+//             }
+//
+//             TList * listProp( dirProp->GetListOfKeys() );
+//             TIter nextInListProp( listProp );
+//             if ( verbose_ > 3 ) listProp->Print();
+//             while ( TKey * keyEta = ( TKey* )nextInListProp() ) {
+//               if ( std::string( keyEta->GetClassName() ) != dirClassName ) continue;
+//               const std::string binEta( keyEta->GetName() );
+//               TDirectory * dirEta = ( TDirectory* )( dirProp->Get( binEta.c_str() ) );
+//
+//               const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
+//               TF1 * func( ( TF1* )( dirEta->Get( name.c_str() ) ) );
+//               if ( ! func ) {
+//                 std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+//                           << "   resolution function '" << name << "' not found" << std::endl;
+//                 returnStatus_ += 0x300;
+//                 continue;
+//               }
+//
+//             } // loop: nextInListProp()
+//
+//           } // loop: nextInListCat()
+//
+//         } // !( objCat == "MET" )
+//
+//       } // loop: iCat < objCats_.size()
+//
+//       // Close output file
+//       resolutionFile->Close();
+//
+//     } // ( resolutionFile )
+//
+//     else {
+//       std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+//                 << "   resolution file '" << resolutionFile_ << "' missing" << std::endl;
+//       returnStatus_ += 0x100;
+//     } // !( resolutionFile )
+//
+//   }
 
-  if ( useExisting_ ) {
 
-    // Configuration for existing resolution functions
-    const edm::ParameterSet & exist_( process_.getParameter< edm::ParameterSet >( "existing" ) );
-    const std::string resolutionFile_( exist_.getParameter< std::string >( "resolutionFile" ) );
-
-    if ( verbose_ > 0 )
-      std::cout << std::endl
-                << argv[ 0 ] << " --> INFO:" << std::endl
-                << "   accessing existing resolution functions from resolution file '" << resolutionFile_ << "'" << std::endl;
-
-    // Open output file
-    TFile * resolutionFile( TFile::Open( resolutionFile_.c_str() ) );
-    if ( resolutionFile ) {
-      if ( verbose_ > 2 ) gDirectory->pwd();
-
-      // Loop over objects and quantities
-
-      for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
-        const std::string objCat( objCats_.at( iCat ) );
-        TDirectory * dirCat = ( TDirectory* )( resolutionFile->Get( objCat.c_str() ) );
-        if ( ! dirCat ) {
-          std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                    << "   object category '" << objCat << "' does not exist in resolution file" << std::endl;
-          continue;
-        }
-
-        if ( objCat == "MET" ) {
-
-          TList * listCat( dirCat->GetListOfKeys() );
-          if ( verbose_ > 3 ) listCat->Print();
-          TIter nextInListCat( listCat );
-          TKey * keyProp( ( TKey* )nextInListCat() );
-          const std::string kinProp( keyProp->GetName() );
-          TDirectory * dirProp( ( TDirectory* )( dirCat->Get( kinProp.c_str() ) ) );
-          if ( ! dirProp ) {
-            std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                      << "   resolution file '" << resolutionFile_ << "' does not have directory for" << std::endl
-                      << "   object category " << objCat << std::endl
-                      << "   quantity        " << kinProp << std::endl;
-            returnStatus_ += 0x200;
-            continue;
-          }
-
-          const std::string name( "fitExist_" + objCat + "_" + kinProp );
-          TF1 * func( ( TF1* )( dirProp->Get( name.c_str() ) ) );
-          if ( ! func ) {
-            std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                      << "   resolution function '" << name << "' not found" << std::endl;
-            returnStatus_ += 0x300;
-            continue;
-          }
-
-        } // objCat == "MET"
-
-        else {
-
-          TList * listCat( dirCat->GetListOfKeys() );
-          TIter nextInListCat( listCat );
-          if ( verbose_ > 3 ) listCat->Print();
-          while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
-            if ( std::string( keyProp->GetClassName() ) != dirClassName ) continue;
-            const std::string kinProp( keyProp->GetName() );
-            TDirectory * dirProp( ( TDirectory* )( dirCat->Get( kinProp.c_str() ) ) );
-            if ( ! dirProp ) {
-              std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                        << "   resolution file '" << resolutionFile_ << "' does not have directory for" << std::endl
-                        << "   object category " << objCat << std::endl
-                        << "   quantity        " << kinProp << std::endl;
-              returnStatus_ += 0x200;
-              continue;
-            }
-
-            TList * listProp( dirProp->GetListOfKeys() );
-            TIter nextInListProp( listProp );
-            if ( verbose_ > 3 ) listProp->Print();
-            while ( TKey * keyEta = ( TKey* )nextInListProp() ) {
-              if ( std::string( keyEta->GetClassName() ) != dirClassName ) continue;
-              const std::string binEta( keyEta->GetName() );
-              TDirectory * dirEta = ( TDirectory* )( dirProp->Get( binEta.c_str() ) );
-
-              const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
-              TF1 * func( ( TF1* )( dirEta->Get( name.c_str() ) ) );
-              if ( ! func ) {
-                std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                          << "   resolution function '" << name << "' not found" << std::endl;
-                returnStatus_ += 0x300;
-                continue;
-              }
-
-            } // loop: nextInListProp()
-
-          } // loop: nextInListCat()
-
-        } // !( objCat == "MET" )
-
-      } // loop: iCat < objCats_.size()
-
-      // Close output file
-      resolutionFile->Close();
-
-    } // ( resolutionFile )
-
-    else {
-      std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                << "   resolution file '" << resolutionFile_ << "' missing" << std::endl;
-      returnStatus_ += 0x100;
-    } // !( resolutionFile )
-
-  }
-
+  // Fit the new resolution functions
 
   // Open input file
   TFile * inFile( TFile::Open( inFile_.c_str(), "UPDATE" ) );
@@ -186,52 +188,14 @@ int main( int argc, char * argv[] )
   }
   TDirectory * dirSel = ( TDirectory* )( inFile->Get( evtSel_.c_str() ) );
 
-  // Get binning (must be identical for selections)
-
-  if ( verbose_ > 0 )
-    std::cout << std::endl
-              << argv[ 0 ] << " --> INFO:" << std::endl
-              << "   extract binning from input file '" << inFile_ << "'" << std::endl;
-  if ( verbose_ > 2 ) gDirectory->pwd();
-
-  std::vector< std::vector< double > > etaBins_;
-  std::vector< std::vector< double > > ptBins_;
-
-  for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
-    const std::string objCat( objCats_.at( iCat ) );
-    TDirectory * dirCat = ( TDirectory* )( dirSel->Get( objCat.c_str() ) );
-    if ( ! dirCat ) {
-      std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                << "   object category '" << objCat << "' does not exist in input file" << std::endl;
-      continue;
-    }
-
-    // Eta binning
-    std::vector< double > etaBins;
-    TH1D * hist_EtaBins( ( TH1D* )( dirCat->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
-    for ( int iEta = 1; iEta <= hist_EtaBins->GetNbinsX(); ++iEta ) {
-      etaBins.push_back( hist_EtaBins->GetBinLowEdge( iEta ) );
-    }
-    etaBins.push_back( hist_EtaBins->GetBinLowEdge( hist_EtaBins->GetNbinsX() ) + hist_EtaBins->GetBinWidth( hist_EtaBins->GetNbinsX() ) );
-    etaBins_.push_back( etaBins );
-    // Pt binning
-    std::vector< double > ptBins;
-    TH1D * hist_PtBins( ( TH1D* )( dirCat->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
-    for ( int iPt = 1; iPt <= hist_PtBins->GetNbinsX(); ++iPt ) {
-      ptBins.push_back( hist_PtBins->GetBinLowEdge( iPt ) );
-    }
-    ptBins.push_back( hist_PtBins->GetBinLowEdge( hist_PtBins->GetNbinsX() ) + hist_PtBins->GetBinWidth( hist_PtBins->GetNbinsX() ) );
-    ptBins_.push_back( ptBins );
-
-  }
-
-  // Loop over objects, quantities and bins
+  // Loops through directory structure
 
   if ( verbose_ > 0 )
     std::cout << std::endl
               << argv[ 0 ] << " --> INFO:" << std::endl
               << "   fitting resolution functions from input file '" << inFile_ << "'" << std::endl;
 
+  // Loop over configured object categories
   for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
     const std::string objCat( objCats_.at( iCat ) );
     TDirectory * dirCat( ( TDirectory* )( dirSel->Get( objCat.c_str() ) ) );
@@ -241,6 +205,25 @@ int main( int argc, char * argv[] )
       continue;
     }
 
+    // Get binning per object category
+
+    // Eta binning
+    std::vector< double > etaBins;
+    TH1D * hist_EtaBins( ( TH1D* )( dirCat->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
+    for ( int iEta = 1; iEta <= hist_EtaBins->GetNbinsX(); ++iEta ) {
+      etaBins.push_back( hist_EtaBins->GetBinLowEdge( iEta ) );
+    }
+    etaBins.push_back( hist_EtaBins->GetBinLowEdge( hist_EtaBins->GetNbinsX() ) + hist_EtaBins->GetBinWidth( hist_EtaBins->GetNbinsX() ) );
+
+    // Pt binning
+    std::vector< double > ptBins;
+    TH1D * hist_PtBins( ( TH1D* )( dirCat->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
+    for ( int iPt = 1; iPt <= hist_PtBins->GetNbinsX(); ++iPt ) {
+      ptBins.push_back( hist_PtBins->GetBinLowEdge( iPt ) );
+    }
+    ptBins.push_back( hist_PtBins->GetBinLowEdge( hist_PtBins->GetNbinsX() ) + hist_PtBins->GetBinWidth( hist_PtBins->GetNbinsX() ) );
+
+    // Loop over kinematic properties
     TList * listCat( dirCat->GetListOfKeys() );
     TIter nextInListCat( listCat );
     if ( verbose_ > 3 ) listCat->Print();
@@ -249,6 +232,7 @@ int main( int argc, char * argv[] )
       const std::string kinProp( keyProp->GetName() );
       TDirectory * dirProp( ( TDirectory* )( dirCat->Get( kinProp.c_str() ) ) );
 
+      // Loop over fit versions
       TList * listProp( dirProp->GetListOfKeys() );
       TIter nextInListProp( listProp );
       if ( verbose_ > 3 ) listProp->Print();
@@ -257,9 +241,17 @@ int main( int argc, char * argv[] )
         const std::string subFit( keyFit->GetName() );
         TDirectory * dirFit = ( TDirectory* )( dirProp->Get( subFit.c_str() ) );
 
+        // Inversion flag from directory name
         const bool inverse( subFit.substr( subFit.size() - 3 ) == "Inv" );
 
+        // Loop over eta bins
         TList * listFit( dirFit->GetListOfKeys() );
+        if ( listFit->GetSize() != ( Int_t )( etaBins.size() - 1 ) ) {
+          std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                    << "   mismatch of eta binning for object category '" << objCat << "':" << std::endl
+                    << "       bins in directory structure: " << listFit->GetSize()         << std::endl
+                    << "       bins in binning histogram  : " << etaBins.size() - 1         << std::endl;
+        }
         TIter nextInListFit( listFit );
         if ( verbose_ > 3 ) listFit->Print();
         while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
@@ -268,10 +260,13 @@ int main( int argc, char * argv[] )
           dirFit->cd( binEta.c_str() );
           if ( verbose_ > 1 ) gDirectory->pwd();
 
+          // Do the fits
+
           const std::string name( objCat + "_" + kinProp + "_" + subFit + "_" + binEta );
+
+          // Direct fit in slices of the 2-dim histogram
           TH2D * hist2D( ( TH2D* )( gDirectory->Get( name.c_str() ) ) );
           hist2D->FitSlicesY( 0, 1, hist2D->GetNbinsX(), 1 );
-
           TH1D * histSigma( ( TH1D* )( gDirectory->Get( std::string( name + "_2" ).c_str() ) ) ); // sigmas of the slice fits
           const std::string nameFunc( "fit_" + name );
           const std::string formula( inverse ? resFuncInv_ : resFunc_ );
@@ -281,11 +276,12 @@ int main( int argc, char * argv[] )
 
           const std::string nameSigma( name + "_Sigma" );
           TH1D * histSigmaPt( new TH1D( *( ( TH1D* )( histSigma->Clone( nameSigma.c_str() ) ) ) ) );
-          for ( unsigned iPt = 1; iPt < ptBins_.at( iCat ).size() - 1; ++iPt ) {
-            const std::string binPt( my::helpers::to_string( iPt ) );
+          histSigmaPt->Reset( "ICE" ); // emoty the contents
+          for ( unsigned iPt = 1; iPt < ptBins.size() - 1; ++iPt ) {
+            const std::string binPt( boost::lexical_cast< std::string >( iPt ) );
 
             const std::string namePt( name + "_Pt_" + binPt );
-            const std::string titlePt( std::string( hist2D->GetTitle() ) + ", " + my::helpers::to_string( hist2D->GetXaxis()->GetBinLowEdge( iPt ) ) + " GeV #leq p_{t} < " + my::helpers::to_string( hist2D->GetXaxis()->GetBinUpEdge( iPt ) ) + " GeV" );
+            const std::string titlePt( std::string( hist2D->GetTitle() ) + ", " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinLowEdge( iPt ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinUpEdge( iPt ) ) + " GeV" );
             const Int_t nBins( hist2D->GetNbinsY() );
             TH1D * hist1D( new TH1D( namePt.c_str(), titlePt.c_str(), nBins, hist2D->GetYaxis()->GetXmin(), hist2D->GetYaxis()->GetXmax() ) );
             hist1D->SetXTitle( hist2D->GetYaxis()->GetTitle() );
@@ -302,7 +298,7 @@ int main( int argc, char * argv[] )
               histSigmaPt->SetBinContent( iPt, funcFit->GetParameter( 2 ) );
               histSigmaPt->SetBinError( iPt, funcFit->GetParError( 2 ) );
             }
-          } // loop: iPt < ptBins_.at( iCat ).size() - 1
+          } // loop: iPt < ptBins.size() - 1
           const std::string nameFuncSigma( "fit_" + nameSigma );
           TF1 * funcSigma( new TF1( nameFuncSigma.c_str(), formula.c_str() ) );
           funcSigma->SetRange( histSigmaPt->GetXaxis()->GetXmin(), histSigmaPt->GetXaxis()->GetXmax() );

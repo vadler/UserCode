@@ -2,6 +2,8 @@
 #include <vector>
 #include <iostream>
 
+#include "boost/lexical_cast.hpp"
+
 #include <TROOT.h>
 #include <TSystem.h>
 #include <TStyle.h>
@@ -15,8 +17,6 @@
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
-
-#include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/Helpers.h"
 
 
 int main(  int argc, char * argv[] )
@@ -189,7 +189,7 @@ int main(  int argc, char * argv[] )
             TDirectory * curFit( gDirectory );
 
             for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
-              const std::string binEta( "Eta" + my::helpers::to_string( iEta ) );
+              const std::string binEta( "Eta" + boost::lexical_cast< std::string >( iEta ) );
 
               curFit->cd();
               curFit->Cd( binEta.c_str() );
