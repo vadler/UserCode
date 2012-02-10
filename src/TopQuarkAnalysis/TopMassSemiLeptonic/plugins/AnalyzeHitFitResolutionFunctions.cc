@@ -339,18 +339,7 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
     const std::string cat( objCats_.at( iCat ) );
     const bool useEt( ( cat == "UdscJet" || cat == "BJet" ) && useJetEt_ );
     TFileDirectory dir( fileService->mkdir( cat.c_str(), "" ) );
-    // N-tuple
-    data_.push_back( dir.make< TTree >( std::string( cat + "_data" ).c_str(), std::string( cat + " data" ).c_str() ) );
-    data_.back()->Branch( "MomE", &momE_, "momE/D" );
-    data_.back()->Branch( "Eta", &eta_, "eta/D" );
-    data_.back()->Branch( "Phi", &phi_, "phi/D" );
-    data_.back()->Branch( "BinEta", &binEta_, "binEta/I" );
-    data_.back()->Branch( "BinEtaSymm", &binEtaSymm_, "binEtaSymm/I" );
-    data_.back()->Branch( "MomEGen", &momEGen_, "momEGen/D" );
-    data_.back()->Branch( "EtaGen", &etaGen_, "etaGen/D" );
-    data_.back()->Branch( "PhiGen", &phiGen_, "phiGen/D" );
-    data_.back()->Branch( "BinEtaGen", &binEtaGen_, "binEtaGen/I" );
-    data_.back()->Branch( "BinEtaSymmGen", &binEtaSymmGen_, "binEtaSymmGen/I" );
+
     // Eta binning
     histos_EtaBins_.push_back( dir.make< TH1D >( std::string( cat + "_binsEta" ).c_str(), cat.c_str(), etaBins_.at( iCat ).size() - 1, etaBins_.at( iCat ).data() ) );
     histos_EtaBins_.back()->SetXTitle( "#eta" );
@@ -359,6 +348,7 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
     for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
       histos_EtaBins_.back()->Fill( ( etaBins_.at( iCat ).at( iEta ) + etaBins_.at( iCat ).at( iEta + 1 ) ) / 2., iEta ); // fill bin with mean
     }
+
     // Pt binning
     histos_PtBins_.push_back( dir.make< TH1D >( std::string( cat + "_binsPt" ).c_str(), cat.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data() ) );
     if ( useEt ) histos_PtBins_.back()->SetXTitle( "E_{t} (GeV)" );
@@ -368,6 +358,19 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
     for ( unsigned iPt = 0; iPt < ptBins_.at( iCat ).size() - 1; ++iPt ) {
       histos_PtBins_.back()->Fill( ( ptBins_.at( iCat ).at( iPt ) + ptBins_.at( iCat ).at( iPt + 1 ) ) / 2., iPt ); // fill bin with mean
     }
+
+    // N-tuple
+    data_.push_back( dir.make< TTree >( std::string( cat + "_data" ).c_str(), std::string( cat + " data" ).c_str() ) );
+    data_.back()->Branch( "MomE"         , &momE_         , "momE/D" );
+    data_.back()->Branch( "Eta"          , &eta_          , "eta/D" );
+    data_.back()->Branch( "Phi"          , &phi_          , "phi/D" );
+    data_.back()->Branch( "BinEta"       , &binEta_       , "binEta/I" );
+    data_.back()->Branch( "BinEtaSymm"   , &binEtaSymm_   , "binEtaSymm/I" );
+    data_.back()->Branch( "MomEGen"      , &momEGen_      , "momEGen/D" );
+    data_.back()->Branch( "EtaGen"       , &etaGen_       , "etaGen/D" );
+    data_.back()->Branch( "PhiGen"       , &phiGen_       , "phiGen/D" );
+    data_.back()->Branch( "BinEtaGen"    , &binEtaGen_    , "binEtaGen/I" );
+    data_.back()->Branch( "BinEtaSymmGen", &binEtaSymmGen_, "binEtaSymmGen/I" );
 
     for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
       const std::string prop( kinProps_.at( iProp ) );
