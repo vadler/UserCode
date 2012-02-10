@@ -195,7 +195,6 @@ int main( int argc, char * argv[] )
     std::vector< std::vector< Double_t > > momEGen_( etaBins_.size() - 1 );
     std::vector< std::vector< Double_t > > etaGen_( etaBins_.size() - 1 );
     std::vector< std::vector< Double_t > > phiGen_( etaBins_.size() - 1 );
-    std::cout << "DEBUG size: " << momE_.size() << std::endl;
     Double_t momE, eta, phi;
     Double_t momEGen, etaGen, phiGen;
     Int_t    binEta;
@@ -212,12 +211,12 @@ int main( int argc, char * argv[] )
     else
       if ( refGen_ ) data_->SetBranchAddress( "BinEtaGen", &binEta );
       else           data_->SetBranchAddress( "BinEta", &binEta );
-    Int_t n( ( Int_t )data_->GetEntries() );
-    std::cout << "DEBUG objCat: " << objCat << std::endl; // DEBUG
-    std::cout << "DEBUG      n: " << n      << std::endl; // DEBUG
-    for ( Int_t i = 0; i < n; ++i ) {
-      data_->GetEntry( i );
+    Int_t nEntries( ( Int_t )data_->GetEntries() );
+    std::vector< unsigned > sizeEta_( etaBins_.size() - 1 );
+    for ( Int_t iEntry = 0; iEntry < nEntries; ++iEntry ) {
+      data_->GetEntry( iEntry );
       assert( binEta <= ( Int_t )( etaBins_.size() - 1 ) ); // has to fit (and be consistent)
+      sizeEta_.at( binEta ) += 1;
       momE_.at( binEta ).push_back( momE );
       eta_.at( binEta ).push_back( eta );
       phi_.at( binEta ).push_back( phi );
@@ -312,43 +311,37 @@ int main( int argc, char * argv[] )
           // Create new 1-dim histograms from n-tuple
           TH1D * histSigmaPtNTup( new TH1D( *( ( TH1D* )( histSigma->Clone( nameSigma.c_str() ) ) ) ) );
           histSigmaPtNTup->Reset( "ICE" ); // emoty the contents to use it as "template" only     std::vector< std::vector< Double_t > > momE_( etaBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > momEPt( ptBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > etaPt( ptBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > phiPt( ptBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > momEGenPt( ptBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > etaGenPt( ptBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > phiGenPt( ptBins_.size() - 1 );
-          unsigned size( momE_.at( iEta ).size() );
-          assert( size == eta_.at( iEta ).size() );
-          assert( size == phi_.at( iEta ).size() );
-          assert( size == momEGen_.at( iEta ).size() );
-          assert( size == etaGen_.at( iEta ).size() );
-          assert( size == phiGen_.at( iEta ).size() );
-          for ( unsigned i = 0; i < size; ++i ) {
+          // Split data into p_t bins
+          std::vector< std::vector< Double_t > > momEEtaBin( ptBins_.size() - 1 );
+          std::vector< std::vector< Double_t > > etaEtaBin( ptBins_.size() - 1 );
+          std::vector< std::vector< Double_t > > phiEtaBin( ptBins_.size() - 1 );
+          std::vector< std::vector< Double_t > > momEGenEtaBin( ptBins_.size() - 1 );
+          std::vector< std::vector< Double_t > > etaGenEtaBin( ptBins_.size() - 1 );
+          std::vector< std::vector< Double_t > > phiGenEtaBin( ptBins_.size() - 1 );
+          for ( unsigned iEntryEtaBin = 0; iEntryEtaBin < sizeEta_.at( iEta ); ++iEntryEtaBin ) {
             for ( unsigned iPt = 0; iPt < ptBins_.size() - 1; ++iPt ) {
-              if ( ptBins_.at( iPt ) <= momE_.at( iEta ).at( i ) && momE_.at( iEta ).at( i ) < ptBins_.at( iPt + 1 ) ) {
-                momEPt.at( iPt ).push_back( momE_.at( iEta ).at( i ) );
-                etaPt.at( iPt ).push_back( eta_.at( iEta ).at( i ) );
-                phiPt.at( iPt ).push_back( phi_.at( iEta ).at( i ) );
-                momEGenPt.at( iPt ).push_back( momEGen_.at( iEta ).at( i ) );
-                etaGenPt.at( iPt ).push_back( etaGen_.at( iEta ).at( i ) );
-                phiGenPt.at( iPt ).push_back( phiGen_.at( iEta ).at( i ) );
+              if ( ptBins_.at( iPt ) <= momE_.at( iEta ).at( iEntryEtaBin ) && momE_.at( iEta ).at( iEntryEtaBin ) < ptBins_.at( iPt + 1 ) ) {
+                momEEtaBin.at( iPt ).push_back( momE_.at( iEta ).at( iEntryEtaBin ) );
+                etaEtaBin.at( iPt ).push_back( eta_.at( iEta ).at( iEntryEtaBin ) );
+                phiEtaBin.at( iPt ).push_back( phi_.at( iEta ).at( iEntryEtaBin ) );
+                momEGenEtaBin.at( iPt ).push_back( momEGen_.at( iEta ).at( iEntryEtaBin ) );
+                etaGenEtaBin.at( iPt ).push_back( etaGen_.at( iEta ).at( iEntryEtaBin ) );
+                phiGenEtaBin.at( iPt ).push_back( phiGen_.at( iEta ).at( iEntryEtaBin ) );
                 break;
               }
-            }
-          }
+            } // loop: iPt < ptBins_.size() - 1
+          } // loop: iEntryEtaBin < nEntries
           for ( unsigned iPt = 0; iPt < ptBins_.size() - 1; ++iPt ) {
-            std::cout << "DEBUG iPt: " << iPt << std::endl;                     // DEBUG
-            std::cout << "DEBUG size momEPt: " << momEPt.at( iPt ).size() << std::endl; // DEBUG
+            std::cout << "DEBUG Fill histos now!!!" << std::endl; // DEBUG
           }
 
-        } // loop: nextInListFit()
+        } // loop: keyEta
 
-      } // loop: nextInListProp()
+      } // loop: keyFit
 
-    } // loop: nextInListCat()
+    } // loop: keyProp
 
-  } // loop: iCat < objCats_.size(
+  } // loop: iCat < objCats_.size()
 
   // Write and close input file
   inFile->Write();

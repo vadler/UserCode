@@ -61,7 +61,7 @@ if runTest:
   process.fitter.selection = 'analyzeHitFitResolutionFunctions'
 
 # process.useExisting = cms.bool( True )
-process.useExisting = cms.bool( False ) # nothing done there yet
+process.useExisting = cms.bool( True ) # nothing done there yet
 process.existing = cms.PSet(
   resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era ) )
 )
