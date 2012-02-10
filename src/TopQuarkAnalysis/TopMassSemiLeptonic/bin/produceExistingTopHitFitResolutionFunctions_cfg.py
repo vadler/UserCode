@@ -29,6 +29,11 @@ process.existing = cms.PSet(
                                , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution_%s.txt'%( era )
                                , 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution_%s.txt'%( era )
                                )
+  # Kinematic variables to use; available: 'Pt', 'Eta', 'Phi'
+, kinematicProperties = cms.vstring( 'Pt'
+                                   , 'Eta'
+                                   , 'Phi'
+                                   )
 , resolutionFunction        = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])' )
 , resolutionFunctionInverse = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
 , outputFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era ) )
