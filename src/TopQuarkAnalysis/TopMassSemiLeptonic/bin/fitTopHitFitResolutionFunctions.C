@@ -71,6 +71,7 @@ int main( int argc, char * argv[] )
 
   // Set constants
   const std::string dirClassName( "TDirectoryFile" );
+  const std::string funcClassName( "TF1" );
 
 
   // Get existing resolution functions
@@ -95,81 +96,34 @@ int main( int argc, char * argv[] )
 
       for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
         const std::string objCat( objCats_.at( iCat ) );
-        TDirectory * dirCat = ( TDirectory* )( resolutionFile->Get( objCat.c_str() ) );
+        TDirectory * dirCat( ( TDirectory* )( resolutionFile->Get( objCat.c_str() ) ) );
         if ( ! dirCat ) {
           std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                     << "   object category '" << objCat << "' does not exist in resolution file" << std::endl;
           continue;
         }
 
-        if ( objCat == "MET" ) {
-
-          TList * listCat( dirCat->GetListOfKeys() );
-          if ( verbose_ > 3 ) listCat->Print();
-          TIter nextInListCat( listCat );
-          TKey * keyProp( ( TKey* )nextInListCat() );
+        TList * listCat( dirCat->GetListOfKeys() );
+        if ( verbose_ > 3 ) listCat->Print();
+        TIter nextInListCat( listCat );
+        while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
+          if ( std::string( keyProp->GetClassName() ) != dirClassName ) continue;
           const std::string kinProp( keyProp->GetName() );
           TDirectory * dirProp( ( TDirectory* )( dirCat->Get( kinProp.c_str() ) ) );
-          if ( ! dirProp ) {
-            std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                      << "   resolution file '" << resolutionFile_ << "' does not have directory for" << std::endl
-                      << "   object category " << objCat << std::endl
-                      << "   quantity        " << kinProp << std::endl;
-            returnStatus_ += 0x200;
-            continue;
-          }
 
-          const std::string name( "fitExist_" + objCat + "_" + kinProp );
-          TF1 * func( ( TF1* )( dirProp->Get( name.c_str() ) ) );
-          if ( ! func ) {
-            std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                      << "   resolution function '" << name << "' not found" << std::endl;
-            returnStatus_ += 0x300;
-            continue;
-          }
+          TList * listProp( dirProp->GetListOfKeys() );
+          if ( verbose_ > 3 ) listProp->Print();
+          TIter nextInListProp( listProp );
+          while ( TKey * keyEta = ( TKey* )nextInListProp() ) {
+            if ( std::string( keyEta->GetClassName() ) != funcClassName ) continue;
+            const std::string name( keyEta->GetName() );
+            if ( name.find( "InvFake" ) != std::string::npos ) continue;
 
-        } // objCat == "MET"
+            TF1 * func( ( TF1* )( dirProp->Get( name.c_str() ) ) );
 
-        else {
+          } // loop: nextInListProp()
 
-          TList * listCat( dirCat->GetListOfKeys() );
-          TIter nextInListCat( listCat );
-          if ( verbose_ > 3 ) listCat->Print();
-          while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
-            if ( std::string( keyProp->GetClassName() ) != dirClassName ) continue;
-            const std::string kinProp( keyProp->GetName() );
-            TDirectory * dirProp( ( TDirectory* )( dirCat->Get( kinProp.c_str() ) ) );
-            if ( ! dirProp ) {
-              std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                        << "   resolution file '" << resolutionFile_ << "' does not have directory for" << std::endl
-                        << "   object category " << objCat << std::endl
-                        << "   quantity        " << kinProp << std::endl;
-              returnStatus_ += 0x200;
-              continue;
-            }
-
-            TList * listProp( dirProp->GetListOfKeys() );
-            TIter nextInListProp( listProp );
-            if ( verbose_ > 3 ) listProp->Print();
-            while ( TKey * keyEta = ( TKey* )nextInListProp() ) {
-              if ( std::string( keyEta->GetClassName() ) != dirClassName ) continue;
-              const std::string binEta( keyEta->GetName() );
-              TDirectory * dirEta = ( TDirectory* )( dirProp->Get( binEta.c_str() ) );
-
-              const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
-              TF1 * func( ( TF1* )( dirEta->Get( name.c_str() ) ) );
-              if ( ! func ) {
-                std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                          << "   resolution function '" << name << "' not found" << std::endl;
-                returnStatus_ += 0x300;
-                continue;
-              }
-
-            } // loop: nextInListProp()
-
-          } // loop: nextInListCat()
-
-        } // !( objCat == "MET" )
+        } // loop: nextInListCat()
 
       } // loop: iCat < objCats_.size()
 
@@ -274,8 +228,8 @@ int main( int argc, char * argv[] )
 
     // Loop over kinematic properties
     TList * listCat( dirCat->GetListOfKeys() );
-    TIter nextInListCat( listCat );
     if ( verbose_ > 3 ) listCat->Print();
+    TIter nextInListCat( listCat );
     while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
       if ( std::string( keyProp->GetClassName() ) != dirClassName ) continue;
       const std::string kinProp( keyProp->GetName() );
@@ -283,8 +237,8 @@ int main( int argc, char * argv[] )
 
       // Loop over fit versions
       TList * listProp( dirProp->GetListOfKeys() );
-      TIter nextInListProp( listProp );
       if ( verbose_ > 3 ) listProp->Print();
+      TIter nextInListProp( listProp );
       while ( TKey * keyFit = ( TKey* )nextInListProp() ) {
         if ( std::string( keyFit->GetClassName() ) != dirClassName ) continue;
         const std::string subFit( keyFit->GetName() );
@@ -295,6 +249,7 @@ int main( int argc, char * argv[] )
 
         // Loop over eta bins
         TList * listFit( dirFit->GetListOfKeys() );
+        if ( verbose_ > 3 ) listFit->Print();
         if ( listFit->GetSize() != ( Int_t )( etaBins_.size() - 1 ) ) {
           std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                     << "   mismatch of eta binning for object category '" << objCat << "':" << std::endl
@@ -302,7 +257,6 @@ int main( int argc, char * argv[] )
                     << "       bins in binning histogram  : " << etaBins_.size() - 1         << std::endl;
         }
         TIter nextInListFit( listFit );
-        if ( verbose_ > 3 ) listFit->Print();
         while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
           if ( std::string( keyEta->GetClassName() ) != dirClassName ) continue;
           const std::string binEta( keyEta->GetName() );
