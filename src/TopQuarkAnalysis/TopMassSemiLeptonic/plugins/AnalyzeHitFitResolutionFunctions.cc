@@ -59,7 +59,7 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     virtual void analyze( const edm::Event & iEvent, const edm::EventSetup & iSetup );
 
     /// End job
-    virtual void endJob() {};
+    virtual void endJob();
 
   private:
 
@@ -99,6 +99,7 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     std::vector< std::string > kinProps_;
 
     /// Data
+    unsigned filledEvents_;
     std::vector< TTree* > data_;
     // reconstructed
     Double_t momE_;          // used momentum term, can be: E, p, E_t, p_t
@@ -360,6 +361,7 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
     }
 
     // N-tuple
+    filledEvents_ = 0;
     data_.push_back( dir.make< TTree >( std::string( cat + "_data" ).c_str(), std::string( cat + " data" ).c_str() ) );
     data_.back()->Branch( "MomE"         , &momE_         , "momE/D" );
     data_.back()->Branch( "Eta"          , &eta_          , "eta/D" );
@@ -533,7 +535,11 @@ void AnalyzeHitFitResolutionFunctions::analyze( const edm::Event & iEvent, const
           for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
             fill( iCat, iProp );
           }
+          // Fill tree
+          data_.at( iCat )->Fill(); // works only after calling 'fill' for all kinematic properties
         }
+
+        ++filledEvents_;
 
       } // Valid TTbar MC matching
       else edm::LogInfo( "AnalyzeHitFitResolutionFunctions" ) << "...no valid MC match";
@@ -542,6 +548,15 @@ void AnalyzeHitFitResolutionFunctions::analyze( const edm::Event & iEvent, const
     else edm::LogInfo( "AnalyzeHitFitResolutionFunctions" ) << "...no signal event";
 
   } // MC
+
+}
+
+
+// End job
+void AnalyzeHitFitResolutionFunctions::endJob()
+{
+
+  edm::LogInfo( "AnalyzeHitFitResolutionFunctions" ) << "Filled events: " << filledEvents_;
 
 }
 
@@ -564,7 +579,10 @@ void AnalyzeHitFitResolutionFunctions::fill( unsigned iCat, unsigned iProp )
 {
 
   const std::string cat( objCats_.at( iCat ) );
-  if ( ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) && cat == "Mu" ) || ( ttGenEvent_->isSemiLeptonic( WDecay::kElec ) && cat == "Elec" ) ) {
+  if ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) && cat == "Mu" ) {
+    fillLepton( iCat, iProp );
+  }
+  else if ( ttGenEvent_->isSemiLeptonic( WDecay::kElec ) && cat == "Elec" ) {
     fillLepton( iCat, iProp );
   }
   else if ( cat == "UdscJet" ) {
@@ -604,7 +622,8 @@ void AnalyzeHitFitResolutionFunctions::fillLepton( unsigned iCat, unsigned iProp
 void AnalyzeHitFitResolutionFunctions::fillUdscJet( unsigned iCat, unsigned iProp )
 {
 
-  const std::string index( "UdscJet_" + kinProps_.at( iProp ) );
+  const std::string cat( objCats_.at( iCat ) );
+  const std::string index( cat + "_" + kinProps_.at( iProp ) );
   const std::vector< int > jetLepCombi( ttSemiLeptonicEvent_->jetLeptonCombination( TtEvent::kGenMatch ) );
 
   pat::Jet qJet( patJets_->at( ( unsigned )jetLepCombi.at( TtSemiLepEvtPartons::LightQ ) ).correctedJet( jecLevel_, "uds" ) );
@@ -643,7 +662,8 @@ void AnalyzeHitFitResolutionFunctions::fillUdscJet( unsigned iCat, unsigned iPro
 void AnalyzeHitFitResolutionFunctions::fillBJet( unsigned iCat, unsigned iProp )
 {
 
-  const std::string index( "BJet_" + kinProps_.at( iProp ) );
+  const std::string cat( objCats_.at( iCat ) );
+  const std::string index( cat + "_" + kinProps_.at( iProp ) );
   const std::vector< int > jetLepCombi( ttSemiLeptonicEvent_->jetLeptonCombination( TtEvent::kGenMatch ) );
 
   pat::Jet hadBJet( patJets_->at( ( unsigned )jetLepCombi.at( TtSemiLepEvtPartons::HadB ) ).correctedJet( jecLevel_, "bottom" ) );
@@ -682,7 +702,8 @@ void AnalyzeHitFitResolutionFunctions::fillBJet( unsigned iCat, unsigned iProp )
 void AnalyzeHitFitResolutionFunctions::fillMET( unsigned iCat, unsigned iProp )
 {
 
-  const std::string index( "MET_" + kinProps_.at( iProp ) );
+  const std::string cat( objCats_.at( iCat ) );
+  const std::string index( cat + "_" + kinProps_.at( iProp ) );
 
   double pt( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() );
   double ptGen( ttGenEvent_->singleNeutrino()->pt() );
@@ -797,9 +818,6 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
     }
 
   }
-
-  // Finally, fill tree
-  data_.at( iCat )->Fill();
 
 }
 
