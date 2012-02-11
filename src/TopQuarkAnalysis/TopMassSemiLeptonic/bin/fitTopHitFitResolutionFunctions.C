@@ -119,7 +119,7 @@ int main( int argc, char * argv[] )
             const std::string name( keyEta->GetName() );
             if ( name.find( "InvFake" ) != std::string::npos ) continue;
 
-            TF1 * func( ( TF1* )( dirProp->Get( name.c_str() ) ) );
+//             TF1 * func( ( TF1* )( dirProp->Get( name.c_str() ) ) );
 
           } // loop: nextInListProp()
 
@@ -160,6 +160,8 @@ int main( int argc, char * argv[] )
               << argv[ 0 ] << " --> INFO:" << std::endl
               << "   fitting resolution functions from input file '" << inFile_ << "'" << std::endl;
 
+  typedef std::vector< std::vector< Double_t > > dataCont;
+
   // Loop over configured object categories
   for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
     const std::string objCat( objCats_.at( iCat ) );
@@ -188,23 +190,14 @@ int main( int argc, char * argv[] )
     }
     ptBins_.push_back( hist_PtBins->GetBinLowEdge( hist_PtBins->GetNbinsX() ) + hist_PtBins->GetBinWidth( hist_PtBins->GetNbinsX() ) );
 
-    // Read n-tuple data
-    std::vector< std::vector< Double_t > > momE_( etaBins_.size() - 1 );
-    std::vector< std::vector< Double_t > > eta_( etaBins_.size() - 1 );
-    std::vector< std::vector< Double_t > > phi_( etaBins_.size() - 1 );
-    std::vector< std::vector< Double_t > > momEGen_( etaBins_.size() - 1 );
-    std::vector< std::vector< Double_t > > etaGen_( etaBins_.size() - 1 );
-    std::vector< std::vector< Double_t > > phiGen_( etaBins_.size() - 1 );
-    Double_t momE, eta, phi;
-    Double_t momEGen, etaGen, phiGen;
+    // Read general n-tuple data
+    dataCont momEData_( etaBins_.size() - 1 );
+    dataCont momEGenData_( etaBins_.size() - 1 );
+    Double_t momEData, momEGenData;
     Int_t    binEta;
     TTree * data_( ( TTree* )( dirCat->Get( std::string( objCat + "_data" ).c_str() ) ) );
-    data_->SetBranchAddress( "MomE"  , &momE );
-    data_->SetBranchAddress( "Eta"   , &eta );
-    data_->SetBranchAddress( "Phi"   , &phi );
-    data_->SetBranchAddress( "MomEGen", &momEGen );
-    data_->SetBranchAddress( "EtaGen" , &etaGen );
-    data_->SetBranchAddress( "PhiGen" , &phiGen );
+    data_->SetBranchAddress( "MomE", &momEData );
+    data_->SetBranchAddress( "MomEGen", &momEGenData );
     if ( useSymm_ )
       if ( refGen_ ) data_->SetBranchAddress( "BinEtaSymmGen", &binEta );
       else           data_->SetBranchAddress( "BinEtaSymm", &binEta );
@@ -215,14 +208,11 @@ int main( int argc, char * argv[] )
     std::vector< unsigned > sizeEta_( etaBins_.size() - 1 );
     for ( Int_t iEntry = 0; iEntry < nEntries; ++iEntry ) {
       data_->GetEntry( iEntry );
-      assert( binEta <= ( Int_t )( etaBins_.size() - 1 ) ); // has to fit (and be consistent)
+      assert( binEta < ( Int_t )( etaBins_.size() - 1 ) ); // has to fit (and be consistent)
+      if ( binEta == -1 ) continue; // FIXME: eta out of range in analyzer; should be solved more consistently
       sizeEta_.at( binEta ) += 1;
-      momE_.at( binEta ).push_back( momE );
-      eta_.at( binEta ).push_back( eta );
-      phi_.at( binEta ).push_back( phi );
-      momEGen_.at( binEta ).push_back( momEGen );
-      etaGen_.at( binEta ).push_back( etaGen );
-      phiGen_.at( binEta ).push_back( phiGen );
+      momEData_.at( binEta ).push_back( momEData );
+      momEGenData_.at( binEta ).push_back( momEGenData );
     }
 
     // Loop over kinematic properties
@@ -233,6 +223,22 @@ int main( int argc, char * argv[] )
       if ( std::string( keyProp->GetClassName() ) != dirClassName ) continue;
       const std::string kinProp( keyProp->GetName() );
       TDirectory * dirProp( ( TDirectory* )( dirCat->Get( kinProp.c_str() ) ) );
+
+      // Read kinematic property n-tuple data
+      dataCont propData_( etaBins_.size() - 1 );
+      dataCont propGenData_( etaBins_.size() - 1 );
+      Double_t propData, propGenData;
+      std::string kinBranch;
+      if ( kinProp == "Pt" ) kinBranch = "MomE"; //FIXME: in analyzer
+      else                   kinBranch = kinProp;
+      data_->SetBranchAddress( kinBranch.c_str(), &propData );
+      data_->SetBranchAddress( std::string( kinBranch + "Gen" ).c_str(), &propGenData );
+      for ( Int_t iEntry = 0; iEntry < nEntries; ++iEntry ) {
+        data_->GetEntry( iEntry );
+        if ( binEta == -1 ) continue; // FIXME: eta out of range in analyzer; should be solved more consistently
+        propData_.at( binEta ).push_back( propData );
+        propGenData_.at( binEta ).push_back( propGenData );
+      }
 
       // Loop over fit versions
       TList * listProp( dirProp->GetListOfKeys() );
@@ -277,6 +283,7 @@ int main( int argc, char * argv[] )
           func->SetRange( histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() );
           histSigma->Fit( func, "QR" );
 
+          // FIXME: can be removed soon
           // Extract individual 1-dim histograms per p_t-bin and fit
           const std::string nameSigma( name + "_Sigma" );
           TH1D * histSigmaPt( new TH1D( *( ( TH1D* )( histSigma->Clone( nameSigma.c_str() ) ) ) ) );
@@ -285,19 +292,19 @@ int main( int argc, char * argv[] )
             const std::string binPt( boost::lexical_cast< std::string >( iPt ) );
 
             const std::string namePt( name + "_Pt_" + binPt );
-            const std::string titlePt( std::string( hist2D->GetTitle() ) + ", " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinLowEdge( iPt ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinUpEdge( iPt ) ) + " GeV" );
+            const std::string titlePt( std::string( hist2D->GetTitle() ) + ", " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinLowEdge( iPt + 1 ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinUpEdge( iPt + 1 ) ) + " GeV" );
             const Int_t nBins( hist2D->GetNbinsY() );
-            TH1D * hist1D( new TH1D( namePt.c_str(), titlePt.c_str(), nBins, hist2D->GetYaxis()->GetXmin(), hist2D->GetYaxis()->GetXmax() ) );
-            hist1D->SetXTitle( hist2D->GetYaxis()->GetTitle() );
-            hist1D->SetYTitle( hist2D->GetZaxis()->GetTitle() );
+            TH1D * hist1DPt( new TH1D( namePt.c_str(), titlePt.c_str(), nBins, hist2D->GetYaxis()->GetXmin(), hist2D->GetYaxis()->GetXmax() ) );
+            hist1DPt->SetXTitle( hist2D->GetYaxis()->GetTitle() );
+            hist1DPt->SetYTitle( hist2D->GetZaxis()->GetTitle() );
             for ( Int_t iBin = 1; iBin <= nBins; ++iBin ) {
-              hist1D->SetBinContent( iBin, hist2D->GetBinContent( iPt, iBin ) );
+              hist1DPt->SetBinContent( iBin, hist2D->GetBinContent( iPt + 1, iBin ) ); // skip underflow bin
             }
 
             const std::string nameFuncGauss( "gauss_" + namePt );
-            TF1 * funcGauss( new TF1( nameFuncGauss.c_str(), "gaus", hist1D->GetXaxis()->GetXmin(), hist1D->GetXaxis()->GetXmax() ) );
-            Int_t fitStatus( hist1D->Fit( funcGauss, "QRS" ) );
-            TF1 * funcFit( hist1D->GetFunction( nameFuncGauss.c_str() ) );
+            TF1 * funcGauss( new TF1( nameFuncGauss.c_str(), "gaus", hist1DPt->GetXaxis()->GetXmin(), hist1DPt->GetXaxis()->GetXmax() ) );
+            Int_t fitStatus( hist1DPt->Fit( funcGauss, "QRS" ) );
+            TF1 * funcFit( hist1DPt->GetFunction( nameFuncGauss.c_str() ) );
             if ( fitStatus == 0 ) {
               histSigmaPt->SetBinContent( iPt, funcFit->GetParameter( 2 ) );
               histSigmaPt->SetBinError( iPt, funcFit->GetParError( 2 ) );
@@ -310,29 +317,39 @@ int main( int argc, char * argv[] )
 
           // Create new 1-dim histograms from n-tuple
           TH1D * histSigmaPtNTup( new TH1D( *( ( TH1D* )( histSigma->Clone( nameSigma.c_str() ) ) ) ) );
-          histSigmaPtNTup->Reset( "ICE" ); // emoty the contents to use it as "template" only     std::vector< std::vector< Double_t > > momE_( etaBins_.size() - 1 );
+          histSigmaPtNTup->Reset( "ICE" ); // emoty the contents to use it as "template" only     dataCont momEData_( etaBins_.size() - 1 );
           // Split data into p_t bins
-          std::vector< std::vector< Double_t > > momEEtaBin( ptBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > etaEtaBin( ptBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > phiEtaBin( ptBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > momEGenEtaBin( ptBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > etaGenEtaBin( ptBins_.size() - 1 );
-          std::vector< std::vector< Double_t > > phiGenEtaBin( ptBins_.size() - 1 );
+          dataCont momEEtaBin( ptBins_.size() - 1 );
+          dataCont propEtaBin( ptBins_.size() - 1 );
+          dataCont propGenEtaBin( ptBins_.size() - 1 );
+          std::vector< unsigned > sizePt( ptBins_.size() - 1 );
           for ( unsigned iEntryEtaBin = 0; iEntryEtaBin < sizeEta_.at( iEta ); ++iEntryEtaBin ) {
             for ( unsigned iPt = 0; iPt < ptBins_.size() - 1; ++iPt ) {
-              if ( ptBins_.at( iPt ) <= momE_.at( iEta ).at( iEntryEtaBin ) && momE_.at( iEta ).at( iEntryEtaBin ) < ptBins_.at( iPt + 1 ) ) {
-                momEEtaBin.at( iPt ).push_back( momE_.at( iEta ).at( iEntryEtaBin ) );
-                etaEtaBin.at( iPt ).push_back( eta_.at( iEta ).at( iEntryEtaBin ) );
-                phiEtaBin.at( iPt ).push_back( phi_.at( iEta ).at( iEntryEtaBin ) );
-                momEGenEtaBin.at( iPt ).push_back( momEGen_.at( iEta ).at( iEntryEtaBin ) );
-                etaGenEtaBin.at( iPt ).push_back( etaGen_.at( iEta ).at( iEntryEtaBin ) );
-                phiGenEtaBin.at( iPt ).push_back( phiGen_.at( iEta ).at( iEntryEtaBin ) );
+              if ( ptBins_.at( iPt ) <= momEData_.at( iEta ).at( iEntryEtaBin ) && momEData_.at( iEta ).at( iEntryEtaBin ) < ptBins_.at( iPt + 1 ) ) {
+                sizePt.at( iPt ) += 1;
+                momEEtaBin.at( iPt ).push_back( momEData_.at( iEta ).at( iEntryEtaBin ) );
+                propEtaBin.at( iPt ).push_back( propData_.at( iEta ).at( iEntryEtaBin ) );
+                propGenEtaBin.at( iPt ).push_back( propGenData_.at( iEta ).at( iEntryEtaBin ) );
                 break;
               }
             } // loop: iPt < ptBins_.size() - 1
           } // loop: iEntryEtaBin < nEntries
           for ( unsigned iPt = 0; iPt < ptBins_.size() - 1; ++iPt ) {
-            std::cout << "DEBUG Fill histos now!!!" << std::endl; // DEBUG
+            if ( sizePt.at( iPt ) == 0 ) continue;
+            const std::string binPt( boost::lexical_cast< std::string >( iPt ) );
+
+            const std::string namePtNTup( name + "_PtNTup_" + binPt );
+            const std::string titlePtNTup( std::string( hist2D->GetTitle() ) + ", " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinLowEdge( iPt + 1 ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinUpEdge( iPt + 1 ) ) + " GeV" );
+            const Int_t nBinsNTup( hist2D->GetNbinsY() );
+            const Double_t sigma( histSigma->GetBinContent( iPt + 1 ) );
+            const Double_t range( sigma == 0 ? 3. * hist2D->GetYaxis()->GetXmax() : 3. * sigma ); // FIXME: tune, incl. under- and overflow
+            TH1D * hist1DPtNTup( new TH1D( namePtNTup.c_str(), titlePtNTup.c_str(), nBinsNTup, -range, range ) );
+            hist1DPtNTup->SetXTitle( hist2D->GetYaxis()->GetTitle() );
+            hist1DPtNTup->SetYTitle( hist2D->GetZaxis()->GetTitle() );
+            for ( unsigned iEntryEtaBin = 0; iEntryEtaBin < sizePt.at( iPt ); ++iEntryEtaBin ) {
+              if ( inverse ) hist1DPtNTup->Fill( 1. / propEtaBin.at( iPt ).at( iEntryEtaBin ) - 1. / propGenEtaBin.at( iPt ).at( iEntryEtaBin ) );
+              else           hist1DPtNTup->Fill( propEtaBin.at( iPt ).at( iEntryEtaBin ) - propGenEtaBin.at( iPt ).at( iEntryEtaBin ) );
+            }
           }
 
         } // loop: keyEta
