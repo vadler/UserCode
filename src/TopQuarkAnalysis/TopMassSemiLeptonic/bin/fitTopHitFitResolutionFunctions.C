@@ -70,8 +70,11 @@ int main( int argc, char * argv[] )
       std::cout << "'" << objCats_.back() << "'" << std::endl;
 
   // Set constants
-  const std::string dirClassName( "TDirectoryFile" );
-  const std::string funcClassName( "TF1" );
+  const std::string dirClassName_( "TDirectoryFile" );
+  const std::string funcClassName_( "TF1" );
+  std::string fitOptions_( "MR" );
+  if      ( verbose_ < 2 ) fitOptions_.append( "Q" );
+  else if ( verbose_ > 3 ) fitOptions_.append( "V" );
 
 
   // Get existing resolution functions
@@ -107,7 +110,7 @@ int main( int argc, char * argv[] )
         if ( verbose_ > 3 ) listCat->Print();
         TIter nextInListCat( listCat );
         while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
-          if ( std::string( keyProp->GetClassName() ) != dirClassName ) continue;
+          if ( std::string( keyProp->GetClassName() ) != dirClassName_ ) continue;
           const std::string kinProp( keyProp->GetName() );
           TDirectory * dirProp( ( TDirectory* )( dirCat->Get( kinProp.c_str() ) ) );
 
@@ -115,7 +118,7 @@ int main( int argc, char * argv[] )
           if ( verbose_ > 3 ) listProp->Print();
           TIter nextInListProp( listProp );
           while ( TKey * keyEta = ( TKey* )nextInListProp() ) {
-            if ( std::string( keyEta->GetClassName() ) != funcClassName ) continue;
+            if ( std::string( keyEta->GetClassName() ) != funcClassName_ ) continue;
             const std::string name( keyEta->GetName() );
             if ( name.find( "InvFake" ) != std::string::npos ) continue;
 
@@ -177,16 +180,16 @@ int main( int argc, char * argv[] )
     // Eta binning
     std::vector< double > etaBins_;
     TH1D * hist_EtaBins( ( TH1D* )( dirCat->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
-    for ( int iEta = 1; iEta <= hist_EtaBins->GetNbinsX(); ++iEta ) {
-      etaBins_.push_back( hist_EtaBins->GetBinLowEdge( iEta ) );
+    for ( int iEta = 0; iEta < hist_EtaBins->GetNbinsX(); ++iEta ) {
+      etaBins_.push_back( hist_EtaBins->GetBinLowEdge( iEta + 1 ) );
     }
     etaBins_.push_back( hist_EtaBins->GetBinLowEdge( hist_EtaBins->GetNbinsX() ) + hist_EtaBins->GetBinWidth( hist_EtaBins->GetNbinsX() ) );
 
     // Pt binning
     std::vector< double > ptBins_;
     TH1D * hist_PtBins( ( TH1D* )( dirCat->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
-    for ( int iPt = 1; iPt <= hist_PtBins->GetNbinsX(); ++iPt ) {
-      ptBins_.push_back( hist_PtBins->GetBinLowEdge( iPt ) );
+    for ( int iPt = 0; iPt < hist_PtBins->GetNbinsX(); ++iPt ) {
+      ptBins_.push_back( hist_PtBins->GetBinLowEdge( iPt + 1 ) );
     }
     ptBins_.push_back( hist_PtBins->GetBinLowEdge( hist_PtBins->GetNbinsX() ) + hist_PtBins->GetBinWidth( hist_PtBins->GetNbinsX() ) );
 
@@ -220,7 +223,7 @@ int main( int argc, char * argv[] )
     if ( verbose_ > 3 ) listCat->Print();
     TIter nextInListCat( listCat );
     while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
-      if ( std::string( keyProp->GetClassName() ) != dirClassName ) continue;
+      if ( std::string( keyProp->GetClassName() ) != dirClassName_ ) continue;
       const std::string kinProp( keyProp->GetName() );
       TDirectory * dirProp( ( TDirectory* )( dirCat->Get( kinProp.c_str() ) ) );
 
@@ -245,7 +248,7 @@ int main( int argc, char * argv[] )
       if ( verbose_ > 3 ) listProp->Print();
       TIter nextInListProp( listProp );
       while ( TKey * keyFit = ( TKey* )nextInListProp() ) {
-        if ( std::string( keyFit->GetClassName() ) != dirClassName ) continue;
+        if ( std::string( keyFit->GetClassName() ) != dirClassName_ ) continue;
         const std::string subFit( keyFit->GetName() );
         TDirectory * dirFit = ( TDirectory* )( dirProp->Get( subFit.c_str() ) );
 
@@ -263,7 +266,7 @@ int main( int argc, char * argv[] )
         }
         TIter nextInListFit( listFit );
         while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
-          if ( std::string( keyEta->GetClassName() ) != dirClassName ) continue;
+          if ( std::string( keyEta->GetClassName() ) != dirClassName_ ) continue;
           const std::string binEta( keyEta->GetName() );
           const unsigned iEta( std::atoi( binEta.substr( 3 ).data() ) );
           dirFit->cd( binEta.c_str() );
@@ -281,7 +284,7 @@ int main( int argc, char * argv[] )
           const std::string formula( inverse ? resFuncInv_ : resFunc_ );
           TF1 * func( new TF1( nameFunc.c_str(), formula.c_str() ) );
           func->SetRange( histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() );
-          histSigma->Fit( func, "QR" );
+          histSigma->Fit( func, fitOptions_.c_str() );
 
           // FIXME: can be removed soon
           // Extract individual 1-dim histograms per p_t-bin and fit
@@ -297,26 +300,27 @@ int main( int argc, char * argv[] )
             TH1D * hist1DPt( new TH1D( namePt.c_str(), titlePt.c_str(), nBins, hist2D->GetYaxis()->GetXmin(), hist2D->GetYaxis()->GetXmax() ) );
             hist1DPt->SetXTitle( hist2D->GetYaxis()->GetTitle() );
             hist1DPt->SetYTitle( hist2D->GetZaxis()->GetTitle() );
-            for ( Int_t iBin = 1; iBin <= nBins; ++iBin ) {
-              hist1DPt->SetBinContent( iBin, hist2D->GetBinContent( iPt + 1, iBin ) ); // skip underflow bin
+            for ( Int_t iBin = 0; iBin < nBins; ++iBin ) {
+              hist1DPt->SetBinContent( iBin, hist2D->GetBinContent( iPt + 1, iBin + 1 ) ); // skip underflow bin
             }
 
             const std::string nameFuncGauss( "gauss_" + namePt );
             TF1 * funcGauss( new TF1( nameFuncGauss.c_str(), "gaus", hist1DPt->GetXaxis()->GetXmin(), hist1DPt->GetXaxis()->GetXmax() ) );
-            Int_t fitStatus( hist1DPt->Fit( funcGauss, "QRS" ) );
+            Int_t fitStatus( hist1DPt->Fit( funcGauss, "QR" ) );
             TF1 * funcFit( hist1DPt->GetFunction( nameFuncGauss.c_str() ) );
             if ( fitStatus == 0 ) {
-              histSigmaPt->SetBinContent( iPt, funcFit->GetParameter( 2 ) );
-              histSigmaPt->SetBinError( iPt, funcFit->GetParError( 2 ) );
+              histSigmaPt->SetBinContent( iPt + 1, funcFit->GetParameter( 2 ) );
+              histSigmaPt->SetBinError( iPt + 1, funcFit->GetParError( 2 ) );
             }
           } // loop: iPt < ptBins_.size() - 1
           const std::string nameFuncSigma( "fit_" + nameSigma );
           TF1 * funcSigma( new TF1( nameFuncSigma.c_str(), formula.c_str() ) );
           funcSigma->SetRange( histSigmaPt->GetXaxis()->GetXmin(), histSigmaPt->GetXaxis()->GetXmax() );
-          histSigmaPt->Fit( funcSigma, "QR" );
+          histSigmaPt->Fit( funcSigma, fitOptions_.c_str() );
 
           // Create new 1-dim histograms from n-tuple
-          TH1D * histSigmaPtNTup( new TH1D( *( ( TH1D* )( histSigma->Clone( nameSigma.c_str() ) ) ) ) );
+          const std::string nameSigmaNTup( name + "NTup_Sigma" );
+          TH1D * histSigmaPtNTup( new TH1D( *( ( TH1D* )( histSigma->Clone( nameSigmaNTup.c_str() ) ) ) ) );
           histSigmaPtNTup->Reset( "ICE" ); // emoty the contents to use it as "template" only     dataCont momEData_( etaBins_.size() - 1 );
           // Split data into p_t bins
           dataCont momEEtaBin( ptBins_.size() - 1 );
@@ -335,22 +339,53 @@ int main( int argc, char * argv[] )
             } // loop: iPt < ptBins_.size() - 1
           } // loop: iEntryEtaBin < nEntries
           for ( unsigned iPt = 0; iPt < ptBins_.size() - 1; ++iPt ) {
-            if ( sizePt.at( iPt ) == 0 ) continue;
+            if ( sizePt.at( iPt ) == 0 ) {
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                          << "   empty bin in '" << name << "'" << std::endl
+                          << "       for p_t bin" << iPt  << std::endl;
+              }
+              continue;
+            }
             const std::string binPt( boost::lexical_cast< std::string >( iPt ) );
 
+            const std::string namePt( name + "_Pt_" + binPt );
+            TH1D * hist1DPt( ( TH1D* )( gDirectory->Get( namePt.c_str() ) ) );
             const std::string namePtNTup( name + "_PtNTup_" + binPt );
-            const std::string titlePtNTup( std::string( hist2D->GetTitle() ) + ", " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinLowEdge( iPt + 1 ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinUpEdge( iPt + 1 ) ) + " GeV" );
-            const Int_t nBinsNTup( hist2D->GetNbinsY() );
-            const Double_t sigma( histSigma->GetBinContent( iPt + 1 ) );
-            const Double_t range( sigma == 0 ? 3. * hist2D->GetYaxis()->GetXmax() : 3. * sigma ); // FIXME: tune, incl. under- and overflow
+//             const std::string titlePtNTup( std::string( hist2D->GetTitle() ) + ", " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinLowEdge( iPt + 1 ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( hist2D->GetXaxis()->GetBinUpEdge( iPt + 1 ) ) + " GeV" );
+//             const Int_t nBinsNTup( hist2D->GetNbinsY() ); // FIXME: tune number of bins,
+//             const Double_t sigma( std::fabs( histSigma->GetBinContent( iPt + 1 ) ) );
+            const std::string titlePtNTup( hist1DPt->GetTitle() );
+            const Int_t nBinsNTup( hist1DPt->GetNbinsX() ); // FIXME: tune number of bins,
+            const Double_t sigma( std::fabs( histSigma->GetBinContent( iPt + 1 ) ) );
+            const Double_t width( sigma == 0. ? std::fabs( hist1DPt->GetRMS() ) : sigma ); // FIXME: Hmm...
+            if ( width == 0. && verbose_ > 2 ) {
+              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                        << "   no sigma nor RMS in '" << name << "'" << std::endl
+                        << "       for p_t bin" << iPt  << std::endl;
+            }
+            const Double_t range( width == 0. ? 3. * std::fabs( hist1DPt->GetXaxis()->GetXmax() ) : 3. * width ); // FIXME: tune, incl. under- and overflow, remove hard-coding
             TH1D * hist1DPtNTup( new TH1D( namePtNTup.c_str(), titlePtNTup.c_str(), nBinsNTup, -range, range ) );
-            hist1DPtNTup->SetXTitle( hist2D->GetYaxis()->GetTitle() );
-            hist1DPtNTup->SetYTitle( hist2D->GetZaxis()->GetTitle() );
+            hist1DPtNTup->SetXTitle( hist1DPt->GetXaxis()->GetTitle() );
+            hist1DPtNTup->SetYTitle( hist1DPt->GetYaxis()->GetTitle() );
             for ( unsigned iEntryEtaBin = 0; iEntryEtaBin < sizePt.at( iPt ); ++iEntryEtaBin ) {
               if ( inverse ) hist1DPtNTup->Fill( 1. / propEtaBin.at( iPt ).at( iEntryEtaBin ) - 1. / propGenEtaBin.at( iPt ).at( iEntryEtaBin ) );
               else           hist1DPtNTup->Fill( propEtaBin.at( iPt ).at( iEntryEtaBin ) - propGenEtaBin.at( iPt ).at( iEntryEtaBin ) );
             }
-          }
+
+            const std::string nameFuncGaussNTup( "gauss_" + namePtNTup );
+            TF1 * funcGaussNTup( new TF1( nameFuncGaussNTup.c_str(), "gaus", hist1DPtNTup->GetXaxis()->GetXmin(), hist1DPtNTup->GetXaxis()->GetXmax() ) );
+            Int_t fitStatusNTup( hist1DPtNTup->Fit( funcGaussNTup, "QR" ) );
+            TF1 * funcFitNTup( hist1DPtNTup->GetFunction( nameFuncGaussNTup.c_str() ) );
+            if ( fitStatusNTup == 0 ) {
+              histSigmaPtNTup->SetBinContent( iPt + 1, funcFitNTup->GetParameter( 2 ) );
+              histSigmaPtNTup->SetBinError( iPt + 1, funcFitNTup->GetParError( 2 ) );
+            }  // loop: iPt < ptBins_.size() - 1
+          }  // loop: iEntryEtaBin < sizePt.at( iPt )
+          const std::string nameFuncSigmaNTup( "fit_" + nameSigmaNTup );
+          TF1 * funcSigmaNTup( new TF1( nameFuncSigmaNTup.c_str(), formula.c_str() ) );
+          funcSigmaNTup->SetRange( histSigmaPtNTup->GetXaxis()->GetXmin(), histSigmaPtNTup->GetXaxis()->GetXmax() );
+          histSigmaPtNTup->Fit( funcSigmaNTup, fitOptions_.c_str() );
 
         } // loop: keyEta
 
