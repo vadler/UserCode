@@ -744,11 +744,11 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
     }
     else if ( prop == "Eta" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, eta - etaGen );
-      histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / eta - 1. / etaGen );
+      histos_RecoInv_[ index ].at( iEta )->Fill( pt, eta - etaGen );
     }
     else if ( prop == "Phi" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - phiGen ) );
-      histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / phi - 1. / phiGen );
+      histos_RecoInv_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - phiGen ) );
     }
   }
 
@@ -765,11 +765,11 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
       }
       else if ( prop == "Eta" ) {
         histos_Gen_[ index ].at( iEta )->Fill( ptGen, etaGen - eta );
-        histos_GenInv_[ index ].at( iEta )->Fill( ptGen, 1. / etaGen - 1. / eta );
+        histos_GenInv_[ index ].at( iEta )->Fill( ptGen, etaGen - eta );
       }
       else if ( prop == "Phi" ) {
         histos_Gen_[ index ].at( iEta )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
-        histos_GenInv_[ index ].at( iEta )->Fill( ptGen, 1. / phiGen - 1. / phi );
+        histos_GenInv_[ index ].at( iEta )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
       }
     }
   }
@@ -787,11 +787,11 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
       }
       else if ( prop == "Eta" ) {
         histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - etaGen );
-        histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / eta - 1. / etaGen );
+        histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - etaGen );
       }
       else if ( prop == "Phi" ) {
         histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - phiGen ) );
-        histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / phi - 1. / phiGen );
+        histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - phiGen ) );
       }
     }
 
@@ -808,11 +808,11 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
         }
         else if ( prop == "Eta" ) {
           histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, etaGen - eta );
-          histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / etaGen - 1. / eta );
+          histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, etaGen - eta );
         }
         else if ( prop == "Phi" ) {
           histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
-          histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / phiGen - 1. / phi );
+          histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
         }
       }
     }
