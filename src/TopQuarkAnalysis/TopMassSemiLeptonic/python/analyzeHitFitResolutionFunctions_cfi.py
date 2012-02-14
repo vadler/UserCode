@@ -15,7 +15,6 @@ analyzeHitFitResolutionFunctions = cms.EDAnalyzer(
 , useSymm = cms.bool( False ) # add histograms adding up symmetric bins in eta
 
   # Switches for kinematic variables
-, usePtRel = cms.bool( False )
 , useJetEt = cms.bool( False )
 
   # Leptons to use

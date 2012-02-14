@@ -75,7 +75,6 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     edm::InputTag ttSemiLeptonicEventTag_;
     bool refGen_;
     bool useSymm_;
-    bool usePtRel_;
     bool useJetEt_;
     bool useMuons_;
     bool useElecs_;
@@ -178,7 +177,6 @@ AnalyzeHitFitResolutionFunctions::AnalyzeHitFitResolutionFunctions( const edm::P
 , ttSemiLeptonicEventTag_( iConfig.getParameter< edm::InputTag >( "ttSemiLeptonicEvent" ) )
 , refGen_( iConfig.getParameter< bool >( "refGen" ) )
 , useSymm_( iConfig.getParameter< bool >( "useSymm" ) )
-, usePtRel_( iConfig.getParameter< bool >( "usePtRel" ) )
 , useJetEt_( iConfig.getParameter< bool >( "useJetEt" ) )
 , useMuons_( iConfig.getParameter< bool >( "useMuons" ) )
 , useElecs_( iConfig.getParameter< bool >( "useElectrons" ) )
@@ -330,8 +328,7 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
   yTitles.push_back( "#Delta#eta" );
   yTitles.push_back( "#Delta#phi" );
   std::vector< std::string > yTitlesInv;
-  if ( usePtRel_ ) yTitlesInv.push_back( "#frac{#Deltap_{t}}{p_{t}}" );
-  else             yTitlesInv.push_back( "#Delta#frac{1}{p_{t}} (#frac{1}{GeV})" );
+  yTitlesInv.push_back( "#Delta#frac{1}{p_{t}} (#frac{1}{GeV})" );
   yTitlesInv.push_back( "#Delta#frac{1}{#eta}" );
   yTitlesInv.push_back( "#Delta#frac{1}{#phi}" );
   const std::string zTitle( "events" );
@@ -739,8 +736,7 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
     binEta_ = iEta;
     if ( prop == "Pt" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, pt - ptGen );
-      if ( usePtRel_ ) histos_RecoInv_[ index ].at( iEta )->Fill( pt, ( pt - ptGen ) / pt );
-      else             histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / pt - 1. / ptGen );
+      histos_RecoInv_[ index ].at( iEta )->Fill( pt, 1. / pt - 1. / ptGen );
     }
     else if ( prop == "Eta" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, eta - etaGen );
@@ -760,8 +756,7 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
       binEtaGen_ = iEta;
       if ( prop == "Pt" ) {
         histos_Gen_[ index ].at( iEta )->Fill( ptGen, ptGen - pt );
-        if ( usePtRel_ ) histos_GenInv_[ index ].at( iEta )->Fill( ptGen, ( ptGen - pt ) / ptGen );
-        else             histos_GenInv_[ index ].at( iEta )->Fill( ptGen, 1. / ptGen - 1. / pt );
+        histos_GenInv_[ index ].at( iEta )->Fill( ptGen, 1. / ptGen - 1. / pt );
       }
       else if ( prop == "Eta" ) {
         histos_Gen_[ index ].at( iEta )->Fill( ptGen, etaGen - eta );
@@ -782,8 +777,7 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
       binEtaSymm_ = iEtaSymm;
       if ( prop == "Pt" ) {
         histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, pt - ptGen );
-        if ( usePtRel_ ) histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, ( pt - ptGen ) / pt );
-        else             histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / pt - 1. / ptGen );
+        histos_RecoInvSymm_[ index ].at( iEtaSymm )->Fill( pt, 1. / pt - 1. / ptGen );
       }
       else if ( prop == "Eta" ) {
         histos_RecoSymm_[ index ].at( iEtaSymm )->Fill( pt, eta - etaGen );
@@ -803,8 +797,7 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
         binEtaSymmGen_ = iEtaSymm;
         if ( prop == "Pt" ) {
           histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ptGen - pt );
-          if ( usePtRel_ ) histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ( ptGen - pt ) / ptGen );
-          else             histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / ptGen - 1. / pt );
+          histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / ptGen - 1. / pt );
         }
         else if ( prop == "Eta" ) {
           histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, etaGen - eta );

@@ -18,7 +18,6 @@ skimProcess = 'SKIM'
 # Settings
 refGen   = False
 useSymm  = False
-usePtRel = False # ( Delta p_t ) / p_t instead of Delta ( 1 / p_t ) in inverse p_t
 useJetEt = False
 
 ### Initialization
@@ -74,8 +73,7 @@ process.maxEvents = cms.untracked.PSet(
 ### Output
 
 outputFile = '%s/output/analyzeHitFitResolutionFunctions_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
-if usePtRel:
-  outputFile = outputFile.replace( '.root', '_ptRel.root' )
+
 if useJetEt:
   outputFile = outputFile.replace( '.root', '_jetEt.root' )
 if runTest:
@@ -106,7 +104,6 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'refer
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.analyzeHitFitResolutionFunctions_cfi" )
 process.analyzeHitFitResolutionFunctions.refGen              = refGen
 process.analyzeHitFitResolutionFunctions.useSymm             = useSymm
-process.analyzeHitFitResolutionFunctions.usePtRel            = usePtRel
 process.analyzeHitFitResolutionFunctions.useJetEt            = useJetEt
 process.analyzeHitFitResolutionFunctions.jecLevel            = 'L3Absolute'
 process.analyzeHitFitResolutionFunctions.muonResolutions     = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution_%s.txt'%( era )
