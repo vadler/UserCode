@@ -101,42 +101,27 @@ int main(  int argc, char * argv[] )
 
         for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
           std::string kinProp( kinProps_.at( iProp ) );
-          bool inverse( false );
-          bool inverseFake( false );
           hitfit::Resolution res;
           if ( kinProp == "Pt" ) {
             res = hitfit::Resolution( vecRes.p_res() );
-            if ( res.inverse() ) inverse = true;
           }
           else if ( kinProp == "Eta" ) {
             res = hitfit::Resolution( vecRes.eta_res() );
-            if ( res.inverse() ) inverseFake = true;
           }
           else if ( kinProp == "Phi" ) {
             res = hitfit::Resolution( vecRes.phi_res() );
-            if ( res.inverse() ) inverseFake = true;
           }
           TDirectory * dirProp;
           if ( iResElem == 0 ) dirProp = dirCat->mkdir( kinProp.c_str(), kinProp.c_str() );
           else                 dirProp = ( TDirectory* )( dirCat->Get( kinProp.c_str() ) );
           dirProp->cd();
 
-          if ( inverse ) kinProp.append( std::string( "Inv" ) );
-          const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
-          const std::string title( objCat + ", " + kinProp + ", " + boost::lexical_cast< std::string >( etaMin ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaMax ) + ( inverse ? ", inv." : "" ) );
-          TF1 * func = new TF1( name.c_str(), inverse ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
+          const std::string inverse( res.inverse() ? "_Inv" : "" );
+          const std::string name( "fitExist_" + objCat + inverse + "_" + kinProp + "_" + binEta );
+          const std::string title( objCat + ", " + kinProp + ", " + boost::lexical_cast< std::string >( etaMin ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaMax ) + ( res.inverse() ? ", inv." : "" ) );
+          TF1 * func = new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
           func->SetParameters( res.C(), res.R(), res.N() );
           func->Write();
-
-          assert( inverse * inverseFake != true );
-          if ( inverseFake ) {
-            std::string kinPropFake( kinProp + "InvFake" );
-            const std::string nameFake( "fitExist_" + objCat + "_" + kinPropFake + "_" + binEta );
-            const std::string titleFake( objCat + ", " + kinProp + ", " + boost::lexical_cast< std::string >( etaMin ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaMax ) + ( inverse ? ", inv. (fake)" : "" ) );
-            TF1 * funcFake = new TF1( nameFake.c_str(), resFuncInv_.c_str(), 0., objLimits_.at( iCat ) );
-            funcFake->SetParameters( res.C(), res.R(), res.N() );
-            funcFake->Write();
-          }
 
         }
       }
