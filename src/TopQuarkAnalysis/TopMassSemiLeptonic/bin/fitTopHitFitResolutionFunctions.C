@@ -341,7 +341,7 @@ int main( int argc, char * argv[] )
           std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                     << "   mismatch of eta binning for object category '" << objCat << "':" << std::endl
                     << "       bins in directory structure: " << listFit->GetSize()         << std::endl
-                    << "       bins in binning histogram  : " << nEtaBins_         << std::endl;
+                    << "       bins in binning histogram  : " << nEtaBins_                  << std::endl;
         }
         TIter nextInListFit( listFit );
         while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
@@ -365,11 +365,11 @@ int main( int argc, char * argv[] )
           TF1 * fitSigma2D2( new TF1( nameFitSigma2D2.c_str(), formula.c_str() ) );
           fitSigma2D2->SetRange( histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() );
           TFitResultPtr fitSigma2D2ResultPtr( histSigma2D2->Fit( fitSigma2D2, optionsFitSigma_.c_str() ) );
-          if ( fitSigma2D2ResultPtr >= 0 && fitSigma2D2ResultPtr->Status() == 0 ) {
+          if ( fitSigma2D2ResultPtr->Status() == 0 || fitSigma2D2ResultPtr->Status() == 4000 ) { // ignore errors from IMPROVE
             hist2D2Chi2Map->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Chi2() / fitSigma2D2ResultPtr->Ndf() );
             hist2D2ProbMap->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Prob() );
             hist2D2Prob->Fill( fitSigma2D2ResultPtr->Prob() );
-            if ( objCat == "Pt" ) {
+            if ( kinProp == "Pt" ) {
               const Double_t * params( fitSigma2D2ResultPtr->GetParams() );
               const std::string nameFitSigma2D2Rel( nameFitSigma2D2 + "Rel" );
               TF1 * fitSigma2D2Rel( new TF1( nameFitSigma2D2Rel.c_str(), formulaRel.c_str(), histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() ) );
@@ -382,6 +382,13 @@ int main( int argc, char * argv[] )
                 fitSigma2D2Inv->Write();
               }
             }
+          }
+          else if ( verbose_ > 1 ) {
+            std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                      << "   failing fit in directory '";
+            gDirectory->pwd();
+            std::cout << "':" << std::endl
+                      << "       '" << nameFitSigma2D2 << "' status: " << fitSigma2D2ResultPtr->Status() << std::endl;
           }
 
           // FIXME: can be removed soon -- really?
@@ -426,11 +433,11 @@ int main( int argc, char * argv[] )
           TF1 * fitSigma( new TF1( nameFitSigma.c_str(), formula.c_str() ) );
           fitSigma->SetRange( histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() );
           TFitResultPtr fitSigmaResultPtr( histSigma->Fit( fitSigma, std::string( optionsFitSigma_ ).c_str() ) );
-          if ( fitSigmaResultPtr >= 0 && fitSigmaResultPtr->Status() == 0 ) {
+          if ( fitSigmaResultPtr->Status() == 0 || fitSigmaResultPtr->Status() == 4000 ) { // ignore errors from IMPROVE
             histSigmaChi2Map->SetBinContent( uEta + 1, fitSigmaResultPtr->Chi2() / fitSigmaResultPtr->Ndf() );
             histSigmaProbMap->SetBinContent( uEta + 1, fitSigmaResultPtr->Prob() );
             histSigmaProb->Fill( fitSigmaResultPtr->Prob() );
-            if ( objCat == "Pt" ) {
+            if ( kinProp == "Pt" ) {
               const Double_t * params( fitSigmaResultPtr->GetParams() );
               const std::string nameFitSigmaRel( nameFitSigma + "Rel" );
               TF1 * fitSigmaRel( new TF1( nameFitSigmaRel.c_str(), formulaRel.c_str(), histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() ) );
@@ -443,6 +450,13 @@ int main( int argc, char * argv[] )
                 fitSigmaInv->Write();
               }
             }
+          }
+          else if ( verbose_ > 1 ) {
+            std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                      << "   failing fit in directory '";
+            gDirectory->pwd();
+            std::cout << "':" << std::endl
+                      << "       '" << nameFitSigma << "' status: " << fitSigmaResultPtr->Status() << std::endl;
           }
 
           // Create new 1-dim histograms from n-tuple
@@ -476,7 +490,7 @@ int main( int argc, char * argv[] )
             if ( sizePt.at( uPt ) == 0 ) {
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                          << "   empty bin in '" << name << "' for p_t bin" << uPt  << std::endl;
+                          << "   empty bin in '" << name << "' for p_t bin " << uPt  << std::endl;
               }
               continue;
             }
@@ -527,11 +541,11 @@ int main( int argc, char * argv[] )
           TF1 * fitSigmaNtup( new TF1( nameFitSigmaNtup.c_str(), formula.c_str() ) );
           fitSigmaNtup->SetRange( histSigmaNtup->GetXaxis()->GetXmin(), histSigmaNtup->GetXaxis()->GetXmax() );
           TFitResultPtr fitSigmaNtupResultPtr( histSigmaNtup->Fit( fitSigmaNtup, std::string( optionsFitSigma_ ).c_str() ) );
-          if ( fitSigmaNtupResultPtr >= 0 && fitSigmaNtupResultPtr->Status() == 0 ) {
+          if ( fitSigmaNtupResultPtr->Status() == 0 || fitSigmaNtupResultPtr->Status() == 4000 ) { // ignore errors from IMPROVE
             histSigmaNtupChi2Map->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Chi2() / fitSigmaNtupResultPtr->Ndf() );
             histSigmaNtupProbMap->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Prob() );
             histSigmaNtupProb->Fill( fitSigmaNtupResultPtr->Prob() );
-            if ( objCat == "Pt" ) {
+            if ( kinProp == "Pt" ) {
               const Double_t * params( fitSigmaNtupResultPtr->GetParams() );
               const std::string nameFitSigmaNtupRel( nameFitSigmaNtup + "Rel" );
               TF1 * fitSigmaNtupRel( new TF1( nameFitSigmaNtupRel.c_str(), formulaRel.c_str(), histSigmaNtup->GetXaxis()->GetXmin(), histSigmaNtup->GetXaxis()->GetXmax() ) );
@@ -544,6 +558,13 @@ int main( int argc, char * argv[] )
                 fitSigmaNtupInv->Write();
               }
             }
+          }
+          else if ( verbose_ > 1 ) {
+            std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                      << "   failing fit in directory '";
+            gDirectory->pwd();
+            std::cout << "':" << std::endl
+                      << "       '" << nameFitSigmaNtup << "' status: " << fitSigmaNtupResultPtr->Status() << std::endl;
           }
 
         } // loop: keyEta
