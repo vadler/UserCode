@@ -101,13 +101,13 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     unsigned filledEvents_;
     std::vector< TTree* > data_;
     // reconstructed
-    Double_t momE_;          // used momentum term, can be: E, p, E_t, p_t
+    Double_t pt_;            // used momentum term, can be: E, p, E_t, p_t
     Double_t eta_;
     Double_t phi_;
     Int_t    binEta_;        // eta bin number as determined by 'getEtaBin'
     Int_t    binEtaSymm_;    // symmetrised eta bin number as determined by 'getEtaBin'
     // generated
-    Double_t momEGen_;       // used momentum term, can be: E, p, E_t, p_t
+    Double_t ptGen_;         // used momentum term, can be: E, p, E_t, p_t
     Double_t etaGen_;
     Double_t phiGen_;
     Int_t    binEtaGen_;     // eta bin number as determined by 'getEtaBin'
@@ -360,12 +360,12 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
     // N-tuple
     filledEvents_ = 0;
     data_.push_back( dir.make< TTree >( std::string( cat + "_data" ).c_str(), std::string( cat + " data" ).c_str() ) );
-    data_.back()->Branch( "MomE"         , &momE_         , "momE/D" );
+    data_.back()->Branch( "Pt"           , &pt_           , "pt/D" );
     data_.back()->Branch( "Eta"          , &eta_          , "eta/D" );
     data_.back()->Branch( "Phi"          , &phi_          , "phi/D" );
     data_.back()->Branch( "BinEta"       , &binEta_       , "binEta/I" );
     data_.back()->Branch( "BinEtaSymm"   , &binEtaSymm_   , "binEtaSymm/I" );
-    data_.back()->Branch( "MomEGen"      , &momEGen_      , "momEGen/D" );
+    data_.back()->Branch( "PtGen"        , &ptGen_        , "ptGen/D" );
     data_.back()->Branch( "EtaGen"       , &etaGen_       , "etaGen/D" );
     data_.back()->Branch( "PhiGen"       , &phiGen_       , "phiGen/D" );
     data_.back()->Branch( "BinEtaGen"    , &binEtaGen_    , "binEtaGen/I" );
@@ -718,12 +718,12 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
 {
 
   // Fill n-tuple
-   momE_          = pt;
+   pt_          = pt;
    eta_           = eta;
    phi_           = phi;
    binEta_        = -1; // initialise
    binEtaSymm_    = -1; // initialise
-   momEGen_       = ptGen;
+   ptGen_       = ptGen;
    etaGen_        = etaGen;
    phiGen_        = phiGen;
    binEtaGen_     = -1; // initialise
