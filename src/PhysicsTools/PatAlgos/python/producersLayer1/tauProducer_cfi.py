@@ -127,4 +127,3 @@ patTaus = cms.EDProducer("PATTauProducer",
     resolutions     = cms.PSet()
 )
 
-
