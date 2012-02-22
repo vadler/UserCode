@@ -204,14 +204,14 @@ int main( int argc, char * argv[] )
     const unsigned nPtBins_( ptBins_.size() - 1 );
 
     // Read general n-tuple data
-    dataCont momEData_( nEtaBins_ );
-    dataCont momEGenData_( nEtaBins_ );
-    Double_t momEData;
-    Double_t momEGenData;
+    dataCont ptData_( nEtaBins_ );
+    dataCont ptGenData_( nEtaBins_ );
+    Double_t ptData;
+    Double_t ptGenData;
     Int_t    iEta;
     TTree * data_( ( TTree* )( dirCat_->Get( std::string( objCat + "_data" ).c_str() ) ) );
-    data_->SetBranchAddress( "MomE", &momEData );
-    data_->SetBranchAddress( "MomEGen", &momEGenData );
+    data_->SetBranchAddress( "Pt", &ptData );
+    data_->SetBranchAddress( "PtGen", &ptGenData );
     if ( useSymm_ )
       if ( refGen_ ) data_->SetBranchAddress( "BinEtaSymmGen", &iEta );
       else           data_->SetBranchAddress( "BinEtaSymm", &iEta );
@@ -225,8 +225,8 @@ int main( int argc, char * argv[] )
       assert( iEta < ( Int_t )( nEtaBins_ ) ); // has to fit (and be consistent)
       if ( iEta == -1 ) continue; // FIXME: eta out of range in analyzer; should be solved more consistently
       sizeEta_.at( iEta ) += 1;
-      momEData_.at( iEta ).push_back( momEData );
-      momEGenData_.at( iEta ).push_back( momEGenData );
+      ptData_.at( iEta ).push_back( ptData );
+      ptGenData_.at( iEta ).push_back( ptGenData );
     }
 
     // Loop over kinematic properties
@@ -243,11 +243,8 @@ int main( int argc, char * argv[] )
       dataCont propGenData_( nEtaBins_ );
       Double_t propData;
       Double_t propGenData;
-      std::string kinBranch;
-      if ( kinProp == "Pt" ) kinBranch = "MomE"; //FIXME: in analyzer
-      else                   kinBranch = kinProp;
-      data_->SetBranchAddress( kinBranch.c_str(), &propData );
-      data_->SetBranchAddress( std::string( kinBranch + "Gen" ).c_str(), &propGenData );
+      data_->SetBranchAddress( kinProp.c_str(), &propData );
+      data_->SetBranchAddress( std::string( kinProp + "Gen" ).c_str(), &propGenData );
       for ( Int_t iEntry = 0; iEntry < nEntries; ++iEntry ) {
         data_->GetEntry( iEntry );
         if ( iEta == -1 ) continue; // FIXME: eta out of range in analyzer; should be solved more consistently
@@ -365,7 +362,7 @@ int main( int argc, char * argv[] )
           TF1 * fitSigma2D2( new TF1( nameFitSigma2D2.c_str(), formula.c_str() ) );
           fitSigma2D2->SetRange( histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() );
           TFitResultPtr fitSigma2D2ResultPtr( histSigma2D2->Fit( fitSigma2D2, optionsFitSigma_.c_str() ) );
-          if ( fitSigma2D2ResultPtr->Status() == 0 || fitSigma2D2ResultPtr->Status() == 4000 ) { // ignore errors from IMPROVE
+          if ( fitSigma2D2ResultPtr >= 0 && (fitSigma2D2ResultPtr->Status() == 0 || fitSigma2D2ResultPtr->Status() == 4000 ) ) { // ignore errors from IMPROVE
             hist2D2Chi2Map->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Chi2() / fitSigma2D2ResultPtr->Ndf() );
             hist2D2ProbMap->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Prob() );
             hist2D2Prob->Fill( fitSigma2D2ResultPtr->Prob() );
@@ -419,7 +416,7 @@ int main( int argc, char * argv[] )
             const std::string nameFitDelta( nameDelta + "_fit" );
             TF1 * fitDelta( new TF1( nameFitDelta.c_str(), "gaus", histDelta->GetXaxis()->GetXmin(), histDelta->GetXaxis()->GetXmax() ) );
             TFitResultPtr fitDeltaResultPtr( histDelta->Fit( fitDelta, optionsFit_.c_str() ) );
-            if ( fitDeltaResultPtr >= 0 && fitDeltaResultPtr->Status() == 0 && fitDeltaResultPtr->Ndf() != 0. ) {
+            if ( fitDeltaResultPtr >= 0 && ( fitDeltaResultPtr->Status() == 0 && fitDeltaResultPtr->Ndf() != 0. ) ) {
               histDeltasChi2Map->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Chi2() / fitDeltaResultPtr->Ndf() );
               histDeltaChi2->SetBinContent( uPt + 1, fitDeltaResultPtr->Chi2() / fitDeltaResultPtr->Ndf() );
               histDeltasPropMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Prob() );
@@ -433,7 +430,7 @@ int main( int argc, char * argv[] )
           TF1 * fitSigma( new TF1( nameFitSigma.c_str(), formula.c_str() ) );
           fitSigma->SetRange( histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() );
           TFitResultPtr fitSigmaResultPtr( histSigma->Fit( fitSigma, std::string( optionsFitSigma_ ).c_str() ) );
-          if ( fitSigmaResultPtr->Status() == 0 || fitSigmaResultPtr->Status() == 4000 ) { // ignore errors from IMPROVE
+          if ( fitSigmaResultPtr >= 0 && ( fitSigmaResultPtr->Status() == 0 || fitSigmaResultPtr->Status() == 4000 ) ) { // ignore errors from IMPROVE
             histSigmaChi2Map->SetBinContent( uEta + 1, fitSigmaResultPtr->Chi2() / fitSigmaResultPtr->Ndf() );
             histSigmaProbMap->SetBinContent( uEta + 1, fitSigmaResultPtr->Prob() );
             histSigmaProb->Fill( fitSigmaResultPtr->Prob() );
@@ -471,15 +468,15 @@ int main( int argc, char * argv[] )
           const std::string nameSigmaNtup( nameSigma + "Ntup" );
           TH1D * histSigmaNtup( new TH1D( nameSigmaNtup.c_str(), hist2D->GetTitle(), nPtBins_, ptBins_.data() ) );
           // Split data into p_t bins
-          dataCont momEEtaBin( nPtBins_ );
+          dataCont ptEtaBin( nPtBins_ );
           dataCont propEtaBin( nPtBins_ );
           dataCont propGenEtaBin( nPtBins_ );
           std::vector< unsigned > sizePt( nPtBins_ );
           for ( unsigned uEntry = 0; uEntry < sizeEta_.at( uEta ); ++uEntry ) {
             for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
-              if ( ptBins_.at( uPt ) <= momEData_.at( uEta ).at( uEntry ) && momEData_.at( uEta ).at( uEntry ) < ptBins_.at( uPt + 1 ) ) {
+              if ( ptBins_.at( uPt ) <= ptData_.at( uEta ).at( uEntry ) && ptData_.at( uEta ).at( uEntry ) < ptBins_.at( uPt + 1 ) ) {
                 sizePt.at( uPt ) += 1;
-                momEEtaBin.at( uPt ).push_back( momEData_.at( uEta ).at( uEntry ) );
+                ptEtaBin.at( uPt ).push_back( ptData_.at( uEta ).at( uEntry ) );
                 propEtaBin.at( uPt ).push_back( propData_.at( uEta ).at( uEntry ) );
                 propGenEtaBin.at( uPt ).push_back( propGenData_.at( uEta ).at( uEntry ) );
                 break;
@@ -527,7 +524,7 @@ int main( int argc, char * argv[] )
             const std::string nameFitDeltaNtup( nameDeltaNtup + "_fit" );
             TF1 * fitDeltaNtup( new TF1( nameFitDeltaNtup.c_str(), "gaus", histDeltaNtup->GetXaxis()->GetXmin(), histDeltaNtup->GetXaxis()->GetXmax() ) );
             TFitResultPtr fitDeltaNtupResultPtr( histDeltaNtup->Fit( fitDeltaNtup, optionsFit_.c_str() ) );
-            if ( fitDeltaNtupResultPtr >= 0 && fitDeltaNtupResultPtr->Status() == 0 && fitDeltaNtupResultPtr->Ndf() != 0. ) {
+            if ( fitDeltaNtupResultPtr >= 0 && ( fitDeltaNtupResultPtr->Status() == 0 && fitDeltaNtupResultPtr->Ndf() != 0. ) ) {
               histDeltasNtupChi2Map->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Chi2() / fitDeltaNtupResultPtr->Ndf() );
               histDeltaNtupChi2->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Chi2() / fitDeltaNtupResultPtr->Ndf() );
               histDeltasNtupPropMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Prob() );
@@ -540,8 +537,8 @@ int main( int argc, char * argv[] )
           const std::string nameFitSigmaNtup( nameSigmaNtup + "_fit" );
           TF1 * fitSigmaNtup( new TF1( nameFitSigmaNtup.c_str(), formula.c_str() ) );
           fitSigmaNtup->SetRange( histSigmaNtup->GetXaxis()->GetXmin(), histSigmaNtup->GetXaxis()->GetXmax() );
-          TFitResultPtr fitSigmaNtupResultPtr( histSigmaNtup->Fit( fitSigmaNtup, std::string( optionsFitSigma_ ).c_str() ) );
-          if ( fitSigmaNtupResultPtr->Status() == 0 || fitSigmaNtupResultPtr->Status() == 4000 ) { // ignore errors from IMPROVE
+          TFitResultPtr fitSigmaNtupResultPtr( histSigmaNtup->Fit( fitSigmaNtup, optionsFitSigma_.c_str() ) );
+          if ( fitSigmaNtupResultPtr >= 0 && ( fitSigmaNtupResultPtr->Status() == 0 || fitSigmaNtupResultPtr->Status() == 4000 ) ) { // ignore errors from IMPROVE
             histSigmaNtupChi2Map->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Chi2() / fitSigmaNtupResultPtr->Ndf() );
             histSigmaNtupProbMap->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Prob() );
             histSigmaNtupProb->Fill( fitSigmaNtupResultPtr->Prob() );
