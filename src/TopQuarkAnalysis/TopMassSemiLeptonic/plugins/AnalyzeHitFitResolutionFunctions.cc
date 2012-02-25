@@ -31,6 +31,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "AnalysisDataFormats/TopObjects/interface/TtSemiLeptonicEvent.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
 
@@ -68,16 +70,21 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     edm::Handle< TtSemiLeptonicEvent > ttSemiLeptonicEvent_;
     // TQAF MC event
     TtGenEvent * ttGenEvent_;
+    // PAT leptons
+    edm::Handle< pat::MuonCollection > patMuons_;     // direct access needed to deal with alternative kinematics
+    edm::Handle< pat::ElectronCollection > patElecs_; // direct access needed to deal with alternative kinematics
     // PAT jets
-    edm::Handle< pat::JetCollection > patJets_; // direct access needed to deal with JECs
+    edm::Handle< pat::JetCollection > patJets_; // direct access needed to deal with JECs and alternative kinematics
 
     /// Configuration parameters
     edm::InputTag ttSemiLeptonicEventTag_;
-    bool refGen_;
+    bool useAlt_;
     bool useSymm_;
-    bool useJetEt_;
-    bool useMuons_;
-    bool useElecs_;
+    bool refGen_;
+    std::string leptonType_;
+    bool useMuons_; // indirect
+    bool useElecs_; // indirect
+    edm::InputTag patLeptonsTag_;
     edm::InputTag patJetsTag_;
     std::string jecLevel_;
     // Eta binning
@@ -106,6 +113,12 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     Double_t phi_;
     Int_t    binEta_;        // eta bin number as determined by 'getEtaBin'
     Int_t    binEtaSymm_;    // symmetrised eta bin number as determined by 'getEtaBin'
+    // reconstructed alternative
+    Double_t ptAlt_;         // used momentum term, can be: E, p, E_t, p_t
+    Double_t etaAlt_;
+    Double_t phiAlt_;
+    Int_t    binEtaAlt_;     // eta bin number as determined by 'getEtaBin'
+    Int_t    binEtaSymmAlt_; // symmetrised eta bin number as determined by 'getEtaBin'
     // generated
     Double_t ptGen_;         // used momentum term, can be: E, p, E_t, p_t
     Double_t etaGen_;
@@ -121,18 +134,34 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     TH2DVecMap histos_Reco_;
     // Kinematic quantities RECO inverted
     TH2DVecMap histos_RecoInv_;
+    // Kinematic quantities RECO, alt.
+    TH2DVecMap histos_Alt_;
+    // Kinematic quantities RECO, alt. inverted
+    TH2DVecMap histos_AltInv_;
     // Kinematic quantities GEN
     TH2DVecMap histos_Gen_;
     // Kinematic quantities GEN inverted
     TH2DVecMap histos_GenInv_;
+    // Kinematic quantities GEN
+    TH2DVecMap histos_AltGen_;
+    // Kinematic quantities GEN inverted
+    TH2DVecMap histos_AltGenInv_;
     // Kinematic quantities RECO, symmetric in eta
     TH2DVecMap histos_RecoSymm_;
     // Kinematic quantities RECO inverted, symmetric in eta
     TH2DVecMap histos_RecoInvSymm_;
+    // Kinematic quantities RECO, alt., symmetric in eta
+    TH2DVecMap histos_AltSymm_;
+    // Kinematic quantities RECO, alt. inverted, symmetric in eta
+    TH2DVecMap histos_AltInvSymm_;
     // Kinematic quantities GEN, symmetric in eta
     TH2DVecMap histos_GenSymm_;
     // Kinematic quantities GEN inverted, symmetric in eta
     TH2DVecMap histos_GenInvSymm_;
+    // Kinematic quantities GEN, symmetric in eta
+    TH2DVecMap histos_AltGenSymm_;
+    // Kinematic quantities GEN inverted, symmetric in eta
+    TH2DVecMap histos_AltGenInvSymm_;
 
     /// Private functions
 
@@ -142,12 +171,13 @@ class AnalyzeHitFitResolutionFunctions : public edm::EDAnalyzer {
     // Main function
     void fill( unsigned iCat, unsigned iProp );
     // Object categories
-    void fillLepton( unsigned iCat, unsigned iProp );
+    void fillMuon( unsigned iCat, unsigned iProp );
+    void fillElectron( unsigned iCat, unsigned iProp );
     void fillUdscJet( unsigned iCat, unsigned iProp );
     void fillBJet( unsigned iCat, unsigned iProp );
     void fillMET( unsigned iCat, unsigned iProp );
     // One function fills all
-    void fillObject( const std::string & index, unsigned iCat, unsigned iProp, double pt, double ptGen, double eta, double etaGen, double phi, double phiGen );
+    void fillObject( unsigned iCat, unsigned iProp, double pt, double ptAlt, double ptGen, double eta, double etaAlt, double etaGen, double phi, double phiAlt, double phiGen );
 
 };
 
@@ -175,14 +205,20 @@ AnalyzeHitFitResolutionFunctions::AnalyzeHitFitResolutionFunctions( const edm::P
 , ttGenEvent_()
 , patJets_()
 , ttSemiLeptonicEventTag_( iConfig.getParameter< edm::InputTag >( "ttSemiLeptonicEvent" ) )
-, refGen_( iConfig.getParameter< bool >( "refGen" ) )
+, useAlt_( iConfig.getParameter< bool >( "useAlt" ) )
 , useSymm_( iConfig.getParameter< bool >( "useSymm" ) )
-, useJetEt_( iConfig.getParameter< bool >( "useJetEt" ) )
-, useMuons_( iConfig.getParameter< bool >( "useMuons" ) )
-, useElecs_( iConfig.getParameter< bool >( "useElectrons" ) )
+, refGen_( iConfig.getParameter< bool >( "refGen" ) )
+, leptonType_( iConfig.getParameter< std::string >( "leptonType" ) )
+, useMuons_( leptonType_ == "Muons" )
+, useElecs_( leptonType_ == "Electrons" )
+, patLeptonsTag_( iConfig.getParameter< edm::InputTag >( "patLeptons" ) )
 , patJetsTag_( iConfig.getParameter< edm::InputTag >( "patJets" ) )
 , jecLevel_( iConfig.getParameter< std::string >( "jecLevel" ) )
 {
+
+  // Check configuration
+
+  assert( useMuons_ != useElecs_ );
 
   // Constants
 
@@ -301,8 +337,8 @@ AnalyzeHitFitResolutionFunctions::AnalyzeHitFitResolutionFunctions( const edm::P
     if ( ptBins_.at( iCat ).size() < 2 )
       edm::LogError( "AnalyzeHitFitResolutionFunctions" ) << objCats_.at( iCat ) << ": less than 2 p_t bin bounderies found";
     std::string cat( "" );
-    if ( ( ( cat == "UdscJet" || cat == "BJet" ) && useJetEt_ ) ) cat.append( "E_t" );
-    else                                                          cat.append( objCats_.at( iCat ) );
+    if ( ( ( cat == "UdscJet" || cat == "BJet" ) && useAlt_ ) ) cat.append( "E_t" );
+    else                                                        cat.append( objCats_.at( iCat ) );
     sstrPt << "  " << cat << ": ";
     for ( unsigned iPt = 0; iPt < ptBins_.at( iCat ).size() - 1; ++iPt ) {
       sstrPt << ptBins_.at( iCat ).at( iPt ) << ", ";
@@ -322,20 +358,28 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
   edm::Service< TFileService > fileService;
 
   const std::string xTitleReco( "p_{t}^{RECO} (GeV)" );
+  const std::string xTitleAlt( "p_{t}^{RECO, alt.} (GeV)" );
   const std::string xTitleGen( "p_{t}^{GEN} (GeV)" );
   std::vector< std::string > yTitles;
   yTitles.push_back( "#Deltap_{t} (GeV)" );
   yTitles.push_back( "#Delta#eta" );
   yTitles.push_back( "#Delta#phi" );
+  std::vector< std::string > yTitlesAlt;
+  yTitlesAlt.push_back( "#Deltap_{t}^{alt.} (GeV)" );
+  yTitlesAlt.push_back( "#Delta#eta^{alt.}" );
+  yTitlesAlt.push_back( "#Delta#phi^{alt.}" );
   std::vector< std::string > yTitlesInv;
   yTitlesInv.push_back( "#Delta#frac{1}{p_{t}} (#frac{1}{GeV})" );
   yTitlesInv.push_back( "#Delta#frac{1}{#eta}" );
   yTitlesInv.push_back( "#Delta#frac{1}{#phi}" );
+  std::vector< std::string > yTitlesAltInv;
+  yTitlesAltInv.push_back( "#Delta#frac{1}{p_{t}^{alt.}} (#frac{1}{GeV})" );
+  yTitlesAltInv.push_back( "#Delta#frac{1}{#eta^{alt.}}" );
+  yTitlesAltInv.push_back( "#Delta#frac{1}{#phi^{alt.}}" );
   const std::string zTitle( "events" );
 
   for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
     const std::string cat( objCats_.at( iCat ) );
-    const bool useEt( ( cat == "UdscJet" || cat == "BJet" ) && useJetEt_ );
     TFileDirectory dir( fileService->mkdir( cat.c_str(), "" ) );
 
     // Eta binning
@@ -349,8 +393,7 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
 
     // Pt binning
     histos_PtBins_.push_back( dir.make< TH1D >( std::string( cat + "_binsPt" ).c_str(), cat.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data() ) );
-    if ( useEt ) histos_PtBins_.back()->SetXTitle( "E_{t} (GeV)" );
-    else         histos_PtBins_.back()->SetXTitle( "p_{t} (GeV)" );
+    histos_PtBins_.back()->SetXTitle( "p_{t} (GeV)" );
     histos_PtBins_.back()->SetYTitle( "bin" );
     histos_PtBins_.back()->GetYaxis()->SetRangeUser( -1., ptBins_.at( iCat ).size() );
     for ( unsigned iPt = 0; iPt < ptBins_.at( iCat ).size() - 1; ++iPt ) {
@@ -365,6 +408,11 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
     data_.back()->Branch( "Phi"          , &phi_          , "phi/D" );
     data_.back()->Branch( "BinEta"       , &binEta_       , "binEta/I" );
     data_.back()->Branch( "BinEtaSymm"   , &binEtaSymm_   , "binEtaSymm/I" );
+    data_.back()->Branch( "PtAlt"        , &ptAlt_        , "ptAlt/D" );
+    data_.back()->Branch( "EtaAlt"       , &etaAlt_       , "etaAlt/D" );
+    data_.back()->Branch( "PhiAlt"       , &phiAlt_       , "phiAlt/D" );
+    data_.back()->Branch( "BinEtaAlt"    , &binEtaAlt_    , "binEtaAlt/I" );
+    data_.back()->Branch( "BinEtaSymmAlt", &binEtaSymmAlt_, "binEtaSymmAlt/I" );
     data_.back()->Branch( "PtGen"        , &ptGen_        , "ptGen/D" );
     data_.back()->Branch( "EtaGen"       , &etaGen_       , "etaGen/D" );
     data_.back()->Branch( "PhiGen"       , &phiGen_       , "phiGen/D" );
@@ -374,17 +422,12 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
     for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
       const std::string prop( kinProps_.at( iProp ) );
       std::string xTitleRecoProp( xTitleReco );
+      std::string xTitleAltProp( xTitleAlt );
       std::string xTitleGenProp( xTitleGen );
       std::string yTitle( yTitles.at( iProp ) );
+      std::string yTitleAlt( yTitlesAlt.at( iProp ) );
       std::string yTitleInv( yTitlesInv.at( iProp ) );
-      if ( useEt ) {
-        boost::replace_all( xTitleRecoProp, "p_{t}", "E_{t}" );
-        boost::replace_all( xTitleGenProp, "p_{t}", "E_{t}" );
-        if ( prop == "Pt" ) {
-          boost::replace_all( yTitle, "p_{t}", "E_{t}" );
-          boost::replace_all( yTitleInv, "p_{t}", "E_{t}" );
-        }
-      }
+      std::string yTitleAltInv( yTitlesAltInv.at( iProp ) );
       TFileDirectory subDir( dir.mkdir( prop.c_str(), "" ) );
 
       const std::string nameDirReco( "Reco" );
@@ -412,6 +455,33 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
       histos_Reco_[ cat + "_" + prop ] = histos_Reco;
       histos_RecoInv_[ cat + "_" + prop ] = histos_RecoInv;
 
+      if ( useAlt_ ) {
+        const std::string nameDirAlt( "Alt" );
+        TFileDirectory subDirAlt( subDir.mkdir( nameDirAlt.c_str(), "" ) );
+        TH2DVec histos_Alt;
+        const std::string nameDirAltInv( "AltInv" );
+        TFileDirectory subDirAltInv( subDir.mkdir( nameDirAltInv.c_str(), "" ) );
+        TH2DVec histos_AltInv;
+        for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
+          const std::string eta( "Eta" + boost::lexical_cast< std::string >( iEta ) );
+          const std::string title( cat + ", " + boost::lexical_cast< std::string >( etaBins_.at( iCat ).at( iEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( iCat ).at( iEta + 1 ) ) );
+          TFileDirectory subDirAltEta( subDirAlt.mkdir( eta.c_str(), title.c_str() ) );
+          const std::string nameAltEta( cat + "_" + prop + "_Alt_" + eta );
+          histos_Alt.push_back( subDirAltEta.make< TH2D >( nameAltEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
+          histos_Alt.back()->SetXTitle( xTitleAltProp.c_str() );
+          histos_Alt.back()->SetYTitle( yTitle.c_str() );
+          histos_Alt.back()->SetZTitle( zTitle.c_str() );
+          TFileDirectory subDirAltInvEta( subDirAltInv.mkdir( eta.c_str(), title.c_str() ) );
+          const std::string nameAltInvEta( cat + "_" + prop + "_AltInv_" + eta );
+          histos_AltInv.push_back( subDirAltInvEta.make< TH2D >( nameAltInvEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
+          histos_AltInv.back()->SetXTitle( xTitleAltProp.c_str() );
+          histos_AltInv.back()->SetYTitle( yTitleInv.c_str() );
+          histos_AltInv.back()->SetZTitle( zTitle.c_str() );
+        }
+        histos_Alt_[ cat + "_" + prop ] = histos_Alt;
+        histos_AltInv_[ cat + "_" + prop ] = histos_AltInv;
+      }
+
       if ( refGen_ ) {
         const std::string nameDirGen( "Gen" );
         TFileDirectory subDirGen( subDir.mkdir( nameDirGen.c_str(), "" ) );
@@ -437,6 +507,32 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
         }
         histos_Gen_[ cat + "_" + prop ] = histos_Gen;
         histos_GenInv_[ cat + "_" + prop ] = histos_GenInv;
+        if ( useAlt_ ) {
+          const std::string nameDirAltGen( "AltGen" );
+          TFileDirectory subDirAltGen( subDir.mkdir( nameDirAltGen.c_str(), "" ) );
+          TH2DVec histos_AltGen;
+          const std::string nameDirAltGenInv( "AltGenInv" );
+          TFileDirectory subDirAltGenInv( subDir.mkdir( nameDirAltGenInv.c_str(), "" ) );
+          TH2DVec histos_AltGenInv;
+          for ( unsigned iEta = 0; iEta < etaBins_.at( iCat ).size() - 1; ++iEta ) {
+            const std::string eta( "Eta" + boost::lexical_cast< std::string >( iEta ) );
+            const std::string title( cat + ", " + boost::lexical_cast< std::string >( etaBins_.at( iCat ).at( iEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( iCat ).at( iEta + 1 ) ) );
+            TFileDirectory subDirAltGenEta( subDirAltGen.mkdir( eta.c_str(), title.c_str() ) );
+            const std::string nameAltGenEta( cat + "_" + prop + "_AltGen_" + eta );
+            histos_AltGen.push_back( subDirAltGenEta.make< TH2D >( nameAltGenEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
+            histos_AltGen.back()->SetXTitle( xTitleGenProp.c_str() );
+            histos_AltGen.back()->SetYTitle( yTitle.c_str() );
+            histos_AltGen.back()->SetZTitle( zTitle.c_str() );
+            TFileDirectory subDirAltGenInvEta( subDirAltGenInv.mkdir( eta.c_str(), title.c_str() ) );
+            const std::string nameAltGenInvEta( cat + "_" + prop + "_AltGenInv_" + eta );
+            histos_AltGenInv.push_back( subDirAltGenInvEta.make< TH2D >( nameAltGenInvEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
+            histos_AltGenInv.back()->SetXTitle( xTitleGenProp.c_str() );
+            histos_AltGenInv.back()->SetYTitle( yTitleInv.c_str() );
+            histos_AltGenInv.back()->SetZTitle( zTitle.c_str() );
+          }
+          histos_AltGen_[ cat + "_" + prop ] = histos_AltGen;
+          histos_AltGenInv_[ cat + "_" + prop ] = histos_AltGenInv;
+        }
       }
 
       if ( useSymm_ ) {
@@ -465,6 +561,33 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
         histos_RecoSymm_[ cat + "_" + prop ] = histos_RecoSymm;
         histos_RecoInvSymm_[ cat + "_" + prop ] = histos_RecoInvSymm;
 
+        if ( useAlt_ ) {
+          const std::string nameDirAltSymm( "AltSymm" );
+          TFileDirectory subDirAltSymm( subDir.mkdir( nameDirAltSymm.c_str(), "" ) );
+          TH2DVec histos_AltSymm;
+          const std::string nameDirAltInvSymm( "AltInvSymm" );
+          TFileDirectory subDirAltInvSymm( subDir.mkdir( nameDirAltInvSymm.c_str(), "" ) );
+          TH2DVec histos_AltInvSymm;
+          for ( unsigned iEtaSymm = 0; iEtaSymm < etaSymmBins_.at( iCat ).size() - 1; ++iEtaSymm ) {
+            const std::string etaSymm( "Eta" + boost::lexical_cast< std::string >( iEtaSymm ) );
+            const std::string title( cat + ", " + boost::lexical_cast< std::string >( etaSymmBins_.at( iCat ).at( iEtaSymm ) ) + " #leq |#eta| #leq " + boost::lexical_cast< std::string >( etaSymmBins_.at( iCat ).at( iEtaSymm + 1 ) ) );
+            TFileDirectory subDirAltSymmEta( subDirAltSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
+            const std::string nameAltSymmEta( cat + "_" + prop + "_AltSymm_" + etaSymm );
+            histos_AltSymm.push_back( subDirAltSymmEta.make< TH2D >( nameAltSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
+            histos_AltSymm.back()->SetXTitle( xTitleAltProp.c_str() );
+            histos_AltSymm.back()->SetYTitle( yTitle.c_str() );
+            histos_AltSymm.back()->SetZTitle( zTitle.c_str() );
+            TFileDirectory subDirAltInvSymmEta( subDirAltInvSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
+            const std::string nameAltInvSymmEta( cat + "_" + prop + "_AltInvSymm_" + etaSymm );
+            histos_AltInvSymm.push_back( subDirAltInvSymmEta.make< TH2D >( nameAltInvSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
+            histos_AltInvSymm.back()->SetXTitle( xTitleAltProp.c_str() );
+            histos_AltInvSymm.back()->SetYTitle( yTitleInv.c_str() );
+            histos_AltInvSymm.back()->SetZTitle( zTitle.c_str() );
+          }
+          histos_AltSymm_[ cat + "_" + prop ] = histos_AltSymm;
+          histos_AltInvSymm_[ cat + "_" + prop ] = histos_AltInvSymm;
+        }
+
         if ( refGen_ ) {
           const std::string nameDirGenSymm( "GenSymm" );
           TFileDirectory subDirGenSymm( subDir.mkdir( nameDirGenSymm.c_str(), "" ) );
@@ -490,6 +613,32 @@ void AnalyzeHitFitResolutionFunctions::beginJob()
           }
           histos_GenSymm_[ cat + "_" + prop ] = histos_GenSymm;
           histos_GenInvSymm_[ cat + "_" + prop ] = histos_GenInvSymm;
+          if ( useAlt_ ) {
+            const std::string nameDirAltGenSymm( "AltGenSymm" );
+            TFileDirectory subDirAltGenSymm( subDir.mkdir( nameDirAltGenSymm.c_str(), "" ) );
+            TH2DVec histos_AltGenSymm;
+            const std::string nameDirAltGenInvSymm( "AltGenInvSymm" );
+            TFileDirectory subDirAltGenInvSymm( subDir.mkdir( nameDirAltGenInvSymm.c_str(), "" ) );
+            TH2DVec histos_AltGenInvSymm;
+            for ( unsigned iEtaSymm = 0; iEtaSymm < etaSymmBins_.at( iCat ).size() - 1; ++iEtaSymm ) {
+              const std::string etaSymm( "Eta" + boost::lexical_cast< std::string >( iEtaSymm ) );
+              const std::string title( cat + ", " + boost::lexical_cast< std::string >( etaSymmBins_.at( iCat ).at( iEtaSymm ) ) + " #leq |#eta| #leq " + boost::lexical_cast< std::string >( etaSymmBins_.at( iCat ).at( iEtaSymm + 1 ) ) );
+              TFileDirectory subDirAltGenSymmEta( subDirAltGenSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
+              const std::string nameAltGenSymmEta( cat + "_" + prop + "_AltGenSymm_" + etaSymm );
+              histos_AltGenSymm.push_back( subDirAltGenSymmEta.make< TH2D >( nameAltGenSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propBins_.at( iCat).at( iProp ), -propMaxs_.at( iCat).at( iProp ), propMaxs_.at( iCat).at( iProp ) ) );
+              histos_AltGenSymm.back()->SetXTitle( xTitleGenProp.c_str() );
+              histos_AltGenSymm.back()->SetYTitle( yTitleAlt.c_str() );
+              histos_AltGenSymm.back()->SetZTitle( zTitle.c_str() );
+              TFileDirectory subDirAltGenInvSymmEta( subDirAltGenInvSymm.mkdir( etaSymm.c_str(), title.c_str() ) );
+              const std::string nameAltGenInvSymmEta( cat + "_" + prop + "_AltGenInvSymm_" + etaSymm );
+              histos_AltGenInvSymm.push_back( subDirAltGenInvSymmEta.make< TH2D >( nameAltGenInvSymmEta.c_str(), title.c_str(), ptBins_.at( iCat ).size() - 1, ptBins_.at( iCat ).data(), propInvBins_.at( iCat).at( iProp ), -propInvMaxs_.at( iCat).at( iProp ), propInvMaxs_.at( iCat).at( iProp ) ) );
+              histos_AltGenInvSymm.back()->SetXTitle( xTitleGenProp.c_str() );
+              histos_AltGenInvSymm.back()->SetYTitle( yTitleAltInv.c_str() );
+              histos_AltGenInvSymm.back()->SetZTitle( zTitle.c_str() );
+            }
+            histos_AltGenSymm_[ cat + "_" + prop ] = histos_AltGenSymm;
+            histos_AltGenInvSymm_[ cat + "_" + prop ] = histos_AltGenInvSymm;
+          }
         }
 
       }
@@ -511,6 +660,10 @@ void AnalyzeHitFitResolutionFunctions::analyze( const edm::Event & iEvent, const
   // TQAF semi-leptonic event
   iEvent.getByLabel( ttSemiLeptonicEventTag_, ttSemiLeptonicEvent_ );
 
+  // PAT leptons
+  if ( useMuons_ ) iEvent.getByLabel( patLeptonsTag_, patMuons_ );
+  if ( useElecs_ ) iEvent.getByLabel( patLeptonsTag_, patElecs_ );
+
   // PAT jets
   iEvent.getByLabel( patJetsTag_, patJets_ );
 
@@ -525,7 +678,7 @@ void AnalyzeHitFitResolutionFunctions::analyze( const edm::Event & iEvent, const
          ( ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) && useMuons_ ) ||
            ( ttGenEvent_->isSemiLeptonic( WDecay::kElec ) && useElecs_ ) ) ) {
 
-      // Valid TTbar MC matching
+      // Valid full TTbar MC matching
       if ( ttSemiLeptonicEvent_->isHypoValid( TtEvent::kGenMatch ) ) {
 
         for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
@@ -538,7 +691,7 @@ void AnalyzeHitFitResolutionFunctions::analyze( const edm::Event & iEvent, const
 
         ++filledEvents_;
 
-      } // Valid TTbar MC matching
+      } // Valid full TTbar MC matching
       else edm::LogInfo( "AnalyzeHitFitResolutionFunctions" ) << "...no valid MC match";
 
     } // Semi-leptonic signal event
@@ -576,11 +729,11 @@ void AnalyzeHitFitResolutionFunctions::fill( unsigned iCat, unsigned iProp )
 {
 
   const std::string cat( objCats_.at( iCat ) );
-  if ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) && cat == "Mu" ) {
-    fillLepton( iCat, iProp );
+  if ( useMuons_ && cat == "Mu" ) {
+    fillMuon( iCat, iProp );
   }
-  else if ( ttGenEvent_->isSemiLeptonic( WDecay::kElec ) && cat == "Elec" ) {
-    fillLepton( iCat, iProp );
+  else if ( useElecs_ && cat == "Elec" ) {
+    fillElectron( iCat, iProp );
   }
   else if ( cat == "UdscJet" ) {
     fillUdscJet( iCat, iProp );
@@ -598,20 +751,44 @@ void AnalyzeHitFitResolutionFunctions::fill( unsigned iCat, unsigned iProp )
 }
 
 
-void AnalyzeHitFitResolutionFunctions::fillLepton( unsigned iCat, unsigned iProp )
+void AnalyzeHitFitResolutionFunctions::fillMuon( unsigned iCat, unsigned iProp )
 {
 
   const std::string cat( objCats_.at( iCat ) );
-  const std::string index( cat + "_" + kinProps_.at( iProp ) );
+  const int muonIndex( ttSemiLeptonicEvent_->jetLeptonCombination( TtEvent::kGenMatch ).at( TtSemiLepEvtPartons::Lepton ) );
 
   double pt( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() );
+  double ptAlt( patMuons_->at( muonIndex ).globalTrack()->pt() );
   double ptGen( ttGenEvent_->singleLepton()->pt() );
   double eta( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() );
+  double etaAlt( patMuons_->at( muonIndex ).globalTrack()->eta() );
   double etaGen( ttGenEvent_->singleLepton()->eta() );
   double phi( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() );
+  double phiAlt( patMuons_->at( muonIndex ).globalTrack()->phi() );
   double phiGen( ttGenEvent_->singleLepton()->phi() );
 
-  fillObject( index, iCat, iProp, pt, ptGen, eta, etaGen, phi, phiGen );
+  fillObject( iCat, iProp, pt, ptAlt, ptGen, eta, etaAlt, etaGen, phi, phiAlt, phiGen );
+
+}
+
+
+void AnalyzeHitFitResolutionFunctions::fillElectron( unsigned iCat, unsigned iProp )
+{
+
+  const std::string cat( objCats_.at( iCat ) );
+  const int elecIndex( ttSemiLeptonicEvent_->jetLeptonCombination( TtEvent::kGenMatch ).at( TtSemiLepEvtPartons::Lepton ) );
+
+  double pt( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->pt() );
+  double ptAlt( patElecs_->at( elecIndex ).closestCtfTrackRef()->pt() ); // FIXME: or which one?
+  double ptGen( ttGenEvent_->singleLepton()->pt() );
+  double eta( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->eta() );
+  double etaAlt( patElecs_->at( elecIndex ).closestCtfTrackRef()->eta() ); // FIXME: or which one?
+  double etaGen( ttGenEvent_->singleLepton()->eta() );
+  double phi( ttSemiLeptonicEvent_->singleLepton( TtEvent::kGenMatch )->phi() );
+  double phiAlt( patElecs_->at( elecIndex ).closestCtfTrackRef()->phi() ); // FIXME: or which one?
+  double phiGen( ttGenEvent_->singleLepton()->phi() );
+
+  fillObject( iCat, iProp, pt, ptAlt, ptGen, eta, etaAlt, etaGen, phi, phiAlt, phiGen );
 
 }
 
@@ -620,38 +797,35 @@ void AnalyzeHitFitResolutionFunctions::fillUdscJet( unsigned iCat, unsigned iPro
 {
 
   const std::string cat( objCats_.at( iCat ) );
-  const std::string index( cat + "_" + kinProps_.at( iProp ) );
   const std::vector< int > jetLepCombi( ttSemiLeptonicEvent_->jetLeptonCombination( TtEvent::kGenMatch ) );
 
   pat::Jet qJet( patJets_->at( ( unsigned )jetLepCombi.at( TtSemiLepEvtPartons::LightQ ) ).correctedJet( jecLevel_, "uds" ) );
 
   double pt( qJet.pt() );
+  double ptAlt( qJet.et() );
   double ptGen( ttGenEvent_->hadronicDecayQuark()->pt() );
   double eta( qJet.eta() );
+  double etaAlt( qJet.eta() );
   double etaGen( ttGenEvent_->hadronicDecayQuark()->eta() );
   double phi( qJet.phi() );
+  double phiAlt( qJet.phi() );
   double phiGen( ttGenEvent_->hadronicDecayQuark()->phi() );
-  if ( useJetEt_ ) {
-    pt    = qJet.et();
-    ptGen = ttGenEvent_->hadronicDecayQuark()->et();
-  }
 
-  fillObject( index, iCat, iProp, pt, ptGen, eta, etaGen, phi, phiGen );
+  fillObject( iCat, iProp, pt, ptAlt, ptGen, eta, etaAlt, etaGen, phi, phiAlt, phiGen );
 
   pat::Jet qBarJet( patJets_->at( ( unsigned )jetLepCombi.at( TtSemiLepEvtPartons::LightQBar ) ).correctedJet( jecLevel_, "uds" ) );
 
   pt     = qBarJet.pt();
+  ptAlt  = qBarJet.et();
   ptGen  = ttGenEvent_->hadronicDecayQuarkBar()->pt();
   eta    = qBarJet.eta();
+  etaAlt = qBarJet.eta();
   etaGen = ttGenEvent_->hadronicDecayQuarkBar()->eta();
   phi    = qBarJet.phi();
+  phiAlt = qBarJet.phi();
   phiGen = ttGenEvent_->hadronicDecayQuarkBar()->phi();
-  if ( useJetEt_ ) {
-    pt    = qBarJet.et();
-    ptGen = ttGenEvent_->hadronicDecayQuarkBar()->et();
-  }
 
-  fillObject( index, iCat, iProp, pt, ptGen, eta, etaGen, phi, phiGen );
+  fillObject( iCat, iProp, pt, ptAlt, ptGen, eta, etaAlt, etaGen, phi, phiAlt, phiGen );
 
 }
 
@@ -660,38 +834,35 @@ void AnalyzeHitFitResolutionFunctions::fillBJet( unsigned iCat, unsigned iProp )
 {
 
   const std::string cat( objCats_.at( iCat ) );
-  const std::string index( cat + "_" + kinProps_.at( iProp ) );
   const std::vector< int > jetLepCombi( ttSemiLeptonicEvent_->jetLeptonCombination( TtEvent::kGenMatch ) );
 
   pat::Jet hadBJet( patJets_->at( ( unsigned )jetLepCombi.at( TtSemiLepEvtPartons::HadB ) ).correctedJet( jecLevel_, "bottom" ) );
 
   double pt( hadBJet.pt() );
+  double ptAlt( hadBJet.et() );
   double ptGen( ttGenEvent_->hadronicDecayB()->pt() );
   double eta( hadBJet.eta() );
+  double etaAlt( hadBJet.eta() );
   double etaGen( ttGenEvent_->hadronicDecayB()->eta() );
   double phi( hadBJet.phi() );
+  double phiAlt( hadBJet.phi() );
   double phiGen( ttGenEvent_->hadronicDecayB()->phi() );
-  if ( useJetEt_ ) {
-    pt    = hadBJet.et();
-    ptGen = ttGenEvent_->hadronicDecayB()->et();
-  }
 
-  fillObject( index, iCat, iProp, pt, ptGen, eta, etaGen, phi, phiGen );
+  fillObject( iCat, iProp, pt, ptAlt, ptGen, eta, etaAlt, etaGen, phi, phiAlt, phiGen );
 
   pat::Jet lepBJet( patJets_->at( ( unsigned )jetLepCombi.at( TtSemiLepEvtPartons::LepB ) ).correctedJet( jecLevel_, "bottom" ) );
 
   pt     = lepBJet.pt();
+  ptAlt  = lepBJet.et();
   ptGen  = ttGenEvent_->leptonicDecayB()->pt();
   eta    = lepBJet.eta();
+  etaAlt = lepBJet.eta();
   etaGen = ttGenEvent_->leptonicDecayB()->eta();
   phi    = lepBJet.phi();
+  phiAlt = lepBJet.phi();
   phiGen = ttGenEvent_->leptonicDecayB()->phi();
-  if ( useJetEt_ ) {
-    pt    = lepBJet.et();
-    ptGen = ttGenEvent_->leptonicDecayB()->et();
-  }
 
-  fillObject( index, iCat, iProp, pt, ptGen, eta, etaGen, phi, phiGen );
+  fillObject( iCat, iProp, pt, ptAlt, ptGen, eta, etaAlt, etaGen, phi, phiAlt, phiGen );
 
 }
 
@@ -699,37 +870,53 @@ void AnalyzeHitFitResolutionFunctions::fillBJet( unsigned iCat, unsigned iProp )
 void AnalyzeHitFitResolutionFunctions::fillMET( unsigned iCat, unsigned iProp )
 {
 
-  const std::string cat( objCats_.at( iCat ) );
-  const std::string index( cat + "_" + kinProps_.at( iProp ) );
 
   double pt( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() );
+  double ptAlt( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->pt() );
   double ptGen( ttGenEvent_->singleNeutrino()->pt() );
   double eta( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->eta() );
+  double etaAlt( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->eta() );
   double etaGen( ttGenEvent_->singleNeutrino()->eta() );
   double phi( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() );
+  double phiAlt( ttSemiLeptonicEvent_->singleNeutrino( TtEvent::kGenMatch )->phi() );
   double phiGen( ttGenEvent_->singleNeutrino()->phi() );
 
-  fillObject( index, iCat, iProp, pt, ptGen, eta, etaGen, phi, phiGen );
+  fillObject( iCat, iProp, pt, ptAlt, ptGen, eta, etaAlt, etaGen, phi, phiAlt, phiGen );
 
 }
 
 
-void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, unsigned iCat, unsigned iProp, double pt, double ptGen, double eta, double etaGen, double phi, double phiGen )
+void AnalyzeHitFitResolutionFunctions::fillObject( unsigned iCat, unsigned iProp, double pt, double ptAlt, double ptGen, double eta, double etaAlt, double etaGen, double phi, double phiAlt, double phiGen )
 {
 
-  // Fill n-tuple
-   pt_          = pt;
-   eta_           = eta;
-   phi_           = phi;
-   binEta_        = -1; // initialise
-   binEtaSymm_    = -1; // initialise
-   ptGen_       = ptGen;
-   etaGen_        = etaGen;
-   phiGen_        = phiGen;
-   binEtaGen_     = -1; // initialise
-   binEtaSymmGen_ = -1; // initialise
-
   const std::string prop( kinProps_.at( iProp ) );
+  const std::string index( objCats_.at( iCat ) + "_" + prop );
+
+  // Fill n-tuple
+  if ( prop == "Pt" ) {
+    pt_    = pt;
+    ptAlt_ = ptAlt;
+    ptGen_ = ptGen;
+  }
+  else if ( prop == "Eta" ) {
+    eta_    = eta;
+    etaAlt_ = etaAlt;
+    etaGen_ = etaGen;
+  }
+  else if ( prop == "Phi" ) {
+    phi_    = phi;
+    phiAlt_ = phiAlt;
+    phiGen_ = phiGen;
+  }
+
+  // Initialise eta bins
+  binEta_    = -1;
+  binEtaAlt_ = -1;
+  binEtaGen_ = -1;
+  binEtaSymm_    = -1;
+  binEtaSymmAlt_ = -1;
+  binEtaSymmGen_ = -1;
+
   unsigned iEta( getEtaBin( iCat, eta ) );
 
   if ( iEta < etaBins_.at( iCat ).size() ) {
@@ -745,6 +932,27 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
     else if ( prop == "Phi" ) {
       histos_Reco_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - phiGen ) );
       histos_RecoInv_[ index ].at( iEta )->Fill( pt, ROOT::Math::VectorUtil::Phi_mpi_pi( phi - phiGen ) );
+    }
+  }
+
+  if ( useAlt_ ) {
+
+    iEta = getEtaBin( iCat, etaAlt );
+
+    if ( iEta < etaBins_.at( iCat ).size() ) {
+      binEtaAlt_ = iEta;
+      if ( prop == "Pt" ) {
+        histos_Alt_[ index ].at( iEta )->Fill( ptAlt, ptAlt - ptGen );
+        histos_AltInv_[ index ].at( iEta )->Fill( ptAlt, 1. / ptAlt - 1. / ptGen );
+      }
+      else if ( prop == "Eta" ) {
+        histos_Alt_[ index ].at( iEta )->Fill( ptAlt, etaAlt - etaGen );
+        histos_AltInv_[ index ].at( iEta )->Fill( ptAlt, etaAlt - etaGen );
+      }
+      else if ( prop == "Phi" ) {
+        histos_Alt_[ index ].at( iEta )->Fill( ptAlt, ROOT::Math::VectorUtil::Phi_mpi_pi( phiAlt - phiGen ) );
+        histos_AltInv_[ index ].at( iEta )->Fill( ptAlt, ROOT::Math::VectorUtil::Phi_mpi_pi( phiAlt - phiGen ) );
+      }
     }
   }
 
@@ -766,7 +974,23 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
         histos_Gen_[ index ].at( iEta )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
         histos_GenInv_[ index ].at( iEta )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
       }
+
+      if ( useAlt_ ) {
+        if ( prop == "Pt" ) {
+          histos_AltGen_[ index ].at( iEta )->Fill( ptGen, ptGen - ptAlt );
+          histos_AltGenInv_[ index ].at( iEta )->Fill( ptGen, 1. / ptGen - 1. / ptAlt );
+        }
+        else if ( prop == "Eta" ) {
+          histos_AltGen_[ index ].at( iEta )->Fill( ptGen, etaGen - etaAlt );
+          histos_AltGenInv_[ index ].at( iEta )->Fill( ptGen, etaGen - etaAlt );
+        }
+        else if ( prop == "Phi" ) {
+          histos_AltGen_[ index ].at( iEta )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phiAlt ) );
+          histos_AltGenInv_[ index ].at( iEta )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phiAlt ) );
+        }
+      }
     }
+
   }
 
   if ( useSymm_ ) {
@@ -789,6 +1013,27 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
       }
     }
 
+    if ( useAlt_ ) {
+
+      iEtaSymm = getEtaBin( iCat, etaAlt, true );
+
+      if ( iEtaSymm < etaSymmBins_.at( iCat ).size() ) {
+        binEtaSymmAlt_ = iEtaSymm;
+        if ( prop == "Pt" ) {
+          histos_AltSymm_[ index ].at( iEtaSymm )->Fill( ptAlt, ptAlt - ptGen );
+          histos_AltInvSymm_[ index ].at( iEtaSymm )->Fill( ptAlt, 1. / ptAlt - 1. / ptGen );
+        }
+        else if ( prop == "Eta" ) {
+          histos_AltSymm_[ index ].at( iEtaSymm )->Fill( ptAlt, etaAlt - etaGen );
+          histos_AltInvSymm_[ index ].at( iEtaSymm )->Fill( ptAlt, etaAlt - etaGen );
+        }
+        else if ( prop == "Phi" ) {
+          histos_AltSymm_[ index ].at( iEtaSymm )->Fill( ptAlt, ROOT::Math::VectorUtil::Phi_mpi_pi( phiAlt - phiGen ) );
+          histos_AltInvSymm_[ index ].at( iEtaSymm )->Fill( ptAlt, ROOT::Math::VectorUtil::Phi_mpi_pi( phiAlt - phiGen ) );
+        }
+      }
+    }
+
     if ( refGen_ ) {
 
       iEtaSymm = getEtaBin( iCat, etaGen, true );
@@ -806,6 +1051,21 @@ void AnalyzeHitFitResolutionFunctions::fillObject( const std::string & index, un
         else if ( prop == "Phi" ) {
           histos_GenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
           histos_GenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phi ) );
+        }
+
+        if ( useAlt_ ) {
+          if ( prop == "Pt" ) {
+            histos_AltGenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ptGen - ptAlt );
+            histos_AltGenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, 1. / ptGen - 1. / ptAlt );
+          }
+          else if ( prop == "Eta" ) {
+            histos_AltGenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, etaGen - etaAlt );
+            histos_AltGenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, etaGen - etaAlt );
+          }
+          else if ( prop == "Phi" ) {
+            histos_AltGenSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phiAlt ) );
+            histos_AltGenInvSymm_[ index ].at( iEtaSymm )->Fill( ptGen, ROOT::Math::VectorUtil::Phi_mpi_pi( phiGen - phiAlt ) );
+          }
         }
       }
     }

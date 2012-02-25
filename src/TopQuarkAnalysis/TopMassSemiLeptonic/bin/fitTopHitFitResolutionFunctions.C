@@ -51,8 +51,9 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & process_( edm::readPSetsFrom( argv[ 1 ] )->getParameter< edm::ParameterSet >( "process" ) );
   const unsigned verbose_( process_.getParameter< unsigned >( "verbose" ) );
   const std::vector< std::string > objCats_( process_.getParameter< std::vector< std::string > >( "objectCategories" ) );   // object categories
-  const bool refGen_(  process_.getParameter< bool >( "refGen" ));
+  const bool useAlt_(  process_.getParameter< bool >( "useAlt" ));
   const bool useSymm_(  process_.getParameter< bool >( "useSymm" ));
+  const bool refGen_(  process_.getParameter< bool >( "refGen" ));
   // Configuration for fitting new resolution functions
   const edm::ParameterSet & fitter_( process_.getParameter< edm::ParameterSet >( "fitter" ) );
   const std::string inFile_( fitter_.getParameter< std::string >( "inputFile" ) );                                          // input file with RECO-GEN distributions
@@ -210,14 +211,17 @@ int main( int argc, char * argv[] )
     Double_t ptGenData;
     Int_t    iEta;
     TTree * data_( ( TTree* )( dirCat_->Get( std::string( objCat + "_data" ).c_str() ) ) );
-    data_->SetBranchAddress( "Pt", &ptData );
+    if ( useAlt_ ) data_->SetBranchAddress( "PtAlt", &ptData );
+    else           data_->SetBranchAddress( "Pt", &ptData );
     data_->SetBranchAddress( "PtGen", &ptGenData );
     if ( useSymm_ )
-      if ( refGen_ ) data_->SetBranchAddress( "BinEtaSymmGen", &iEta );
-      else           data_->SetBranchAddress( "BinEtaSymm", &iEta );
+      if      ( refGen_ ) data_->SetBranchAddress( "BinEtaSymmGen", &iEta );
+      else if ( useAlt_ ) data_->SetBranchAddress( "BinEtaSymmAlt", &iEta );
+      else                data_->SetBranchAddress( "BinEtaSymm", &iEta );
     else
-      if ( refGen_ ) data_->SetBranchAddress( "BinEtaGen", &iEta );
-      else           data_->SetBranchAddress( "BinEta", &iEta );
+      if      ( refGen_ ) data_->SetBranchAddress( "BinEtaGen", &iEta );
+      else if ( useAlt_ ) data_->SetBranchAddress( "BinEtaAlt", &iEta );
+      else                data_->SetBranchAddress( "BinEta", &iEta );
     Int_t nEntries( ( Int_t )data_->GetEntries() );
     std::vector< unsigned > sizeEta_( nEtaBins_ );
     for ( Int_t iEntry = 0; iEntry < nEntries; ++iEntry ) {
@@ -259,6 +263,9 @@ int main( int argc, char * argv[] )
       while ( TKey * keyFit = ( TKey* )nextInListProp() ) {
         if ( std::string( keyFit->GetClassName() ) != nameDirClass ) continue;
         const std::string subFit( keyFit->GetName() );
+        if ( useAlt_  == ( subFit.find( "Alt" )  == std::string::npos ) ) continue;
+        if ( useSymm_ == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
+        if ( refGen_  == ( subFit.find( "Gen" )  == std::string::npos ) ) continue;
         TDirectory * dirFit_( ( TDirectory* )( dirProp_->Get( subFit.c_str() ) ) );
 
         // Inversion flag from directory name

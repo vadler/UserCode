@@ -16,9 +16,9 @@ era = 'Summer11'
 skimProcess = 'SKIM'
 
 # Settings
-refGen   = False
+useAlt   = True
 useSymm  = False
-useJetEt = False
+refGen   = False
 
 ### Initialization
 
@@ -74,8 +74,6 @@ process.maxEvents = cms.untracked.PSet(
 
 outputFile = '%s/output/analyzeHitFitResolutionFunctions_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 
-if useJetEt:
-  outputFile = outputFile.replace( '.root', '_jetEt.root' )
 if runTest:
   outputFile = outputFile.replace( 'root', 'test.root' )
 if not rfioInput:
@@ -102,9 +100,10 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'refer
 ### Analyzer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.analyzeHitFitResolutionFunctions_cfi" )
-process.analyzeHitFitResolutionFunctions.refGen              = refGen
+process.analyzeHitFitResolutionFunctions.useAlt              = useAlt
 process.analyzeHitFitResolutionFunctions.useSymm             = useSymm
-process.analyzeHitFitResolutionFunctions.useJetEt            = useJetEt
+process.analyzeHitFitResolutionFunctions.refGen              = refGen
+process.analyzeHitFitResolutionFunctions.patLeptons          = cms.InputTag( 'selectedPat' + process.analyzeHitFitResolutionFunctions.leptonType.value() ) # obligatory assignment
 process.analyzeHitFitResolutionFunctions.jecLevel            = 'L3Absolute'
 process.analyzeHitFitResolutionFunctions.muonResolutions     = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution_%s.txt'%( era )
 process.analyzeHitFitResolutionFunctions.electronResolutions = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution_%s.txt'%( era )

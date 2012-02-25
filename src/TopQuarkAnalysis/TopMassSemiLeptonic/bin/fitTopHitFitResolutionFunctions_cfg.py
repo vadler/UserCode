@@ -20,13 +20,12 @@ lepton = 'Mu'
 # lepton = 'Elec'
 
 # Settings
-refGen   = False # 'True' makes sense only, if available in input (will not crash other wise)
-useSymm  = False # 'True' makes sense only, if available in input (will not crash other wise)
-useJetEt = False
+# Exclusive switches:
+useAlt  = False # 'True' makes sense only, if available in input (will not crash other wise)
+useSymm = False # 'True' makes sense only, if available in input (will not crash other wise)
+refGen  = False # 'True' makes sense only, if available in input (will not crash other wise)
 
 inputFile = 'file:%s/output/fitTopHitFitResolutionFunctions_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
-if useJetEt:
-  inputFile = inputFile.replace( '.root', '_jetEt.root' )
 if runTest:
   inputFile = inputFile.replace( 'root', 'test.root' )
 if not rfioInput:
@@ -42,14 +41,15 @@ if runTest:
 process.objectCategories = cms.vstring( lepton
                                       #, 'UdscJet'
                                       #, 'BJet'
-                                      #, 'MET'
+                                      , 'MET'
                                       )
 if not runTest:
   process.objectCategories.append( 'UdscJet' )
   process.objectCategories.append( 'BJet' )
-  process.objectCategories.append( 'MET' )
-process.refGen  = cms.bool( refGen )
-process.useSymm = cms.bool( useSymm )
+  #process.objectCategories.append( 'MET' )
+process.useAlt   = cms.bool( useAlt )
+process.useSymm  = cms.bool( useSymm )
+process.refGen   = cms.bool( refGen )
 
 process.fitter = cms.PSet(
   inputFile                    = cms.string( inputFile )

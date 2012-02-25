@@ -10,20 +10,22 @@ analyzeHitFitResolutionFunctions = cms.EDAnalyzer(
   # TQAF semi-leptonic event
 , ttSemiLeptonicEvent = cms.InputTag( 'ttSemiLepEvent' )
 
-  # Switches for eta symmetric distribution
-, refGen  = cms.bool( False ) # add histograms with generated kinematics as reference
+  # Switch for using alternative kinematics
+, useAlt = cms.bool( False )
+
+  # Switch for eta symmetric distribution
 , useSymm = cms.bool( False ) # add histograms adding up symmetric bins in eta
 
-  # Switches for kinematic variables
-, useJetEt = cms.bool( False )
+  # Switches for referring to generator truth
+, refGen = cms.bool( False ) # add histograms with generated kinematics as reference
 
   # Leptons to use
-, useMuons     = cms.bool( True )
-, useElectrons = cms.bool( False )
+, leptonType = cms.string( 'Muons' ) # 'Muons' or 'Electrons'
 
   # JEC level to be considered
-, patJets  = cms.InputTag( 'selectedPatJets' )
-, jecLevel = cms.string( 'L3Absolute' )
+, patLeptons = cms.InputTag( '' ) # dummy, needs assignemnt in main config
+, patJets    = cms.InputTag( 'selectedPatJets' )
+, jecLevel   = cms.string( 'L3Absolute' )
 
   # Eta binning (overrides input from resolution files, if not empty)
 , muonEtaBins     = cms.vdouble()
