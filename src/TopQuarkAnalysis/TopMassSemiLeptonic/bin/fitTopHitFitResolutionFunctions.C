@@ -61,6 +61,7 @@ int main( int argc, char * argv[] )
   const std::string resFunc_( fitter_.getParameter< std::string >( "resolutionFunction" ) );
   const std::string resFuncInv_( fitter_.getParameter< std::string >( "resolutionFunctionInverse" ) );
   const std::string resFuncRel_( fitter_.getParameter< std::string >( "resolutionFunctionRel" ) );
+  const std::string resFuncInvRel_( fitter_.getParameter< std::string >( "resolutionFunctionInverseRel" ) );
   const std::string resFuncInvInv_( fitter_.getParameter< std::string >( "resolutionFunctionInverseInv" ) );
   const std::string resFuncInvInvRel_( fitter_.getParameter< std::string >( "resolutionFunctionInverseInvRel" ) );
   const double widthFactor_( fitter_.getParameter< double >( "widthFactor" ) );
@@ -365,7 +366,7 @@ int main( int argc, char * argv[] )
           TH1D * histSigma2D2( ( TH1D* )( gDirectory->Get( std::string( name + "_2" ).c_str() ) ) ); // sigmas of the slice fits
           const std::string nameFitSigma2D2( name + "_2D2_fit" );
           const std::string formula( inverse ? resFuncInv_ : resFunc_ );
-          const std::string formulaRel( inverse ? resFuncInvInvRel_ : resFuncRel_ );
+          const std::string formulaRel( inverse ? resFuncInvRel_ : resFuncRel_ );
           TF1 * fitSigma2D2( new TF1( nameFitSigma2D2.c_str(), formula.c_str() ) );
           fitSigma2D2->SetRange( histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() );
           TFitResultPtr fitSigma2D2ResultPtr( histSigma2D2->Fit( fitSigma2D2, optionsFitSigma_.c_str() ) );
@@ -384,6 +385,10 @@ int main( int argc, char * argv[] )
                 TF1 * fitSigma2D2Inv( new TF1( nameFitSigma2D2Inv.c_str(), resFuncInvInv_.c_str(), histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() ) );
                 fitSigma2D2Inv->SetParameters( params );
                 fitSigma2D2Inv->Write();
+                const std::string nameFitSigma2D2InvRel( nameFitSigma2D2Inv + "Rel" );
+                TF1 * fitSigma2D2InvRel( new TF1( nameFitSigma2D2InvRel.c_str(), resFuncInvInvRel_.c_str(), histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() ) );
+                fitSigma2D2InvRel->SetParameters( params );
+                fitSigma2D2InvRel->Write();
               }
             }
           }

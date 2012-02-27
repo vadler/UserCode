@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Config as cms
 # Steering
 
 runTest   = True
-rfioInput = True
+rfioInput = False
 
 # Origin of existing resolution functions
 # era = 'Spring10'
@@ -20,7 +20,7 @@ lepton = 'Mu'
 # lepton = 'Elec'
 
 # Settings
-# Exclusive switches:
+# !!! Exclusive switches:
 useAlt  = False # 'True' makes sense only, if available in input (will not crash other wise)
 useSymm = False # 'True' makes sense only, if available in input (will not crash other wise)
 refGen  = False # 'True' makes sense only, if available in input (will not crash other wise)
@@ -41,12 +41,12 @@ if runTest:
 process.objectCategories = cms.vstring( lepton
                                       #, 'UdscJet'
                                       #, 'BJet'
-                                      , 'MET'
+                                      #, 'MET'
                                       )
 if not runTest:
   process.objectCategories.append( 'UdscJet' )
   process.objectCategories.append( 'BJet' )
-  #process.objectCategories.append( 'MET' )
+  process.objectCategories.append( 'MET' )
 process.useAlt   = cms.bool( useAlt )
 process.useSymm  = cms.bool( useSymm )
 process.refGen   = cms.bool( refGen )
@@ -59,6 +59,7 @@ process.fitter = cms.PSet(
 , resolutionFunctionInverse    = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
   # derived formulas
 , resolutionFunctionRel           = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])/x' )
+, resolutionFunctionInverseRel    = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])/x' )
 , resolutionFunctionInverseInv    = cms.string( 'sqrt(([2]*[2]*x+[1]*[1])*x+[0]*[0])' )
 , resolutionFunctionInverseInvRel = cms.string( 'sqrt(([2]*[2]*x+[1]*[1])*x+[0]*[0])/x' )
   # histogram options

@@ -125,16 +125,18 @@ int main(  int argc, char * argv[] )
           TF1 * func( new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) ) );
           func->SetParameters( res.C(), res.R(), res.N() );
           func->Write();
-          TF1 * funcRel( new TF1( std::string( name + "_Rel" ).c_str(), res.inverse() ? resFuncInvRel_.c_str() : resFuncRel_.c_str(), 0., objLimits_.at( iCat ) ) );
-          funcRel->SetParameters( res.C(), res.R(), res.N() );
-          funcRel->Write();
-          if ( kinProp == "Pt" && res.inverse() ) {
-            TF1 * funcInv( new TF1( std::string( name + "_Inv" ).c_str(), resFuncInvInv_.c_str(), 0., objLimits_.at( iCat ) ) );
-            funcInv->SetParameters( res.C(), res.R(), res.N() );
-            funcInv->Write();
-            TF1 * funcInvRel( new TF1( std::string( name + "_InvRel" ).c_str(), resFuncInvInvRel_.c_str(), 0., objLimits_.at( iCat ) ) );
-            funcInvRel->SetParameters( res.C(), res.R(), res.N() );
-            funcInvRel->Write();
+          if ( kinProp == "Pt" ) {
+            TF1 * funcRel( new TF1( std::string( name + "_Rel" ).c_str(), res.inverse() ? resFuncInvRel_.c_str() : resFuncRel_.c_str(), 0., objLimits_.at( iCat ) ) );
+            funcRel->SetParameters( res.C(), res.R(), res.N() );
+            funcRel->Write();
+            if ( res.inverse() ) {
+              TF1 * funcInv( new TF1( std::string( name + "_Inv" ).c_str(), resFuncInvInv_.c_str(), 0., objLimits_.at( iCat ) ) );
+              funcInv->SetParameters( res.C(), res.R(), res.N() );
+              funcInv->Write();
+              TF1 * funcInvRel( new TF1( std::string( name + "_InvRel" ).c_str(), resFuncInvInvRel_.c_str(), 0., objLimits_.at( iCat ) ) );
+              funcInvRel->SetParameters( res.C(), res.R(), res.N() );
+              funcInvRel->Write();
+            }
           }
 
         }
