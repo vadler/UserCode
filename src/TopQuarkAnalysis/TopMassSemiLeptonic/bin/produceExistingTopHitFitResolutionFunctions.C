@@ -48,6 +48,10 @@ int main(  int argc, char * argv[] )
   const std::vector< std::string > kinProps_( exist_.getParameter< std::vector< std::string > >( "kinematicProperties" ) ); // kinematic variables
   const std::string                resFunc_( exist_.getParameter< std::string >( "resolutionFunction" ) );
   const std::string                resFuncInv_( exist_.getParameter< std::string >( "resolutionFunctionInverse" ) );
+  const std::string                resFuncRel_( exist_.getParameter< std::string >( "resolutionFunctionRel" ) );
+  const std::string                resFuncInvRel_( exist_.getParameter< std::string >( "resolutionFunctionInverseRel" ) );
+  const std::string                resFuncInvInv_( exist_.getParameter< std::string >( "resolutionFunctionInverseInv" ) );
+  const std::string                resFuncInvInvRel_( exist_.getParameter< std::string >( "resolutionFunctionInverseInvRel" ) );
   const std::string                outFile_( exist_.getParameter< std::string >( "outputFile" ) );
   assert( objCats_.size() == resFiles_.size() );
   assert( objLimits_.size() == resFiles_.size() );
@@ -80,10 +84,12 @@ int main(  int argc, char * argv[] )
       dirProp->cd();
 
       const std::string name( "fitExist_" + objCat + "_" + kinProp );
-      const std::string title( objCat + ", " + kinProp + ( res.inverse() ? ", inv." : "" ) );
-      TF1 * func = new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
+      TF1 * func( new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) ) );
       func->SetParameters( res.C(), res.R(), res.N() );
       func->Write();
+      TF1 * funcRel( new TF1( std::string( name + "_Rel" ).c_str(), res.inverse() ? resFuncInvInvRel_.c_str() : resFuncRel_.c_str(), 0., objLimits_.at( iCat ) ) );
+      funcRel->SetParameters( res.C(), res.R(), res.N() );
+      funcRel->Write();
 
     }
 
@@ -96,8 +102,6 @@ int main(  int argc, char * argv[] )
         const std::string binEta( "Eta" + boost::lexical_cast< std::string >( iResElem ) );
 
         const hitfit::Vector_Resolution vecRes( resElems.at( iResElem ).GetResolution() );
-        const double etaMin( resElems.at( iResElem ).EtaMin() );
-        const double etaMax( resElems.at( iResElem ).EtaMax() );
 
         for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
           std::string kinProp( kinProps_.at( iProp ) );
@@ -118,10 +122,20 @@ int main(  int argc, char * argv[] )
 
           const std::string inverse( res.inverse() ? "_Inv" : "" );
           const std::string name( "fitExist_" + objCat + inverse + "_" + kinProp + "_" + binEta );
-          const std::string title( objCat + ", " + kinProp + ", " + boost::lexical_cast< std::string >( etaMin ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaMax ) + ( res.inverse() ? ", inv." : "" ) );
-          TF1 * func = new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) );
+          TF1 * func( new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) ) );
           func->SetParameters( res.C(), res.R(), res.N() );
           func->Write();
+          TF1 * funcRel( new TF1( std::string( name + "_Rel" ).c_str(), res.inverse() ? resFuncInvRel_.c_str() : resFuncRel_.c_str(), 0., objLimits_.at( iCat ) ) );
+          funcRel->SetParameters( res.C(), res.R(), res.N() );
+          funcRel->Write();
+          if ( kinProp == "Pt" && res.inverse() ) {
+            TF1 * funcInv( new TF1( std::string( name + "_Inv" ).c_str(), resFuncInvInv_.c_str(), 0., objLimits_.at( iCat ) ) );
+            funcInv->SetParameters( res.C(), res.R(), res.N() );
+            funcInv->Write();
+            TF1 * funcInvRel( new TF1( std::string( name + "_InvRel" ).c_str(), resFuncInvInvRel_.c_str(), 0., objLimits_.at( iCat ) ) );
+            funcInvRel->SetParameters( res.C(), res.R(), res.N() );
+            funcInvRel->Write();
+          }
 
         }
       }
