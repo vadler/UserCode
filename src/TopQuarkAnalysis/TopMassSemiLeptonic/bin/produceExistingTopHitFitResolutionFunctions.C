@@ -66,13 +66,13 @@ int main(  int argc, char * argv[] )
   for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
     const std::string objCat( objCats_.at( iCat ) );
     TDirectory * dirCat( outFile->mkdir( objCat.c_str(), objCat.c_str() ) );
-    if ( ! dirCat ) {
-      std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                << "   object category '" << objCat << "' does not exist in input file" << std::endl;
-      continue;
-    }
 
     const edm::FileInPath resFile( resFiles_.at( iCat ) );
+//     if ( ! resFile ) { // FIXME
+//       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+//                 << "   object category '" << objCat << "' does not exist in input file" << std::endl;
+//       continue;
+//     }
 
     if ( objCat == "MET" ) {
 
