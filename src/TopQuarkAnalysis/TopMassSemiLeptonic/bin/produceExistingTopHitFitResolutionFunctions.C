@@ -68,28 +68,34 @@ int main(  int argc, char * argv[] )
     TDirectory * dirCat( outFile->mkdir( objCat.c_str(), objCat.c_str() ) );
 
     const edm::FileInPath resFile( resFiles_.at( iCat ) );
-//     if ( ! resFile ) { // FIXME
-//       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-//                 << "   object category '" << objCat << "' does not exist in input file" << std::endl;
-//       continue;
-//     }
 
     if ( objCat == "MET" ) {
 
       const hitfit::Defaults_Text text( resFile.fullPath() );
+      const std::string binEta( "Eta" + boost::lexical_cast< std::string >( 0 ) );
+
       const hitfit::Resolution res( text.get_string( "met_resolution" ) );
-      std::string kinProp( kinProps_.at( 0 ) );
+      const std::string kinProp( kinProps_.at( 0 ) );
 
       TDirectory * dirProp( dirCat->mkdir( kinProp.c_str(), kinProp.c_str() ) );
-      dirProp->cd();
+      TDirectory * dirEta( dirProp->mkdir( binEta.c_str(), binEta.c_str() ) );
+      dirEta->cd();
 
-      const std::string name( "fitExist_" + objCat + "_" + kinProp );
+      const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
       TF1 * func( new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) ) );
       func->SetParameters( res.C(), res.R(), res.N() );
       func->Write();
       TF1 * funcRel( new TF1( std::string( name + "_Rel" ).c_str(), res.inverse() ? resFuncInvInvRel_.c_str() : resFuncRel_.c_str(), 0., objLimits_.at( iCat ) ) );
       funcRel->SetParameters( res.C(), res.R(), res.N() );
       funcRel->Write();
+      if ( res.inverse() ) {
+        TF1 * funcInv( new TF1( std::string( name + "_Inv" ).c_str(), resFuncInvInv_.c_str(), 0., objLimits_.at( iCat ) ) );
+        funcInv->SetParameters( res.C(), res.R(), res.N() );
+        funcInv->Write();
+        TF1 * funcInvRel( new TF1( std::string( name + "_InvRel" ).c_str(), resFuncInvInvRel_.c_str(), 0., objLimits_.at( iCat ) ) );
+        funcInvRel->SetParameters( res.C(), res.R(), res.N() );
+        funcInvRel->Write();
+      }
 
     }
 
@@ -115,10 +121,14 @@ int main(  int argc, char * argv[] )
           else if ( kinProp == "Phi" ) {
             res = hitfit::Resolution( vecRes.phi_res() );
           }
+
           TDirectory * dirProp;
-          if ( iResElem == 0 ) dirProp = dirCat->mkdir( kinProp.c_str(), kinProp.c_str() );
-          else                 dirProp = ( TDirectory* )( dirCat->Get( kinProp.c_str() ) );
-          dirProp->cd();
+          dirCat->GetObject( kinProp.c_str(), dirProp );
+          if ( ! dirProp ) dirProp = dirCat->mkdir( kinProp.c_str(), kinProp.c_str() );
+          TDirectory * dirEta;
+          dirProp->GetObject( binEta.c_str(), dirEta );
+          if ( ! dirEta ) dirEta = dirProp->mkdir( binEta.c_str(), binEta.c_str() );
+          dirEta->cd();
 
           const std::string inverse( res.inverse() ? "_Inv" : "" );
           const std::string name( "fitExist_" + objCat + inverse + "_" + kinProp + "_" + binEta );
