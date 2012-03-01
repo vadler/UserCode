@@ -125,9 +125,7 @@ int main(  int argc, char * argv[] )
           TDirectory * dirProp;
           dirCat->GetObject( kinProp.c_str(), dirProp );
           if ( ! dirProp ) dirProp = dirCat->mkdir( kinProp.c_str(), kinProp.c_str() );
-          TDirectory * dirEta;
-          dirProp->GetObject( binEta.c_str(), dirEta );
-          if ( ! dirEta ) dirEta = dirProp->mkdir( binEta.c_str(), binEta.c_str() );
+          TDirectory * dirEta( dirProp->mkdir( binEta.c_str(), binEta.c_str() ) );
           dirEta->cd();
 
           const std::string inverse( res.inverse() ? "_Inv" : "" );

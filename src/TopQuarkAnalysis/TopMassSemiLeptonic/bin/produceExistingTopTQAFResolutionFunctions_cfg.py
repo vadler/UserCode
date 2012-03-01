@@ -2,7 +2,7 @@ import os
 
 import FWCore.ParameterSet.Config as cms
 
-verbosity = 2
+verbosity = 1
 
 # era = 'Spring10'
 # import TopQuarkAnalysis.TopObjectResolutions.stringResolutions_etEtaPhi_Spring10_cff as resolutions
