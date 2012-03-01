@@ -2,6 +2,8 @@ import os
 
 import FWCore.ParameterSet.Config as cms
 
+verbosity = 2
+
 # era = 'Spring10'
 # import TopQuarkAnalysis.TopObjectResolutions.stringResolutions_etEtaPhi_Spring10_cff as resolutions
 era = 'Summer11'
@@ -16,6 +18,8 @@ objectCategories = cms.vstring( 'muon'
                               )
 
 process = cms.PSet()
+
+process.verbosity = cms.uint32( verbosity )
 
 process.existing = cms.PSet(
   # P_t limits for the plots, in line with the categories in "objectCategories"

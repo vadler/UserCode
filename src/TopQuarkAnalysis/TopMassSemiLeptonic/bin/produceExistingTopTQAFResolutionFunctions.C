@@ -1,6 +1,6 @@
-#include <cstdlib>
-#include <cmath>
-#include <cassert>
+// #include <cstdlib>
+// #include <cmath>
+// #include <cassert>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -16,8 +16,6 @@
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
-
-#include "TopQuarkAnalysis/TopHitFit/interface/EtaDepResolution.h"
 
 
 int main(  int argc, char * argv[] )
@@ -42,6 +40,7 @@ int main(  int argc, char * argv[] )
 
   // Get the configurations
   const edm::ParameterSet &              process_( parameterSet_->getParameter< edm::ParameterSet >( "process" ) );
+  const unsigned                         verbosity_( process_.getParameter< bool >( "verbosity" ) );
   const edm::ParameterSet &              exist_( process_.getParameter< edm::ParameterSet >( "existing" ) );
   const std::vector< double >            objLimits_( exist_.getParameter< std::vector< double > >( "objectPtLimits" ) );          // object upper edge of p_t range to display
   const std::vector< std::string >       kinProps_( exist_.getParameter< std::vector< std::string > >( "kinematicProperties" ) ); // kinematic variables
@@ -62,76 +61,38 @@ int main(  int argc, char * argv[] )
   for ( unsigned iRes = 0; iRes < resolutions_.size(); ++iRes ) {
     const edm::ParameterSet resolution( resolutions_.at( iRes ) );
     const std::string label( resolution.getParameter< std::string >( "label" ) );
+    if ( verbosity_ > 0 ) std::cout << "Found resolution set: " << label << std::endl;
 
-//     if ( objCat == "MET" ) {
-//
-//       const hitfit::Defaults_Text text( resFile.fullPath() );
-//       const hitfit::Resolution res( text.get_string( "met_resolution" ) );
-//       std::string kinProp( kinProps_.at( 0 ) );
-//
-//       TDirectory * dirProp( dirCat->mkdir( kinProp.c_str(), kinProp.c_str() ) );
-//       dirProp->cd();
-//
-//       const std::string name( "fitExist_" + objCat + "_" + kinProp );
-//       TF1 * func( new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) ) );
-//       func->SetParameters( res.C(), res.R(), res.N() );
-//       func->Write();
-//       TF1 * funcRel( new TF1( std::string( name + "_Rel" ).c_str(), res.inverse() ? resFuncInvInvRel_.c_str() : resFuncRel_.c_str(), 0., objLimits_.at( iCat ) ) );
-//       funcRel->SetParameters( res.C(), res.R(), res.N() );
-//       funcRel->Write();
-//
-//     }
-//
-//     else {
-//
-//       const hitfit::EtaDepResolution res( resFile.fullPath() );
-//       const std::vector< hitfit::EtaDepResElement > resElems( res.GetEtaDepResElement() );
-//
-//       for ( unsigned iResElem = 0; iResElem < resElems.size(); ++iResElem ) {
-//         const std::string binEta( "Eta" + boost::lexical_cast< std::string >( iResElem ) );
-//
-//         const hitfit::Vector_Resolution vecRes( resElems.at( iResElem ).GetResolution() );
-//
-//         for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
-//           std::string kinProp( kinProps_.at( iProp ) );
-//           hitfit::Resolution res;
-//           if ( kinProp == "Pt" ) {
-//             res = hitfit::Resolution( vecRes.p_res() );
-//           }
-//           else if ( kinProp == "Eta" ) {
-//             res = hitfit::Resolution( vecRes.eta_res() );
-//           }
-//           else if ( kinProp == "Phi" ) {
-//             res = hitfit::Resolution( vecRes.phi_res() );
-//           }
-//           TDirectory * dirProp;
-//           if ( iResElem == 0 ) dirProp = dirCat->mkdir( kinProp.c_str(), kinProp.c_str() );
-//           else                 dirProp = ( TDirectory* )( dirCat->Get( kinProp.c_str() ) );
-//           dirProp->cd();
-//
-//           const std::string inverse( res.inverse() ? "_Inv" : "" );
-//           const std::string name( "fitExist_" + objCat + inverse + "_" + kinProp + "_" + binEta );
-//           TF1 * func( new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) ) );
-//           func->SetParameters( res.C(), res.R(), res.N() );
-//           func->Write();
-//           if ( kinProp == "Pt" ) {
-//             TF1 * funcRel( new TF1( std::string( name + "_Rel" ).c_str(), res.inverse() ? resFuncInvRel_.c_str() : resFuncRel_.c_str(), 0., objLimits_.at( iCat ) ) );
-//             funcRel->SetParameters( res.C(), res.R(), res.N() );
-//             funcRel->Write();
-//             if ( res.inverse() ) {
-//               TF1 * funcInv( new TF1( std::string( name + "_Inv" ).c_str(), resFuncInvInv_.c_str(), 0., objLimits_.at( iCat ) ) );
-//               funcInv->SetParameters( res.C(), res.R(), res.N() );
-//               funcInv->Write();
-//               TF1 * funcInvRel( new TF1( std::string( name + "_InvRel" ).c_str(), resFuncInvInvRel_.c_str(), 0., objLimits_.at( iCat ) ) );
-//               funcInvRel->SetParameters( res.C(), res.R(), res.N() );
-//               funcInvRel->Write();
-//             }
-//           }
-//
-//         }
-//       }
-//
-//     }
+    TDirectory * dirRes( outFile->mkdir( label.c_str(), label.c_str() ) );
+
+    const std::vector< edm::ParameterSet > functions( resolution.getParameter< std::vector< edm::ParameterSet > >( "functions" ) );
+    if ( functions.size() == 1 ) { // MET
+      const edm::ParameterSet binFunctions( functions.at( 0) );
+      const std::string titleEt( binFunctions.getParameter< std::string >( "et" ) );
+      const std::string titleEta( binFunctions.getParameter< std::string >( "eta" ) );
+      const std::string titlePhi( binFunctions.getParameter< std::string >( "phi" ) );
+      if ( verbosity_ > 1 ) {
+        std::cout << "  bin: no eta binning" << std::endl;
+        std::cout << "    et : " << titleEt << std::endl;
+        std::cout << "    eta: " << titleEta << std::endl;
+        std::cout << "    phi: " << titlePhi << std::endl;
+      }
+    }
+    else {
+      for ( unsigned iBin = 0; iBin < functions.size(); ++iBin ) {
+        const edm::ParameterSet binFunctions( functions.at( iBin) );
+        const std::string titleBin( binFunctions.getParameter< std::string >( "bin" ) );
+        const std::string titleEt( binFunctions.getParameter< std::string >( "et" ) );
+        const std::string titleEta( binFunctions.getParameter< std::string >( "eta" ) );
+        const std::string titlePhi( binFunctions.getParameter< std::string >( "phi" ) );
+        if ( verbosity_ > 1 ) {
+          std::cout << "  bin: " << titleBin << std::endl;
+          std::cout << "    et : " << titleEt << std::endl;
+          std::cout << "    eta: " << titleEta << std::endl;
+          std::cout << "    phi: " << titlePhi << std::endl;
+        }
+      }
+    }
 
   }
 
