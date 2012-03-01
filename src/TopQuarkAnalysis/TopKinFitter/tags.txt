@@ -7,7 +7,7 @@ DataFormats/PatCandidates                        V06-04-33      V06-04-32
 PhysicsTools/KinFitter                           V00-03-06      V00-03-04      
 PhysicsTools/PatAlgos                            V08-07-39      V08-07-37      
 TopQuarkAnalysis/TopEventProducers               V06-08-01      V06-07-13      
-TopQuarkAnalysis/TopHitFit                       V00-00-01                     
+TopQuarkAnalysis/TopHitFit                       V00-00-02                     
 TopQuarkAnalysis/TopJetCombination               V06-08-01      V06-07-09      
 TopQuarkAnalysis/TopKinFitter                    V06-07-17      V06-07-11      
 TopQuarkAnalysis/TopMassSemiLeptonic             NoCVS                         
