@@ -39,9 +39,6 @@ process.verbose = cms.uint32( 2 )
 if runTest:
   process.verbose = 3
 process.objectCategories = cms.vstring( lepton
-                                      #, 'UdscJet'
-                                      #, 'BJet'
-                                      #, 'MET'
                                       )
 if not runTest:
   process.objectCategories.append( 'UdscJet' )
@@ -60,8 +57,8 @@ process.fitter = cms.PSet(
   # derived formulas
 , resolutionFunctionRel           = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])/x' )
 , resolutionFunctionInverseRel    = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])/x' )
-, resolutionFunctionInverseInv    = cms.string( 'sqrt(([2]*[2]*x+[1]*[1])*x+[0]*[0])' )
-, resolutionFunctionInverseInvRel = cms.string( 'sqrt(([2]*[2]*x+[1]*[1])*x+[0]*[0])/x' )
+, resolutionFunctionInverseInv    = cms.string( 'sqrt(([2]*[2]*x+[1]*[1])*x+[0]*[0])*x' )
+, resolutionFunctionInverseInvRel = cms.string( 'sqrt(([2]*[2]*x+[1]*[1])*x+[0]*[0])' )
   # histogram options
 , widthFactor = cms.double( 5. )
 )
