@@ -1,8 +1,8 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-from Configuration.AlCa.autoCond import autoCond
-process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
-process.source.fileNames    = pickRelValInputFiles()
+process.source.fileNames    = pickRelValInputFiles( relVal      = 'RelValProdTTbar'
+                                                  , dataTier    = 'AODSIM'
+                                                  )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
 
