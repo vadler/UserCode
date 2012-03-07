@@ -4,7 +4,7 @@ process = cms.Process( "HLTPROV" )
 
 # Steering
 cmsswVersion = 'CMSSW_5_1_1'
-globalTag    = 'PU_START50_V13_special_120214'
+globalTag    = 'START50_V13'
 
 # Conditions
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
@@ -20,7 +20,7 @@ process.source = cms.Source("PoolSource",
                         , relVal        = None
                         , dataTier      = None
                         , condition     = None
-                        , globalTag     = globalTag
+                        , globalTag     = 'PU_START50_V13_special_120214'
                         , maxVersions   = 1
                         , skipFiles     = None
                         , numberOfFiles = None
