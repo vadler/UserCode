@@ -45,7 +45,7 @@ process.p = cms.Path(
 from L1Trigger.Configuration.L1Trigger_EventContent_cff import L1TriggerAOD
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, fileName       = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfoOnly_dataFromRAW.root'%( cmsswBase ) )
+, fileName       = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfoOnly_dataFromRAWOld.root'%( cmsswBase ) )
 , SelectEvents   = cms.untracked.PSet(
     SelectEvents = cms.vstring(
       'p'
