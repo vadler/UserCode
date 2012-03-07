@@ -7,17 +7,16 @@ condition = 'startup'
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ condition ] )
-globalTag                   = autoCond[ condition ][ : -5 ]
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
     pickRelValInputFiles( cmsswVersion  = None
-                        , relVal        = None
-                        , dataTier      = None
+                        , relVal        = 'RelValProdTTbar'
+                        , dataTier      = 'AODSIM'
                         , condition     = None
-                        , globalTag     = globalTag
+                        , globalTag     = None
                         , maxVersions   = None
                         , skipFiles     = None
                         , numberOfFiles = None

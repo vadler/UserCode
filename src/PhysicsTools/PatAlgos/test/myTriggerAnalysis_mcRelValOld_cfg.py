@@ -3,8 +3,8 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process( "HLTPROV" )
 
 # Steering
-cmsswVersion = 'CMSSW_5_1_1'
-globalTag    = 'START50_V13'
+cmsswVersion = 'CMSSW_5_2_0_pre5'
+globalTag    = 'START52_V1'
 
 # Conditions
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
@@ -17,10 +17,10 @@ process.source = cms.Source("PoolSource",
 
     pickRelValInputFiles( #formerVersion = True
                           cmsswVersion  = cmsswVersion
-                        , relVal        = None
-                        , dataTier      = None
+                        , relVal        = 'RelValProdTTbar'
+                        , dataTier      = 'AODSIM'
                         , condition     = None
-                        , globalTag     = 'PU_START50_V13_special_120214'
+                        , globalTag     = globalTag
                         , maxVersions   = 1
                         , skipFiles     = None
                         , numberOfFiles = None

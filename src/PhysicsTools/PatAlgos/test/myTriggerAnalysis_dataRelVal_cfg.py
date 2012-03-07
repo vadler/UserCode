@@ -6,8 +6,8 @@ process = cms.Process( "HLTPROV" )
 condition = 'com10'
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.autoCond import autoCond
-process.GlobalTag.globaltag = autoCond[ condition ]
 globalTag                   = autoCond[ condition ][ : -5 ]
+process.GlobalTag.globaltag = autoCond[ condition ]
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
