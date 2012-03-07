@@ -11,9 +11,9 @@ process.options = cms.untracked.PSet(
 )
 
 ## Source
-from PhysicsTools.PatAlgos.myPatTuple_dataFromRAW_cff import fileNames
+from PhysicsTools.PatAlgos.myPatTuple_dataFromRAW_cff import fileNamesOld
 process.source = cms.Source( "PoolSource"
-, fileNames
+, fileNamesOld
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 100 )
