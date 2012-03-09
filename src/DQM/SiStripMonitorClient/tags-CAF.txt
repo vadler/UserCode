@@ -1,7 +1,0 @@
-Test Release based on: CMSSW_3_1_X_2009-03-19-0300
-Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc4_ia32_gcc345/thu/3.1-thu-03/CMSSW_3_1_X_2009-03-19-0300
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_3_1_X_2009-03-19-0300
---- Tag ---    -------- Package --------                        
-V03-03-21      DQM/SiStripMonitorClient                         
----------------------------------------
-total packages: 1 (1 displayed)
