@@ -1,5 +1,5 @@
 //
-// $Id: PATObject.h,v 1.38 2012/01/20 08:51:05 cbern Exp $
+// $Id: PATObject.h,v 1.35 2011/05/29 22:43:15 rwolf Exp $
 //
 
 #ifndef DataFormats_PatCandidates_PATObject_h
@@ -15,7 +15,7 @@
    https://hypernews.cern.ch/HyperNews/CMS/get/physTools.html
 
   \author   Steven Lowette, Giovanni Petrucciani, Frederic Ronga, Volker Adler, Sal Rappoccio
-  \version  $Id: PATObject.h,v 1.38 2012/01/20 08:51:05 cbern Exp $
+  \version  $Id: PATObject.h,v 1.35 2011/05/29 22:43:15 rwolf Exp $
 */
 
 
@@ -24,7 +24,6 @@
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include <vector>
 #include <string>
-#include <iosfwd>
 
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/LookupTableRecord.h"
@@ -55,8 +54,8 @@ namespace pat {
       PATObject(const edm::Ptr<ObjectType> & ref);
       /// destructor
       virtual ~PATObject() {}
-      // returns a clone                                  // NO: ObjectType can be an abstract type like reco::Candidate
-      // virtual PATObject<ObjectType> * clone() const ;  //     for which the clone() can't be defined
+    // returns a clone                                  // NO: ObjectType can be an abstract type like reco::Candidate
+    //  virtual PATObject<ObjectType> * clone() const ; //     for which the clone() can't be defined
 
       /// access to the original object; returns zero for null Ref and throws for unavailable collection
       const reco::Candidate * originalObject() const;
@@ -169,11 +168,11 @@ namespace pat {
         return triggerObjectMatchesByPath( std::string( namePath ), pathLastFilterAccepted, pathL3FilterAccepted );
       };
       // for the cut string parser
-      const TriggerObjectStandAloneCollection triggerObjectMatchesByPath( const std::string & namePath, const unsigned pathLastFilterAccepted, const unsigned pathL3FilterAccepted = 1 ) const {
+      const TriggerObjectStandAloneCollection triggerObjectMatchesByPath( const std::string & namePath, const unsigned pathLastFilterAccepted = 0, const unsigned pathL3FilterAccepted = 1 ) const {
         return triggerObjectMatchesByPath( namePath, bool( pathLastFilterAccepted ), bool( pathL3FilterAccepted ) );
       };
       // for RooT command line and the cut string parser
-      const TriggerObjectStandAloneCollection triggerObjectMatchesByPath( const char * namePath, const unsigned pathLastFilterAccepted, const unsigned pathL3FilterAccepted = 1 ) const {
+      const TriggerObjectStandAloneCollection triggerObjectMatchesByPath( const char * namePath, const unsigned pathLastFilterAccepted = 0, const unsigned pathL3FilterAccepted = 1 ) const {
         return triggerObjectMatchesByPath( std::string( namePath ), bool( pathLastFilterAccepted ), bool( pathL3FilterAccepted ) );
       };
       /// get one matched HLT object used in a certain HLT path by index;
@@ -187,11 +186,11 @@ namespace pat {
         return triggerObjectMatchByPath( std::string( namePath ), pathLastFilterAccepted, pathL3FilterAccepted, idx );
       };
       // for the cut string parser
-      const TriggerObjectStandAlone * triggerObjectMatchByPath( const std::string & namePath, const unsigned pathLastFilterAccepted, const unsigned pathL3FilterAccepted = 1, const size_t idx = 0 ) const {
+      const TriggerObjectStandAlone * triggerObjectMatchByPath( const std::string & namePath, const unsigned pathLastFilterAccepted = 0, const unsigned pathL3FilterAccepted = 1, const size_t idx = 0 ) const {
         return triggerObjectMatchByPath( namePath, bool( pathLastFilterAccepted ), bool( pathL3FilterAccepted ), idx );
       };
       // for RooT command line and the cut string parser
-      const TriggerObjectStandAlone * triggerObjectMatchByPath( const char * namePath, const unsigned pathLastFilterAccepted, const unsigned pathL3FilterAccepted = 1, const size_t idx = 0 ) const {
+      const TriggerObjectStandAlone * triggerObjectMatchByPath( const char * namePath, const unsigned pathLastFilterAccepted = 0, const unsigned pathL3FilterAccepted = 1, const size_t idx = 0 ) const {
         return triggerObjectMatchByPath( std::string( namePath ), bool( pathLastFilterAccepted ), bool( pathL3FilterAccepted ), idx );
       };
       /// add a trigger match
@@ -312,9 +311,6 @@ namespace pat {
       /// Get user-defined float
       /// Note: it will return 0.0 if the key is not found; you can check if the key exists with 'hasUserFloat' method.
       float userFloat( const std::string & key ) const;
-      /// a CINT-friendly interface
-      float userFloat( const char* key ) const { return userFloat( std::string(key) ); }
-      
       /// Set user-defined float
       void addUserFloat( const  std::string & label, float data );
       /// Get list of user-defined float names
@@ -323,9 +319,6 @@ namespace pat {
       bool hasUserFloat( const std::string & key ) const {
         return std::find(userFloatLabels_.begin(), userFloatLabels_.end(), key) != userFloatLabels_.end();
       }
-      /// a CINT-friendly interface
-      bool hasUserFloat( const char* key ) const {return hasUserFloat( std::string(key) );}
-
       /// Get user-defined int
       /// Note: it will return 0 if the key is not found; you can check if the key exists with 'hasUserInt' method.
       int32_t userInt( const std::string & key ) const;
@@ -465,6 +458,7 @@ namespace pat {
     ObjectType(*ref),
     refToOrig_(ref) {
   }
+
 
   template <class ObjectType> const reco::Candidate * PATObject<ObjectType>::originalObject() const {
     if (refToOrig_.isNull()) {
