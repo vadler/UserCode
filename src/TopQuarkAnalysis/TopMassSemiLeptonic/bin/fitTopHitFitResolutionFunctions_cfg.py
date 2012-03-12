@@ -12,14 +12,15 @@ rfioInput = False
 era = 'Summer11'
 
 # Selection to fit for
-# selection = 'analyzeHitFitResolutionFunctions'
-selection = 'analyzeHitFitResolutionFunctions_Reference'
+selection = 'analyzeHitFitResolutionFunctions'
+# selection = 'analyzeHitFitResolutionFunctions_Reference'
 
 # Lepton
 lepton = 'Mu'
 # lepton = 'Elec'
 
 # Settings
+overwrite = True
 # !!! Exclusive switches:
 useAlt  = False # 'True' makes sense only, if available in input (will not crash other wise)
 useSymm = False # 'True' makes sense only, if available in input (will not crash other wise)
@@ -44,9 +45,10 @@ if not runTest:
   process.objectCategories.append( 'UdscJet' )
   process.objectCategories.append( 'BJet' )
   process.objectCategories.append( 'MET' )
-process.useAlt   = cms.bool( useAlt )
-process.useSymm  = cms.bool( useSymm )
-process.refGen   = cms.bool( refGen )
+process.overwrite = cms.bool( overwrite )
+process.useAlt    = cms.bool( useAlt )
+process.useSymm   = cms.bool( useSymm )
+process.refGen    = cms.bool( refGen )
 
 process.fitter = cms.PSet(
   inputFile                    = cms.string( inputFile )

@@ -51,6 +51,7 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & process_( edm::readPSetsFrom( argv[ 1 ] )->getParameter< edm::ParameterSet >( "process" ) );
   const unsigned verbose_( process_.getParameter< unsigned >( "verbose" ) );
   const std::vector< std::string > objCats_( process_.getParameter< std::vector< std::string > >( "objectCategories" ) );   // object categories
+  const bool overwrite_(  process_.getParameter< bool >( "overwrite" ));
   const bool useAlt_(  process_.getParameter< bool >( "useAlt" ));
   const bool useSymm_(  process_.getParameter< bool >( "useSymm" ));
   const bool refGen_(  process_.getParameter< bool >( "refGen" ));
@@ -84,6 +85,7 @@ int main( int argc, char * argv[] )
   else if ( verbose_ > 3 ) optionsFitSigma_.append( "V" );
   const std::string titleChi2( "#chi^{2} / ndf" );
   const std::string titleProb( "Probability" );
+  const std::string titleNdf( "ndf" );
   const std::string titleEta( "#eta" );
   const std::string titlePt( "p_{t} (GeV)" );
 
@@ -110,7 +112,7 @@ int main( int argc, char * argv[] )
 
       for ( unsigned uCat = 0; uCat < objCats_.size(); ++uCat ) {
         const std::string objCat( objCats_.at( uCat ) );
-        TDirectory * dirCat_( ( TDirectory* )( resolutionFile->Get( objCat.c_str() ) ) );
+        TDirectory * dirCat_( dynamic_cast< TDirectory* >( resolutionFile->Get( objCat.c_str() ) ) );
         if ( ! dirCat_ ) {
           std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                     << "   object category '" << objCat << "' does not exist in resolution file" << std::endl;
@@ -123,7 +125,7 @@ int main( int argc, char * argv[] )
         while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
           if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
           const std::string kinProp( keyProp->GetName() );
-          TDirectory * dirProp_( ( TDirectory* )( dirCat_->Get( kinProp.c_str() ) ) );
+          TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
 
           TList * listProp( dirProp_->GetListOfKeys() );
           if ( verbose_ > 3 ) listProp->Print();
@@ -132,7 +134,7 @@ int main( int argc, char * argv[] )
             if ( std::string( keyEta->GetClassName() ) != nameFuncClass ) continue;
             const std::string name( keyEta->GetName() );
 
-//             TF1 * fitSigma2D2( ( TF1* )( dirProp_->Get( name.c_str() ) ) );
+//             TF1 * fitSigma2D2( dynamic_cast< TF1* >( dirProp_->Get( name.c_str() ) ) );
 
           } // loop: nextInListProp()
 
@@ -164,7 +166,7 @@ int main( int argc, char * argv[] )
     returnStatus_ += 0x10;
     return returnStatus_;
   }
-  TDirectory * dirSel_ = ( TDirectory* )( fileIn_->Get( evtSel_.c_str() ) );
+  TDirectory * dirSel_ = dynamic_cast< TDirectory* >( fileIn_->Get( evtSel_.c_str() ) );
 
   // Loops through directory structure
 
@@ -178,7 +180,7 @@ int main( int argc, char * argv[] )
   // Loop over configured object categories
   for ( unsigned uCat = 0; uCat < objCats_.size(); ++uCat ) {
     const std::string objCat( objCats_.at( uCat ) );
-    TDirectory * dirCat_( ( TDirectory* )( dirSel_->Get( objCat.c_str() ) ) );
+    TDirectory * dirCat_( dynamic_cast< TDirectory* >( dirSel_->Get( objCat.c_str() ) ) );
     if ( ! dirCat_ ) {
       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                 << "   object category '" << objCat << "' does not exist in input file" << std::endl;
@@ -189,7 +191,7 @@ int main( int argc, char * argv[] )
 
     // Eta binning
     std::vector< double > etaBins_;
-    TH1D * histBinsEta( ( TH1D* )( dirCat_->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
+    TH1D * histBinsEta( dynamic_cast< TH1D* >( dirCat_->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
     for ( int iEta = 0; iEta < histBinsEta->GetNbinsX(); ++iEta ) {
       etaBins_.push_back( histBinsEta->GetBinLowEdge( iEta + 1 ) );
     }
@@ -198,7 +200,7 @@ int main( int argc, char * argv[] )
 
     // Pt binning
     std::vector< double > ptBins_;
-    TH1D * histBinsPt( ( TH1D* )( dirCat_->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
+    TH1D * histBinsPt( dynamic_cast< TH1D* >( dirCat_->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
     for ( int uPt = 0; uPt < histBinsPt->GetNbinsX(); ++uPt ) {
       ptBins_.push_back( histBinsPt->GetBinLowEdge( uPt + 1 ) );
     }
@@ -211,7 +213,7 @@ int main( int argc, char * argv[] )
     Double_t ptData;
     Double_t ptGenData;
     Int_t    iEta;
-    TTree * data_( ( TTree* )( dirCat_->Get( std::string( objCat + "_data" ).c_str() ) ) );
+    TTree * data_( dynamic_cast< TTree* >( dirCat_->Get( std::string( objCat + "_data" ).c_str() ) ) );
     if ( useAlt_ ) data_->SetBranchAddress( "PtAlt", &ptData );
     else           data_->SetBranchAddress( "Pt", &ptData );
     data_->SetBranchAddress( "PtGen", &ptGenData );
@@ -241,7 +243,7 @@ int main( int argc, char * argv[] )
     while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
       if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
       const std::string kinProp( keyProp->GetName() );
-      TDirectory * dirProp_( ( TDirectory* )( dirCat_->Get( kinProp.c_str() ) ) );
+      TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
 
       // Read kinematic property n-tuple data
       dataCont propData_( nEtaBins_ );
@@ -264,10 +266,11 @@ int main( int argc, char * argv[] )
       while ( TKey * keyFit = ( TKey* )nextInListProp() ) {
         if ( std::string( keyFit->GetClassName() ) != nameDirClass ) continue;
         const std::string subFit( keyFit->GetName() );
+        // These are real switches: depending on configuration, only one setting combination can be run at a time
         if ( useAlt_  == ( subFit.find( "Alt" )  == std::string::npos ) ) continue;
         if ( useSymm_ == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
         if ( refGen_  == ( subFit.find( "Gen" )  == std::string::npos ) ) continue;
-        TDirectory * dirFit_( ( TDirectory* )( dirProp_->Get( subFit.c_str() ) ) );
+        TDirectory * dirFit_( dynamic_cast< TDirectory* >( dirProp_->Get( subFit.c_str() ) ) );
 
         // Inversion flag from directory name
         const bool inverse( subFit.substr( subFit.size() - 3 ) == "Inv" );
@@ -301,6 +304,7 @@ int main( int argc, char * argv[] )
         TH1D * histSigmaNtupProbMap( new TH1D( nameSigmaNtupProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
         histSigmaNtupProbMap->SetXTitle( titleEta.c_str() );
         histSigmaNtupProbMap->SetYTitle( titleProb.c_str() );
+        ////////
         const std::string name2D2Prob( name + "_2D2_fitProb" );
         TH1D * hist2D2Prob( new TH1D( name2D2Prob.c_str(), titleProb.c_str(), 20, 0., 1. ) );
         hist2D2Prob->SetXTitle( titleProb.c_str() );
@@ -338,6 +342,19 @@ int main( int argc, char * argv[] )
         const std::string nameDeltasNtupProp( name + "_DeltasNtup_fitProp" );
         TH1D * histDeltasNtupProp( new TH1D( nameDeltasNtupProp.c_str(), titleProb.c_str(), 20, 0., 1. ) );
         histDeltasNtupProp->SetXTitle( titleProb.c_str() );
+        ////////
+        const std::string nameDeltasBadProp( name + "_Deltas_fitBadProp" );
+        TH1D * histDeltasBadProp( new TH1D( nameDeltasBadProp.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histDeltasBadProp->SetXTitle( titleProb.c_str() );
+        const std::string nameDeltasNtupBadProp( name + "_DeltasNtup_fitBadProp" );
+        TH1D * histDeltasNtupBadProp( new TH1D( nameDeltasNtupBadProp.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histDeltasNtupBadProp->SetXTitle( titleProb.c_str() );
+        const std::string nameDeltasBadNdf( name + "_Deltas_fitBadNdf" );
+        TH1D * histDeltasBadNdf( new TH1D( nameDeltasBadNdf.c_str(), titleNdf.c_str(), 20, 0., 20. ) );
+        histDeltasBadNdf->SetXTitle( titleNdf.c_str() );
+        const std::string nameDeltasNtupBadNdf( name + "_DeltasNtup_fitBadNdf" );
+        TH1D * histDeltasNtupBadNdf( new TH1D( nameDeltasNtupBadNdf.c_str(), titleNdf.c_str(), 20, 0., 20. ) );
+        histDeltasNtupBadNdf->SetXTitle( titleNdf.c_str() );
 
         // Loop over eta bins
         TList * listFit( dirFit_->GetListOfKeys() );
@@ -361,9 +378,9 @@ int main( int argc, char * argv[] )
           const std::string name( objCat + "_" + kinProp + "_" + subFit + "_" + binEta );
 
           // Direct fit in slices of the 2-dim histogram
-          TH2D * hist2D( ( TH2D* )( gDirectory->Get( name.c_str() ) ) );
+          TH2D * hist2D( dynamic_cast< TH2D* >( gDirectory->Get( name.c_str() ) ) );
           hist2D->FitSlicesY( 0, 1, hist2D->GetNbinsX(), 1 );
-          TH1D * histSigma2D2( ( TH1D* )( gDirectory->Get( std::string( name + "_2" ).c_str() ) ) ); // sigmas of the slice fits
+          TH1D * histSigma2D2( dynamic_cast< TH1D* >( gDirectory->Get( std::string( name + "_2" ).c_str() ) ) ); // sigmas of the slice fits
           const std::string nameFitSigma2D2( name + "_2D2_fit" );
           const std::string formula( inverse ? resFuncInv_ : resFunc_ );
           const std::string formulaRel( inverse ? resFuncInvRel_ : resFuncRel_ );
@@ -428,14 +445,21 @@ int main( int argc, char * argv[] )
             const std::string nameFitDelta( nameDelta + "_fit" );
             TF1 * fitDelta( new TF1( nameFitDelta.c_str(), "gaus", histDelta->GetXaxis()->GetXmin(), histDelta->GetXaxis()->GetXmax() ) );
             TFitResultPtr fitDeltaResultPtr( histDelta->Fit( fitDelta, optionsFit_.c_str() ) );
-            if ( fitDeltaResultPtr >= 0 && ( fitDeltaResultPtr->Status() == 0 && fitDeltaResultPtr->Ndf() != 0. ) ) {
-              histDeltasChi2Map->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Chi2() / fitDeltaResultPtr->Ndf() );
-              histDeltaChi2->SetBinContent( uPt + 1, fitDeltaResultPtr->Chi2() / fitDeltaResultPtr->Ndf() );
-              histDeltasPropMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Prob() );
-              histDeltasProp->Fill( fitDeltaResultPtr->Prob() );
-              histDeltaProp->SetBinContent( uPt + 1, fitDeltaResultPtr->Prob() );
-              histSigma->SetBinContent( uPt + 1, fitDeltaResultPtr->Parameter( 2 ) );
-              histSigma->SetBinError( uPt + 1, fitDeltaResultPtr->ParError( 2 ) );
+            if ( fitDeltaResultPtr >= 0 ) {
+              if ( fitDeltaResultPtr->Status() == 0 && fitDeltaResultPtr->Ndf() != 0. ) {
+                histDeltasChi2Map->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Chi2() / fitDeltaResultPtr->Ndf() );
+                histDeltaChi2->SetBinContent( uPt + 1, fitDeltaResultPtr->Chi2() / fitDeltaResultPtr->Ndf() );
+                histDeltasPropMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Prob() );
+                histDeltasProp->Fill( fitDeltaResultPtr->Prob() );
+                histDeltaProp->SetBinContent( uPt + 1, fitDeltaResultPtr->Prob() );
+                histSigma->SetBinContent( uPt + 1, fitDeltaResultPtr->Parameter( 2 ) );
+                histSigma->SetBinError( uPt + 1, fitDeltaResultPtr->ParError( 2 ) );
+              }
+              else {
+                if ( fitDeltaResultPtr->Prob() == 0. ) histDeltasBadProp->AddBinContent( 0 );
+                else                                   histDeltasBadProp->Fill( fitDeltaResultPtr->Prob() );
+                histDeltasBadNdf->Fill( fitDeltaResultPtr->Ndf() );
+              }
             }
           } // loop: uPt < nPtBins_
           const std::string nameFitSigma( nameSigma + "_fit" );
@@ -506,7 +530,7 @@ int main( int argc, char * argv[] )
             const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
 
             const std::string nameDelta( name + "_Pt" + binPt + "_Delta" );
-            TH1D * histDelta( ( TH1D* )( gDirectory->Get( nameDelta.c_str() ) ) );
+            TH1D * histDelta( dynamic_cast< TH1D* >( gDirectory->Get( nameDelta.c_str() ) ) );
             const std::string nameDeltaNtup( nameDelta + "Ntup" );
             const std::string titleDeltaNtup( histDelta->GetTitle() );
             const Int_t nBinsDeltaNtup( hist2D->GetNbinsY() ); // FIXME: tune number of bins,
@@ -531,20 +555,27 @@ int main( int argc, char * argv[] )
                 if ( inverse && kinProp == "Pt" ) histDeltaNtup->Fill( 1. / propEtaBin.at( uPt ).at( uEntry ) - 1. / propGenEtaBin.at( uPt ).at( uEntry ) );
                 else                              histDeltaNtup->Fill( propEtaBin.at( uPt ).at( uEntry ) - propGenEtaBin.at( uPt ).at( uEntry ) );
               }
-            }
+            } // loop: uEntry < nEntries
 
             const std::string nameFitDeltaNtup( nameDeltaNtup + "_fit" );
             TF1 * fitDeltaNtup( new TF1( nameFitDeltaNtup.c_str(), "gaus", histDeltaNtup->GetXaxis()->GetXmin(), histDeltaNtup->GetXaxis()->GetXmax() ) );
             TFitResultPtr fitDeltaNtupResultPtr( histDeltaNtup->Fit( fitDeltaNtup, optionsFit_.c_str() ) );
-            if ( fitDeltaNtupResultPtr >= 0 && ( fitDeltaNtupResultPtr->Status() == 0 && fitDeltaNtupResultPtr->Ndf() != 0. ) ) {
-              histDeltasNtupChi2Map->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Chi2() / fitDeltaNtupResultPtr->Ndf() );
-              histDeltaNtupChi2->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Chi2() / fitDeltaNtupResultPtr->Ndf() );
-              histDeltasNtupPropMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Prob() );
-              histDeltasNtupProp->Fill( fitDeltaNtupResultPtr->Prob() );
-              histDeltaNtupProp->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Prob() );
-              histSigmaNtup->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Parameter( 2 ) );
-              histSigmaNtup->SetBinError( uPt + 1, fitDeltaNtupResultPtr->ParError( 2 ) );
-            }  // loop: uPt < nPtBins
+            if ( fitDeltaNtupResultPtr >= 0 ) {
+              if ( fitDeltaNtupResultPtr->Status() == 0 && fitDeltaNtupResultPtr->Ndf() != 0. ) {
+                histDeltasNtupChi2Map->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Chi2() / fitDeltaNtupResultPtr->Ndf() );
+                histDeltaNtupChi2->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Chi2() / fitDeltaNtupResultPtr->Ndf() );
+                histDeltasNtupPropMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Prob() );
+                histDeltasNtupProp->Fill( fitDeltaNtupResultPtr->Prob() );
+                histDeltaNtupProp->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Prob() );
+                histSigmaNtup->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Parameter( 2 ) );
+                histSigmaNtup->SetBinError( uPt + 1, fitDeltaNtupResultPtr->ParError( 2 ) );
+              }
+              else {
+                if ( fitDeltaNtupResultPtr->Prob() == 0. ) histDeltasNtupBadProp->AddBinContent( 0 );
+                else                                       histDeltasNtupBadProp->Fill( fitDeltaNtupResultPtr->Prob() );
+                histDeltasNtupBadNdf->Fill( fitDeltaNtupResultPtr->Ndf() );
+              }
+            }
           }  // loop: uEntry < sizePt.at( uPt )
           const std::string nameFitSigmaNtup( nameSigmaNtup + "_fit" );
           TF1 * fitSigmaNtup( new TF1( nameFitSigmaNtup.c_str(), formula.c_str() ) );
@@ -585,7 +616,8 @@ int main( int argc, char * argv[] )
   } // loop: uCat < objCats_.size()
 
   // Write and close input file
-  fileIn_->Write();
+  if ( overwrite_ ) fileIn_->Write( 0, TObject::kOverwrite );
+  else              fileIn_->Write();
   fileIn_->Close();
 
   if ( verbose_ > 0 )
