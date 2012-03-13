@@ -280,41 +280,7 @@ int main( int argc, char * argv[] )
         dirFit_->cd();
         const std::string name( objCat + "_" + kinProp + "_" + subFit );
 
-        const std::string name2D2Chi2Map( name + "_2D2_fitChi2Map" );
-        TH1D * hist2D2Chi2Map( new TH1D( name2D2Chi2Map.c_str(), titleChi2.c_str(), nEtaBins_, etaBins_.data() ) );
-        hist2D2Chi2Map->SetXTitle( titleEta.c_str() );
-        hist2D2Chi2Map->SetYTitle( titleChi2.c_str() );
-        const std::string nameSigmaChi2Map( name + "_Sigma_fitChi2Map" );
-        TH1D * histSigmaChi2Map( new TH1D( nameSigmaChi2Map.c_str(), titleChi2.c_str(), nEtaBins_, etaBins_.data() ) );
-        histSigmaChi2Map->SetXTitle( titleEta.c_str() );
-        histSigmaChi2Map->SetYTitle( titleChi2.c_str() );
-        const std::string nameSigmaNtupChi2Map( name + "_SigmaNtup_fitChi2Map" );
-        TH1D * histSigmaNtupChi2Map( new TH1D( nameSigmaNtupChi2Map.c_str(), titleChi2.c_str(), nEtaBins_, etaBins_.data() ) );
-        histSigmaNtupChi2Map->SetXTitle( titleEta.c_str() );
-        histSigmaNtupChi2Map->SetYTitle( titleChi2.c_str() );
-        const std::string name2D2ProbMap( name + "_2D2_fitProbMap" );
-        TH1D * hist2D2ProbMap( new TH1D( name2D2ProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
-        hist2D2ProbMap->SetXTitle( titleEta.c_str() );
-        hist2D2ProbMap->SetYTitle( titleProb.c_str() );
-        const std::string nameSigmaProbMap( name + "_Sigma_fitProbMap" );
-        TH1D * histSigmaProbMap( new TH1D( nameSigmaProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
-        histSigmaProbMap->SetXTitle( titleEta.c_str() );
-        histSigmaProbMap->SetYTitle( titleProb.c_str() );
-        const std::string nameSigmaNtupProbMap( name + "_SigmaNtup_fitProbMap" );
-        TH1D * histSigmaNtupProbMap( new TH1D( nameSigmaNtupProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
-        histSigmaNtupProbMap->SetXTitle( titleEta.c_str() );
-        histSigmaNtupProbMap->SetYTitle( titleProb.c_str() );
-        ////////
-        const std::string name2D2Prob( name + "_2D2_fitProb" );
-        TH1D * hist2D2Prob( new TH1D( name2D2Prob.c_str(), titleProb.c_str(), 20, 0., 1. ) );
-        hist2D2Prob->SetXTitle( titleProb.c_str() );
-        const std::string nameSigmaProb( name + "_Sigma_fitProb" );
-        TH1D * histSigmaProb( new TH1D( nameSigmaProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
-        histSigmaProb->SetXTitle( titleProb.c_str() );
-        const std::string nameSigmaNtupProb( name + "_SigmaNtup_fitProb" );
-        TH1D * histSigmaNtupProb( new TH1D( nameSigmaNtupProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
-        histSigmaNtupProb->SetXTitle( titleProb.c_str() );
-
+        // Single resolutions
         const std::string nameDeltasChi2Map( name + "_Deltas_fitChi2Map" );
         TH2D * histDeltasChi2Map( new TH2D( nameDeltasChi2Map.c_str(), titleChi2.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
         histDeltasChi2Map->SetXTitle( titleEta.c_str() );
@@ -325,36 +291,150 @@ int main( int argc, char * argv[] )
         histDeltasNtupChi2Map->SetXTitle( titleEta.c_str() );
         histDeltasNtupChi2Map->SetYTitle( titlePt.c_str() );
         histDeltasNtupChi2Map->SetZTitle( titleChi2.c_str() );
-        const std::string nameDeltasPropMap( name + "_Deltas_fitPropMap" );
-        TH2D * histDeltasPropMap( new TH2D( nameDeltasPropMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
-        histDeltasPropMap->SetXTitle( titleEta.c_str() );
-        histDeltasPropMap->SetYTitle( titlePt.c_str() );
-        histDeltasPropMap->SetZTitle( titleProb.c_str() );
-        const std::string nameDeltasNtupPropMap( name + "_DeltasNtup_fitPropMap" );
-        TH2D * histDeltasNtupPropMap( new TH2D( nameDeltasNtupPropMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
-        histDeltasNtupPropMap->SetXTitle( titleEta.c_str() );
-        histDeltasNtupPropMap->SetYTitle( titlePt.c_str() );
-        histDeltasNtupPropMap->SetZTitle( titleProb.c_str() );
-        ////////
-        const std::string nameDeltasProp( name + "_Deltas_fitProp" );
-        TH1D * histDeltasProp( new TH1D( nameDeltasProp.c_str(), titleProb.c_str(), 20, 0., 1. ) );
-        histDeltasProp->SetXTitle( titleProb.c_str() );
-        const std::string nameDeltasNtupProp( name + "_DeltasNtup_fitProp" );
-        TH1D * histDeltasNtupProp( new TH1D( nameDeltasNtupProp.c_str(), titleProb.c_str(), 20, 0., 1. ) );
-        histDeltasNtupProp->SetXTitle( titleProb.c_str() );
-        ////////
-        const std::string nameDeltasBadProp( name + "_Deltas_fitBadProp" );
-        TH1D * histDeltasBadProp( new TH1D( nameDeltasBadProp.c_str(), titleProb.c_str(), 20, 0., 1. ) );
-        histDeltasBadProp->SetXTitle( titleProb.c_str() );
-        const std::string nameDeltasNtupBadProp( name + "_DeltasNtup_fitBadProp" );
-        TH1D * histDeltasNtupBadProp( new TH1D( nameDeltasNtupBadProp.c_str(), titleProb.c_str(), 20, 0., 1. ) );
-        histDeltasNtupBadProp->SetXTitle( titleProb.c_str() );
+        const std::string nameDeltasProbMap( name + "_Deltas_fitProbMap" );
+        TH2D * histDeltasProbMap( new TH2D( nameDeltasProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+        histDeltasProbMap->SetXTitle( titleEta.c_str() );
+        histDeltasProbMap->SetYTitle( titlePt.c_str() );
+        histDeltasProbMap->SetZTitle( titleProb.c_str() );
+        const std::string nameDeltasNtupProbMap( name + "_DeltasNtup_fitProbMap" );
+        TH2D * histDeltasNtupProbMap( new TH2D( nameDeltasNtupProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+        histDeltasNtupProbMap->SetXTitle( titleEta.c_str() );
+        histDeltasNtupProbMap->SetYTitle( titlePt.c_str() );
+        histDeltasNtupProbMap->SetZTitle( titleProb.c_str() );
+        const std::string nameDeltasProb( name + "_Deltas_fitProb" );
+        TH1D * histDeltasProb( new TH1D( nameDeltasProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histDeltasProb->SetXTitle( titleProb.c_str() );
+        const std::string nameDeltasNtupProb( name + "_DeltasNtup_fitProb" );
+        TH1D * histDeltasNtupProb( new TH1D( nameDeltasNtupProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histDeltasNtupProb->SetXTitle( titleProb.c_str() );
+        // Failing fits
+        const std::string nameDeltasMissingMap( name + "_Deltas_fitMissingMap" );
+        TH2D * histDeltasMissingMap( new TH2D( nameDeltasMissingMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+        histDeltasMissingMap->SetXTitle( titleEta.c_str() );
+        histDeltasMissingMap->SetYTitle( titlePt.c_str() );
+        const std::string nameDeltasNtupMissingMap( name + "_DeltasNtup_fitMissingMap" );
+        TH2D * histDeltasNtupMissingMap( new TH2D( nameDeltasNtupMissingMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+        histDeltasNtupMissingMap->SetXTitle( titleEta.c_str() );
+        histDeltasNtupMissingMap->SetYTitle( titlePt.c_str() );
+        const std::string nameDeltasBadProbMap( name + "_Deltas_fitBadProbMap" );
+        TH2D * histDeltasBadProbMap( new TH2D( nameDeltasBadProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+        histDeltasBadProbMap->SetXTitle( titleEta.c_str() );
+        histDeltasBadProbMap->SetYTitle( titlePt.c_str() );
+        histDeltasBadProbMap->SetZTitle( titleProb.c_str() );
+        const std::string nameDeltasNtupBadProbMap( name + "_DeltasNtup_fitBadProbMap" );
+        TH2D * histDeltasNtupBadProbMap( new TH2D( nameDeltasNtupBadProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+        histDeltasNtupBadProbMap->SetXTitle( titleEta.c_str() );
+        histDeltasNtupBadProbMap->SetYTitle( titlePt.c_str() );
+        histDeltasNtupBadProbMap->SetZTitle( titleProb.c_str() );
+        const std::string nameDeltasBadNdfMap( name + "_Deltas_fitBadNdfMap" );
+        TH2D * histDeltasBadNdfMap( new TH2D( nameDeltasBadNdfMap.c_str(), titleNdf.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+        histDeltasBadNdfMap->SetXTitle( titleEta.c_str() );
+        histDeltasBadNdfMap->SetYTitle( titlePt.c_str() );
+        histDeltasBadNdfMap->SetZTitle( titleNdf.c_str() );
+        const std::string nameDeltasNtupBadNdfMap( name + "_DeltasNtup_fitBadNdfMap" );
+        TH2D * histDeltasNtupBadNdfMap( new TH2D( nameDeltasNtupBadNdfMap.c_str(), titleNdf.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+        histDeltasNtupBadNdfMap->SetXTitle( titleEta.c_str() );
+        histDeltasNtupBadNdfMap->SetYTitle( titlePt.c_str() );
+        histDeltasNtupBadNdfMap->SetZTitle( titleNdf.c_str() );
+        const std::string nameDeltasBadProb( name + "_Deltas_fitBadProb" );
+        TH1D * histDeltasBadProb( new TH1D( nameDeltasBadProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histDeltasBadProb->SetXTitle( titleProb.c_str() );
+        const std::string nameDeltasNtupBadProb( name + "_DeltasNtup_fitBadProb" );
+        TH1D * histDeltasNtupBadProb( new TH1D( nameDeltasNtupBadProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histDeltasNtupBadProb->SetXTitle( titleProb.c_str() );
         const std::string nameDeltasBadNdf( name + "_Deltas_fitBadNdf" );
         TH1D * histDeltasBadNdf( new TH1D( nameDeltasBadNdf.c_str(), titleNdf.c_str(), 20, 0., 20. ) );
         histDeltasBadNdf->SetXTitle( titleNdf.c_str() );
         const std::string nameDeltasNtupBadNdf( name + "_DeltasNtup_fitBadNdf" );
         TH1D * histDeltasNtupBadNdf( new TH1D( nameDeltasNtupBadNdf.c_str(), titleNdf.c_str(), 20, 0., 20. ) );
         histDeltasNtupBadNdf->SetXTitle( titleNdf.c_str() );
+
+        // Resolution functions
+        const std::string nameSigma2D2Chi2Map( name + "_Sigma2D2_fitChi2Map" );
+        TH1D * histSigma2D2Chi2Map( new TH1D( nameSigma2D2Chi2Map.c_str(), titleChi2.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigma2D2Chi2Map->SetXTitle( titleEta.c_str() );
+        histSigma2D2Chi2Map->SetYTitle( titleChi2.c_str() );
+        const std::string nameSigmaChi2Map( name + "_Sigma_fitChi2Map" );
+        TH1D * histSigmaChi2Map( new TH1D( nameSigmaChi2Map.c_str(), titleChi2.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigmaChi2Map->SetXTitle( titleEta.c_str() );
+        histSigmaChi2Map->SetYTitle( titleChi2.c_str() );
+        const std::string nameSigmaNtupChi2Map( name + "_SigmaNtup_fitChi2Map" );
+        TH1D * histSigmaNtupChi2Map( new TH1D( nameSigmaNtupChi2Map.c_str(), titleChi2.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigmaNtupChi2Map->SetXTitle( titleEta.c_str() );
+        histSigmaNtupChi2Map->SetYTitle( titleChi2.c_str() );
+        const std::string nameSigma2D2ProbMap( name + "_Sigma2D2_fitProbMap" );
+        TH1D * histSigma2D2ProbMap( new TH1D( nameSigma2D2ProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigma2D2ProbMap->SetXTitle( titleEta.c_str() );
+        histSigma2D2ProbMap->SetYTitle( titleProb.c_str() );
+        const std::string nameSigmaProbMap( name + "_Sigma_fitProbMap" );
+        TH1D * histSigmaProbMap( new TH1D( nameSigmaProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigmaProbMap->SetXTitle( titleEta.c_str() );
+        histSigmaProbMap->SetYTitle( titleProb.c_str() );
+        const std::string nameSigmaNtupProbMap( name + "_SigmaNtup_fitProbMap" );
+        TH1D * histSigmaNtupProbMap( new TH1D( nameSigmaNtupProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigmaNtupProbMap->SetXTitle( titleEta.c_str() );
+        histSigmaNtupProbMap->SetYTitle( titleProb.c_str() );
+        const std::string nameSigma2D2Prob( name + "_Sigma2D2_fitProb" );
+        TH1D * histSigma2D2Prob( new TH1D( nameSigma2D2Prob.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histSigma2D2Prob->SetXTitle( titleProb.c_str() );
+        const std::string nameSigmaProb( name + "_Sigma_fitProb" );
+        TH1D * histSigmaProb( new TH1D( nameSigmaProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histSigmaProb->SetXTitle( titleProb.c_str() );
+        const std::string nameSigmaNtupProb( name + "_SigmaNtup_fitProb" );
+        TH1D * histSigmaNtupProb( new TH1D( nameSigmaNtupProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histSigmaNtupProb->SetXTitle( titleProb.c_str() );
+        // Failing fits
+        const std::string nameSigma2D2MissingMap( name + "_Sigma2D2_fitMissingMap" );
+        TH1D * histSigma2D2MissingMap( new TH1D( nameSigma2D2MissingMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigma2D2MissingMap->SetXTitle( titleEta.c_str() );
+        const std::string nameSigmaMissingMap( name + "_Sigma_fitMissingMap" );
+        TH1D * histSigmaMissingMap( new TH1D( nameSigmaMissingMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigmaMissingMap->SetXTitle( titleEta.c_str() );
+        const std::string nameSigmaNtupMissingMap( name + "_SigmaNtup_fitMissingMap" );
+        TH1D * histSigmaNtupMissingMap( new TH1D( nameSigmaNtupMissingMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigmaNtupMissingMap->SetXTitle( titleEta.c_str() );
+        const std::string nameSigma2D2BadProbMap( name + "_Sigma2D2_fitBadProbMap" );
+        TH1D * histSigma2D2BadProbMap( new TH1D( nameSigma2D2BadProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigma2D2BadProbMap->SetXTitle( titleEta.c_str() );
+        histSigma2D2BadProbMap->SetYTitle( titleProb.c_str() );
+        const std::string nameSigmaBadProbMap( name + "_Sigma_fitBadProbMap" );
+        TH1D * histSigmaBadProbMap( new TH1D( nameSigmaBadProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigmaBadProbMap->SetXTitle( titleEta.c_str() );
+        histSigmaBadProbMap->SetYTitle( titleProb.c_str() );
+        const std::string nameSigmaNtupBadProbMap( name + "_SigmaNtup_fitBadProbMap" );
+        TH1D * histSigmaNtupBadProbMap( new TH1D( nameSigmaNtupBadProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigmaNtupBadProbMap->SetXTitle( titleEta.c_str() );
+        histSigmaNtupBadProbMap->SetYTitle( titleProb.c_str() );
+        const std::string nameSigma2D2BadNdfMap( name + "_Sigma2D2_fitBadNdfMap" );
+        TH1D * histSigma2D2BadNdfMap( new TH1D( nameSigma2D2BadNdfMap.c_str(), titleNdf.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigma2D2BadNdfMap->SetXTitle( titleEta.c_str() );
+        histSigma2D2BadNdfMap->SetYTitle( titleNdf.c_str() );
+        const std::string nameSigmaBadNdfMap( name + "_Sigma_fitBadNdfMap" );
+        TH1D * histSigmaBadNdfMap( new TH1D( nameSigmaBadNdfMap.c_str(), titleNdf.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigmaBadNdfMap->SetXTitle( titleEta.c_str() );
+        histSigmaBadNdfMap->SetYTitle( titleNdf.c_str() );
+        const std::string nameSigmaNtupBadNdfMap( name + "_SigmaNtup_fitBadNdfMap" );
+        TH1D * histSigmaNtupBadNdfMap( new TH1D( nameSigmaNtupBadNdfMap.c_str(), titleNdf.c_str(), nEtaBins_, etaBins_.data() ) );
+        histSigmaNtupBadNdfMap->SetXTitle( titleEta.c_str() );
+        histSigmaNtupBadNdfMap->SetYTitle( titleNdf.c_str() );
+        const std::string nameSigma2D2BadProb( name + "_Sigma2D2_fitBadProb" );
+        TH1D * histSigma2D2BadProb( new TH1D( nameSigma2D2BadProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histSigma2D2BadProb->SetXTitle( titleProb.c_str() );
+        const std::string nameSigmaBadProb( name + "_Sigma_fitBadProb" );
+        TH1D * histSigmaBadProb( new TH1D( nameSigmaBadProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histSigmaBadProb->SetXTitle( titleProb.c_str() );
+        const std::string nameSigmaNtupBadProb( name + "_SigmaNtup_fitBadProb" );
+        TH1D * histSigmaNtupBadProb( new TH1D( nameSigmaNtupBadProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+        histSigmaNtupBadProb->SetXTitle( titleProb.c_str() );
+        const std::string nameSigma2D2BadNdf( name + "_Sigma2D2_fitBadNdf" );
+        TH1D * histSigma2D2BadNdf( new TH1D( nameSigma2D2BadNdf.c_str(), titleNdf.c_str(), 20, 0., 20. ) );
+        histSigma2D2BadNdf->SetXTitle( titleNdf.c_str() );
+        const std::string nameSigmaBadNdf( name + "_Sigma_fitBadNdf" );
+        TH1D * histSigmaBadNdf( new TH1D( nameSigmaBadNdf.c_str(), titleNdf.c_str(), 20, 0., 20. ) );
+        histSigmaBadNdf->SetXTitle( titleNdf.c_str() );
+        const std::string nameSigmaNtupBadNdf( name + "_SigmaNtup_fitBadNdf" );
+        TH1D * histSigmaNtupBadNdf( new TH1D( nameSigmaNtupBadNdf.c_str(), titleNdf.c_str(), 20, 0., 20. ) );
+        histSigmaNtupBadNdf->SetXTitle( titleNdf.c_str() );
 
         // Loop over eta bins
         TList * listFit( dirFit_->GetListOfKeys() );
@@ -381,40 +461,60 @@ int main( int argc, char * argv[] )
           TH2D * hist2D( dynamic_cast< TH2D* >( gDirectory->Get( name.c_str() ) ) );
           hist2D->FitSlicesY( 0, 1, hist2D->GetNbinsX(), 1 );
           TH1D * histSigma2D2( dynamic_cast< TH1D* >( gDirectory->Get( std::string( name + "_2" ).c_str() ) ) ); // sigmas of the slice fits
-          const std::string nameFitSigma2D2( name + "_2D2_fit" );
+          const std::string nameFitSigma2D2( name + "_Sigma2D2_fit" );
           const std::string formula( inverse ? resFuncInv_ : resFunc_ );
           const std::string formulaRel( inverse ? resFuncInvRel_ : resFuncRel_ );
           TF1 * fitSigma2D2( new TF1( nameFitSigma2D2.c_str(), formula.c_str() ) );
           fitSigma2D2->SetRange( histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() );
           TFitResultPtr fitSigma2D2ResultPtr( histSigma2D2->Fit( fitSigma2D2, optionsFitSigma_.c_str() ) );
-          if ( fitSigma2D2ResultPtr >= 0 && (fitSigma2D2ResultPtr->Status() == 0 || fitSigma2D2ResultPtr->Status() == 4000 ) ) { // ignore errors from IMPROVE
-            hist2D2Chi2Map->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Chi2() / fitSigma2D2ResultPtr->Ndf() );
-            hist2D2ProbMap->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Prob() );
-            hist2D2Prob->Fill( fitSigma2D2ResultPtr->Prob() );
-            if ( kinProp == "Pt" ) {
-              const Double_t * params( fitSigma2D2ResultPtr->GetParams() );
-              const std::string nameFitSigma2D2Rel( nameFitSigma2D2 + "Rel" );
-              TF1 * fitSigma2D2Rel( new TF1( nameFitSigma2D2Rel.c_str(), formulaRel.c_str(), histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() ) );
-              fitSigma2D2Rel->SetParameters( params );
-              fitSigma2D2Rel->Write();
-              if ( inverse ) {
-                const std::string nameFitSigma2D2Inv( nameFitSigma2D2 + "Inv" );
-                TF1 * fitSigma2D2Inv( new TF1( nameFitSigma2D2Inv.c_str(), resFuncInvInv_.c_str(), histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() ) );
-                fitSigma2D2Inv->SetParameters( params );
-                fitSigma2D2Inv->Write();
-                const std::string nameFitSigma2D2InvRel( nameFitSigma2D2Inv + "Rel" );
-                TF1 * fitSigma2D2InvRel( new TF1( nameFitSigma2D2InvRel.c_str(), resFuncInvInvRel_.c_str(), histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() ) );
-                fitSigma2D2InvRel->SetParameters( params );
-                fitSigma2D2InvRel->Write();
+          if ( fitSigma2D2ResultPtr >= 0 ) {
+            if ( ( fitSigma2D2ResultPtr->Status() == 0 || fitSigma2D2ResultPtr->Status() == 4000 ) && fitSigma2D2ResultPtr->Ndf() != 0. ) { // ignore errors from IMPROVE
+              histSigma2D2Chi2Map->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Chi2() / fitSigma2D2ResultPtr->Ndf() );
+              histSigma2D2ProbMap->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Prob() );
+              histSigma2D2Prob->Fill( fitSigma2D2ResultPtr->Prob() );
+              if ( kinProp == "Pt" ) {
+                const Double_t * params( fitSigma2D2ResultPtr->GetParams() );
+                const std::string nameFitSigma2D2Rel( nameFitSigma2D2 + "Rel" );
+                TF1 * fitSigma2D2Rel( new TF1( nameFitSigma2D2Rel.c_str(), formulaRel.c_str(), histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() ) );
+                fitSigma2D2Rel->SetParameters( params );
+                if ( overwrite_ ) fitSigma2D2Rel->Write( 0, TObject::kOverwrite );
+                else              fitSigma2D2Rel->Write();
+                if ( inverse ) {
+                  const std::string nameFitSigma2D2Inv( nameFitSigma2D2 + "Inv" );
+                  TF1 * fitSigma2D2Inv( new TF1( nameFitSigma2D2Inv.c_str(), resFuncInvInv_.c_str(), histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() ) );
+                  fitSigma2D2Inv->SetParameters( params );
+                  if ( overwrite_ ) fitSigma2D2Inv->Write( 0, TObject::kOverwrite );
+                  else              fitSigma2D2Inv->Write();
+                  const std::string nameFitSigma2D2InvRel( nameFitSigma2D2Inv + "Rel" );
+                  TF1 * fitSigma2D2InvRel( new TF1( nameFitSigma2D2InvRel.c_str(), resFuncInvInvRel_.c_str(), histSigma2D2->GetXaxis()->GetXmin(), histSigma2D2->GetXaxis()->GetXmax() ) );
+                  fitSigma2D2InvRel->SetParameters( params );
+                  if ( overwrite_ ) fitSigma2D2InvRel->Write( 0, TObject::kOverwrite );
+                  else              fitSigma2D2InvRel->Write();
+                }
               }
             }
+            else {
+              if ( fitSigma2D2ResultPtr->Prob() == 0. ) {
+                histSigma2D2BadProbMap->SetBinContent( uEta + 1, -1. );
+                histSigma2D2BadProb->AddBinContent( 0 );
+              }
+              else {
+                histSigma2D2BadProbMap->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Prob() );
+                histSigma2D2BadProb->Fill( fitSigma2D2ResultPtr->Prob() );
+              }
+              histSigma2D2BadNdfMap->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Ndf() );
+              histSigma2D2BadNdf->Fill( fitSigma2D2ResultPtr->Ndf() );
+            }
           }
-          else if ( verbose_ > 1 ) {
-            std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                      << "   failing fit in directory '";
-            gDirectory->pwd();
-            std::cout << "':" << std::endl
-                      << "       '" << nameFitSigma2D2 << "' status: " << fitSigma2D2ResultPtr->Status() << std::endl;
+          else {
+            histSigma2D2MissingMap->AddBinContent( uEta + 1 );
+            if ( verbose_ > 1 ) {
+              std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                        << "   failing fit in directory '";
+              gDirectory->pwd();
+              std::cout << "':" << std::endl
+                        << "       '" << nameFitSigma2D2 << "' status: " << fitSigma2D2ResultPtr->Status() << std::endl;
+            }
           }
 
           // FIXME: can be removed soon -- really?
@@ -423,7 +523,7 @@ int main( int argc, char * argv[] )
           TH1D * histDeltaChi2( new TH1D( nameDeltaChi2.c_str(), titleChi2.c_str(), nPtBins_, ptBins_.data() ) );
           histDeltasChi2Map->SetXTitle( titlePt.c_str() );
           histDeltasChi2Map->SetYTitle( titleChi2.c_str() );
-          const std::string nameDeltaProp( name + "Delta_fitProp" );
+          const std::string nameDeltaProp( name + "Delta_fitProb" );
           TH1D * histDeltaProp( new TH1D( nameDeltaProp.c_str(), titleProb.c_str(), nPtBins_, ptBins_.data() ) );
           histDeltaProp->SetXTitle( titlePt.c_str() );
           histDeltaProp->SetYTitle( titleProb.c_str() );
@@ -449,47 +549,76 @@ int main( int argc, char * argv[] )
               if ( fitDeltaResultPtr->Status() == 0 && fitDeltaResultPtr->Ndf() != 0. ) {
                 histDeltasChi2Map->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Chi2() / fitDeltaResultPtr->Ndf() );
                 histDeltaChi2->SetBinContent( uPt + 1, fitDeltaResultPtr->Chi2() / fitDeltaResultPtr->Ndf() );
-                histDeltasPropMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Prob() );
-                histDeltasProp->Fill( fitDeltaResultPtr->Prob() );
+                histDeltasProbMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Prob() );
+                histDeltasProb->Fill( fitDeltaResultPtr->Prob() );
                 histDeltaProp->SetBinContent( uPt + 1, fitDeltaResultPtr->Prob() );
                 histSigma->SetBinContent( uPt + 1, fitDeltaResultPtr->Parameter( 2 ) );
                 histSigma->SetBinError( uPt + 1, fitDeltaResultPtr->ParError( 2 ) );
               }
               else {
-                if ( fitDeltaResultPtr->Prob() == 0. ) histDeltasBadProp->AddBinContent( 0 );
-                else                                   histDeltasBadProp->Fill( fitDeltaResultPtr->Prob() );
+                if ( fitDeltaResultPtr->Prob() == 0. ) {
+                  histDeltasBadProbMap->SetBinContent( uEta + 1, uPt + 1, -1. );
+                  histDeltasBadProb->AddBinContent( 0 );
+                }
+                else {
+                  histDeltasBadProbMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Prob() );
+                  histDeltasBadProb->Fill( fitDeltaResultPtr->Prob() );
+                }
+                histDeltasBadNdfMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Ndf() );
                 histDeltasBadNdf->Fill( fitDeltaResultPtr->Ndf() );
               }
+            }
+            else {
+              histDeltasMissingMap->AddBinContent( uEta + 1, uPt + 1 );
             }
           } // loop: uPt < nPtBins_
           const std::string nameFitSigma( nameSigma + "_fit" );
           TF1 * fitSigma( new TF1( nameFitSigma.c_str(), formula.c_str() ) );
           fitSigma->SetRange( histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() );
           TFitResultPtr fitSigmaResultPtr( histSigma->Fit( fitSigma, std::string( optionsFitSigma_ ).c_str() ) );
-          if ( fitSigmaResultPtr >= 0 && ( fitSigmaResultPtr->Status() == 0 || fitSigmaResultPtr->Status() == 4000 ) ) { // ignore errors from IMPROVE
-            histSigmaChi2Map->SetBinContent( uEta + 1, fitSigmaResultPtr->Chi2() / fitSigmaResultPtr->Ndf() );
-            histSigmaProbMap->SetBinContent( uEta + 1, fitSigmaResultPtr->Prob() );
-            histSigmaProb->Fill( fitSigmaResultPtr->Prob() );
-            if ( kinProp == "Pt" ) {
-              const Double_t * params( fitSigmaResultPtr->GetParams() );
-              const std::string nameFitSigmaRel( nameFitSigma + "Rel" );
-              TF1 * fitSigmaRel( new TF1( nameFitSigmaRel.c_str(), formulaRel.c_str(), histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() ) );
-              fitSigmaRel->SetParameters( params );
-              fitSigmaRel->Write();
-              if ( inverse ) {
-                const std::string nameFitSigmaInv( nameFitSigma + "Inv" );
-                TF1 * fitSigmaInv( new TF1( nameFitSigmaInv.c_str(), resFuncInvInv_.c_str(), histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() ) );
-                fitSigmaInv->SetParameters( params );
-                fitSigmaInv->Write();
+          if ( fitSigmaResultPtr >= 0 ) {
+            if ( ( fitSigmaResultPtr->Status() == 0 || fitSigmaResultPtr->Status() == 4000 ) && fitSigmaResultPtr->Ndf() != 0. ) { // ignore errors from IMPROVE
+              histSigmaChi2Map->SetBinContent( uEta + 1, fitSigmaResultPtr->Chi2() / fitSigmaResultPtr->Ndf() );
+              histSigmaProbMap->SetBinContent( uEta + 1, fitSigmaResultPtr->Prob() );
+              histSigmaProb->Fill( fitSigmaResultPtr->Prob() );
+              if ( kinProp == "Pt" ) {
+                const Double_t * params( fitSigmaResultPtr->GetParams() );
+                const std::string nameFitSigmaRel( nameFitSigma + "Rel" );
+                TF1 * fitSigmaRel( new TF1( nameFitSigmaRel.c_str(), formulaRel.c_str(), histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() ) );
+                fitSigmaRel->SetParameters( params );
+                if ( overwrite_ ) fitSigmaRel->Write( 0, TObject::kOverwrite );
+                else              fitSigmaRel->Write();
+                if ( inverse ) {
+                  const std::string nameFitSigmaInv( nameFitSigma + "Inv" );
+                  TF1 * fitSigmaInv( new TF1( nameFitSigmaInv.c_str(), resFuncInvInv_.c_str(), histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() ) );
+                  fitSigmaInv->SetParameters( params );
+                  if ( overwrite_ ) fitSigmaInv->Write( 0, TObject::kOverwrite );
+                  else              fitSigmaInv->Write();
+                }
               }
             }
+            else {
+              if ( fitSigmaResultPtr->Prob() == 0. ) {
+                histSigmaBadProbMap->SetBinContent( uEta + 1, -1. );
+                histSigmaBadProb->AddBinContent( 0 );
+              }
+              else {
+                histSigmaBadProbMap->SetBinContent( uEta + 1, fitSigmaResultPtr->Prob() );
+                histSigmaBadProb->Fill( fitSigmaResultPtr->Prob() );
+              }
+              histSigmaBadNdfMap->SetBinContent( uEta + 1, fitSigmaResultPtr->Ndf() );
+              histSigmaBadNdf->Fill( fitSigmaResultPtr->Ndf() );
+            }
           }
-          else if ( verbose_ > 1 ) {
-            std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                      << "   failing fit in directory '";
-            gDirectory->pwd();
-            std::cout << "':" << std::endl
-                      << "       '" << nameFitSigma << "' status: " << fitSigmaResultPtr->Status() << std::endl;
+          else {
+            histSigmaMissingMap->AddBinContent( uEta + 1 );
+            if ( verbose_ > 1 ) {
+              std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                        << "   failing fit in directory '";
+              gDirectory->pwd();
+              std::cout << "':" << std::endl
+                        << "       '" << nameFitSigma << "' status: " << fitSigmaResultPtr->Status() << std::endl;
+            }
           }
 
           // Create new 1-dim histograms from n-tuple
@@ -497,10 +626,10 @@ int main( int argc, char * argv[] )
           TH1D * histDeltaNtupChi2( new TH1D( nameDeltaNtupChi2.c_str(), titleChi2.c_str(), nPtBins_, ptBins_.data() ) );
           histDeltaNtupChi2->SetXTitle( titlePt.c_str() );
           histDeltaNtupChi2->SetYTitle( titleChi2.c_str() );
-          const std::string nameDeltaNtupProp( name + "DeltaNtup_fitProp" );
-          TH1D * histDeltaNtupProp( new TH1D( nameDeltaNtupProp.c_str(), titleProb.c_str(), nPtBins_, ptBins_.data() ) );
-          histDeltaNtupProp->SetXTitle( titlePt.c_str() );
-          histDeltaNtupProp->SetYTitle( titleProb.c_str() );
+          const std::string nameDeltaNtupProb( name + "DeltaNtup_fitProb" );
+          TH1D * histDeltaNtupProb( new TH1D( nameDeltaNtupProb.c_str(), titleProb.c_str(), nPtBins_, ptBins_.data() ) );
+          histDeltaNtupProb->SetXTitle( titlePt.c_str() );
+          histDeltaNtupProb->SetYTitle( titleProb.c_str() );
           const std::string nameSigmaNtup( nameSigma + "Ntup" );
           TH1D * histSigmaNtup( new TH1D( nameSigmaNtup.c_str(), hist2D->GetTitle(), nPtBins_, ptBins_.data() ) );
           // Split data into p_t bins
@@ -564,47 +693,76 @@ int main( int argc, char * argv[] )
               if ( fitDeltaNtupResultPtr->Status() == 0 && fitDeltaNtupResultPtr->Ndf() != 0. ) {
                 histDeltasNtupChi2Map->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Chi2() / fitDeltaNtupResultPtr->Ndf() );
                 histDeltaNtupChi2->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Chi2() / fitDeltaNtupResultPtr->Ndf() );
-                histDeltasNtupPropMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Prob() );
-                histDeltasNtupProp->Fill( fitDeltaNtupResultPtr->Prob() );
-                histDeltaNtupProp->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Prob() );
+                histDeltasNtupProbMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Prob() );
+                histDeltasNtupProb->Fill( fitDeltaNtupResultPtr->Prob() );
+                histDeltaNtupProb->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Prob() );
                 histSigmaNtup->SetBinContent( uPt + 1, fitDeltaNtupResultPtr->Parameter( 2 ) );
                 histSigmaNtup->SetBinError( uPt + 1, fitDeltaNtupResultPtr->ParError( 2 ) );
               }
               else {
-                if ( fitDeltaNtupResultPtr->Prob() == 0. ) histDeltasNtupBadProp->AddBinContent( 0 );
-                else                                       histDeltasNtupBadProp->Fill( fitDeltaNtupResultPtr->Prob() );
+                if ( fitDeltaNtupResultPtr->Prob() == 0. ) {
+                  histDeltasNtupBadProbMap->SetBinContent( uEta + 1, uPt + 1, -1. );
+                  histDeltasNtupBadProb->AddBinContent( 0 );
+                }
+                else {
+                  histDeltasNtupBadProbMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Prob() );
+                  histDeltasNtupBadProb->Fill( fitDeltaNtupResultPtr->Prob() );
+                }
+                histDeltasNtupBadNdfMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Ndf() );
                 histDeltasNtupBadNdf->Fill( fitDeltaNtupResultPtr->Ndf() );
               }
+            }
+            else {
+              histDeltasNtupMissingMap->AddBinContent( uEta + 1, uPt + 1 );
             }
           }  // loop: uEntry < sizePt.at( uPt )
           const std::string nameFitSigmaNtup( nameSigmaNtup + "_fit" );
           TF1 * fitSigmaNtup( new TF1( nameFitSigmaNtup.c_str(), formula.c_str() ) );
           fitSigmaNtup->SetRange( histSigmaNtup->GetXaxis()->GetXmin(), histSigmaNtup->GetXaxis()->GetXmax() );
           TFitResultPtr fitSigmaNtupResultPtr( histSigmaNtup->Fit( fitSigmaNtup, optionsFitSigma_.c_str() ) );
-          if ( fitSigmaNtupResultPtr >= 0 && ( fitSigmaNtupResultPtr->Status() == 0 || fitSigmaNtupResultPtr->Status() == 4000 ) ) { // ignore errors from IMPROVE
-            histSigmaNtupChi2Map->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Chi2() / fitSigmaNtupResultPtr->Ndf() );
-            histSigmaNtupProbMap->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Prob() );
-            histSigmaNtupProb->Fill( fitSigmaNtupResultPtr->Prob() );
-            if ( kinProp == "Pt" ) {
-              const Double_t * params( fitSigmaNtupResultPtr->GetParams() );
-              const std::string nameFitSigmaNtupRel( nameFitSigmaNtup + "Rel" );
-              TF1 * fitSigmaNtupRel( new TF1( nameFitSigmaNtupRel.c_str(), formulaRel.c_str(), histSigmaNtup->GetXaxis()->GetXmin(), histSigmaNtup->GetXaxis()->GetXmax() ) );
-              fitSigmaNtupRel->SetParameters( params );
-              fitSigmaNtupRel->Write();
-              if ( inverse ) {
-                const std::string nameFitSigmaNtupInv( nameFitSigmaNtup + "Inv" );
-                TF1 * fitSigmaNtupInv( new TF1( nameFitSigmaNtupInv.c_str(), resFuncInvInv_.c_str(), histSigmaNtup->GetXaxis()->GetXmin(), histSigmaNtup->GetXaxis()->GetXmax() ) );
-                fitSigmaNtupInv->SetParameters( params );
-                fitSigmaNtupInv->Write();
+          if ( fitSigmaNtupResultPtr >= 0 ) {
+            if ( ( fitSigmaNtupResultPtr->Status() == 0 || fitSigmaNtupResultPtr->Status() == 4000 ) && fitSigmaNtupResultPtr->Ndf() != 0. ) { // ignore errors from IMPROVE
+              histSigmaNtupChi2Map->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Chi2() / fitSigmaNtupResultPtr->Ndf() );
+              histSigmaNtupProbMap->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Prob() );
+              histSigmaNtupProb->Fill( fitSigmaNtupResultPtr->Prob() );
+              if ( kinProp == "Pt" ) {
+                const Double_t * params( fitSigmaNtupResultPtr->GetParams() );
+                const std::string nameFitSigmaNtupRel( nameFitSigmaNtup + "Rel" );
+                TF1 * fitSigmaNtupRel( new TF1( nameFitSigmaNtupRel.c_str(), formulaRel.c_str(), histSigmaNtup->GetXaxis()->GetXmin(), histSigmaNtup->GetXaxis()->GetXmax() ) );
+                fitSigmaNtupRel->SetParameters( params );
+                if ( overwrite_ ) fitSigmaNtupRel->Write( 0, TObject::kOverwrite );
+                else              fitSigmaNtupRel->Write();
+                if ( inverse ) {
+                  const std::string nameFitSigmaNtupInv( nameFitSigmaNtup + "Inv" );
+                  TF1 * fitSigmaNtupInv( new TF1( nameFitSigmaNtupInv.c_str(), resFuncInvInv_.c_str(), histSigmaNtup->GetXaxis()->GetXmin(), histSigmaNtup->GetXaxis()->GetXmax() ) );
+                  fitSigmaNtupInv->SetParameters( params );
+                  if ( overwrite_ ) fitSigmaNtupInv->Write( 0, TObject::kOverwrite );
+                  else              fitSigmaNtupInv->Write();
+                }
               }
             }
+            else {
+              if ( fitSigmaNtupResultPtr->Prob() == 0. ) {
+                histSigmaNtupBadProbMap->SetBinContent( uEta + 1, -1. );
+                histSigmaNtupBadProb->AddBinContent( 0 );
+              }
+              else {
+                histSigmaNtupBadProbMap->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Prob() );
+                histSigmaNtupBadProb->Fill( fitSigmaNtupResultPtr->Prob() );
+              }
+              histSigmaNtupBadNdfMap->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Ndf() );
+              histSigmaNtupBadNdf->Fill( fitSigmaNtupResultPtr->Ndf() );
+              }
           }
-          else if ( verbose_ > 1 ) {
-            std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                      << "   failing fit in directory '";
-            gDirectory->pwd();
-            std::cout << "':" << std::endl
-                      << "       '" << nameFitSigmaNtup << "' status: " << fitSigmaNtupResultPtr->Status() << std::endl;
+          else {
+            histSigmaNtupMissingMap->AddBinContent( uEta + 1 );
+            if ( verbose_ > 1 ) {
+              std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                        << "   failing fit in directory '";
+              gDirectory->pwd();
+              std::cout << "':" << std::endl
+                        << "       '" << nameFitSigmaNtup << "' status: " << fitSigmaNtupResultPtr->Status() << std::endl;
+            }
           }
 
         } // loop: keyEta
