@@ -273,7 +273,7 @@ int main( int argc, char * argv[] )
         TDirectory * dirFit_( dynamic_cast< TDirectory* >( dirProp_->Get( subFit.c_str() ) ) );
 
         // Inversion flag from directory name
-        const bool inverse( subFit.substr( subFit.size() - 3 ) == "Inv" );
+        const bool inverse( useSymm_ ? subFit.substr( subFit.size() - 7, 3 ) == "Inv" : subFit.substr( subFit.size() - 3 ) == "Inv" );
 
         // Fit performance histograms
 
@@ -508,7 +508,7 @@ int main( int argc, char * argv[] )
           dataCont propEtaBin( nPtBins_ );
           dataCont propGenEtaBin( nPtBins_ );
           std::vector< unsigned > sizePt( nPtBins_ );
-          for ( unsigned uEntry = 0; uEntry < sizeEta_.at( uEta ); ++uEntry ) {
+          for ( unsigned uEntry = 0; uEntry < sizeEta_.at( uEta ); ++uEntry ) { // FIXME: WRONG for useSymm_ ???
             for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
               if ( ptBins_.at( uPt ) <= ptData_.at( uEta ).at( uEntry ) && ptData_.at( uEta ).at( uEntry ) < ptBins_.at( uPt + 1 ) ) {
                 sizePt.at( uPt ) += 1;
@@ -518,7 +518,7 @@ int main( int argc, char * argv[] )
                 break;
               }
             } // loop: uPt < nPtBins_
-          } // loop: uEntry < nEntries
+          } // loop: uEntry < sizeEta_.at( uEta )
           for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
             if ( sizePt.at( uPt ) == 0 ) {
               if ( verbose_ > 2 ) {
