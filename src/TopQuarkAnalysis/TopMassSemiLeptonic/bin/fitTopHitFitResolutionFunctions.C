@@ -439,15 +439,11 @@ int main( int argc, char * argv[] )
         // Loop over eta bins
         TList * listFit( dirFit_->GetListOfKeys() );
         if ( verbose_ > 3 ) listFit->Print();
-        if ( listFit->GetSize() != ( Int_t )( nEtaBins_ ) ) {
-          std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                    << "   mismatch of eta binning for object category '" << objCat << "':" << std::endl
-                    << "       bins in directory structure: " << listFit->GetSize()         << std::endl
-                    << "       bins in binning histogram  : " << nEtaBins_                  << std::endl;
-        }
+        unsigned sizeEtaBins( 0 );
         TIter nextInListFit( listFit );
         while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
           if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
+          ++sizeEtaBins;
           const std::string binEta( keyEta->GetName() );
           const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
           dirFit_->cd( binEta.c_str() );
@@ -492,6 +488,12 @@ int main( int argc, char * argv[] )
                   else              fitSigma2D2InvRel->Write();
                 }
               }
+              if ( verbose_ > 3 && fitSigma2D2ResultPtr->Status() == 4000 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "   IMPROVE error in directory '";
+                gDirectory->pwd();
+                std::cout << "':" << nameFitSigma2D2 << "' status " << fitSigma2D2ResultPtr->Status() << std::endl;
+              }
             }
             else {
               if ( fitSigma2D2ResultPtr->Prob() == 0. ) {
@@ -504,16 +506,21 @@ int main( int argc, char * argv[] )
               }
               histSigma2D2BadNdfMap->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Ndf() );
               histSigma2D2BadNdf->Fill( fitSigma2D2ResultPtr->Ndf() );
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "   failing fit in directory '";
+                gDirectory->pwd();
+                std::cout << "':" << nameFitSigma2D2 << "' status " << fitSigma2D2ResultPtr->Status() << std::endl;
+              }
             }
           }
           else {
             histSigma2D2MissingMap->AddBinContent( uEta + 1 );
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "   failing fit in directory '";
+                        << "   missing fit in directory '";
               gDirectory->pwd();
-              std::cout << "':" << std::endl
-                        << "       '" << nameFitSigma2D2 << "' status: " << fitSigma2D2ResultPtr->Status() << std::endl;
+              std::cout << "':" << nameFitSigma2D2 << std::endl;
             }
           }
 
@@ -566,10 +573,23 @@ int main( int argc, char * argv[] )
                 }
                 histDeltasBadNdfMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaResultPtr->Ndf() );
                 histDeltasBadNdf->Fill( fitDeltaResultPtr->Ndf() );
+                if ( verbose_ > 2 ) {
+                  std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                            << "   failing fit in directory '";
+                  gDirectory->pwd();
+                  std::cout << "':" <<nameDelta << "' status " << fitDeltaResultPtr->Status() << std::endl;
+                }
               }
             }
             else {
-              histDeltasMissingMap->AddBinContent( uEta + 1, uPt + 1 );
+              const Int_t uBin( histDeltasMissingMap->GetBin( uEta + 1, uPt + 1 ) );
+              histDeltasMissingMap->AddBinContent( uBin );
+              if ( verbose_ > 1 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "   missing fit in directory '";
+                gDirectory->pwd();
+                std::cout << "':" << nameDelta << std::endl;
+              }
             }
           } // loop: uPt < nPtBins_
           const std::string nameFitSigma( nameSigma + "_fit" );
@@ -596,6 +616,12 @@ int main( int argc, char * argv[] )
                   else              fitSigmaInv->Write();
                 }
               }
+              if ( verbose_ > 3 && fitSigmaResultPtr->Status() == 4000 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "   IMPROVE error in directory '";
+                gDirectory->pwd();
+                std::cout << "':" << nameFitSigma << "' status " << fitSigmaResultPtr->Status() << std::endl;
+              }
             }
             else {
               if ( fitSigmaResultPtr->Prob() == 0. ) {
@@ -608,16 +634,21 @@ int main( int argc, char * argv[] )
               }
               histSigmaBadNdfMap->SetBinContent( uEta + 1, fitSigmaResultPtr->Ndf() );
               histSigmaBadNdf->Fill( fitSigmaResultPtr->Ndf() );
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "   failing fit in directory '";
+                gDirectory->pwd();
+                std::cout << "':" << nameFitSigma << "' status " << fitSigmaResultPtr->Status() << std::endl;
+              }
             }
           }
           else {
             histSigmaMissingMap->AddBinContent( uEta + 1 );
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "   failing fit in directory '";
+                        << "   missing fit in directory '";
               gDirectory->pwd();
-              std::cout << "':" << std::endl
-                        << "       '" << nameFitSigma << "' status: " << fitSigmaResultPtr->Status() << std::endl;
+              std::cout << "':" << nameFitSigma << std::endl;
             }
           }
 
@@ -710,10 +741,23 @@ int main( int argc, char * argv[] )
                 }
                 histDeltasNtupBadNdfMap->SetBinContent( uEta + 1, uPt + 1, fitDeltaNtupResultPtr->Ndf() );
                 histDeltasNtupBadNdf->Fill( fitDeltaNtupResultPtr->Ndf() );
+                if ( verbose_ > 2 ) {
+                  std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                            << "   failing fit in directory '";
+                  gDirectory->pwd();
+                  std::cout << "':" << nameDeltaNtup << "' status " << fitDeltaNtupResultPtr->Status() << std::endl;
+                }
               }
             }
             else {
-              histDeltasNtupMissingMap->AddBinContent( uEta + 1, uPt + 1 );
+              const Int_t uBin( histDeltasNtupMissingMap->GetBin( uEta + 1, uPt + 1 ) );
+              histDeltasNtupMissingMap->AddBinContent( uBin );
+              if ( verbose_ > 1 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "   missing fit in directory '";
+                gDirectory->pwd();
+                std::cout << "':" << nameDeltaNtup << std::endl;
+              }
             }
           }  // loop: uEntry < sizePt.at( uPt )
           const std::string nameFitSigmaNtup( nameSigmaNtup + "_fit" );
@@ -740,6 +784,12 @@ int main( int argc, char * argv[] )
                   else              fitSigmaNtupInv->Write();
                 }
               }
+              if ( verbose_ > 3 && fitSigmaNtupResultPtr->Status() == 4000 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "   IMPROVE error in directory '";
+                gDirectory->pwd();
+                std::cout << "':" << nameFitSigmaNtup << "' status " << fitSigmaNtupResultPtr->Status() << std::endl;
+              }
             }
             else {
               if ( fitSigmaNtupResultPtr->Prob() == 0. ) {
@@ -752,20 +802,31 @@ int main( int argc, char * argv[] )
               }
               histSigmaNtupBadNdfMap->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Ndf() );
               histSigmaNtupBadNdf->Fill( fitSigmaNtupResultPtr->Ndf() );
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "   failing fit in directory '";
+                gDirectory->pwd();
+                std::cout << "':" << nameFitSigmaNtup << "' status " << fitSigmaNtupResultPtr->Status() << std::endl;
               }
+            }
           }
           else {
             histSigmaNtupMissingMap->AddBinContent( uEta + 1 );
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "   failing fit in directory '";
+                        << "   missing fit in directory '";
               gDirectory->pwd();
-              std::cout << "':" << std::endl
-                        << "       '" << nameFitSigmaNtup << "' status: " << fitSigmaNtupResultPtr->Status() << std::endl;
+              std::cout << "':" << nameFitSigmaNtup << std::endl;
             }
           }
 
         } // loop: keyEta
+        if ( sizeEtaBins != nEtaBins_ ) {
+          std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                    << "   mismatch of eta binning for object category '" << objCat << "':" << std::endl
+                    << "       bins in directory structure: " << sizeEtaBins         << std::endl
+                    << "       bins in binning histogram  : " << nEtaBins_                  << std::endl;
+        }
 
       } // loop: keyFit
 
