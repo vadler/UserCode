@@ -44,19 +44,6 @@ files_Summer11 = [ '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/skimHit
                  , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/skimHitFitResolutionFunctions_41_0_OMv.root'
                  ]
 
-filesTest_Summer11 = [ '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_10_0_TQL.root'
-                     , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_11_0_xPY.root'
-                     , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_1_1_rEB.root'
-                     , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_2_0_gWr.root'
-                     , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_3_0_skE.root'
-                     , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_4_0_70E.root'
-                     , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_5_0_zEA.root'
-                     , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_6_0_SbW.root'
-                     , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_7_0_IXO.root'
-                     , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_8_0_GAP.root'
-                     , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Summer11/test/skimHitFitResolutionFunctions_9_0_vJ1.root'
-                     ]
-
 files_Fall11_R3 = [ '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/skimHitFitResolutionFunctions_10_0_zUr.root'
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/skimHitFitResolutionFunctions_11_0_AfC.root'
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/skimHitFitResolutionFunctions_12_0_kHg.root'
@@ -101,11 +88,3 @@ files_Fall11_R3 = [ '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/skimH
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/skimHitFitResolutionFunctions_8_0_FHW.root'
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/skimHitFitResolutionFunctions_9_0_kjU.root'
                   ]
-
-filesTest_Fall11_R3 = [ '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/test/skimHitFitResolutionFunctions_1_1_8Js.root'
-                      , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/test/skimHitFitResolutionFunctions_2_0_BT2.root'
-                      , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/test/skimHitFitResolutionFunctions_3_0_PSg.root'
-                      , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/test/skimHitFitResolutionFunctions_4_0_ZlK.root'
-                      , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/test/skimHitFitResolutionFunctions_5_0_05y.root'
-                      , '/store/user/vadler/cms/Top/CMSSW_4_4_2/data/Fall11_R3/test/skimHitFitResolutionFunctions_6_0_OL0.root'
-                      ]
