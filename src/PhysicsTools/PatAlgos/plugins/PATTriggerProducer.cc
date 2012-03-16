@@ -51,7 +51,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
   onlyStandAlone_( iConfig.getParameter< bool >( "onlyStandAlone" ) ),
   // L1 configuration parameters
   addL1Algos_( false ),
-  tagL1GlobalTriggerObjectMaps_( "hltL1GtObjectMap" ),
+  tagL1GlobalTriggerObjectMaps_( "l1L1GtObjectMap" ),
   tagL1ExtraMu_(),
   tagL1ExtraNoIsoEG_(),
   tagL1ExtraIsoEG_(),
