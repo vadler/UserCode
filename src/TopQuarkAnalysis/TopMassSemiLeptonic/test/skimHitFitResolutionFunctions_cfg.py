@@ -170,11 +170,10 @@ if not runCrab:
                                                  , globalTag    = globalTag
                                                  , maxVersions  = 1
                                                  )
-  triggerSelection = 'HLT_IsoMu24_v*'
+  triggerSelection = 'HLT_IsoMu15_v*'
 
 
 ### Output
-
 
 process.out = cms.OutputModule( "PoolOutputModule"
 , fileName       = cms.untracked.string( 'skimHitFitResolutionFunctions.root' )
@@ -264,8 +263,7 @@ usePF2PAT( process
          )
 # still need to fix event content afterwards :-(
 process.out.outputCommands.append( 'keep *_addPileupInfo_*_*' )
-process.out.outputCommands.append( 'drop edmTriggerResults_*_*_*' )
-process.out.outputCommands.append( 'keep edmTriggerResults_*_*_%s'%( process.name_() ) )
+process.out.outputCommands.append( 'keep edmTriggerResults_*_*_*' )
 
 process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
 process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )
