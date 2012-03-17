@@ -142,9 +142,8 @@ process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 # from Configuration.AlCa.autoCond import autoCond
 # process.GlobalTag.globaltag = autoCond[ 'startup' ]
-process.GlobalTag.globaltag = 'START44_V12::All' # JEC2011V12 as in https://hypernews.cern.ch/HyperNews/CMS/get/jes/303.html
+process.GlobalTag.globaltag = 'START44_V13::All'
 if runCrab:
-#   process.GlobalTag.globaltag = 'START44_V5D::All' # Fall11_R3
   process.GlobalTag.globaltag = 'START44_V9C::All' # Fall11_R4
 
 
