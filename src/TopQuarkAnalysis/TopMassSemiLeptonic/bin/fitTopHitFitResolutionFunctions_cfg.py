@@ -20,7 +20,7 @@ lepton = 'Mu'
 # lepton = 'Elec'
 
 # Settings
-overwrite = True
+overwrite = True # to throw away earlier versions of histograms, trees and functions
 # !!! Exclusive switches:
 useAlt  = False # 'True' makes sense only, if available in input (will not crash other wise)
 useSymm = False # 'True' makes sense only, if available in input (will not crash other wise)
@@ -67,10 +67,10 @@ process.fitter = cms.PSet(
 if runTest:
   process.fitter.selection = 'analyzeHitFitResolutionFunctions'
 
-# process.useExisting = cms.bool( True )
-process.useExisting = cms.bool( True ) # nothing done there yet
 process.existing = cms.PSet(
   resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era ) )
+  # skip resolutions without existing counterpart?
+  onlyExisting   = cms.bool( True )
 )
 
 # Messaging

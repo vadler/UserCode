@@ -67,7 +67,11 @@ int main( int argc, char * argv[] )
   const std::string resFuncInvInvRel_( fitter_.getParameter< std::string >( "resolutionFunctionInverseInvRel" ) );
   const double widthFactor_( fitter_.getParameter< double >( "widthFactor" ) );
   // Configuration for existing resolution functions
-  const bool useExisting_( process_.getParameter< bool >( "useExisting" ) );
+  const edm::ParameterSet & exist_( process_.getParameter< edm::ParameterSet >( "existing" ) );
+  const std::string resolutionFile_( exist_.getParameter< std::string >( "resolutionFile" ) );
+  const bool onlyExisting_( exist_.getParameter< bool >( "onlyExisting" ) );
+
+  std::vector< std::vector< bool > > nominalInv_( objCats_.size() );
 
   if ( verbose_ > 0 )
     std::cout << std::endl
@@ -90,70 +94,83 @@ int main( int argc, char * argv[] )
   const std::string titlePt( "p_{t} (GeV)" );
 
 
-  // Get existing resolution functions
+  // Use existing resolution functions
 
-  if ( useExisting_ ) {
+  if ( verbose_ > 0 )
+    std::cout << std::endl
+              << argv[ 0 ] << " --> INFO:" << std::endl
+              << "   accessing existing resolution functions from resolution file '" << resolutionFile_ << "'" << std::endl;
 
-    // Configuration for existing resolution functions
-    const edm::ParameterSet & exist_( process_.getParameter< edm::ParameterSet >( "existing" ) );
-    const std::string resolutionFile_( exist_.getParameter< std::string >( "resolutionFile" ) );
+  // Open output file
+  TFile * resolutionFile( TFile::Open( resolutionFile_.c_str() ) );
+  if ( resolutionFile ) {
+    if ( verbose_ > 2 ) gDirectory->pwd();
 
-    if ( verbose_ > 0 )
-      std::cout << std::endl
-                << argv[ 0 ] << " --> INFO:" << std::endl
-                << "   accessing existing resolution functions from resolution file '" << resolutionFile_ << "'" << std::endl;
+    // Loop over objects and quantities
 
-    // Open output file
-    TFile * resolutionFile( TFile::Open( resolutionFile_.c_str() ) );
-    if ( resolutionFile ) {
-      if ( verbose_ > 2 ) gDirectory->pwd();
+    for ( unsigned uCat = 0; uCat < objCats_.size(); ++uCat ) {
+      const std::string objCat( objCats_.at( uCat ) );
+      TDirectory * dirCat_( dynamic_cast< TDirectory* >( resolutionFile->Get( objCat.c_str() ) ) );
+      if ( ! dirCat_ ) {
+        std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                  << "   object category '" << objCat << "' does not exist in resolution file" << std::endl;
+        continue;
+      }
 
-      // Loop over objects and quantities
+      TList * listCat( dirCat_->GetListOfKeys() );
+      if ( verbose_ > 3 ) listCat->Print();
+      TIter nextInListCat( listCat );
+      while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
+        if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
+        const std::string kinProp( keyProp->GetName() );
+        TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
 
-      for ( unsigned uCat = 0; uCat < objCats_.size(); ++uCat ) {
-        const std::string objCat( objCats_.at( uCat ) );
-        TDirectory * dirCat_( dynamic_cast< TDirectory* >( resolutionFile->Get( objCat.c_str() ) ) );
-        if ( ! dirCat_ ) {
-          std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                    << "   object category '" << objCat << "' does not exist in resolution file" << std::endl;
-          continue;
-        }
+        TList * listProp( dirProp_->GetListOfKeys() );
+        if ( verbose_ > 3 ) listProp->Print();
+        TIter nextInListProp( listProp );
+        unsigned uEta( 0 );
+        while ( TKey * keyEta = ( TKey* )nextInListProp() ) {
+          if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
+          const std::string binEta( keyEta->GetName() );
+          TDirectory * dirEta_( dynamic_cast< TDirectory* >( dirProp_->Get( binEta.c_str() ) ) );
 
-        TList * listCat( dirCat_->GetListOfKeys() );
-        if ( verbose_ > 3 ) listCat->Print();
-        TIter nextInListCat( listCat );
-        while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
-          if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
-          const std::string kinProp( keyProp->GetName() );
-          TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
+          const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
+          const std::string nameInv( "fitExist_" + objCat + "_Inv_" + kinProp + "_" + binEta );
 
-          TList * listProp( dirProp_->GetListOfKeys() );
-          if ( verbose_ > 3 ) listProp->Print();
-          TIter nextInListProp( listProp );
-          while ( TKey * keyEta = ( TKey* )nextInListProp() ) {
-            if ( std::string( keyEta->GetClassName() ) != nameFuncClass ) continue;
-            const std::string name( keyEta->GetName() );
+          TList * listEta( dirEta_->GetListOfKeys() );
+          if ( verbose_ > 3 ) listEta->Print();
+          TIter nextInListEta( listEta );
+          while ( TKey * keyFunc = ( TKey* )nextInListEta() ) {
+            if ( std::string( keyFunc->GetClassName() ) != nameFuncClass ) continue;
 
-//             TF1 * fitSigma2D2( dynamic_cast< TF1* >( dirProp_->Get( name.c_str() ) ) );
+            TF1 * fitSigma( dynamic_cast< TF1* >( dirEta_->Get( name.c_str() ) ) );
+            TF1 * fitSigmaInv( dynamic_cast< TF1* >( dirEta_->Get( nameInv.c_str() ) ) );
+            if ( ( fitSigma && fitSigmaInv ) || ( ! fitSigma && ! fitSigmaInv ) ) {
+              std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                        << "   inconsitent resolution functions in '" << objCat << "', '" << kinProp << "', '" << binEta << std::endl;
+              continue;
+            }
+            if ( uEta == 0 ) nominalInv_.at( uCat ).push_back( fitSigmaInv ? true : false );
+          }
 
-          } // loop: nextInListProp()
+          ++uEta;
 
-        } // loop: nextInListCat()
+        } // loop: nextInListProp()
 
-      } // loop: uCat < objCats_.size()
+      } // loop: nextInListCat()
 
-      // Close output file
-      resolutionFile->Close();
+    } // loop: uCat < objCats_.size()
 
-    } // ( resolutionFile )
+    // Close output file
+    resolutionFile->Close();
 
-    else {
-      std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-                << "   resolution file '" << resolutionFile_ << "' missing" << std::endl;
-      returnStatus_ += 0x100;
-    } // !( resolutionFile )
+  } // ( resolutionFile )
 
-  } // ( useExisting_ )
+  else {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "   resolution file '" << resolutionFile_ << "' missing" << std::endl;
+    returnStatus_ += 0x100;
+  } // !( resolutionFile )
 
 
   // Fit the new resolution functions
@@ -263,6 +280,7 @@ int main( int argc, char * argv[] )
       TList * listProp( dirProp_->GetListOfKeys() );
       if ( verbose_ > 3 ) listProp->Print();
       TIter nextInListProp( listProp );
+      unsigned uProp( 0 );
       while ( TKey * keyFit = ( TKey* )nextInListProp() ) {
         if ( std::string( keyFit->GetClassName() ) != nameDirClass ) continue;
         const std::string subFit( keyFit->GetName() );
@@ -271,13 +289,22 @@ int main( int argc, char * argv[] )
         if ( useSymm_ == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
         if ( refGen_  == ( subFit.find( "Gen" )  == std::string::npos ) ) continue;
         TDirectory * dirFit_( dynamic_cast< TDirectory* >( dirProp_->Get( subFit.c_str() ) ) );
+        dirFit_->cd();
 
-        // Inversion flag from directory name
+        // Inversion flags
         const bool inverse( useSymm_ ? subFit.substr( subFit.size() - 7, 3 ) == "Inv" : subFit.substr( subFit.size() - 3 ) == "Inv" );
+        const bool nominalInv( nominalInv_.at( uCat ).at( uProp ) == inverse );
+        if ( onlyExisting_ && ! nominalInv ) {
+          if ( verbose_ > 1 ) {
+            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                      << "   skipping unnominal directory '";
+            gDirectory->pwd();
+          }
+          continue;
+        }
 
         // Fit performance histograms
 
-        dirFit_->cd();
         const std::string name( objCat + "_" + kinProp + "_" + subFit );
 
         // Single resolutions
@@ -829,6 +856,8 @@ int main( int argc, char * argv[] )
         }
 
       } // loop: keyFit
+
+      ++uProp;
 
     } // loop: keyProp
 
