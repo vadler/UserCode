@@ -5,7 +5,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4
 AnalysisDataFormats/TopObjects                   V06-08-04      V06-07-07      
 PhysicsTools/KinFitter                           V00-03-06      V00-03-04      
 TopQuarkAnalysis/TopEventProducers               V06-08-01      V06-07-13      
-TopQuarkAnalysis/TopHitFit                       V00-00-03                     
+TopQuarkAnalysis/TopHitFit                       V00-00-04                     
 TopQuarkAnalysis/TopJetCombination               V06-08-01      V06-07-09      
 TopQuarkAnalysis/TopKinFitter                    V06-07-17      V06-07-11      
 TopQuarkAnalysis/TopMassSemiLeptonic             NoCVS                         
