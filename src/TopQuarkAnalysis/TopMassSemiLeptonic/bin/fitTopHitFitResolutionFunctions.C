@@ -42,7 +42,7 @@ int main( int argc, char * argv[] )
   }
   if ( ! edm::readPSetsFrom( argv[ 1 ] )->existsAs< edm::ParameterSet >( "process" ) ) {
     std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-              << "   cms.PSet 'process' missing in " << argv[ 1 ] << std::endl;
+              << "    cms.PSet 'process' missing in " << argv[ 1 ] << std::endl;
     returnStatus_ += 0x2;
     return returnStatus_;
   }
@@ -76,7 +76,7 @@ int main( int argc, char * argv[] )
   if ( verbose_ > 0 )
     std::cout << std::endl
               << argv[ 0 ] << " --> INFO:" << std::endl
-              << "   called for object categories ";
+              << "    called for object categories ";
     for ( unsigned uCat = 0; uCat < objCats_.size() - 1; ++uCat ) std::cout << "'" << objCats_.at( uCat ) << "', ";
     std::cout << "'" << objCats_.back() << "'" << std::endl;
 
@@ -99,7 +99,7 @@ int main( int argc, char * argv[] )
   if ( verbose_ > 0 )
     std::cout << std::endl
               << argv[ 0 ] << " --> INFO:" << std::endl
-              << "   accessing existing resolution functions from resolution file '" << resolutionFile_ << "'" << std::endl;
+              << "    accessing existing resolution functions from resolution file '" << resolutionFile_ << "'" << std::endl;
 
   // Open output file
   TFile * resolutionFile( TFile::Open( resolutionFile_.c_str() ) );
@@ -113,7 +113,7 @@ int main( int argc, char * argv[] )
       TDirectory * dirCat_( dynamic_cast< TDirectory* >( resolutionFile->Get( objCat.c_str() ) ) );
       if ( ! dirCat_ ) {
         std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                  << "   object category '" << objCat << "' does not exist in resolution file" << std::endl;
+                  << "    object category '" << objCat << "' does not exist in resolution file" << std::endl;
         continue;
       }
 
@@ -128,7 +128,7 @@ int main( int argc, char * argv[] )
         TList * listProp( dirProp_->GetListOfKeys() );
         if ( verbose_ > 3 ) listProp->Print();
         TIter nextInListProp( listProp );
-        unsigned uEta( 0 );
+        bool bEta( false );
         while ( TKey * keyEta = ( TKey* )nextInListProp() ) {
           if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
           const std::string binEta( keyEta->GetName() );
@@ -140,22 +140,37 @@ int main( int argc, char * argv[] )
           TList * listEta( dirEta_->GetListOfKeys() );
           if ( verbose_ > 3 ) listEta->Print();
           TIter nextInListEta( listEta );
+          TF1 * fitSigma( 0 );
+          TF1 * fitSigmaInv( 0 );
           while ( TKey * keyFunc = ( TKey* )nextInListEta() ) {
             if ( std::string( keyFunc->GetClassName() ) != nameFuncClass ) continue;
 
-            TF1 * fitSigma( dynamic_cast< TF1* >( dirEta_->Get( name.c_str() ) ) );
-            TF1 * fitSigmaInv( dynamic_cast< TF1* >( dirEta_->Get( nameInv.c_str() ) ) );
-            if ( ( fitSigma && fitSigmaInv ) || ( ! fitSigma && ! fitSigmaInv ) ) {
-              std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "   inconsitent resolution functions in '" << objCat << "', '" << kinProp << "', '" << binEta << std::endl;
-              continue;
+            fitSigma    = dynamic_cast< TF1* >( dirEta_->Get( name.c_str() ) );
+            fitSigmaInv = dynamic_cast< TF1* >( dirEta_->Get( nameInv.c_str() ) );
+          }
+          if ( ( fitSigma && fitSigmaInv ) || ( ! fitSigma && ! fitSigmaInv ) ) {
+            std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                      << "    inconsistent resolution functions in '" << objCat << "', '" << kinProp << "', '" << binEta << std::endl;
+            continue;
+          }
+          if ( ! bEta ) {
+            if ( verbose_ > 3 ) {
+              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                        << "    found non-inverted'" << name << "': " << ( fitSigma != 0 ) << std::endl
+                        << "    found inverted '" << nameInv << "': " << ( fitSigmaInv != 0 ) << std::endl;
             }
-            if ( uEta == 0 ) nominalInv_.at( uCat ).push_back( fitSigmaInv ? true : false );
+            nominalInv_.at( uCat ).push_back( fitSigmaInv ? true : false );
+            bEta = true;
           }
 
-          ++uEta;
-
         } // loop: nextInListProp()
+
+        dirProp_->cd();
+        if (! bEta  ) {
+          std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                    << "    no resolution function in '"; gDirectory->pwd();
+          returnStatus_ += 0x200;
+        }
 
       } // loop: nextInListCat()
 
@@ -168,9 +183,11 @@ int main( int argc, char * argv[] )
 
   else {
     std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-              << "   resolution file '" << resolutionFile_ << "' missing" << std::endl;
+              << "    resolution file '" << resolutionFile_ << "' missing" << std::endl;
     returnStatus_ += 0x100;
   } // !( resolutionFile )
+
+  if ( returnStatus_ != 0 ) return returnStatus_;
 
 
   // Fit the new resolution functions
@@ -179,7 +196,7 @@ int main( int argc, char * argv[] )
   TFile * fileIn_( TFile::Open( inFile_.c_str(), "UPDATE" ) );
   if ( ! fileIn_ ) {
     std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-              << "   input file '" << inFile_ << "' missing" << std::endl;
+              << "    input file '" << inFile_ << "' missing" << std::endl;
     returnStatus_ += 0x10;
     return returnStatus_;
   }
@@ -190,7 +207,7 @@ int main( int argc, char * argv[] )
   if ( verbose_ > 0 )
     std::cout << std::endl
               << argv[ 0 ] << " --> INFO:" << std::endl
-              << "   fitting resolution functions from input file '" << inFile_ << "'" << std::endl;
+              << "    fitting resolution functions from input file '" << inFile_ << "'" << std::endl;
 
   typedef std::vector< std::vector< Double_t > > dataCont;
 
@@ -200,7 +217,7 @@ int main( int argc, char * argv[] )
     TDirectory * dirCat_( dynamic_cast< TDirectory* >( dirSel_->Get( objCat.c_str() ) ) );
     if ( ! dirCat_ ) {
       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                << "   object category '" << objCat << "' does not exist in input file" << std::endl;
+                << "    object category '" << objCat << "' does not exist in input file" << std::endl;
       continue;
     }
 
@@ -257,7 +274,15 @@ int main( int argc, char * argv[] )
     TList * listCat( dirCat_->GetListOfKeys() );
     if ( verbose_ > 3 ) listCat->Print();
     TIter nextInListCat( listCat );
+    unsigned uProp( 0 );
     while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
+      if ( onlyExisting_ && ! ( uProp < nominalInv_.at( uCat ).size() ) ) {
+        if ( verbose_ > 2 ) {
+          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                    << "    only " << uProp << " kinematic properties available for " << objCat << std::endl;
+        }
+        break;
+      }
       if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
       const std::string kinProp( keyProp->GetName() );
       TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
@@ -280,7 +305,6 @@ int main( int argc, char * argv[] )
       TList * listProp( dirProp_->GetListOfKeys() );
       if ( verbose_ > 3 ) listProp->Print();
       TIter nextInListProp( listProp );
-      unsigned uProp( 0 );
       while ( TKey * keyFit = ( TKey* )nextInListProp() ) {
         if ( std::string( keyFit->GetClassName() ) != nameDirClass ) continue;
         const std::string subFit( keyFit->GetName() );
@@ -293,14 +317,18 @@ int main( int argc, char * argv[] )
 
         // Inversion flags
         const bool inverse( useSymm_ ? subFit.substr( subFit.size() - 7, 3 ) == "Inv" : subFit.substr( subFit.size() - 3 ) == "Inv" );
-        const bool nominalInv( nominalInv_.at( uCat ).at( uProp ) == inverse );
-        if ( onlyExisting_ && ! nominalInv ) {
-          if ( verbose_ > 1 ) {
-            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                      << "   skipping unnominal directory '";
-            gDirectory->pwd();
+        if ( onlyExisting_ ) {
+          if ( nominalInv_.at( uCat ).at( uProp ) != inverse ) {
+            if ( verbose_ > 2 ) {
+              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                        << "    skipping unnominal directory '"; gDirectory->pwd();
+            }
+            continue;
           }
-          continue;
+          else if ( verbose_ > 3 ) {
+            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                      << "    entering nominal directory '"; gDirectory->pwd();
+          }
         }
 
         // Fit performance histograms
@@ -517,9 +545,8 @@ int main( int argc, char * argv[] )
               }
               if ( verbose_ > 3 && fitSigma2D2ResultPtr->Status() == 4000 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "   IMPROVE error in directory '";
-                gDirectory->pwd();
-                std::cout << "':" << nameFitSigma2D2 << "' status " << fitSigma2D2ResultPtr->Status() << std::endl;
+                          << "    IMPROVE error in directory '"; gDirectory->pwd();
+                std::cout << "    '" << nameFitSigma2D2 << "' status " << fitSigma2D2ResultPtr->Status() << std::endl;
               }
             }
             else {
@@ -535,9 +562,8 @@ int main( int argc, char * argv[] )
               histSigma2D2BadNdf->Fill( fitSigma2D2ResultPtr->Ndf() );
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "   failing fit in directory '";
-                gDirectory->pwd();
-                std::cout << "':" << nameFitSigma2D2 << "' status " << fitSigma2D2ResultPtr->Status() << std::endl;
+                          << "    failing fit in directory '"; gDirectory->pwd();
+                std::cout << "    '" << nameFitSigma2D2 << "' status " << fitSigma2D2ResultPtr->Status() << std::endl;
               }
             }
           }
@@ -545,9 +571,8 @@ int main( int argc, char * argv[] )
             histSigma2D2MissingMap->AddBinContent( uEta + 1 );
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "   missing fit in directory '";
-              gDirectory->pwd();
-              std::cout << "':" << nameFitSigma2D2 << std::endl;
+                        << "    missing fit in directory '"; gDirectory->pwd();
+              std::cout << "    '" << nameFitSigma2D2 << std::endl;
             }
           }
 
@@ -602,9 +627,8 @@ int main( int argc, char * argv[] )
                 histDeltasBadNdf->Fill( fitDeltaResultPtr->Ndf() );
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "   failing fit in directory '";
-                  gDirectory->pwd();
-                  std::cout << "':" <<nameDelta << "' status " << fitDeltaResultPtr->Status() << std::endl;
+                            << "    failing fit in directory '"; gDirectory->pwd();
+                  std::cout << "    '" <<nameDelta << "' status " << fitDeltaResultPtr->Status() << std::endl;
                 }
               }
             }
@@ -613,9 +637,8 @@ int main( int argc, char * argv[] )
               histDeltasMissingMap->AddBinContent( uBin );
               if ( verbose_ > 1 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "   missing fit in directory '";
-                gDirectory->pwd();
-                std::cout << "':" << nameDelta << std::endl;
+                          << "    missing fit in directory '"; gDirectory->pwd();
+                std::cout << "    '" << nameDelta << std::endl;
               }
             }
           } // loop: uPt < nPtBins_
@@ -645,9 +668,8 @@ int main( int argc, char * argv[] )
               }
               if ( verbose_ > 3 && fitSigmaResultPtr->Status() == 4000 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "   IMPROVE error in directory '";
-                gDirectory->pwd();
-                std::cout << "':" << nameFitSigma << "' status " << fitSigmaResultPtr->Status() << std::endl;
+                          << "    IMPROVE error in directory '";gDirectory->pwd();
+                std::cout << "    '" << nameFitSigma << "' status " << fitSigmaResultPtr->Status() << std::endl;
               }
             }
             else {
@@ -663,9 +685,8 @@ int main( int argc, char * argv[] )
               histSigmaBadNdf->Fill( fitSigmaResultPtr->Ndf() );
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "   failing fit in directory '";
-                gDirectory->pwd();
-                std::cout << "':" << nameFitSigma << "' status " << fitSigmaResultPtr->Status() << std::endl;
+                          << "    failing fit in directory '"; gDirectory->pwd();
+                std::cout << "    '" << nameFitSigma << "' status " << fitSigmaResultPtr->Status() << std::endl;
               }
             }
           }
@@ -673,9 +694,8 @@ int main( int argc, char * argv[] )
             histSigmaMissingMap->AddBinContent( uEta + 1 );
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "   missing fit in directory '";
-              gDirectory->pwd();
-              std::cout << "':" << nameFitSigma << std::endl;
+                        << "    missing fit in directory '"; gDirectory->pwd();
+              std::cout << "    '" << nameFitSigma << std::endl;
             }
           }
 
@@ -710,7 +730,7 @@ int main( int argc, char * argv[] )
             if ( sizePt.at( uPt ) == 0 ) {
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                          << "   empty bin in '" << name << "' for p_t bin " << uPt  << std::endl;
+                          << "    empty bin in '" << name << "' for p_t bin " << uPt  << std::endl;
               }
               continue;
             }
@@ -727,7 +747,7 @@ int main( int argc, char * argv[] )
             const Double_t width( std::fabs( histDelta->GetRMS() ) );
             if ( width == 0. && verbose_ > 2 ) {
               std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                        << "   no histogram \"width\" in '" << nameDelta << "'" << std::endl;
+                        << "    no histogram \"width\" in '" << nameDelta << "'" << std::endl;
             }
             const Double_t range( width == 0. ? widthFactor_ * std::fabs( histDelta->GetXaxis()->GetXmax() ) : widthFactor_ * width ); // FIXME: tune, incl. under- and overflow, remove hard-coding
             TH1D * histDeltaNtup( new TH1D( nameDeltaNtup.c_str(), titleDeltaNtup.c_str(), nBinsDeltaNtup, -range + mean, range + mean ) );
@@ -770,9 +790,8 @@ int main( int argc, char * argv[] )
                 histDeltasNtupBadNdf->Fill( fitDeltaNtupResultPtr->Ndf() );
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "   failing fit in directory '";
-                  gDirectory->pwd();
-                  std::cout << "':" << nameDeltaNtup << "' status " << fitDeltaNtupResultPtr->Status() << std::endl;
+                            << "    failing fit in directory '"; gDirectory->pwd();
+                  std::cout << "    '" << nameDeltaNtup << "' status " << fitDeltaNtupResultPtr->Status() << std::endl;
                 }
               }
             }
@@ -781,9 +800,8 @@ int main( int argc, char * argv[] )
               histDeltasNtupMissingMap->AddBinContent( uBin );
               if ( verbose_ > 1 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "   missing fit in directory '";
-                gDirectory->pwd();
-                std::cout << "':" << nameDeltaNtup << std::endl;
+                          << "    missing fit in directory '"; gDirectory->pwd();
+                std::cout << "    '" << nameDeltaNtup << std::endl;
               }
             }
           }  // loop: uEntry < sizePt.at( uPt )
@@ -813,9 +831,8 @@ int main( int argc, char * argv[] )
               }
               if ( verbose_ > 3 && fitSigmaNtupResultPtr->Status() == 4000 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "   IMPROVE error in directory '";
-                gDirectory->pwd();
-                std::cout << "':" << nameFitSigmaNtup << "' status " << fitSigmaNtupResultPtr->Status() << std::endl;
+                          << "    IMPROVE error in directory '"; gDirectory->pwd();
+                std::cout << "    '" << nameFitSigmaNtup << "' status " << fitSigmaNtupResultPtr->Status() << std::endl;
               }
             }
             else {
@@ -831,9 +848,8 @@ int main( int argc, char * argv[] )
               histSigmaNtupBadNdf->Fill( fitSigmaNtupResultPtr->Ndf() );
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "   failing fit in directory '";
-                gDirectory->pwd();
-                std::cout << "':" << nameFitSigmaNtup << "' status " << fitSigmaNtupResultPtr->Status() << std::endl;
+                          << "    failing fit in directory '"; gDirectory->pwd();
+                std::cout << "    '" << nameFitSigmaNtup << "' status " << fitSigmaNtupResultPtr->Status() << std::endl;
               }
             }
           }
@@ -841,18 +857,17 @@ int main( int argc, char * argv[] )
             histSigmaNtupMissingMap->AddBinContent( uEta + 1 );
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "   missing fit in directory '";
-              gDirectory->pwd();
-              std::cout << "':" << nameFitSigmaNtup << std::endl;
+                        << "    missing fit in directory '"; gDirectory->pwd();
+              std::cout << "    '" << nameFitSigmaNtup << std::endl;
             }
           }
 
         } // loop: keyEta
         if ( sizeEtaBins != nEtaBins_ ) {
           std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                    << "   mismatch of eta binning for object category '" << objCat << "':" << std::endl
-                    << "       bins in directory structure: " << sizeEtaBins         << std::endl
-                    << "       bins in binning histogram  : " << nEtaBins_                  << std::endl;
+                    << "    mismatch of eta binning for object category '" << objCat << "':" << std::endl
+                    << "        bins in directory structure: " << sizeEtaBins         << std::endl
+                    << "        bins in binning histogram  : " << nEtaBins_                  << std::endl;
         }
 
       } // loop: keyFit
@@ -871,7 +886,7 @@ int main( int argc, char * argv[] )
   if ( verbose_ > 0 )
     std::cout << std::endl
               << argv[ 0 ] << " --> INFO:" << std::endl
-              << "   return status " << returnStatus_ << std::endl;
+              << "    return status " << returnStatus_ << std::endl;
   return returnStatus_;
 
 }
