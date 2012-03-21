@@ -11,10 +11,6 @@ rfioInput = False
 # era = 'Spring10'
 era = 'Summer11'
 
-# Selection to fit for
-selection = 'analyzeHitFitResolutionFunctions'
-# selection = 'analyzeHitFitResolutionFunctions_Reference'
-
 # Lepton
 lepton = 'Mu'
 # lepton = 'Elec'
@@ -25,6 +21,9 @@ overwrite = True # to throw away earlier versions of histograms, trees and funct
 useAlt  = False # 'True' makes sense only, if available in input (will not crash other wise)
 useSymm = False # 'True' makes sense only, if available in input (will not crash other wise)
 refGen  = False # 'True' makes sense only, if available in input (will not crash other wise)
+refSel  = False # 'True' makes sense only, if available in input (will not crash other wise)
+if runTest:
+  refSel = False
 
 inputFile = 'file:%s/output/fitTopHitFitResolutionFunctions_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 if runTest:
@@ -49,10 +48,10 @@ process.overwrite = cms.bool( overwrite )
 process.useAlt    = cms.bool( useAlt )
 process.useSymm   = cms.bool( useSymm )
 process.refGen    = cms.bool( refGen )
+process.refSel    = cms.bool( refSel )
 
 process.fitter = cms.PSet(
   inputFile                    = cms.string( inputFile )
-, selection                    = cms.string( selection )
   # resolution function formulas
 , resolutionFunction           = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])' )
 , resolutionFunctionInverse    = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
@@ -64,13 +63,12 @@ process.fitter = cms.PSet(
   # histogram options
 , widthFactor = cms.double( 5. )
 )
-if runTest:
-  process.fitter.selection = 'analyzeHitFitResolutionFunctions'
 
 process.existing = cms.PSet(
   resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era ) )
   # skip resolutions without existing counterpart?
-  onlyExisting   = cms.bool( True )
+, onlyExisting   = cms.bool( True ) # True includes the writing of resolution function text files.
+, pathOut        = cms.string( '%s/src/TopQuarkAnalysis/TopHitFit/data/resolution_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the new resolution functions
 )
 
 # Messaging

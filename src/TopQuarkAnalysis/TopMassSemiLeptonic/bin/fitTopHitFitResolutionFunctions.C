@@ -3,7 +3,8 @@
 #include <cassert>
 #include <string>
 #include <vector>
-#include <iostream>
+#include <fstream>
+#include <iomanip>
 
 #include "boost/lexical_cast.hpp"
 
@@ -52,13 +53,13 @@ int main( int argc, char * argv[] )
   const unsigned verbose_( process_.getParameter< unsigned >( "verbose" ) );
   const std::vector< std::string > objCats_( process_.getParameter< std::vector< std::string > >( "objectCategories" ) );   // object categories
   const bool overwrite_(  process_.getParameter< bool >( "overwrite" ));
-  const bool useAlt_(  process_.getParameter< bool >( "useAlt" ));
-  const bool useSymm_(  process_.getParameter< bool >( "useSymm" ));
-  const bool refGen_(  process_.getParameter< bool >( "refGen" ));
+  const bool useAlt_( process_.getParameter< bool >( "useAlt" ) );
+  const bool useSymm_( process_.getParameter< bool >( "useSymm" ) );
+  const bool refGen_( process_.getParameter< bool >( "refGen" ) );
+  const bool refSel_( process_.getParameter< bool >( "refSel" ) );
   // Configuration for fitting new resolution functions
   const edm::ParameterSet & fitter_( process_.getParameter< edm::ParameterSet >( "fitter" ) );
   const std::string inFile_( fitter_.getParameter< std::string >( "inputFile" ) );                                          // input file with RECO-GEN distributions
-  const std::string evtSel_( fitter_.getParameter< std::string >( "selection" ) );
   const std::string resFunc_( fitter_.getParameter< std::string >( "resolutionFunction" ) );
   const std::string resFuncInv_( fitter_.getParameter< std::string >( "resolutionFunctionInverse" ) );
   const std::string resFuncRel_( fitter_.getParameter< std::string >( "resolutionFunctionRel" ) );
@@ -70,6 +71,7 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & exist_( process_.getParameter< edm::ParameterSet >( "existing" ) );
   const std::string resolutionFile_( exist_.getParameter< std::string >( "resolutionFile" ) );
   const bool onlyExisting_( exist_.getParameter< bool >( "onlyExisting" ) );
+  const std::string pathOut_( exist_.getParameter< std::string >( "pathOut" ) );
 
   std::vector< std::vector< bool > > nominalInv_( objCats_.size() );
 
@@ -81,6 +83,8 @@ int main( int argc, char * argv[] )
     std::cout << "'" << objCats_.back() << "'" << std::endl;
 
   // Set constants
+  std::string evtSel_( "analyzeHitFitResolutionFunctions" );
+  if ( refSel_ ) evtSel_.append( "_Reference" );
   const std::string nameDirClass( "TDirectoryFile" );
   const std::string nameFuncClass( "TF1" );
   std::string optionsFit_( "QRS" );
@@ -270,22 +274,35 @@ int main( int argc, char * argv[] )
       ptGenData_.at( iEta ).push_back( ptGenData );
     }
 
+    // Save fit results for text output
+    std::vector< std::vector< double > > Cs, Rs, Ns;             // resolution parameter vectors
+    std::vector< std::vector< double > > CsNtup, RsNtup, NsNtup; // resolution parameter vectors with re-binning used
+
     // Loop over kinematic properties
+
     TList * listCat( dirCat_->GetListOfKeys() );
     if ( verbose_ > 3 ) listCat->Print();
     TIter nextInListCat( listCat );
     unsigned uProp( 0 );
     while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
+      if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
       if ( onlyExisting_ && ! ( uProp < nominalInv_.at( uCat ).size() ) ) {
         if ( verbose_ > 2 ) {
           std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                    << "    only " << uProp << " kinematic properties available for " << objCat << std::endl;
+                    << "    only " << nominalInv_.at( uCat ).size() << " kinematic properties available for " << objCat << std::endl
+                    << "    but  " << uProp + 1 << " requested" << std::endl;
         }
         break;
       }
-      if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
       const std::string kinProp( keyProp->GetName() );
       TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
+
+      Cs.push_back( std::vector< double >( nEtaBins_ ) );
+      Rs.push_back( std::vector< double >( nEtaBins_ ) );
+      Ns.push_back( std::vector< double >( nEtaBins_ ) );
+      CsNtup.push_back( std::vector< double >( nEtaBins_ ) );
+      RsNtup.push_back( std::vector< double >( nEtaBins_ ) );
+      NsNtup.push_back( std::vector< double >( nEtaBins_ ) );
 
       // Read kinematic property n-tuple data
       dataCont propData_( nEtaBins_ );
@@ -316,7 +333,7 @@ int main( int argc, char * argv[] )
         dirFit_->cd();
 
         // Inversion flags
-        const bool inverse( useSymm_ ? subFit.substr( subFit.size() - 7, 3 ) == "Inv" : subFit.substr( subFit.size() - 3 ) == "Inv" );
+        const bool inverse( subFit.find( "Inv" ) != std::string::npos );
         if ( onlyExisting_ ) {
           if ( nominalInv_.at( uCat ).at( uProp ) != inverse ) {
             if ( verbose_ > 2 ) {
@@ -543,6 +560,11 @@ int main( int argc, char * argv[] )
                   else              fitSigma2D2InvRel->Write();
                 }
               }
+              if ( onlyExisting_ ) {
+                Cs.at( uProp ).at( uEta ) = fitSigma2D2->GetParameter( 0 );
+                Rs.at( uProp ).at( uEta ) = fitSigma2D2->GetParameter( 1 );
+                Ns.at( uProp ).at( uEta ) = fitSigma2D2->GetParameter( 2 );
+              }
               if ( verbose_ > 3 && fitSigma2D2ResultPtr->Status() == 4000 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                           << "    IMPROVE error in directory '"; gDirectory->pwd();
@@ -560,6 +582,11 @@ int main( int argc, char * argv[] )
               }
               histSigma2D2BadNdfMap->SetBinContent( uEta + 1, fitSigma2D2ResultPtr->Ndf() );
               histSigma2D2BadNdf->Fill( fitSigma2D2ResultPtr->Ndf() );
+              if ( onlyExisting_ ) {
+                Cs.at( uProp ).at( uEta ) = -1.;
+                Rs.at( uProp ).at( uEta ) = -1.;
+                Ns.at( uProp ).at( uEta ) = -1.;
+              }
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                           << "    failing fit in directory '"; gDirectory->pwd();
@@ -569,6 +596,11 @@ int main( int argc, char * argv[] )
           }
           else {
             histSigma2D2MissingMap->AddBinContent( uEta + 1 );
+            if ( onlyExisting_ ) {
+              Cs.at( uProp ).at( uEta ) = -1.;
+              Rs.at( uProp ).at( uEta ) = -1.;
+              Ns.at( uProp ).at( uEta ) = -1.;
+            }
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                         << "    missing fit in directory '"; gDirectory->pwd();
@@ -699,7 +731,7 @@ int main( int argc, char * argv[] )
             }
           }
 
-          // Create new 1-dim histograms from n-tuple
+          // Create new 1-dim histograms with re-binning from n-tuple
           const std::string nameDeltaNtupChi2( name + "DeltaNtup_fitChi2" );
           TH1D * histDeltaNtupChi2( new TH1D( nameDeltaNtupChi2.c_str(), titleChi2.c_str(), nPtBins_, ptBins_.data() ) );
           histDeltaNtupChi2->SetXTitle( titlePt.c_str() );
@@ -875,6 +907,160 @@ int main( int argc, char * argv[] )
       ++uProp;
 
     } // loop: keyProp
+
+    // Write fit results to text files
+    if ( onlyExisting_ ) {
+
+      // File name
+      std::string nameOut( pathOut_ + "/gentResolution_Fall11_R3_" + objCat ); // FIXME: hard-coding
+      if ( useAlt_ )  nameOut.append( "_Alt" );
+      if ( useSymm_ ) nameOut.append( "_Symm" );
+      if ( refGen_ )  nameOut.append( "_Gen" );
+      if ( refSel_)  nameOut.append( "_Ref" );
+      nameOut.append( ".txt" );
+
+      ofstream fileOut;
+      fileOut.open( nameOut.c_str(), std::ios_base::out );
+      unsigned nEta( 0 );
+      if ( useSymm_ ) {
+        for ( unsigned uEta = nEtaBins_; uEta > 0; --uEta ) {
+          fileOut << std::endl << "etadep_etamin";
+          fileOut.width( 3 );
+          fileOut << std::left << nEta;
+          fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
+          fileOut << std::endl << "etadep_etamax";
+          fileOut.width( 3 );
+          fileOut << std::left << nEta;
+          fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
+          fileOut << std::endl << "etadep_vecres";
+          fileOut.width( 3 );
+          fileOut << std::left << nEta;
+          for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
+            if ( uProp > 0 ) fileOut << "/";
+            if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
+            fileOut << std::setprecision( 8 );
+            if ( Cs.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
+            else                                  fileOut << Cs.at( uProp ).at( uEta );
+            fileOut << ",";
+            if ( Rs.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
+            else                                  fileOut << Rs.at( uProp ).at( uEta );
+            fileOut << ",";
+            if ( Ns.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
+            else                                  fileOut << Ns.at( uProp ).at( uEta );
+          }
+          fileOut << "/et"; // FIXME: determine from existing
+          fileOut << std::endl;
+          ++nEta;
+        }
+      }
+      for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
+        fileOut << std::endl << "etadep_etamin";
+        fileOut.width( 3 );
+        fileOut << std::left << nEta;
+        fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
+        fileOut << std::endl << "etadep_etamax";
+        fileOut.width( 3 );
+        fileOut << std::left << nEta;
+        fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
+        fileOut << std::endl << "etadep_vecres";
+        fileOut.width( 3 );
+        fileOut << std::left << nEta;
+        for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
+          if ( uProp > 0 ) fileOut << "/";
+          if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
+          fileOut << std::setprecision( 8 );
+          if ( Cs.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
+          else                                  fileOut << Cs.at( uProp ).at( uEta );
+          fileOut << ",";
+          if ( Rs.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
+          else                                  fileOut << Rs.at( uProp ).at( uEta );
+          fileOut << ",";
+          if ( Ns.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
+          else                                  fileOut << Ns.at( uProp ).at( uEta );
+        }
+        fileOut << "/et"; // FIXME: determine from existing
+        fileOut << std::endl;
+        ++nEta;
+      }
+      fileOut.close();
+
+      std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                << "    written resolution file for object category '" << objCat << "':" << std::endl
+                << "        " << nameOut << std::endl;
+
+      std::string nameOutNtup( nameOut );
+      nameOutNtup.insert( nameOutNtup.find( "gentResolution" ) + std::string( "gentResolution" ).size(), "Ntup" );
+
+      ofstream fileOutNtup;
+      fileOutNtup.open( nameOutNtup.c_str(), std::ios_base::out );
+      nEta = 0;
+      if ( useSymm_ ) {
+        for ( unsigned uEta = nEtaBins_; uEta > 0; --uEta ) {
+          fileOutNtup << std::endl << "etadep_etamin";
+          fileOutNtup.width( 3 );
+          fileOutNtup << std::left << nEta;
+          fileOutNtup << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
+          fileOutNtup << std::endl << "etadep_etamax";
+          fileOutNtup.width( 3 );
+          fileOutNtup << std::left << nEta;
+          fileOutNtup << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
+          fileOutNtup << std::endl << "etadep_vecres";
+          fileOutNtup.width( 3 );
+          fileOutNtup << std::left << nEta;
+          for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
+            if ( uProp > 0 ) fileOutNtup << "/";
+            if ( nominalInv_.at( uCat ).at( uProp ) ) fileOutNtup << "-";
+            fileOutNtup << std::setprecision( 8 );
+            if ( CsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
+            else                                  fileOutNtup << CsNtup.at( uProp ).at( uEta );
+            fileOutNtup << ",";
+            if ( RsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
+            else                                  fileOutNtup << RsNtup.at( uProp ).at( uEta );
+            fileOutNtup << ",";
+            if ( NsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
+            else                                  fileOutNtup << NsNtup.at( uProp ).at( uEta );
+          }
+          fileOutNtup << "/et"; // FIXME: determine from existing
+          fileOutNtup << std::endl;
+          ++nEta;
+        }
+      }
+      for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
+        fileOutNtup << std::endl << "etadep_etamin";
+        fileOutNtup.width( 3 );
+        fileOutNtup << std::left << nEta;
+        fileOutNtup << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
+        fileOutNtup << std::endl << "etadep_etamax";
+        fileOutNtup.width( 3 );
+        fileOutNtup << std::left << nEta;
+        fileOutNtup << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
+        fileOutNtup << std::endl << "etadep_vecres";
+        fileOutNtup.width( 3 );
+        fileOutNtup << std::left << nEta;
+        for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
+          if ( uProp > 0 ) fileOutNtup << "/";
+          if ( nominalInv_.at( uCat ).at( uProp ) ) fileOutNtup << "-";
+          fileOutNtup << std::setprecision( 8 );
+          if ( CsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
+          else                                  fileOutNtup << CsNtup.at( uProp ).at( uEta );
+          fileOutNtup << ",";
+          if ( RsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
+          else                                  fileOutNtup << RsNtup.at( uProp ).at( uEta );
+          fileOutNtup << ",";
+          if ( NsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
+          else                                  fileOutNtup << NsNtup.at( uProp ).at( uEta );
+        }
+        fileOutNtup << "/et"; // FIXME: determine from existing
+        fileOutNtup << std::endl;
+        ++nEta;
+      }
+      fileOutNtup.close();
+
+      std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                << "    written resolution file for object category '" << objCat << "':" << std::endl
+                << "        " << nameOutNtup << std::endl;
+
+    }
 
   } // loop: uCat < objCats_.size()
 
