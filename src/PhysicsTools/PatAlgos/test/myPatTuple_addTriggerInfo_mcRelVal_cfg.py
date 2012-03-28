@@ -3,6 +3,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.source.fileNames    = pickRelValInputFiles( relVal      = 'RelValProdTTbar'
                                                   , dataTier    = 'AODSIM'
                                                   )
+process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
 

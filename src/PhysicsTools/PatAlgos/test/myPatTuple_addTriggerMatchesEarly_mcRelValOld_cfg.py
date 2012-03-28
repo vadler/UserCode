@@ -11,6 +11,7 @@ process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                   , globalTag     = globalTag
                                                   , maxVersions   = 1
                                                   )
+process.source.skipBadFiles = cms.untracked.bool( True )
 process.maxEvents.input     = 10
 process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
 process.options.wantSummary = False

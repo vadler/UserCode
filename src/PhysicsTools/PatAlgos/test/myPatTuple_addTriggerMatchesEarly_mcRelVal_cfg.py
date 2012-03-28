@@ -4,6 +4,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.source.fileNames    = pickRelValInputFiles( relVal   = 'RelValProdTTbar'
                                                   , dataTier = 'AODSIM'
                                                   )
+process.source.skipBadFiles = cms.untracked.bool( True )
 process.maxEvents.input     = 10
 process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
 process.options.wantSummary = False

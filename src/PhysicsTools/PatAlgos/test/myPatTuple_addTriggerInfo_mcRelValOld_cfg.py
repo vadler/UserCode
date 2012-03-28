@@ -11,6 +11,7 @@ process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                   , globalTag     = globalTag
                                                   , maxVersions   = 1
                                                   )
+process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
 

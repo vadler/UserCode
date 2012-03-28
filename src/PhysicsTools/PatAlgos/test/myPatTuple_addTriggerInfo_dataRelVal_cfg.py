@@ -5,8 +5,9 @@ globalTag                   = autoCond[ condition ][ : -5 ]
 process.GlobalTag.globaltag = autoCond[ condition ]
 process.source.fileNames    = pickRelValInputFiles( relVal      = 'SingleMu'
                                                   , dataTier    = 'RECO'
-                                                  , globalTag   = '%s_RelVal_mu2011A'%( globalTag )
+                                                  , globalTag   = '%s_RelVal_mu2011B'%( globalTag )
                                                   )
+process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
 

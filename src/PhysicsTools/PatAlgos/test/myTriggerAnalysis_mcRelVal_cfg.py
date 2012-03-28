@@ -23,6 +23,7 @@ process.source = cms.Source("PoolSource",
                         , debug         = True
                         )
   )
+, skipBadFiles = cms.untracked.bool( True )
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 1 )
