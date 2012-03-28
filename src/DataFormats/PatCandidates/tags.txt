@@ -1,6 +1,6 @@
-Test Release based on: CMSSW_5_2_1
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_1
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_5_2_1
+Test Release based on: CMSSW_5_2_2
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_2
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_5_2_2
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        V06-04-33      V06-04-33      
 PhysicsTools/PatAlgos                            V08-08-22      V08-08-22      
