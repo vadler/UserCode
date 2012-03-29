@@ -164,7 +164,6 @@ inputFiles = [ '/store/data/Run2011B/MuHad/AOD/PromptReco-v1/000/179/411/E6068DC
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
-maxInputEvents = 1000
 
 ### Conditions
 

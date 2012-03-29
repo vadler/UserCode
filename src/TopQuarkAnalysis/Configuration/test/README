@@ -2,11 +2,12 @@
 Environment:
 ============
 
-cmsrel CMSSW_4_4_3
-cd CMSSW_4_4_3/src
+cmsrel CMSSW_4_4_4
+cd CMSSW_4_4_4/src
 cmsenv
-cvs co -r V00-03-06    PhysicsTools/KinFitter
-cvs co -r V08-07-38-02 PhysicsTools/PatAlgos
+cvs co -r V06-01-16    TopQuarkAnalysis/Configuration
+cvs co -r V08-07-42    PhysicsTools/PatAlgos
+cvs co -r V00-03-05-04 CommonTools/ParticleFlow
 scram b -j 9
 
 Steering:
@@ -15,7 +16,7 @@ Steering:
 Some very basic steering switches are found at the top of the configurations:
 - runOnMC         : self-explaining
 - runMatch        : to switch on/off MC matching
-- runGenJetMatch  : to switch on/off (sepüarately) MC matching for MC jets
+- runGenJetMatch  : to switch on/off (separately) MC matching for MC jets
 - runCiC          : to switch on/off the addition of the CiC electron ID variables
                     to the electrons
 - runEwk          : to switch on/off the addition of the electron ID variables
@@ -98,13 +99,3 @@ This should also be sufficient to reconstruct the TtGenEvent in the TQAF.
 
 Tests:
 ======
-
-The tests have been performed with the CMSSW_4_4_2_patch10 set-up on CMSSW_4_4_2 RelVal samples:
-- MC  : /RelValTTbar/CMSSW_4_4_2-START44_V7-v1/GEN-SIM-RECO (run over 1000 evts.)
-- data: /SingleMu/CMSSW_4_4_2-GR_R_44_V7_RelVal_mu2011A-v1/RECO (run over 1000 evts.)
-        /Electron/CMSSW_4_4_2-GR_R_44_V7_RelVal_electron2010B-v1/RECO (run over 1000 evts.)
-
-The CMSSW timing service has been added and its summary is found at the end of the
-Fwk output.
-
-Additional information on the event size from 'edmEventSize' is also added.

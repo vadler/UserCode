@@ -33,7 +33,6 @@ process = cms.Process( 'PAT' )
 
 ### Data or MC?
 runOnMC = options.runOnMC
-runOnMC = True
 
 ### Standard and PF reconstruction
 useStandardPAT = True
@@ -162,7 +161,6 @@ inputFiles = [ '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/122C
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
-maxInputEvents = 1000
 
 ### Conditions
 
