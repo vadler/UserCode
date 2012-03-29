@@ -1,0 +1,101 @@
+
+Environment:
+============
+
+cmsrel CMSSW_4_4_4
+cd CMSSW_4_4_4/src
+cmsenv
+cvs co -r V06-01-16    TopQuarkAnalysis/Configuration
+cvs co -r V08-07-42    PhysicsTools/PatAlgos
+cvs co -r V00-03-05-04 CommonTools/ParticleFlow
+scram b -j 9
+
+Steering:
+=========
+
+Some very basic steering switches are found at the top of the configurations:
+- runOnMC         : self-explaining
+- runMatch        : to switch on/off MC matching
+- runGenJetMatch  : to switch on/off (separately) MC matching for MC jets
+- runCiC          : to switch on/off the addition of the CiC electron ID variables
+                    to the electrons
+- runEwk          : to switch on/off the addition of the electron ID variables
+                    defined by the EWK PAG working points to the electrons
+- addGenEvt       : produces and adds the TQAF MC event;
+                    needs also the GenParticles, so some space...
+- hltProcess      : process name of the HLT, needed to be adapted for re-DIGI MC
+- triggerSelection: defines logical expression for HLT selection;
+                    no slection, if empty
+- jetAlgo         : (pseudo-)identifier of used jet algorithm (others than "AK5"
+                    have not been tested -- and will not work)
+- jecLevels       : list of stored JECs
+- pvCollections   : name of primary vertex collection to be used in PF2PAT
+
+- pf{Muon, Electron}Select           : selection string cut for objects to be kept in PF2PAT
+                                       top projections
+- usePf{Muon, Electron}IsoConeR03IsoR: to switch on/off the use of radius 0.3 to compute the
+                                       isolation; "off" uses the radius 0.4 instead
+- pf{Muon, Electron}Iso              : cut value for combined isolation of objects to be
+                                       kept in PF top projection procedure
+- {muon, electron, jet}Select        : selection string cut for objects to be stored in the
+                                       output
+- {muon, electron, jet}Cut           : selection string cut for objects used in the event
+                                       selection
+- {muon, electron, jet}sMin          : minimum number of objects fulfilling the event
+                                       selection cut
+- leptonsMin                         : minimum number of sum of leptons fulfilling the event
+                                       selection cut
+
+
+Remarks:
+========
+
+Selection:
+----------
+
+The selection criteria for objects used in the event selection are chosen as the
+minimum found in the Top PAG l+jets reference selection, incl. veto leptons plus
+an additional margin for meaningful N-1-plots.
+
+For the event selection, the parameters '{muon, electron}sMin' on the one hand and
+'leptonsMin' on the other hand count the same objects, where the first counts muons
+and electrons separately and the latter the sum of both. A logical "OR" (select
+events with either an electron or a muon) can be acchieved by setting the first to
+'0' and the latter to '1'.
+
+Jets:
+-----
+
+The following settings might be objects to optimisation:
+- b-Tagging   : re-run and added
+- JTA         : not added
+- jet charge  : not added
+- constituents: not added
+
+For MC, the matching to generator particles match is switched on on demand. Matching
+to jets from generator particles is kept separately, since it increases the data
+volume remarkably.
+
+JEC:
+----
+
+The following settings might be objects to optimisation:
+- JEC levels  : which to apply, which to store
+
+Note, that the actually applied JEC depends on the JECs stored (details in PAT
+documentation).
+
+MET:
+----
+
+Note that all METs in these configurations are uncorrected, since PF.
+CaloMET (corrections available) is removed.
+
+MC:
+---
+
+If no MC match is performed, the GenParticles are kept in the event content.
+This should also be sufficient to reconstruct the TtGenEvent in the TQAF.
+
+Tests:
+======
