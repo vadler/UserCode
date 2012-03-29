@@ -7,8 +7,8 @@ import FWCore.ParameterSet.Config as cms
 runOnMC        = True
 runMatch       = False
 runGenJetMatch = False # separate from rest of matches due to rapidly inceasing data volume
-runCiC         = True
-runEwk         = True
+runCiC         = False
+runEwk         = False
 addGenEvt      = False
 
 hltProcess       = 'HLT'
