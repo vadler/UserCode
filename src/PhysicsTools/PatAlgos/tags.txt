@@ -1,8 +1,9 @@
 Test Release based on: CMSSW_4_4_4
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_4
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_4_4
--------- Package --------                        --- Tag ---    --- RelTag --- 
-CommonTools/ParticleFlow                         V00-03-05-04   V00-03-05-02   
-PhysicsTools/PatAlgos                            V08-07-41      V08-07-39      
+--- Tag ---    -------- Package --------                        
+V00-03-05-04   CommonTools/ParticleFlow                         
+V08-07-42      PhysicsTools/PatAlgos                            
+V14-07-07-05   RecoParticleFlow/PFProducer                      
 ---------------------------------------
-total packages: 2 (2 displayed)
+total packages: 3 (3 displayed)
