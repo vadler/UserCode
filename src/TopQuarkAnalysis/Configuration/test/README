@@ -8,6 +8,7 @@ cmsenv
 cvs co -r V06-01-17    TopQuarkAnalysis/Configuration
 cvs co -r V08-07-42    PhysicsTools/PatAlgos
 cvs co -r V00-03-05-04 CommonTools/ParticleFlow
+cvs co -r V14-07-07-05 RecoParticleFlow/PFProducer
 scram b -j 9
 
 Steering:
