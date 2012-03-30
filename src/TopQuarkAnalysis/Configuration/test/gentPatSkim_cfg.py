@@ -74,9 +74,9 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START44_V12::All'
+  process.GlobalTag.globaltag = 'START44_V13::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_44_V13::All'
+  process.GlobalTag.globaltag = 'GR_R_44_V15::All'
 
 
 ### Input
@@ -87,7 +87,7 @@ process.source = cms.Source( "PoolSource"
 , fileNames          = cms.untracked.vstring()
 )
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( 1000 )
+  input = cms.untracked.int32( 100 )
 )
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
