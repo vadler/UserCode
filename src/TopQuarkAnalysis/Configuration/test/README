@@ -5,7 +5,7 @@ Environment:
 cmsrel CMSSW_4_4_4
 cd CMSSW_4_4_4/src
 cmsenv
-cvs co -r V06-01-16    TopQuarkAnalysis/Configuration
+cvs co -r V06-01-17    TopQuarkAnalysis/Configuration
 cvs co -r V08-07-42    PhysicsTools/PatAlgos
 cvs co -r V00-03-05-04 CommonTools/ParticleFlow
 scram b -j 9
