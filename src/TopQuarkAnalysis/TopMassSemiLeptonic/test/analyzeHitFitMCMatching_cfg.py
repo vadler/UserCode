@@ -92,7 +92,9 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'refer
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.analyzeHitFitMCMatching_cfi" )
 process.analyzeHitFitMCMatching.patLeptons = cms.InputTag( 'selectedPat' + process.analyzeHitFitMCMatching.leptonType.value() ) # obligatory assignment
 process.analyzeHitFitMCMatching_Reference = process.analyzeHitFitMCMatching.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReference'
-                                                                                 ) # FIXME: Doesn't this also need the corresponding collections???
+                                                                                 , patLeptons          = cms.InputTag( 'referencePat' + process.analyzeHitFitMCMatching.leptonType.value() )
+                                                                                 , patJets             = 'referencePatJets'
+                                                                                 )
 
 
 ### Paths

@@ -58,15 +58,14 @@ if rfioInput:
   from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import *
   #inputFiles = files_Summer11
   inputFiles = files_Fall11_R3
-  if runTest:
-    #inputFiles = filesTest_Summer11
-    inputFiles = filesTest_Fall11_R3
 process.source = cms.Source(
   "PoolSource"
 , fileNames = cms.untracked.vstring( inputFiles )
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( -1 )
+if rfioInput and runTest:
+  process.maxEvents.input = 10000
 )
 
 
@@ -115,7 +114,9 @@ process.analyzeHitFitResolutionFunctions.metResolutions      = 'TopQuarkAnalysis
 # process.analyzeHitFitResolutionFunctions_L7Parton = process.analyzeHitFitResolutionFunctions.clone( jecLevel = 'L7Parton'
 #                                                                                            )
 process.analyzeHitFitResolutionFunctions_Reference = process.analyzeHitFitResolutionFunctions.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReference'
-                                                                                           )
+                                                                                                   , patLeptons          = cms.InputTag( 'referencePat' + process.analyzeHitFitResolutionFunctions.leptonType.value() )
+                                                                                                   , patJets             = 'referencePatJets'
+                                                                                                   )
 
 
 ### Paths
