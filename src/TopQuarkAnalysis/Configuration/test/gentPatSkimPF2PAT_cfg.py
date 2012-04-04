@@ -175,8 +175,13 @@ process.eventCleaning = cms.Sequence(
   process.HBHENoiseFilter
 + process.scrapingFilter
 )
+
+if runOnMC:
+  process.eventCleaning += process.totalKinematicsFilter
+
 if triggerSelection != '':
   process.eventCleaning += process.triggerResultsFilter
+
 process.eventCleaning += process.goodOfflinePrimaryVertices
 
 

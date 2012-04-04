@@ -139,6 +139,10 @@ process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
 , thresh      = cms.untracked.double( 0.25 )
 )
 
+# Filter for Pythia bug
+if runOnMC:
+  process.load("GeneratorInterface.GenFilters.TotalKinematicsFilter_cfi")
+
 # Trigger
 process.load( "HLTrigger.HLTfilters.triggerResultsFilter_cfi" )
 process.triggerResultsFilter.hltResults        = cms.InputTag( 'TriggerResults::' + hltProcess )
@@ -161,8 +165,13 @@ process.eventCleaning = cms.Sequence(
   process.HBHENoiseFilter
 + process.scrapingFilter
 )
+
+if runOnMC:
+  process.eventCleaning += process.totalKinematicsFilter
+
 if triggerSelection != '':
   process.eventCleaning += process.triggerResultsFilter
+
 process.eventCleaning += process.goodOfflinePrimaryVertices
 
 

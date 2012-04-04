@@ -12,3 +12,5 @@ eventCleaning = cms.Sequence(
   HBHENoiseFilter
 + scrapingFilter
 )
+
+from GeneratorInterface.GenFilters.TotalKinematicsFilter_cfi import totalKinematicsFilter

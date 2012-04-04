@@ -259,9 +259,10 @@ process.step0b = process.goodOfflinePrimaryVertices.clone( filter = True )
 
 ### Event cleaning
 process.load( 'TopQuarkAnalysis.Configuration.patRefSel_eventCleaning_cff' )
+if runOnMC:
+  process.eventCleaning += process.totalKinematicsFilter
 process.step0c = cms.Sequence(
-  process.HBHENoiseFilter
-+ process.scrapingFilter
+  process.eventCleaning
 )
 
 
@@ -737,8 +738,7 @@ if runStandardPAT:
     process.p += process.goodOfflinePrimaryVertices
     if useGoodVertex:
       process.p += process.step0b
-    if not runOnMC:
-      process.p += process.step0c
+    process.p += process.step0c
     process.p += process.eidCiCSequence
     if useL1FastJet and useRelVals:
       process.p += process.ak5CaloJetSequence
@@ -796,8 +796,7 @@ if runStandardPAT:
     pAddPF += process.goodOfflinePrimaryVertices
     if useGoodVertex:
       pAddPF += process.step0b
-    if not runOnMC:
-      pAddPF += process.step0c
+    pAddPF += process.step0c
     pAddPF += process.eidCiCSequence
     if useL1FastJet:
       pAddPF += process.ak5PFJets
@@ -865,8 +864,7 @@ if runPF2PAT:
   pPF += process.goodOfflinePrimaryVertices
   if useGoodVertex:
     pPF += process.step0b
-  if not runOnMC:
-    pPF += process.step0c
+  pPF += process.step0c
   pPF += process.eidCiCSequence
   pPF += getattr( process, 'patPF2PATSequence' + postfix )
   pPF += getattr( process, 'patAddOnSequence' + postfix )

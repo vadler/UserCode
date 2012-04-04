@@ -219,6 +219,10 @@ process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
 , thresh      = cms.untracked.double( 0.25 )
 )
 
+# Filter for Pythia bug
+if runOnMC:
+  process.load("GeneratorInterface.GenFilters.TotalKinematicsFilter_cfi")
+
 # Trigger
 process.load( "HLTrigger.HLTfilters.triggerResultsFilter_cfi" )
 process.triggerResultsFilter.hltResults        = cms.InputTag( 'TriggerResults::' + hltProcess )
@@ -250,15 +254,17 @@ process.vertexSelection = cms.Sequence(
 )
 
 process.eventCleaning = cms.Sequence(
+  process.HBHENoiseFilter
++ process.scrapingFilter
 )
 
-if not runOnMC:
-  process.eventCleaning += process.HBHENoiseFilter
-  process.eventCleaning += process.scrapingFilter
+if runOnMC:
+  process.eventCleaning += process.totalKinematicsFilter
 
 if triggerSelection != '':
   process.eventCleaning += process.triggerResultsFilter
-process.eventCleaning += process.vertexSelection
+
+process.eventCleaning += process.goodOfflinePrimaryVertices
 
 ### PAT
 
@@ -272,6 +278,7 @@ usePF2PAT( process
          , jetCorrections = ( jetAlgo + 'PFchs'
                             , jecLevels
                             )
+         , pvCollection   = 'goodOfflinePrimaryVertices'
          )
 process.patPF2PATSequence.remove( process.patPFParticles )
 process.patPF2PATSequence.remove( process.selectedPatPFParticles )
@@ -495,10 +502,6 @@ if addGenEvt:
 
 ### Path
 process.p = cms.Path()
-
-if runOnMC:
-  process.load("GeneratorInterface.GenFilters.TotalKinematicsFilter_cfi")
-  process.p *= process.totalKinematicsFilter
 
 process.p += process.eventCleaning
 process.p += process.patPF2PATSequence

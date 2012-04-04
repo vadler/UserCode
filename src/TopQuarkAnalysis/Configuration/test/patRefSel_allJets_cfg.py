@@ -242,6 +242,8 @@ process.out.SelectEvents.SelectEvents = []
 
 ### Event cleaning
 process.load( 'TopQuarkAnalysis.Configuration.patRefSel_eventCleaning_cff' )
+if runOnMC:
+  process.eventCleaning += process.totalKinematicsFilter
 
 ### Trigger selection
 if runOnMC:
@@ -608,8 +610,7 @@ if runPF2PAT:
 # The paths
 if useStandardPAT:
   process.p = cms.Path()
-  if not runOnMC:
-    process.p += process.eventCleaning
+  process.p += process.eventCleaning
   if useTrigger:
     process.p += process.step1
   process.p += process.goodOfflinePrimaryVertices
@@ -627,8 +628,7 @@ if useStandardPAT:
 
 if runPF2PAT:
   pPF = cms.Path()
-  if not runOnMC:
-    pPF += process.eventCleaning
+  pPF += process.eventCleaning
   if useTrigger:
     pPF += process.step1
   pPF += process.goodOfflinePrimaryVertices
