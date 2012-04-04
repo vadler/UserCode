@@ -5,10 +5,9 @@ Environment:
 cmsrel CMSSW_4_4_4
 cd CMSSW_4_4_4/src
 cmsenv
-cvs co -r V06-01-17    TopQuarkAnalysis/Configuration
+cvs co -r V06-01-19    TopQuarkAnalysis/Configuration
 cvs co -r V08-07-42    PhysicsTools/PatAlgos
 cvs co -r V00-03-05-04 CommonTools/ParticleFlow
-cvs co -r V14-07-07-05 RecoParticleFlow/PFProducer
 scram b -j 9
 
 Steering:
@@ -16,6 +15,7 @@ Steering:
 
 Some very basic steering switches are found at the top of the configurations:
 - runOnMC         : self-explaining
+- runOn42X        : restore backward compatibility with PhysicsTools/PatAlgos V08-07-42
 - runMatch        : to switch on/off MC matching
 - runGenJetMatch  : to switch on/off (separately) MC matching for MC jets
 - runCiC          : to switch on/off the addition of the CiC electron ID variables

@@ -4,6 +4,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 runOnMC   = True
+runOn42X  = False
 runMatch  = True
 runCiC    = True
 runEwk    = True
@@ -459,20 +460,13 @@ if runCiC:
 # X-leptons
 process.countPatLeptons.minNumber = leptonsMin
 
-process.pfPileUp = cms.EDProducer("PFPileUp",
-    PFCandidates = cms.InputTag("particleFlow"),
-    Enable = cms.bool(True),
-    checkClosestZVertex = cms.bool(False),
-    verbose = cms.untracked.bool(False),
-    Vertices = cms.InputTag("goodOfflinePrimaryVertices")
-)
-
 # Jets
 if len( jecLevels ) is 0:
   process.patJets.addJetCorrFactors = False
   print 'WARNING: No JECs are stored or applied!'
 elif 'L1FastJet' in jecLevels:
-  process.pfPileUp.checkClosestZVertex = False
+  process.pfPileUp.checkClosestZVertex    = False
+  process.pfPileUpIso.checkClosestZVertex = True
   process.pfJets.doAreaFastjet = True
   process.pfJets.doRhoFastjet  = False
 process.patJets.embedCaloTowers   = False

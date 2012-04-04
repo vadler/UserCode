@@ -371,20 +371,16 @@ process.countPatLeptons.minNumber = leptonsMin
 if len( jecLevels ) is 0:
   process.patJets.addJetCorrFactors = False
   print 'WARNING: No JECs are stored or applied!'
-process.pfPileUp.checkClosestZVertex = False # for L1FastJet corrections, even if applied later
+process.pfPileUp.checkClosestZVertex    = False # for L1FastJet corrections, even if applied later
+process.pfPileUpIso.checkClosestZVertex = True  # for PF isolation with CHS
 process.pfJets.doAreaFastjet = True          # for L1FastJet corrections, even if applied later
-process.pfJets.doRhoFastjet  = False         # for L1FastJet corrections, even if applied later
-process.pfPileUpIso.checkClosestZVertex = True # for L1FastJet corrections in isolations, even if applied later
+process.pfJets.doRhoFastjet  = False
 from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
-process.kt6PFJets = kt6PFJets.clone( src           = cms.InputTag( 'pfNoElectron' )
-                                   , doAreaFastjet = True
-                                   , doRhoFastjet  = True
-                                   , voronoiRfact  = -0.9
-                                   ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
-process.patPF2PATSequence.replace( process.patJetCorrFactors
-                                 , process.kt6PFJets * process.patJetCorrFactors
+process.kt6PFJets = kt6PFJets.clone( doRhoFastjet  = True )
+process.patPF2PATSequence.replace( process.pfNoElectron
+                                 , process.pfNoElectron * process.kt6PFJets
                                  )
-process.out.outputCommands += [ 'keep *_kt6PFJets_rho_' + process.name_() ]
+process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs' # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.levels  = jecLevels         # needs to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJets.embedCaloTowers   = False
