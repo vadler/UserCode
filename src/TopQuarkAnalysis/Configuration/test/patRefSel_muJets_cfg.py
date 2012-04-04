@@ -20,7 +20,10 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = True
+runOnMC  = True
+
+### Input from produced with CMSSW_4_2_X?
+runOn42X = False
 
 ### Standard and PF work flow
 
@@ -621,6 +624,8 @@ if runStandardPAT:
   ### Electrons
 
   process.patElectrons.electronIDSources = electronIDSources
+  if runOn42X:
+    process.patElectrons.pfElectronSource  = 'particleFlow'
 
   process.selectedPatElectrons.cut = electronCut
 

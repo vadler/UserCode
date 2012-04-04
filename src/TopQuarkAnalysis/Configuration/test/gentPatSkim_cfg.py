@@ -4,6 +4,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 runOnMC        = True
+runOn42X       = False
 runMatch       = False
 runGenJetMatch = False # separate from rest of matches due to rapidly inceasing data volume
 runCiC         = False
@@ -247,6 +248,8 @@ process.countPatMuons.minNumber = muonsMin
 
 # Electrons
 process.patElectrons.embedTrack = True
+if runOn42X:
+  process.patElectrons.pfElectronSource = 'particleFlow'
 process.selectedPatElectrons.cut = electronSelect
 process.cleanPatElectrons.src           = cms.InputTag( 'patElectrons' )
 process.cleanPatElectrons.preselection  = electronCut
