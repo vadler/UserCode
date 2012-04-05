@@ -2,12 +2,14 @@
 Environment:
 ============
 
-cmsrel CMSSW_4_4_4
-cd CMSSW_4_4_4/src
+cmsrel CMSSW_5_2_3
+cd CMSSW_5_2_3/src
+setenv SCRAM_ARCH slc5_amd64_gcc462
 cmsenv
-cvs co -r V06-01-16    TopQuarkAnalysis/Configuration
-cvs co -r V08-07-42    PhysicsTools/PatAlgos
-cvs co -r V00-03-05-04 CommonTools/ParticleFlow
+cvs co -r V06-02-00 TopQuarkAnalysis/Configuration
+cvs co -r V08-08-25 PhysicsTools/PatAlgos
+cvs co -r V00-03-07 CommonTools/ParticleFlow
+cvs co -r V15-01-04 RecoParticleFlow/PFProducer
 scram b -j 9
 
 Steering:
