@@ -8,9 +8,9 @@ runMatch  = True
 runCiC    = True
 runEwk    = True
 addGenEvt = True
-createNTuples = False
-writeNonIsoMuons = False
-writeNonIsoElectrons = False
+createNTuples = True
+writeNonIsoMuons = True
+writeNonIsoElectrons = True
 gc = False
 
 ### Initialization
@@ -24,23 +24,23 @@ process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 
 writePdfWeights   = False
-writeWDecay = True	# this should only be set True for *broken* W datasets
+writeWDecay = False	# this should only be set True for *broken* W datasets
 pfJetCollection = 'pfJets'
 #pfJetCollection = 'pfNoTau'
 postfixNonIsoMu = 'NonIsoMu'#if changing this also change when adding to process.p
 postfixNonIsoE = 'NonIsoE'
 # muon isolation
 usePfMuonIsoConeR03 = False
-pfMuonIso = 0.15 # PF2PAT: 0.15
+pfMuonIso = 0.5 # PF2PAT: 0.15
 muonsMin = 0
 # electron isolation
 usePfElectronIsoConeR03 = False
 # electron top projection isolation
-pfElectronIso = 0.2 # PF2PAT: 0.2
+pfElectronIso = 0.5 # PF2PAT: 0.2
 electronsMin = 0
 # x-leptons event selection
-leptonsMin = 0
-jetsMin = 0
+leptonsMin = 1
+jetsMin = 3
 if runOnMC:
   process.GlobalTag.globaltag = 'START52_V7::All'
 else:
@@ -142,7 +142,7 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 ### Logging
 
 process.load( "FWCore.MessageService.MessageLogger_cfi" )
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
@@ -152,21 +152,21 @@ process.Timing = cms.Service( "Timing"
 
 ### Input
 
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-inputFiles = cms.untracked.vstring()
-if runOnMC:
- inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_2'
-                                  , globalTag     = 'START52_V4'
-                                  , maxVersions   = 1
-                                  )
-else:
- inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_2'
-                                  , dataTier      = 'RECO'
-                                  , relVal        = 'SingleMu'
-                                  , globalTag     = 'GR_R_52_V4_RelVal_mu2011B'
-                                  #, relVal        = 'Electron'
-                                  #, globalTag     = 'GR_R_52_V4_RelVal_electron2011B'
-                                  )
+# from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
+# inputFiles = cms.untracked.vstring()
+# if runOnMC:
+#  inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_2'
+#                                   , globalTag     = 'START52_V4'
+#                                   , maxVersions   = 1
+#                                   )
+# else:
+#  inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_2'
+#                                   , dataTier      = 'RECO'
+#                                   , relVal        = 'SingleMu'
+#                                   , globalTag     = 'GR_R_52_V4_RelVal_mu2011B'
+#                                   #, relVal        = 'Electron'
+#                                   #, globalTag     = 'GR_R_52_V4_RelVal_electron2011B'
+#                                   )
 
 process.source = cms.Source( "PoolSource"
 , noEventSort        = cms.untracked.bool( True )
@@ -175,13 +175,13 @@ process.source = cms.Source( "PoolSource"
 #, fileNames          = cms.untracked.vstring('file:////user/mccartin/TTbarFall11.root')
 #, fileNames          = cms.untracked.vstring('file:////user/bklein/WjetsScaleUpAOD.root')
 #, fileNames          = cms.untracked.vstring('file:////user/bklein/AOD_v6_Mu_latest_trigger_menu.root')
-#, fileNames          = cms.untracked.vstring('file:////user/bklein/DYToEESummer11AOD.root')
-, fileNames          = cms.untracked.vstring()
+, fileNames          = cms.untracked.vstring('file:///user/ksbeerna/RECO2012DataTEST.root')
+#, fileNames          = cms.untracked.vstring()
 , skipBadFiles = cms.untracked.bool( True )
 )
-process.source.fileNames = inputFiles
+#process.source.fileNames = inputFiles
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( 1000 )
+  input = cms.untracked.int32( 20000 )
 )
 
 ### Output
