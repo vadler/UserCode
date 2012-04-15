@@ -3,7 +3,8 @@ Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_4
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_4_4_4
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 CommonTools/ParticleFlow                         V00-03-05-04   V00-03-05-02   
+DataFormats/PatCandidates                        V06-04-34      V06-04-33      
 PhysicsTools/PatAlgos                            V08-07-42      V08-07-39      
 PhysicsTools/PatUtils                            V03-09-18-03   V03-09-18-02   
 ---------------------------------------
-total packages: 3 (3 displayed)
+total packages: 4 (4 displayed)
