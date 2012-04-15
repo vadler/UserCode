@@ -1,5 +1,6 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source.fileNames    = pickRelValInputFiles( relVal      = 'RelValProdTTbar'
                                                   , dataTier    = 'AODSIM'
                                                   )

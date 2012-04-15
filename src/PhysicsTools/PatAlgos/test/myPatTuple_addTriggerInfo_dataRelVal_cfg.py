@@ -1,5 +1,6 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 condition                   = 'com10'
 globalTag                   = autoCond[ condition ][ : -5 ]
 process.GlobalTag.globaltag = autoCond[ condition ]
