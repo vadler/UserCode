@@ -29,6 +29,63 @@ from copy import deepcopy
 def warningIsolation():
     print "WARNING: particle based isolation must be studied"
 
+
+def adaptPFIsoElectrons(process,module, postfix = "PFIso"):
+    #FIXME: adaptPFElectrons can use this function.
+    module.isoDeposits = cms.PSet(
+        pfChargedHadrons = cms.InputTag("elPFIsoDepositCharged" + postfix),
+        pfChargedAll = cms.InputTag("elPFIsoDepositChargedAll" + postfix),
+        pfPUChargedHadrons = cms.InputTag("elPFIsoDepositPU" + postfix),
+        pfNeutralHadrons = cms.InputTag("elPFIsoDepositNeutral" + postfix),
+        pfPhotons = cms.InputTag("elPFIsoDepositGamma" + postfix)
+        )
+    module.isolationValues = cms.PSet(
+        pfChargedHadrons = cms.InputTag("elPFIsoValueCharged04PFId"+ postfix),
+        pfChargedAll = cms.InputTag("elPFIsoValueChargedAll04PFId"+ postfix),
+        pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU04PFId" + postfix),
+        pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral04PFId" + postfix),
+        pfPhotons = cms.InputTag("elPFIsoValueGamma04PFId" + postfix)
+        )
+    module.isolationValuesNoPFId = cms.PSet(
+        pfChargedHadrons = cms.InputTag("elPFIsoValueCharged04NoPFId"+ postfix),
+        pfChargedAll = cms.InputTag("elPFIsoValueChargedAll04NoPFId"+ postfix),
+        pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU04NoPFId" + postfix),
+        pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral04NoPFId" + postfix),
+        pfPhotons = cms.InputTag("elPFIsoValueGamma04NoPFId" + postfix)
+        )
+
+def adaptPFIsoMuons(process,module, postfix = "PFIso"):
+    #FIXME: adaptPFMuons can use this function.
+    module.isoDeposits = cms.PSet(
+        pfChargedHadrons = cms.InputTag("muPFIsoDepositCharged" + postfix),
+        pfChargedAll = cms.InputTag("muPFIsoDepositChargedAll" + postfix),
+        pfPUChargedHadrons = cms.InputTag("muPFIsoDepositPU" + postfix),
+        pfNeutralHadrons = cms.InputTag("muPFIsoDepositNeutral" + postfix),
+        pfPhotons = cms.InputTag("muPFIsoDepositGamma" + postfix)
+        )
+    module.isolationValues = cms.PSet(
+        pfChargedHadrons = cms.InputTag("muPFIsoValueCharged04"+ postfix),
+        pfChargedAll = cms.InputTag("muPFIsoValueChargedAll04"+ postfix),
+        pfPUChargedHadrons = cms.InputTag("muPFIsoValuePU04" + postfix),
+        pfNeutralHadrons = cms.InputTag("muPFIsoValueNeutral04" + postfix),
+        pfPhotons = cms.InputTag("muPFIsoValueGamma04" + postfix)
+        )
+
+from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setupPFMuonIso
+
+def usePFIso(process, postfix = "PFIso"):
+    print "Building particle-based isolation "
+    print "***************** "
+    process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons', postfix)
+    process.muIsoSequence = setupPFMuonIso(process, 'muons', postfix)
+    adaptPFIsoMuons( process, applyPostfix(process,"patMuons",""), postfix)
+    adaptPFIsoElectrons( process, applyPostfix(process,"patElectrons",""), postfix)
+    getattr(process,'patDefaultSequence').replace( getattr(process,"patCandidates"),
+                                                   process.pfParticleSelectionSequence +
+                                                   process.eleIsoSequence +
+                                                   process.muIsoSequence +
+                                                   getattr(process,"patCandidates") )
+
 def adaptPFMuons(process,module,postfix="" ):
     print "Adapting PF Muons "
     print "***************** "
@@ -77,11 +134,11 @@ def adaptPFElectrons(process,module, postfix):
         pfPhotons = cms.InputTag("elPFIsoDepositGamma" + postfix)
         )
     module.isolationValues = cms.PSet(
-        pfChargedHadrons = cms.InputTag("elPFIsoValueCharged04"+ postfix),
-        pfChargedAll = cms.InputTag("elPFIsoValueChargedAll04"+ postfix),
-        pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU04" + postfix),
-        pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral04" + postfix),
-        pfPhotons = cms.InputTag("elPFIsoValueGamma04" + postfix)
+        pfChargedHadrons = cms.InputTag("elPFIsoValueCharged04PFId"+ postfix),
+        pfChargedAll = cms.InputTag("elPFIsoValueChargedAll04PFId"+ postfix),
+        pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU04PFId" + postfix),
+        pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral04PFId" + postfix),
+        pfPhotons = cms.InputTag("elPFIsoValueGamma04PFId" + postfix)
         )
 
     # COLIN: since we take the egamma momentum for pat Electrons, we must
@@ -142,7 +199,7 @@ def reconfigurePF2PATTaus(process,
            )
        newTau.modifiers[1] = newTauSansRefs.modifiers[1]
        newTauSansRefs.piZeroSrc = "pfJetsLegacyTaNCPiZeros"+postfix
-       newTau.piZeroSrc = newTauSansRefs.piZeroSrc 
+       newTau.piZeroSrc = newTauSansRefs.piZeroSrc
        newTauSansRefs.builders[0].pfCandSrc = oldTauSansRefs.builders[0].pfCandSrc
        newTauSansRefs.jetRegionSrc = oldTauSansRefs.jetRegionSrc
        newTauSansRefs.jetSrc = oldTauSansRefs.jetSrc
@@ -263,7 +320,7 @@ def adaptPFTaus(process,tauType = 'shrinkingConePFTau', postfix = ""):
     else:
         applyPostfix(process,"patTaus", postfix).tauSource = cms.InputTag("hpsPFTauProducer"+postfix)
     # to use preselected collection (old default) uncomment line below
-    #applyPostfix(process,"patTaus", postfix).tauSource = cms.InputTag("pfTaus"+postfix)    
+    #applyPostfix(process,"patTaus", postfix).tauSource = cms.InputTag("pfTaus"+postfix)
 
 
     redoPFTauDiscriminators(process,
