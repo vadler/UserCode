@@ -6,7 +6,6 @@ cmsrel CMSSW_5_2_4
 cd CMSSW_5_2_4/src
 setenv SCRAM_ARCH slc5_amd64_gcc462
 cmsenv
-cvs co -r V06-02-00    TopQuarkAnalysis/Configuration
 cvs co -r V06-05-00    DataFormats/PatCandidates
 cvs co -r V08-09-02    PhysicsTools/PatAlgos
 cvs co -r V03-09-18-03 PhysicsTools/PatUtils
@@ -17,8 +16,12 @@ scram b -j 9
 Steering:
 =========
 
-Some very basic steering switches are found at the top of the configurations:
+Some very basic steering switches are found at the top of the configurations. Not all of these
+parameters are availabel in all configuration files:
+- gc              : switch for the use of an external steering file
 - runOnMC         : self-explaining
+- runOnPrompt     : in the default version, this uses PromptReco data rather than RelVals
+                    for "runOnMC = False"
 - runMatch        : to switch on/off MC matching
 - runGenJetMatch  : to switch on/off (separately) MC matching for MC jets
 - runCiC          : to switch on/off the addition of the CiC electron ID variables
@@ -27,13 +30,24 @@ Some very basic steering switches are found at the top of the configurations:
                     defined by the EWK PAG working points to the electrons
 - addGenEvt       : produces and adds the TQAF MC event;
                     needs also the GenParticles, so some space...
+- createNTuples   : to switch on/off n-tuple production instead of EDM output
+- writePdfWeights : to switch on/off the inclusion of PDF weights
+- writeWDecay     : to switch on/off ...;
+                    should only be set True for W datasets suffering from the Pythia bug in
+                    2011 MC
+- writeNonIsoMuons, writeNonIsoElectrons:
+                    add another work flow, which ignores the isolation of the lepton also in
+                    the jet clustering
+- maxEvents       : self-explaining
 - hltProcess      : process name of the HLT, needed to be adapted for re-DIGI MC
 - triggerSelection: defines logical expression for HLT selection;
                     no slection, if empty
 - jetAlgo         : (pseudo-)identifier of used jet algorithm (others than "AK5"
                     have not been tested -- and will not work)
 - jecLevels       : list of stored JECs
-- pvCollections   : name of primary vertex collection to be used in PF2PAT
+- pvCollection    : name of primary vertex collection to be used in PF2PAT
+- pfJetCollection : name of the input collection for the PAT jets;
+                  : can be 'pfJets' (incl. taus) or 'pfNoTau' (excl. taus)
 
 - pf{Muon, Electron}Select           : selection string cut for objects to be kept in PF2PAT
                                        top projections
@@ -49,6 +63,8 @@ Some very basic steering switches are found at the top of the configurations:
                                        selection cut
 - leptonsMin                         : minimum number of sum of leptons fulfilling the event
                                        selection cut
+
+"processing_mode" and other parameters to steer the n-tuple production step are explained elsewhere.
 
 
 Remarks:
