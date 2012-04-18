@@ -523,18 +523,14 @@ if addGenEvt:
   process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
 
 ### Path
-process.p = cms.Path()
+process.p = cms.Path( process.eventCleaning
+                    * process.patPF2PATSequence
+                    )
 
-if runOnMC:
-  process.load("GeneratorInterface.GenFilters.TotalKinematicsFilter_cfi")
-  process.p *= process.totalKinematicsFilter
-
-process.p += process.eventCleaning
-process.p += process.patPF2PATSequence
 if writeNonIsoMuons:
-  process.p += process.patPF2PATSequenceNonIsoMu
+  process.p *= process.patPF2PATSequenceNonIsoMu
 if writeNonIsoElectrons:
-  process.p += process.patPF2PATSequenceNonIsoE
+  process.p *= process.patPF2PATSequenceNonIsoE
 
 if addGenEvt:
   process.p *= process.makeGenEvt
