@@ -3,108 +3,79 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-runOnMC   = False
+gc = False
+
+runOnMC     = True
+runOnPrompt = True
+
 runMatch  = True
 runCiC    = True
 runEwk    = True
 addGenEvt = True
-createNTuples = True
-writeNonIsoMuons = True
+createNTuples        = False
+writePdfWeights      = False
+writeWDecay          = False	# this should only be set True for *broken* W datasets
+writeNonIsoMuons     = True
 writeNonIsoElectrons = True
-gc = False
 
-### Initialization
-
-process = cms.Process( 'PF2PAT' )
-
-### Conditions
-
-process.load( "Configuration.StandardSequences.Geometry_cff" )
-process.load( "Configuration.StandardSequences.MagneticField_cff" )
-process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-
-writePdfWeights   = False
-writeWDecay = False	# this should only be set True for *broken* W datasets
-pfJetCollection = 'pfJets'
-#pfJetCollection = 'pfNoTau'
-postfixNonIsoMu = 'NonIsoMu'#if changing this also change when adding to process.p
-postfixNonIsoE = 'NonIsoE'
-# muon isolation
-usePfMuonIsoConeR03 = False
-pfMuonIso = 0.5 # PF2PAT: 0.15
-muonsMin = 0
-# electron isolation
-usePfElectronIsoConeR03 = False
-# electron top projection isolation
-pfElectronIso = 0.5 # PF2PAT: 0.2
-electronsMin = 0
-# x-leptons event selection
-leptonsMin = 1
-jetsMin = 3
-if runOnMC:
-  process.GlobalTag.globaltag = 'START52_V7::All'
-else:
-  process.GlobalTag.globaltag = 'GR_R_52_V7::All'
-
-if gc:
-	runOnMC   = eval('@MC@')
-	pfJetCollection = '@PFJETS@'
-	muonsIsoR = eval('@MUTPCONE@')
-	muonsIsoTP = eval('@MUTPISO@')
-	muonsMin = eval('@MINNMU@')
-	electronsIsoR = eval('@ETPCONE@')
-	electronsIsoTP = eval('@ETPISO@')
-	electronsMin = eval('@MINNE@')
-	leptonsMin = eval('@MINNLEP@')
-	jetsMin = eval('@MINNJETS@')
-        writeNonIsoMuons   = eval('@WRITENONISOMU@')
-        writeNonIsoElectrons   = eval('@WRITENONISOE@')
-	process.GlobalTag.globaltag = '@GLOBALTAG@'
-	# if not set in gc config, take default value
-	if '@WRITEWDECAY@'.lower() == 'true' or '@WRITEWDECAY@'.lower() == 'false':
-		writeWDecay = eval('@WRITEWDECAY@')
-	else:
-		writeWDecay = False
-	# if not set in gc config, take default value
-	if '@PDFWEIGHTS@'.lower() == 'true' or '@PDFWEIGHTS@'.lower() == 'false':
-		writePdfWeights = eval('@PDFWEIGHTS@')
-	else:
-		writePdfWeights = False
+maxEvents = 100
 
 hltProcess       = 'HLT'
 triggerSelection = ''
 
-
 jetAlgo   = 'AK5'
 jecLevels = []
-jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
-if not runOnMC:
-  jecLevels.append( 'L2L3Residual' )
+#jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
+#if not runOnMC:
+  #jecLevels.append( 'L2L3Residual' )
 
-# muon object selection
+# vertex collection to use
+# 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
+pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
+
+# jet collection to use
+# 'pfJets' or 'pfNoTau'
+pfJetCollection = 'pfJets'
+
+# muon top projection object selection
 pfMuonSelect = 'pt > 5.' # PF2PAT: 'pt > 5.'
+# muon isolation cone
+usePfMuonIsoConeR03 = True
+# muon top projection isolation
+pfMuonIso = 0.5 # PF2PAT: 0.15
+postfixNonIsoMu = 'NonIsoMu'
+# muon object selection
 #muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
 muonSelect = ''
 # muon event selection
-muonCut = 'isGlobalMuon && pt > 5. && abs(eta) < 2.5 && globalTrack().hitPattern().numberOfValidMuonHits() > 0 && numberOfMatches() > 1 && innerTrack().numberOfValidHits()> 10 && innerTrack().hitPattern().numberOfValidPixelHits()>0'
+#muonCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
+#muonCut = 'isGlobalMuon && pt > 5. && abs(eta) < 2.5 && globalTrack().hitPattern().numberOfValidMuonHits() > 0 && numberOfMatches() > 1 && innerTrack().numberOfValidHits()> 10 && innerTrack().hitPattern().numberOfValidPixelHits()>0'
+muonCut = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5 && globalTrack().hitPattern().numberOfValidMuonHits()> 0 && numberOfMatchedStations() > 1 && innerTrack().hitPattern().numberOfValidPixelHits()>0 && track().hitPattern().trackerLayersWithMeasurement() > 8'
+muonsMin = 0
 
-# electron object selection
+# electron top projection object selection
 pfElectronSelect = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2' # PF2PAT: 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
+# electron isolation cone
+usePfElectronIsoConeR03 = True
+# electron top projection isolation
+pfElectronIso = 0.5 # PF2PAT: 0.2
+postfixNonIsoE = 'NonIsoE'
+# electron object selection
 #electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
 electronSelect = ''
 # electron event selection
-electronCut = 'et > 5. && abs(eta) < 3.0'
+electronCut  = 'et > 5. && abs(eta) < 3.0'
+electronsMin = 0
+
+# x-leptons event selection
+leptonsMin = 1
 
 # jet object selection
 #jetSelect = 'pt > 30. && abs(eta) < 2.4' # RefSel
 jetSelect = ''
 # jet event selection
-jetsCut = 'pt > 15. && abs(eta) < 3.0'
-
-
-runMatch  = runMatch  and runOnMC
-addGenEvt = addGenEvt and runOnMC
-writePdfWeights = writePdfWeights and runOnMC
+jetCut  = 'pt > 15. && abs(eta) < 3.0'
+jetsMin = 3
 
 # Flat NTuple production
 processing_mode = 0
@@ -127,17 +98,55 @@ tcmet = ""
 pfmetTypeI = ""
 pfmetTypeII = ""
 
+### Initialization
+
+process = cms.Process( 'PF2PAT' )
+
+### Conditions
+
+process.load( "Configuration.StandardSequences.Geometry_cff" )
+process.load( "Configuration.StandardSequences.MagneticField_cff" )
+process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
+if runOnMC:
+  process.GlobalTag.globaltag = 'START52_V7::All'
+else:
+  process.GlobalTag.globaltag = 'GR_R_52_V7::All'
+
+if gc:
+	runOnMC   = eval('@MC@')
+	pfJetCollection = '@PFJETS@'
+	usePfMuonIsoConeR03 = eval('@MUTPCONE03@') # FIXME in input file
+	pfMuonIso = eval('@MUTPISO@')
+	muonsMin = eval('@MINNMU@')
+	usePfElectronIsoConeR03 = eval('@ETPCONE03@')
+	pfElectronsIso = eval('@ETPISO@') # FIXME in input file
+	electronsMin = eval('@MINNE@')
+	leptonsMin = eval('@MINNLEP@')
+	jetsMin = eval('@MINNJETS@')
+        writeNonIsoMuons   = eval('@WRITENONISOMU@')
+        writeNonIsoElectrons   = eval('@WRITENONISOE@')
+	process.GlobalTag.globaltag = '@GLOBALTAG@'
+	# if not set in gc config, take default value
+	if '@WRITEWDECAY@'.lower() == 'true' or '@WRITEWDECAY@'.lower() == 'false':
+		writeWDecay = eval('@WRITEWDECAY@')
+	else:
+		writeWDecay = False
+	# if not set in gc config, take default value
+	if '@PDFWEIGHTS@'.lower() == 'true' or '@PDFWEIGHTS@'.lower() == 'false':
+		writePdfWeights = eval('@PDFWEIGHTS@')
+	else:
+		writePdfWeights = False
+
+runOnPrompt     = runOnPrompt     and not runOnMC
+runMatch        = runMatch        and runOnMC
+addGenEvt       = addGenEvt       and runOnMC
+writePdfWeights = writePdfWeights and runOnMC
+
 # muon propagator requirements
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
 process.load("RecoMuon.DetLayers.muonDetLayerGeometry_cfi")
-
-# Process the PDF weights
-process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-        PdfInfoTag = cms.untracked.InputTag("generator"),
-        PdfSetNames = cms.untracked.vstring("cteq66.LHgrid")
-	)
 
 ### Logging
 
@@ -152,36 +161,56 @@ process.Timing = cms.Service( "Timing"
 
 ### Input
 
-# from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-# inputFiles = cms.untracked.vstring()
-# if runOnMC:
-#  inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_2'
-#                                   , globalTag     = 'START52_V4'
-#                                   , maxVersions   = 1
-#                                   )
-# else:
-#  inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_2'
-#                                   , dataTier      = 'RECO'
-#                                   , relVal        = 'SingleMu'
-#                                   , globalTag     = 'GR_R_52_V4_RelVal_mu2011B'
-#                                   #, relVal        = 'Electron'
-#                                   #, globalTag     = 'GR_R_52_V4_RelVal_electron2011B'
-#                                   )
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
+inputFiles = cms.untracked.vstring()
+if runOnMC:
+  inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_3'
+                                   , globalTag     = 'START52_V5'
+                                   , maxVersions   = 1
+                                   )
+elif runOnPrompt:
+  inputFiles = [ '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/EEFA1B9F-E687-E111-9C6D-BCAEC5364C62.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/EC6F55F7-E187-E111-9C56-0030486780EC.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/D6979235-D787-E111-8E2F-001D09F2527B.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/CA288C4D-D287-E111-98F5-0025901D5DB2.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/BAEDD978-CC87-E111-98FC-BCAEC53296F4.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/9A94FDB6-DE87-E111-B1E7-BCAEC518FF80.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/98C29851-D287-E111-AB01-5404A6388699.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/98234FE6-DF87-E111-8EE9-E0CB4E4408E7.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/7C5F35B9-DE87-E111-B35B-5404A63886EE.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/70EEB83A-D987-E111-8EFE-0025B3203898.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/38E568D8-E087-E111-ACE0-BCAEC518FF50.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/32A98280-E387-E111-AA76-001D09F2AD84.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/2CAE5610-D687-E111-B6E6-BCAEC53296FB.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/28B730D4-D387-E111-AFD7-E0CB4E4408E3.root'
+               , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/14610E71-DC87-E111-A90B-BCAEC518FF40.root'
+               ]
+else:
+  inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_2'
+                                   , dataTier      = 'RECO'
+                                   , relVal        = 'SingleMu'
+                                   , globalTag     = 'GR_R_52_V4_RelVal_mu2011B'
+                                   #, relVal        = 'Electron'
+                                   #, globalTag     = 'GR_R_52_V4_RelVal_electron2011B'
+                                   )
 
 process.source = cms.Source( "PoolSource"
 , noEventSort        = cms.untracked.bool( True )
 , duplicateCheckMode = cms.untracked.string( 'noDuplicateCheck' )
+, fileNames          = cms.untracked.vstring( inputFiles )
 #, fileNames          = cms.untracked.vstring('file:////user/walsh/tmp/20110812_Wjets_AODforsync.root')
 #, fileNames          = cms.untracked.vstring('file:////user/mccartin/TTbarFall11.root')
 #, fileNames          = cms.untracked.vstring('file:////user/bklein/WjetsScaleUpAOD.root')
 #, fileNames          = cms.untracked.vstring('file:////user/bklein/AOD_v6_Mu_latest_trigger_menu.root')
-, fileNames          = cms.untracked.vstring('file:///user/ksbeerna/RECO2012DataTEST.root')
-#, fileNames          = cms.untracked.vstring()
+#, fileNames          = cms.untracked.vstring('file:///user/ksbeerna/RECO2012DataTEST.root')
 , skipBadFiles = cms.untracked.bool( True )
 )
-#process.source.fileNames = inputFiles
+if runOnPrompt:
+  process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange( '191226:81-191226:831'
+                                                                     )
+
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32( 20000 )
+  input = cms.untracked.int32( maxEvents )
 )
 
 ### Output
@@ -269,6 +298,7 @@ usePF2PAT( process
          , jetCorrections = ( jetAlgo + 'PFchs'
                             , jecLevels
                             )
+         , pvCollection   = cms.InputTag( pvCollection )
          )
 process.patPF2PATSequence.remove( process.patPFParticles )
 process.patPF2PATSequence.remove( process.selectedPatPFParticles )
@@ -335,28 +365,28 @@ process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
 process.patJetCorrFactors.levels  = jecLevels
 if not createNTuples:
   process.out.outputCommands += [ 'drop recoGenJets_*_*_*'
-                                  , 'drop recoBaseTagInfosOwned_*_*_*'
-                                  , 'drop CaloTowers_*_*_*'
-                                  , 'keep edmTriggerResults_*_*_*'
-                                  , 'drop edmTriggerResults_*_*_*RECO*'
-                                  , 'drop edmTriggerResults_*_*_*NONE*'
-                                  , 'keep *_hltTriggerSummaryAOD_*_*'
-                                  , 'keep *_offlineBeamSpot_*_*'
-                                  , 'keep *_goodOfflinePrimaryVertices_*_*'
-                                  # for conversion rejection
-                                  , 'keep recoTracks_generalTracks_*_*'
-                                  , 'keep recoGsfTracks_electronGsfTracks_*_*'
-                                  ]
+                                , 'drop recoBaseTagInfosOwned_*_*_*'
+                                , 'drop CaloTowers_*_*_*'
+                                , 'keep edmTriggerResults_*_*_*'
+                                , 'drop edmTriggerResults_*_*_*RECO*'
+                                , 'drop edmTriggerResults_*_*_*NONE*'
+                                , 'keep *_hltTriggerSummaryAOD_*_*'
+                                , 'keep *_offlineBeamSpot_*_*'
+                                , 'keep *_goodOfflinePrimaryVertices_*_*'
+                                # for conversion rejection
+                                , 'keep recoTracks_generalTracks_*_*'
+                                , 'keep recoGsfTracks_electronGsfTracks_*_*'
+                                ]
   if runOnMC:
     process.out.outputCommands += [ 'keep *_addPileupInfo_*_*'
-                                    ]
+                                  ]
   if not runMatch:
     process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'
-                                    ]
+                                  ]
   if addGenEvt:
     process.out.outputCommands += [ 'keep *_genParticles_*_*'
-                                    , 'keep *_genEvt_*_*'
-                                    ]
+                                  , 'keep *_genEvt_*_*'
+                                  ]
 
 process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
 
@@ -385,19 +415,19 @@ process.countPatMuons.minNumber = muonsMin
 # Electrons
 process.pfSelectedElectrons.cut = pfElectronSelect
 if usePfElectronIsoConeR03:
-  process.pfIsolatedElectrons.isolationValueMapsCharged  = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03' )
+  process.pfIsolatedElectrons.isolationValueMapsCharged  = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03PFId' )
                                                                         )
-  process.pfIsolatedElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03' )
-  process.pfIsolatedElectrons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03' )
-                                                                        , cms.InputTag( 'elPFIsoValueGamma03' )
+  process.pfIsolatedElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03PFId' )
+  process.pfIsolatedElectrons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
+                                                                        , cms.InputTag( 'elPFIsoValueGamma03PFId' )
                                                                         )
 process.pfIsolatedElectrons.isolationCut = pfElectronIso
 process.patElectrons.embedTrack = True
 if usePfElectronIsoConeR03:
-  process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03' )
-  process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03' )
-  process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03' )
-  process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03' )
+  process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03PFId' )
+  process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFId' )
+  process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03PFId' )
+  process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03PFId' )
 process.selectedPatElectrons.cut = electronSelect
 process.cleanPatElectrons.src           = cms.InputTag( 'patElectrons' )
 process.cleanPatElectrons.preselection  = electronCut
@@ -449,13 +479,13 @@ if runCiC:
 # X-leptons
 process.countPatLeptons.minNumber = leptonsMin
 
-process.pfPileUp = cms.EDProducer("PFPileUp",
-    PFCandidates = cms.InputTag("particleFlow"),
-    Enable = cms.bool(True),
-    checkClosestZVertex = cms.bool(False),
-    verbose = cms.untracked.bool(False),
-    Vertices = cms.InputTag("goodOfflinePrimaryVertices")
-)
+#process.pfPileUp = cms.EDProducer("PFPileUp",
+    #PFCandidates = cms.InputTag("particleFlow"),
+    #Enable = cms.bool(True),
+    #checkClosestZVertex = cms.bool(False),
+    #verbose = cms.untracked.bool(False),
+    #Vertices = cms.InputTag("goodOfflinePrimaryVertices")
+#)
 
 # Jets
 if len( jecLevels ) is 0:
@@ -469,7 +499,7 @@ process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
 process.cleanPatJets.src           = cms.InputTag( 'patJets' )
-process.cleanPatJets.preselection  = jetsCut
+process.cleanPatJets.preselection  = jetCut
 process.cleanPatJets.checkOverlaps = cms.PSet()
 process.countPatJets.minNumber = jetsMin
 
@@ -477,13 +507,15 @@ process.countPatJets.minNumber = jetsMin
 from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
 if writeNonIsoMuons:
   cloneProcessingSnippet(process,process.patPF2PATSequence,postfixNonIsoMu)
-  getattr(process,'patMuons'+postfixNonIsoMu).pfMuonSource = "pfSelectedMuons" + postfixNonIsoMu
   getattr(process,'pfNoMuon'+postfixNonIsoMu).topCollection = "pfSelectedMuons" + postfixNonIsoMu
+  if runOnMC:
+    getattr(process,'muonMatch'+postfixNonIsoMu).src = "pfSelectedMuons" + postfixNonIsoMu
+  getattr(process,'patMuons'+postfixNonIsoMu).pfMuonSource = "pfSelectedMuons" + postfixNonIsoMu
   #getattr(process,'pfIsolatedMuons'+postfixNonIsoMu).isolationCut = 999999.
 if writeNonIsoElectrons:
   cloneProcessingSnippet(process,process.patPF2PATSequence,postfixNonIsoE)
-  getattr(process,'patElectrons'+postfixNonIsoE).pfElectronSource = "pfSelectedElectrons" + postfixNonIsoE
   getattr(process,'pfNoElectron'+postfixNonIsoE).topCollection = "pfSelectedElectrons" + postfixNonIsoE
+  getattr(process,'patElectrons'+postfixNonIsoE).pfElectronSource = "pfSelectedElectrons" + postfixNonIsoE
   #getattr(process,'pfIsolatedElectrons'+postfixNonIsoE).isolationCut = 999999.
 
 ### TQAF
@@ -508,6 +540,10 @@ if addGenEvt:
   process.p *= process.makeGenEvt
 
 if writePdfWeights:
+  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+        PdfInfoTag = cms.untracked.InputTag("generator"),
+        PdfSetNames = cms.untracked.vstring("cteq66.LHgrid")
+	)
   process.p *= process.pdfWeights
 
 if createNTuples:
