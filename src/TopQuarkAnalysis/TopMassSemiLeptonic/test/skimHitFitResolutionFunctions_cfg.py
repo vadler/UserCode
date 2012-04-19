@@ -27,11 +27,11 @@ pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOf
 # switch for muon isolation cone, PF2PAT default: 0.4 (False)
 muonsIsoR03           = True # isolation cone of 0.3, if 'True'
 # muon top projection isolation selection, PF2PAT default: 0.15
-muonsSelectIsoPf      = 0.2
+muonsSelectIsoPf      = 0.5
 # muon top projection object selection, PF2PAT default: 'pt > 5.'
 muonSelectPf          = 'pt > 5.'
 # muon object selection
-muonSelectHitFit      = 'abs(eta) < 9.0'
+muonSelectHitFit      = 'abs(eta) < 2.4'
 muonSelectVeto        = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5 && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.2'
 muonSelect            = muonSelectHitFit + ' && ' + muonSelectVeto
 muonSelectSignal      = 'isTrackerMuon && pt > 20. && abs(eta) < 2.1 && globalTrack.normalizedChi2 < 10. && globalTrack.hitPattern.numberOfValidMuonHits > 0 && abs(dB) < 0.02 && innerTrack.numberOfValidHits > 10 && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1 && numberOfMatches > 1 && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.125'
@@ -48,7 +48,7 @@ referenceMuonsMax = 1
 # switch for muon isolation cone, PF2PAT default: 0.4 (False)
 electronsIsoR03      = True # isolation cone of 0.3, if 'True'
 # electron top projection isolation selection, PF2PAT: 0.2
-electronsSelectIsoPf = 0.2
+electronsSelectIsoPf = 0.5
 # electron top projection object selection, PF2PAT default: 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
 electronSelectPf     = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
 # electron object selection
@@ -80,7 +80,6 @@ jetAlgo   = 'AK5'
 jecLevels = [ 'L1FastJet'
             , 'L2Relative'
             , 'L3Absolute'
-            #, 'L2L3Residual'
             ]
 # jet object selection
 jetSelectHitFit = 'abs(eta) < 3.0'
@@ -196,7 +195,7 @@ logFile = outputFile.replace( 'root', 'log' )
 
 ### Cleaning
 
-# Fix for Pythia bug in 2011 MC (not used here)
+# Fix for Pythia bug in 2011 MC
 process.load("GeneratorInterface.GenFilters.TotalKinematicsFilter_cfi")
 process.totalKinematicsFilter.tolerance = 5. # from Martijn
 
