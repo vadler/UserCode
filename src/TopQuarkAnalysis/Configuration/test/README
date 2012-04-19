@@ -10,7 +10,8 @@ cvs co -r V06-05-00    DataFormats/PatCandidates
 cvs co -r V08-09-02    PhysicsTools/PatAlgos
 cvs co -r V03-09-18-03 PhysicsTools/PatUtils
 cvs co -r V00-03-08    CommonTools/ParticleFlow
-cvs co -r V15-01-05    RecoParticleFlow/PFProducer
+cvs co -r V15-01-06    RecoParticleFlow/PFProducer
+cvs co -r V00-00-05 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
 scram b -j 9
 
 Steering:
@@ -20,10 +21,11 @@ Some very basic steering switches are found at the top of the configurations. No
 parameters are availabel in all configuration files:
 - gc              : switch for the use of an external steering file
 - runOnMC         : self-explaining
-- runOnPrompt     : in the default version, this uses PromptReco data rather than RelVals
-                    for "runOnMC = False"
+- runOnRelVal     : to switch on/off automatic RelVal input determination
 - runMatch        : to switch on/off MC matching
 - runGenJetMatch  : to switch on/off (separately) MC matching for MC jets
+- runMVA          : to switch on/off the addition of the MVA electron ID variables
+                    to the electrons
 - runCiC          : to switch on/off the addition of the CiC electron ID variables
                     to the electrons
 - runEwk          : to switch on/off the addition of the electron ID variables
@@ -47,7 +49,7 @@ parameters are availabel in all configuration files:
 - jecLevels       : list of stored JECs
 - pvCollection    : name of primary vertex collection to be used in PF2PAT
 - pfJetCollection : name of the input collection for the PAT jets;
-                  : can be 'pfJets' (incl. taus) or 'pfNoTau' (excl. taus)
+                  : can be 'pfJets' (incl. taus) or 'pfNoTau' (excl. taus, runs their reconstruction)
 
 - pf{Muon, Electron}Select           : selection string cut for objects to be kept in PF2PAT
                                        top projections
