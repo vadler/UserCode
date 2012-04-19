@@ -11,9 +11,10 @@ runTest    = True
 reportTime = False
 
 # Input
-relVal    = 'RelValProdTTbar'
-dataTier  = 'AODSIM'
-globalTag = 'START44_V7'
+cmsswVersion = 'CMSSW_4_4_2'
+relVal       = 'RelValProdTTbar'
+dataTier     = 'AODSIM'
+globalTag    = 'START44_V7'
 
 # Trigger
 hltProcess       = 'HLT'
@@ -114,7 +115,7 @@ if len( jecLevels ) == 0:
   print '       HitFit does not allow for that. Exit....'
   sys.exit( 1 )
 
-pvCollection += '::%s'%( process.name_() )
+pvCollectionTag = pvCollection + '::%s'%( process.name_() )
 
 if runTest:
   process.Timing = cms.Service( "Timing"
@@ -143,7 +144,8 @@ process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff"
 # process.GlobalTag.globaltag = autoCond[ 'startup' ]
 process.GlobalTag.globaltag = 'START44_V13::All'
 if runCrab:
-  process.GlobalTag.globaltag = 'START44_V9C::All' # Fall11_R4
+  process.GlobalTag.globaltag = 'START44_V5D::All' # Fall11_R3
+  #process.GlobalTag.globaltag = 'START44_V9C::All' # Fall11_R4
 
 
 ### Input
@@ -163,7 +165,7 @@ process.maxEvents = cms.untracked.PSet(
 
 if not runCrab:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion = 'CMSSW_4_4_2'
+  process.source.fileNames = pickRelValInputFiles( cmsswVersion = cmsswVersion
                                                  , relVal       = relVal
                                                  , dataTier     = dataTier
                                                  , globalTag    = globalTag
@@ -252,6 +254,8 @@ usePF2PAT( process
 # still need to fix event content afterwards :-(
 process.out.outputCommands.append( 'keep *_addPileupInfo_*_*' )
 process.out.outputCommands.append( 'keep edmTriggerResults_*_*_*' )
+process.out.outputCommands.append( 'keep *_offlinePrimaryVertices_*_*' )
+process.out.outputCommands.append( 'keep *_%s_*_*'%( pvCollection ) )
 
 process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
 process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )
