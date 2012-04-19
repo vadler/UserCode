@@ -196,6 +196,10 @@ logFile = outputFile.replace( 'root', 'log' )
 
 ### Cleaning
 
+# Fix for Pythia bug in 2011 MC (not used here)
+process.load("GeneratorInterface.GenFilters.TotalKinematicsFilter_cfi")
+process.totalKinematicsFilter.tolerance = 5. # from Martijn
+
 # Trigger
 if triggerSelection == '' or triggerSelection == '*':
   triggerSelection = 'HLT_*'
@@ -217,25 +221,10 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
   )
 )
 
-# HBHE noise filter
-process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
-process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
-process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
-process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
-
-# Scraping filter
-process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
-, applyfilter = cms.untracked.bool( True )
-, debugOn     = cms.untracked.bool( False )
-, numtrack    = cms.untracked.uint32( 10 )
-, thresh      = cms.untracked.double( 0.25 )
-)
-
-process.eventCleaning = cms.Sequence ( process.triggerResultsFilter
-                                     + process.goodOfflinePrimaryVertices
-                                     + process.HBHENoiseFilter
-                                     + process.scrapingFilter
-                                     )
+process.eventCleaning = cms.Sequence( process.totalKinematicsFilter
+                                    + process.triggerResultsFilter
+                                    + process.goodOfflinePrimaryVertices
+                                    )
 
 
 ### PAT
@@ -363,6 +352,12 @@ if muonsIsoR03:
                                                                    , cms.InputTag( 'muPFIsoValueGamma03' )
                                                                    )
   process.pfIsolatedMuons.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03' )
+  process.pfMuons.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03' )
+                                                           )
+  process.pfMuons.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03' )
+                                                           , cms.InputTag( 'muPFIsoValueGamma03' )
+                                                           )
+  process.pfMuons.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03' )
 process.pfIsolatedMuons.isolationCut = muonsSelectIsoPf
 process.patMuons.embedTrack = embedLeptonTracks
 if muonsIsoR03:
@@ -387,19 +382,25 @@ process.referencePatMuons.checkOverlaps = cms.PSet(
 # Electrons
 process.pfSelectedElectrons.cut = electronSelectPf
 if electronsIsoR03:
-  process.pfIsolatedElectrons.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03' )
+  process.pfIsolatedElectrons.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03PFId' )
                                                                        )
-  process.pfIsolatedElectrons.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03' )
-                                                                       , cms.InputTag( 'elPFIsoValueGamma03' )
+  process.pfIsolatedElectrons.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
+                                                                       , cms.InputTag( 'elPFIsoValueGamma03PFId' )
                                                                        )
-  process.pfIsolatedElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03' )
+  process.pfIsolatedElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03PFId' )
+  process.pfElectrons.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03PFId' )
+                                                               )
+  process.pfElectrons.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
+                                                               , cms.InputTag( 'elPFIsoValueGamma03PFId' )
+                                                               )
+  process.pfElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03PFId' )
 process.pfIsolatedElectrons.isolationCut = electronsSelectIsoPf
 process.patElectrons.embedTrack = embedLeptonTracks
 if electronsIsoR03:
-  process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03' )
-  process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03' )
-  process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03' )
-  process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03' )
+  process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03PFId' )
+  process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03PFId' )
+  process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03PFId' )
+  process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFId' )
 process.selectedPatElectrons.cut = electronSelect
 process.referencePatElectrons.preselection = electronSelectSignal
 
