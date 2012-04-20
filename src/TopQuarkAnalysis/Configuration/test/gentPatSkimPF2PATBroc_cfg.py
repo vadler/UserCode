@@ -1,4 +1,8 @@
-import os
+#import os
+#lxplusTest = ( os.uname()[ 1 ].split( '.' )[ 0 ][ :6 ] == 'lxplus' )
+import socket
+lxplusTest = ( socket.getfqdn().split( '.' )[ 0 ][ :6 ] == 'lxplus' )
+
 import FWCore.ParameterSet.Config as cms
 
 ### Steering
@@ -9,12 +13,12 @@ runOnMC     = True
 runOnRelVal = True # If 'False', define input files in l. 187ff.
 
 runMatch  = True
-runMVA    = False
+runMVA    = True
 runCiC    = True
 runEwk    = True
 addGenEvt = True
-createNTuples        = False
-writePdfWeights      = False
+createNTuples        = True
+writePdfWeights      = False    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
 writeWDecay          = False	# this should only be set True for *broken* W datasets
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
@@ -189,7 +193,8 @@ else:
     inputFiles = [ 'file:/afs/cern.ch/work/v/vadler/public/data/CMSSW_5_2_X/TTbar_Summer12_AODskim.root'
                  ]
   else:
-    process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange( '191226:81-191226:831'
+    if lxplusTest:
+      process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange( '191226:81-191226:831'
                                                                        )
     #inputFiles = [ '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/EEFA1B9F-E687-E111-9C6D-BCAEC5364C62.root'
                  #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/EC6F55F7-E187-E111-9C56-0030486780EC.root'
@@ -279,6 +284,7 @@ process.maxEvents = cms.untracked.PSet(
 
 ### Output
 
+outputModules = []
 if not createNTuples:
   from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
   process.out = cms.OutputModule( "PoolOutputModule"
@@ -287,10 +293,12 @@ if not createNTuples:
   , outputCommands = cms.untracked.vstring( 'drop *', *patEventContentNoCleaning )
   , dropMetaData   = cms.untracked.string( 'ALL' )
   )
+  outputModules.append( 'out' )
   # Outpath
   process.outpath = cms.EndPath(
     process.out
     )
+
 
 ### Cleaning
 
@@ -367,6 +375,7 @@ usePF2PAT( process
                             , jecLevels
                             )
          , pvCollection   = cms.InputTag( pvCollection )
+         , outputModules  = outputModules
          )
 from PhysicsTools.PatAlgos.tools.helpers import removeIfInSequence
 removeIfInSequence( process, 'patPFParticles', 'patPF2PATSequence', '' )
@@ -374,7 +383,8 @@ removeIfInSequence( process, 'selectedPatPFParticles', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'countPatPFParticles', 'patPF2PATSequence', '' )
 from PhysicsTools.PatAlgos.tools.coreTools import *
 removeSpecificPATObjects( process
-                        , names = [ 'Photons', 'Taus' ]
+                        , names          = [ 'Photons', 'Taus' ]
+                        , outputModules  = outputModules
                         )
 # The following is not performed (properly) by 'removeSpecificPATObjects()'
 process.cleanPatCandidateSummary.candidates.remove( cms.InputTag( 'cleanPatPhotons' ) )
@@ -666,7 +676,7 @@ if writePdfWeights:
 	)
   process.p *= process.pdfWeights
 
-if createNTuples:
+if createNTuples and not lxplusTest:
   process.produceNTuples = cms.EDAnalyzer('FlatNTuples',
 	tauTag      = cms.untracked.InputTag("selectedPatTaus"),
 	photonTag   = cms.untracked.InputTag("selectedPatPhotons"),
