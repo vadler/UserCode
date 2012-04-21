@@ -230,8 +230,16 @@ int main( int argc, char * argv[] )
     // Eta binning
     std::vector< double > etaBins_;
     TH1D * histBinsEta( dynamic_cast< TH1D* >( dirCat_->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
-    for ( int iEta = 0; iEta < histBinsEta->GetNbinsX(); ++iEta ) {
-      etaBins_.push_back( histBinsEta->GetBinLowEdge( iEta + 1 ) );
+    const bool objMetLike( histBinsEta->GetNbinsX() == 1 );
+    if ( objMetLike ) {
+      etaBins_.push_back( histBinsEta->GetBinLowEdge( 1 ) );
+    }
+    else {
+      for ( int iEta = 0; iEta < histBinsEta->GetNbinsX(); ++iEta ) {
+        double edge( histBinsEta->GetBinLowEdge( iEta + 1 ) );
+        if ( useSymm_  && edge < 0. ) continue;
+        etaBins_.push_back( edge );
+      }
     }
     etaBins_.push_back( histBinsEta->GetBinLowEdge( histBinsEta->GetNbinsX() ) + histBinsEta->GetBinWidth( histBinsEta->GetNbinsX() ) );
     const unsigned nEtaBins_( etaBins_.size() - 1 );
@@ -518,6 +526,7 @@ int main( int argc, char * argv[] )
           ++sizeEtaBins;
           const std::string binEta( keyEta->GetName() );
           const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
+          std::cout << "uEta: " << uEta << std::endl;
           dirFit_->cd( binEta.c_str() );
           if ( verbose_ > 1 ) gDirectory->pwd();
 
@@ -696,6 +705,11 @@ int main( int argc, char * argv[] )
                   fitSigmaInv->SetParameters( params );
                   if ( overwrite_ ) fitSigmaInv->Write( 0, TObject::kOverwrite );
                   else              fitSigmaInv->Write();
+                  const std::string nameFitSigmaInvRel( nameFitSigmaInv + "Rel" );
+                  TF1 * fitSigmaInvRel( new TF1( nameFitSigmaInvRel.c_str(), resFuncInvInvRel_.c_str(), histSigma->GetXaxis()->GetXmin(), histSigma->GetXaxis()->GetXmax() ) );
+                  fitSigmaInvRel->SetParameters( params );
+                  if ( overwrite_ ) fitSigmaInvRel->Write( 0, TObject::kOverwrite );
+                  else              fitSigmaInvRel->Write();
                 }
               }
               if ( verbose_ > 3 && fitSigmaResultPtr->Status() == 4000 ) {
@@ -859,6 +873,11 @@ int main( int argc, char * argv[] )
                   fitSigmaNtupInv->SetParameters( params );
                   if ( overwrite_ ) fitSigmaNtupInv->Write( 0, TObject::kOverwrite );
                   else              fitSigmaNtupInv->Write();
+                  const std::string nameFitSigmaNtupInvRel( nameFitSigmaNtupInv + "Rel" );
+                  TF1 * fitSigmaNtupInvRel( new TF1( nameFitSigmaNtupInvRel.c_str(), resFuncInvInvRel_.c_str(), histSigmaNtup->GetXaxis()->GetXmin(), histSigmaNtup->GetXaxis()->GetXmax() ) );
+                  fitSigmaNtupInvRel->SetParameters( params );
+                  if ( overwrite_ ) fitSigmaNtupInvRel->Write( 0, TObject::kOverwrite );
+                  else              fitSigmaNtupInvRel->Write();
                 }
               }
               if ( verbose_ > 3 && fitSigmaNtupResultPtr->Status() == 4000 ) {
@@ -898,7 +917,7 @@ int main( int argc, char * argv[] )
         if ( sizeEtaBins != nEtaBins_ ) {
           std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                     << "    mismatch of eta binning for object category '" << objCat << "':" << std::endl
-                    << "        bins in directory structure: " << sizeEtaBins         << std::endl
+                    << "        bins in directory structure: " << sizeEtaBins                << std::endl
                     << "        bins in binning histogram  : " << nEtaBins_                  << std::endl;
         }
 
@@ -921,17 +940,60 @@ int main( int argc, char * argv[] )
 
       ofstream fileOut;
       fileOut.open( nameOut.c_str(), std::ios_base::out );
-      unsigned nEta( 0 );
-      if ( useSymm_ ) {
-        for ( unsigned uEta = nEtaBins_; uEta > 0; --uEta ) {
+      if ( objMetLike ) {
+        fileOut << std::endl << "met_resolution = ";
+        fileOut << std::setprecision( 6 );
+        if ( Cs.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
+        else                           fileOut << Cs.at( 0 ).at( 0 );
+        fileOut << ",";
+        if ( Rs.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
+        else                           fileOut << Rs.at( 0 ).at( 0 );
+        fileOut << ",";
+        if ( Ns.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
+        else                           fileOut << Ns.at( 0 ).at( 0 );
+      }
+      else {
+        unsigned nEta( 0 );
+        if ( useSymm_ ) {
+          for ( unsigned uEta = nEtaBins_; uEta > 0; --uEta ) {
+            fileOut << std::endl << "etadep_etamin";
+            fileOut.width( 3 );
+            fileOut << std::left << nEta;
+            fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
+            fileOut << std::endl << "etadep_etamax";
+            fileOut.width( 3 );
+            fileOut << std::left << nEta;
+            fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
+            fileOut << std::endl << "etadep_vecres";
+            fileOut.width( 3 );
+            fileOut << std::left << nEta;
+            for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
+              if ( uProp > 0 ) fileOut << "/";
+              if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
+              fileOut << std::setprecision( 8 );
+              if ( Cs.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
+              else                                  fileOut << Cs.at( uProp ).at( uEta - 1 );
+              fileOut << ",";
+              if ( Rs.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
+              else                                  fileOut << Rs.at( uProp ).at( uEta - 1 );
+              fileOut << ",";
+              if ( Ns.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
+              else                                  fileOut << Ns.at( uProp ).at( uEta - 1 );
+            }
+            fileOut << "/et"; // FIXME: determine from existing
+            fileOut << std::endl;
+            ++nEta;
+          }
+        }
+        for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
           fileOut << std::endl << "etadep_etamin";
           fileOut.width( 3 );
           fileOut << std::left << nEta;
-          fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
+          fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
           fileOut << std::endl << "etadep_etamax";
           fileOut.width( 3 );
           fileOut << std::left << nEta;
-          fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
+          fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
           fileOut << std::endl << "etadep_vecres";
           fileOut.width( 3 );
           fileOut << std::left << nEta;
@@ -953,35 +1015,6 @@ int main( int argc, char * argv[] )
           ++nEta;
         }
       }
-      for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
-        fileOut << std::endl << "etadep_etamin";
-        fileOut.width( 3 );
-        fileOut << std::left << nEta;
-        fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
-        fileOut << std::endl << "etadep_etamax";
-        fileOut.width( 3 );
-        fileOut << std::left << nEta;
-        fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
-        fileOut << std::endl << "etadep_vecres";
-        fileOut.width( 3 );
-        fileOut << std::left << nEta;
-        for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
-          if ( uProp > 0 ) fileOut << "/";
-          if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
-          fileOut << std::setprecision( 8 );
-          if ( Cs.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
-          else                                  fileOut << Cs.at( uProp ).at( uEta );
-          fileOut << ",";
-          if ( Rs.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
-          else                                  fileOut << Rs.at( uProp ).at( uEta );
-          fileOut << ",";
-          if ( Ns.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
-          else                                  fileOut << Ns.at( uProp ).at( uEta );
-        }
-        fileOut << "/et"; // FIXME: determine from existing
-        fileOut << std::endl;
-        ++nEta;
-      }
       fileOut.close();
 
       std::cout << argv[ 0 ] << " --> INFO:" << std::endl
@@ -993,17 +1026,60 @@ int main( int argc, char * argv[] )
 
       ofstream fileOutNtup;
       fileOutNtup.open( nameOutNtup.c_str(), std::ios_base::out );
-      nEta = 0;
-      if ( useSymm_ ) {
-        for ( unsigned uEta = nEtaBins_; uEta > 0; --uEta ) {
+      if ( objMetLike ) {
+        fileOut << std::endl << "met_resolution = ";
+        fileOut << std::setprecision( 6 );
+        if ( CsNtup.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
+        else                               fileOut << CsNtup.at( 0 ).at( 0 );
+        fileOut << ",";
+        if ( RsNtup.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
+        else                               fileOut << RsNtup.at( 0 ).at( 0 );
+        fileOut << ",";
+        if ( NsNtup.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
+        else                               fileOut << NsNtup.at( 0 ).at( 0 );
+      }
+      else {
+        unsigned nEta( 0 );
+        if ( useSymm_ ) {
+          for ( unsigned uEta = nEtaBins_; uEta > 0; --uEta ) {
+            fileOutNtup << std::endl << "etadep_etamin";
+            fileOutNtup.width( 3 );
+            fileOutNtup << std::left << nEta;
+            fileOutNtup << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
+            fileOutNtup << std::endl << "etadep_etamax";
+            fileOutNtup.width( 3 );
+            fileOutNtup << std::left << nEta;
+            fileOutNtup << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
+            fileOutNtup << std::endl << "etadep_vecres";
+            fileOutNtup.width( 3 );
+            fileOutNtup << std::left << nEta;
+            for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
+              if ( uProp > 0 ) fileOutNtup << "/";
+              if ( nominalInv_.at( uCat ).at( uProp ) ) fileOutNtup << "-";
+              fileOutNtup << std::setprecision( 8 );
+              if ( CsNtup.at( uProp ).at( uEta - 1 ) < 0. ) fileOutNtup << "NAN";
+              else                                          fileOutNtup << CsNtup.at( uProp ).at( uEta - 1 );
+              fileOutNtup << ",";
+              if ( RsNtup.at( uProp ).at( uEta - 1 ) < 0. ) fileOutNtup << "NAN";
+              else                                          fileOutNtup << RsNtup.at( uProp ).at( uEta - 1 );
+              fileOutNtup << ",";
+              if ( NsNtup.at( uProp ).at( uEta - 1 ) < 0. ) fileOutNtup << "NAN";
+              else                                          fileOutNtup << NsNtup.at( uProp ).at( uEta - 1 );
+            }
+            fileOutNtup << "/et"; // FIXME: determine from existing
+            fileOutNtup << std::endl;
+            ++nEta;
+          }
+        }
+        for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
           fileOutNtup << std::endl << "etadep_etamin";
           fileOutNtup.width( 3 );
           fileOutNtup << std::left << nEta;
-          fileOutNtup << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
+          fileOutNtup << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
           fileOutNtup << std::endl << "etadep_etamax";
           fileOutNtup.width( 3 );
           fileOutNtup << std::left << nEta;
-          fileOutNtup << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
+          fileOutNtup << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
           fileOutNtup << std::endl << "etadep_vecres";
           fileOutNtup.width( 3 );
           fileOutNtup << std::left << nEta;
@@ -1024,35 +1100,6 @@ int main( int argc, char * argv[] )
           fileOutNtup << std::endl;
           ++nEta;
         }
-      }
-      for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
-        fileOutNtup << std::endl << "etadep_etamin";
-        fileOutNtup.width( 3 );
-        fileOutNtup << std::left << nEta;
-        fileOutNtup << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
-        fileOutNtup << std::endl << "etadep_etamax";
-        fileOutNtup.width( 3 );
-        fileOutNtup << std::left << nEta;
-        fileOutNtup << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
-        fileOutNtup << std::endl << "etadep_vecres";
-        fileOutNtup.width( 3 );
-        fileOutNtup << std::left << nEta;
-        for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
-          if ( uProp > 0 ) fileOutNtup << "/";
-          if ( nominalInv_.at( uCat ).at( uProp ) ) fileOutNtup << "-";
-          fileOutNtup << std::setprecision( 8 );
-          if ( CsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
-          else                                  fileOutNtup << CsNtup.at( uProp ).at( uEta );
-          fileOutNtup << ",";
-          if ( RsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
-          else                                  fileOutNtup << RsNtup.at( uProp ).at( uEta );
-          fileOutNtup << ",";
-          if ( NsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
-          else                                  fileOutNtup << NsNtup.at( uProp ).at( uEta );
-        }
-        fileOutNtup << "/et"; // FIXME: determine from existing
-        fileOutNtup << std::endl;
-        ++nEta;
       }
       fileOutNtup.close();
 
