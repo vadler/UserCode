@@ -17,8 +17,8 @@ skimProcess = 'SKIM'
 
 # Settings
 useAlt   = True
-useSymm  = False
-refGen   = False
+useSymm  = True
+refGen   = True
 
 ### Initialization
 
@@ -64,9 +64,9 @@ process.source = cms.Source(
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( -1 )
+)
 if rfioInput and runTest:
   process.maxEvents.input = 10000
-)
 
 
 ### Output
