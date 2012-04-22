@@ -570,9 +570,9 @@ int main( int argc, char * argv[] )
                 }
               }
               if ( onlyExisting_ ) {
-                Cs.at( uProp ).at( uEta ) = fitSigma2D2->GetParameter( 0 );
-                Rs.at( uProp ).at( uEta ) = fitSigma2D2->GetParameter( 1 );
-                Ns.at( uProp ).at( uEta ) = fitSigma2D2->GetParameter( 2 );
+                Cs.at( uProp ).at( uEta ) = std::fabs( fitSigma2D2->GetParameter( 0 ) );
+                Rs.at( uProp ).at( uEta ) = std::fabs( fitSigma2D2->GetParameter( 1 ) );
+                Ns.at( uProp ).at( uEta ) = std::fabs( fitSigma2D2->GetParameter( 2 ) );
               }
               if ( verbose_ > 3 && fitSigma2D2ResultPtr->Status() == 4000 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
@@ -880,6 +880,11 @@ int main( int argc, char * argv[] )
                   else              fitSigmaNtupInvRel->Write();
                 }
               }
+              if ( onlyExisting_ ) {
+                CsNtup.at( uProp ).at( uEta ) = std::fabs( fitSigmaNtup->GetParameter( 0 ) );
+                RsNtup.at( uProp ).at( uEta ) = std::fabs( fitSigmaNtup->GetParameter( 1 ) );
+                NsNtup.at( uProp ).at( uEta ) = std::fabs( fitSigmaNtup->GetParameter( 2 ) );
+              }
               if ( verbose_ > 3 && fitSigmaNtupResultPtr->Status() == 4000 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                           << "    IMPROVE error in directory '"; gDirectory->pwd();
@@ -897,6 +902,11 @@ int main( int argc, char * argv[] )
               }
               histSigmaNtupBadNdfMap->SetBinContent( uEta + 1, fitSigmaNtupResultPtr->Ndf() );
               histSigmaNtupBadNdf->Fill( fitSigmaNtupResultPtr->Ndf() );
+              if ( onlyExisting_ ) {
+                CsNtup.at( uProp ).at( uEta ) = -1.;
+                RsNtup.at( uProp ).at( uEta ) = -1.;
+                NsNtup.at( uProp ).at( uEta ) = -1.;
+              }
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                           << "    failing fit in directory '"; gDirectory->pwd();
@@ -906,6 +916,11 @@ int main( int argc, char * argv[] )
           }
           else {
             histSigmaNtupMissingMap->AddBinContent( uEta + 1 );
+            if ( onlyExisting_ ) {
+              CsNtup.at( uProp ).at( uEta ) = -1.;
+              RsNtup.at( uProp ).at( uEta ) = -1.;
+              NsNtup.at( uProp ).at( uEta ) = -1.;
+            }
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                         << "    missing fit in directory '"; gDirectory->pwd();
@@ -972,13 +987,13 @@ int main( int argc, char * argv[] )
               if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
               fileOut << std::setprecision( 8 );
               if ( Cs.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
-              else                                  fileOut << Cs.at( uProp ).at( uEta - 1 );
+              else                                      fileOut << Cs.at( uProp ).at( uEta - 1 );
               fileOut << ",";
               if ( Rs.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
-              else                                  fileOut << Rs.at( uProp ).at( uEta - 1 );
+              else                                      fileOut << Rs.at( uProp ).at( uEta - 1 );
               fileOut << ",";
               if ( Ns.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
-              else                                  fileOut << Ns.at( uProp ).at( uEta - 1 );
+              else                                      fileOut << Ns.at( uProp ).at( uEta - 1 );
             }
             fileOut << "/et"; // FIXME: determine from existing
             fileOut << std::endl;
@@ -1027,16 +1042,16 @@ int main( int argc, char * argv[] )
       ofstream fileOutNtup;
       fileOutNtup.open( nameOutNtup.c_str(), std::ios_base::out );
       if ( objMetLike ) {
-        fileOut << std::endl << "met_resolution = ";
-        fileOut << std::setprecision( 6 );
-        if ( CsNtup.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
-        else                               fileOut << CsNtup.at( 0 ).at( 0 );
-        fileOut << ",";
-        if ( RsNtup.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
-        else                               fileOut << RsNtup.at( 0 ).at( 0 );
-        fileOut << ",";
-        if ( NsNtup.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
-        else                               fileOut << NsNtup.at( 0 ).at( 0 );
+        fileOutNtup << std::endl << "met_resolution = ";
+        fileOutNtup << std::setprecision( 6 );
+        if ( CsNtup.at( 0 ).at( 0 ) < 0. ) fileOutNtup << "NAN";
+        else                               fileOutNtup << CsNtup.at( 0 ).at( 0 );
+        fileOutNtup << ",";
+        if ( RsNtup.at( 0 ).at( 0 ) < 0. ) fileOutNtup << "NAN";
+        else                               fileOutNtup << RsNtup.at( 0 ).at( 0 );
+        fileOutNtup << ",";
+        if ( NsNtup.at( 0 ).at( 0 ) < 0. ) fileOutNtup << "NAN";
+        else                               fileOutNtup << NsNtup.at( 0 ).at( 0 );
       }
       else {
         unsigned nEta( 0 );
@@ -1088,13 +1103,13 @@ int main( int argc, char * argv[] )
             if ( nominalInv_.at( uCat ).at( uProp ) ) fileOutNtup << "-";
             fileOutNtup << std::setprecision( 8 );
             if ( CsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
-            else                                  fileOutNtup << CsNtup.at( uProp ).at( uEta );
+            else                                      fileOutNtup << CsNtup.at( uProp ).at( uEta );
             fileOutNtup << ",";
             if ( RsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
-            else                                  fileOutNtup << RsNtup.at( uProp ).at( uEta );
+            else                                      fileOutNtup << RsNtup.at( uProp ).at( uEta );
             fileOutNtup << ",";
             if ( NsNtup.at( uProp ).at( uEta ) < 0. ) fileOutNtup << "NAN";
-            else                                  fileOutNtup << NsNtup.at( uProp ).at( uEta );
+            else                                      fileOutNtup << NsNtup.at( uProp ).at( uEta );
           }
           fileOutNtup << "/et"; // FIXME: determine from existing
           fileOutNtup << std::endl;
