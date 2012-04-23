@@ -19,9 +19,9 @@ lepton = 'Mu'
 overwrite = True # to throw away earlier versions of histograms, trees and functions
 # !!! Exclusive switches:
 useAlt  = False # 'True' makes sense only, if available in input (will not crash other wise)
-useSymm = False # 'True' makes sense only, if available in input (will not crash other wise)
+useSymm = True # 'True' makes sense only, if available in input (will not crash other wise)
 refGen  = False # 'True' makes sense only, if available in input (will not crash other wise)
-refSel  = False # 'True' makes sense only, if available in input (will not crash other wise)
+refSel  = False # 'True' makes sense only, if available in input (will not crash other wise) and with enough statistics
 if runTest:
   refSel = False
 
