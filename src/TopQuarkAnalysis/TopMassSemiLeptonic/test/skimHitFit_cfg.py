@@ -43,7 +43,7 @@ muonSelectHitFit      = muonSelectBase + ' && abs(eta) < 2.4'
 muonSelect            = muonSelectBase + ' && abs(eta) < 2.5'
 muonSelectSignal      = 'isTrackerMuon && pt > 26. && abs(eta) < 2.1 && globalTrack.normalizedChi2 < 10. && globalTrack.hitPattern.numberOfValidMuonHits > 0 && abs(dB) < 0.02 && innerTrack.numberOfValidHits > 10 && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1 && numberOfMatches > 1 && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.125'
 muonSelectSignalJetDR = 0.3
-# counters
+# counters for muon channel
 selectedMuonsMin = 1
 selectedMuonsMax = 1
 referenceMuonsMin = 1
@@ -62,7 +62,7 @@ electronSelectHitFit = electronSelectBase + ' && abs(eta) < 2.5'
 electronSelect       = electronSelectBase + ' && abs(eta) < 2.5'
 electronSelectSignal = 'et > 35. && abs(eta) < 2.5 && !(1.4442 < abs(superCluster.eta) && abs(superCluster.eta) < 1.5660) && abs(dB) < 0.02 && (electronID("eidHyperTight1MC") == 9. || electronID("eidHyperTight1MC") == 11. || electronID("eidHyperTight1MC") == 13. || electronID("eidHyperTight1MC") == 15.) && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.1 && gsfTrack.trackerExpectedHitsInner.numberOfLostHits == 0'
 electronSelectSignalJetDR = 0.3
-# counters
+# counters for electron channel
 selectedElectronsMin = 1
 selectedElectronsMax = 1
 referenceElectronsMin = 1
@@ -143,9 +143,9 @@ process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff"
 # process.GlobalTag.globaltag = autoCond[ 'startup' ]
 process.GlobalTag.globaltag = 'START44_V13::All'
 if runCrab:
-  if mc == 'Fall11_R3'
+  if mc == 'Fall11_R3':
     process.GlobalTag.globaltag = 'START44_V5D::All'
-  elif mc == 'Fall11_R4'
+  elif mc == 'Fall11_R4':
     process.GlobalTag.globaltag = 'START44_V9C::All'
 
 
@@ -172,7 +172,7 @@ if not runCrab:
                                                  , globalTag    = globalTag
                                                  , maxVersions  = 1
                                                  )
-  triggerSelection =  ['HLT_IsoMu24_v*'
+  triggerSelection =  [ 'HLT_IsoMu24_v*'
                       , 'HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v*'
                       ]
 
