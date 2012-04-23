@@ -316,10 +316,6 @@ process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
 , thresh      = cms.untracked.double( 0.25 )
 )
 
-# Fix for Pythia bug in 2011 MC (not used here)
-process.load("GeneratorInterface.GenFilters.TotalKinematicsFilter_cfi")
-process.totalKinematicsFilter.tolerance = 5. # recommended
-
 # Trigger
 process.load( "HLTrigger.HLTfilters.triggerResultsFilter_cfi" )
 process.triggerResultsFilter.hltResults        = cms.InputTag( 'TriggerResults::' + hltProcess )
@@ -355,8 +351,6 @@ process.eventCleaning = cms.Sequence()
 if not runOnMC:
   process.eventCleaning += process.HBHENoiseFilter
   process.eventCleaning += process.scrapingFilter
-else:
-  process.eventCleaning += process.totalKinematicsFilter
 
 if triggerSelection != '':
   process.eventCleaning += process.triggerResultsFilter
