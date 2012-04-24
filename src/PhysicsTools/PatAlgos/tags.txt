@@ -4,7 +4,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_2_4
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-08-06      V06-08-04      
 CommonTools/ParticleFlow                         V00-03-08      V00-03-06-01   
-DataFormats/PatCandidates                        V06-05-00      V06-04-33      
+DataFormats/PatCandidates                        V06-05-01      V06-04-33      
 EGamma/EGammaAnalysisTools                       V00-00-05                     
 PhysicsTools/KinFitter                           V00-03-07      V00-03-04      
 PhysicsTools/PatAlgos                            V08-09-02      V08-08-22      
