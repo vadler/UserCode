@@ -58,9 +58,9 @@ electronsSelectIsoPf = 0.5
 electronSelectPf     = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
 # electron object selection
 electronSelectBase   = 'et > 15. && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.2'
-electronSelectHitFit = electronSelectBase + ' && abs(eta) < 2.5'
+electronSelectHitFit = electronSelectBase + ' && abs(eta) < 2.5 && passConversionVeto'
 electronSelect       = electronSelectBase + ' && abs(eta) < 2.5'
-electronSelectSignal = 'et > 35. && abs(eta) < 2.5 && !(1.4442 < abs(superCluster.eta) && abs(superCluster.eta) < 1.5660) && abs(dB) < 0.02 && (electronID("eidHyperTight1MC") == 9. || electronID("eidHyperTight1MC") == 11. || electronID("eidHyperTight1MC") == 13. || electronID("eidHyperTight1MC") == 15.) && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.1 && gsfTrack.trackerExpectedHitsInner.numberOfLostHits == 0'
+electronSelectSignal = 'et > 35. && abs(eta) < 2.5 && !(1.4442 < abs(superCluster.eta) && abs(superCluster.eta) < 1.5660) && abs(dB) < 0.02 && (electronID("eidHyperTight1MC") == 9. || electronID("eidHyperTight1MC") == 11. || electronID("eidHyperTight1MC") == 13. || electronID("eidHyperTight1MC") == 15.) && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.1 && passConversionVeto && gsfTrack.trackerExpectedHitsInner.numberOfLostHits == 0'
 electronSelectSignalJetDR = 0.3
 # counters for electron channel
 selectedElectronsMin = 1
@@ -88,16 +88,6 @@ jetSelectBase   = 'pt > 30. && numberOfDaughters > 1 && chargedEmEnergyFraction 
 jetSelectHitFit = jetSelectBase + ' && abs(eta) < 3.0'
 jetSelect       = jetSelectBase + ' && abs(eta) < 2.4'
 jetSelectSignal = ''
-#jetBTagAlgo          = '' # empty string switches the use of b-Tagging off
-#jetBTagAlgo          = 'trackCountingHighPurBJetTags' # empty string switches the use of b-Tagging off
-jetBTagAlgo          = 'simpleSecondaryVertexHighEffBJetTags'
-# working points from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagPerformanceOP:
-#jetMinBDiscBJets     = 1.93 # TCHPM
-#jetMaxBDiscLightJets = 1.93 # should it be the same?
-#jetMinBDiscBJets     = 3.14 # TCHPT
-#jetMaxBDiscLightJets = 3.14 # should it be the same?
-jetMinBDiscBJets     = 1.74 # SSVHEM
-jetMaxBDiscLightJets = 1.74 # should it be the same?
 # counters
 selectedJetsMin = 0
 selectedJetsMax = 999999
@@ -426,6 +416,10 @@ if electronsIsoR03:
   process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03PFId' )
   process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFId' )
 process.selectedPatElectrons.cut       = electronSelect
+process.selectedPatElectronConversions = cms.EDProducer(
+  "PATConversionProducer"
+, electronSource = cms.InputTag( 'selectedPatElectrons' )
+)
 process.selectedPatElectronsHitFit.cut = electronSelectHitFit
 process.referencePatElectrons.preselection = electronSelectSignal
 process.referencePatElectrons.checkOverlaps = cms.PSet(
