@@ -1,3 +1,6 @@
+//
+// $Id: PATElectronProducer.cc,v 1.51.2.5 2012/04/20 19:54:06 tjkim Exp $
+//
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -28,6 +31,9 @@
 
 #include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
+
+#include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
 #include <vector>
 #include <memory>
@@ -171,6 +177,15 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
        embedGenMatch_ = false;
    }
 
+  // for additional mva variables
+  edm::InputTag  reducedEBRecHitCollection(string("reducedEcalRecHitsEB"));
+  edm::InputTag  reducedEERecHitCollection(string("reducedEcalRecHitsEE"));
+  EcalClusterLazyTools lazyTools(iEvent, iSetup, reducedEBRecHitCollection, reducedEERecHitCollection);
+
+  // for conversion veto selection  
+  edm::Handle<reco::ConversionCollection> hConversions;
+  iEvent.getByLabel("allConversions", hConversions);
+
   // Get the ESHandle for the transient track builder, if needed for
   // high level selection embedding
   edm::ESHandle<TransientTrackBuilder> trackBuilder;
@@ -223,25 +238,29 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
   reco::BeamSpot beamSpot;
   bool beamSpotIsValid = false;
   bool primaryVertexIsValid = false;
-  if ( embedHighLevelSelection_ ) {
-    // Get the beamspot
-    edm::Handle<reco::BeamSpot> beamSpotHandle;
-    iEvent.getByLabel(beamLineSrc_, beamSpotHandle);
 
-    // Get the primary vertex
-    edm::Handle< std::vector<reco::Vertex> > pvHandle;
-    iEvent.getByLabel( pvSrc_, pvHandle );
+  // Get the beamspot
+  edm::Handle<reco::BeamSpot> beamSpotHandle;
+  iEvent.getByLabel(beamLineSrc_, beamSpotHandle);
+
+  // Get the primary vertex
+  edm::Handle< std::vector<reco::Vertex> > pvHandle;
+  iEvent.getByLabel( pvSrc_, pvHandle );
+
+
+  if ( embedHighLevelSelection_ ) {
 
     // This is needed by the IPTools methods from the tracking group
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", trackBuilder);
 
     if ( ! usePV_ ) {
+
       if ( beamSpotHandle.isValid() ){
-	beamSpot = *beamSpotHandle;
-	beamSpotIsValid = true;
+        beamSpot = *beamSpotHandle;
+        beamSpotIsValid = true;
       } else{
-	edm::LogError("DataNotAvailable")
-	  << "No beam spot available from EventSetup, not adding high level selection \n";
+        edm::LogError("DataNotAvailable")
+          << "No beam spot available from EventSetup, not adding high level selection \n";
       }
 
       double x0 = beamSpot.x0();
@@ -310,7 +329,8 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 	    userDataHelper_.add( anElectron, iEvent, iSetup );
 	  }
 
-
+          double ip3d = -999; // for mva variable
+ 
 	  // embed high level selection
 	  if ( embedHighLevelSelection_ ) {
 	    // get the global track
@@ -328,13 +348,16 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 			      beamSpot,
 			      beamSpotIsValid );
 
+              std::pair<bool,Measurement1D> ip3dpv = IPTools::absoluteImpactParameter3D(tt, primaryVertex);
+              ip3d = ip3dpv.second.value(); // for mva variable
+
 	      if ( !usePV_ ) {
 		double corr_d0 = track->dxy( beamPoint );
 		anElectron.setDB( corr_d0, -1.0 );
 	      } else {
-		std::pair<bool,Measurement1D> result = IPTools::absoluteTransverseImpactParameter(tt, primaryVertex);
-		double d0_corr = result.second.value();
-		double d0_err = result.second.error();
+                 std::pair<bool,Measurement1D> result = IPTools::absoluteTransverseImpactParameter(tt, primaryVertex);
+                double d0_corr = result.second.value();
+                double d0_err = result.second.error();
 		anElectron.setDB( d0_corr, d0_err );
 	      }
 	    }
@@ -352,6 +375,29 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 	    ids.push_back(std::make_pair("pf_evsmu",pfRef->mva_e_mu()));
 	    anElectron.setElectronIDs(ids);
 	  }
+
+          // add missing mva variables
+          double r9 = lazyTools.e3x3( *( itElectron->superCluster()->seed())) / itElectron->superCluster()->rawEnergy() ;
+          double sigmaIphiIphi;
+          double sigmaIetaIphi;
+          std::vector<float> vCov = lazyTools.localCovariances(*( itElectron->superCluster()->seed()));
+          if( !isnan(vCov[2])) sigmaIphiIphi = sqrt(vCov[2]);
+          else sigmaIphiIphi = 0;
+          sigmaIetaIphi = vCov[1];
+          anElectron.setMvaVariables( r9, sigmaIphiIphi, sigmaIetaIphi, ip3d);
+
+          // set conversion veto selection
+          bool passconversionveto = false;
+          if( hConversions.isValid()){          
+            // this is recommended method
+            passconversionveto = !ConversionTools::hasMatchedConversion( *itElectron, hConversions, beamSpotHandle->position());
+          }else{
+            // use missing hits without vertex fit method
+            passconversionveto = itElectron->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() < 1;
+          }
+
+          anElectron.setPassConversionVeto( passconversionveto );
+
 
 // 	  fillElectron(anElectron,elecsRef,pfBaseRef,
 // 		       genMatches, deposits, isolationValues);
@@ -448,6 +494,8 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
       }
 
 
+      double ip3d = -999; //for mva variable
+
       // embed high level selection
       if ( embedHighLevelSelection_ ) {
 	// get the global track
@@ -465,19 +513,41 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
 			  beamSpot,
 			  beamSpotIsValid );
 
+          std::pair<bool,Measurement1D> ip3dpv = IPTools::absoluteImpactParameter3D(tt, primaryVertex);
+          ip3d = ip3dpv.second.value(); // for mva variable
 
 	  if ( !usePV_ ) {
 	    double corr_d0 = track->dxy( beamPoint );
 	    anElectron.setDB( corr_d0, -1.0 );
 	  } else {
-	    
-	    std::pair<bool,Measurement1D> result = IPTools::absoluteTransverseImpactParameter(tt, primaryVertex);
-	    double d0_corr = result.second.value();
-	    double d0_err = result.second.error();
+            std::pair<bool,Measurement1D> result = IPTools::absoluteTransverseImpactParameter(tt, primaryVertex);
+            double d0_corr = result.second.value();
+            double d0_err = result.second.error();
 	    anElectron.setDB( d0_corr, d0_err );
 	  }
 	}
       }
+
+      // add mva variables
+      double r9 = lazyTools.e3x3( *( itElectron->superCluster()->seed())) / itElectron->superCluster()->rawEnergy() ;
+      double sigmaIphiIphi;
+      double sigmaIetaIphi;
+      std::vector<float> vCov = lazyTools.localCovariances(*( itElectron->superCluster()->seed()));
+      if( !isnan(vCov[2])) sigmaIphiIphi = sqrt(vCov[2]);
+      else sigmaIphiIphi = 0;
+      sigmaIetaIphi = vCov[1];
+      anElectron.setMvaVariables( r9, sigmaIphiIphi, sigmaIetaIphi, ip3d);
+
+      // set conversion veto selection
+      bool passconversionveto = false;
+      if( hConversions.isValid()){
+        // this is recommended method 
+        passconversionveto = !ConversionTools::hasMatchedConversion( *itElectron, hConversions, beamSpotHandle->position());
+      }else{
+        // use missing hits without vertex fit method
+        passconversionveto = itElectron->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() < 1;
+      }
+      anElectron.setPassConversionVeto( passconversionveto );
 
       // add sel to selected
       fillElectron( anElectron, elecsRef,elecBaseRef,
