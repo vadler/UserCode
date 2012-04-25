@@ -10,6 +10,8 @@ PhysicsTools/KinFitter                           V00-03-07      V00-03-04
 PhysicsTools/PatAlgos                            V08-09-03      V08-08-22      
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
 PhysicsTools/PatUtils                            V03-09-18-03   V03-09-18-02   
+RecoBTag/ImpactParameter                         V01-04-08      V01-04-07      
+RecoBTag/SecondaryVertex                         V01-06-02      V01-06-01      
 RecoParticleFlow/PFProducer                      V15-01-06      V15-01-03-01   
 TopQuarkAnalysis/Configuration                   V06-02-00      V06-01-12      
 TopQuarkAnalysis/Examples                        V06-07-11      V06-07-10      
@@ -21,4 +23,4 @@ TopQuarkAnalysis/TopKinFitter                    V06-07-19      V06-07-12
 TopQuarkAnalysis/TopObjectResolutions            V06-07-09      V06-07-06      
 TopQuarkAnalysis/TopTools                        V06-07-11      V06-07-10      
 ---------------------------------------
-total packages: 18 (18 displayed)
+total packages: 20 (20 displayed)
