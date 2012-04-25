@@ -787,6 +787,7 @@ if createNTuples and not lxplusTest:
 	GetL1FromL1Extra	= cms.bool(False),
 	PropagateMuToStation2	= cms.bool(True),
 	EnablePartnerTrackFinder = cms.bool(True),
+        EnableConvRej2012 = cms.bool(True),
 	WriteMET	= cms.bool(True),
 	WriteTriggerPrescales	= cms.bool(True),
 	WritePDFEventWeights = cms.bool(writePdfWeights),
