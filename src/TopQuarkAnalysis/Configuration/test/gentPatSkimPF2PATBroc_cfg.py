@@ -793,7 +793,7 @@ if createNTuples and not lxplusTest:
 	WritePDFEventWeights = cms.bool(writePdfWeights),
 	WriteWDecayInformation = cms.bool(writeWDecay),
 	PDFWeights = cms.VInputTag("pdfWeights:cteq66"),
-	Writed0wrtPV	= cms.bool(False),		# write d0 wrt PV
+	Writed0wrtPV	= cms.bool(True),		# write d0 wrt PV
         WriteLooseMuons = cms.bool(writeNonIsoMuons),
         WriteLooseElectrons = cms.bool(writeNonIsoElectrons),
 	WriteGenParticles = cms.bool(False),		# write selected MC particles
