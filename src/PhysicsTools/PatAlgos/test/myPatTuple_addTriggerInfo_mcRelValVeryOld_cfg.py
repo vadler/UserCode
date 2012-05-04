@@ -13,7 +13,7 @@ process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
-process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
+process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelValVeryOld.root'%( os.getenv( "CMSSW_BASE" ) )
 
 from PhysicsTools.PatAlgos.tools.coreTools import removeSpecificPATObjects
 removeSpecificPATObjects( process
