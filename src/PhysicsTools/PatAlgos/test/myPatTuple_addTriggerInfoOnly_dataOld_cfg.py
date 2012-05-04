@@ -3,7 +3,7 @@ cmsswBase = os.getenv( "CMSSW_BASE" )
 
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process( "PT" )
+process = cms.Process( "PAT" )
 
 ## Options and Output Report
 process.options = cms.untracked.PSet(
