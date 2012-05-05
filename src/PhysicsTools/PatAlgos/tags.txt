@@ -3,8 +3,9 @@ Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_4
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_4_4_4
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-07-09      V06-07-07      
-CommonTools/ParticleFlow                         V00-03-05-04   V00-03-05-02   
+CommonTools/ParticleFlow                         V00-03-05-08   V00-03-05-02   
 DataFormats/PatCandidates                        V06-05-01      V06-04-33      
+FWCore/GuiBrowsers                               V00-00-60      V00-00-57      
 PhysicsTools/KinFitter                           V00-03-06      V00-03-04      
 PhysicsTools/PatAlgos                            V08-07-44      V08-07-39      
 PhysicsTools/PatUtils                            V03-09-18-03   V03-09-18-02   
@@ -15,4 +16,4 @@ TopQuarkAnalysis/TopKinFitter                    V06-07-17      V06-07-11
 TopQuarkAnalysis/TopObjectResolutions            V06-07-08      V06-07-05      
 TopQuarkAnalysis/TopTools                        V06-07-11      V06-07-09      
 ---------------------------------------
-total packages: 12 (12 displayed)
+total packages: 13 (13 displayed)
