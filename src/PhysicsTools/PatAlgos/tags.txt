@@ -8,7 +8,7 @@ EGamma/EGammaAnalysisTools                       V00-00-05
 PhysicsTools/PatAlgos                            V08-09-04      V08-09-04      
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
 PhysicsTools/PatUtils                            V03-09-18-03   V03-09-18-03   
-TopQuarkAnalysis/Configuration                   V06-02-00      V06-02-00      
+TopQuarkAnalysis/Configuration                   V06-02-01      V06-02-00      
 TopQuarkAnalysis/Examples                        V06-07-11      V06-07-11      
 TopQuarkAnalysis/TopEventProducers               V06-09-08      V06-09-08      
 TopQuarkAnalysis/TopEventSelection               V06-07-14      V06-07-14      
