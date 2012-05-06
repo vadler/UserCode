@@ -973,15 +973,15 @@ int main( int argc, char * argv[] )
           for ( unsigned uEta = nEtaBins_; uEta > 0; --uEta ) {
             fileOut << std::endl << "etadep_etamin";
             fileOut.width( 3 );
-            fileOut << std::left << nEta;
+            fileOut << std::left << nEta << "= ";
             fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
             fileOut << std::endl << "etadep_etamax";
             fileOut.width( 3 );
-            fileOut << std::left << nEta;
+            fileOut << std::left << nEta << "= ";
             fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
             fileOut << std::endl << "etadep_vecres";
             fileOut.width( 3 );
-            fileOut << std::left << nEta;
+            fileOut << std::left << nEta << "= ";
             for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
               if ( uProp > 0 ) fileOut << "/";
               if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
@@ -1003,15 +1003,15 @@ int main( int argc, char * argv[] )
         for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
           fileOut << std::endl << "etadep_etamin";
           fileOut.width( 3 );
-          fileOut << std::left << nEta;
+          fileOut << std::left << nEta << "= ";
           fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
           fileOut << std::endl << "etadep_etamax";
           fileOut.width( 3 );
-          fileOut << std::left << nEta;
+          fileOut << std::left << nEta << "= ";
           fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
           fileOut << std::endl << "etadep_vecres";
           fileOut.width( 3 );
-          fileOut << std::left << nEta;
+          fileOut << std::left << nEta << "= ";
           for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
             if ( uProp > 0 ) fileOut << "/";
             if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
@@ -1059,15 +1059,15 @@ int main( int argc, char * argv[] )
           for ( unsigned uEta = nEtaBins_; uEta > 0; --uEta ) {
             fileOutNtup << std::endl << "etadep_etamin";
             fileOutNtup.width( 3 );
-            fileOutNtup << std::left << nEta;
+            fileOutNtup << std::left << nEta << "= ";
             fileOutNtup << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
             fileOutNtup << std::endl << "etadep_etamax";
             fileOutNtup.width( 3 );
-            fileOutNtup << std::left << nEta;
+            fileOutNtup << std::left << nEta << "= ";
             fileOutNtup << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
             fileOutNtup << std::endl << "etadep_vecres";
             fileOutNtup.width( 3 );
-            fileOutNtup << std::left << nEta;
+            fileOutNtup << std::left << nEta << "= ";
             for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
               if ( uProp > 0 ) fileOutNtup << "/";
               if ( nominalInv_.at( uCat ).at( uProp ) ) fileOutNtup << "-";
@@ -1089,15 +1089,15 @@ int main( int argc, char * argv[] )
         for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
           fileOutNtup << std::endl << "etadep_etamin";
           fileOutNtup.width( 3 );
-          fileOutNtup << std::left << nEta;
+          fileOutNtup << std::left << nEta << "= ";
           fileOutNtup << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
           fileOutNtup << std::endl << "etadep_etamax";
           fileOutNtup.width( 3 );
-          fileOutNtup << std::left << nEta;
+          fileOutNtup << std::left << nEta << "= ";
           fileOutNtup << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
           fileOutNtup << std::endl << "etadep_vecres";
           fileOutNtup.width( 3 );
-          fileOutNtup << std::left << nEta;
+          fileOutNtup << std::left << nEta << "= ";
           for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
             if ( uProp > 0 ) fileOutNtup << "/";
             if ( nominalInv_.at( uCat ).at( uProp ) ) fileOutNtup << "-";
