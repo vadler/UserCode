@@ -92,6 +92,7 @@ def adaptPFMuons(process,module,postfix="" ):
     warningIsolation()
     print
     module.useParticleFlow = True
+    module.pfMuonSource    = cms.InputTag("pfIsolatedMuons" + postfix)
     module.userIsolation   = cms.PSet()
     module.isoDeposits = cms.PSet(
         pfChargedHadrons = cms.InputTag("muPFIsoDepositCharged" + postfix),
@@ -124,8 +125,9 @@ def adaptPFElectrons(process,module, postfix):
     print "********************* "
     warningIsolation()
     print
-    module.useParticleFlow = True
-    module.userIsolation   = cms.PSet()
+    module.useParticleFlow  = True
+    module.pfElectronSource = cms.InputTag("pfIsolatedElectrons" + postfix)
+    module.userIsolation    = cms.PSet()
     module.isoDeposits = cms.PSet(
         pfChargedHadrons = cms.InputTag("elPFIsoDepositCharged" + postfix),
         pfChargedAll = cms.InputTag("elPFIsoDepositChargedAll" + postfix),
