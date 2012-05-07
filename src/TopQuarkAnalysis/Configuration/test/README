@@ -10,7 +10,10 @@ cvs co -r V06-02-03    TopQuarkAnalysis/Configuration
 cvs co -r V06-05-01    DataFormats/PatCandidates
 cvs co -r V08-09-05    PhysicsTools/PatAlgos
 cvs co -r V00-03-11    CommonTools/ParticleFlow
-cvs co -r V00-00-06 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
+cvs co -r V00-00-08 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
+cd EGamma/EGammaAnalysisTools/data
+cat download.url | xargs wget
+cd -
 scram b -j 9
 
 Steering:
