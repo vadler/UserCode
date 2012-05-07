@@ -2,16 +2,14 @@
 Environment:
 ============
 
-cmsrel CMSSW_5_2_4
-cd CMSSW_5_2_4/src
+cmsrel CMSSW_5_2_5
+cd CMSSW_5_2_5/src
 setenv SCRAM_ARCH slc5_amd64_gcc462
 cmsenv
 cvs co -r V06-05-01    DataFormats/PatCandidates
-cvs co -r V08-09-02    PhysicsTools/PatAlgos
-cvs co -r V03-09-18-03 PhysicsTools/PatUtils
-cvs co -r V00-03-08    CommonTools/ParticleFlow
-cvs co -r V15-01-06    RecoParticleFlow/PFProducer
-cvs co -r V00-00-05 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
+cvs co -r V08-09-05    PhysicsTools/PatAlgos
+cvs co -r V00-03-11    CommonTools/ParticleFlow
+cvs co -r V00-00-06 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
 scram b -j 9
 
 Steering:
