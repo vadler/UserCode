@@ -6,8 +6,9 @@ cmsrel CMSSW_4_4_4
 cd CMSSW_4_4_4/src
 cmsenv
 cvs co -r V06-01-21    TopQuarkAnalysis/Configuration
-cvs co -r V08-07-42    PhysicsTools/PatAlgos
-cvs co -r V00-03-05-04 CommonTools/ParticleFlow
+cvs co -r V06-05-01    DataFormats/PatCandidates
+cvs co -r V08-07-45    PhysicsTools/PatAlgos
+cvs co -r V00-03-05-08 CommonTools/ParticleFlow
 scram b -j 9
 
 Steering:
