@@ -6,7 +6,7 @@ setenv SCRAM_ARCH slc5_amd64_gcc462
 cmsrel CMSSW_5_2_5
 cd CMSSW_5_2_5/src
 cmsenv
-cvs co -r V06-02-04    TopQuarkAnalysis/Configuration
+cvs co -r V06-02-05    TopQuarkAnalysis/Configuration
 cvs co -r V06-05-01    DataFormats/PatCandidates
 cvs co -r V08-09-05    PhysicsTools/PatAlgos
 cvs co -r V00-03-11    CommonTools/ParticleFlow
