@@ -2,9 +2,9 @@ Test Release based on: CMSSW_4_2_8_patch7
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw-patch/CMSSW_4_2_8_patch7
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_4_2_8_patch7
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CommonTools/ParticleFlow                         B4_2_X_V00-03-03 V00-01-06      
-DataFormats/PatCandidates                        V06-04-19-04   V06-04-18      
-PhysicsTools/PatAlgos                            V08-06-55      V08-06-41      
+CommonTools/ParticleFlow                         B4_2_X_V00-03-05 V00-01-06      
+DataFormats/PatCandidates                        V06-04-19-05   V06-04-18      
+PhysicsTools/PatAlgos                            V08-06-58      V08-06-41      
 PhysicsTools/PatUtils                            V03-09-18      V03-09-18      
 PhysicsTools/SelectorUtils                       V00-03-24      V00-03-17      
 PhysicsTools/UtilAlgos                           V08-02-14      V08-02-12      
