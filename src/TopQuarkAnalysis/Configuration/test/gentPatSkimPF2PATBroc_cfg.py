@@ -26,7 +26,9 @@ if lxplusTest:
   writeNonIsoMuons     = False
   writeNonIsoElectrons = False
 
-maxEvents = 1000
+maxEvents = -1
+if lxplusTest:
+  maxEvents = 1000
 
 hltProcess       = 'HLT'
 triggerSelection = ''
