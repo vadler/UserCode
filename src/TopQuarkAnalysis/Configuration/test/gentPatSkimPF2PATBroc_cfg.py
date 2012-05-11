@@ -10,16 +10,15 @@ import FWCore.ParameterSet.Config as cms
 gc = False
 
 runOnMC     = True
-runOnRelVal = True # If 'False', define input files in l. 187ff.
+runOnRelVal = False # If 'False', define input files in l. 187ff.
 
 runMatch  = True
-runMVA    = True
+runMVA    = False
 runCiC    = True
 runEwk    = True
 addGenEvt = True
 createNTuples        = True
 writePdfWeights      = False    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
-writeWDecay          = False	# this should only be set True for *broken* W datasets
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
 
@@ -30,9 +29,9 @@ triggerSelection = ''
 
 jetAlgo   = 'AK5'
 jecLevels = []
-#jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
-#if not runOnMC:
-  #jecLevels.append( 'L2L3Residual' )
+jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
+if not runOnMC:
+  jecLevels.append( 'L2L3Residual' )
 
 # vertex collection to use
 # 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
@@ -45,7 +44,7 @@ pfJetCollection = 'pfJets'
 # muon top projection object selection
 pfMuonSelect = 'pt > 5.' # PF2PAT: 'pt > 5.'
 # muon isolation cone
-usePfMuonIsoConeR03 = True
+usePfMuonIsoConeR03 = False
 # muon top projection isolation
 pfMuonIso = 0.5 # PF2PAT: 0.15
 postfixNonIsoMu = 'NonIsoMu'
@@ -55,11 +54,11 @@ muonSelect = ''
 # muon event selection
 #muonCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
 #muonCut = 'isGlobalMuon && pt > 5. && abs(eta) < 2.5 && globalTrack().hitPattern().numberOfValidMuonHits() > 0 && numberOfMatches() > 1 && innerTrack().numberOfValidHits()> 10 && innerTrack().hitPattern().numberOfValidPixelHits()>0'
-muonCut = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5 && globalTrack().hitPattern().numberOfValidMuonHits()> 0 && numberOfMatchedStations() > 1 && innerTrack().hitPattern().numberOfValidPixelHits()>0 && track().hitPattern().trackerLayersWithMeasurement() > 8'
+muonCut = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5'
 muonsMin = 0
 
 # electron top projection object selection
-pfElectronSelect = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2' # PF2PAT: 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
+pfElectronSelect = 'pt > 10. && gsfTrackRef.isNonnull' # PF2PAT: 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
 # electron isolation cone
 usePfElectronIsoConeR03 = True
 # electron top projection isolation
@@ -69,18 +68,18 @@ postfixNonIsoE = 'NonIsoE'
 #electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
 electronSelect = ''
 # electron event selection
-electronCut  = 'et > 5. && abs(eta) < 3.0'
+electronCut  = 'et > 10. && abs(eta) < 2.5'
 electronsMin = 0
 
 # x-leptons event selection
-leptonsMin = 1
+leptonsMin = 0
 
 # jet object selection
 #jetSelect = 'pt > 30. && abs(eta) < 2.4' # RefSel
-jetSelect = ''
+jetSelect = 'pt > 15. && abs(eta) < 2.6'
 # jet event selection
-jetCut  = 'pt > 15. && abs(eta) < 3.0'
-jetsMin = 3
+jetCut  = 'pt > 15. && abs(eta) < 2.6'
+jetsMin = 0
 
 # Flat NTuple production
 processing_mode = 0
@@ -119,23 +118,27 @@ else:
 
 if gc:
 	runOnMC   = eval('@MC@')
-	pfJetCollection = '@PFJETS@'
-	usePfMuonIsoConeR03 = eval('@MUTPCONE03@') # FIXME in input file
-	pfMuonIso = eval('@MUTPISO@')
-	muonsMin = eval('@MINNMU@')
-	usePfElectronIsoConeR03 = eval('@ETPCONE03@')
-	pfElectronsIso = eval('@ETPISO@') # FIXME in input file
-	electronsMin = eval('@MINNE@')
-	leptonsMin = eval('@MINNLEP@')
-	jetsMin = eval('@MINNJETS@')
-        writeNonIsoMuons   = eval('@WRITENONISOMU@')
-        writeNonIsoElectrons   = eval('@WRITENONISOE@')
-	process.GlobalTag.globaltag = '@GLOBALTAG@'
-	# if not set in gc config, take default value
-	if '@WRITEWDECAY@'.lower() == 'true' or '@WRITEWDECAY@'.lower() == 'false':
-		writeWDecay = eval('@WRITEWDECAY@')
+	#pfJetCollection = '@PFJETS@'
+	#usePfMuonIsoConeR03 = eval('@MUTPCONE03@') # FIXME in input file
+	#pfMuonIso = eval('@MUTPISO@')
+	#muonsMin = eval('@MINNMU@')
+	#usePfElectronIsoConeR03 = eval('@ETPCONE03@')
+	#pfElectronsIso = eval('@ETPISO@') # FIXME in input file
+	#electronsMin = eval('@MINNE@')
+	#leptonsMin = eval('@MINNLEP@')
+	#jetsMin = eval('@MINNJETS@')
+       	writeNonIsoElectrons   = eval('@WRITENONISOE@')
+	if '@WRITENONISOMU@'.lower() == 'false':
+        	writeNonIsoMuons   = False
 	else:
-		writeWDecay = False
+		writeNonIsoMuons = True
+
+	if '@WRITENONISOE@'.lower() == 'false':
+        	writeNonIsoElectrons   = False
+	else:
+		writeNonIsoElectrons = True
+
+	process.GlobalTag.globaltag = '@GLOBALTAG@'
 	# if not set in gc config, take default value
 	if '@PDFWEIGHTS@'.lower() == 'true' or '@PDFWEIGHTS@'.lower() == 'false':
 		writePdfWeights = eval('@PDFWEIGHTS@')
@@ -190,7 +193,8 @@ if runOnRelVal:
                                      )
 else:
   if runOnMC:
-    inputFiles = [ 'file:/afs/cern.ch/work/v/vadler/public/data/CMSSW_5_2_X/TTbar_Summer12_AODskim.root'
+    #inputFiles = [ 'file:/afs/cern.ch/work/v/vadler/public/data/CMSSW_5_2_X/TTbar_Summer12_AODskim.root'
+    inputFiles = [ 'file:////user/mccartin/data/TTbar_Summer12_FEBE99BB-3881-E111-B1F3-003048D42DC8.root'
                  ]
   else:
     if lxplusTest:
@@ -749,6 +753,8 @@ if createNTuples and not lxplusTest:
 					, "eidHyperTight2MC_no_iso"
 					, "eidHyperTight3MC_no_iso"
 					, "eidHyperTight4MC_no_iso"
+					#, "mvaTrigV0"
+					#, "mvaNonTrigV0"
 					),
 	TriggerList      = cms.vstring("HLT_Ele[2-9]\\\d+(?:(?!(No|Anti)BPTX|Tau|MT|MHT|Deta|SC17).)*","HLT_(Iso)?Mu([1-9]\\\d|9)_(?:(?!(Photon|Deta|MT|Ele|HT|MET|Track|Tk|Vertex|NoBPTX|AntiBPTX|Jpsi|Single|Tau|MR|R0)).)*","HLT_(Central)?(Tri|Quad)Jet(?:(?!(No|Anti)BPTX|BTag|Tau|MT|MHT|MET|NoJetID).)*"),
 	VetoObjectTriggers = cms.vstring("HLT_.*MET.*"),
@@ -791,7 +797,7 @@ if createNTuples and not lxplusTest:
 	WriteMET	= cms.bool(True),
 	WriteTriggerPrescales	= cms.bool(True),
 	WritePDFEventWeights = cms.bool(writePdfWeights),
-	WriteWDecayInformation = cms.bool(writeWDecay),
+	WriteWDecayInformation = cms.bool(False),
 	PDFWeights = cms.VInputTag("pdfWeights:cteq66"),
 	Writed0wrtPV	= cms.bool(True),		# write d0 wrt PV
         WriteLooseMuons = cms.bool(writeNonIsoMuons),
