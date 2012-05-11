@@ -22,16 +22,16 @@ writePdfWeights      = False    # corresponding actions to be updated, s. https:
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
 
-maxEvents = 1000
+maxEvents = -1
 
 hltProcess       = 'HLT'
 triggerSelection = ''
 
 jetAlgo   = 'AK5'
 jecLevels = []
-jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
-if not runOnMC:
-  jecLevels.append( 'L2L3Residual' )
+#jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
+#if not runOnMC:
+#  jecLevels.append( 'L2L3Residual' )
 
 # vertex collection to use
 # 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
@@ -46,7 +46,7 @@ pfMuonSelect = 'pt > 5.' # PF2PAT: 'pt > 5.'
 # muon isolation cone
 usePfMuonIsoConeR03 = False
 # muon top projection isolation
-pfMuonIso = 0.5 # PF2PAT: 0.15
+pfMuonIso = 0.2 # PF2PAT: 0.15
 postfixNonIsoMu = 'NonIsoMu'
 # muon object selection
 #muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
@@ -62,7 +62,7 @@ pfElectronSelect = 'pt > 10. && gsfTrackRef.isNonnull' # PF2PAT: 'pt > 5. && gsf
 # electron isolation cone
 usePfElectronIsoConeR03 = True
 # electron top projection isolation
-pfElectronIso = 0.5 # PF2PAT: 0.2
+pfElectronIso = 0.2 # PF2PAT: 0.2
 postfixNonIsoE = 'NonIsoE'
 # electron object selection
 #electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
@@ -127,7 +127,6 @@ if gc:
 	#electronsMin = eval('@MINNE@')
 	#leptonsMin = eval('@MINNLEP@')
 	#jetsMin = eval('@MINNJETS@')
-       	writeNonIsoElectrons   = eval('@WRITENONISOE@')
 	if '@WRITENONISOMU@'.lower() == 'false':
         	writeNonIsoMuons   = False
 	else:
@@ -281,6 +280,7 @@ else:
 #inputFiles = ['file:////user/bklein/WjetsScaleUpAOD.root']
 #inputFiles = ['file:////user/bklein/AOD_v6_Mu_latest_trigger_menu.root']
 #inputFiles = ['file:///user/ksbeerna/RECO2012DataTEST.root']
+#  inputFiles = ['file:////user/bklein/TTbar_2012_synchronisation_ex.root']
 process.source.fileNames = cms.untracked.vstring( inputFiles )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( maxEvents )
@@ -470,7 +470,7 @@ if not runMatch:
   process.patJets.JetPartonMapSource = cms.InputTag( '' )
   removeIfInSequence( process, 'patJetFlavourId', 'patPF2PATSequence', '' )
 
-process.patJets.jetSource = cms.InputTag(pfJetCollection)#Added S
+process.patJets.jetSource = cms.InputTag(pfJetCollection)#Added S sync ex 2011
 process.jetTracksAssociatorAtVertex.jets = cms.InputTag(pfJetCollection)
 process.patJetCorrFactors.src = cms.InputTag(pfJetCollection)
 process.patJetGenJetMatch.src = cms.InputTag(pfJetCollection)
@@ -479,6 +479,14 @@ process.patJetPartonMatch.src = cms.InputTag(pfJetCollection)
 process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag("pfJets")
 process.pfMET.jets = cms.InputTag("pfJets")
 process.softMuonTagInfosAOD.jets = cms.InputTag(pfJetCollection)#end add
+#Added S sync ex 2012
+process.pfNoTau.enable = False 
+process.pfIsolatedElectrons.doDeltaBetaCorrection = True
+process.pfIsolatedMuons.doDeltaBetaCorrection = True
+process.pfPileUp.checkClosestZVertex = False # recommended JetMET twiki
+process.kt6PFJets.doAreaFastjet = True
+process.kt6PFJets.Rho_EtaMax = 4.4 # recommended by TOP JetMET contact
+# end add
 
 if runMatch:
 	process.patJets.addGenJetMatch = True
