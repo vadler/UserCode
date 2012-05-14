@@ -6,7 +6,7 @@ AnalysisDataFormats/TopObjects                   V06-08-07      V06-08-07
 CommonTools/ParticleFlow                         V00-03-11      V00-03-08      
 DataFormats/PatCandidates                        V06-05-01      V06-05-00      
 EGamma/EGammaAnalysisTools                       V00-00-08                     
-PhysicsTools/PatAlgos                            V08-09-06      V08-09-04      
+PhysicsTools/PatAlgos                            V08-09-07      V08-09-04      
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
 PhysicsTools/PatUtils                            V03-09-18-03   V03-09-18-03   
 TopQuarkAnalysis/Configuration                   V06-02-05      V06-02-00      
