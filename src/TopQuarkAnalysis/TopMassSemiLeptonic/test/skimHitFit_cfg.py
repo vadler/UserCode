@@ -6,8 +6,8 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 # Misc
-runCrab    = False
-runTest    = True
+runCrab    = True
+runTest    = False
 reportTime = False
 
 # MC Input (only for 'runCrab' = True)
@@ -485,10 +485,10 @@ massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitMuons
                             )
 process.ttSemiLepEventHitFitMuons.hypotheses = [ 'ttSemiLepHypGenMatchHitFitMuons'
                                                ]
-process.makeTtSemiLepEventHitFitMuons = cloneProcessingSnippet( process
-                                                              , process.makeTtSemiLepEvent
-                                                              , 'HitFitElectrons'
-                                                              )
+process.makeTtSemiLepEventHitFitElectrons = cloneProcessingSnippet( process
+                                                                  , process.makeTtSemiLepEvent
+                                                                  , 'HitFitElectrons'
+                                                                  )
 massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitElectrons
                             , 'selectedPatMuons'
                             , 'selectedPatElectronsHitFit'
@@ -513,10 +513,10 @@ massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceMuons
                             )
 process.ttSemiLepEventReferenceMuons.hypotheses = [ 'ttSemiLepHypGenMatchReferenceMuons'
                                                   ]
-process.makeTtSemiLepEventReferenceMuons = cloneProcessingSnippet( process
-                                                                 , process.makeTtSemiLepEvent
-                                                                 , 'ReferenceElectrons'
-                                                                 )
+process.makeTtSemiLepEventReferenceElectrons = cloneProcessingSnippet( process
+                                                                     , process.makeTtSemiLepEvent
+                                                                     , 'ReferenceElectrons'
+                                                                     )
 massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceElectrons
                             , 'selectedPatMuons'
                             , 'referencePatElectrons'
