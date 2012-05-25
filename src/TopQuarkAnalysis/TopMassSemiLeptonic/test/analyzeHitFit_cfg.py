@@ -6,14 +6,27 @@ import FWCore.ParameterSet.Config as cms
 
 # Misc
 runTest   = True
-rfioInput = False
+rfioInput = True
 
 # Origin of existing resolution functions
 # era = 'Spring10'
 era = 'Summer11'
 
 # Event selection
-skimProcess = 'SKIM'
+leptonType = 'Muon' # 'Muon' or 'Electron'
+
+# Correlation to input
+pileUpFileMCTrue       = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileMC_Fall11.root'
+pileUpFileMCObserved   = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileMC_Fall11inTime.root'
+pileUpFileDataTrue     = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileData_2011truePixel.root'
+pileUpFileDataObserved = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileData_2011observedPixel.root'
+#pileUpFileDataTrue     = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileData_2011true.root'
+#pileUpFileDataObserve = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileData_2011observed.root'
+skimProcess    = 'SKIM'
+jecLevels      = [ 'L1FastJet'
+                 , 'L2Relative'
+                 , 'L3Absolute'
+                 ]
 
 ### Initialization
 
@@ -34,7 +47,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
-if runTest:
+if not rfioInput:
   process.MessageLogger.cerr.threshold = 'INFO'
   process.MessageLogger.categories.append('AnalyzeHitFit')
   process.MessageLogger.cerr.AnalyzeHitFit = cms.untracked.PSet(
@@ -51,10 +64,8 @@ if runTest:
                ]
 if rfioInput:
   from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import *
-  #inputFiles = files_Summer11
-  #inputFiles = filesOld_Fall11_R3
-  #inputFiles = files_Fall11_R3
-  inputFiles = files_Fall11_R4
+  #inputFiles = filesNew_Fall11_R4
+  inputFiles = filesNew_Fall11_R4_1
 process.source = cms.Source(
   "PoolSource"
 , fileNames = cms.untracked.vstring( inputFiles )
@@ -63,12 +74,12 @@ process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( -1 )
 )
 if rfioInput and runTest:
-  process.maxEvents.input = 250000
+  process.maxEvents.input = 25000
 
 
 ### Output
 
-outputFile = '%s/output/analyzeHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
+outputFile = '%s/output/analyzeHitFit%ss_from%s.root'%( os.getenv( "CMSSW_BASE" ), leptonType, era )
 
 if runTest:
   outputFile = outputFile.replace( 'root', 'test.root' )
@@ -86,19 +97,28 @@ logFile = outputFile.replace( 'root', 'log' )
 # Trigger
 process.load( "HLTrigger.HLTfilters.hltHighLevel_cfi" )
 process.hltHighLevel.TriggerResultsTag = cms.InputTag( 'TriggerResults::%s'%( skimProcess ) )
-process.hltHighLevel.HLTPaths          = [ 'pf2PatPath'
+process.hltHighLevel.HLTPaths          = [ 'pf2PatPathMuons'
+                                         , 'pf2PatPathElectrons'
                                          ]
-process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'referencePath'
-                                                                        ]
-                                                           )
+process.hltHighLevelReference = process.hltHighLevel.clone( HLTPaths = [ 'referencePathMuons'
+                                                                       , 'referencePathElectrons'
+                                                                       ]
+                                                          )
 
 
 ### Analyzer
 
 process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.analyzeHitFit_cfi" )
-process.analyzeHitFit.ttSemiLeptonicEvent = 'ttSemiLepEventHitFit'
-process.analyzeHitFit.patLeptons          = cms.InputTag( 'selectedPat' + process.analyzeHitFit.leptonType.value() + 'HitFit' ) # obligatory assignment
+process.analyzeHitFit.pileUpFileMCTrue       = pileUpFileMCTrue
+process.analyzeHitFit.pileUpFileMCObserved   = pileUpFileMCObserved
+process.analyzeHitFit.pileUpFileDataTrue     = pileUpFileDataTrue
+process.analyzeHitFit.pileUpFileDataObserved = pileUpFileDataObserved
+process.analyzeHitFit.ttSemiLeptonicEventMuons     = 'ttSemiLepEventHitFitMuons'
+process.analyzeHitFit.ttSemiLeptonicEventElectrons = 'ttSemiLepEventHitFitElectrons'
+process.analyzeHitFit.patMuons            = 'selectedPatMuonsHitFit'
+process.analyzeHitFit.patElectrons        = 'selectedPatElectronsHitFit'
 process.analyzeHitFit.patJets             = 'selectedPatJetsHitFit'
+process.analyzeHitFit.patMETs             = 'patMETs'
 process.analyzeHitFit.jecLevel            = 'L3Absolute'
 process.analyzeHitFit.muonResolutions     = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution_%s.txt'%( era )
 process.analyzeHitFit.electronResolutions = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution_%s.txt'%( era )
@@ -108,10 +128,12 @@ process.analyzeHitFit.metResolutions      = 'TopQuarkAnalysis/TopHitFit/data/res
 # process.analyzeHitFit_L5Flavor = process.analyzeHitFit.clone( jecLevel = 'L5Flavor'
 #                                                                                            )
 # process.analyzeHitFit_L7Parton = process.analyzeHitFit.clone( jecLevel = 'L7Parton'
-#                                                                                            )
-process.analyzeHitFit_Reference = process.analyzeHitFit.clone( ttSemiLeptonicEvent = 'ttSemiLepEventReference'
-                                                             , patLeptons          = cms.InputTag( 'referencePat' + process.analyzeHitFit.leptonType.value() )
-                                                             , patJets             = 'referencePatJets'
+#                                                                                          )
+process.analyzeHitFit_Reference = process.analyzeHitFit.clone( ttSemiLeptonicEventMuons     = 'ttSemiLepEventReferenceMuons'
+                                                             , ttSemiLeptonicEventElectrons = 'ttSemiLepEventReferenceElectrons'
+                                                             , patMuons     = 'referencePatMuons'
+                                                             , patElectrons = 'referencePatElectrons'
+                                                             , patJets      = 'referencePatJets'
                                                              )
 
 
@@ -124,8 +146,8 @@ process.standardPath = cms.Path(
 
 if not runTest:
   process.referencePath = cms.Path(
-    process.hltHighLevel_Reference
-  * process.analyzeHitFit_Reference
+    process.hltHighLevelReference
+  * process.analyzeHitFitReference
   )
 
 

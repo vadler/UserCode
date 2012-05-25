@@ -48,7 +48,7 @@ if runTest:
 if rfioInput:
   from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import *
   #inputFiles = files_Summer11
-  inputFiles = files_Fall11_R3
+  inputFiles = filesOld_Fall11_R3
 process.source = cms.Source(
   "PoolSource"
 , fileNames = cms.untracked.vstring( inputFiles )

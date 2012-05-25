@@ -27,19 +27,19 @@ analyzeHitFitResolutionFunctions = cms.EDAnalyzer(
 , patJets    = cms.InputTag( 'selectedPatJets' )
 , jecLevel   = cms.string( 'L3Absolute' )
 
-  # Eta binning (overrides input from resolution files, if not empty)
-, muonEtaBins     = cms.vdouble()
-, electronEtaBins = cms.vdouble()
-, udscJetEtaBins  = cms.vdouble()
-, bJetEtaBins     = cms.vdouble()
-, metEtaBins      = cms.vdouble()
-
   # HitFit resolution file paths (only used, if eta binning empty per objects category)
 , muonResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution.txt' )
 , electronResolutions = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution.txt' )
 , udscJetResolutions  = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution.txt' )
 , bJetResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution.txt' )
 , metResolutions      = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution.txt' )
+
+  # Eta binning (overrides input from resolution files, if not empty)
+, muonEtaBins     = cms.vdouble()
+, electronEtaBins = cms.vdouble()
+, udscJetEtaBins  = cms.vdouble()
+, bJetEtaBins     = cms.vdouble()
+, metEtaBins      = cms.vdouble()
 
   # P_t binning (overrides input from resolution files, if not empty)
 , muonPtBins     = cms.vdouble( 20., 27., 33., 40., 47., 54., 62.,  73.,  86., 109., 200., 400. )

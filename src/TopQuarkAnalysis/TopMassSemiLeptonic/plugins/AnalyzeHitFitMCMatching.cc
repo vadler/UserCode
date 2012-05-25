@@ -230,25 +230,25 @@ void AnalyzeHitFitMCMatching::analyze( const edm::Event & iEvent, const edm::Eve
   // generated
   decayChn_ = WDecay::kNone;
   mcLepMatch_        = -1;
-  mcLepPt_        = 0.;
-  mcLepEta_       = 0.;
-  mcLepPhi_       = 0.;
-  mcQuarkPt_      = 0.;
-  mcQuarkMatch_        = -1;
-  mcQuarkEta_     = 0.;
-  mcQuarkPhi_     = 0.;
-  mcQuarkBarPt_   = 0.;
-  mcQuarkBarMatch_        = -1;
-  mcQuarkBarEta_  = 0.;
-  mcQuarkBarPhi_  = 0.;
-  mcBQuarkLepPt_  = 0.;
-  mcBQuarkLepMatch_        = -1;
-  mcBQuarkLepEta_ = 0.;
-  mcBQuarkLepPhi_ = 0.;
-  mcBQuarkHadPt_  = 0.;
-  mcBQuarkHadMatch_        = -1;
-  mcBQuarkHadEta_ = 0.;
-  mcBQuarkHadPhi_ = 0.;
+  mcLepPt_           =  0.;
+  mcLepEta_          =  0.;
+  mcLepPhi_          =  0.;
+  mcQuarkPt_         =  0.;
+  mcQuarkMatch_      = -1;
+  mcQuarkEta_        =  0.;
+  mcQuarkPhi_        =  0.;
+  mcQuarkBarPt_      =  0.;
+  mcQuarkBarMatch_   = -1;
+  mcQuarkBarEta_     =  0.;
+  mcQuarkBarPhi_     =  0.;
+  mcBQuarkLepPt_     =  0.;
+  mcBQuarkLepMatch_  = -1;
+  mcBQuarkLepEta_    =  0.;
+  mcBQuarkLepPhi_    =  0.;
+  mcBQuarkHadPt_     =  0.;
+  mcBQuarkHadMatch_  = -1;
+  mcBQuarkHadEta_    =  0.;
+  mcBQuarkHadPhi_    =  0.;
   mcMatchValid_ = false;
 
   // TQAF semi-leptonic event
@@ -417,7 +417,7 @@ void AnalyzeHitFitMCMatching::analyze( const edm::Event & iEvent, const edm::Eve
 
         } // Valid full TTbar MC matching
 
-        data_->Fill(); // works only after calling 'fill' for all kinematic properties
+        data_->Fill();
         ++filledEvents_;
 
       } // Semi-leptonic signal event
