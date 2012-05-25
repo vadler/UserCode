@@ -1,0 +1,9 @@
+<use   name="root"/>
+<use   name="rootcintex"/>
+<use   name="FWCore/FWLite"/>
+<use   name="DataFormats/FWLite"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="FWCore/PythonParameterSet"/>
+<environment>
+  <bin   file="produceExistingPileUp.C"></bin>
+</environment>
