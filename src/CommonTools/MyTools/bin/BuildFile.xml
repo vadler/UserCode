@@ -5,5 +5,5 @@
 <use   name="FWCore/ParameterSet"/>
 <use   name="FWCore/PythonParameterSet"/>
 <environment>
-  <bin   file="produceExistingTopHitFitResolutionFunctions.C"></bin>
+  <bin   file="produceExistingPileUp.C"></bin>
 </environment>
