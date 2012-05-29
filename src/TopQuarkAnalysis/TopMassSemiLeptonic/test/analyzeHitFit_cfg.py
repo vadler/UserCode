@@ -6,23 +6,26 @@ import FWCore.ParameterSet.Config as cms
 
 # Misc
 runTest   = True
-rfioInput = True
+rfioInput = False
 
 # Origin of existing resolution functions
 # era = 'Spring10'
 era = 'Summer11'
 
-# Event selection
-leptonType = 'Muon' # 'Muon' or 'Electron'
-
 # Correlation to input
-pileUpFileMCTrue       = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileMC_Fall11.root'
-pileUpFileMCObserved   = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileMC_Fall11inTime.root'
-pileUpFileDataTrue     = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileData_2011truePixel.root'
-pileUpFileDataObserved = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileData_2011observedPixel.root'
-#pileUpFileDataTrue     = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileData_2011true.root'
-#pileUpFileDataObserve = 'TopQuarkAnalysis/TopMassSemiLeptonic/data/pileUpFileData_2011observed.root'
+pileUpFileMCTrue       = 'CommonTools/MyTools/data/pileUpFileMC_Fall11.root'
+pileUpFileMCObserved   = 'CommonTools/MyTools/data/pileUpFileMC_Fall11inTime.root'
+pileUpFileDataTrue     = 'CommonTools/MyTools/data/pileUpFileData_2011truePixel.root'
+pileUpFileDataObserved = 'CommonTools/MyTools/data/pileUpFileData_2011observedPixel.root'
+#pileUpFileDataTrue     = 'CommonTools/MyTools/data/pileUpFileData_2011true.root'
+#pileUpFileDataObserve = 'CommonTools/MyTools/data/pileUpFileData_2011observed.root'
 skimProcess    = 'SKIM'
+ttSemiLeptonicEventMuons     = 'ttSemiLepEventHitFitMuons'
+ttSemiLeptonicEventElectrons = 'ttSemiLepEventHitFitElectrons'
+patMuons            = 'selectedPatMuonsHitFit'
+patElectrons        = 'selectedPatElectronsHitFit'
+patJets             = 'selectedPatJetsHitFit'
+patMETs             = 'patMETs'
 jecLevels      = [ 'L1FastJet'
                  , 'L2Relative'
                  , 'L3Absolute'
@@ -64,8 +67,7 @@ if runTest:
                ]
 if rfioInput:
   from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import *
-  #inputFiles = filesNew_Fall11_R4
-  inputFiles = filesNew_Fall11_R4_1
+  inputFiles = filesNewest_Fall11_R4
 process.source = cms.Source(
   "PoolSource"
 , fileNames = cms.untracked.vstring( inputFiles )
@@ -79,7 +81,7 @@ if rfioInput and runTest:
 
 ### Output
 
-outputFile = '%s/output/analyzeHitFit%ss_from%s.root'%( os.getenv( "CMSSW_BASE" ), leptonType, era )
+outputFile = '%s/output/analyzeHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 
 if runTest:
   outputFile = outputFile.replace( 'root', 'test.root' )
@@ -113,13 +115,13 @@ process.analyzeHitFit.pileUpFileMCTrue       = pileUpFileMCTrue
 process.analyzeHitFit.pileUpFileMCObserved   = pileUpFileMCObserved
 process.analyzeHitFit.pileUpFileDataTrue     = pileUpFileDataTrue
 process.analyzeHitFit.pileUpFileDataObserved = pileUpFileDataObserved
-process.analyzeHitFit.ttSemiLeptonicEventMuons     = 'ttSemiLepEventHitFitMuons'
-process.analyzeHitFit.ttSemiLeptonicEventElectrons = 'ttSemiLepEventHitFitElectrons'
-process.analyzeHitFit.patMuons            = 'selectedPatMuonsHitFit'
-process.analyzeHitFit.patElectrons        = 'selectedPatElectronsHitFit'
-process.analyzeHitFit.patJets             = 'selectedPatJetsHitFit'
-process.analyzeHitFit.patMETs             = 'patMETs'
-process.analyzeHitFit.jecLevel            = 'L3Absolute'
+process.analyzeHitFit.ttSemiLeptonicEventMuons     = ttSemiLeptonicEventMuons
+process.analyzeHitFit.ttSemiLeptonicEventElectrons = ttSemiLeptonicEventElectrons
+process.analyzeHitFit.patMuons            = patMuons
+process.analyzeHitFit.patElectrons        = patElectrons
+process.analyzeHitFit.patJets             = patJets
+process.analyzeHitFit.patMETs             = patMETs
+process.analyzeHitFit.jecLevel            = jecLevels[ -1 ]
 process.analyzeHitFit.muonResolutions     = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution_%s.txt'%( era )
 process.analyzeHitFit.electronResolutions = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafElectronResolution_%s.txt'%( era )
 process.analyzeHitFit.udscJetResolutions  = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution_%s.txt'%( era )

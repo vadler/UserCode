@@ -506,8 +506,8 @@ void AnalyzeHitFit::analyze( const edm::Event & iEvent, const edm::EventSetup & 
        ) {
 
       // Valid full TTbar MC matching
-      if (  ttSemiLeptonicEventMuons_->isHypoValid( TtEvent::kGenMatch )
-         || ttSemiLeptonicEventElecs_->isHypoValid( TtEvent::kGenMatch )
+      if (  ( ttSemiLeptonicEventMuons_.isValid() && ttSemiLeptonicEventMuons_->isHypoValid( TtEvent::kGenMatch ) )
+         || ( ttSemiLeptonicEventElecs_.isValid() && ttSemiLeptonicEventElecs_->isHypoValid( TtEvent::kGenMatch ) )
          ) {
         // Initialise variables
         nPVTrue_              = -1.;
@@ -534,36 +534,34 @@ void AnalyzeHitFit::analyze( const edm::Event & iEvent, const edm::EventSetup & 
           phiAlt_ = -999.;
           phiGen_ = -999.;
           // Fill variables
-          if ( objCats_.at( iCat ) == "Mu" && ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) ) {
-            if ( ttSemiLeptonicEventMuons_->isHypoValid( TtEvent::kGenMatch )  ) {
-              fill( iCat, ttSemiLeptonicEventMuons_ );
-              ++filledEvents_;
-            }
-            else {
-              edm::LogInfo( "AnalyzeHitFit" ) << "...no valid MC match in muon channel";
+          if ( objCats_.at( iCat ) == "Mu" ) {
+            if ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) ) {
+              if ( ttSemiLeptonicEventMuons_.isValid() && ttSemiLeptonicEventMuons_->isHypoValid( TtEvent::kGenMatch )  ) {
+                fill( iCat, ttSemiLeptonicEventMuons_ );
+                ++filledEvents_;
+              }
+              else edm::LogInfo( "AnalyzeHitFit" ) << "...no valid MC match in muon channel";
             }
           }
-          else if ( objCats_.at( iCat ) == "Elec" && ttGenEvent_->isSemiLeptonic( WDecay::kElec ) ) {
-            if ( ttSemiLeptonicEventElecs_->isHypoValid( TtEvent::kGenMatch ) ) {
-              fill( iCat, ttSemiLeptonicEventElecs_ );
-              ++filledEvents_;
-            }
-            else {
-              edm::LogInfo( "AnalyzeHitFit" ) << "...no valid MC match in electron channel";
+          else if ( objCats_.at( iCat ) == "Elec" ) {
+            if ( ttGenEvent_->isSemiLeptonic( WDecay::kElec ) ) {
+              if ( ttSemiLeptonicEventElecs_.isValid() && ttSemiLeptonicEventElecs_->isHypoValid( TtEvent::kGenMatch ) ) {
+                fill( iCat, ttSemiLeptonicEventElecs_ );
+                ++filledEvents_;
+              }
+              else edm::LogInfo( "AnalyzeHitFit" ) << "...no valid MC match in electron channel";
             }
           }
           else {
-            if ( ttSemiLeptonicEventMuons_->isHypoValid( TtEvent::kGenMatch )  ) {
+            if ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) && ttSemiLeptonicEventMuons_.isValid() && ttSemiLeptonicEventMuons_->isHypoValid( TtEvent::kGenMatch )  ) {
               fill( iCat, ttSemiLeptonicEventMuons_ );
               ++filledEvents_;
             }
-            else if ( ttSemiLeptonicEventElecs_->isHypoValid( TtEvent::kGenMatch ) ) {
+            else if ( ttGenEvent_->isSemiLeptonic( WDecay::kElec ) && ttSemiLeptonicEventElecs_.isValid() && ttSemiLeptonicEventElecs_->isHypoValid( TtEvent::kGenMatch ) ) {
               fill( iCat, ttSemiLeptonicEventElecs_ );
               ++filledEvents_;
             }
-            else {
-              edm::LogInfo( "AnalyzeHitFit" ) << "...no valid MC match in both channel";
-            }
+            else edm::LogInfo( "AnalyzeHitFit" ) << "...no valid MC match in both channel";
           }
           // Fill tree
           catData_.at( iCat )->Fill();
@@ -586,17 +584,15 @@ void AnalyzeHitFit::analyze( const edm::Event & iEvent, const edm::EventSetup & 
             phi_    = -999.;
             phiAlt_ = -999.;
             phiGen_ = -999.;
-            if ( ttSemiLeptonicEventMuons_->isHypoValid( TtEvent::kGenMatch )  ) {
+            if ( ttSemiLeptonicEventMuons_.isValid() && ttSemiLeptonicEventMuons_->isHypoValid( TtEvent::kGenMatch )  ) {
               fill( iCat, ttSemiLeptonicEventMuons_, true );
               ++filledEvents_;
             }
-            else if ( ttSemiLeptonicEventElecs_->isHypoValid( TtEvent::kGenMatch ) ) {
+            else if ( ttSemiLeptonicEventElecs_.isValid() && ttSemiLeptonicEventElecs_->isHypoValid( TtEvent::kGenMatch ) ) {
               fill( iCat, ttSemiLeptonicEventElecs_, true );
               ++filledEvents_;
             }
-            else {
-              edm::LogInfo( "AnalyzeHitFit" ) << "...no valid MC match in both channel";
-            }
+            else edm::LogInfo( "AnalyzeHitFit" ) << "...no valid MC match in both channel";
             catData_.at( iCat )->Fill();
           }
         }
@@ -605,7 +601,7 @@ void AnalyzeHitFit::analyze( const edm::Event & iEvent, const edm::EventSetup & 
         ++filledEvents_;
 
       } // Valid full TTbar MC matching
-      else  edm::LogInfo( "AnalyzeHitFit" ) << "...no valid MC match";
+      else edm::LogInfo( "AnalyzeHitFit" ) << "...no valid MC match";
 
     } // Semi-leptonic signal event
     else edm::LogInfo( "AnalyzeHitFit" ) << "...no signal event";
