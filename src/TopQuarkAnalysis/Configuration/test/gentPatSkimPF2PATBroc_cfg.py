@@ -7,7 +7,7 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-gc = False
+gc = True
 
 runOnMC     = True
 runOnRelVal = False # If 'False', define input files in l. 187ff.
@@ -43,6 +43,7 @@ jecLevels = []
 
 # vertex collection to use
 # 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
+#pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
 pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
 
 # jet collection to use
@@ -130,11 +131,11 @@ else:
 if gc:
 	runOnMC   = eval('@MC@')
 	#pfJetCollection = '@PFJETS@'
-	#usePfMuonIsoConeR03 = eval('@MUTPCONE03@') # FIXME in input file
+	#usePfMuonIsoConeR03 = eval('@MUTPCONE03@')
 	#pfMuonIso = eval('@MUTPISO@')
 	#muonsMin = eval('@MINNMU@')
 	#usePfElectronIsoConeR03 = eval('@ETPCONE03@')
-	#pfElectronsIso = eval('@ETPISO@') # FIXME in input file
+	#pfElectronsIso = eval('@ETPISO@')
 	#electronsMin = eval('@MINNE@')
 	#leptonsMin = eval('@MINNLEP@')
 	#jetsMin = eval('@MINNJETS@')
@@ -209,7 +210,7 @@ else:
       inputFiles = [ 'file:/afs/cern.ch/work/v/vadler/public/data/CMSSW_5_2_X/TTbar_Summer12_AODskim.root'
                    ]
     else:
-      inputFiles = [ 'file:////user/mccartin/data/TTbar_Summer12_FEBE99BB-3881-E111-B1F3-003048D42DC8.root'
+      inputFiles = [ 'file:////user/bklein/TTbar_2012_synchronisation_ex.root'
                    ]
   else:
     if lxplusTest:
@@ -322,6 +323,9 @@ if not createNTuples:
     process.out
     )
 
+from RecoJets.JetProducers.kt4PFJets_cfi import *
+process.kt6PFJetsForIsolation = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
 
 ### Cleaning
 
@@ -330,6 +334,7 @@ process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
 process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
 process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
 process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
+
 
 # Scraping filter
 process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
@@ -366,8 +371,10 @@ process.goodOfflinePrimaryVertexFilter = cms.EDFilter(
 )
 process.vertexSelection = cms.Sequence(
   process.goodOfflinePrimaryVertices
-* process.goodOfflinePrimaryVertexFilter
 )
+
+if not runOnMC:
+	process.vertexSelection *= process.goodOfflinePrimaryVertexFilter
 
 process.eventCleaning = cms.Sequence()
 
@@ -506,6 +513,22 @@ process.pfPileUp.checkClosestZVertex = False # recommended JetMET twiki
 process.kt6PFJets.doAreaFastjet = True
 process.kt6PFJets.Rho_EtaMax = 4.4 # recommended by TOP JetMET contact
 # end add
+
+#######BEGIN####FIXME
+# process.pfSelectedMuons.cut = 'pt > 10. && abs(eta) < 2.5'
+# process.pfSelectedElectrons.cut = 'pt > 15. && abs(eta) < 2.5'
+# process.pfNoTau.enable = False #jetCollection = pfNoTau (pfJets should give same results)
+# process.pfJets.srcPVs = "offlinePrimaryVertices"
+# process.pfElectronsFromVertex.vertices = "offlinePrimaryVertices"
+# process.pfIsolatedElectrons.doDeltaBetaCorrection = True
+# process.pfIsolatedMuons.doDeltaBetaCorrection = True
+# process.pfMuonsFromVertex.vertices = "offlinePrimaryVertices"
+# process.pfPileUp.checkClosestZVertex = False # JetMET recommendation
+# process.patJetCorrFactors.primaryVertices = "offlinePrimaryVertices"
+# process.kt6PFJets.doAreaFastjet = True
+# process.kt6PFJets.Rho_EtaMax = 4.4 #recommendation
+# process.kt6PFJets.srcPVs = ""
+#######END######FIXME
 
 if runMatch:
 	process.patJets.addGenJetMatch = True
@@ -684,6 +707,7 @@ if addGenEvt:
 ### Path
 process.p = cms.Path( process.eventCleaning
                     * process.patPF2PATSequence
+		    * process.kt6PFJetsForIsolation
                     )
 
 if writeNonIsoMuons:
@@ -829,10 +853,10 @@ if createNTuples:
 	Writed0wrtPV	= cms.bool(True),		# write d0 wrt PV
         WriteLooseMuons = cms.bool(writeNonIsoMuons),
         WriteLooseElectrons = cms.bool(writeNonIsoElectrons),
-	WriteGenParticles = cms.bool(False),		# write selected MC particles
-	SelectedGenParticles = cms.vint32(11,13),	# pdgIds of MC particles to write
-	SelectedGenParticlesMinPt = cms.double(1),	# min pt of MC particles to write
-	SelectedGenParticlesMaxEta = cms.double(3.0),	# max eta of MC particles to write
+	WriteGenParticles = cms.bool(runOnMC),		# write selected MC particles
+	SelectedGenParticles = cms.vint32(5),	# pdgIds of MC particles to write
+	SelectedGenParticlesMinPt = cms.double(0.),	# min pt of MC particles to write
+	SelectedGenParticlesMaxEta = cms.double(0.1),	# max eta of MC particles to write
 	outfile		= cms.string("NTuple.root")
   )
   process.p *= process.produceNTuples
