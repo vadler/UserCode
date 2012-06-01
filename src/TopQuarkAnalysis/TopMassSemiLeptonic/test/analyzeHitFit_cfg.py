@@ -62,12 +62,12 @@ if not rfioInput:
 
 inputFiles = [ 'file:%s/output/skimHitFit.local.root'%( os.getenv( "CMSSW_BASE" ) )
              ]
-if runTest:
-  inputFiles = [ 'file:%s/output/skimHitFit.test.local.root'%( os.getenv( "CMSSW_BASE" ) )
-               ]
 if rfioInput:
   from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import *
-  inputFiles = filesNewest_Fall11_R4
+  inputFiles = files_Fall11_R4_1
+elif runTest:
+  inputFiles = [ 'file:%s/output/skimHitFit.test.local.root'%( os.getenv( "CMSSW_BASE" ) )
+               ]
 process.source = cms.Source(
   "PoolSource"
 , fileNames = cms.untracked.vstring( inputFiles )
@@ -75,8 +75,8 @@ process.source = cms.Source(
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( -1 )
 )
-if rfioInput and runTest:
-  process.maxEvents.input = 25000
+if runTest:
+  process.maxEvents.input = 100000
 
 
 ### Output
@@ -131,12 +131,12 @@ process.analyzeHitFit.metResolutions      = 'TopQuarkAnalysis/TopHitFit/data/res
 #                                                                                            )
 # process.analyzeHitFit_L7Parton = process.analyzeHitFit.clone( jecLevel = 'L7Parton'
 #                                                                                          )
-process.analyzeHitFit_Reference = process.analyzeHitFit.clone( ttSemiLeptonicEventMuons     = 'ttSemiLepEventReferenceMuons'
-                                                             , ttSemiLeptonicEventElectrons = 'ttSemiLepEventReferenceElectrons'
-                                                             , patMuons     = 'referencePatMuons'
-                                                             , patElectrons = 'referencePatElectrons'
-                                                             , patJets      = 'referencePatJets'
-                                                             )
+process.analyzeHitFitReference = process.analyzeHitFit.clone( ttSemiLeptonicEventMuons     = 'ttSemiLepEventReferenceMuons'
+                                                            , ttSemiLeptonicEventElectrons = 'ttSemiLepEventReferenceElectrons'
+                                                            , patMuons     = 'referencePatMuons'
+                                                            , patElectrons = 'referencePatElectrons'
+                                                            , patJets      = 'referencePatJets'
+                                                            )
 
 
 ### Paths
