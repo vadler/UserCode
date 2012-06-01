@@ -361,7 +361,7 @@ void AnalyzeHitFit::beginJob()
     histo_pileUpWeightTrue_->Fill( iBin, lumiWeightTrue_.weight( iBin ) );
   }
   histo_pileUpWeightObserved_ = fileService->make< TH1D >( "pileUpWeightObserved", "Observed pile-up weights", nBinsMCObserved, 0., double( nBinsMCObserved ) );
-  histo_pileUpWeightObserved_->SetXTitle( "number of true interactions" );
+  histo_pileUpWeightObserved_->SetXTitle( "number of observed interactions" );
   histo_pileUpWeightObserved_->SetYTitle( "weight (#frac{data}{MC})" );
   for ( int iBin = 1; iBin < nBinsMCObserved + 1; ++iBin ) {
     histo_pileUpWeightObserved_->Fill( iBin, lumiWeightObserved_.weight( iBin ) );
@@ -524,15 +524,15 @@ void AnalyzeHitFit::analyze( const edm::Event & iEvent, const edm::EventSetup & 
           binEtaSymm_    = -1;
           binEtaSymmAlt_ = -1;
           binEtaSymmGen_ = -1;
-          pt_     = -999.;
-          ptAlt_  = -999.;
-          ptGen_  = -999.;
-          eta_    = -999.;
-          etaAlt_ = -999.;
-          etaGen_ = -999.;
-          phi_    = -999.;
-          phiAlt_ = -999.;
-          phiGen_ = -999.;
+          pt_     = -5.;
+          ptAlt_  = -5.;
+          ptGen_  = -5.;
+          eta_    = -5.;
+          etaAlt_ = -5.;
+          etaGen_ = -5.;
+          phi_    = -5.;
+          phiAlt_ = -5.;
+          phiGen_ = -5.;
           // Fill variables
           if ( objCats_.at( iCat ) == "Mu" ) {
             if ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) ) {
@@ -575,15 +575,15 @@ void AnalyzeHitFit::analyze( const edm::Event & iEvent, const edm::EventSetup & 
             binEtaSymm_    = -1;
             binEtaSymmAlt_ = -1;
             binEtaSymmGen_ = -1;
-            pt_     = -999.;
-            ptAlt_  = -999.;
-            ptGen_  = -999.;
-            eta_    = -999.;
-            etaAlt_ = -999.;
-            etaGen_ = -999.;
-            phi_    = -999.;
-            phiAlt_ = -999.;
-            phiGen_ = -999.;
+            pt_     = -5.;
+            ptAlt_  = -5.;
+            ptGen_  = -5.;
+            eta_    = -5.;
+            etaAlt_ = -5.;
+            etaGen_ = -5.;
+            phi_    = -5.;
+            phiAlt_ = -5.;
+            phiGen_ = -5.;
             if ( ttSemiLeptonicEventMuons_.isValid() && ttSemiLeptonicEventMuons_->isHypoValid( TtEvent::kGenMatch )  ) {
               fill( iCat, ttSemiLeptonicEventMuons_, true );
               ++filledEvents_;
