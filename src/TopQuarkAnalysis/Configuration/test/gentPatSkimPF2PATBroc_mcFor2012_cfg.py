@@ -7,23 +7,22 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-gc = False
+gc            = True
+createNTuples = True
+if lxplusTest:
+  gc            = False
+  createNTuples = False
 
-runOnRelVal = True # If 'False', define input files in l. 187ff.
+runOnRelVal = False # If 'False', define input files in l. 183ff.
 
 runMatch  = True
 #runMVA    = False
 runCiC    = True
 runEwk    = True
 addGenEvt = True
-createNTuples        = True
 writePdfWeights      = False    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
-
-if lxplusTest:
-  writeNonIsoMuons     = False
-  writeNonIsoElectrons = False
 
 maxEvents = -1
 if lxplusTest:
@@ -183,10 +182,10 @@ if runOnRelVal:
                ]
 else:
   if lxplusTest:
-    inputFiles = [
+    inputFiles = [ '/store/user/vadler/cms/AT/CMSSW_4_4_4/data/Fall11_R3/copyFall11_1_2_ibi.root'
                  ]
   else:
-    inputFiles = [ 'file:////user/bklein/TTbar_2012_synchronisation_ex.root'
+    inputFiles = [ 'file:////user/bklein/TTbar_44X.root'
                  ]
 process.source.fileNames = cms.untracked.vstring( inputFiles )
 process.maxEvents = cms.untracked.PSet(
@@ -194,9 +193,6 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 ### Output
-
-if lxplusTest:
-  createNTuples = False
 
 outputModules = []
 if not createNTuples:
@@ -452,10 +448,17 @@ if usePfMuonIsoConeR03:
   process.pfIsolatedMuons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03' )
                                                                     , cms.InputTag( 'muPFIsoValueGamma03' )
                                                                     )
+  process.pfMuons.isolationValueMapsCharged  = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03' )
+                                                            )
+  process.pfMuons.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03' )
+  process.pfMuons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03' )
+                                                            , cms.InputTag( 'muPFIsoValueGamma03' )
+                                                            )
 process.pfIsolatedMuons.isolationCut = pfMuonIso
 process.patMuons.embedTrack = True
 if usePfMuonIsoConeR03:
   process.patMuons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'muPFIsoValueNeutral03' )
+  process.patMuons.isolationValues.pfChargedAll       = cms.InputTag( 'muPFIsoValueChargedAll03' )
   process.patMuons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03' )
   process.patMuons.isolationValues.pfPhotons          = cms.InputTag( 'muPFIsoValueGamma03' )
   process.patMuons.isolationValues.pfChargedHadrons   = cms.InputTag( 'muPFIsoValueCharged03' )
@@ -474,10 +477,17 @@ if usePfElectronIsoConeR03:
   process.pfIsolatedElectrons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
                                                                         , cms.InputTag( 'elPFIsoValueGamma03PFId' )
                                                                         )
+  process.pfElectrons.isolationValueMapsCharged  = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03PFId' )
+                                                                )
+  process.pfElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03PFId' )
+  process.pfElectrons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
+                                                                , cms.InputTag( 'elPFIsoValueGamma03PFId' )
+                                                                )
 process.pfIsolatedElectrons.isolationCut = pfElectronIso
 process.patElectrons.embedTrack = True
 if usePfElectronIsoConeR03:
   process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03PFId' )
+  process.patElectrons.isolationValues.pfChargedAll       = cms.InputTag( 'elPFIsoValueChargedAll03PFId' )
   process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFId' )
   process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03PFId' )
   process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03PFId' )
@@ -571,16 +581,14 @@ process.countPatJets.minNumber = jetsMin
 from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
 if writeNonIsoMuons:
   cloneProcessingSnippet(process,process.patPF2PATSequence,postfixNonIsoMu)
-  getattr(process,'pfNoMuon'+postfixNonIsoMu).topCollection = "pfSelectedMuons" + postfixNonIsoMu
-  getattr(process,'muonMatch'+postfixNonIsoMu).src = "pfSelectedMuons" + postfixNonIsoMu
-  getattr(process,'patMuons'+postfixNonIsoMu).pfMuonSource = "pfSelectedMuons" + postfixNonIsoMu
-  #getattr(process,'pfIsolatedMuons'+postfixNonIsoMu).isolationCut = 999999.
+  getattr(process,'pfNoMuon'+postfixNonIsoMu).topCollection = "pfMuons" + postfixNonIsoMu
+  getattr(process,'muonMatch'+postfixNonIsoMu).src = "pfMuons" + postfixNonIsoMu
+  getattr(process,'patMuons'+postfixNonIsoMu).pfMuonSource = "pfMuons" + postfixNonIsoMu
 if writeNonIsoElectrons:
   cloneProcessingSnippet(process,process.patPF2PATSequence,postfixNonIsoE)
-  getattr(process,'pfNoElectron'+postfixNonIsoE).topCollection = "pfSelectedElectrons" + postfixNonIsoE
-  getattr(process,'electronMatch'+postfixNonIsoE).src = "pfSelectedElectrons" + postfixNonIsoE
-  getattr(process,'patElectrons'+postfixNonIsoE).pfElectronSource = "pfSelectedElectrons" + postfixNonIsoE
-  #getattr(process,'pfIsolatedElectrons'+postfixNonIsoE).isolationCut = 999999.
+  getattr(process,'pfNoElectron'+postfixNonIsoE).topCollection = "pfElectrons" + postfixNonIsoE
+  #getattr(process,'electronMatch'+postfixNonIsoE).src = "pfElectrons" + postfixNonIsoE
+  getattr(process,'patElectrons'+postfixNonIsoE).pfElectronSource = "pfElectrons" + postfixNonIsoE
 
 ### TQAF
 if addGenEvt:
