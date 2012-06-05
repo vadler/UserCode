@@ -70,7 +70,7 @@ files_Fall11_R4 = [ '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newes
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newest/skimHitFit_160_2_EuZ.root'
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newest/skimHitFit_161_1_F4F.root'
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newest/skimHitFit_162_1_DAd.root'
-                  #, '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newest/skimHitFit_163_?_???.root'
+                  , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newest/skimHitFit_163_4_CPv.root'
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newest/skimHitFit_164_2_6iU.root'
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newest/skimHitFit_165_2_PM1.root'
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newest/skimHitFit_166_2_Rsy.root'
@@ -248,8 +248,8 @@ files_Fall11_R4 = [ '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newes
                   ]
 files_Fall11_R4_1 = files_Fall11_R4[   0 :  61 ]
 files_Fall11_R4_2 = files_Fall11_R4[  61 : 122 ]
-files_Fall11_R4_3 = files_Fall11_R4[ 122 : 182 ]#183 ]
-files_Fall11_R4_4 = files_Fall11_R4[ 182 : 243 ]#183 : 244 ]
+files_Fall11_R4_3 = files_Fall11_R4[ 122 : 183 ]
+files_Fall11_R4_4 = files_Fall11_R4[ 183 : 244 ]
 
 files_Fall11_R3 = [ '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R3/skimHitFitResolutionFunctions_10_1_Lvc.root'
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R3/skimHitFitResolutionFunctions_11_1_XLH.root'
