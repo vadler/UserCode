@@ -608,7 +608,7 @@ void AnalyzeHitFit::analyze( const edm::Event & iEvent, const edm::EventSetup & 
 void AnalyzeHitFit::endJob()
 {
 
-  edm::LogInfo( "AnalyzeHitFit" ) << "Filled events: " << filledEvents_;
+  edm::LogPrint( "AnalyzeHitFit" ) << std::endl << "Filled events: " << filledEvents_ << std::endl;
 
 }
 
