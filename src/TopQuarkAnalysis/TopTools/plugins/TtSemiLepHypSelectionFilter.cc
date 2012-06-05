@@ -84,10 +84,10 @@ bool TtSemiLepHypSelectionFilter::beginRun( edm::Run & iRun, const edm::EventSet
   // Initialise HLTConfigProvider
   bool changed( true );
   if ( ! origConfig_.init( iRun, iSetup, processName_, changed ) ) {
-    edm::LogError( "hltConfigExtraction" ) << "HLT config extraction error with process name '" << processName_ << "'";
+    edm::LogError( "TtSemiLepHypSelectionFilter" ) << "HLT config extraction error with process name '" << processName_ << "'";
     return false;
   } else if ( origConfig_.size() <= 0 ) {
-    edm::LogError( "hltConfigSize" ) << "HLT config size error";
+    edm::LogError( "TtSemiLepHypSelectionFilter" ) << "HLT config size error";
     return false;
   }
 
@@ -97,9 +97,9 @@ bool TtSemiLepHypSelectionFilter::beginRun( edm::Run & iRun, const edm::EventSet
   else if ( origConfig_.moduleType( leptonSelector_ ) == "PATElectronSelector" ) {
   }
   leptonSelectorCut_ = origConfig_.modulePSet( leptonSelector_ ).getParameter< std::string >( "cut" );
-  edm::LogInfo( "leptonCut" ) << leptonSelectorCut_;
   jetSelectorCut_    = origConfig_.modulePSet( jetSelector_ ).getParameter< std::string >( "cut" );
-  edm::LogInfo( "jetCut" )    << jetSelectorCut_;
+  edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Lepton selection cut: '" << leptonSelectorCut_ << "'";
+  edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Jet selection cut: '"    << jetSelectorCut_    << "'";
 
   return true;
 
@@ -114,7 +114,7 @@ bool TtSemiLepHypSelectionFilter::filter( edm::Event & iEvent, const edm::EventS
   edm::Handle< TtSemiLeptonicEvent > ttSemiLepEvt;
   iEvent.getByLabel( ttSemiLepEvtTag_, ttSemiLepEvt );
   if ( ! ttSemiLepEvt->isHypoValid( ttSemiLepHyp_ ) ) {
-    edm::LogInfo( "hypoValid" ) << "Event hypothesis '" << ttSemiLepHyp_ << "' not available/valid.";
+    edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Event hypothesis '" << ttSemiLepHyp_ << "' not available/valid.";
     return result;
   }
   const std::vector< int > jetLepCombi( ttSemiLepEvt->jetLeptonCombination( ttSemiLepHyp_ ) );
@@ -125,7 +125,7 @@ bool TtSemiLepHypSelectionFilter::filter( edm::Event & iEvent, const edm::EventS
     iEvent.getByLabel( ttSemiLepHypLeptonsTag_, patMuons );
     const pat::Muon singleMuon( patMuons->at( jetLepCombi.at( TtSemiLepEvtPartons::Lepton ) ) );
     if ( ! muonSelector( singleMuon ) ) {
-      edm::LogInfo( "singleMuon" );
+      edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Single muon failed";
       result = false;
     }
   }
@@ -135,7 +135,7 @@ bool TtSemiLepHypSelectionFilter::filter( edm::Event & iEvent, const edm::EventS
     iEvent.getByLabel( ttSemiLepHypLeptonsTag_, patElectrons );
     const pat::Electron singleElectron( patElectrons->at( jetLepCombi.at( TtSemiLepEvtPartons::Lepton ) ) );
     if ( ! electronSelector( singleElectron ) ) {
-      edm::LogInfo( "singleElectron" );
+      edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Single electron failed";
       result = false;
     }
   }
@@ -145,22 +145,22 @@ bool TtSemiLepHypSelectionFilter::filter( edm::Event & iEvent, const edm::EventS
   StringCutObjectSelector< pat::Jet > jetSelector( jetSelectorCut_ );
   const pat::Jet leptonicDecayB( patJets->at( jetLepCombi.at( TtSemiLepEvtPartons::LepB ) ) );
   if ( ! jetSelector( leptonicDecayB ) ) {
-    edm::LogInfo( "leptonicDecayB" );
+    edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Leptonic b-jet failed";
     result = false;
   }
   const pat::Jet hadronicDecayB( patJets->at( jetLepCombi.at( TtSemiLepEvtPartons::HadB ) ) );
   if ( ! jetSelector( hadronicDecayB ) ) {
-    edm::LogInfo( "hadronicDecayB" );
+    edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "hadronic b-jet failed";
     result = false;
   }
   const pat::Jet hadronicDecayQuark( patJets->at( jetLepCombi.at( TtSemiLepEvtPartons::LightQ ) ) );
   if ( ! jetSelector( hadronicDecayQuark ) ) {
-    edm::LogInfo( "hadronicDecayQuark" );
+    edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Light jet failed";
     result = false;
   }
   const pat::Jet hadronicDecayQuarkBar( patJets->at( jetLepCombi.at( TtSemiLepEvtPartons::LightQBar ) ) );
   if ( ! jetSelector( hadronicDecayQuarkBar ) ) {
-    edm::LogInfo( "hadronicDecayQuarkBar" );
+    edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Light jet failed";
     result = false;
   }
 
