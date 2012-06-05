@@ -83,7 +83,7 @@ jecLevels = [ 'L1FastJet'
             ]
 # jet object selection
 jetSelectBase   = 'pt > 30. && numberOfDaughters > 1 && chargedEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4) && (chargedMultiplicity > 0 || abs(eta) >= 2.4) && abs(eta) < 3.0'
-jetSelectHitFit = jetSelectBase + ' && abs(eta) < 3.0'
+jetSelectHitFit = jetSelectBase + ' && abs(eta) < 2.5'
 jetSelect       = jetSelectBase + ' && abs(eta) < 2.4'
 jetSelectSignal = ''
 # counters
@@ -297,7 +297,6 @@ process.patHitFitSequence = cms.Sequence( process.selectedPatMuonsHitFit
                                         )
 
 # Final object selections
-process.load( "TopQuarkAnalysis.TopTools.muonSelectorVertex_cfi" )
 process.referencePatMuons     = process.cleanPatMuons.clone( preselection  = ''
                                                            , checkOverlaps = cms.PSet()
                                                            )
@@ -313,7 +312,7 @@ process.referencePatCandidateSummary = process.cleanPatCandidateSummary.clone( l
                                                                                                           , cms.InputTag( 'referencePatJets' )
                                                                                                           )
                                                                              )
-process.load( "TopQuarkAnalysis.TopMassSemiLeptonic.muonSelectorVertex_cfi" )
+process.load( "TopQuarkAnalysis.TopTools.muonSelectorVertex_cfi" )
 process.patReferenceSequence = cms.Sequence( process.muonSelectorVertex
                                            * process.referencePatMuons
                                            * process.referencePatElectrons
@@ -551,9 +550,9 @@ massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitElectrons
 process.ttSemiLepEventHitFitElectrons.hypotheses = [ 'ttSemiLepHypGenMatchHitFitElectrons'
                                                    ]
 process.makeTtSemiLepEventReferenceMuons = cloneProcessingSnippet( process
-                                                              , process.makeTtSemiLepEvent
-                                                              , 'ReferenceMuons'
-                                                              )
+                                                                 , process.makeTtSemiLepEvent
+                                                                 , 'ReferenceMuons'
+                                                                 )
 massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceMuons
                             , 'selectedPatMuons'
                             , 'referencePatMuons'
