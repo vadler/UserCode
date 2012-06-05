@@ -81,7 +81,8 @@ int main(  int argc, char * argv[] )
       TDirectory * dirEta( dirProp->mkdir( binEta.c_str(), binEta.c_str() ) );
       dirEta->cd();
 
-      const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
+      const std::string inverse( res.inverse() ? "_Inv" : "" );
+      const std::string name( "fitExist_" + objCat + inverse + "_" + kinProp + "_" + binEta );
       TF1 * func( new TF1( name.c_str(), res.inverse() ? resFuncInv_.c_str() : resFunc_.c_str(), 0., objLimits_.at( iCat ) ) );
       func->SetParameters( res.C(), res.R(), res.N() );
       func->Write();
@@ -154,9 +155,9 @@ int main(  int argc, char * argv[] )
 
   }
 
-    // Close output file
-    outFile->Write();
-    outFile->Close();
+  // Close output file
+  outFile->Write();
+  outFile->Close();
 
   return 0;
 
