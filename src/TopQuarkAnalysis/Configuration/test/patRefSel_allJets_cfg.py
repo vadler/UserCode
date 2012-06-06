@@ -32,7 +32,7 @@ process = cms.Process( 'PAT' )
 
 
 ### Data or MC?
-runOnMC = options.runOnMC
+#runOnMC = options.runOnMC
 runOnMC = True
 
 ### Standard and PF reconstruction
@@ -455,22 +455,12 @@ if runPF2PAT:
   ### Jets
 
   applyPostfix( process, 'patJetCorrFactors', postfix ).primaryVertices = cms.InputTag( 'goodOfflinePrimaryVertices' )
-  if usePFnoPU:
-    kt6PFJetsPFChs = kt6PFJetsChs.clone( src = cms.InputTag( 'pfNoElectron' + postfix ) )
-    setattr( process, 'kt6PFJetsChs' + postfix, kt6PFJetsPFChs )
-    getattr( process, 'patPF2PATSequence' + postfix).replace( getattr( process, 'patJetCorrFactors' + postfix )
-                                                            , getattr( process, 'kt6PFJetsChs' + postfix ) * getattr( process, 'patJetCorrFactors' + postfix )
-                                                            )
-    if useL1FastJet:
-      applyPostfix( process, 'patJetCorrFactors', postfix ).rho = cms.InputTag( 'kt6PFJetsChs' + postfix, 'rho' )
-  else:
-    kt6PFJetsPF = kt6PFJets.clone( doRhoFastjet = True )
-    setattr( process, 'kt6PFJets' + postfix, kt6PFJetsPF )
-    getattr( process, 'patPF2PATSequence' + postfix).replace( getattr( process, 'patJetCorrFactors' + postfix )
-                                                            , getattr( process, 'kt6PFJets' + postfix ) * getattr( process, 'patJetCorrFactors' + postfix )
-                                                            )
-    if useL1FastJet:
-      applyPostfix( process, 'patJetCorrFactors', postfix ).rho = cms.InputTag( 'kt6PFJets' + postfix, 'rho' )
+  setattr( process, 'kt6PFJets' + postfix, kt6PFJets )
+  getattr( process, 'patPF2PATSequence' + postfix).replace( getattr( process, 'patJetCorrFactors' + postfix )
+                                                          , getattr( process, 'kt6PFJets' + postfix ) * getattr( process, 'patJetCorrFactors' + postfix )
+                                                          )
+  if useL1FastJet:
+    applyPostfix( process, 'patJetCorrFactors', postfix ).rho = cms.InputTag( 'kt6PFJets' + postfix, 'rho' )
   process.out.outputCommands.append( 'keep double_*' + postfix + '*_*_' + process.name_() )
 
   goodPatJetsPF = goodPatJets.clone( src = cms.InputTag( 'selectedPatJets' + postfix ) )
