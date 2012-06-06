@@ -568,6 +568,7 @@ elif 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
   process.pfJets.doAreaFastjet = True
   process.pfJets.doRhoFastjet  = False
+removeIfInSequence( process, 'kt6PFJets', 'patPF2PATSequence', '' )
 process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
