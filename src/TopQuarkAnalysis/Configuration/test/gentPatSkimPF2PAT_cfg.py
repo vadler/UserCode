@@ -369,8 +369,7 @@ process.pfJets.doAreaFastjet = True          # for L1FastJet corrections, even i
 process.pfJets.doRhoFastjet  = False         # for L1FastJet corrections, even if applied later
 process.pfPileUpIso.checkClosestZVertex = False # for L1FastJet corrections in isolations, even if applied later
 from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
-process.kt6PFJets = kt6PFJets.clone( src           = cms.InputTag( 'pfNoElectron' )
-                                   , doAreaFastjet = True
+process.kt6PFJets = kt6PFJets.clone( doAreaFastjet = True
                                    , doRhoFastjet  = True
                                    , voronoiRfact  = -0.9
                                    ) # to ensure not to use the Voronoi tessalation for the moment (s. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1215.html)
