@@ -33,6 +33,7 @@ process = cms.Process( 'PAT' )
 
 ### Data or MC?
 runOnMC = options.runOnMC
+runOnMC = True
 
 ### Input from produced with CMSSW_4_2_X?
 runOn42X = False
@@ -137,34 +138,12 @@ useL7Parton     = True
 
 # list of input files
 useRelVals = True # if 'False', "inputFiles" is used
-inputFiles = [ '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/122CC36B-32FB-E011-9C29-001D09F295FB.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/16F98CC4-BCFA-E011-AF7C-BCAEC532971A.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/1A167592-53FB-E011-B28B-E0CB4E4408E7.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/1A2F8D37-C4FA-E011-9A03-0030486780B4.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/328E6513-BCFA-E011-94CB-BCAEC5329732.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/421E8A85-52FB-E011-90CF-001D09F2426D.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/46ED9F2E-57FB-E011-960E-003048D3C944.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/507FC650-B9FA-E011-9BB1-003048D3C944.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/543952D1-C6FA-E011-83E8-BCAEC532971E.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/62CD468E-54FB-E011-BCC4-003048D374CA.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/76F69435-BEFA-E011-A7C1-BCAEC532972D.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/8E080FBC-56FB-E011-AB40-BCAEC518FF8D.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/969EA6B0-31FB-E011-B27D-BCAEC53296F7.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/984FD744-55FB-E011-973E-E0CB4E55367F.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/9E73F7B3-BFFA-E011-B9C1-BCAEC5329711.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/A64B1990-54FB-E011-A661-003048D3756A.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/AA9F05F6-B4FA-E011-882B-003048D2BE06.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/D2D261A4-B8FA-E011-B835-485B3962633D.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/E05FD2AF-55FB-E011-ACBC-BCAEC532972D.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/E4FFA75D-C0FA-E011-862A-E0CB4E55367F.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/FA2EBD16-BCFA-E011-8AA9-BCAEC532972D.root'
-             , '/store/data/Run2011B/MultiJet/AOD/PromptReco-v1/000/178/866/FE5D18FE-2CFB-E011-8EFA-BCAEC5329730.root'
-             ]   # overwritten, if "useRelVals" is 'True'
+inputFiles = []   # overwritten, if "useRelVals" is 'True'
 
 
 # maximum number of events
 maxInputEvents = -1 # reduce for testing
-maxInputEvents = 1000
+maxInputEvents = 100
 
 ### Conditions
 
@@ -214,13 +193,7 @@ if useRelVals:
                  , '/store/relval/CMSSW_4_4_2_patch10/RelValProdTTbar/AODSIM/START44_V7_special_120119-v1/0088/0ECC7FA5-7A43-E111-9B36-002618943861.root'
                  ]
   else:
-    print 'running on *Jet* data stream (instead of MultiJet) as no better stream exists as RelVal'
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_4_2'
-                                     , relVal        = 'Jet'
-                                     , dataTier      = 'RECO'
-                                     , globalTag     = 'GR_R_44_V7_RelVal_jet2011A'
-                                     , maxVersions   = 1
-                                     )
+    inputFiles = []
 process.source.fileNames = inputFiles
 process.maxEvents.input  = maxInputEvents
 
@@ -407,7 +380,7 @@ if useStandardPAT:
     print '        switching to   L1Offset   !!!'
     process.patJetCorrFactors.levels.insert( 0, 'L1Offset' )
     process.patJetCorrFactors.levels.remove( 'L1FastJet' )
-    process.patJetCorrFactors.useRho = False # FIXME: does not apply
+    process.patJetCorrFactors.useRho = False
 
   from PhysicsTools.PatAlgos.tools.jetTools import *
   jecSetPFNoCHS = jecSetPF.rstrip('chs')
@@ -419,7 +392,7 @@ if useStandardPAT:
                    doL1Cleaning = False,
                    doL1Counters = True,
                    genJetCollection=cms.InputTag('ak5GenJets'),
-                   doJetID      = True,
+                   doJetID      = True
                    )
   from PhysicsTools.PatAlgos.tools.metTools import *
   addPfMET(process, 'AK5PF')
