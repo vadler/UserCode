@@ -7,13 +7,16 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
+runOnRelVal   = True # If 'False', define input files in l. 182ff.
+maxEvents     = -1
 gc            = True
 createNTuples = True
 if lxplusTest:
   gc            = False
   createNTuples = False
-
-runOnRelVal = False # If 'False', define input files in l. 183ff.
+  maxEvents     = 100
+else:
+  runOnRelVal = False # If 'False', define input files in l. 182ff.
 
 runMatch  = True
 #runMVA    = False
@@ -23,10 +26,6 @@ addGenEvt = True
 writePdfWeights      = False    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
-
-maxEvents = -1
-if lxplusTest:
-  maxEvents = 1000
 
 hltProcess       = 'HLT'
 triggerSelection = ''
@@ -118,7 +117,7 @@ process = cms.Process( 'PF2PAT' )
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.globaltag = 'START44_V13::All'
+process.GlobalTag.globaltag = 'START44_V9C::All'
 
 if gc:
 	#pfJetCollection = '@PFJETS@'
