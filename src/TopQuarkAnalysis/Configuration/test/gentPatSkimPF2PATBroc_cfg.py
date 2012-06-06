@@ -7,7 +7,7 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-runOnRelVal   = True # If 'False', define input files in l. 185ff.
+runOnRelVal   = True # If 'False', define input files in l. 184ff.
 maxEvents     = -1
 gc            = True
 createNTuples = True
@@ -16,8 +16,7 @@ if lxplusTest:
   createNTuples = False
   maxEvents     = 100
 else:
-  runOnRelVal = False # If 'False', define input files in l. 185ff.
-
+  runOnRelVal = False # If 'False', define input files in l. 184ff.
 
 runOnMC   = True
 runMatch  = True
@@ -77,9 +76,9 @@ triggerSelection = ''
 
 jetAlgo   = 'AK5'
 jecLevels = []
-jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
-if not runOnMC:
-  jecLevels.append( 'L2L3Residual' )
+#jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
+#if not runOnMC:
+  #jecLevels.append( 'L2L3Residual' )
 
 # muon object selection
 pfMuonSelect = 'pt > 5.' # PF2PAT: 'pt > 5.'
@@ -422,7 +421,7 @@ if not createNTuples:
                                   , 'keep *_genEvt_*_*'
                                   ]
 
-process.out.outputCommands += [ 'keep double_kt6PFJets_*_*' ]
+process.out.outputCommands += [ 'keep double_kt6PFJets*_*_*' ]
 
 # Muons
 process.pfSelectedMuons.cut = pfMuonSelect
@@ -542,6 +541,7 @@ elif 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
   process.pfJets.doAreaFastjet = True
   process.pfJets.doRhoFastjet  = False
+  process.patPF2PATSequence.remove( process.kt6PFJets )
 process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
