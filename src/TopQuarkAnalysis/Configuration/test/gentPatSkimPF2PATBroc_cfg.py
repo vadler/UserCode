@@ -7,28 +7,28 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-gc = True
-
-runOnMC     = True
-runOnRelVal = False # If 'False', define input files in l. 187ff.
+runOnMC       = True
+runOnRelVal   = True # If 'False', define input files in l. 207ff.
+maxEvents     = -1
+gc            = True
+createNTuples = True
+if lxplusTest:
+  gc            = False
+  createNTuples = False
+  maxEvents     = 100
+  if not runOnMC:
+    maxEvents = 1000
+else:
+  runOnRelVal = False # If 'False', define input files in l. 207ff.
 
 runMatch  = True
-runMVA    = False
+runMVA    = True
 runCiC    = True
 runEwk    = True
 addGenEvt = True
-createNTuples        = True
 writePdfWeights      = False    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
-
-if lxplusTest:
-  writeNonIsoMuons     = False
-  writeNonIsoElectrons = False
-
-maxEvents = -1
-if lxplusTest:
-  maxEvents = 1000
 
 hltProcess       = 'HLT'
 triggerSelection = ''
@@ -43,7 +43,6 @@ jecLevels = []
 
 # vertex collection to use
 # 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
-#pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
 pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
 
 # jet collection to use
@@ -124,9 +123,9 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START52_V9::All'
+  process.GlobalTag.globaltag = 'START52_V10::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_52_V7::All'
+  process.GlobalTag.globaltag = 'GR_R_52_V8::All'
 
 if gc:
 	runOnMC   = eval('@MC@')
@@ -139,6 +138,7 @@ if gc:
 	#electronsMin = eval('@MINNE@')
 	#leptonsMin = eval('@MINNLEP@')
 	#jetsMin = eval('@MINNJETS@')
+        writeNonIsoMuons   = eval('@WRITENONISOMU@')
        	writeNonIsoElectrons   = eval('@WRITENONISOE@')
 	if '@WRITENONISOMU@'.lower() == 'false':
         	writeNonIsoMuons   = False
@@ -207,7 +207,7 @@ if runOnRelVal:
 else:
   if runOnMC:
     if lxplusTest:
-      inputFiles = [ 'file:/afs/cern.ch/work/v/vadler/public/data/CMSSW_5_2_X/TTbar_Summer12_AODskim.root'
+      inputFiles = [ '/store/user/vadler/cms/AT/CMSSW_5_2_5/output/TTbar_Summer12_AODskim.root'
                    ]
     else:
       inputFiles = [ 'file:////user/bklein/TTbar_2012_synchronisation_ex.root'
@@ -305,9 +305,6 @@ process.maxEvents = cms.untracked.PSet(
 
 ### Output
 
-if lxplusTest:
-  createNTuples = False
-
 outputModules = []
 if not createNTuples:
   from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
@@ -323,9 +320,16 @@ if not createNTuples:
     process.out
     )
 
-from RecoJets.JetProducers.kt4PFJets_cfi import *
-process.kt6PFJetsForIsolation = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
+### DEBUG START ###
+#from RecoJets.JetProducers.kt4PFJets_cfi import *
+#process.kt6PFJetsForIsolation = kt4PFJets.clone( rParam       = 0.6
+                                               #, doRhoFastjet = True
+                                               #, Rho_EtaMax   = 2.5
+                                               #)
+#from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
+#process.kt6PFJetsForIsolation = kt6PFJets.clone( Rho_EtaMax = 2.5
+                                               #)
+### DEBUG END ###
 
 ### Cleaning
 
@@ -363,18 +367,18 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
 , filter       = cms.bool( False )
 , src          = cms.InputTag( 'offlinePrimaryVertices' )
 )
-process.goodOfflinePrimaryVertexFilter = cms.EDFilter(
-  "PrimaryVertexFilter"
-, pvSelection
-, pvSrc = cms.InputTag( 'goodOfflinePrimaryVertices' )
-, NPV   = cms.int32( 1 )
-)
 process.vertexSelection = cms.Sequence(
   process.goodOfflinePrimaryVertices
 )
 
 if not runOnMC:
-	process.vertexSelection *= process.goodOfflinePrimaryVertexFilter
+  process.goodOfflinePrimaryVertexFilter = cms.EDFilter(
+    "PrimaryVertexFilter"
+  , pvSelection
+  , pvSrc = cms.InputTag( 'goodOfflinePrimaryVertices' )
+  , NPV   = cms.int32( 1 )
+  )
+  process.vertexSelection *= process.goodOfflinePrimaryVertexFilter
 
 process.eventCleaning = cms.Sequence()
 
@@ -385,6 +389,13 @@ if not runOnMC:
 if triggerSelection != '':
   process.eventCleaning += process.triggerResultsFilter
 process.eventCleaning += process.vertexSelection
+
+if writePdfWeights:
+  process.pdfWeights = cms.EDProducer(
+    "PdfWeightProducer"
+  , PdfInfoTag  = cms.untracked.InputTag( 'generator' )
+  , PdfSetNames = cms.untracked.vstring( 'cteq66.LHgrid' )
+  )
 
 ### PAT
 
@@ -466,7 +477,6 @@ removeIfInSequence( process, 'hpsPFTauDiscriminationByMediumMuonRejection', 'pat
 removeIfInSequence( process, 'hpsPFTauDiscriminationByTightMuonRejection', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'patTaus', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'selectedPatTaus', 'patPF2PATSequence', '' )
-removeIfInSequence( process, 'patTaus', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'countPatTaus', 'patPF2PATSequence', '' )
 process.patPF2PATSequence.replace( process.selectedPatCandidateSummary
                                  , process.selectedPatCandidateSummary * ( process.cleanPatMuons
@@ -504,43 +514,19 @@ process.patJetPartonAssociation.jets = cms.InputTag(pfJetCollection)
 process.patJetPartonMatch.src = cms.InputTag(pfJetCollection)
 process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag("pfJets")
 process.pfMET.jets = cms.InputTag("pfJets")
-process.softMuonTagInfosAOD.jets = cms.InputTag(pfJetCollection)#end add
-#Added S sync ex 2012
-process.pfNoTau.enable = False
+process.softMuonTagInfosAOD.jets = cms.InputTag(pfJetCollection)
+### DEBUG START ###
 process.pfIsolatedElectrons.doDeltaBetaCorrection = True
 process.pfIsolatedMuons.doDeltaBetaCorrection = True
-process.pfPileUp.checkClosestZVertex = False # recommended JetMET twiki
-process.kt6PFJets.doAreaFastjet = True
-process.kt6PFJets.Rho_EtaMax = 4.4 # recommended by TOP JetMET contact
-# end add
-
-#######BEGIN####FIXME
-# process.pfSelectedMuons.cut = 'pt > 10. && abs(eta) < 2.5'
-# process.pfSelectedElectrons.cut = 'pt > 15. && abs(eta) < 2.5'
-# process.pfNoTau.enable = False #jetCollection = pfNoTau (pfJets should give same results)
-# process.pfJets.srcPVs = "offlinePrimaryVertices"
-# process.pfElectronsFromVertex.vertices = "offlinePrimaryVertices"
-# process.pfIsolatedElectrons.doDeltaBetaCorrection = True
-# process.pfIsolatedMuons.doDeltaBetaCorrection = True
-# process.pfMuonsFromVertex.vertices = "offlinePrimaryVertices"
-# process.pfPileUp.checkClosestZVertex = False # JetMET recommendation
-# process.patJetCorrFactors.primaryVertices = "offlinePrimaryVertices"
-# process.kt6PFJets.doAreaFastjet = True
-# process.kt6PFJets.Rho_EtaMax = 4.4 #recommendation
-# process.kt6PFJets.srcPVs = ""
-#######END######FIXME
+### DEBUG END ###
 
 if runMatch:
-	process.patJets.addGenJetMatch = True
+  process.patJets.addGenJetMatch = True
 else:
-        process.patJets.addGenJetMatch = False
+  process.patJets.addGenJetMatch = False
 
-#process.patJets.genJetMatch    = cms.InputTag( '' )
-#removeIfInSequence( process, 'patJetGenJetMatch', 'patPF2PATSequence', '' )
-#removeIfInSequence( process, 'ak5GenJetsNoNu', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'ak7GenJetsNoNu', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'iterativeCone5GenJetsNoNu', 'patPF2PATSequence', '' )
-#removeIfInSequence( process, 'genParticlesForJetsNoNu', 'patPF2PATSequence', '' )
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
 process.patJetCorrFactors.levels  = jecLevels
@@ -568,7 +554,7 @@ if not createNTuples:
     process.out.outputCommands += [ 'keep *_genParticles_*_*'
                                   , 'keep *_genEvt_*_*'
                                   ]
-  process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
+  process.out.outputCommands += [ 'keep double_kt6PFJets*_*_*' ]
 
 # Muons
 process.pfSelectedMuons.cut = pfMuonSelect
@@ -579,10 +565,17 @@ if usePfMuonIsoConeR03:
   process.pfIsolatedMuons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03' )
                                                                     , cms.InputTag( 'muPFIsoValueGamma03' )
                                                                     )
+  process.pfMuons.isolationValueMapsCharged  = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03' )
+                                                            )
+  process.pfMuons.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03' )
+  process.pfMuons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03' )
+                                                            , cms.InputTag( 'muPFIsoValueGamma03' )
+                                                            )
 process.pfIsolatedMuons.isolationCut = pfMuonIso
 process.patMuons.embedTrack = True
 if usePfMuonIsoConeR03:
   process.patMuons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'muPFIsoValueNeutral03' )
+  process.patMuons.isolationValues.pfChargedAll       = cms.InputTag( 'muPFIsoValueChargedAll03' )
   process.patMuons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03' )
   process.patMuons.isolationValues.pfPhotons          = cms.InputTag( 'muPFIsoValueGamma03' )
   process.patMuons.isolationValues.pfChargedHadrons   = cms.InputTag( 'muPFIsoValueCharged03' )
@@ -601,10 +594,17 @@ if usePfElectronIsoConeR03:
   process.pfIsolatedElectrons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
                                                                         , cms.InputTag( 'elPFIsoValueGamma03PFId' )
                                                                         )
+  process.pfElectrons.isolationValueMapsCharged  = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03PFId' )
+                                                                )
+  process.pfElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03PFId' )
+  process.pfElectrons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
+                                                                , cms.InputTag( 'elPFIsoValueGamma03PFId' )
+                                                                )
 process.pfIsolatedElectrons.isolationCut = pfElectronIso
 process.patElectrons.embedTrack = True
 if usePfElectronIsoConeR03:
   process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03PFId' )
+  process.patElectrons.isolationValues.pfChargedAll       = cms.InputTag( 'elPFIsoValueChargedAll03PFId' )
   process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFId' )
   process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03PFId' )
   process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03PFId' )
@@ -673,10 +673,18 @@ process.countPatLeptons.minNumber = leptonsMin
 if len( jecLevels ) is 0:
   process.patJets.addJetCorrFactors = False
   print 'WARNING: No JECs are stored or applied!'
+  print '         Following settings are adjusted for on-the-fly usage of L1FastJet (CHS):'
+  print '         - pfPileUp.checkClosestZVertex = False'
+  print '         - pfJets.doAreaFastjet = True'
+  print '         - pfJets.doRhoFastjet  = False'
+  process.pfPileUp.checkClosestZVertex = False
+  process.pfJets.doAreaFastjet = True
+  process.pfJets.doRhoFastjet  = False
 elif 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
   process.pfJets.doAreaFastjet = True
   process.pfJets.doRhoFastjet  = False
+removeIfInSequence( process, 'kt6PFJets', 'patPF2PATSequence', '' )
 process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
@@ -697,6 +705,8 @@ if writeNonIsoMuons:
 if writeNonIsoElectrons:
   cloneProcessingSnippet(process,process.patPF2PATSequence,postfixNonIsoE)
   getattr(process,'pfNoElectron'+postfixNonIsoE).topCollection = "pfSelectedElectrons" + postfixNonIsoE
+  #if runOnMC:
+    #getattr(process,'electronMatch'+postfixNonIsoE).src = "pfElectrons" + postfixNonIsoE
   getattr(process,'patElectrons'+postfixNonIsoE).pfElectronSource = "pfSelectedElectrons" + postfixNonIsoE
   #getattr(process,'pfIsolatedElectrons'+postfixNonIsoE).isolationCut = 999999.
 
@@ -707,7 +717,7 @@ if addGenEvt:
 ### Path
 process.p = cms.Path( process.eventCleaning
                     * process.patPF2PATSequence
-		    * process.kt6PFJetsForIsolation
+                    #* process.kt6PFJetsForIsolation
                     )
 
 if writeNonIsoMuons:
@@ -719,10 +729,6 @@ if addGenEvt:
   process.p *= process.makeGenEvt
 
 if writePdfWeights:
-  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-        PdfInfoTag = cms.untracked.InputTag("generator"),
-        PdfSetNames = cms.untracked.vstring("cteq66.LHgrid")
-	)
   process.p *= process.pdfWeights
 
 if createNTuples:
