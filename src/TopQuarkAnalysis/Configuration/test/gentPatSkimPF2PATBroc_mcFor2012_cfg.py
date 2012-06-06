@@ -430,7 +430,7 @@ if not createNTuples:
     process.out.outputCommands += [ 'keep *_genParticles_*_*'
                                   , 'keep *_genEvt_*_*'
                                   ]
-  process.out.outputCommands += [ 'keep double_kt6PFJets*_*_' + process.name_() ]
+  process.out.outputCommands += [ 'keep double_kt6PFJets*_*_*' ]
 
 process.phPFIsoDepositCharged.ExtractorPSet.DR_Veto    = cms.double( 1e-05 )
 process.phPFIsoDepositChargedAll.ExtractorPSet.DR_Veto = cms.double( 1e-05 )
