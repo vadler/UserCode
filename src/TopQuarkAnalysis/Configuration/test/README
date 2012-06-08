@@ -7,9 +7,12 @@ cmsrel CMSSW_5_2_5
 cd CMSSW_5_2_5/src
 cmsenv
 cvs co -r V06-05-01    DataFormats/PatCandidates
-cvs co -r V08-09-07    PhysicsTools/PatAlgos
-cvs co -r V00-03-11    CommonTools/ParticleFlow
-cvs co -r V00-00-08 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
+cvs co -r V08-09-11-01 PhysicsTools/PatAlgos
+cvs co -r V03-09-22    PhysicsTools/PatUtils
+cvs co -r V00-03-14    CommonTools/ParticleFlow
+cvs co -r V00-00-09    CommonTools/RecoUtils
+cvs co -r V04-06-05    JetMETCorrections/Type1MET
+cvs co -r V00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
 cd EGamma/EGammaAnalysisTools/data
 cat download.url | xargs wget
 cd -

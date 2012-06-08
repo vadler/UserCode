@@ -554,7 +554,7 @@ if not createNTuples:
     process.out.outputCommands += [ 'keep *_genParticles_*_*'
                                   , 'keep *_genEvt_*_*'
                                   ]
-  process.out.outputCommands += [ 'keep double_kt6PFJets*_*_*' ]
+  process.out.outputCommands += [ 'keep double_kt6PFJets_*_*' ]
 
 # Muons
 process.pfSelectedMuons.cut = pfMuonSelect
@@ -676,16 +676,10 @@ if len( jecLevels ) is 0:
   print '         Following settings are adjusted for on-the-fly usage of L1FastJet (CHS):'
   print '         - pfPileUp.checkClosestZVertex = False'
   print '         - pfJets.doAreaFastjet = True'
-  print '         - pfJets.doRhoFastjet  = False'
   process.pfPileUp.checkClosestZVertex = False
   process.pfJets.doAreaFastjet = True
-  process.pfJets.doRhoFastjet  = False
 elif 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
-  process.pfJets.doAreaFastjet = True
-  process.pfJets.doRhoFastjet  = False
-removeIfInSequence( process, 'kt6PFJets', 'patPF2PATSequence', '' )
-process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
 process.cleanPatJets.src           = cms.InputTag( 'patJets' )
