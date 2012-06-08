@@ -1,23 +1,22 @@
 Test Release based on: CMSSW_5_2_5
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_5
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_2_5
--------- Package --------                        --- Tag ---    --- RelTag --- 
-AnalysisDataFormats/TopObjects                   V06-08-07      V06-08-07      
-CommonTools/ParticleFlow                         V00-03-11      V00-03-08      
-DataFormats/PatCandidates                        V06-05-01      V06-05-00      
-EGamma/EGammaAnalysisTools                       V00-00-08                     
-JetMETCorrections/Type1MET                       V04-06-03      V04-06-03      
-PhysicsTools/PatAlgos                            V08-09-07      V08-09-04      
-PhysicsTools/PatExamples                         NoTag          V00-05-25      
-PhysicsTools/PatUtils                            V03-09-18-03   V03-09-18-03   
-TopQuarkAnalysis/Configuration                   V06-02-06      V06-02-00      
-TopQuarkAnalysis/Examples                        V06-07-11      V06-07-11      
-TopQuarkAnalysis/TopEventProducers               V06-09-09      V06-09-08      
-TopQuarkAnalysis/TopEventSelection               V06-07-14      V06-07-14      
-TopQuarkAnalysis/TopHitFit                       V00-00-05      V00-00-05      
-TopQuarkAnalysis/TopJetCombination               V06-08-03      V06-08-03      
-TopQuarkAnalysis/TopKinFitter                    V06-07-19      V06-07-19      
-TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09      
-TopQuarkAnalysis/TopTools                        V06-07-11      V06-07-11      
+-------- Package --------                        --- Tag ---    --- RelTag ---
+AnalysisDataFormats/TopObjects                   V06-08-07      V06-08-07
+CommonTools/ParticleFlow                         V00-03-11      V00-03-08
+DataFormats/PatCandidates                        V06-05-01      V06-05-00
+EGamma/EGammaAnalysisTools                       V00-00-08
+PhysicsTools/PatAlgos                            V08-09-07      V08-09-04
+PhysicsTools/PatExamples                         NoTag          V00-05-25
+PhysicsTools/PatUtils                            V03-09-18-03   V03-09-18-03
+TopQuarkAnalysis/Configuration                   V06-02-07      V06-02-00
+TopQuarkAnalysis/Examples                        V06-07-11      V06-07-11
+TopQuarkAnalysis/TopEventProducers               V06-09-09      V06-09-08
+TopQuarkAnalysis/TopEventSelection               V06-07-14      V06-07-14
+TopQuarkAnalysis/TopHitFit                       V00-00-05      V00-00-05
+TopQuarkAnalysis/TopJetCombination               V06-08-03      V06-08-03
+TopQuarkAnalysis/TopKinFitter                    V06-07-19      V06-07-19
+TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09
+TopQuarkAnalysis/TopTools                        V06-07-11      V06-07-11
 ---------------------------------------
-total packages: 17 (17 displayed)
+total packages: 16 (16 displayed)
