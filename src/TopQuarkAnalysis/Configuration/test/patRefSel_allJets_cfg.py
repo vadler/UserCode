@@ -33,7 +33,6 @@ process = cms.Process( 'PAT' )
 
 ### Data or MC?
 runOnMC = options.runOnMC
-runOnMC = True
 
 ### Standard and PF reconstruction
 runStandardPAT = True
@@ -425,8 +424,6 @@ if runStandardPAT:
   process.step3b_3 = step3b_3.clone()
   process.step3b   = cms.Sequence( process.step3b_1 * process.step3b_2 * process.step3b_3 )
 
-  process.patDefaultSequence.remove( process.kt6PFJets )
-  process.patDefaultSequence.remove( process.ak5PFJets )
   process.patJetCorrFactors.payload = jecSet
   process.patJetCorrFactors.levels  = jecLevels
   if useL1FastJet:
