@@ -452,9 +452,10 @@ if runStandardPAT:
 
   ### Jets
 
+  process.patDefaultSequence.remove( process.kt6PFJets )
+  process.patDefaultSequence.remove( process.ak5PFJets )
   jecLevelsCalo = copy.copy( jecLevels )
   if useL1FastJet:
-    process.patDefaultSequence.remove( process.kt6PFJets )
     if useCaloJets:
       print 'WARNING patRefSel_muJets_test_cfg.py:'
       print '        L1FastJet JECs are not available for AK5Calo jets in this data due to missing jet area computation;'
