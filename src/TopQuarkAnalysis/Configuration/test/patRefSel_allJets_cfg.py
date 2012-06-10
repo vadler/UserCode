@@ -33,7 +33,6 @@ process = cms.Process( 'PAT' )
 
 ### Data or MC?
 runOnMC = options.runOnMC
-runOnMC = True
 
 ### Input from produced with CMSSW_4_2_X?
 runOn42X = False
@@ -404,6 +403,7 @@ process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
                               , 'keep *_offlineBeamSpot_*_*'
                               , 'keep *_offlinePrimaryVertices*_*_*'
                               , 'keep *_goodOfflinePrimaryVertices*_*_*'
+                              , 'keep double_kt6PFJets_*_*'
                               ]
 if runOnMC:
   process.out.outputCommands += [ 'keep GenEventInfoProduct_*_*_*'
@@ -427,7 +427,6 @@ if useStandardPAT:
   process.step3b_3 = step3b_3.clone()
   process.step3b   = cms.Sequence( process.step3b_1 * process.step3b_2 * process.step3b_3 )
 
-  process.out.outputCommands.append( 'keep double_kt6PFJets*_*_*' )
   if useL1FastJet:
     process.patJetCorrFactors.useRho = True
     process.patJetCorrFactors.rho    = cms.InputTag( 'kt6PFJets', 'rho' )
@@ -454,10 +453,6 @@ if runPF2PAT:
   setattr( process, 'tightPatMuons' + postfix, tightPatMuonsPF )
 
   ### Jets
-
-  if useL1FastJet:
-    applyPostfix( process, 'patJetCorrFactors', postfix ).rho = cms.InputTag( 'kt6PFJets' + postfix, 'rho' )
-  process.out.outputCommands.append( 'keep double_kt6PFJets*_*_*' )
 
   goodPatJetsPF = goodPatJets.clone( src = cms.InputTag( 'selectedPatJets' + postfix ) )
   setattr( process, 'goodPatJets' + postfix, goodPatJetsPF )

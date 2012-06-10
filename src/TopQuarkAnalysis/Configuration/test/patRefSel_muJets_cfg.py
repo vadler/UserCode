@@ -424,6 +424,7 @@ process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
                               , 'keep *_offlineBeamSpot_*_*'
                               , 'keep *_offlinePrimaryVertices*_*_*'
                               , 'keep *_goodOfflinePrimaryVertices*_*_*'
+                              , 'keep double_kt6PFJets_*_*'
                               ]
 if runOnMC:
   process.out.outputCommands += [ 'keep GenEventInfoProduct_*_*_*'
@@ -462,7 +463,6 @@ if runStandardPAT:
 
   ### Jets
 
-  process.out.outputCommands.append( 'keep double_kt6PFJets*_*_*' )
   if useL1FastJet:
     if useCaloJets and "L1FastJet" in jecLevelsCalo:
       process.patJetCorrFactors.useRho = True
@@ -517,10 +517,6 @@ if runPF2PAT:
   setattr( process, 'step2' + postfix, step2PF )
 
   ### Jets
-
-  if useL1FastJet:
-    applyPostfix( process, 'patJetCorrFactors', postfix ).rho = cms.InputTag( 'kt6PFJets', 'rho' )
-  process.out.outputCommands.append( 'keep double_kt6PFJets*_*_*' )
 
   goodPatJetsPF = goodPatJets.clone( src = cms.InputTag( 'selectedPatJets' + postfix ) )
   setattr( process, 'goodPatJets' + postfix, goodPatJetsPF )
