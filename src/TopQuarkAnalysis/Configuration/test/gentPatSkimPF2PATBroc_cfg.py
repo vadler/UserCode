@@ -421,7 +421,7 @@ if not createNTuples:
                                   , 'keep *_genEvt_*_*'
                                   ]
 
-process.out.outputCommands += [ 'keep double_kt6PFJets*_*_*' ]
+process.out.outputCommands += [ 'keep double_kt6PFJets_*_*' ]
 
 # Muons
 process.pfSelectedMuons.cut = pfMuonSelect
@@ -541,7 +541,6 @@ elif 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
   process.pfJets.doAreaFastjet = True
   process.pfJets.doRhoFastjet  = False
-  process.patPF2PATSequence.remove( process.kt6PFJets )
 process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect

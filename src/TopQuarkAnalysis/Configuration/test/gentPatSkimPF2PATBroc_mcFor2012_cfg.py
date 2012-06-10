@@ -430,7 +430,7 @@ if not createNTuples:
     process.out.outputCommands += [ 'keep *_genParticles_*_*'
                                   , 'keep *_genEvt_*_*'
                                   ]
-  process.out.outputCommands += [ 'keep double_kt6PFJets*_*_*' ]
+  process.out.outputCommands += [ 'keep double_kt6PFJets_*_*' ]
 
 process.phPFIsoDepositCharged.ExtractorPSet.DR_Veto    = cms.double( 1e-05 )
 process.phPFIsoDepositChargedAll.ExtractorPSet.DR_Veto = cms.double( 1e-05 )
@@ -568,7 +568,6 @@ elif 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
   process.pfJets.doAreaFastjet = True
   process.pfJets.doRhoFastjet  = False
-removeIfInSequence( process, 'kt6PFJets', 'patPF2PATSequence', '' )
 process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
