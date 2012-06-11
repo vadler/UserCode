@@ -354,7 +354,7 @@ void AnalyzeHitFit::beginJob()
   data_->Branch( "PileUpWeightTrue"    , &pileUpWeightTrue_    , "pileUpWeightTrue/D" );
   data_->Branch( "PileUpWeightObserved", &pileUpWeightObserved_, "pileUpWeightObserved/D" );
 
-  histo_pileUpWeightTrue_ = fileService->make< TH1D >( "pileUpWeightTrue"    , "True pile-up weights"    , nBinsMCTrue    , 0., double( nBinsMCTrue ) );
+  histo_pileUpWeightTrue_ = fileService->make< TH1D >( "pileUpWeightTrue", "True pile-up weights", nBinsMCTrue, 0., double( nBinsMCTrue ) );
   histo_pileUpWeightTrue_->SetXTitle( "number of true interactions" );
   histo_pileUpWeightTrue_->SetYTitle( "weight (#frac{data}{MC})" );
   for ( int iBin = 1; iBin < nBinsMCTrue + 1; ++iBin ) {
@@ -746,11 +746,11 @@ void AnalyzeHitFit::fill( unsigned iCat, const edm::Handle< TtSemiLeptonicEvent 
     ptAlt_  = pt_;
     ptGen_  = ttGenEvent_->singleNeutrino()->pt();
 //     eta_    = ttSemiLeptonicEvent->singleNeutrino( TtEvent::kGenMatch )->eta();
-    pt_     = patMETs_->at( 0 ).eta();
+    eta_    = patMETs_->at( 0 ).eta();
     etaAlt_ = eta_;
     etaGen_ = ttGenEvent_->singleNeutrino()->eta();
 //     phi_    = ttSemiLeptonicEvent->singleNeutrino( TtEvent::kGenMatch )->phi();
-    pt_     = patMETs_->at( 0 ).phi();
+    phi_    = patMETs_->at( 0 ).phi();
     phiAlt_ = phi_;
     phiGen_ = ttGenEvent_->singleNeutrino()->phi();
   }
