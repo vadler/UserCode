@@ -103,11 +103,6 @@ class AnalyzeHitFit : public edm::EDAnalyzer {
     std::vector< std::vector< double > > etaSymmBins_;
     // P_t binning
     std::vector< std::vector< double > > ptBins_;
-    // Quantities Delta binning
-    std::vector< std::vector< unsigned > > propBins_;
-    std::vector< std::vector< double > > propMaxs_;
-    std::vector< std::vector< unsigned > > propInvBins_;
-    std::vector< std::vector< double > > propInvMaxs_;
 
     /// Constants
     // Object categories
@@ -232,28 +227,10 @@ AnalyzeHitFit::AnalyzeHitFit( const edm::ParameterSet & iConfig )
   std::vector< std::string > fileNameParams;
   std::vector< std::string > etaBinParams;
   std::vector< std::string > ptBinParams;
-  std::vector< std::vector< std::string > > objPropBinParams;
-  std::vector< std::vector< std::string > > objPropMaxParams;
-  std::vector< std::vector< std::string > > objPropInvBinParams;
-  std::vector< std::vector< std::string > > objPropInvMaxParams;
   for ( unsigned iObj = 0; iObj < objNames.size(); ++iObj ) {
     fileNameParams.push_back( objNames.at( iObj ) + "Resolutions" );
     etaBinParams.push_back( objNames.at( iObj ) + "EtaBins" );
     ptBinParams.push_back( objNames.at( iObj ) + "PtBins" );
-    std::vector< std::string > propBinParams;
-    std::vector< std::string > propMaxParams;
-    std::vector< std::string > propInvBinParams;
-    std::vector< std::string > propInvMaxParams;
-    for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
-      propBinParams.push_back( objNames.at( iObj ) + "Delta" + kinProps_.at( iProp ) + "Bins" );
-      propMaxParams.push_back( objNames.at( iObj ) + "Delta" + kinProps_.at( iProp ) + "Max" );
-      propInvBinParams.push_back( objNames.at( iObj ) + "Delta" + kinProps_.at( iProp ) + "InvBins" );
-      propInvMaxParams.push_back( objNames.at( iObj ) + "Delta" + kinProps_.at( iProp ) + "InvMax" );
-    }
-    objPropBinParams.push_back( propBinParams );
-    objPropMaxParams.push_back( propMaxParams );
-    objPropInvBinParams.push_back( propInvBinParams );
-    objPropInvMaxParams.push_back( propInvMaxParams );
   }
 
   for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
@@ -291,21 +268,6 @@ AnalyzeHitFit::AnalyzeHitFit( const edm::ParameterSet & iConfig )
     etaSymmBins_.push_back( etaSymmBins );
 
     ptBins_.push_back( iConfig.getParameter< std::vector< double > >( ptBinParams.at( iCat ) ) );
-
-    std::vector< unsigned > propBins;
-    std::vector< double > propMaxs;
-    std::vector< unsigned > propInvBins;
-    std::vector< double > propInvMaxs;
-    for ( unsigned iProp = 0; iProp < kinProps_.size(); ++iProp ) {
-      propBins.push_back( iConfig.getParameter< unsigned >( objPropBinParams.at( iCat ).at( iProp ) ) );
-      propMaxs.push_back( iConfig.getParameter< double >( objPropMaxParams.at( iCat ).at( iProp ) ) );
-      propInvBins.push_back( iConfig.getParameter< unsigned >( objPropInvBinParams.at( iCat ).at( iProp ) ) );
-      propInvMaxs.push_back( iConfig.getParameter< double >( objPropInvMaxParams.at( iCat ).at( iProp ) ) );
-    }
-    propBins_.push_back( propBins );
-    propMaxs_.push_back( propMaxs );
-    propInvBins_.push_back( propInvBins );
-    propInvMaxs_.push_back( propInvMaxs );
 
   }
 
