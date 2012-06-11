@@ -92,10 +92,6 @@ bool TtSemiLepHypSelectionFilter::beginRun( edm::Run & iRun, const edm::EventSet
   }
 
   // Get original configuration
-  if ( origConfig_.moduleType( leptonSelector_ ) == "PATMuonSelector" ) {
-  }
-  else if ( origConfig_.moduleType( leptonSelector_ ) == "PATElectronSelector" ) {
-  }
   leptonSelectorCut_ = origConfig_.modulePSet( leptonSelector_ ).getParameter< std::string >( "cut" );
   jetSelectorCut_    = origConfig_.modulePSet( jetSelector_ ).getParameter< std::string >( "cut" );
   edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Lepton selection cut: '" << leptonSelectorCut_ << "'";
@@ -150,7 +146,7 @@ bool TtSemiLepHypSelectionFilter::filter( edm::Event & iEvent, const edm::EventS
   }
   const pat::Jet hadronicDecayB( patJets->at( jetLepCombi.at( TtSemiLepEvtPartons::HadB ) ) );
   if ( ! jetSelector( hadronicDecayB ) ) {
-    edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "hadronic b-jet failed";
+    edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Hadronic b-jet failed";
     result = false;
   }
   const pat::Jet hadronicDecayQuark( patJets->at( jetLepCombi.at( TtSemiLepEvtPartons::LightQ ) ) );
