@@ -63,16 +63,17 @@ process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
-if not rfioInput:
+if runTest:
   process.MessageLogger.cerr.threshold = 'INFO'
-  process.MessageLogger.categories.append( 'AnalyzeHitFit' )
-  process.MessageLogger.cerr.AnalyzeHitFit = cms.untracked.PSet(
-    limit = cms.untracked.int32( -1 )
-  )
   process.MessageLogger.categories.append( 'TtSemiLepHypSelectionFilter' )
   process.MessageLogger.cerr.TtSemiLepHypSelectionFilter = cms.untracked.PSet(
     limit = cms.untracked.int32( -1 )
   )
+  if not rfioInput:
+    process.MessageLogger.categories.append( 'AnalyzeHitFit' )
+    process.MessageLogger.cerr.AnalyzeHitFit = cms.untracked.PSet(
+      limit = cms.untracked.int32( -1 )
+    )
 
 
 ### Input
@@ -171,12 +172,18 @@ process.ttSemiLepEventMCMatchElectrons.hypotheses = [ 'ttSemiLepHypGenMatchMCMat
                                                     ]
 
 from TopQuarkAnalysis.TopTools.ttSemiLepHypSelectionFilter_cfi import ttSemiLepHypSelectionFilter
+### FIXME BEGIN
+jetCut = 'pt > 30. && numberOfDaughters > 1 && chargedEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4) && (chargedMultiplicity > 0 || abs(eta) >= 2.4) && abs(eta) < 3.0 && abs(eta) < 2.5'
+### FIXME END
 process.ttSemiLepHypSelectionFilterMuons     = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtMuons
                                                                                 , ttSemiLepHypLeptons = ttSemiLepHypMuons
                                                                                 , ttSemiLepHypJets    = ttSemiLepHypJets
                                                                                 , processName         = skimProcess
                                                                                 , leptonSelector      = patMuons
                                                                                 , jetSelector         = patJets
+                                                                                ### FIXME BEGIN
+                                                                                , jetCut              = cms.string( jetCut )
+                                                                                ### FIXME END
                                                                                 )
 process.ttSemiLepHypSelectionFilterElectrons = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtElectrons
                                                                                 , ttSemiLepHypLeptons = ttSemiLepHypElectrons
@@ -184,6 +191,9 @@ process.ttSemiLepHypSelectionFilterElectrons = ttSemiLepHypSelectionFilter.clone
                                                                                 , processName         = skimProcess
                                                                                 , leptonSelector      = patElectrons
                                                                                 , jetSelector         = patJets
+                                                                                ### FIXME BEGIN
+                                                                                , jetCut              = cms.string( jetCut )
+                                                                                ### FIXME END
                                                                                 )
 
 process.matcherSequence = cms.Sequence(
