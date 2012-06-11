@@ -40,8 +40,8 @@ class TtSemiLepHypSelectionFilter : public edm::EDFilter {
 
     // Provenance
     HLTConfigProvider origConfig_;
-    std::string       leptonSelectorCut_;
-    std::string       jetSelectorCut_;
+    std::string       leptonSelectorCutTight_; // can also be filled in the configuration
+    std::string       jetSelectorCutTight_;    // can also be filled in the configuration
 
   public:
 
@@ -74,7 +74,13 @@ TtSemiLepHypSelectionFilter::TtSemiLepHypSelectionFilter( const edm::ParameterSe
 , processName_( iConfig.getParameter< std::string >( "processName" ) )
 , leptonSelector_( iConfig.getParameter< std::string >( "leptonSelector" ) )
 , jetSelector_( iConfig.getParameter< std::string >( "jetSelector" ) )
+, leptonSelectorCutTight_( "" )
+, jetSelectorCutTight_( "" )
 {
+
+  if ( iConfig.exists( "leptonCut" ) ) leptonSelectorCutTight_ = iConfig.getParameter< std::string >( "leptonCut" );
+  if ( iConfig.exists( "jetCut" ) )    jetSelectorCutTight_    = iConfig.getParameter< std::string >( "jetCut" );
+
 }
 
 
@@ -92,10 +98,19 @@ bool TtSemiLepHypSelectionFilter::beginRun( edm::Run & iRun, const edm::EventSet
   }
 
   // Get original configuration
-  leptonSelectorCut_ = origConfig_.modulePSet( leptonSelector_ ).getParameter< std::string >( "cut" );
-  jetSelectorCut_    = origConfig_.modulePSet( jetSelector_ ).getParameter< std::string >( "cut" );
-  edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Lepton selection cut: '" << leptonSelectorCut_ << "'";
-  edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Jet selection cut: '"    << jetSelectorCut_    << "'";
+  edm::LogPrint( "TtSemiLepHypSelectionFilter" ) << "\nTtSemiLepHypSelectionFilter";
+  if ( origConfig_.processPSet().exists( ttSemiLepHypLeptonsTag_.label() ) ) {
+    std::string leptonSelectorCutLoose  = origConfig_.modulePSet( ttSemiLepHypLeptonsTag_.label() ).getParameter< std::string >( "cut" );
+    edm::LogPrint( "TtSemiLepHypSelectionFilter" ) << "  Lepton selection cut (loose): '" << leptonSelectorCutLoose << "'";
+  }
+  if ( leptonSelectorCutTight_.empty() ) leptonSelectorCutTight_ = origConfig_.modulePSet( leptonSelector_ ).getParameter< std::string >( "cut" );
+  edm::LogPrint( "TtSemiLepHypSelectionFilter" ) << "  Lepton selection cut (tight): '" << leptonSelectorCutTight_ << "'";
+  if ( origConfig_.processPSet().exists( ttSemiLepHypJetsTag_.label() ) ) {
+    std::string jetSelectorCutLoose = origConfig_.modulePSet( ttSemiLepHypJetsTag_.label() ).getParameter< std::string >( "cut" );
+    edm::LogPrint( "TtSemiLepHypSelectionFilter" ) << "  Jet selection cut    (loose): '" << jetSelectorCutLoose << "'";
+  }
+  if ( jetSelectorCutTight_.empty() ) jetSelectorCutTight_ = origConfig_.modulePSet( jetSelector_ ).getParameter< std::string >( "cut" );
+  edm::LogPrint( "TtSemiLepHypSelectionFilter" ) << "  Jet selection cut    (tight): '" << jetSelectorCutTight_ << "'\n";
 
   return true;
 
@@ -110,13 +125,13 @@ bool TtSemiLepHypSelectionFilter::filter( edm::Event & iEvent, const edm::EventS
   edm::Handle< TtSemiLeptonicEvent > ttSemiLepEvt;
   iEvent.getByLabel( ttSemiLepEvtTag_, ttSemiLepEvt );
   if ( ! ttSemiLepEvt->isHypoValid( ttSemiLepHyp_ ) ) {
-    edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Event hypothesis '" << ttSemiLepHyp_ << "' not available/valid.";
+    LogDebug( "TtSemiLepHypSelectionFilter" ) << "Event hypothesis '" << ttSemiLepHyp_ << "' not available/valid.";
     return result;
   }
   const std::vector< int > jetLepCombi( ttSemiLepEvt->jetLeptonCombination( ttSemiLepHyp_ ) );
 
   if ( origConfig_.moduleType( leptonSelector_ ) == "PATMuonSelector" ) {
-    StringCutObjectSelector< pat::Muon > muonSelector( leptonSelectorCut_ );
+    StringCutObjectSelector< pat::Muon > muonSelector( leptonSelectorCutTight_ );
     edm::Handle< pat::MuonCollection > patMuons;
     iEvent.getByLabel( ttSemiLepHypLeptonsTag_, patMuons );
     const pat::Muon singleMuon( patMuons->at( jetLepCombi.at( TtSemiLepEvtPartons::Lepton ) ) );
@@ -126,7 +141,7 @@ bool TtSemiLepHypSelectionFilter::filter( edm::Event & iEvent, const edm::EventS
     }
   }
   else if ( origConfig_.moduleType( leptonSelector_ ) == "PATElectronSelector" ) {
-    StringCutObjectSelector< pat::Electron > electronSelector( leptonSelectorCut_ );
+    StringCutObjectSelector< pat::Electron > electronSelector( leptonSelectorCutTight_ );
     edm::Handle< pat::ElectronCollection > patElectrons;
     iEvent.getByLabel( ttSemiLepHypLeptonsTag_, patElectrons );
     const pat::Electron singleElectron( patElectrons->at( jetLepCombi.at( TtSemiLepEvtPartons::Lepton ) ) );
@@ -138,7 +153,7 @@ bool TtSemiLepHypSelectionFilter::filter( edm::Event & iEvent, const edm::EventS
 
   edm::Handle< pat::JetCollection > patJets;
   iEvent.getByLabel( ttSemiLepHypJetsTag_, patJets );
-  StringCutObjectSelector< pat::Jet > jetSelector( jetSelectorCut_ );
+  StringCutObjectSelector< pat::Jet > jetSelector( jetSelectorCutTight_ );
   const pat::Jet leptonicDecayB( patJets->at( jetLepCombi.at( TtSemiLepEvtPartons::LepB ) ) );
   if ( ! jetSelector( leptonicDecayB ) ) {
     edm::LogInfo( "TtSemiLepHypSelectionFilter" ) << "Leptonic b-jet failed";
