@@ -12,9 +12,9 @@ rfioInput = False
 era = 'Summer11'
 
 # Settings
-overwrite = True # to throw away earlier versions of histograms, trees and functions
+overwrite = False # to throw away earlier versions of histograms, trees and functions
 # !!! Exclusive switches:
-usePileUp = True
+usePileUp = False
 useAlt    = False
 useSymm   = True
 refGen    = False
@@ -140,8 +140,12 @@ process.resFuncs = cms.PSet(
 , resolutionFunctionInverseInv    = cms.string( 'sqrt(([2]*[2]*x+[1]*[1])*x+[0]*[0])*x' )
 , resolutionFunctionInverseInvRel = cms.string( 'sqrt(([2]*[2]*x+[1]*[1])*x+[0]*[0])' )
   # skip resolutions without existing counterpart?
-, onlyExisting = cms.bool( True ) # True includes the writing of resolution function text files.
+, onlyExisting = cms.bool( True ) # True includes the possibility of writing resolution function text files.
+, writeFiles   = cms.bool( True ) # True takes effect only, if "onlyExisting" is True, too.
 )
+
+if runTest:
+  process.resFuncs.writeFiles = False
 
 process.jecsL5L7 = cms.PSet(
   fit = cms.bool( True )

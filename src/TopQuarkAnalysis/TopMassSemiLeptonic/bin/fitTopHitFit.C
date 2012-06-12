@@ -77,6 +77,7 @@ int main( int argc, char * argv[] )
   const std::string resFuncInvInv_( resFuncs_.getParameter< std::string >( "resolutionFunctionInverseInv" ) );
   const std::string resFuncInvInvRel_( resFuncs_.getParameter< std::string >( "resolutionFunctionInverseInvRel" ) );
   const bool onlyExisting_( resFuncs_.getParameter< bool >( "onlyExisting" ) );
+  const bool writeFiles_( resFuncs_.getParameter< bool >( "writeFiles" ) && onlyExisting_ );
   // Configuration for fitting L5L7 JECs
   const edm::ParameterSet & jecsL5L7_( process_.getParameter< edm::ParameterSet >( "jecsL5L7" ) );
   const bool fitJecsL5L7_( jecsL5L7_.getParameter< bool >( "fit" ) );
@@ -376,10 +377,10 @@ int main( int argc, char * argv[] )
         TDirectory * dirFit_( dynamic_cast< TDirectory* >( dirProp_->Get( subFit.c_str() ) ) );
         dirFit_->cd();
 
+        const std::string name( objCat + "_" + kinProp + "_" + subFit );
+
         // Inversion flags
         const bool inverse( subFit.find( "Inv" ) != std::string::npos );
-
-        const std::string name( objCat + "_" + kinProp + "_" + subFit );
 
         std::string yTitle( yTitles.at( uProp ) );
         std::string yRelTitle( yRelTitles.at( uProp ) );
@@ -418,11 +419,13 @@ int main( int argc, char * argv[] )
           histPtDelta->SetXTitle( yTitle.c_str() );
           histPtDelta->SetYTitle( zTitle.c_str() );
           histVecPtDelta.push_back( histPtDelta );
-          const std::string namePtDeltaRel( namePtDelta + "Rel" );
-          TH1D * histPtDeltaRel( new TH1D( namePtDeltaRel.c_str(), titlePtDelta.c_str(), deltaBins, -1., 1. ) );
-          histPtDeltaRel->SetXTitle( yRelTitle.c_str() );
-          histPtDeltaRel->SetYTitle( zTitle.c_str() );
-          histVecPtDeltaRel.push_back( histPtDeltaRel );
+          if ( ! inverse && kinProp == "Pt" ) {
+            const std::string namePtDeltaRel( namePtDelta + "Rel" );
+            TH1D * histPtDeltaRel( new TH1D( namePtDeltaRel.c_str(), titlePtDelta.c_str(), deltaBins, -1., 1. ) );
+            histPtDeltaRel->SetXTitle( yRelTitle.c_str() );
+            histPtDeltaRel->SetYTitle( zTitle.c_str() );
+            histVecPtDeltaRel.push_back( histPtDeltaRel );
+          }
         }
 
         // Loop over eta bins
@@ -509,7 +512,7 @@ int main( int argc, char * argv[] )
             histDelta->Add( histEtaPtDelta );
             histVecPtDelta.at( uPt )->Add( histEtaPtDelta );
             histEtaDelta->Add( histEtaPtDelta );
-            if ( kinProp == "Pt" ) {
+            if ( ! inverse && kinProp == "Pt" ) {
               histDeltaRel->Add( histEtaPtDeltaRel );
               histVecPtDeltaRel.at( uPt )->Add( histEtaPtDeltaRel );
               histEtaDeltaRel->Add( histEtaPtDeltaRel );
@@ -530,7 +533,8 @@ int main( int argc, char * argv[] )
             histEtaPtDeltaRebin->SetYTitle( histEtaPtDelta->GetYaxis()->GetTitle() );
 
             const std::string nameEtaPtDeltaRelRebin( nameEtaPtDeltaRel + "Rebin" );
-//             const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+//             const Int_t deltaBinsRebinRel( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+            const Int_t deltaBinsRebinRel( deltaBins );
             const Double_t meanEtaPtDeltaRel( histEtaPtDeltaRel->GetMean() );
             const Double_t widthEtaPtDeltaRel( std::fabs( histEtaPtDeltaRel->GetRMS() ) );
             if ( widthEtaPtDeltaRel == 0. && verbose_ > 2 ) {
@@ -538,7 +542,7 @@ int main( int argc, char * argv[] )
                         << "    no histogram \"width\" in '" << nameEtaPtDeltaRel << "'" << std::endl;
             }
             const Double_t rangeEtaPtDeltaRelRebin( widthEtaPtDeltaRel == 0. ? widthFactor_ * std::fabs( histEtaPtDeltaRel->GetXaxis()->GetXmax() ) : widthFactor_ * widthEtaPtDeltaRel ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-            TH1D * histEtaPtDeltaRelRebin( new TH1D( nameEtaPtDeltaRelRebin.c_str(), titleEtaPtDelta.c_str(), deltaBinsRebin, -rangeEtaPtDeltaRelRebin + meanEtaPtDeltaRel, rangeEtaPtDeltaRelRebin + meanEtaPtDeltaRel ) );
+            TH1D * histEtaPtDeltaRelRebin( new TH1D( nameEtaPtDeltaRelRebin.c_str(), titleEtaPtDelta.c_str(), deltaBinsRebinRel, -rangeEtaPtDeltaRelRebin + meanEtaPtDeltaRel, rangeEtaPtDeltaRelRebin + meanEtaPtDeltaRel ) );
             histEtaPtDeltaRelRebin->SetXTitle( histEtaPtDeltaRel->GetXaxis()->GetTitle() );
             histEtaPtDeltaRelRebin->SetYTitle( histEtaPtDeltaRel->GetYaxis()->GetTitle() );
 
@@ -572,6 +576,7 @@ int main( int argc, char * argv[] )
 
           const std::string nameEtaDeltaRelRebin( nameEtaDeltaRel + "Rebin" );
 //           const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+          const Int_t deltaBinsRebinRel( deltaBins );
           const Double_t meanEtaDeltaRel( histEtaDeltaRel->GetMean() );
           const Double_t widthEtaDeltaRel( std::fabs( histEtaDeltaRel->GetRMS() ) );
           if ( widthEtaDeltaRel == 0. && verbose_ > 2 ) {
@@ -579,7 +584,7 @@ int main( int argc, char * argv[] )
                       << "    no histogram \"width\" in '" << nameEtaDeltaRel << "'" << std::endl;
           }
           const Double_t rangeEtaDeltaRelRebin( widthEtaDeltaRel == 0. ? widthFactor_ * std::fabs( histEtaDeltaRel->GetXaxis()->GetXmax() ) : widthFactor_ * widthEtaDeltaRel ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-          TH1D * histEtaDeltaRelRebin( new TH1D( nameEtaDeltaRelRebin.c_str(), titleEtaDelta.c_str(), deltaBinsRebin, -rangeEtaDeltaRelRebin + meanEtaDeltaRel, rangeEtaDeltaRelRebin + meanEtaDeltaRel ) );
+          TH1D * histEtaDeltaRelRebin( new TH1D( nameEtaDeltaRelRebin.c_str(), titleEtaDelta.c_str(), deltaBinsRebinRel, -rangeEtaDeltaRelRebin + meanEtaDeltaRel, rangeEtaDeltaRelRebin + meanEtaDeltaRel ) );
           histEtaDeltaRelRebin->SetXTitle( histEtaDeltaRel->GetXaxis()->GetTitle() );
           histEtaDeltaRelRebin->SetYTitle( histEtaDeltaRel->GetYaxis()->GetTitle() );
 
@@ -617,7 +622,8 @@ int main( int argc, char * argv[] )
         histDeltaRebin->SetYTitle( histDelta->GetYaxis()->GetTitle() );
 
         const std::string nameDeltaRelRebin( nameDeltaRel + "Rebin" );
-//         const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+//         const Int_t deltaBinsRebinRel( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+        const Int_t deltaBinsRebinRel( deltaBins );
         const Double_t meanDeltaRel( histDeltaRel->GetMean() );
         const Double_t widthDeltaRel( std::fabs( histDeltaRel->GetRMS() ) );
         if ( widthDeltaRel == 0. && verbose_ > 2 ) {
@@ -625,7 +631,7 @@ int main( int argc, char * argv[] )
                     << "    no histogram \"width\" in '" << nameDeltaRel << "'" << std::endl;
         }
         const Double_t rangeDeltaRelRebin( widthDeltaRel == 0. ? widthFactor_ * std::fabs( histDeltaRel->GetXaxis()->GetXmax() ) : widthFactor_ * widthDeltaRel ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-        TH1D * histDeltaRelRebin( new TH1D( nameDeltaRelRebin.c_str(), titleDelta.c_str(), deltaBinsRebin, -rangeDeltaRelRebin + meanDeltaRel, rangeDeltaRelRebin + meanDeltaRel ) );
+        TH1D * histDeltaRelRebin( new TH1D( nameDeltaRelRebin.c_str(), titleDelta.c_str(), deltaBinsRebinRel, -rangeDeltaRelRebin + meanDeltaRel, rangeDeltaRelRebin + meanDeltaRel ) );
         histDeltaRelRebin->SetXTitle( histDeltaRel->GetXaxis()->GetTitle() );
         histDeltaRelRebin->SetYTitle( histDeltaRel->GetYaxis()->GetTitle() );
 
@@ -636,8 +642,8 @@ int main( int argc, char * argv[] )
           const std::string namePt( objCat + "_" + kinProp + "_" + subFit + "_Pt" + binPt );
 
           const std::string namePtDelta( namePt + "_Delta" );
+          const std::string titlePtDelta( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq #eta #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
           const std::string namePtDeltaRebin( namePtDelta + "Rebin" );
-          const std::string titlePtDeltaRebin( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq #eta #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
 //           const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
           const Int_t deltaBinsRebin( deltaBins );
           const Double_t meanPtDelta( histVecPtDelta.at( uPt )->GetMean() );
@@ -647,26 +653,28 @@ int main( int argc, char * argv[] )
                       << "    no histogram \"width\" in '" << namePtDelta << "'" << std::endl;
           }
           const Double_t rangePtDeltaRebin( widthPtDelta == 0. ? widthFactor_ * std::fabs( histVecPtDelta.at( uPt )->GetXaxis()->GetXmax() ) : widthFactor_ * widthPtDelta ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-          TH1D * histPtDeltaRebin( new TH1D( namePtDeltaRebin.c_str(), titlePtDeltaRebin.c_str(), deltaBinsRebin, -rangePtDeltaRebin + meanPtDelta, rangePtDeltaRebin + meanPtDelta ) );
+          TH1D * histPtDeltaRebin( new TH1D( namePtDeltaRebin.c_str(), titlePtDelta.c_str(), deltaBinsRebin, -rangePtDeltaRebin + meanPtDelta, rangePtDeltaRebin + meanPtDelta ) );
           histPtDeltaRebin->SetXTitle( yTitle.c_str() );
           histPtDeltaRebin->SetYTitle( zTitle.c_str() );
           histVecPtDeltaRebin.push_back( histPtDeltaRebin );
 
-          const std::string namePtDeltaRel( namePtDelta + "Rel" );
-          const std::string namePtDeltaRelRebin( namePtDeltaRel + "Rebin" );
-//           const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
-          const Double_t meanPtDeltaRel( histVecPtDeltaRel.at( uPt )->GetMean() );
-          const Double_t widthPtDeltaRel( std::fabs( histVecPtDeltaRel.at( uPt )->GetRMS() ) );
-          if ( widthPtDeltaRel == 0. && verbose_ > 2 ) {
-            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                      << "    no histogram \"width\" in '" << namePtDeltaRel << "'" << std::endl;
+          if ( ! inverse && kinProp == "Pt" ) {
+            const std::string namePtDeltaRel( namePtDelta + "Rel" );
+            const std::string namePtDeltaRelRebin( namePtDeltaRel + "Rebin" );
+//             const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+            const Double_t meanPtDeltaRel( histVecPtDeltaRel.at( uPt )->GetMean() );
+            const Double_t widthPtDeltaRel( std::fabs( histVecPtDeltaRel.at( uPt )->GetRMS() ) );
+            if ( widthPtDeltaRel == 0. && verbose_ > 2 ) {
+              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                        << "    no histogram \"width\" in '" << namePtDeltaRel << "'" << std::endl;
+            }
+            const Double_t rangePtDeltaRelRebin( widthPtDeltaRel == 0. ? widthFactor_ * std::fabs( histVecPtDeltaRel.at( uPt )->GetXaxis()->GetXmax() ) : widthFactor_ * widthPtDeltaRel ); // FIXME: tune, incl. under- and overflow, remove hard-coding
+            TH1D * histPtDeltaRelRebin( new TH1D( namePtDeltaRelRebin.c_str(), titlePtDelta.c_str(), deltaBinsRebinRel, -rangePtDeltaRelRebin + meanPtDeltaRel, rangePtDeltaRelRebin + meanPtDeltaRel ) );
+            histPtDeltaRelRebin->SetXTitle( yRelTitle.c_str() );
+            histPtDeltaRelRebin->SetYTitle( zTitle.c_str() );
+            histVecPtDeltaRelRebin.push_back( histPtDeltaRelRebin );
           }
-          const Double_t rangePtDeltaRelRebin( widthPtDeltaRel == 0. ? widthFactor_ * std::fabs( histVecPtDeltaRel.at( uPt )->GetXaxis()->GetXmax() ) : widthFactor_ * widthPtDeltaRel ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-          TH1D * histPtDeltaRelRebin( new TH1D( namePtDeltaRelRebin.c_str(), titlePtDeltaRebin.c_str(), deltaBinsRebin, -rangePtDeltaRelRebin + meanPtDeltaRel, rangePtDeltaRelRebin + meanPtDeltaRel ) );
-          histPtDeltaRelRebin->SetXTitle( yRelTitle.c_str() );
-          histPtDeltaRelRebin->SetYTitle( zTitle.c_str() );
-          histVecPtDeltaRelRebin.push_back( histPtDeltaRelRebin );
-        }
+        } // loop: uPt < nPtBins_
 
         if ( sizeEtaBins != nEtaBins_ ) {
           std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
@@ -724,7 +732,7 @@ int main( int argc, char * argv[] )
     if ( fitResFuncs_ ) {
 
       // Save fit results for text output
-      std::vector< std::vector< double > > CsRebin, RsRebin, NsRebin; // resolution parameter vectors
+      std::vector< std::vector< double > > Cs, Rs, Ns; // resolution parameter vectors
 
       // Loop over kinematic properties
 
@@ -744,9 +752,9 @@ int main( int argc, char * argv[] )
         const std::string kinProp( keyProp->GetName() );
         TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
 
-        CsRebin.push_back( std::vector< double >( nEtaBins_ ) );
-        RsRebin.push_back( std::vector< double >( nEtaBins_ ) );
-        NsRebin.push_back( std::vector< double >( nEtaBins_ ) );
+        Cs.push_back( std::vector< double >( nEtaBins_ ) );
+        Rs.push_back( std::vector< double >( nEtaBins_ ) );
+        Ns.push_back( std::vector< double >( nEtaBins_ ) );
 
         // Loop over fit versions
         TList * listProp( dirProp_->GetListOfKeys() );
@@ -777,7 +785,74 @@ int main( int argc, char * argv[] )
             }
           }
 
-          const std::string formula( inverse ? resFuncInv_ : resFunc_ );
+          const std::string name( objCat + "_" + kinProp + "_" + subFit );
+
+          // Fit performance histograms
+
+          // Single resolutions maps
+          const std::string nameDeltaFitChi2Map( name + "_DeltaFitChi2Map" );
+          TH2D * histDeltasFitChi2Map( new TH2D( nameDeltaFitChi2Map.c_str(), titleChi2.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+          histDeltasFitChi2Map->SetXTitle( titleEta.c_str() );
+          histDeltasFitChi2Map->SetYTitle( titlePt.c_str() );
+          histDeltasFitChi2Map->SetZTitle( titleChi2.c_str() );
+          const std::string nameDeltaFitProbMap( name + "_DeltaFitProbMap" );
+          TH2D * histDeltasFitProbMap( new TH2D( nameDeltaFitProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+          histDeltasFitProbMap->SetXTitle( titleEta.c_str() );
+          histDeltasFitProbMap->SetYTitle( titlePt.c_str() );
+          histDeltasFitProbMap->SetZTitle( titleProb.c_str() );
+          const std::string nameDeltaFitProb( name + "_DeltasNtup_fitProb" );
+          TH1D * histDeltaFitProb( new TH1D( nameDeltaFitProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+          histDeltaFitProb->SetXTitle( titleProb.c_str() );
+          // Failing fits
+          const std::string nameDeltasFitMissingMap( name + "_eDeltasFitMissingMap" );
+          TH2D * histDeltasFitMissingMap( new TH2D( nameDeltasFitMissingMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+          histDeltasFitMissingMap->SetXTitle( titleEta.c_str() );
+          histDeltasFitMissingMap->SetYTitle( titlePt.c_str() );
+          const std::string nameDeltasFitBadProbMap( name + "_DeltasFitBadProbMap" );
+          TH2D * histDeltasFitBadProbMap( new TH2D( nameDeltasFitBadProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+          histDeltasFitBadProbMap->SetXTitle( titleEta.c_str() );
+          histDeltasFitBadProbMap->SetYTitle( titlePt.c_str() );
+          histDeltasFitBadProbMap->SetZTitle( titleProb.c_str() );
+          const std::string nameDeltasNFitBadNdfMap( name + "_DeltasNFitBadNdfMap" );
+          TH2D * histDeltasNFitBadNdfMap( new TH2D( nameDeltasNFitBadNdfMap.c_str(), titleNdf.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+          histDeltasNFitBadNdfMap->SetXTitle( titleEta.c_str() );
+          histDeltasNFitBadNdfMap->SetYTitle( titlePt.c_str() );
+          histDeltasNFitBadNdfMap->SetZTitle( titleNdf.c_str() );
+          const std::string nameDeltasFitBadProb( name + "_DeltasFitBadProb" );
+          TH1D * histDeltasFitBadProb( new TH1D( nameDeltasFitBadProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+          histDeltasFitBadProb->SetXTitle( titleProb.c_str() );
+          const std::string nameDeltasFitBadNdf( name + "_DeltasFitBadNdf" );
+          TH1D * histDeltasFitBadNdf( new TH1D( nameDeltasFitBadNdf.c_str(), titleNdf.c_str(), 20, 0., 20. ) );
+          histDeltasFitBadNdf->SetXTitle( titleNdf.c_str() );
+
+          // Resolution functions
+          const std::string nameSigmaFitChi2Map( name + "_SigmaFitChi2Map" );
+          TH1D * histSigmaFitChi2Map( new TH1D( nameSigmaFitChi2Map.c_str(), titleChi2.c_str(), nEtaBins_, etaBins_.data() ) );
+          histSigmaFitChi2Map->SetXTitle( titleEta.c_str() );
+          histSigmaFitChi2Map->SetYTitle( titleChi2.c_str() );
+          const std::string nameSigmaFitProbMap( name + "_SigmaFitProbMap" );
+          TH1D * histSigmaFitProbMap( new TH1D( nameSigmaFitProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+          histSigmaFitProbMap->SetXTitle( titleEta.c_str() );
+          histSigmaFitProbMap->SetYTitle( titleProb.c_str() );
+          const std::string nameSigmaFitProb( name + "_SigmaFitProb" );
+          TH1D * histSigmaFitProb( new TH1D( nameSigmaFitProb.c_str(), titleProb.c_str(), 20, 0., 1. ) );
+          histSigmaFitProb->SetXTitle( titleProb.c_str() );
+          // Failing fits
+          const std::string nameSigmaFitMissingMap( name + "_SigmaFitMissingMap" );
+          TH1D * histSigmaFitMissingMap( new TH1D( nameSigmaFitMissingMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+          histSigmaFitMissingMap->SetXTitle( titleEta.c_str() );
+          const std::string nameSigmaFitBadProbMap( name + "_SigmaFitBadProbMap" );
+          TH1D * histSigmaFitBadProbMap( new TH1D( nameSigmaFitBadProbMap.c_str(), titleProb.c_str(), nEtaBins_, etaBins_.data() ) );
+          histSigmaFitBadProbMap->SetXTitle( titleEta.c_str() );
+          histSigmaFitBadProbMap->SetYTitle( titleProb.c_str() );
+          const std::string nameSigmaFitBadNdfMap( name + "_SigmaFitBadNdfMap" );
+          TH1D * histSigmaFitBadNdfMap( new TH1D( nameSigmaFitBadNdfMap.c_str(), titleNdf.c_str(), nEtaBins_, etaBins_.data() ) );
+          histSigmaFitBadNdfMap->SetXTitle( titleEta.c_str() );
+          histSigmaFitBadNdfMap->SetYTitle( titleNdf.c_str() );
+          histSigmaFitBadNdfMap->SetXTitle( titleProb.c_str() );
+          const std::string nameSigmaFitBadNdf( name + "_SigmaFitBadNdff" );
+          TH1D * histSigmaFitBadNdf( new TH1D( nameSigmaFitBadNdf.c_str(), titleNdf.c_str(), 20, 0., 20. ) );
+          histSigmaFitBadNdf->SetXTitle( titleNdf.c_str() );
 
           // Loop over eta bins
           TList * listFit( dirFit_->GetListOfKeys() );
@@ -789,11 +864,21 @@ int main( int argc, char * argv[] )
             dirFit_->cd( binEta.c_str() );
 
             const std::string nameEta( objCat + "_" + kinProp + "_" + subFit + "_" + binEta );
+            const std::string formula( inverse ? resFuncInv_ : resFunc_ );
+            const std::string formulaRel( inverse ? resFuncInvRel_ : resFuncRel_ );
+
+            const std::string nameDeltaFitChi2( name + "_DeltaFitChi2" );
+            TH1D * histDeltaFitChi2( new TH1D( nameDeltaFitChi2.c_str(), titleChi2.c_str(), nPtBins_, ptBins_.data() ) );
+            histDeltaFitChi2->SetXTitle( titlePt.c_str() );
+            histDeltaFitChi2->SetYTitle( titleChi2.c_str() );
+            const std::string nameDeltaFitProb( name + "_DeltaFitProb" );
+            TH1D * histDeltaFitProb( new TH1D( nameDeltaFitProb.c_str(), titleProb.c_str(), nPtBins_, ptBins_.data() ) );
+            histDeltaFitProb->SetXTitle( titlePt.c_str() );
+            histDeltaFitProb->SetYTitle( titleProb.c_str() );
 
             const std::string nameEtaSigma( nameEta + "_Sigma" );
-            const std::string nameEtaSigmaRebin( nameEtaSigma + "Rebin" );
-            const std::string titleEtaSigmaRebin( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) );
-            TH1D * histEtaSigmaRebin( new TH1D( nameEtaSigmaRebin.c_str(), titleEtaSigmaRebin.c_str(), nPtBins_, ptBins_.data() ) );
+            const std::string titleEtaSigma( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) );
+            TH1D * histEtaSigma( new TH1D( nameEtaSigma.c_str(), titleEtaSigma.c_str(), nPtBins_, ptBins_.data() ) );
 
             for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
               const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
@@ -806,38 +891,38 @@ int main( int argc, char * argv[] )
               const std::string nameEtaPtDeltaFit( nameEtaPtDelta + "_fit" );
               const std::string nameEtaPtDeltaRebinFit( nameEtaPtDeltaRebin + "_fit" );
               TF1 * fitEtaPtDeltaRebin( new TF1( nameEtaPtDeltaRebinFit.c_str(), "gaus", histEtaPtDeltaRebin->GetXaxis()->GetXmin(), histEtaPtDeltaRebin->GetXaxis()->GetXmax() ) );
-              TFitResultPtr fitEtaPtDeltaRebinResultPtr( histEtaPtDeltaRebin->Fit( fitEtaPtDeltaRebin, optionsFit_.c_str() ) );
-              if ( fitEtaPtDeltaRebinResultPtr >= 0 ) {
-                if ( fitEtaPtDeltaRebinResultPtr->Status() == 0 && fitEtaPtDeltaRebinResultPtr->Ndf() != 0. ) {
-//                   histDeltasNtupChi2Map->SetBinContent( uEta + 1, uPt + 1, fitEtaPtDeltaRebinResultPtr->Chi2() / fitEtaPtDeltaRebinResultPtr->Ndf() );
-//                   histDeltaNtupChi2->SetBinContent( uPt + 1, fitEtaPtDeltaRebinResultPtr->Chi2() / fitEtaPtDeltaRebinResultPtr->Ndf() );
-//                   histDeltasNtupProbMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtDeltaRebinResultPtr->Prob() );
-//                   histDeltasNtupProb->Fill( fitEtaPtDeltaRebinResultPtr->Prob() );
-//                   histDeltaNtupProb->SetBinContent( uPt + 1, fitEtaPtDeltaRebinResultPtr->Prob() );
-                  histEtaSigmaRebin->SetBinContent( uPt + 1, fitEtaPtDeltaRebinResultPtr->Parameter( 2 ) );
-                  histEtaSigmaRebin->SetBinError( uPt + 1, fitEtaPtDeltaRebinResultPtr->ParError( 2 ) );
+              TFitResultPtr fitEtaPtDeltaResultPtr( histEtaPtDeltaRebin->Fit( fitEtaPtDeltaRebin, optionsFit_.c_str() ) );
+              if ( fitEtaPtDeltaResultPtr >= 0 ) {
+                if ( fitEtaPtDeltaResultPtr->Status() == 0 && fitEtaPtDeltaResultPtr->Ndf() != 0. ) {
+                  histDeltasFitChi2Map->SetBinContent( uEta + 1, uPt + 1, fitEtaPtDeltaResultPtr->Chi2() / fitEtaPtDeltaResultPtr->Ndf() );
+                  histDeltaFitChi2->SetBinContent( uPt + 1, fitEtaPtDeltaResultPtr->Chi2() / fitEtaPtDeltaResultPtr->Ndf() );
+                  histDeltasFitProbMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtDeltaResultPtr->Prob() );
+                  histDeltaFitProb->Fill( fitEtaPtDeltaResultPtr->Prob() );
+                  histDeltaFitProb->SetBinContent( uPt + 1, fitEtaPtDeltaResultPtr->Prob() );
+                  histEtaSigma->SetBinContent( uPt + 1, fitEtaPtDeltaResultPtr->Parameter( 2 ) );
+                  histEtaSigma->SetBinError( uPt + 1, fitEtaPtDeltaResultPtr->ParError( 2 ) );
                 }
                 else {
-                  if ( fitEtaPtDeltaRebinResultPtr->Prob() == 0. ) {
-//                     histDeltasNtupBadProbMap->SetBinContent( uEta + 1, uPt + 1, -1. );
-//                     histDeltasNtupBadProb->AddBinContent( 0 );
+                  if ( fitEtaPtDeltaResultPtr->Prob() == 0. ) {
+                    histDeltasFitBadProbMap->SetBinContent( uEta + 1, uPt + 1, -1. );
+                    histDeltasFitBadProb->AddBinContent( 0 );
                   }
                   else {
-//                     histDeltasNtupBadProbMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtDeltaRebinResultPtr->Prob() );
-//                     histDeltasNtupBadProb->Fill( fitEtaPtDeltaRebinResultPtr->Prob() );
+                    histDeltasFitBadProbMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtDeltaResultPtr->Prob() );
+                    histDeltasFitBadProb->Fill( fitEtaPtDeltaResultPtr->Prob() );
                   }
-//                   histDeltasNtupBadNdfMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtDeltaRebinResultPtr->Ndf() );
-//                   histDeltasNtupBadNdf->Fill( fitEtaPtDeltaRebinResultPtr->Ndf() );
+                  histDeltasNFitBadNdfMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtDeltaResultPtr->Ndf() );
+                  histDeltasFitBadNdf->Fill( fitEtaPtDeltaResultPtr->Ndf() );
                   if ( verbose_ > 2 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    failing fit in directory '"; gDirectory->pwd();
-                    std::cout << "    '" << nameEtaPtDeltaRebin << "' status " << fitEtaPtDeltaRebinResultPtr->Status() << std::endl;
+                    std::cout << "    '" << nameEtaPtDeltaRebin << "' status " << fitEtaPtDeltaResultPtr->Status() << std::endl;
                   }
                 }
               }
               else {
-//                 const Int_t iBin( histDeltasNtupMissingMap->GetBin( uEta + 1, uPt + 1 ) );
-//                 histDeltasNtupMissingMap->AddBinContent( iBin );
+                const Int_t iBin( histDeltasFitMissingMap->GetBin( uEta + 1, uPt + 1 ) );
+                histDeltasFitMissingMap->AddBinContent( iBin );
                 if ( verbose_ > 1 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    missing fit in directory '"; gDirectory->pwd();
@@ -847,80 +932,79 @@ int main( int argc, char * argv[] )
             } // loop: uPt < nPtBins_
 
             const std::string nameEtaSigmaFit( nameEtaSigma + "_fit" );
-            const std::string nameEtaSigmaRebinFit( nameEtaSigmaRebin + "_fit" );
-            TF1 * fitEtaSigmaRebinFit( new TF1( nameEtaSigmaRebinFit.c_str(), formula.c_str() ) );
-            fitEtaSigmaRebinFit->SetRange( histEtaSigmaRebin->GetXaxis()->GetXmin(), histEtaSigmaRebin->GetXaxis()->GetXmax() );
-            TFitResultPtr fitEtaSigmaRebinFitResultPtr( histEtaSigmaRebin->Fit( fitEtaSigmaRebinFit, optionsFitSigma_.c_str() ) );
-            if ( fitEtaSigmaRebinFitResultPtr >= 0 ) {
-              if ( ( fitEtaSigmaRebinFitResultPtr->Status() == 0 || fitEtaSigmaRebinFitResultPtr->Status() == 4000 ) && fitEtaSigmaRebinFitResultPtr->Ndf() != 0. ) { // ignore errors from IMPROVE
-//                 histSigmaNtupChi2Map->SetBinContent( uEta + 1, fitEtaSigmaRebinFitResultPtr->Chi2() / fitEtaSigmaRebinFitResultPtr->Ndf() );
-//                 histSigmaNtupProbMap->SetBinContent( uEta + 1, fitEtaSigmaRebinFitResultPtr->Prob() );
-//                 histSigmaNtupProb->Fill( fitEtaSigmaRebinFitResultPtr->Prob() );
-//                 if ( kinProp == "Pt" ) {
-//                   const Double_t * params( fitEtaSigmaRebinFitResultPtr->GetParams() );
-//                   const std::string nameFitSigmaNtupRel( nameEtaSigmaRebinFit + "Rel" );
-//                   TF1 * fitSigmaNtupRel( new TF1( nameFitSigmaNtupRel.c_str(), formulaRel.c_str(), histEtaSigmaRebin->GetXaxis()->GetXmin(), histEtaSigmaRebin->GetXaxis()->GetXmax() ) );
-//                   fitSigmaNtupRel->SetParameters( params );
-//                   if ( overwrite_ ) fitSigmaNtupRel->Write( 0, TObject::kOverwrite );
-//                   else              fitSigmaNtupRel->Write();
-//                   if ( inverse ) {
-//                     const std::string nameFitSigmaNtupInv( nameEtaSigmaRebinFit + "Inv" );
-//                     TF1 * fitSigmaNtupInv( new TF1( nameFitSigmaNtupInv.c_str(), resFuncInvInv_.c_str(), histEtaSigmaRebin->GetXaxis()->GetXmin(), histEtaSigmaRebin->GetXaxis()->GetXmax() ) );
-//                     fitSigmaNtupInv->SetParameters( params );
-//                     if ( overwrite_ ) fitSigmaNtupInv->Write( 0, TObject::kOverwrite );
-//                     else              fitSigmaNtupInv->Write();
-//                     const std::string nameFitSigmaNtupInvRel( nameFitSigmaNtupInv + "Rel" );
-//                     TF1 * fitSigmaNtupInvRel( new TF1( nameFitSigmaNtupInvRel.c_str(), resFuncInvInvRel_.c_str(), histEtaSigmaRebin->GetXaxis()->GetXmin(), histEtaSigmaRebin->GetXaxis()->GetXmax() ) );
-//                     fitSigmaNtupInvRel->SetParameters( params );
-//                     if ( overwrite_ ) fitSigmaNtupInvRel->Write( 0, TObject::kOverwrite );
-//                     else              fitSigmaNtupInvRel->Write();
-//                   }
-//                 }
-                if ( onlyExisting_ ) {
-                  CsRebin.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaRebinFit->GetParameter( 0 ) );
-                  RsRebin.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaRebinFit->GetParameter( 1 ) );
-                  NsRebin.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaRebinFit->GetParameter( 2 ) );
+            TF1 * fitEtaSigmaFit( new TF1( nameEtaSigmaFit.c_str(), formula.c_str() ) );
+            fitEtaSigmaFit->SetRange( histEtaSigma->GetXaxis()->GetXmin(), histEtaSigma->GetXaxis()->GetXmax() );
+            TFitResultPtr fitEtaSigmaFitResultPtr( histEtaSigma->Fit( fitEtaSigmaFit, optionsFitSigma_.c_str() ) );
+            if ( fitEtaSigmaFitResultPtr >= 0 ) {
+              if ( ( fitEtaSigmaFitResultPtr->Status() == 0 || fitEtaSigmaFitResultPtr->Status() == 4000 ) && fitEtaSigmaFitResultPtr->Ndf() != 0. ) { // ignore errors from IMPROVE
+                histSigmaFitChi2Map->SetBinContent( uEta + 1, fitEtaSigmaFitResultPtr->Chi2() / fitEtaSigmaFitResultPtr->Ndf() );
+                histSigmaFitProbMap->SetBinContent( uEta + 1, fitEtaSigmaFitResultPtr->Prob() );
+                histSigmaFitProb->Fill( fitEtaSigmaFitResultPtr->Prob() );
+                if ( ! inverse && kinProp == "Pt" ) {
+                  const Double_t * params( fitEtaSigmaFitResultPtr->GetParams() );
+                  const std::string nameEtaSigmaFitRel( nameEtaSigmaFit + "Rel" );
+                  TF1 * fitEtaSigmaRelFit( new TF1( nameEtaSigmaFitRel.c_str(), formulaRel.c_str(), histEtaSigma->GetXaxis()->GetXmin(), histEtaSigma->GetXaxis()->GetXmax() ) );
+                  fitEtaSigmaRelFit->SetParameters( params );
+                  if ( overwrite_ ) fitEtaSigmaRelFit->Write( 0, TObject::kOverwrite );
+                  else              fitEtaSigmaRelFit->Write();
+                  if ( inverse ) {
+                    const std::string nameEtaSigmaFitInv( nameEtaSigmaFit + "Inv" );
+                    TF1 * fitEtaSigmaInvFit( new TF1( nameEtaSigmaFitInv.c_str(), resFuncInvInv_.c_str(), histEtaSigma->GetXaxis()->GetXmin(), histEtaSigma->GetXaxis()->GetXmax() ) );
+                    fitEtaSigmaInvFit->SetParameters( params );
+                    if ( overwrite_ ) fitEtaSigmaInvFit->Write( 0, TObject::kOverwrite );
+                    else              fitEtaSigmaInvFit->Write();
+                    const std::string nameEtaSigmaFitInvRel( nameEtaSigmaFitInv + "Rel" );
+                    TF1 * fitEtaSigmaInvRelFit( new TF1( nameEtaSigmaFitInvRel.c_str(), resFuncInvInvRel_.c_str(), histEtaSigma->GetXaxis()->GetXmin(), histEtaSigma->GetXaxis()->GetXmax() ) );
+                    fitEtaSigmaInvRelFit->SetParameters( params );
+                    if ( overwrite_ ) fitEtaSigmaInvRelFit->Write( 0, TObject::kOverwrite );
+                    else              fitEtaSigmaInvRelFit->Write();
+                  }
                 }
-                if ( verbose_ > 3 && fitEtaSigmaRebinFitResultPtr->Status() == 4000 ) {
+                if ( writeFiles_ ) {
+                  Cs.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaFit->GetParameter( 0 ) );
+                  Rs.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaFit->GetParameter( 1 ) );
+                  Ns.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaFit->GetParameter( 2 ) );
+                }
+                if ( verbose_ > 3 && fitEtaSigmaFitResultPtr->Status() == 4000 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    IMPROVE error in directory '"; gDirectory->pwd();
-                  std::cout << "    '" << nameEtaSigmaRebinFit << "' status " << fitEtaSigmaRebinFitResultPtr->Status() << std::endl;
+                  std::cout << "    '" << nameEtaSigmaFit << "' status " << fitEtaSigmaFitResultPtr->Status() << std::endl;
                 }
               }
               else {
-                if ( fitEtaSigmaRebinFitResultPtr->Prob() == 0. ) {
-//                   histSigmaNtupBadProbMap->SetBinContent( uEta + 1, -1. );
+                if ( fitEtaSigmaFitResultPtr->Prob() == 0. ) {
+                  histSigmaFitBadProbMap->SetBinContent( uEta + 1, -1. );
 //                   histSigmaNtupBadProb->AddBinContent( 0 );
                 }
                 else {
-//                   histSigmaNtupBadProbMap->SetBinContent( uEta + 1, fitEtaSigmaRebinFitResultPtr->Prob() );
-//                   histSigmaNtupBadProb->Fill( fitEtaSigmaRebinFitResultPtr->Prob() );
+                  histSigmaFitBadProbMap->SetBinContent( uEta + 1, fitEtaSigmaFitResultPtr->Prob() );
+//                   histSigmaNtupBadProb->Fill( fitEtaSigmaFitResultPtr->Prob() );
                 }
-//                 histSigmaNtupBadNdfMap->SetBinContent( uEta + 1, fitEtaSigmaRebinFitResultPtr->Ndf() );
-//                 histSigmaNtupBadNdf->Fill( fitEtaSigmaRebinFitResultPtr->Ndf() );
-                if ( onlyExisting_ ) {
-                  CsRebin.at( uProp ).at( uEta ) = -1.;
-                  RsRebin.at( uProp ).at( uEta ) = -1.;
-                  NsRebin.at( uProp ).at( uEta ) = -1.;
+                histSigmaFitBadNdfMap->SetBinContent( uEta + 1, fitEtaSigmaFitResultPtr->Ndf() );
+                histSigmaFitBadNdf->Fill( fitEtaSigmaFitResultPtr->Ndf() );
+                if ( writeFiles_ ) {
+                  Cs.at( uProp ).at( uEta ) = -1.;
+                  Rs.at( uProp ).at( uEta ) = -1.;
+                  Ns.at( uProp ).at( uEta ) = -1.;
                 }
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    failing fit in directory '"; gDirectory->pwd();
-                  std::cout << "    '" << nameEtaSigmaRebinFit << "' status " << fitEtaSigmaRebinFitResultPtr->Status() << std::endl;
+                  std::cout << "    '" << nameEtaSigmaFit << "' status " << fitEtaSigmaFitResultPtr->Status() << std::endl;
                 }
               }
             }
             else {
-//               histSigmaNtupMissingMap->AddBinContent( uEta + 1 );
-              if ( onlyExisting_ ) {
-                CsRebin.at( uProp ).at( uEta ) = -1.;
-                RsRebin.at( uProp ).at( uEta ) = -1.;
-                NsRebin.at( uProp ).at( uEta ) = -1.;
+              histSigmaFitMissingMap->AddBinContent( uEta + 1 );
+              if ( writeFiles_ ) {
+                Cs.at( uProp ).at( uEta ) = -1.;
+                Rs.at( uProp ).at( uEta ) = -1.;
+                Ns.at( uProp ).at( uEta ) = -1.;
               }
               if ( verbose_ > 1 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                           << "    missing fit in directory '"; gDirectory->pwd();
-                std::cout << "    '" << nameEtaSigmaRebinFit << std::endl;
+                std::cout << "    '" << nameEtaSigmaFit << std::endl;
               }
             }
 
@@ -933,7 +1017,7 @@ int main( int argc, char * argv[] )
       } // loop: keyProp
 
       // Write fit results to text files
-      if ( onlyExisting_ ) {
+      if ( writeFiles_ ) {
 
         // File name
         std::string nameOut( pathOut_ + "/gentResolution_Fall11_R4_" + objCat ); // FIXME: hard-coding
@@ -944,174 +1028,88 @@ int main( int argc, char * argv[] )
         if ( refSel_)     nameOut.append( "_Ref" );
         nameOut.append( ".txt" );
 
-//         ofstream fileOut;
-//         fileOut.open( nameOut.c_str(), std::ios_base::out );
-//         if ( objMetLike ) {
-//           fileOut << std::endl << "met_resolution = ";
-//           fileOut << std::setprecision( 6 );
-//           if ( Cs.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
-//           else                           fileOut << Cs.at( 0 ).at( 0 );
-//           fileOut << ",";
-//           if ( Rs.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
-//           else                           fileOut << Rs.at( 0 ).at( 0 );
-//           fileOut << ",";
-//           if ( Ns.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
-//           else                           fileOut << Ns.at( 0 ).at( 0 );
-//         }
-//         else {
-//           unsigned nEta( 0 );
-//           if ( useSymm_ ) {
-//             for ( unsigned uEta = nEtaBins_; uEta > 0; --uEta ) {
-//               fileOut << std::endl << "etadep_etamin";
-//               fileOut.width( 3 );
-//               fileOut << std::left << nEta << "= ";
-//               fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
-//               fileOut << std::endl << "etadep_etamax";
-//               fileOut.width( 3 );
-//               fileOut << std::left << nEta << "= ";
-//               fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
-//               fileOut << std::endl << "etadep_vecres";
-//               fileOut.width( 3 );
-//               fileOut << std::left << nEta << "= ";
-//               for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
-//                 if ( uProp > 0 ) fileOut << "/";
-//                 if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
-//                 fileOut << std::setprecision( 8 );
-//                 if ( Cs.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
-//                 else                                      fileOut << Cs.at( uProp ).at( uEta - 1 );
-//                 fileOut << ",";
-//                 if ( Rs.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
-//                 else                                      fileOut << Rs.at( uProp ).at( uEta - 1 );
-//                 fileOut << ",";
-//                 if ( Ns.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
-//                 else                                      fileOut << Ns.at( uProp ).at( uEta - 1 );
-//               }
-//               fileOut << "/et"; // FIXME: determine from existing
-//               fileOut << std::endl;
-//               ++nEta;
-//             }
-//           }
-//           for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
-//             fileOut << std::endl << "etadep_etamin";
-//             fileOut.width( 3 );
-//             fileOut << std::left << nEta << "= ";
-//             fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
-//             fileOut << std::endl << "etadep_etamax";
-//             fileOut.width( 3 );
-//             fileOut << std::left << nEta << "= ";
-//             fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
-//             fileOut << std::endl << "etadep_vecres";
-//             fileOut.width( 3 );
-//             fileOut << std::left << nEta << "= ";
-//             for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
-//               if ( uProp > 0 ) fileOut << "/";
-//               if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
-//               fileOut << std::setprecision( 8 );
-//               if ( Cs.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
-//               else                                  fileOut << Cs.at( uProp ).at( uEta );
-//               fileOut << ",";
-//               if ( Rs.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
-//               else                                  fileOut << Rs.at( uProp ).at( uEta );
-//               fileOut << ",";
-//               if ( Ns.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
-//               else                                  fileOut << Ns.at( uProp ).at( uEta );
-//             }
-//             fileOut << "/et"; // FIXME: determine from existing
-//             fileOut << std::endl;
-//             ++nEta;
-//           }
-//         }
-//         fileOut.close();
-//
-//         std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-//                   << "    written resolution file for object category '" << objCat << "':" << std::endl
-//                   << "        " << nameOut << std::endl;
-
-        std::string nameOutRebin( nameOut );
-        nameOutRebin.insert( nameOutRebin.find( "gentResolution" ) + std::string( "gentResolution" ).size(), "Rebin" );
-
-        ofstream fileOutRebin;
-        fileOutRebin.open( nameOutRebin.c_str(), std::ios_base::out );
+        ofstream fileOut;
+        fileOut.open( nameOut.c_str(), std::ios_base::out );
         if ( objMetLike ) {
-          fileOutRebin << std::endl << "met_resolution = ";
-          fileOutRebin << std::setprecision( 6 );
-          if ( CsRebin.at( 0 ).at( 0 ) < 0. ) fileOutRebin << "NAN";
-          else                               fileOutRebin << CsRebin.at( 0 ).at( 0 );
-          fileOutRebin << ",";
-          if ( RsRebin.at( 0 ).at( 0 ) < 0. ) fileOutRebin << "NAN";
-          else                               fileOutRebin << RsRebin.at( 0 ).at( 0 );
-          fileOutRebin << ",";
-          if ( NsRebin.at( 0 ).at( 0 ) < 0. ) fileOutRebin << "NAN";
-          else                               fileOutRebin << NsRebin.at( 0 ).at( 0 );
+          fileOut << std::endl << "met_resolution = ";
+          fileOut << std::setprecision( 6 );
+          if ( Cs.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
+          else                           fileOut << Cs.at( 0 ).at( 0 );
+          fileOut << ",";
+          if ( Rs.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
+          else                           fileOut << Rs.at( 0 ).at( 0 );
+          fileOut << ",";
+          if ( Ns.at( 0 ).at( 0 ) < 0. ) fileOut << "NAN";
+          else                           fileOut << Ns.at( 0 ).at( 0 );
         }
         else {
           unsigned nEta( 0 );
           if ( useSymm_ ) {
             for ( unsigned uEta = nEtaBins_; uEta > 0; --uEta ) {
-              fileOutRebin << std::endl << "etadep_etamin";
-              fileOutRebin.width( 3 );
-              fileOutRebin << std::left << nEta << "= ";
-              fileOutRebin << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
-              fileOutRebin << std::endl << "etadep_etamax";
-              fileOutRebin.width( 3 );
-              fileOutRebin << std::left << nEta << "= ";
-              fileOutRebin << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
-              fileOutRebin << std::endl << "etadep_vecres";
-              fileOutRebin.width( 3 );
-              fileOutRebin << std::left << nEta << "= ";
+              fileOut << std::endl << "etadep_etamin";
+              fileOut.width( 3 );
+              fileOut << std::left << nEta << "= ";
+              fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta );
+              fileOut << std::endl << "etadep_etamax";
+              fileOut.width( 3 );
+              fileOut << std::left << nEta << "= ";
+              fileOut << std::fixed << std::setprecision( 2 ) << -etaBins_.at( uEta - 1 );
+              fileOut << std::endl << "etadep_vecres";
+              fileOut.width( 3 );
+              fileOut << std::left << nEta << "= ";
               for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
-                if ( uProp > 0 ) fileOutRebin << "/";
-                if ( nominalInv_.at( uCat ).at( uProp ) ) fileOutRebin << "-";
-                fileOutRebin << std::setprecision( 8 );
-                if ( CsRebin.at( uProp ).at( uEta - 1 ) < 0. ) fileOutRebin << "NAN";
-                else                                          fileOutRebin << CsRebin.at( uProp ).at( uEta - 1 );
-                fileOutRebin << ",";
-                if ( RsRebin.at( uProp ).at( uEta - 1 ) < 0. ) fileOutRebin << "NAN";
-                else                                          fileOutRebin << RsRebin.at( uProp ).at( uEta - 1 );
-                fileOutRebin << ",";
-                if ( NsRebin.at( uProp ).at( uEta - 1 ) < 0. ) fileOutRebin << "NAN";
-                else                                          fileOutRebin << NsRebin.at( uProp ).at( uEta - 1 );
+                if ( uProp > 0 ) fileOut << "/";
+                if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
+                fileOut << std::setprecision( 8 );
+                if ( Cs.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
+                else                                      fileOut << Cs.at( uProp ).at( uEta - 1 );
+                fileOut << ",";
+                if ( Rs.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
+                else                                      fileOut << Rs.at( uProp ).at( uEta - 1 );
+                fileOut << ",";
+                if ( Ns.at( uProp ).at( uEta - 1 ) < 0. ) fileOut << "NAN";
+                else                                      fileOut << Ns.at( uProp ).at( uEta - 1 );
               }
-              fileOutRebin << "/et"; // FIXME: determine from existing
-              fileOutRebin << std::endl;
+              fileOut << "/et"; // FIXME: determine from existing
+              fileOut << std::endl;
               ++nEta;
             }
           }
           for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
-            fileOutRebin << std::endl << "etadep_etamin";
-            fileOutRebin.width( 3 );
-            fileOutRebin << std::left << nEta << "= ";
-            fileOutRebin << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
-            fileOutRebin << std::endl << "etadep_etamax";
-            fileOutRebin.width( 3 );
-            fileOutRebin << std::left << nEta << "= ";
-            fileOutRebin << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
-            fileOutRebin << std::endl << "etadep_vecres";
-            fileOutRebin.width( 3 );
-            fileOutRebin << std::left << nEta << "= ";
+            fileOut << std::endl << "etadep_etamin";
+            fileOut.width( 3 );
+            fileOut << std::left << nEta << "= ";
+            fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta );
+            fileOut << std::endl << "etadep_etamax";
+            fileOut.width( 3 );
+            fileOut << std::left << nEta << "= ";
+            fileOut << std::fixed << std::setprecision( 2 ) << etaBins_.at( uEta + 1 );
+            fileOut << std::endl << "etadep_vecres";
+            fileOut.width( 3 );
+            fileOut << std::left << nEta << "= ";
             for ( unsigned uProp = 0; uProp < nominalInv_.at( uCat ).size(); ++uProp ) {
-              if ( uProp > 0 ) fileOutRebin << "/";
-              if ( nominalInv_.at( uCat ).at( uProp ) ) fileOutRebin << "-";
-              fileOutRebin << std::setprecision( 8 );
-              if ( CsRebin.at( uProp ).at( uEta ) < 0. ) fileOutRebin << "NAN";
-              else                                      fileOutRebin << CsRebin.at( uProp ).at( uEta );
-              fileOutRebin << ",";
-              if ( RsRebin.at( uProp ).at( uEta ) < 0. ) fileOutRebin << "NAN";
-              else                                      fileOutRebin << RsRebin.at( uProp ).at( uEta );
-              fileOutRebin << ",";
-              if ( NsRebin.at( uProp ).at( uEta ) < 0. ) fileOutRebin << "NAN";
-              else                                      fileOutRebin << NsRebin.at( uProp ).at( uEta );
+              if ( uProp > 0 ) fileOut << "/";
+              if ( nominalInv_.at( uCat ).at( uProp ) ) fileOut << "-";
+              fileOut << std::setprecision( 8 );
+              if ( Cs.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
+              else                                  fileOut << Cs.at( uProp ).at( uEta );
+              fileOut << ",";
+              if ( Rs.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
+              else                                  fileOut << Rs.at( uProp ).at( uEta );
+              fileOut << ",";
+              if ( Ns.at( uProp ).at( uEta ) < 0. ) fileOut << "NAN";
+              else                                  fileOut << Ns.at( uProp ).at( uEta );
             }
-            fileOutRebin << "/et"; // FIXME: determine from existing
-            fileOutRebin << std::endl;
+            fileOut << "/et"; // FIXME: determine from existing
+            fileOut << std::endl;
             ++nEta;
           }
         }
-        fileOutRebin.close();
+        fileOut.close();
 
         std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                   << "    written resolution file for object category '" << objCat << "':" << std::endl
-                  << "        " << nameOutRebin << std::endl;
+                  << "        " << nameOut << std::endl;
 
       }
 
@@ -1130,7 +1128,7 @@ int main( int argc, char * argv[] )
         unsigned uProp( 0 );
         while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
           if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
-          if ( onlyExisting_ && ! ( uProp < nominalInv_.at( uCat ).size() ) ) {
+          if ( ! ( uProp < nominalInv_.at( uCat ).size() ) ) {
             if ( verbose_ > 2 ) {
               std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                         << "    only " << nominalInv_.at( uCat ).size() << " kinematic properties available for " << objCat << std::endl
@@ -1165,19 +1163,19 @@ int main( int argc, char * argv[] )
             const std::string nameDeltaFit( nameDelta + "_fit" );
             const std::string nameDeltaRebinFit( nameDeltaRebin + "_fit" );
             TF1 * fitDeltaRebin( new TF1( nameDeltaRebinFit.c_str(), "gaus", histDeltaRebin->GetXaxis()->GetXmin(), histDeltaRebin->GetXaxis()->GetXmax() ) );
-            TFitResultPtr fitDeltaRebinResultPtr( histDeltaRebin->Fit( fitDeltaRebin, optionsFit_.c_str() ) );
-            if ( fitDeltaRebinResultPtr >= 0 ) {
-              if ( fitDeltaRebinResultPtr->Status() == 0 && fitDeltaRebinResultPtr->Ndf() != 0. ) {
+            TFitResultPtr fitDeltaResultPtr( histDeltaRebin->Fit( fitDeltaRebin, optionsFit_.c_str() ) );
+            if ( fitDeltaResultPtr >= 0 ) {
+              if ( fitDeltaResultPtr->Status() == 0 && fitDeltaResultPtr->Ndf() != 0. ) {
               }
               else {
-                if ( fitDeltaRebinResultPtr->Prob() == 0. ) {
+                if ( fitDeltaResultPtr->Prob() == 0. ) {
                 }
                 else {
                 }
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    failing fit in directory '"; gDirectory->pwd();
-                  std::cout << "    '" << nameDeltaRebin << "' status " << fitDeltaRebinResultPtr->Status() << std::endl;
+                  std::cout << "    '" << nameDeltaRebin << "' status " << fitDeltaResultPtr->Status() << std::endl;
                 }
               }
             }
@@ -1190,9 +1188,8 @@ int main( int argc, char * argv[] )
             }
 
             const std::string nameMean( name + "_Mean" );
-            const std::string nameMeanRebin( nameMean + "Rebin" );
-            const std::string titleMeanRebin( objCat );
-            TH1D * histMeanRebin( new TH1D( nameMeanRebin.c_str(), titleMeanRebin.c_str(), nPtBins_, ptBins_.data() ) );
+            const std::string titleMean( objCat );
+            TH1D * histMean( new TH1D( nameMean.c_str(), titleMean.c_str(), nPtBins_, ptBins_.data() ) );
             for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
               const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
               const std::string namePt( objCat + "_" + kinProp + "_" + subFit + "_Pt" + binPt );
@@ -1204,21 +1201,21 @@ int main( int argc, char * argv[] )
               const std::string namePtDeltaFit( namePtDelta + "_fit" );
               const std::string namePtDeltaRebinFit( namePtDeltaRebin + "_fit" );
               TF1 * fitPtDeltaRebin( new TF1( namePtDeltaRebinFit.c_str(), "gaus", histPtDeltaRebin->GetXaxis()->GetXmin(), histPtDeltaRebin->GetXaxis()->GetXmax() ) );
-              TFitResultPtr fitPtDeltaRebinResultPtr( histPtDeltaRebin->Fit( fitPtDeltaRebin, optionsFit_.c_str() ) );
-              if ( fitPtDeltaRebinResultPtr >= 0 ) {
-                if ( fitPtDeltaRebinResultPtr->Status() == 0 && fitPtDeltaRebinResultPtr->Ndf() != 0. ) {
-                  histMeanRebin->SetBinContent( uPt + 1, fitPtDeltaRebinResultPtr->Parameter( 1 ) );
-                  histMeanRebin->SetBinError( uPt + 1, fitPtDeltaRebinResultPtr->ParError( 1 ) );
+              TFitResultPtr fitPtDeltaResultPtr( histPtDeltaRebin->Fit( fitPtDeltaRebin, optionsFit_.c_str() ) );
+              if ( fitPtDeltaResultPtr >= 0 ) {
+                if ( fitPtDeltaResultPtr->Status() == 0 && fitPtDeltaResultPtr->Ndf() != 0. ) {
+                  histMean->SetBinContent( uPt + 1, fitPtDeltaResultPtr->Parameter( 1 ) );
+                  histMean->SetBinError( uPt + 1, fitPtDeltaResultPtr->ParError( 1 ) );
                 }
                 else {
-                  if ( fitPtDeltaRebinResultPtr->Prob() == 0. ) {
+                  if ( fitPtDeltaResultPtr->Prob() == 0. ) {
                   }
                   else {
                   }
                   if ( verbose_ > 2 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    failing fit in directory '"; gDirectory->pwd();
-                    std::cout << "    '" << namePtDeltaRebin << "' status " << fitPtDeltaRebinResultPtr->Status() << std::endl;
+                    std::cout << "    '" << namePtDeltaRebin << "' status " << fitPtDeltaResultPtr->Status() << std::endl;
                   }
                 }
               }
@@ -1231,66 +1228,26 @@ int main( int argc, char * argv[] )
               }
             } // loop: uPt < nPtBins_
 
-            const std::string nameDeltaRel( nameDelta + "Rel" );
-            const std::string nameDeltaRelRebin( nameDeltaRel + "Rebin" );
-            TH1D * histDeltaRelRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameDeltaRelRebin.c_str() ) ) );
-
-            const std::string nameDeltaRelFit( nameDeltaRel + "_fit" );
-            const std::string nameDeltaRelRebinFit( nameDeltaRelRebin + "_fit" );
-            TF1 * fitDeltaRelRebin( new TF1( nameDeltaRelRebinFit.c_str(), "gaus", histDeltaRelRebin->GetXaxis()->GetXmin(), histDeltaRelRebin->GetXaxis()->GetXmax() ) );
-            TFitResultPtr fitDeltaRelRebinResultPtr( histDeltaRelRebin->Fit( fitDeltaRelRebin, optionsFit_.c_str() ) );
-            if ( fitDeltaRelRebinResultPtr >= 0 ) {
-              if ( fitDeltaRelRebinResultPtr->Status() == 0 && fitDeltaRelRebinResultPtr->Ndf() != 0. ) {
-              }
-              else {
-                if ( fitDeltaRelRebinResultPtr->Prob() == 0. ) {
+            if ( kinProp == "Pt" ) {
+              const std::string nameDeltaRel( nameDelta + "Rel" );
+              const std::string nameDeltaRelRebin( nameDeltaRel + "Rebin" );
+              TH1D * histDeltaRelRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameDeltaRelRebin.c_str() ) ) );
+              const std::string nameDeltaRelFit( nameDeltaRel + "_fit" );
+              const std::string nameDeltaRelRebinFit( nameDeltaRelRebin + "_fit" );
+              TF1 * fitDeltaRelRebin( new TF1( nameDeltaRelRebinFit.c_str(), "gaus", histDeltaRelRebin->GetXaxis()->GetXmin(), histDeltaRelRebin->GetXaxis()->GetXmax() ) );
+              TFitResultPtr fitDeltaRelResultPtr( histDeltaRelRebin->Fit( fitDeltaRelRebin, optionsFit_.c_str() ) );
+              if ( fitDeltaRelResultPtr >= 0 ) {
+                if ( fitDeltaRelResultPtr->Status() == 0 && fitDeltaRelResultPtr->Ndf() != 0. ) {
                 }
                 else {
-                }
-                if ( verbose_ > 2 ) {
-                  std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "    failing fit in directory '"; gDirectory->pwd();
-                  std::cout << "    '" << nameDeltaRelRebin << "' status " << fitDeltaRelRebinResultPtr->Status() << std::endl;
-                }
-              }
-            }
-            else {
-              if ( verbose_ > 1 ) {
-                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    missing fit in directory '"; gDirectory->pwd();
-                std::cout << "    '" << nameDeltaRelRebin << std::endl;
-              }
-            }
-
-            const std::string nameMeanRel( nameMean + "Rel" );
-            const std::string nameMeanRelRebin( nameMeanRel + "Rebin" );
-            TH1D * histMeanRelRebin( new TH1D( nameMeanRelRebin.c_str(), titleMeanRebin.c_str(), nPtBins_, ptBins_.data() ) );
-            for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
-              const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
-              const std::string namePt( objCat + "_" + kinProp + "_" + subFit + "_Pt" + binPt );
-
-              const std::string namePtDeltaRel( namePt + "_DeltaRel" );
-              const std::string namePtDeltaRelRebin( namePtDeltaRel + "Rebin" );
-              TH1D * histPtDeltaRelRebin( dynamic_cast< TH1D* >( gDirectory->Get( namePtDeltaRelRebin.c_str() ) ) );
-
-              const std::string namePtDeltaRelFit( namePtDeltaRel + "_fit" );
-              const std::string namePtDeltaRelRebinFit( namePtDeltaRelRebin + "_fit" );
-              TF1 * fitPtDeltaRelRebin( new TF1( namePtDeltaRelRebinFit.c_str(), "gaus", histPtDeltaRelRebin->GetXaxis()->GetXmin(), histPtDeltaRelRebin->GetXaxis()->GetXmax() ) );
-              TFitResultPtr fitPtDeltaRelRebinResultPtr( histPtDeltaRelRebin->Fit( fitPtDeltaRelRebin, optionsFit_.c_str() ) );
-              if ( fitPtDeltaRelRebinResultPtr >= 0 ) {
-                if ( fitPtDeltaRelRebinResultPtr->Status() == 0 && fitPtDeltaRelRebinResultPtr->Ndf() != 0. ) {
-                  histMeanRelRebin->SetBinContent( uPt + 1, fitPtDeltaRelRebinResultPtr->Parameter( 1 ) );
-                  histMeanRelRebin->SetBinError( uPt + 1, fitPtDeltaRelRebinResultPtr->ParError( 1 ) );
-                }
-                else {
-                  if ( fitPtDeltaRelRebinResultPtr->Prob() == 0. ) {
+                  if ( fitDeltaRelResultPtr->Prob() == 0. ) {
                   }
                   else {
                   }
                   if ( verbose_ > 2 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    failing fit in directory '"; gDirectory->pwd();
-                    std::cout << "    '" << namePtDeltaRelRebin << "' status " << fitPtDeltaRelRebinResultPtr->Status() << std::endl;
+                    std::cout << "    '" << nameDeltaRelRebin << "' status " << fitDeltaRelResultPtr->Status() << std::endl;
                   }
                 }
               }
@@ -1298,10 +1255,50 @@ int main( int argc, char * argv[] )
                 if ( verbose_ > 1 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    missing fit in directory '"; gDirectory->pwd();
-                  std::cout << "    '" << namePtDeltaRelRebin << std::endl;
+                  std::cout << "    '" << nameDeltaRelRebin << std::endl;
                 }
               }
-            } // loop: uPt < nPtBins_
+
+              const std::string nameMeanRel( nameMean + "Rel" );
+              TH1D * histMeanRel( new TH1D( nameMeanRel.c_str(), titleMean.c_str(), nPtBins_, ptBins_.data() ) );
+              for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+                const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
+                const std::string namePt( objCat + "_" + kinProp + "_" + subFit + "_Pt" + binPt );
+
+                const std::string namePtDeltaRel( namePt + "_DeltaRel" );
+                const std::string namePtDeltaRelRebin( namePtDeltaRel + "Rebin" );
+                TH1D * histPtDeltaRelRebin( dynamic_cast< TH1D* >( gDirectory->Get( namePtDeltaRelRebin.c_str() ) ) );
+
+                const std::string namePtDeltaRelFit( namePtDeltaRel + "_fit" );
+                const std::string namePtDeltaRelRebinFit( namePtDeltaRelRebin + "_fit" );
+                TF1 * fitPtDeltaRelRebin( new TF1( namePtDeltaRelRebinFit.c_str(), "gaus", histPtDeltaRelRebin->GetXaxis()->GetXmin(), histPtDeltaRelRebin->GetXaxis()->GetXmax() ) );
+                TFitResultPtr fitPtDeltaRelResultPtr( histPtDeltaRelRebin->Fit( fitPtDeltaRelRebin, optionsFit_.c_str() ) );
+                if ( fitPtDeltaRelResultPtr >= 0 ) {
+                  if ( fitPtDeltaRelResultPtr->Status() == 0 && fitPtDeltaRelResultPtr->Ndf() != 0. ) {
+                    histMeanRel->SetBinContent( uPt + 1, fitPtDeltaRelResultPtr->Parameter( 1 ) );
+                    histMeanRel->SetBinError( uPt + 1, fitPtDeltaRelResultPtr->ParError( 1 ) );
+                  }
+                  else {
+                    if ( fitPtDeltaRelResultPtr->Prob() == 0. ) {
+                    }
+                    else {
+                    }
+                    if ( verbose_ > 2 ) {
+                      std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                                << "    failing fit in directory '"; gDirectory->pwd();
+                      std::cout << "    '" << namePtDeltaRelRebin << "' status " << fitPtDeltaRelResultPtr->Status() << std::endl;
+                    }
+                  }
+                }
+                else {
+                  if ( verbose_ > 1 ) {
+                    std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                              << "    missing fit in directory '"; gDirectory->pwd();
+                    std::cout << "    '" << namePtDeltaRelRebin << std::endl;
+                  }
+                }
+              } // loop: uPt < nPtBins_
+            }
 
             // Loop over eta bins
             TList * listFit( dirFit_->GetListOfKeys() );
@@ -1315,9 +1312,8 @@ int main( int argc, char * argv[] )
               const std::string nameEta( objCat + "_" + kinProp + "_" + subFit + "_" + binEta );
 
               const std::string nameEtaMean( nameEta + "_Mean" );
-              const std::string nameEtaMeanRebin( nameEtaMean + "Rebin" );
-              const std::string titleEtaMeanRebin( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) );
-              TH1D * histEtaMeanRebin( new TH1D( nameEtaMeanRebin.c_str(), titleEtaMeanRebin.c_str(), nPtBins_, ptBins_.data() ) );
+              const std::string titleEtaMean( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) );
+              TH1D * histEtaMean( new TH1D( nameEtaMean.c_str(), titleEtaMean.c_str(), nPtBins_, ptBins_.data() ) );
               for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
                 const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
                 const std::string nameEtaPt( objCat + "_" + kinProp + "_" + subFit + "_" + binEta + "_Pt" + binPt );
@@ -1329,21 +1325,21 @@ int main( int argc, char * argv[] )
                 const std::string nameEtaPtDeltaFit( nameEtaPtDelta + "_fit" );
                 const std::string nameEtaPtDeltaRebinFit( nameEtaPtDeltaRebin + "_fit" );
                 TF1 * fitEtaPtDeltaRebin( new TF1( nameEtaPtDeltaRebinFit.c_str(), "gaus", histEtaPtDeltaRebin->GetXaxis()->GetXmin(), histEtaPtDeltaRebin->GetXaxis()->GetXmax() ) );
-                TFitResultPtr fitEtaPtDeltaRebinResultPtr( histEtaPtDeltaRebin->Fit( fitEtaPtDeltaRebin, optionsFit_.c_str() ) );
-                if ( fitEtaPtDeltaRebinResultPtr >= 0 ) {
-                  if ( fitEtaPtDeltaRebinResultPtr->Status() == 0 && fitEtaPtDeltaRebinResultPtr->Ndf() != 0. ) {
-                    histEtaMeanRebin->SetBinContent( uPt + 1, fitEtaPtDeltaRebinResultPtr->Parameter( 1 ) );
-                    histEtaMeanRebin->SetBinError( uPt + 1, fitEtaPtDeltaRebinResultPtr->ParError( 1 ) );
+                TFitResultPtr fitEtaPtDeltaResultPtr( histEtaPtDeltaRebin->Fit( fitEtaPtDeltaRebin, optionsFit_.c_str() ) );
+                if ( fitEtaPtDeltaResultPtr >= 0 ) {
+                  if ( fitEtaPtDeltaResultPtr->Status() == 0 && fitEtaPtDeltaResultPtr->Ndf() != 0. ) {
+                    histEtaMean->SetBinContent( uPt + 1, fitEtaPtDeltaResultPtr->Parameter( 1 ) );
+                    histEtaMean->SetBinError( uPt + 1, fitEtaPtDeltaResultPtr->ParError( 1 ) );
                   }
                   else {
-                    if ( fitEtaPtDeltaRebinResultPtr->Prob() == 0. ) {
+                    if ( fitEtaPtDeltaResultPtr->Prob() == 0. ) {
                     }
                     else {
                     }
                     if ( verbose_ > 2 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                                 << "    failing fit in directory '"; gDirectory->pwd();
-                      std::cout << "    '" << nameEtaPtDeltaRebin << "' status " << fitEtaPtDeltaRebinResultPtr->Status() << std::endl;
+                      std::cout << "    '" << nameEtaPtDeltaRebin << "' status " << fitEtaPtDeltaResultPtr->Status() << std::endl;
                     }
                   }
                 }
@@ -1354,50 +1350,51 @@ int main( int argc, char * argv[] )
                     std::cout << "    '" << nameEtaPtDeltaRebin << std::endl;
                   }
                 }
-
               } // loop: uPt < nPtBins_
 
-              const std::string nameEtaMeanRel( nameEtaMean + "Rel" );
-              const std::string nameEtaMeanRelRebin( nameEtaMeanRel + "Rebin" );
-              TH1D * histEtaMeanRelRebin( new TH1D( nameEtaMeanRelRebin.c_str(), titleEtaMeanRebin.c_str(), nPtBins_, ptBins_.data() ) );
-              for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
-                const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
-                const std::string nameEtaPt( objCat + "_" + kinProp + "_" + subFit + "_" + binEta + "_Pt" + binPt );
+              if ( kinProp == "Pt" ) {
+                const std::string nameEtaMeanRel( nameEtaMean + "Rel" );
+                TH1D * histEtaMeanRel( new TH1D( nameEtaMeanRel.c_str(), titleEtaMean.c_str(), nPtBins_, ptBins_.data() ) );
+                for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+                  const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
+                  const std::string nameEtaPt( objCat + "_" + kinProp + "_" + subFit + "_" + binEta + "_Pt" + binPt );
 
-                const std::string nameEtaPtDeltaRel( nameEtaPt + "_DeltaRel" );
-                const std::string nameEtaPtDeltaRelRebin( nameEtaPtDeltaRel + "Rebin" );
-                TH1D * histEtaPtDeltaRelRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaPtDeltaRelRebin.c_str() ) ) );
+                  const std::string nameEtaPtDeltaRel( nameEtaPt + "_DeltaRel" );
+                  const std::string nameEtaPtDeltaRelRebin( nameEtaPtDeltaRel + "Rebin" );
+                  TH1D * histEtaPtDeltaRelRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaPtDeltaRelRebin.c_str() ) ) );
 
-                const std::string nameEtaPtDeltaRelFit( nameEtaPtDeltaRel + "_fit" );
-                const std::string nameEtaPtDeltaRelRebinFit( nameEtaPtDeltaRelRebin + "_fit" );
-                TF1 * fitEtaPtDeltaRelRebin( new TF1( nameEtaPtDeltaRelRebinFit.c_str(), "gaus", histEtaPtDeltaRelRebin->GetXaxis()->GetXmin(), histEtaPtDeltaRelRebin->GetXaxis()->GetXmax() ) );
-                TFitResultPtr fitEtaPtDeltaRelRebinResultPtr( histEtaPtDeltaRelRebin->Fit( fitEtaPtDeltaRelRebin, optionsFit_.c_str() ) );
-                if ( fitEtaPtDeltaRelRebinResultPtr >= 0 ) {
-                  if ( fitEtaPtDeltaRelRebinResultPtr->Status() == 0 && fitEtaPtDeltaRelRebinResultPtr->Ndf() != 0. ) {
-                    histEtaMeanRelRebin->SetBinContent( uPt + 1, fitEtaPtDeltaRelRebinResultPtr->Parameter( 1 ) );
-                    histEtaMeanRelRebin->SetBinError( uPt + 1, fitEtaPtDeltaRelRebinResultPtr->ParError( 1 ) );
-                  }
-                  else {
-                    if ( fitEtaPtDeltaRelRebinResultPtr->Prob() == 0. ) {
+                  const std::string nameEtaPtDeltaRelFit( nameEtaPtDeltaRel + "_fit" );
+                  const std::string nameEtaPtDeltaRelRebinFit( nameEtaPtDeltaRelRebin + "_fit" );
+                  TF1 * fitEtaPtDeltaRelRebin( new TF1( nameEtaPtDeltaRelRebinFit.c_str(), "gaus", histEtaPtDeltaRelRebin->GetXaxis()->GetXmin(), histEtaPtDeltaRelRebin->GetXaxis()->GetXmax() ) );
+                  TFitResultPtr fitEtaPtDeltaRelResultPtr( histEtaPtDeltaRelRebin->Fit( fitEtaPtDeltaRelRebin, optionsFit_.c_str() ) );
+                  if ( fitEtaPtDeltaRelResultPtr >= 0 ) {
+                    if ( fitEtaPtDeltaRelResultPtr->Status() == 0 && fitEtaPtDeltaRelResultPtr->Ndf() != 0. ) {
+                      histEtaMeanRel->SetBinContent( uPt + 1, fitEtaPtDeltaRelResultPtr->Parameter( 1 ) );
+                      histEtaMeanRel->SetBinError( uPt + 1, fitEtaPtDeltaRelResultPtr->ParError( 1 ) );
                     }
                     else {
+                      if ( fitEtaPtDeltaRelResultPtr->Prob() == 0. ) {
+                      }
+                      else {
+                      }
+                      if ( verbose_ > 2 ) {
+                        std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                                  << "    failing fit in directory '"; gDirectory->pwd();
+                        std::cout << "    '" << nameEtaPtDeltaRelRebin << "' status " << fitEtaPtDeltaRelResultPtr->Status() << std::endl;
+                      }
                     }
-                    if ( verbose_ > 2 ) {
+                  }
+                  else {
+                    if ( verbose_ > 1 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                                << "    failing fit in directory '"; gDirectory->pwd();
-                      std::cout << "    '" << nameEtaPtDeltaRelRebin << "' status " << fitEtaPtDeltaRelRebinResultPtr->Status() << std::endl;
+                                << "    missing fit in directory '"; gDirectory->pwd();
+                      std::cout << "    '" << nameEtaPtDeltaRelRebin << std::endl;
                     }
                   }
-                }
-                else {
-                  if ( verbose_ > 1 ) {
-                    std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                              << "    missing fit in directory '"; gDirectory->pwd();
-                    std::cout << "    '" << nameEtaPtDeltaRelRebin << std::endl;
-                  }
-                }
 
-              } // loop: uPt < nPtBins_
+                } // loop: uPt < nPtBins_
+
+              }
 
             } // loop: keyEta
 
