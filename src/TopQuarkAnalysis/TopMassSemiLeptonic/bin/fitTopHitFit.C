@@ -63,10 +63,10 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & io_( process_.getParameter< edm::ParameterSet >( "io" ) );
   const std::string inFile_( io_.getParameter< std::string >( "inputFile" ) );
   const std::string resolutionFile_( io_.getParameter< std::string >( "resolutionFile" ) );
-  const std::string pathOut_( io_.getParameter< std::string >( "pathOut" ) );
   // Configuration for histogram binning
   const edm::ParameterSet & histos_( process_.getParameter< edm::ParameterSet >( "histos" ) );
   const double widthFactor_( histos_.getParameter< double >( "widthFactor" ) );
+  const double fitRange_( histos_.getParameter< double >( "fitRange" ) );
   // Configuration for fitting resolution functions
   const edm::ParameterSet & resFuncs_( process_.getParameter< edm::ParameterSet >( "resFuncs" ) );
   const bool fitResFuncs_( resFuncs_.getParameter< bool >( "fit" ) );
@@ -77,10 +77,14 @@ int main( int argc, char * argv[] )
   const std::string resFuncInvInv_( resFuncs_.getParameter< std::string >( "resolutionFunctionInverseInv" ) );
   const std::string resFuncInvInvRel_( resFuncs_.getParameter< std::string >( "resolutionFunctionInverseInvRel" ) );
   const bool onlyExisting_( resFuncs_.getParameter< bool >( "onlyExisting" ) );
-  const bool writeFiles_( resFuncs_.getParameter< bool >( "writeFiles" ) && onlyExisting_ );
+  const bool writeResolutionFiles_( resFuncs_.getParameter< bool >( "writeFiles" ) && onlyExisting_ );
+  const std::string pathOutResolution_( resFuncs_.getParameter< std::string >( "pathOut" ) );
   // Configuration for fitting L5L7 JECs
   const edm::ParameterSet & jecsL5L7_( process_.getParameter< edm::ParameterSet >( "jecsL5L7" ) );
   const bool fitJecsL5L7_( jecsL5L7_.getParameter< bool >( "fit" ) );
+  const std::string transFunc_( jecsL5L7_.getParameter< std::string >( "transferFunction" ) );
+  const bool writeTransfernFiles_( jecsL5L7_.getParameter< bool >( "writeFiles" ) && onlyExisting_ );
+  const std::string pathOutTransfer_( jecsL5L7_.getParameter< std::string >( "pathOut" ) );
 
   std::vector< std::vector< bool > > nominalInv_( objCats_.size() );
 
@@ -183,7 +187,6 @@ int main( int argc, char * argv[] )
           TF1 * fitSigmaInv( 0 );
           while ( TKey * keyFunc = ( TKey* )nextInListEta() ) {
             if ( std::string( keyFunc->GetClassName() ) != nameFuncClass ) continue;
-
             fitSigma    = dynamic_cast< TF1* >( dirEta_->Get( name.c_str() ) );
             fitSigmaInv = dynamic_cast< TF1* >( dirEta_->Get( nameInv.c_str() ) );
           }
@@ -890,7 +893,7 @@ int main( int argc, char * argv[] )
 
               const std::string nameEtaPtDeltaFit( nameEtaPtDelta + "_fit" );
               const std::string nameEtaPtDeltaRebinFit( nameEtaPtDeltaRebin + "_fit" );
-              TF1 * fitEtaPtDeltaRebin( new TF1( nameEtaPtDeltaRebinFit.c_str(), "gaus", histEtaPtDeltaRebin->GetXaxis()->GetXmin(), histEtaPtDeltaRebin->GetXaxis()->GetXmax() ) );
+              TF1 * fitEtaPtDeltaRebin( new TF1( nameEtaPtDeltaRebinFit.c_str(), "gaus", histEtaPtDeltaRebin->GetXaxis()->GetXmin() * fitRange_ / widthFactor_, histEtaPtDeltaRebin->GetXaxis()->GetXmax() * fitRange_ / widthFactor_ ) );
               TFitResultPtr fitEtaPtDeltaResultPtr( histEtaPtDeltaRebin->Fit( fitEtaPtDeltaRebin, optionsFit_.c_str() ) );
               if ( fitEtaPtDeltaResultPtr >= 0 ) {
                 if ( fitEtaPtDeltaResultPtr->Status() == 0 && fitEtaPtDeltaResultPtr->Ndf() != 0. ) {
@@ -940,7 +943,7 @@ int main( int argc, char * argv[] )
                 histSigmaFitChi2Map->SetBinContent( uEta + 1, fitEtaSigmaFitResultPtr->Chi2() / fitEtaSigmaFitResultPtr->Ndf() );
                 histSigmaFitProbMap->SetBinContent( uEta + 1, fitEtaSigmaFitResultPtr->Prob() );
                 histSigmaFitProb->Fill( fitEtaSigmaFitResultPtr->Prob() );
-                if ( ! inverse && kinProp == "Pt" ) {
+                if ( kinProp == "Pt" ) {
                   const Double_t * params( fitEtaSigmaFitResultPtr->GetParams() );
                   const std::string nameEtaSigmaFitRel( nameEtaSigmaFit + "Rel" );
                   TF1 * fitEtaSigmaRelFit( new TF1( nameEtaSigmaFitRel.c_str(), formulaRel.c_str(), histEtaSigma->GetXaxis()->GetXmin(), histEtaSigma->GetXaxis()->GetXmax() ) );
@@ -960,7 +963,7 @@ int main( int argc, char * argv[] )
                     else              fitEtaSigmaInvRelFit->Write();
                   }
                 }
-                if ( writeFiles_ ) {
+                if ( writeResolutionFiles_ ) {
                   Cs.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaFit->GetParameter( 0 ) );
                   Rs.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaFit->GetParameter( 1 ) );
                   Ns.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaFit->GetParameter( 2 ) );
@@ -982,7 +985,7 @@ int main( int argc, char * argv[] )
                 }
                 histSigmaFitBadNdfMap->SetBinContent( uEta + 1, fitEtaSigmaFitResultPtr->Ndf() );
                 histSigmaFitBadNdf->Fill( fitEtaSigmaFitResultPtr->Ndf() );
-                if ( writeFiles_ ) {
+                if ( writeResolutionFiles_ ) {
                   Cs.at( uProp ).at( uEta ) = -1.;
                   Rs.at( uProp ).at( uEta ) = -1.;
                   Ns.at( uProp ).at( uEta ) = -1.;
@@ -996,7 +999,7 @@ int main( int argc, char * argv[] )
             }
             else {
               histSigmaFitMissingMap->AddBinContent( uEta + 1 );
-              if ( writeFiles_ ) {
+              if ( writeResolutionFiles_ ) {
                 Cs.at( uProp ).at( uEta ) = -1.;
                 Rs.at( uProp ).at( uEta ) = -1.;
                 Ns.at( uProp ).at( uEta ) = -1.;
@@ -1017,10 +1020,10 @@ int main( int argc, char * argv[] )
       } // loop: keyProp
 
       // Write fit results to text files
-      if ( writeFiles_ ) {
+      if ( writeResolutionFiles_ ) {
 
         // File name
-        std::string nameOut( pathOut_ + "/gentResolution_Fall11_R4_" + objCat ); // FIXME: hard-coding
+        std::string nameOut( pathOutResolution_ + "/gentResolution_Fall11_R4_" + objCat ); // FIXME: hard-coding
         if ( usePileUp_ ) nameOut.append( "_PileUp" );
         if ( useAlt_ )    nameOut.append( "_Alt" );
         if ( useSymm_ )   nameOut.append( "_Symm" );
@@ -1162,7 +1165,7 @@ int main( int argc, char * argv[] )
 
             const std::string nameDeltaFit( nameDelta + "_fit" );
             const std::string nameDeltaRebinFit( nameDeltaRebin + "_fit" );
-            TF1 * fitDeltaRebin( new TF1( nameDeltaRebinFit.c_str(), "gaus", histDeltaRebin->GetXaxis()->GetXmin(), histDeltaRebin->GetXaxis()->GetXmax() ) );
+            TF1 * fitDeltaRebin( new TF1( nameDeltaRebinFit.c_str(), "gaus", histDeltaRebin->GetXaxis()->GetXmin() * fitRange_ / widthFactor_, histDeltaRebin->GetXaxis()->GetXmax() * fitRange_ / widthFactor_ ) );
             TFitResultPtr fitDeltaResultPtr( histDeltaRebin->Fit( fitDeltaRebin, optionsFit_.c_str() ) );
             if ( fitDeltaResultPtr >= 0 ) {
               if ( fitDeltaResultPtr->Status() == 0 && fitDeltaResultPtr->Ndf() != 0. ) {
@@ -1200,7 +1203,7 @@ int main( int argc, char * argv[] )
 
               const std::string namePtDeltaFit( namePtDelta + "_fit" );
               const std::string namePtDeltaRebinFit( namePtDeltaRebin + "_fit" );
-              TF1 * fitPtDeltaRebin( new TF1( namePtDeltaRebinFit.c_str(), "gaus", histPtDeltaRebin->GetXaxis()->GetXmin(), histPtDeltaRebin->GetXaxis()->GetXmax() ) );
+              TF1 * fitPtDeltaRebin( new TF1( namePtDeltaRebinFit.c_str(), "gaus", histPtDeltaRebin->GetXaxis()->GetXmin() * fitRange_ / widthFactor_, histPtDeltaRebin->GetXaxis()->GetXmax() * fitRange_ / widthFactor_ ) );
               TFitResultPtr fitPtDeltaResultPtr( histPtDeltaRebin->Fit( fitPtDeltaRebin, optionsFit_.c_str() ) );
               if ( fitPtDeltaResultPtr >= 0 ) {
                 if ( fitPtDeltaResultPtr->Status() == 0 && fitPtDeltaResultPtr->Ndf() != 0. ) {
@@ -1234,7 +1237,7 @@ int main( int argc, char * argv[] )
               TH1D * histDeltaRelRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameDeltaRelRebin.c_str() ) ) );
               const std::string nameDeltaRelFit( nameDeltaRel + "_fit" );
               const std::string nameDeltaRelRebinFit( nameDeltaRelRebin + "_fit" );
-              TF1 * fitDeltaRelRebin( new TF1( nameDeltaRelRebinFit.c_str(), "gaus", histDeltaRelRebin->GetXaxis()->GetXmin(), histDeltaRelRebin->GetXaxis()->GetXmax() ) );
+              TF1 * fitDeltaRelRebin( new TF1( nameDeltaRelRebinFit.c_str(), "gaus", histDeltaRelRebin->GetXaxis()->GetXmin() * fitRange_ / widthFactor_, histDeltaRelRebin->GetXaxis()->GetXmax() * fitRange_ / widthFactor_ ) );
               TFitResultPtr fitDeltaRelResultPtr( histDeltaRelRebin->Fit( fitDeltaRelRebin, optionsFit_.c_str() ) );
               if ( fitDeltaRelResultPtr >= 0 ) {
                 if ( fitDeltaRelResultPtr->Status() == 0 && fitDeltaRelResultPtr->Ndf() != 0. ) {
@@ -1271,7 +1274,7 @@ int main( int argc, char * argv[] )
 
                 const std::string namePtDeltaRelFit( namePtDeltaRel + "_fit" );
                 const std::string namePtDeltaRelRebinFit( namePtDeltaRelRebin + "_fit" );
-                TF1 * fitPtDeltaRelRebin( new TF1( namePtDeltaRelRebinFit.c_str(), "gaus", histPtDeltaRelRebin->GetXaxis()->GetXmin(), histPtDeltaRelRebin->GetXaxis()->GetXmax() ) );
+                TF1 * fitPtDeltaRelRebin( new TF1( namePtDeltaRelRebinFit.c_str(), "gaus", histPtDeltaRelRebin->GetXaxis()->GetXmin() * fitRange_ / widthFactor_, histPtDeltaRelRebin->GetXaxis()->GetXmax() * fitRange_ / widthFactor_ ) );
                 TFitResultPtr fitPtDeltaRelResultPtr( histPtDeltaRelRebin->Fit( fitPtDeltaRelRebin, optionsFit_.c_str() ) );
                 if ( fitPtDeltaRelResultPtr >= 0 ) {
                   if ( fitPtDeltaRelResultPtr->Status() == 0 && fitPtDeltaRelResultPtr->Ndf() != 0. ) {
@@ -1324,7 +1327,7 @@ int main( int argc, char * argv[] )
 
                 const std::string nameEtaPtDeltaFit( nameEtaPtDelta + "_fit" );
                 const std::string nameEtaPtDeltaRebinFit( nameEtaPtDeltaRebin + "_fit" );
-                TF1 * fitEtaPtDeltaRebin( new TF1( nameEtaPtDeltaRebinFit.c_str(), "gaus", histEtaPtDeltaRebin->GetXaxis()->GetXmin(), histEtaPtDeltaRebin->GetXaxis()->GetXmax() ) );
+                TF1 * fitEtaPtDeltaRebin( new TF1( nameEtaPtDeltaRebinFit.c_str(), "gaus", histEtaPtDeltaRebin->GetXaxis()->GetXmin() * fitRange_ / widthFactor_, histEtaPtDeltaRebin->GetXaxis()->GetXmax() * fitRange_ / widthFactor_ ) );
                 TFitResultPtr fitEtaPtDeltaResultPtr( histEtaPtDeltaRebin->Fit( fitEtaPtDeltaRebin, optionsFit_.c_str() ) );
                 if ( fitEtaPtDeltaResultPtr >= 0 ) {
                   if ( fitEtaPtDeltaResultPtr->Status() == 0 && fitEtaPtDeltaResultPtr->Ndf() != 0. ) {
@@ -1365,7 +1368,7 @@ int main( int argc, char * argv[] )
 
                   const std::string nameEtaPtDeltaRelFit( nameEtaPtDeltaRel + "_fit" );
                   const std::string nameEtaPtDeltaRelRebinFit( nameEtaPtDeltaRelRebin + "_fit" );
-                  TF1 * fitEtaPtDeltaRelRebin( new TF1( nameEtaPtDeltaRelRebinFit.c_str(), "gaus", histEtaPtDeltaRelRebin->GetXaxis()->GetXmin(), histEtaPtDeltaRelRebin->GetXaxis()->GetXmax() ) );
+                  TF1 * fitEtaPtDeltaRelRebin( new TF1( nameEtaPtDeltaRelRebinFit.c_str(), "gaus", histEtaPtDeltaRelRebin->GetXaxis()->GetXmin() * fitRange_ / widthFactor_, histEtaPtDeltaRelRebin->GetXaxis()->GetXmax() * fitRange_ / widthFactor_ ) );
                   TFitResultPtr fitEtaPtDeltaRelResultPtr( histEtaPtDeltaRelRebin->Fit( fitEtaPtDeltaRelRebin, optionsFit_.c_str() ) );
                   if ( fitEtaPtDeltaRelResultPtr >= 0 ) {
                     if ( fitEtaPtDeltaRelResultPtr->Status() == 0 && fitEtaPtDeltaRelResultPtr->Ndf() != 0. ) {

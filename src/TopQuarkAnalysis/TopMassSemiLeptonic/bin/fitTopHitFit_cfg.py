@@ -24,6 +24,9 @@ if runTest:
 
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
+widthFactor = 5. # for rebinning     (in units of orig. RMS)
+fitRange    = 5. # for Gaussian fits (in units of orig. RMS)
+
 inputFile = 'file:%s/output/fitTopHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 if runTest:
   inputFile = inputFile.replace( 'root', 'test.root' )
@@ -56,7 +59,6 @@ process.pileUp    = cms.string( pileUp )
 process.io = cms.PSet(
   inputFile      = cms.string( inputFile )
 , resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era ) )
-, pathOut        = cms.string( '%s/src/TopQuarkAnalysis/TopHitFit/data/resolution_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the new resolution functions
 )
 
 process.histos = cms.PSet(
@@ -126,7 +128,8 @@ process.histos = cms.PSet(
 , METDeltaPhiInvBins = cms.uint32( 50 )
 , METDeltaPhiInvMax  = cms.double( 1.6 )
   # Rebinning
-, widthFactor = cms.double( 5. )
+, widthFactor = cms.double( widthFactor )
+, fitRange    = cms.double( fitRange )
 )
 
 process.resFuncs = cms.PSet(
@@ -142,13 +145,18 @@ process.resFuncs = cms.PSet(
   # skip resolutions without existing counterpart?
 , onlyExisting = cms.bool( True ) # True includes the possibility of writing resolution function text files.
 , writeFiles   = cms.bool( True ) # True takes effect only, if "onlyExisting" is True, too.
+, pathOut      = cms.string( '%s/src/TopQuarkAnalysis/TopHitFit/data/resolution_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the resolution functions
 )
 
 if runTest:
   process.resFuncs.writeFiles = False
 
 process.jecsL5L7 = cms.PSet(
-  fit = cms.bool( True )
+  fit        = cms.bool( True )
+  # transfer function formulas
+, transferFunction = cms.string( 'gaus' )
+, writeFiles = cms.bool( True )
+, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
 
 # Messaging
