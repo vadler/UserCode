@@ -12,20 +12,20 @@ rfioInput = False
 era = 'Summer11'
 
 # Settings
-overwrite = False # to throw away earlier versions of histograms, trees and functions
+overwrite = True # to throw away earlier versions of histograms, trees and functions
 # !!! Exclusive switches:
 usePileUp = False
 useAlt    = False
 useSymm   = True
 refGen    = False
-refSel    = False
+refSel    = True
 if runTest:
   refSel = False
 
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
 widthFactor = 5. # for rebinning     (in units of orig. RMS)
-fitRange    = 5. # for Gaussian fits (in units of orig. RMS)
+fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
 
 inputFile = 'file:%s/output/fitTopHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 if runTest:
@@ -33,6 +33,7 @@ if runTest:
 if not rfioInput:
   inputFile = inputFile.replace( 'root', 'local.root' )
 logFile = inputFile.replace( 'root', 'log' )
+
 
 # Processing
 
@@ -153,11 +154,26 @@ if runTest:
 
 process.jecsL5L7 = cms.PSet(
   fit        = cms.bool( True )
+, writeFiles = cms.bool( True )
+, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/jecL5L7_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
+)
+
+if runTest:
+  process.jecsL5L7.writeFiles = False
+
+process.transfer = cms.PSet(
+  fit        = cms.bool( True )
   # transfer function formulas
+#, transferFunction = cms.string( '[0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(sqrt(2*pi)*([2]+[3]*[5])))' )
+#, transferFunction = cms.string( 'gaus(0)+gaus(3)' )
 , transferFunction = cms.string( 'gaus' )
 , writeFiles = cms.bool( True )
 , pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
+
+if runTest:
+  process.transfer.writeFiles = False
+
 
 # Messaging
 
