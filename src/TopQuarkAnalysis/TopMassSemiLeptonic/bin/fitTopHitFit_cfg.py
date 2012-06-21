@@ -24,19 +24,24 @@ if runTest:
 
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
-widthFactor        = 5. # for rebinning     (in units of orig. RMS)
+fitOptions  = 'RS'
+widthFactor = 5. # for rebinning     (in units of orig. RMS)
 
-fitResFuncs      = True
-fitRangeResFuncs = 2. # for Gaussian fits (in units of orig. RMS)
+fitResFuncs             = False
+fitOptionsSigmaResFuncs = 'MRS'
+fitRangeResFuncs        = 2. # for Gaussian fits (in units of orig. RMS)
 
-fitJecsL5L7        = True
+fitJecsL5L7        = False
 fitJecsL5L7Around1 = True
 fitRangeJecsL5L7   = 1.5 # for Gaussian fits (in units of orig. RMS)
 
-fitTransfer1D      = True
-fitRangeTransfer1D = 5. # for Gaussian fits (in units of orig. RMS)
+fitTransfer1D          = True
+fitFromStartTransfer1D = True
+fitRangeTransfer1D     = 5. # for Gaussian fits (in units of orig. RMS)
 
-fitTransfer2D = True
+fitTransfer2D          = True
+fitFromStartTransfer2D = True
+widthFactorTransfer2D = 10. # for rebinning     (in units of orig. RMS)
 
 inputFile = 'file:%s/output/fitTopHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 if runTest:
@@ -139,14 +144,17 @@ process.histos = cms.PSet(
 , METDeltaPhiMax  = cms.double( 1.6 )
 , METDeltaPhiInvBins = cms.uint32( 50 )
 , METDeltaPhiInvMax  = cms.double( 1.6 )
+  # Fitting (general)
+, fitOptions  = cms.string( fitOptions )
   # Rebinning
 , widthFactor = cms.double( widthFactor )
 )
 
 process.resFuncs = cms.PSet(
-  fit         = cms.bool( fitResFuncs )
-, fitFunction = cms.string( 'gaus' )
-, fitRange    = cms.double( fitRangeResFuncs )
+  fit             = cms.bool( fitResFuncs )
+, fitFunction     = cms.string( 'gaus' )
+, fitOptionsSigma = cms.string( fitOptionsSigmaResFuncs )
+, fitRange        = cms.double( fitRangeResFuncs )
   # resolution function formulas
 , resolutionFunction        = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])' )
 , resolutionFunctionInverse = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
@@ -176,13 +184,18 @@ process.jecsL5L7 = cms.PSet(
 #if runTest:
   #process.jecsL5L7.writeFiles = False
 
+process.transfer = cms.PSet(
+  transferFunction = cms.string( 'gaus' )
+)
+
 process.transfer1D = cms.PSet(
-  fit        = cms.bool( fitTransfer1D )
-, fitRange   = cms.double( fitRangeTransfer1D )
+  fit          = cms.bool( fitTransfer1D )
+, fitFromStart = cms.bool( fitFromStartTransfer1D )
+, fitRange     = cms.double( fitRangeTransfer1D )
   # transfer function formulas
 #, transferFunction = cms.string( '[0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(sqrt(2*pi)*([2]+[3]*[5])))' )
-#, transferFunction = cms.string( 'gaus(0)+gaus(3)' )
-, transferFunction = cms.string( 'gaus' )
+, transferFunction = cms.string( 'gaus(0)+gaus(3)' )
+#, transferFunction = cms.string( 'gaus' )
 , writeFiles = cms.bool( True )
 , pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer1D_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
@@ -191,10 +204,12 @@ process.transfer1D = cms.PSet(
   #process.transfer1D.writeFiles = False
 
 process.transfer2D = cms.PSet(
-  fit        = cms.bool( fitTransfer2D )
+  fit          = cms.bool( fitTransfer2D )
+, fitFromStart = cms.bool( fitFromStartTransfer2D )
+, widthFactor  = cms.double( widthFactorTransfer2D )
   # transfer function formulas
-#, transferFunction = cms.string( '[0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(sqrt(2*pi)*([2]+[3]*[5])))' )
-, transferFunction = cms.string( 'gaus' )
+#, transferFunction = cms.string( '[0]*(exp(-0.5*((y-([1]+[6]*x))/([2]+[7]*x))**2)+([3]+[8]*x)*exp(-0.5*((y-([4]+[9]*x))/([5]+[10]*x))**2))/(sqrt(2*pi)*(([2]+[7]*x)+([3]+[8]*x)*([5]+[10]*x))))' )
+, transferFunction = cms.string( '[0]*(exp(-0.5*((y-([1]+[6]*x))/([2]+[7]*x))**2))/(sqrt(2*pi)*([2]+[7]*x))' )
 , writeFiles = cms.bool( True )
 , pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer2D_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
