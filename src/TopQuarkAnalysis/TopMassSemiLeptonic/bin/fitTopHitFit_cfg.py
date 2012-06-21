@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Config as cms
 # Steering
 
 runTest   = True
-rfioInput = False
+rfioInput = True
 
 # Origin of existing resolution functions
 # era = 'Spring10'
@@ -18,14 +18,25 @@ usePileUp = False
 useAlt    = False
 useSymm   = True
 refGen    = False
-refSel    = True
+refSel    = False
 if runTest:
   refSel = False
 
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
-widthFactor = 5. # for rebinning     (in units of orig. RMS)
-fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
+widthFactor        = 5. # for rebinning     (in units of orig. RMS)
+
+fitResFuncs      = True
+fitRangeResFuncs = 2. # for Gaussian fits (in units of orig. RMS)
+
+fitJecsL5L7        = True
+fitJecsL5L7Around1 = True
+fitRangeJecsL5L7   = 1.5 # for Gaussian fits (in units of orig. RMS)
+
+fitTransfer1D      = True
+fitRangeTransfer1D = 5. # for Gaussian fits (in units of orig. RMS)
+
+fitTransfer2D = True
 
 inputFile = 'file:%s/output/fitTopHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 if runTest:
@@ -130,14 +141,15 @@ process.histos = cms.PSet(
 , METDeltaPhiInvMax  = cms.double( 1.6 )
   # Rebinning
 , widthFactor = cms.double( widthFactor )
-, fitRange    = cms.double( fitRange )
 )
 
 process.resFuncs = cms.PSet(
-  fit = cms.bool( True )
+  fit         = cms.bool( fitResFuncs )
+, fitFunction = cms.string( 'gaus' )
+, fitRange    = cms.double( fitRangeResFuncs )
   # resolution function formulas
-, resolutionFunction           = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])' )
-, resolutionFunctionInverse    = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
+, resolutionFunction        = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])' )
+, resolutionFunctionInverse = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
   # derived formulas
 , resolutionFunctionRel           = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])/x' )
 , resolutionFunctionInverseRel    = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])/x' )
@@ -153,26 +165,42 @@ if runTest:
   process.resFuncs.writeFiles = False
 
 process.jecsL5L7 = cms.PSet(
-  fit        = cms.bool( True )
+  fit        = cms.bool( fitJecsL5L7 )
+, fitFunction = cms.string( 'gaus' )
+, fitRange   = cms.double( fitRangeJecsL5L7 )
+, fitAround1 = cms.bool( fitJecsL5L7Around1 )
 , writeFiles = cms.bool( True )
 , pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/jecL5L7_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
 
-if runTest:
-  process.jecsL5L7.writeFiles = False
+#if runTest:
+  #process.jecsL5L7.writeFiles = False
 
-process.transfer = cms.PSet(
-  fit        = cms.bool( True )
+process.transfer1D = cms.PSet(
+  fit        = cms.bool( fitTransfer1D )
+, fitRange   = cms.double( fitRangeTransfer1D )
   # transfer function formulas
 #, transferFunction = cms.string( '[0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(sqrt(2*pi)*([2]+[3]*[5])))' )
 #, transferFunction = cms.string( 'gaus(0)+gaus(3)' )
 , transferFunction = cms.string( 'gaus' )
 , writeFiles = cms.bool( True )
-, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
+, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer1D_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
 
-if runTest:
-  process.transfer.writeFiles = False
+#if runTest:
+  #process.transfer1D.writeFiles = False
+
+process.transfer2D = cms.PSet(
+  fit        = cms.bool( fitTransfer2D )
+  # transfer function formulas
+#, transferFunction = cms.string( '[0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(sqrt(2*pi)*([2]+[3]*[5])))' )
+, transferFunction = cms.string( 'gaus' )
+, writeFiles = cms.bool( True )
+, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer2D_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
+)
+
+#if runTest:
+  #process.transfer2D.writeFiles = False
 
 
 # Messaging
