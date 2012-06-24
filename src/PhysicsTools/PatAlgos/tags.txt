@@ -6,7 +6,7 @@ AnalysisDataFormats/TopObjects                   V06-08-07      V06-08-07
 CondFormats/EgammaObjects                        V00-04-01      V00-04-00      
 DataFormats/PatCandidates                        V06-05-02      V06-05-01      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
-PhysicsTools/PatAlgos                            V08-10-01      V08-09-11-01   
+PhysicsTools/PatAlgos                            V08-10-02      V08-09-11-01   
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
 PhysicsTools/PatUtils                            V03-09-22      V03-09-22      
 RecoTauTag/Configuration                         V01-04-03-02   V01-03-04      
