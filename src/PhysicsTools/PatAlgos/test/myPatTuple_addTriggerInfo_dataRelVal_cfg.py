@@ -4,6 +4,11 @@ from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 condition                   = 'com10'
 globalTag                   = autoCond[ condition ][ : -5 ]
 process.GlobalTag.globaltag = autoCond[ condition ]
+process.GlobalTag.toGet.append( cms.PSet( tag     = cms.string( 'L1GtTriggerMenu_L1Menu_Collisions2012_v0_mc' )
+                                        , record  = cms.string( 'L1GtTriggerMenuRcd' )
+                                        , connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_L1T' )
+                                        )
+                              )
 process.source.fileNames    = pickRelValInputFiles( relVal      = 'SingleMu'
                                                   , dataTier    = 'RECO'
                                                   , globalTag   = '%s_RelVal_mu2011B'%( globalTag )
