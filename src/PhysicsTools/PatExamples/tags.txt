@@ -8,9 +8,13 @@ CommonTools/RecoUtils                            V00-00-09      V00-00-03
 DataFormats/PatCandidates                        V06-05-01      V06-05-00      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
 JetMETCorrections/Type1MET                       V04-06-05      V04-06-03      
-PhysicsTools/PatAlgos                            V08-09-11-02   V08-09-04      
+PhysicsTools/PatAlgos                            V08-09-13      V08-09-04      
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
 PhysicsTools/PatUtils                            V03-09-22      V03-09-18-03   
+RecoBTag/SecondaryVertex                         V01-08-00      V01-06-02      
+RecoMET/METAnalyzers                             V00-00-08                     
+RecoMET/METFilters                               V00-00-07                     
+RecoVertex/AdaptiveVertexFinder                  V02-02-00      V02-00-04-02   
 TopQuarkAnalysis/Configuration                   V06-02-08      V06-02-00      
 TopQuarkAnalysis/Examples                        V06-07-13      V06-07-11      
 TopQuarkAnalysis/TopEventProducers               V06-09-10      V06-09-08      
@@ -21,4 +25,4 @@ TopQuarkAnalysis/TopKinFitter                    V06-07-20      V06-07-19
 TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09      
 TopQuarkAnalysis/TopTools                        V06-07-12      V06-07-11      
 ---------------------------------------
-total packages: 18 (18 displayed)
+total packages: 22 (22 displayed)
