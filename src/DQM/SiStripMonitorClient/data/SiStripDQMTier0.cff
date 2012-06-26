@@ -1,0 +1,70 @@
+#--------------------------
+#### DQM services
+#--------------------------
+
+include "DQMServices/Core/data/DQM.cfg"
+
+    #########################################################
+    #### BEGIN DQM Online Environment #######################
+    #########################################################
+
+    #### PUT THE FOLLOWING INTO YOUR PATH FOR OPERATION AT P5
+    #### REPLACE YourSubsystemName by the name of your source ###
+
+    # use include file for dqmEnv dqmSaver
+       include "DQMServices/Components/data/DQMEnvironment.cfi"
+       # Possible conventions are "Online", "Offline" and "RelVal".
+       # Default is "Offline"
+       replace dqmSaver.convention    = "Online"
+       // replace dqmSaver.workflow      = ""
+       replace dqmSaver.dirName       = "."
+       # This is the filename prefix
+       replace dqmSaver.producer        = "DQM"
+       # (this goes into the foldername)
+       replace dqmEnv.subSystemFolder   = "SiStrip"
+       # Ignore run number for MC data
+       # replace dqmSaver.forceRunNumber  = -1
+
+       # optionally change fileSaving  conditions
+       # replace dqmSaver.saveByLumiSection =   1
+       # replace dqmSaver.saveByMinute = -1
+       replace dqmSaver.saveByRun =     1
+       replace dqmSaver.saveAtJobEnd = true
+       # will add switch to select histograms to be saved soon
+
+    #########################################################
+    #### END ################################################
+    #########################################################
+
+    ### FIX YOUR  PATH TO INCLUDE dqmEnv and dqmSaver
+
+
+#--------------------------
+#### STRIP DQM Source and Client
+#--------------------------
+include "DQM/SiStripMonitorClient/data/SiStripSourceConfigTier0.cff"
+
+
+sequence SiStripDQMTest_cosmicTk = {
+    SiStripDQMTier0_cosmicTk,
+    dqmEnv , 
+    dqmSaver 
+}
+
+sequence SiStripDQMTest_ckf = {
+    SiStripDQMTier0_ckf,
+    dqmEnv , 
+    dqmSaver 
+}
+
+sequence SiStripDQMTest_rs = {
+    SiStripDQMTier0_rs,
+    dqmEnv , 
+    dqmSaver 
+}
+
+sequence SiStripDQMTest = {
+    SiStripDQMTier0,
+    dqmEnv , 
+    dqmSaver 
+}

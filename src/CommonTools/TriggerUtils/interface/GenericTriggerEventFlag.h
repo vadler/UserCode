@@ -7,7 +7,7 @@
 // Package:    CommonTools/TriggerUtils
 // Class:      GenericTriggerEventFlag
 //
-// $Id: GenericTriggerEventFlag.h,v 1.6 2012/01/20 18:18:11 vadler Exp $
+// $Id: GenericTriggerEventFlag.h,v 1.1 2010/06/08 10:39:13 vadler Exp $
 //
 /**
   \class    GenericTriggerEventFlag GenericTriggerEventFlag.h "CommonTools/TriggerUtils/interface/GenericTriggerEventFlag.h"
@@ -16,7 +16,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id: GenericTriggerEventFlag.h,v 1.6 2012/01/20 18:18:11 vadler Exp $
+  \version  $Id: GenericTriggerEventFlag.h,v 1.1 2010/06/08 10:39:13 vadler Exp $
 */
 
 
@@ -27,10 +27,9 @@
 #include "CondFormats/DataRecord/interface/AlCaRecoTriggerBitsRcd.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/Scalers/interface/DcsStatus.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-
-#include <string>
 
 
 class GenericTriggerEventFlag {
@@ -41,29 +40,25 @@ class GenericTriggerEventFlag {
     HLTConfigProvider                          hltConfig_;
     bool                                       hltConfigInit_;
     // Configuration parameters
-    bool        andOr_;
-    std::string dbLabel_;
-    unsigned    verbose_;
+    bool     andOr_;
+    unsigned verbose_;
     bool               andOrDcs_;
     edm::InputTag      dcsInputTag_;
     std::vector< int > dcsPartitions_;
     bool               errorReplyDcs_;
     bool                       andOrGt_;
     edm::InputTag              gtInputTag_;
-    edm::InputTag              gtEvmInputTag_;
     std::string                gtDBKey_;
     std::vector< std::string > gtLogicalExpressions_;
     bool                       errorReplyGt_;
     bool                       andOrL1_;
     bool                       l1BeforeMask_;
     std::string                l1DBKey_;
-    std::vector< std::string > l1LogicalExpressionsCache_;
     std::vector< std::string > l1LogicalExpressions_;
     bool                       errorReplyL1_;
     bool                       andOrHlt_;
     edm::InputTag              hltInputTag_;
     std::string                hltDBKey_;
-    std::vector< std::string > hltLogicalExpressionsCache_;
     std::vector< std::string > hltLogicalExpressions_;
     bool                       errorReplyHlt_;
     // Switches
@@ -74,7 +69,6 @@ class GenericTriggerEventFlag {
     bool onHlt_;
     // Member constants
     const std::string configError_;
-    const std::string emptyKeyError_;
 
   public:
 
@@ -98,7 +92,7 @@ class GenericTriggerEventFlag {
 
     // GT status bits
     bool acceptGt( const edm::Event & event );
-    bool acceptGtLogicalExpression( const edm::Event & event, std::string gtLogicalExpression );
+    bool acceptGtLogicalExpression( const edm::Handle< L1GlobalTriggerReadoutRecord > & gtReadoutRecord, std::string gtLogicalExpression );
 
     // L1
     bool acceptL1( const edm::Event & event, const edm::EventSetup & setup );
@@ -109,18 +103,8 @@ class GenericTriggerEventFlag {
     bool acceptHltLogicalExpression( const edm::Handle< edm::TriggerResults > & hltTriggerResults, std::string hltLogicalExpression ) const;
 
     // Algos
-    std::string expandLogicalExpression( const std::vector< std::string > & target, const std::string & expr, bool useAnd = false ) const;
-    bool negate( std::string & word ) const;
-
-  public:
-
-    // Methods for expert analysis
-
-    std::string gtDBKey()  { return gtDBKey_ ; } // can be empty
-    std::string l1DBKey()  { return l1DBKey_ ; } // can be empty
-    std::string hltDBKey() { return hltDBKey_; } // can be empty
-
     std::vector< std::string > expressionsFromDB( const std::string & key, const edm::EventSetup & setup );
+    bool negate( std::string & word ) const;
 
 };
 

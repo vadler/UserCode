@@ -8,7 +8,10 @@
 <use   name="TopQuarkAnalysis/TopHitFit"/>
 <environment>
   <bin   file="produceExistingTopHitFitResolutionFunctions.C"></bin>
-  <bin   file="produceExistingTopTQAFResolutionFunctions.C"></bin>
+</environment>
+<environment>
   <bin   file="fitTopHitFitResolutionFunctions.C"></bin>
+</environment>
+<environment>
   <bin   file="plotTopHitFitAnalyzer.C"></bin>
 </environment>

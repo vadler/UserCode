@@ -6,7 +6,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Misc
 runTest   = True
-rfioInput = True
+rfioInput = False
 
 # Origin of existing resolution functions
 # era = 'Spring10'
@@ -95,41 +95,6 @@ process.hltHighLevel_Reference = process.hltHighLevel.clone( HLTPaths = [ 'refer
                                                                         ]
                                                            )
 
-### TQAF
-
-# GenMatch
-
-process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff" )
-if not rfioInput:
-  process.ttSemiLepEvent.verbosity = 1
-# Jet-parton matching
-process.ttSemiLepJetPartonMatch.jets            = 'selectedPatJets'
-process.ttSemiLepJetPartonMatch.algorithm       = 'totalMinDist'
-process.ttSemiLepJetPartonMatch.useDeltaR       = True
-process.ttSemiLepJetPartonMatch.useMaxDist      = False
-process.ttSemiLepJetPartonMatch.maxDist         = 0.3
-process.ttSemiLepJetPartonMatch.maxNJets        = 4
-process.ttSemiLepJetPartonMatch.maxNComb        = 1
-process.ttSemiLepJetPartonMatch.partonsToIgnore = []
-if runTest and not rfioInput:
-  process.ttSemiLepJetPartonMatch.verbosity = 1
-process.ttSemiLepHypGenMatch.jetCorrectionLevel = 'L3Absolute'
-
-from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag
-from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
-process.makeTtSemiLepEventReference = cloneProcessingSnippet( process
-                                                             , process.makeTtSemiLepEvent
-                                                             , 'Reference'
-                                                             )
-massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReference
-                            , 'selectedPatMuons'
-                            , 'referencePatMuons'
-                             )
-massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReference
-                            , 'selectedPatJets'
-                            , 'referencePatJets'
-                             )
-
 
 ### Analyzer
 
@@ -158,7 +123,6 @@ process.analyzeHitFitResolutionFunctions_Reference = process.analyzeHitFitResolu
 
 process.standardPath = cms.Path(
   process.hltHighLevel
-* process.makeTtSemiLepEvent
 * process.analyzeHitFitResolutionFunctions
 )
 
@@ -175,7 +139,6 @@ process.standardPath = cms.Path(
 if not runTest:
   process.referencePath = cms.Path(
     process.hltHighLevel_Reference
-  * process.makeTtSemiLepEventReference
   * process.analyzeHitFitResolutionFunctions_Reference
   )
 

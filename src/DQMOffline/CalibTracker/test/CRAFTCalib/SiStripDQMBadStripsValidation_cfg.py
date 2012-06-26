@@ -42,7 +42,7 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
  
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_COND_21X_GLOBALTAG'
-process.GlobalTag.globaltag = 'CRAFT_ALL_V4P::All'
+process.GlobalTag.globaltag = 'CRAFT_V4P::All'
 process.es_prefer_GlobalTag = cms.ESPrefer( 'PoolDBESSource', 'GlobalTag' )
 # exclude masking
 process.siStripQualityESProducer.ListOfRecordToMerge = cms.VPSet(
@@ -65,14 +65,7 @@ process.poolDBESSource = cms.ESSource("PoolDBESSource",
 
 ### SiStrip DQM ###
 
-## Reconstruction ##
-
 process.load( "DQM.SiStripMonitorClient.RecoForDQM_Cosmic_cff" )
-
-## DQM modules ##
-
-# SiStripMonitorCluster #
-
 import DQM.SiStripMonitorCluster.SiStripMonitorCluster_cfi
 process.siStripMonitorCluster = DQM.SiStripMonitorCluster.SiStripMonitorCluster_cfi.SiStripMonitorCluster.clone()
 process.siStripMonitorCluster.OutputMEsInRootFile                     = False 
@@ -144,7 +137,7 @@ process.load( "DQMServices.Core.DQM_cfg" )
 process.DQM.collectorHost = ''
 process.load( "DQMServices.Components.DQMEnvironment_cfi" )
 process.dqmSaver.convention        = 'Online'
-process.dqmSaver.dirName           = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_2_2_3/output'
+process.dqmSaver.dirName           = '/afs/cern.ch/user/v/vadler/cms/SiStripDQM/CMSSW_2_1_12/output'
 process.dqmSaver.producer          = 'DQM'
 process.dqmSaver.saveByRun         = 1
 process.dqmSaver.saveAtJobEnd      = True
