@@ -12,7 +12,7 @@ PhysicsTools/PatExamples                         NoTag          V00-05-25
 PhysicsTools/PatUtils                            V03-09-22      V03-09-22      
 RecoTauTag/Configuration                         V01-04-03-02   V01-03-04      
 RecoTauTag/RecoTau                               V01-04-17-01   V01-04-12-00   
-TopQuarkAnalysis/Configuration                   V06-02-05      V06-02-05      
+TopQuarkAnalysis/Configuration                   V07-00-00      V06-02-05      
 TopQuarkAnalysis/Examples                        V06-07-13      V06-07-11      
 TopQuarkAnalysis/TopEventProducers               V06-09-10      V06-09-08      
 TopQuarkAnalysis/TopEventSelection               V06-07-15      V06-07-14      
