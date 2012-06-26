@@ -57,10 +57,10 @@ usePfMuonIsoConeR03 = False
 pfMuonIso = 0.2 # PF2PAT: 0.15
 postfixNonIsoMu = 'NonIsoMu'
 # muon object selection
-#muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
+#muonSelect = 'isPFMuon && (isGlobalMuon || isTrackerMuon) && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
 muonSelect = ''
 # muon event selection
-muonCut = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5'
+muonCut = 'isPFMuon && (isGlobalMuon || isTrackerMuon) && pt > 10. && abs(eta) < 2.5'
 muonsMin = 0
 
 
@@ -72,7 +72,7 @@ usePfElectronIsoConeR03 = True
 pfElectronIso = 0.2 # PF2PAT: 0.2
 postfixNonIsoE = 'NonIsoE'
 # electron object selection
-#electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
+#electronSelect = 'pt > 20. && abs(eta) < 2.5 && electronID("mvaTrigV0") > 0.' # RefSel (min. for veto)
 electronSelect = ''
 # electron event selection
 electronCut  = 'et > 10. && abs(eta) < 2.5'
@@ -84,7 +84,7 @@ if lxplusTest:
   leptonsMin = 1
 
 # jet object selection
-#jetSelect = 'pt > 30. && abs(eta) < 2.4' # RefSel
+#jetSelect = 'pt > 20. && abs(eta) < 2.5' # RefSel
 jetSelect = 'pt > 15. && abs(eta) < 2.6'
 # jet event selection
 jetCut  = 'pt > 15. && abs(eta) < 2.6'
@@ -333,12 +333,24 @@ if not createNTuples:
 
 ### Cleaning
 
-# HBHE noise filter
 process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
 process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
 process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
 process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
 
+process.load( "RecoMET.METAnalyzers.CSCHaloFilter_cfi" )
+
+process.load( "RecoMET.METFilters.hcalLaserEventFilter_cfi" )
+process.hcalLaserEventFilter.vetoByRunEventNumber = cms.untracked.bool( False )
+process.hcalLaserEventFilter.vetoByHBHEOccupancy = cms.untracked.bool( True )
+
+process.load( "RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi" )
+process.EcalDeadCellTriggerPrimitiveFilter.tpDigiCollection = cms.InputTag( 'ecalTPSkimNA' )
+
+process.load( "RecoMET.METFilters.eeBadScFilter_cfi" )
+
+process.load( "RecoMET.METFilters.trackingFailureFilter_cfi" )
+process.trackingFailureFilter.VertexSource = cms.InputTag( 'goodOfflinePrimaryVertices' )
 
 # Scraping filter
 process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
@@ -381,14 +393,16 @@ if not runOnMC:
   process.vertexSelection *= process.goodOfflinePrimaryVertexFilter
 
 process.eventCleaning = cms.Sequence()
-
-if not runOnMC:
-  process.eventCleaning += process.HBHENoiseFilter
-  process.eventCleaning += process.scrapingFilter
-
 if triggerSelection != '':
-  process.eventCleaning += process.triggerResultsFilter
-process.eventCleaning += process.vertexSelection
+  process.eventCleaning *= process.triggerResultsFilter
+if not runOnMC:
+  process.eventCleaning += process.scrapingFilter
+process.eventCleaning += process.HBHENoiseFilter
+process.eventCleaning += process.CSCTightHaloFilter
+process.eventCleaning += process.hcalLaserEventFilter
+process.eventCleaning += process.EcalDeadCellTriggerPrimitiveFilter
+process.eventCleaning += process.eeBadScFilter
+process.eventCleaning += ( process.vertexSelection * process.trackingFailureFilter )
 
 if writePdfWeights:
   process.pdfWeights = cms.EDProducer(
@@ -404,13 +418,14 @@ process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 # Misc
 from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
 usePF2PAT( process
-         , runOnMC        = runOnMC
-         , jetAlgo        = jetAlgo
-         , jetCorrections = ( jetAlgo + 'PFchs'
-                            , jecLevels
-                            )
-         , pvCollection   = cms.InputTag( pvCollection )
-         , outputModules  = outputModules
+         , runOnMC             = runOnMC
+         , jetAlgo             = jetAlgo
+         , jetCorrections      = ( jetAlgo + 'PFchs'
+                                 , jecLevels
+                                 )
+         , typeIMetCorrections = True
+         , pvCollection        = cms.InputTag( pvCollection )
+         , outputModules       = outputModules
          )
 from PhysicsTools.PatAlgos.tools.helpers import removeIfInSequence
 removeIfInSequence( process, 'patPFParticles', 'patPF2PATSequence', '' )
