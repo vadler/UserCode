@@ -1,18 +1,19 @@
-Test Release based on: CMSSW_6_0_0_pre7
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_6_0_0_pre7
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_0_0_pre7
+Test Release based on: CMSSW_5_2_6
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_6
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_2_6
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-08-07      V06-08-07      
-CondFormats/EgammaObjects                        V00-04-01      V00-04-00      
-DataFormats/PatCandidates                        V06-05-02      V06-05-01      
+CommonTools/ParticleFlow                         V00-03-14      V00-03-08      
+CommonTools/RecoUtils                            V00-00-09      V00-00-03      
+DataFormats/PatCandidates                        V06-05-01      V06-05-00      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
 JetMETCorrections/Type1MET                       V04-06-09      V04-06-05      
-PhysicsTools/PatAlgos                            V08-10-02      V08-09-11-01   
+PhysicsTools/PatAlgos                            V08-09-11-02   V08-09-04-01   
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
-PhysicsTools/PatUtils                            V03-09-22      V03-09-22      
-RecoTauTag/Configuration                         V01-04-03-02   V01-03-04      
-RecoTauTag/RecoTau                               V01-04-17-01   V01-04-12-00   
-TopQuarkAnalysis/Configuration                   V07-00-00      V06-02-05      
+PhysicsTools/PatUtils                            V03-09-22      V03-09-18-03   
+RecoMET/METAnalyzers                             V00-00-08                     
+RecoMET/METFilters                               V00-00-07                     
+TopQuarkAnalysis/Configuration                   V07-00-01      V06-02-00      
 TopQuarkAnalysis/Examples                        V06-07-13      V06-07-11      
 TopQuarkAnalysis/TopEventProducers               V06-09-10      V06-09-08      
 TopQuarkAnalysis/TopEventSelection               V06-07-15      V06-07-14      
@@ -20,6 +21,6 @@ TopQuarkAnalysis/TopHitFit                       V00-00-06      V00-00-05
 TopQuarkAnalysis/TopJetCombination               V06-08-04      V06-08-03      
 TopQuarkAnalysis/TopKinFitter                    V06-07-20      V06-07-19      
 TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09      
-TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-11      
+TopQuarkAnalysis/TopTools                        V06-07-11-01   V06-07-11      
 ---------------------------------------
-total packages: 19 (19 displayed)
+total packages: 20 (20 displayed)
