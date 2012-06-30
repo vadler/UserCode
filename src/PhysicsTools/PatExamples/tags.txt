@@ -1,10 +1,10 @@
-Test Release based on: CMSSW_5_2_0
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_0
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/PAT/CMSSW_5_2_0
+Test Release based on: CMSSW_5_2_5
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_5
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_2_5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/PatCandidates                        V06-04-33      V06-04-33      
-PhysicsTools/PatAlgos                            V08-08-14      V08-08-12      
-PhysicsTools/PatExamples                         NoTag          V00-05-25      
-PhysicsTools/PatUtils                            V03-09-18-02   V03-09-18-02   
+PatExercise10c/PatL1PhysAlgo                     NoCVS                         
+PhysicsTools/PatAlgos                            V08-09-04-00-01 V08-09-04      
+PhysicsTools/PatExamples                         tutorialJuly2012_solution10 V00-05-25      
+RecoLuminosity/LumiDB                            V03-05-11      V03-05-00      
 ---------------------------------------
 total packages: 4 (4 displayed)
