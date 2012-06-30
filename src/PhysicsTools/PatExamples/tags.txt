@@ -2,8 +2,9 @@ Test Release based on: CMSSW_5_2_5
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_5
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_2_5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
+PatExercise10c/PatL1PhysAlgo                     NoCVS                         
 PhysicsTools/PatAlgos                            V08-09-04-00-01 V08-09-04      
-PhysicsTools/PatExamples                         V00-05-25      V00-05-25      
+PhysicsTools/PatExamples                         tutorialJuly2012_solution10 V00-05-25      
 RecoLuminosity/LumiDB                            V03-05-11      V03-05-00      
 ---------------------------------------
-total packages: 3 (3 displayed)
+total packages: 4 (4 displayed)
