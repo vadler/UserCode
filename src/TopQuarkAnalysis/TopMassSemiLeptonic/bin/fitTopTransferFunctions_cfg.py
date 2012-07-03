@@ -163,39 +163,38 @@ process.histos = cms.PSet(
 , widthFactor = cms.double( widthFactor )
 )
 
-process.resFuncs = cms.PSet(
-  fit             = cms.bool( fitResFuncs )
-, fitFunction     = cms.string( 'gaus' )
-, fitOptionsSigma = cms.string( fitOptionsSigmaResFuncs )
-, fitRange        = cms.double( fitRangeResFuncs )
-  # resolution function formulas
-, resolutionFunction        = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])' )
-, resolutionFunctionInverse = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])' )
-  # derived formulas
-, resolutionFunctionRel           = cms.string( 'sqrt(([0]*[0]*x+[1]*[1])*x+[2]*[2])/x' )
-, resolutionFunctionInverseRel    = cms.string( 'sqrt(([0]*[0]/x+[1]*[1])/x+[2]*[2])/x' )
-, resolutionFunctionInverseInv    = cms.string( 'sqrt(([2]*[2]*x+[1]*[1])*x+[0]*[0])*x' )
-, resolutionFunctionInverseInvRel = cms.string( 'sqrt(([2]*[2]*x+[1]*[1])*x+[0]*[0])' )
-  # skip resolutions without existing counterpart?
-, onlyExisting = cms.bool( True ) # True includes the possibility of writing resolution function text files.
-, writeFiles   = cms.bool( True ) # True takes effect only, if "onlyExisting" is True, too.
-, pathOut      = cms.string( '%s/src/TopQuarkAnalysis/TopHitFit/data/resolution_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the resolution functions
+process.transfer = cms.PSet(
+  transferFunction = cms.string( 'gaus' )
 )
 
-if runTest:
-  process.resFuncs.writeFiles = False
-
-process.jecsL5L7 = cms.PSet(
-  fit        = cms.bool( fitJecsL5L7 )
-, fitFunction = cms.string( 'gaus' )
-, fitRange   = cms.double( fitRangeJecsL5L7 )
-, fitAround1 = cms.bool( fitJecsL5L7Around1 )
+process.transfer1D = cms.PSet(
+  fit          = cms.bool( fitTransfer1D )
+, fitFromStart = cms.bool( fitFromStartTransfer1D )
+, fitRange     = cms.double( fitRangeTransfer1D )
+  # transfer function formulas
+, transferFunction = cms.string( '[0]*(1/(sqrt(2*pi)*([2]+[3]*[5])))*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))' )
+#, transferFunction = cms.string( 'gaus(0)+gaus(3)' )
+#, transferFunction = cms.string( 'gaus' )
 , writeFiles = cms.bool( True )
-, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/jecL5L7_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
+, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer1D_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
 
 #if runTest:
-  #process.jecsL5L7.writeFiles = False
+  #process.transfer1D.writeFiles = False
+
+process.transfer2D = cms.PSet(
+  fit          = cms.bool( fitTransfer2D )
+, fitFromStart = cms.bool( fitFromStartTransfer2D )
+, widthFactor  = cms.double( widthFactorTransfer2D )
+  # transfer function formulas
+#, transferFunction = cms.string( '[0]*(1/(sqrt(2*pi)*(([2]+[7]*x)+([3]+[8]*x)*([5]+[10]*x)))))*(exp(-0.5*((y-([1]+[6]*x))/([2]+[7]*x))**2)+([3]+[8]*x)*exp(-0.5*((y-([4]+[9]*x))/([5]+[10]*x))**2))' )
+, transferFunction = cms.string( '[0]*(1/(sqrt(2*pi)*([2]+[7]*x)))*(exp(-0.5*((y-([1]+[6]*x))/([2]+[7]*x))**2))' )
+, writeFiles = cms.bool( True )
+, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer2D_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
+)
+
+#if runTest:
+  #process.transfer2D.writeFiles = False
 
 
 # Messaging
