@@ -55,7 +55,7 @@ fitTransfer2D          = True
 fitFromStartTransfer2D = True
 widthFactorTransfer2D = 10. # for rebinning     (in units of orig. RMS)
 
-inputFile = 'file:%s/output/fitTopHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
+inputFile = 'file:%s/output/fitTopTransferFunctions_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 if runTest:
   inputFile = inputFile.replace( 'root', 'test.root' )
 if not rfioInput:
@@ -69,13 +69,10 @@ process = cms.PSet()
 process.verbose = cms.uint32( 1 )
 if runTest:
   process.verbose = 3
-process.objectCategories = cms.vstring( 'Mu'
-                                      , 'UdscJet'
+process.objectCategories = cms.vstring( 'UdscJet'
                                       )
 if not runTest:
-  process.objectCategories.append( 'Elec' )
   process.objectCategories.append( 'BJet' )
-  process.objectCategories.append( 'MET' )
 process.overwrite = cms.bool( overwrite )
 process.usePileUp = cms.bool( usePileUp )
 process.useAlt    = cms.bool( useAlt )
@@ -179,9 +176,6 @@ process.transfer1D = cms.PSet(
 , pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer1D_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
 
-#if runTest:
-  #process.transfer1D.writeFiles = False
-
 process.transfer2D = cms.PSet(
   fit          = cms.bool( fitTransfer2D )
 , fitFromStart = cms.bool( fitFromStartTransfer2D )
@@ -194,6 +188,7 @@ process.transfer2D = cms.PSet(
 )
 
 #if runTest:
+  #process.transfer1D.writeFiles = False
   #process.transfer2D.writeFiles = False
 
 
