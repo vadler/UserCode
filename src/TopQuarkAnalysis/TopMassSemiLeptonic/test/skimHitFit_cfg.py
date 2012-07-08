@@ -313,6 +313,8 @@ process.referencePatCandidateSummary = process.cleanPatCandidateSummary.clone( l
                                                                                                           )
                                                                              )
 process.load( "TopQuarkAnalysis.TopTools.muonSelectorVertex_cfi" )
+process.muonSelectorVertex.vertexSource = pvCollection
+process.muonSelectorVertex.maxDZ        = 1.
 process.patReferenceSequence = cms.Sequence( process.muonSelectorVertex
                                            * process.referencePatMuons
                                            * process.referencePatElectrons

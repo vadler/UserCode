@@ -18,7 +18,7 @@ TopQuarkAnalysis/TopJetCombination               V06-08-01      V06-07-09
 TopQuarkAnalysis/TopKinFitter                    V06-07-17      V06-07-11      
 TopQuarkAnalysis/TopMassSemiLeptonic             NoCVS                         
 TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-05      
-TopQuarkAnalysis/TopTools                        V06-07-11      V06-07-09      
+TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-09      
 TopQuarkAnalysis/TtSpinCorrelations              NoCVS                         
 ---------------------------------------
 total packages: 18 (18 displayed)
