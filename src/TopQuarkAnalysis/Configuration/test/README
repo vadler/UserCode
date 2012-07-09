@@ -8,6 +8,7 @@ cmsenv
 cvs co -r V06-05-01    DataFormats/PatCandidates
 cvs co -r V08-07-47    PhysicsTools/PatAlgos
 cvs co -r V00-03-05-10 CommonTools/ParticleFlow
+cvs co -r V07-01-04    TopQuarkAnalysis/TopSkimming
 scram b -j 9
 
 Steering:
@@ -15,9 +16,7 @@ Steering:
 
 Some very basic steering switches are found at the top of the configurations:
 - runOnMC         : self-explaining
-- runOn42X        : restore backward compatibility with PhysicsTools/PatAlgos V08-07-42
 - runMatch        : to switch on/off MC matching
-- runGenJetMatch  : to switch on/off (separately) MC matching for MC jets
 - runCiC          : to switch on/off the addition of the CiC electron ID variables
                     to the electrons
 - runEwk          : to switch on/off the addition of the electron ID variables

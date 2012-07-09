@@ -14,6 +14,7 @@ TopQuarkAnalysis/TopEventProducers               V06-07-14      V06-07-13
 TopQuarkAnalysis/TopJetCombination               V06-07-10      V06-07-09      
 TopQuarkAnalysis/TopKinFitter                    V06-07-17      V06-07-11      
 TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-05      
+TopQuarkAnalysis/TopSkimming                     V07-01-04      V06-07-05      
 TopQuarkAnalysis/TopTools                        V06-07-11      V06-07-09      
 ---------------------------------------
-total packages: 13 (13 displayed)
+total packages: 14 (14 displayed)
