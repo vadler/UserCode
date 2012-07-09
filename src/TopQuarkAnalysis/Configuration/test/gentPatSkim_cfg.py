@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-runOnMC        = True
+runOnMC        = False
 runMatch       = False
 runGenJetMatch = False # separate from rest of matches due to rapidly inceasing data volume
 runCiC         = True
@@ -92,17 +92,47 @@ process.maxEvents = cms.untracked.PSet(
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 if runOnMC:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
-                                                 , globalTag     = 'START42_V12'
-                                                 )
+  #process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
+                                                 #, globalTag     = 'START42_V12'
+                                                 #)
+  process.source.fileNames = []
 else:
-  process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
-                                                 , dataTier      = 'RECO'
-                                                 , relVal        = 'Mu'
-                                                 , globalTag     = 'GR_R_42_V14_wzMu2010B'
-                                                 #, relVal        = 'Electron'
-                                                 #, globalTag     = 'GR_R_42_V14_wzEG2010B'
-                                                 )
+  #process.source.fileNames = pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_6'
+                                                 #, dataTier      = 'RECO'
+                                                 #, relVal        = 'Mu'
+                                                 #, globalTag     = 'GR_R_42_V14_wzMu2010B'
+                                                 ##, relVal        = 'Electron'
+                                                 ##, globalTag     = 'GR_R_42_V14_wzEG2010B'
+                                                 #)
+  process.source.fileNames = [
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/F20DF449-B402-E111-9804-BCAEC5364C4B.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/EE98420A-BA02-E111-81EF-BCAEC518FF69.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/CEA605D0-D402-E111-86C0-BCAEC518FF54.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/CCF275FD-D302-E111-8666-0025901D5D7E.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/C664F0FF-4403-E111-9892-0019B9F581C9.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/BCA44733-AD02-E111-851A-BCAEC5329728.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/BAD88163-B602-E111-B62A-BCAEC5364C6C.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/BACB95AA-D102-E111-A597-0025901D624E.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/B2FFB7F4-C002-E111-9908-BCAEC518FF6B.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/B2D7CDFE-CD02-E111-A6E7-BCAEC5364C6C.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/A61DD0FD-D302-E111-88DC-BCAEC53296FB.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/9679DA0F-BC02-E111-9D34-485B3977172C.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/866A05DA-DB02-E111-A1B5-003048D3C982.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/723ABEB7-DE02-E111-9FEA-485B3962633D.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/6ECCE52B-EC02-E111-8652-003048F118C4.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/6ECA888F-D802-E111-92E2-BCAEC5364C4C.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/6E4C8ED1-D202-E111-84A4-BCAEC5329703.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/68C57433-DB02-E111-B214-003048D2BEA8.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/5E83A11B-E002-E111-92DC-003048F117EC.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/4E47A6DC-C502-E111-82EA-003048D37524.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/4C1FFB39-C002-E111-A228-BCAEC5329705.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/44065824-C702-E111-9A7C-BCAEC532972D.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/2410C7BD-E302-E111-9F81-003048F118AA.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/1A5F9088-BF02-E111-9D22-BCAEC54DB5D6.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/14913DB5-D702-E111-84D8-BCAEC5329708.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/0C6454BD-E302-E111-8368-003048F11112.root',
+       '/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/076/02D447C2-B702-E111-B8D7-0025901D5C86.root'
+  ]
 
 
 ### Output
