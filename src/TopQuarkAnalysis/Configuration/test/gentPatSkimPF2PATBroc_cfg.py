@@ -27,6 +27,14 @@ writePdfWeights      = False
 writeWDecay          = False # this should only be set True for *broken* W datasets
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
+filterDecayChannels        = False
+addMuonChannel             = True
+addElectronChannel         = True
+restrictTauChannelMuon     = False
+restrictTauChannelElectron = False
+
+hltProcess       = 'HLT'
+triggerSelection = ''
 
 pfJetCollection = 'pfJets'
 #pfJetCollection = 'pfNoTau'
@@ -44,35 +52,6 @@ electronsMin = 0
 # x-leptons event selection
 leptonsMin = 0
 jetsMin = 0
-
-if gc:
-	runOnMC   = eval('@MC@')
-	pfJetCollection = '@PFJETS@'
-	muonsIsoR = eval('@MUTPCONE@')
-	muonsIsoTP = eval('@MUTPISO@')
-	muonsMin = eval('@MINNMU@')
-	electronsIsoR = eval('@ETPCONE@')
-	electronsIsoTP = eval('@ETPISO@')
-	electronsMin = eval('@MINNE@')
-	leptonsMin = eval('@MINNLEP@')
-	jetsMin = eval('@MINNJETS@')
-        writeNonIsoMuons   = eval('@WRITENONISOMU@')
-        writeNonIsoElectrons   = eval('@WRITENONISOE@')
-	process.GlobalTag.globaltag = '@GLOBALTAG@'
-	# if not set in gc config, take default value
-	if '@WRITEWDECAY@'.lower() == 'true' or '@WRITEWDECAY@'.lower() == 'false':
-		writeWDecay = eval('@WRITEWDECAY@')
-	else:
-		writeWDecay = False
-	# if not set in gc config, take default value
-	if '@PDFWEIGHTS@'.lower() == 'true' or '@PDFWEIGHTS@'.lower() == 'false':
-		writePdfWeights = eval('@PDFWEIGHTS@')
-	else:
-		writePdfWeights = False
-
-hltProcess       = 'HLT'
-triggerSelection = ''
-
 
 jetAlgo   = 'AK5'
 jecLevels = []
@@ -101,9 +80,36 @@ jetSelect = ''
 jetsCut = 'pt > 15. && abs(eta) < 3.0'
 
 
+if gc:
+	runOnMC   = eval('@MC@')
+	pfJetCollection = '@PFJETS@'
+	muonsIsoR = eval('@MUTPCONE@')
+	muonsIsoTP = eval('@MUTPISO@')
+	muonsMin = eval('@MINNMU@')
+	electronsIsoR = eval('@ETPCONE@')
+	electronsIsoTP = eval('@ETPISO@')
+	electronsMin = eval('@MINNE@')
+	leptonsMin = eval('@MINNLEP@')
+	jetsMin = eval('@MINNJETS@')
+        writeNonIsoMuons   = eval('@WRITENONISOMU@')
+        writeNonIsoElectrons   = eval('@WRITENONISOE@')
+	process.GlobalTag.globaltag = '@GLOBALTAG@'
+	# if not set in gc config, take default value
+	if '@WRITEWDECAY@'.lower() == 'true' or '@WRITEWDECAY@'.lower() == 'false':
+		writeWDecay = eval('@WRITEWDECAY@')
+	else:
+		writeWDecay = False
+	# if not set in gc config, take default value
+	if '@PDFWEIGHTS@'.lower() == 'true' or '@PDFWEIGHTS@'.lower() == 'false':
+		writePdfWeights = eval('@PDFWEIGHTS@')
+	else:
+		writePdfWeights = False
+
+
 runMatch  = runMatch  and runOnMC
 addGenEvt = addGenEvt and runOnMC
 writePdfWeights = writePdfWeights and runOnMC
+filterDecayChannels = filterDecayChannels and runOnMC
 
 # Flat NTuple production
 processing_mode = 0
@@ -416,7 +422,8 @@ if not createNTuples:
     process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'
                                   ]
   if addGenEvt:
-    process.out.outputCommands += [ 'keep *_genParticles_*_*'
+    process.out.outputCommands += [ 'keep *_decaySubset_*_*'
+                                  , 'keep *_initSubset_*_*'
                                   , 'keep *_genEvt_*_*'
                                   ]
 
@@ -566,11 +573,31 @@ if writeNonIsoElectrons:
 ### TQAF
 if addGenEvt:
   process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
+if filterDecayChannels:
+  process.load( "TopQuarkAnalysis.TopSkimming.ttDecayChannelFilter_cff" )
+  if addGenEvt:
+    process.ttSemiLeptonicFilter.src = 'genEvt'
+  if not addMuonChannel:
+    process.ttSemiLeptonicFilter.allowedTopDecays.decayBranchA.muon = False
+  if not addElectronChannel:
+    process.ttSemiLeptonicFilter.allowedTopDecays.decayBranchA.electron = False
+  if addTauChannel:
+    process.ttSemiLeptonicFilter.allowedTopDecays.decayBranchA.tau = True
+    if restrictTauChannelMuon:
+      process.ttSemiLeptonicFilter.allowedTopDecays.restrictTauDecays.muon = cms.bool( True )
+    if restrictTauChannelElectron:
+      process.ttSemiLeptonicFilter.allowedTopDecays.restrictTauDecays.electron = cms.bool( True )
 
 ### Path
 process.p = cms.Path( process.eventCleaning
-                    * process.patPF2PATSequence
                     )
+
+if addGenEvt:
+  process.p *= process.makeGenEvt
+if filterDecayChannels:
+  process.p *= process.ttSemiLeptonicFilter
+
+process.p *= process.patPF2PATSequence
 
 if writeNonIsoMuons:
   process.p *= process.patPF2PATSequenceNonIsoMu

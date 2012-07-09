@@ -7,8 +7,8 @@ cd CMSSW_4_4_4/src
 cmsenv
 cvs co -r V06-05-01    DataFormats/PatCandidates
 cvs co -r V08-07-47    PhysicsTools/PatAlgos
-cvs co -r V00-03-05-10 CommonTools/ParticleFlow
 cvs co -r V07-01-04    TopQuarkAnalysis/TopSkimming
+cvs co -r V00-03-05-10 CommonTools/ParticleFlow
 scram b -j 9
 
 Steering:
@@ -23,6 +23,9 @@ Some very basic steering switches are found at the top of the configurations:
                     defined by the EWK PAG working points to the electrons
 - addGenEvt       : produces and adds the TQAF MC event;
                     needs also the GenParticles, so some space...
+- filterDecayChannels              : select events based on their semi-leptonic decay channel
+- add{Muon,Electron,Tau}Channel    : switch on leptons to keep; putting all to 'False' will select the hadronic channel
+- restrictTauChannel{Muon,Electron}: switches for leptonic decay channels of the tau to keep; putting all to 'False' will keep all tau channels
 - hltProcess      : process name of the HLT, needed to be adapted for re-DIGI MC
 - triggerSelection: defines logical expression for HLT selection;
                     no slection, if empty
@@ -95,7 +98,6 @@ MC:
 ---
 
 If no MC match is performed, the GenParticles are kept in the event content.
-This should also be sufficient to reconstruct the TtGenEvent in the TQAF.
 
 Tests:
 ======
