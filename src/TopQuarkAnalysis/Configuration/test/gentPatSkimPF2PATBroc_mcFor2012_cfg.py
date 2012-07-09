@@ -370,7 +370,9 @@ for m in listModules( process.countPatCandidates ):
 process.countPatLeptons.electronSource = process.countPatLeptons.electronSource.value().replace( 'selectedPat', 'cleanPat' )
 process.countPatLeptons.muonSource     = process.countPatLeptons.muonSource.value().replace( 'selectedPat', 'cleanPat' )
 process.countPatLeptons.tauSource      = process.countPatLeptons.tauSource.value().replace( 'selectedPat', 'cleanPat' )
-if not runMatch:
+if runMatch:
+  process.patJets.addGenJetMatch = True
+else:
   process.patMuons.addGenMatch = False
   removeIfInSequence( process, 'muonMatch', 'patPF2PATSequence', '' )
   process.patElectrons.addGenMatch = False
@@ -382,6 +384,12 @@ if not runMatch:
   process.patJets.getJetMCFlavour    = False
   process.patJets.JetPartonMapSource = cms.InputTag( '' )
   removeIfInSequence( process, 'patJetFlavourId', 'patPF2PATSequence', '' )
+  process.patJets.addGenJetMatch = False
+  removeIfInSequence( process, 'patJetGenJetMatch', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'ak5GenJetsNoNu', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'genParticlesForJetsNoNu', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'ak7GenJetsNoNu', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'iterativeCone5GenJetsNoNu', 'patPF2PATSequence', '' )
 
 process.patJets.jetSource = cms.InputTag(pfJetCollection)
 process.jetTracksAssociatorAtVertex.jets = cms.InputTag(pfJetCollection)
@@ -397,13 +405,6 @@ process.pfIsolatedElectrons.doDeltaBetaCorrection = True
 process.pfIsolatedMuons.doDeltaBetaCorrection = True
 ### DEBUG END ###
 
-if runMatch:
-	process.patJets.addGenJetMatch = True
-else:
-        process.patJets.addGenJetMatch = False
-
-removeIfInSequence( process, 'ak7GenJetsNoNu', 'patPF2PATSequence', '' )
-removeIfInSequence( process, 'iterativeCone5GenJetsNoNu', 'patPF2PATSequence', '' )
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
 process.patJetCorrFactors.levels  = jecLevels

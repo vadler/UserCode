@@ -293,9 +293,10 @@ usePF2PAT( process
                             )
          , pvCollection   = 'goodOfflinePrimaryVertices'
          )
-process.patPF2PATSequence.remove( process.patPFParticles )
-process.patPF2PATSequence.remove( process.selectedPatPFParticles )
-process.patPF2PATSequence.remove( process.countPatPFParticles )
+from PhysicsTools.PatAlgos.tools.helpers import removeIfInSequence
+removeIfInSequence( process, 'patPFParticles', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'selectedPatPFParticles', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'countPatPFParticles', 'patPF2PATSequence', '' )
 from PhysicsTools.PatAlgos.tools.coreTools import *
 removeSpecificPATObjects( process
                         , names = [ 'Photons', 'Taus' ]
@@ -304,46 +305,46 @@ removeSpecificPATObjects( process
 process.cleanPatCandidateSummary.candidates.remove( cms.InputTag( 'cleanPatPhotons' ) )
 process.cleanPatCandidateSummary.candidates.remove( cms.InputTag( 'cleanPatTaus' ) )
 if pfJetCollection == 'pfJets':
-  process.patPF2PATSequence.remove( process.pfNoJet )
-  process.patPF2PATSequence.remove( process.pfTauPFJets08Region )
-  process.patPF2PATSequence.remove( process.pfTauPileUpVertices )
-  process.patPF2PATSequence.remove( process.pfTauTagInfoProducer )
-  process.patPF2PATSequence.remove( process.pfJetsPiZeros )
-  process.patPF2PATSequence.remove( process.pfJetsLegacyTaNCPiZeros )
-  process.patPF2PATSequence.remove( process.pfJetsLegacyHPSPiZeros )
-  process.patPF2PATSequence.remove( process.pfTausBase )
-  process.patPF2PATSequence.remove( process.pfTausBaseDiscriminationByLeadingTrackFinding )
-  process.patPF2PATSequence.remove( process.pfTausBaseDiscriminationByIsolation )
-  process.patPF2PATSequence.remove( process.pfTausBaseDiscriminationByLeadingPionPtCut )
-  process.patPF2PATSequence.remove( process.pfTaus )
-  process.patPF2PATSequence.remove( process.pfNoTau )
-process.patPF2PATSequence.remove( process.tauIsoDepositPFCandidates )
-process.patPF2PATSequence.remove( process.tauIsoDepositPFChargedHadrons )
-process.patPF2PATSequence.remove( process.tauIsoDepositPFNeutralHadrons )
-process.patPF2PATSequence.remove( process.tauIsoDepositPFGammas )
-process.patPF2PATSequence.remove( process.tauMatch )
-process.patPF2PATSequence.remove( process.tauGenJets )
-process.patPF2PATSequence.remove( process.tauGenJetsSelectorAllHadrons )
-process.patPF2PATSequence.remove( process.tauGenJetMatch )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByLeadingTrackFinding )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByLeadingTrackPtCut )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByLeadingPionPtCut )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByIsolation )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByTrackIsolation )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByECALIsolation )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByIsolationUsingLeadingPion )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByTrackIsolationUsingLeadingPion )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByECALIsolationUsingLeadingPion )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationAgainstElectron )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationAgainstMuon )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByTaNC )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByTaNCfrOnePercent )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByTaNCfrHalfPercent )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByTaNCfrQuarterPercent )
-process.patPF2PATSequence.remove( process.shrinkingConePFTauDiscriminationByTaNCfrTenthPercent )
-process.patPF2PATSequence.remove( process.patTaus )
-process.patPF2PATSequence.remove( process.selectedPatTaus )
-process.patPF2PATSequence.remove( process.countPatTaus )
+  removeIfInSequence( process, 'pfNoJet', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfTauPFJets08Region', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfTauPileUpVertices', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfTauTagInfoProducer', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfJetsPiZeros', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfJetsLegacyTaNCPiZeros', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfJetsLegacyHPSPiZeros', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfTausBase', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfTausBaseDiscriminationByLeadingTrackFinding', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfTausBaseDiscriminationByIsolation', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfTausBaseDiscriminationByLeadingPionPtCut', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfTaus', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfNoTau', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'tauIsoDepositPFCandidates', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'tauIsoDepositPFChargedHadrons', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'tauIsoDepositPFNeutralHadrons', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'tauIsoDepositPFGammas', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'tauMatch', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'tauGenJets', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'tauGenJetsSelectorAllHadrons', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'tauGenJetMatch', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByLeadingTrackFinding', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByLeadingTrackPtCut', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByLeadingPionPtCut', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByIsolation', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByTrackIsolation', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByECALIsolation', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByIsolationUsingLeadingPion', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByTrackIsolationUsingLeadingPion', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByECALIsolationUsingLeadingPion', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationAgainstElectron', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationAgainstMuon', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByTaNC', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByTaNCfrOnePercent', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByTaNCfrHalfPercent', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByTaNCfrQuarterPercent', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'shrinkingConePFTauDiscriminationByTaNCfrTenthPercent', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'patTaus', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'selectedPatTaus', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'countPatTaus', 'patPF2PATSequence', '' )
 process.patPF2PATSequence.replace( process.selectedPatCandidateSummary
                                  , process.selectedPatCandidateSummary * ( process.cleanPatMuons
                                                                          + process.cleanPatElectrons
@@ -359,18 +360,27 @@ if not runOnMC:
   runOnData( process
            , names = [ 'PFAll' ]
            )
-if not runMatch:
+if runMatch:
+  process.patJets.addGenJetMatch = True
+else:
   process.patMuons.addGenMatch = False
-  process.patPF2PATSequence.remove( process.muonMatch )
+  removeIfInSequence( process, 'muonMatch', 'patPF2PATSequence', '' )
   process.patElectrons.addGenMatch = False
-  process.patPF2PATSequence.remove( process.electronMatch )
+  removeIfInSequence( process, 'electronMatch', 'patPF2PATSequence', '' )
   process.patJets.addGenPartonMatch   = False
   process.patJets.embedGenPartonMatch = False
   process.patJets.genPartonMatch      = cms.InputTag( '' )
-  process.patPF2PATSequence.remove( process.patJetPartonMatch )
+  removeIfInSequence( process, 'patJetPartonMatch', 'patPF2PATSequence', '' )
   process.patJets.getJetMCFlavour    = False
   process.patJets.JetPartonMapSource = cms.InputTag( '' )
-  process.patPF2PATSequence.remove( process.patJetFlavourId )
+  removeIfInSequence( process, 'patJetFlavourId', 'patPF2PATSequence', '' )
+  process.patJets.addGenJetMatch = False
+  process.patJets.genJetMatch    = cms.InputTag( '' )
+  removeIfInSequence( process, 'patJetGenJetMatch', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'ak5GenJetsNoNu', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'genParticlesForJetsNoNu', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'ak7GenJetsNoNu', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'iterativeCone5GenJetsNoNu', 'patPF2PATSequence', '' )
 
 process.patJets.jetSource = cms.InputTag(pfJetCollection)
 process.jetTracksAssociatorAtVertex.jets = cms.InputTag(pfJetCollection)
@@ -382,17 +392,6 @@ process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag("pfJets")
 process.pfMET.jets = cms.InputTag("pfJets")
 process.softMuonTagInfosAOD.jets = cms.InputTag(pfJetCollection)#end add
 
-if runMatch:
-	process.patJets.addGenJetMatch = True
-else:
-        process.patJets.addGenJetMatch = False
-
-#process.patJets.genJetMatch    = cms.InputTag( '' )
-#process.patPF2PATSequence.remove( process.patJetGenJetMatch )
-#process.patPF2PATSequence.remove( process.ak5GenJetsNoNu )
-process.patPF2PATSequence.remove( process.ak7GenJetsNoNu )
-process.patPF2PATSequence.remove( process.iterativeCone5GenJetsNoNu )
-#process.patPF2PATSequence.remove( process.genParticlesForJetsNoNu )
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
 process.patJetCorrFactors.levels  = jecLevels
