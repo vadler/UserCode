@@ -29,6 +29,12 @@ addGenEvt = True
 writePdfWeights      = False    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
+filterDecayChannels        = False
+addMuonChannel             = True
+addElectronChannel         = True
+addTauChannel              = False
+restrictTauChannelMuon     = False
+restrictTauChannelElectron = False
 
 hltProcess       = 'HLT'
 triggerSelection = ''
@@ -40,6 +46,7 @@ jecLevels = []
 #jecLevels.append( 'L3Absolute' )
 #if not runOnMC:
   #jecLevels.append( 'L2L3Residual' )
+typeIMetCorrections = True
 
 # vertex collection to use
 # 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
@@ -160,6 +167,7 @@ if gc:
 runMatch        = runMatch        and runOnMC
 addGenEvt       = addGenEvt       and runOnMC
 writePdfWeights = writePdfWeights and runOnMC
+filterDecayChannels = filterDecayChannels and runOnMC
 
 # muon propagator requirements
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
@@ -416,6 +424,8 @@ if writePdfWeights:
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 
 # Misc
+if len( jecLevels ) is 0:
+  typeIMetCorrections = False
 from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
 usePF2PAT( process
          , runOnMC             = runOnMC
@@ -423,7 +433,7 @@ usePF2PAT( process
          , jetCorrections      = ( jetAlgo + 'PFchs'
                                  , jecLevels
                                  )
-         , typeIMetCorrections = True
+         , typeIMetCorrections = typeIMetCorrections
          , pvCollection        = cms.InputTag( pvCollection )
          , outputModules       = outputModules
          )
@@ -440,7 +450,8 @@ removeSpecificPATObjects( process
 process.cleanPatCandidateSummary.candidates.remove( cms.InputTag( 'cleanPatPhotons' ) )
 process.cleanPatCandidateSummary.candidates.remove( cms.InputTag( 'cleanPatTaus' ) )
 if not pfJetCollection == 'pfNoTau':
-  removeIfInSequence( process, 'pfNoJet', 'patPF2PATSequence', '' )
+  if not typeIMetCorrections:
+    removeIfInSequence( process, 'pfNoJet', 'patPF2PATSequence', '' )
   removeIfInSequence( process, 'pfTauPFJets08Region', 'patPF2PATSequence', '' )
   removeIfInSequence( process, 'pfTauPileUpVertices', 'patPF2PATSequence', '' )
   removeIfInSequence( process, 'pfTauTagInfoProducer', 'patPF2PATSequence', '' )
@@ -568,7 +579,8 @@ if not createNTuples:
     process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'
                                   ]
   if addGenEvt:
-    process.out.outputCommands += [ 'keep *_genParticles_*_*'
+    process.out.outputCommands += [ 'keep *_decaySubset_*_*'
+                                  , 'keep *_initSubset_*_*'
                                   , 'keep *_genEvt_*_*'
                                   ]
   process.out.outputCommands += [ 'keep double_kt6PFJets_*_*' ]
@@ -690,6 +702,7 @@ process.countPatLeptons.minNumber = leptonsMin
 if len( jecLevels ) is 0:
   process.patJets.addJetCorrFactors = False
   print 'WARNING: No JECs are stored or applied!'
+  print '         TypeI MET corrections have been switched off in PF2PAT.'
   print '         Following settings are adjusted for on-the-fly usage of L1FastJet (CHS):'
   print '         - pfPileUp.checkClosestZVertex = False'
   print '         - pfJets.doAreaFastjet = True'
@@ -724,12 +737,32 @@ if writeNonIsoElectrons:
 ### TQAF
 if addGenEvt:
   process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
+if filterDecayChannels:
+  process.load( "TopQuarkAnalysis.TopSkimming.ttDecayChannelFilters_cff" )
+  if addGenEvt:
+    process.ttSemiLeptonicFilter.src = 'genEvt'
+  if not addMuonChannel:
+    process.ttSemiLeptonicFilter.allowedTopDecays.decayBranchA.muon = False
+  if not addElectronChannel:
+    process.ttSemiLeptonicFilter.allowedTopDecays.decayBranchA.electron = False
+  if addTauChannel:
+    process.ttSemiLeptonicFilter.allowedTopDecays.decayBranchA.tau = True
+    if restrictTauChannelMuon:
+      process.ttSemiLeptonicFilter.allowedTopDecays.restrictTauDecays.muon = cms.bool( True )
+    if restrictTauChannelElectron:
+      process.ttSemiLeptonicFilter.allowedTopDecays.restrictTauDecays.electron = cms.bool( True )
 
 ### Path
 process.p = cms.Path( process.eventCleaning
-                    * process.patPF2PATSequence
-                    #* process.kt6PFJetsForIsolation
                     )
+
+if addGenEvt:
+  process.p *= process.makeGenEvt
+if filterDecayChannels:
+  process.p *= process.ttSemiLeptonicFilter
+
+process.p *= process.patPF2PATSequence
+#process.p *= process.kt6PFJetsForIsolation
 
 if writeNonIsoMuons:
   process.p *= process.patPF2PATSequenceNonIsoMu

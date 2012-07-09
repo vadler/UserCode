@@ -7,8 +7,9 @@ cmsrel CMSSW_5_2_6
 cd CMSSW_5_2_6/src
 cmsenv
 cvs co -r V06-05-01    DataFormats/PatCandidates
-cvs co -r V08-09-11-02 PhysicsTools/PatAlgos
+cvs co -r V08-09-11-06 PhysicsTools/PatAlgos
 cvs co -r V03-09-22    PhysicsTools/PatUtils
+cvs co -r V07-01-04    TopQuarkAnalysis/TopSkimming
 cvs co -r V06-07-11-01 TopQuarkAnalysis/TopTools
 cvs co -r V00-03-14    CommonTools/ParticleFlow
 cvs co -r V00-00-09    CommonTools/RecoUtils
