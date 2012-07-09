@@ -118,17 +118,10 @@ The following settings might be objects to optimisation:
 Note, that the actually applied JEC depends on the JECs stored (details in PAT
 documentation).
 
-MET:
-----
-
-Note that all METs in these configurations are uncorrected, since PF.
-CaloMET (corrections available) is removed.
-
 MC:
 ---
 
 If no MC match is performed, the GenParticles are kept in the event content.
-This should also be sufficient to reconstruct the TtGenEvent in the TQAF.
 
 Tests:
 ======
