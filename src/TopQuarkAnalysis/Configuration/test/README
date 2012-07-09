@@ -48,6 +48,9 @@ parameters are availabel in all configuration files:
 - writeNonIsoMuons, writeNonIsoElectrons:
                     add another work flow, which ignores the isolation of the lepton also in
                     the jet clustering
+- filterDecayChannels              : select events based on their semi-leptonic decay channel
+- add{Muon,Electron,Tau}Channel    : switch on leptons to keep; putting all to 'False' will select the hadronic channel
+- restrictTauChannel{Muon,Electron}: switches for leptonic decay channels of the tau to keep; putting all to 'False' will keep all tau channels
 - maxEvents       : self-explaining
 - hltProcess      : process name of the HLT, needed to be adapted for re-DIGI MC
 - triggerSelection: defines logical expression for HLT selection;
