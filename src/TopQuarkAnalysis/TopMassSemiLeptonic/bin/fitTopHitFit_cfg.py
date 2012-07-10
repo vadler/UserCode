@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 
-runTest   = True
+runTest   = False
 rfioInput = True
 
 # Origin of existing resolution functions
@@ -24,7 +24,6 @@ if runTest:
 
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
-useMinuit2 = False
 fitOptions  = 'RS+'
 #fitOptions  = 'IRS+'
 # fails mostly for both #fitOptions  = 'MRS+'
@@ -39,21 +38,15 @@ fitOptions  = 'RS+'
 # fails for both #fitOptions  = 'WLMRS+'
 widthFactor = 5. # for rebinning     (in units of orig. RMS)
 
-fitResFuncs             = False
+fitResFuncs             = True
 fitOptionsSigmaResFuncs = 'MERS'
 fitRangeResFuncs        = 2. # for Gaussian fits (in units of orig. RMS)
 
-fitJecsL5L7        = False
-fitJecsL5L7Around1 = True
-fitRangeJecsL5L7   = 1.5 # for Gaussian fits (in units of orig. RMS)
-
-fitTransfer1D          = True
-fitFromStartTransfer1D = True
-fitRangeTransfer1D     = 5. # for Gaussian fits (in units of orig. RMS)
-
-fitTransfer2D          = True
-fitFromStartTransfer2D = True
-widthFactorTransfer2D = 10. # for rebinning     (in units of orig. RMS)
+fitJecsL5L7        = True
+fitJecsL5L7Around1 = False
+minPtPartonL5L7    = 0.
+maxDRPartonL5L7    = 0.2
+fitRangeJecsL5L7   = 2. # for Gaussian fits (in units of orig. RMS)
 
 inputFile = 'file:%s/output/fitTopHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 if runTest:
@@ -157,7 +150,6 @@ process.histos = cms.PSet(
 , METDeltaPhiInvBins = cms.uint32( 50 )
 , METDeltaPhiInvMax  = cms.double( 1.6 )
   # Fitting (general)
-, useMinuit2  = cms.bool( useMinuit2 )
 , fitOptions  = cms.string( fitOptions )
   # Rebinning
 , widthFactor = cms.double( widthFactor )
@@ -186,12 +178,14 @@ if runTest:
   process.resFuncs.writeFiles = False
 
 process.jecsL5L7 = cms.PSet(
-  fit        = cms.bool( fitJecsL5L7 )
+  fit         = cms.bool( fitJecsL5L7 )
 , fitFunction = cms.string( 'gaus' )
-, fitRange   = cms.double( fitRangeJecsL5L7 )
-, fitAround1 = cms.bool( fitJecsL5L7Around1 )
-, writeFiles = cms.bool( True )
-, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/jecL5L7_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
+, fitRange    = cms.double( fitRangeJecsL5L7 )
+, fitAround1  = cms.bool( fitJecsL5L7Around1 )
+, minPtParton = cms.double( minPtPartonL5L7 )
+, maxDRParton = cms.double( maxDRPartonL5L7 )
+, writeFiles  = cms.bool( True )
+, pathOut     = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/jecL5L7_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
 
 #if runTest:
