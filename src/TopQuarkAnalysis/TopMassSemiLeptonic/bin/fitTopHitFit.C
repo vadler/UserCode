@@ -64,6 +64,7 @@ int main( int argc, char * argv[] )
   // Configuration for in- & output
   const edm::ParameterSet & io_( process_.getParameter< edm::ParameterSet >( "io" ) );
   const std::string inFile_( io_.getParameter< std::string >( "inputFile" ) );
+  const std::string sample_( io_.getParameter< std::string >( "sample" ) );
   const std::string resolutionFile_( io_.getParameter< std::string >( "resolutionFile" ) );
   // Configuration for histogram binning
   const edm::ParameterSet & histos_( process_.getParameter< edm::ParameterSet >( "histos" ) );
@@ -1356,7 +1357,7 @@ int main( int argc, char * argv[] )
       if ( writeResolutionFiles_ ) {
 
         // File name
-        std::string nameOut( pathOutResolution_ + "/gentResolution_Fall11_R4_" + objCat );
+        std::string nameOut( pathOutResolution_ + "/gentResolution_" + sample_ + "_" + objCat );
         if ( usePileUp_ ) nameOut.append( "_PileUp" );
         if ( useAlt_ )    nameOut.append( "_Alt" );
         if ( useSymm_ )   nameOut.append( "_Symm" );
@@ -1854,7 +1855,7 @@ int main( int argc, char * argv[] )
             if ( writeJecsL5L7Files_ ) {
 
               // File name
-              std::string nameOut( pathOutJecsL5L7_ + "/gentsL5L7_Fall11_R4_" + name );
+              std::string nameOut( pathOutJecsL5L7_ + "/gentL5L7_" + sample_ + "_" + name );
               if ( usePileUp_ ) nameOut.append( "_PileUp" );
               if ( refSel_)     nameOut.append( "_Ref" );
               nameOut.append( ".txt" );

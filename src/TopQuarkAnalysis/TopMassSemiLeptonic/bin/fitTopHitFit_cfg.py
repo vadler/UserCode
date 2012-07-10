@@ -4,21 +4,22 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 
-runTest   = False
+runTest   = True
 rfioInput = True
 
 # Origin of existing resolution functions
-# era = 'Spring10'
-era = 'Summer11'
+# era    = 'Spring10'
+era    = 'Summer11'
+sample = 'Fall11_R4_1'
 
 # Settings
 overwrite = True # to throw away earlier versions of histograms, trees and functions
-# !!! Exclusive switches:
-usePileUp = False
+# Exclusive switches:
+usePileUp = False # switch overwrites!!!
 useAlt    = False
 useSymm   = True
 refGen    = False
-refSel    = False
+refSel    = True
 if runTest:
   refSel = False
 
@@ -48,12 +49,24 @@ minPtPartonL5L7    = 0.
 maxDRPartonL5L7    = 0.2
 fitRangeJecsL5L7   = 2. # for Gaussian fits (in units of orig. RMS)
 
-inputFile = 'file:%s/output/fitTopHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
+inputFile = 'fitTopHitFit_from%s.root'%( era )
+if usePileUp:
+  inputFile = inputFile.replace( '.root', '_PileUp.root' )
 if runTest:
   inputFile = inputFile.replace( 'root', 'test.root' )
 if not rfioInput:
   inputFile = inputFile.replace( 'root', 'local.root' )
 logFile = inputFile.replace( 'root', 'log' )
+if useAlt:
+  logFile = logFile.replace( '.', '_Alt.', 1 )
+if useSymm:
+  logFile = logFile.replace( '.', '_Symm.', 1 )
+if refGen:
+  logFile = logFile.replace( '.', '_Gen.', 1 )
+if refSel:
+  logFile = logFile.replace( '.', '_Ref.', 1 )
+inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
+logFile   = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
 
 
 # Processing
@@ -80,6 +93,7 @@ process.pileUp    = cms.string( pileUp )
 
 process.io = cms.PSet(
   inputFile      = cms.string( inputFile )
+, sample         = cms.string( sample )
 , resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era ) )
 )
 
