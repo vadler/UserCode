@@ -7,6 +7,7 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
+runOnMC       = True
 runOnRelVal   = True # If 'False', define input files in l. 184ff.
 maxEvents     = -1
 gc            = True
@@ -15,10 +16,11 @@ if lxplusTest:
   gc            = False
   createNTuples = False
   maxEvents     = 100
+  if not runOnMC:
+    maxEvents = 1000
 else:
   runOnRelVal = False # If 'False', define input files in l. 184ff.
 
-runOnMC   = True
 runMatch  = True
 runCiC    = True
 runEwk    = True
@@ -30,6 +32,7 @@ writeNonIsoElectrons = True
 filterDecayChannels        = False
 addMuonChannel             = True
 addElectronChannel         = True
+addTauChannel              = False
 restrictTauChannelMuon     = False
 restrictTauChannelElectron = False
 
