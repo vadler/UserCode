@@ -25,18 +25,7 @@ if runTest:
 
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
-fitOptions  = 'RS+'
-#fitOptions  = 'IRS+'
-# fails mostly for both #fitOptions  = 'MRS+'
-# fails mostly for both #fitOptions  = 'IMRS+'
-#fitOptions  = 'WRS+' # not for pile-up
-#fitOptions  = 'WMRS+' # not for pile-up
-#fitOptions  = 'WWRS+' # not for pile-up
-#fitOptions  = 'WWMRS+' # not for pile-up
-# fails for 1D #fitOptions  = 'LRS+' # possibly not for pile-up?
-# fails for both #fitOptions  = 'LMRS+' # possibly not for pile-up?
-# fails for 1D #fitOptions  = 'WLRS+'
-# fails for both #fitOptions  = 'WLMRS+'
+fitOptions  = 'BRS+'
 widthFactor = 5. # for rebinning     (in units of orig. RMS)
 
 fitResFuncs             = True
@@ -44,10 +33,18 @@ fitOptionsSigmaResFuncs = 'MERS'
 fitRangeResFuncs        = 2. # for Gaussian fits (in units of orig. RMS)
 
 fitJecsL5L7        = True
-fitJecsL5L7Around1 = False
-minPtPartonL5L7    = 0.
-maxDRPartonL5L7    = 0.2
-fitRangeJecsL5L7   = 2. # for Gaussian fits (in units of orig. RMS)
+#minPtPartonL5L7    = 0.
+#maxDRPartonL5L7    = 0.2
+minPtPartonL5L7    = 20.
+maxDRPartonL5L7    = 999999.
+  # Fit function: a Gaussian is always required for the first three function parameters
+#fitFunctionL5L7 = '[1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
+#fitFunctionL5L7 = '[1]*exp(-0.5*((x-[0])/[2])**2)+[4]*exp(-0.5*((x-[0])/[5])**2)' # double Gaussian with common mean
+fitFunctionL5L7 = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x )' # single Gaussian plus log-normal (???)
+#fitRangeJecsL5L7   = 2. # for Gaussian fits (in units of orig. RMS)
+fitRangeJecsL5L7   = 3. # for combined fits (in units of orig. RMS)
+
+bkgFunctionL5L7 = fitFunctionL5L7.split( ' + ' )[1]
 
 inputFile = 'fitTopHitFit_from%s.root'%( era )
 if usePileUp:
@@ -57,14 +54,15 @@ if runTest:
 if not rfioInput:
   inputFile = inputFile.replace( 'root', 'local.root' )
 logFile = inputFile.replace( 'root', 'log' )
-if useAlt:
-  logFile = logFile.replace( '.', '_Alt.', 1 )
-if useSymm:
-  logFile = logFile.replace( '.', '_Symm.', 1 )
-if refGen:
-  logFile = logFile.replace( '.', '_Gen.', 1 )
-if refSel:
-  logFile = logFile.replace( '.', '_Ref.', 1 )
+if not runTest:
+  if useAlt:
+    logFile = logFile.replace( '.', '_Alt.', 1 )
+  if useSymm:
+    logFile = logFile.replace( '.', '_Symm.', 1 )
+  if refGen:
+    logFile = logFile.replace( '.', '_Gen.', 1 )
+  if refSel:
+    logFile = logFile.replace( '.', '_Ref.', 1 )
 inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
 logFile   = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
 
@@ -193,9 +191,9 @@ if runTest:
 
 process.jecsL5L7 = cms.PSet(
   fit         = cms.bool( fitJecsL5L7 )
-, fitFunction = cms.string( 'gaus' )
+, fitFunction = cms.string( fitFunctionL5L7 )
 , fitRange    = cms.double( fitRangeJecsL5L7 )
-, fitAround1  = cms.bool( fitJecsL5L7Around1 )
+, bkgFunction = cms.string( bkgFunctionL5L7 )
 , minPtParton = cms.double( minPtPartonL5L7 )
 , maxDRParton = cms.double( maxDRPartonL5L7 )
 , writeFiles  = cms.bool( True )
