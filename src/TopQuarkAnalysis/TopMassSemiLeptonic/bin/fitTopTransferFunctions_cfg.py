@@ -39,14 +39,6 @@ fitOptions  = 'RS+'
 # fails for both #fitOptions  = 'WLMRS+'
 widthFactor = 5. # for rebinning     (in units of orig. RMS)
 
-fitResFuncs             = False
-fitOptionsSigmaResFuncs = 'MERS'
-fitRangeResFuncs        = 2. # for Gaussian fits (in units of orig. RMS)
-
-fitJecsL5L7        = False
-fitJecsL5L7Around1 = True
-fitRangeJecsL5L7   = 1.5 # for Gaussian fits (in units of orig. RMS)
-
 fitTransfer1D          = True
 fitFromStartTransfer1D = True
 fitRangeTransfer1D     = 5. # for Gaussian fits (in units of orig. RMS)
