@@ -28,7 +28,7 @@ pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 fitOptions  = 'BRS+'
 widthFactor = 5. # for rebinning     (in units of orig. RMS)
 
-fitResFuncs             = True
+fitResFuncs             = False
 fitOptionsSigmaResFuncs = 'MERS'
 fitRangeResFuncs        = 2. # for Gaussian fits (in units of orig. RMS)
 
@@ -37,10 +37,12 @@ fitJecsL5L7        = True
 #maxDRPartonL5L7    = 0.2
 minPtPartonL5L7    = 20.
 maxDRPartonL5L7    = 999999.
-  # Fit function: a Gaussian is always required for the first three function parameters
+# Fit function: a Gaussian is always required for the first three function parameters
+#fitFunctionL5L7 = '[1]*exp(-0.5*((x-[0])/[2])**2)' # single ROOT-like Gaussian
 #fitFunctionL5L7 = '[1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
-#fitFunctionL5L7 = '[1]*exp(-0.5*((x-[0])/[2])**2)+[4]*exp(-0.5*((x-[0])/[5])**2)' # double Gaussian with common mean
-fitFunctionL5L7 = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x )' # single Gaussian plus log-normal (???)
+#fitFunctionL5L7 = '[1]*exp(-0.5*((x-[0])/[2])**2) + [4]*exp(-0.5*((x-[0])/[5])**2)' # double ROOT-like Gaussian with common mean
+#fitFunctionL5L7 = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x )' # single ROOT-like Gaussian plus ROOT-like log-normal
+fitFunctionL5L7 = '( [1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi)) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/(x*[5]*sqrt(2*pi)) )' # single Gaussian plus log-normal
 #fitRangeJecsL5L7   = 2. # for Gaussian fits (in units of orig. RMS)
 fitRangeJecsL5L7   = 3. # for combined fits (in units of orig. RMS)
 
