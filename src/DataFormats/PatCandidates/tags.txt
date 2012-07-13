@@ -10,7 +10,7 @@ EGamma/EGammaAnalysisTools                       V00-00-13
 JetMETCorrections/Type1MET                       V04-06-09      V04-06-05      
 PhysicsTools/PatAlgos                            V08-10-04      V08-09-11-06   
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
-PhysicsTools/PatUtils                            V03-09-22      V03-09-22      
+PhysicsTools/PatUtils                            V03-09-23      V03-09-22      
 RecoTauTag/Configuration                         V01-04-03-02   V01-03-04      
 RecoTauTag/RecoTau                               V01-04-17-01   V01-04-12-01   
 TopQuarkAnalysis/Configuration                   V07-00-00      V06-02-05      
