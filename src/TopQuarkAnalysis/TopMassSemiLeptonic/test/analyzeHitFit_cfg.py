@@ -30,6 +30,9 @@ skimProcess           = 'SKIM'
 patMuons     = 'selectedPatMuonsHitFit'
 patElectrons = 'selectedPatElectronsHitFit'
 patJets      = 'selectedPatJetsHitFit'
+patMuonsReference     = 'referencePatMuons'
+patElectronsReference = 'referencePatElectrons'
+patJetsReference      = 'referencePatJets'
 patMETs      = 'patMETs'
 jecLevels = [ 'L1FastJet'
             , 'L2Relative'
@@ -37,7 +40,6 @@ jecLevels = [ 'L1FastJet'
             ]
 
 # TQAF MC match
-runMatch        = True
 matchMaxNJets   = 6                 # min: 4; default: 4
 matchAlgorithm  = 'unambiguousOnly' # default: 'totalMinDist'
 matchUseDeltaR  = True              # default: True
@@ -53,8 +55,7 @@ process = cms.Process( "USER" )
 
 reportEvery = 1000
 if runTest:
-  if not rfioInput:
-    reportEvery = 1
+  reportEvery = 1
 else:
   if rfioInput:
     reportEvery = 100000
@@ -69,11 +70,10 @@ if runTest:
   process.MessageLogger.cerr.TtSemiLepHypSelectionFilter = cms.untracked.PSet(
     limit = cms.untracked.int32( -1 )
   )
-  if not rfioInput:
-    process.MessageLogger.categories.append( 'AnalyzeHitFit' )
-    process.MessageLogger.cerr.AnalyzeHitFit = cms.untracked.PSet(
-      limit = cms.untracked.int32( -1 )
-    )
+  process.MessageLogger.categories.append( 'AnalyzeHitFit' )
+  process.MessageLogger.cerr.AnalyzeHitFit = cms.untracked.PSet(
+    limit = cms.untracked.int32( -1 )
+  )
 
 
 ### Input
@@ -82,7 +82,10 @@ inputFiles = [ 'file:%s/output/skimHitFit.local.root'%( os.getenv( "CMSSW_BASE" 
              ]
 if rfioInput:
   from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import *
-  inputFiles = files_Fall11_R4_1
+  if runTest:
+    inputFiles = files_Fall11_R4_test
+  else:
+    inputFiles = files_Fall11_R4_1
 elif runTest:
   inputFiles = [ 'file:%s/output/skimHitFit.test.local.root'%( os.getenv( "CMSSW_BASE" ) )
                ]
@@ -129,6 +132,8 @@ process.hltHighLevelReference = process.hltHighLevel.clone( HLTPaths = [ 'refere
 ### TQAF MC matcher
 
 process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff" )
+if not rfioInput:
+  process.ttSemiLepEvent.verbosity = 1
 process.ttSemiLepJetPartonMatch.maxNJets   = matchMaxNJets
 process.ttSemiLepJetPartonMatch.algorithm  = matchAlgorithm
 process.ttSemiLepJetPartonMatch.useDeltaR  = matchUseDeltaR
@@ -137,11 +142,13 @@ process.ttSemiLepJetPartonMatch.maxDist    = matchMaxDist
 process.ttSemiLepHypGenMatch.jetCorrectionLevel = jecLevels[ -1 ]
 if not rfioInput:
   process.ttSemiLepEvent.verbosity = 1
-  if runTest:
-    process.ttSemiLepJetPartonMatch.verbosity = 1
+if runTest:
+  process.ttSemiLepJetPartonMatch.verbosity = 1
 
 from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag
 from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
+
+# MCMatch match
 process.makeTtSemiLepEventMCMatchMuons = cloneProcessingSnippet( process
                                                                , process.makeTtSemiLepEvent
                                                                , 'MCMatchMuons'
@@ -171,20 +178,81 @@ massSearchReplaceAnyInputTag( process.makeTtSemiLepEventMCMatchElectrons
 process.ttSemiLepEventMCMatchElectrons.hypotheses = [ 'ttSemiLepHypGenMatchMCMatchElectrons'
                                                     ]
 
+# HitFit match
+process.makeTtSemiLepEventHitFitMuons = cloneProcessingSnippet( process
+                                                              , process.makeTtSemiLepEvent
+                                                              , 'HitFitMuons'
+                                                              )
+massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitMuons
+                            , 'selectedPatMuons'
+                            , patMuons
+                            )
+massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitMuons
+                            , 'selectedPatJets'
+                            , patJets
+                            )
+process.ttSemiLepEventHitFitMuons.hypotheses = [ 'ttSemiLepHypGenMatchHitFitMuons'
+                                               ]
+process.makeTtSemiLepEventHitFitElectrons = cloneProcessingSnippet( process
+                                                                  , process.makeTtSemiLepEvent
+                                                                  , 'HitFitElectrons'
+                                                                  )
+massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitElectrons
+                            , 'selectedPatMuons'
+                            , patElectrons
+                            )
+massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitElectrons
+                            , 'selectedPatJets'
+                            , patJets
+                            )
+process.ttSemiLepEventHitFitElectrons.hypotheses = [ 'ttSemiLepHypGenMatchHitFitElectrons'
+                                                   ]
+
+# Reference match
+process.makeTtSemiLepEventReferenceMuons = cloneProcessingSnippet( process
+                                                                 , process.makeTtSemiLepEvent
+                                                                 , 'ReferenceMuons'
+                                                                 )
+massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceMuons
+                            , 'selectedPatMuons'
+                            , patMuonsReference
+                            )
+massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceMuons
+                            , 'selectedPatJets'
+                            , patJetsReference
+                            )
+process.ttSemiLepEventReferenceMuons.hypotheses = [ 'ttSemiLepHypGenMatchReferenceMuons'
+                                                  ]
+process.makeTtSemiLepEventReferenceElectrons = cloneProcessingSnippet( process
+                                                                     , process.makeTtSemiLepEvent
+                                                                     , 'ReferenceElectrons'
+                                                                     )
+massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceElectrons
+                            , 'selectedPatMuons'
+                            , patElectronsReference
+                            )
+massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceElectrons
+                            , 'selectedPatJets'
+                            , patJetsReference
+                            )
+process.ttSemiLepEventReferenceElectrons.hypotheses = [ 'ttSemiLepHypGenMatchReferenceElectrons'
+                                                      ]
+
 from TopQuarkAnalysis.TopTools.ttSemiLepHypSelectionFilter_cfi import ttSemiLepHypSelectionFilter
 ### FIXME BEGIN
 jetCut = 'pt > 30. && numberOfDaughters > 1 && chargedEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4) && (chargedMultiplicity > 0 || abs(eta) >= 2.4) && abs(eta) < 3.0 && abs(eta) < 2.5'
 ### FIXME END
-process.ttSemiLepHypSelectionFilterMuons     = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtMuons
-                                                                                , ttSemiLepHypLeptons = ttSemiLepHypMuons
-                                                                                , ttSemiLepHypJets    = ttSemiLepHypJets
-                                                                                , processName         = skimProcess
-                                                                                , leptonSelector      = patMuons
-                                                                                , jetSelector         = patJets
-                                                                                ### FIXME BEGIN
-                                                                                , jetCut              = cms.string( jetCut )
-                                                                                ### FIXME END
-                                                                                )
+
+process.ttSemiLepHypSelectionFilterMuons = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtMuons
+                                                                            , ttSemiLepHypLeptons = ttSemiLepHypMuons
+                                                                            , ttSemiLepHypJets    = ttSemiLepHypJets
+                                                                            , processName         = skimProcess
+                                                                            , leptonSelector      = patMuons
+                                                                            , jetSelector         = patJets
+                                                                            ### FIXME BEGIN
+                                                                            , jetCut              = cms.string( jetCut )
+                                                                            ### FIXME END
+                                                                            )
 process.ttSemiLepHypSelectionFilterElectrons = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtElectrons
                                                                                 , ttSemiLepHypLeptons = ttSemiLepHypElectrons
                                                                                 , ttSemiLepHypJets    = ttSemiLepHypJets
@@ -196,11 +264,42 @@ process.ttSemiLepHypSelectionFilterElectrons = ttSemiLepHypSelectionFilter.clone
                                                                                 ### FIXME END
                                                                                 )
 
-process.matcherSequence = cms.Sequence(
+process.ttSemiLepHypSelectionFilterMuonsReference = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtMuons
+                                                                                     , ttSemiLepHypLeptons = ttSemiLepHypMuons
+                                                                                     , ttSemiLepHypJets    = ttSemiLepHypJets
+                                                                                     , processName         = skimProcess
+                                                                                     , leptonSelector      = patMuonsReference
+                                                                                     , jetSelector         = patJetsReference
+                                                                                     ### FIXME BEGIN
+                                                                                     , jetCut              = cms.string( jetCut )
+                                                                                     ### FIXME END
+                                                                                     )
+process.ttSemiLepHypSelectionFilterElectronsReference = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtElectrons
+                                                                                         , ttSemiLepHypLeptons = ttSemiLepHypElectrons
+                                                                                         , ttSemiLepHypJets    = ttSemiLepHypJets
+                                                                                         , processName         = skimProcess
+                                                                                         , leptonSelector      = patElectronsReference
+                                                                                         , jetSelector         = patJetsReference
+                                                                                         ### FIXME BEGIN
+                                                                                         , jetCut              = cms.string( jetCut )
+                                                                                         ### FIXME END
+                                                                                         )
+
+process.matcherSequenceBase = cms.Sequence(
   process.makeTtSemiLepEventMCMatchMuons
-* process.ttSemiLepHypSelectionFilterMuons
 * process.makeTtSemiLepEventMCMatchElectrons
+)
+process.matcherSequence = cms.Sequence(
+  process.ttSemiLepHypSelectionFilterMuons
 * process.ttSemiLepHypSelectionFilterElectrons
+* process.makeTtSemiLepEventHitFitMuons
+* process.makeTtSemiLepEventHitFitElectrons
+)
+process.matcherSequenceReference = cms.Sequence(
+  process.ttSemiLepHypSelectionFilterMuonsReference
+* process.ttSemiLepHypSelectionFilterElectronsReference
+* process.makeTtSemiLepEventReferenceMuons
+* process.makeTtSemiLepEventReferenceElectrons
 )
 
 
@@ -229,9 +328,9 @@ process.analyzeHitFit.metResolutions      = 'TopQuarkAnalysis/TopHitFit/data/res
 #                                                                                          )
 process.analyzeHitFitReference = process.analyzeHitFit.clone( ttSemiLeptonicEventMuons     = 'ttSemiLepEventReferenceMuons'
                                                             , ttSemiLeptonicEventElectrons = 'ttSemiLepEventReferenceElectrons'
-                                                            , patMuons     = 'referencePatMuons'
-                                                            , patElectrons = 'referencePatElectrons'
-                                                            , patJets      = 'referencePatJets'
+                                                            , patMuons     = patMuonsReference
+                                                            , patElectrons = patElectronsReference
+                                                            , patJets      = patJetsReference
                                                             )
 
 
@@ -239,18 +338,18 @@ process.analyzeHitFitReference = process.analyzeHitFit.clone( ttSemiLeptonicEven
 
 process.standardPath = cms.Path(
   process.hltHighLevel
+* process.matcherSequenceBase
+* process.matcherSequence
+* process.analyzeHitFit
 )
-if runMatch:
-  process.standardPath *= process.matcherSequence
-process.standardPath *= process.analyzeHitFit
 
 if not runTest:
   process.referencePath = cms.Path(
     process.hltHighLevelReference
+  * process.matcherSequenceBase
+  * process.matcherSequenceReference
+  * process.analyzeHitFitReference
   )
-  if runMatch:
-    process.referencePath *= process.matcherSequence
-  process.referencePath *= process.analyzeHitFitReference
 
 
 ### Messages

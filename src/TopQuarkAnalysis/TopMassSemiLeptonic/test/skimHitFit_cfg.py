@@ -6,7 +6,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 # Misc
-runCrab    = False
+runCrab    = True
 runTest    = True
 reportTime = False
 
@@ -358,9 +358,10 @@ process.patMuons.embedTrack = True
 process.patMuons.usePV      = muonUsePV
 if muonsIsoR03:
   process.patMuons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'muPFIsoValueNeutral03' )
-  process.patMuons.isolationValues.pfPhotons          = cms.InputTag( 'muPFIsoValueGamma03' )
+  process.patMuons.isolationValues.pfChargedAll       = cms.InputTag( 'muPFIsoValueChargedAll03' )
   process.patMuons.isolationValues.pfChargedHadrons   = cms.InputTag( 'muPFIsoValueCharged03' )
   process.patMuons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03' )
+  process.patMuons.isolationValues.pfPhotons          = cms.InputTag( 'muPFIsoValueGamma03' )
 process.selectedPatMuonsMCMatch.cut     = muonSelectBase
 process.selectedPatMuons.cut            = muonSelect
 process.selectedPatMuonsHitFit.cut      = muonSelectHitFit
@@ -428,9 +429,10 @@ process.patElectrons.electronIDSources.eidHyperTight3MC = cms.InputTag( 'eidHype
 process.patElectrons.electronIDSources.eidHyperTight4MC = cms.InputTag( 'eidHyperTight4MC' )
 if electronsIsoR03:
   process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03PFId' )
-  process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03PFId' )
+  process.patElectrons.isolationValues.pfChargedAll       = cms.InputTag( 'elPFIsoValueChargedAll03PFId' )
   process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03PFId' )
   process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFId' )
+  process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03PFId' )
 process.selectedPatElectronsMCMatch.cut     = electronSelectBase
 process.selectedPatElectrons.cut            = electronSelect
 process.selectedPatElectronsHitFit.cut      = electronSelectHitFit
@@ -455,11 +457,17 @@ if not runTest:
 # Jets and MET
 if 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
+process.patJetGenJetMatch.resolveByMatchQuality = True
 process.patJets.embedPFCandidates = False
 process.selectedPatJetsMCMatch.cut    = jetSelectBase
 process.selectedPatJets.cut           = jetSelect
 process.selectedPatJetsHitFit.cut     = jetSelectHitFit
 process.referencePatJets.preselection = jetSelectSignal
+# DEBUG BEGIN
+if runTest:
+  process.out.outputCommands.append( 'keep *_ak5GenJetsNoNu_*_*' )
+  process.out.outputCommands.append( 'keep *_patJetGenJetMatch_*_*' )
+# DEBUG END
 
 process.patMETsUncorr = process.patMETs.clone( metSource = 'pfMET' )
 process.patPF2PATSequence.replace( process.patMETs
@@ -476,109 +484,19 @@ process.out.outputCommands.append( 'drop *_kt6PFJets_*_*' )
 
 ### TQAF
 
-process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff" )
-if not runCrab:
-  process.ttSemiLepEvent.verbosity = 1
+#process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttSemiLepEvtBuilder_cff" )
+#if not runCrab:
+  #process.ttSemiLepEvent.verbosity = 1
 process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
-process.ttSemiLepJetPartonMatch.maxNJets = 6
-process.ttSemiLepJetPartonMatch.maxNComb = 1 # no knobs to turn to get several solutions
-if runTest and not runCrab:
-  process.ttSemiLepJetPartonMatch.verbosity = 1
-process.ttSemiLepHypGenMatch.jetCorrectionLevel = jecLevels[ -1 ]
-
-process.out.outputCommands.append( 'keep *_*TtSemiLepEventHypothesis*_*_*' )
-process.out.outputCommands.append( 'keep *_ttSemiLep*_*_*' )
+#process.ttSemiLepJetPartonMatch.maxNJets = 6
+#process.ttSemiLepJetPartonMatch.maxNComb = 1 # no knobs to turn to get several solutions
+#if runTest and not runCrab:
+  #process.ttSemiLepJetPartonMatch.verbosity = 1
+#process.ttSemiLepHypGenMatch.jetCorrectionLevel = jecLevels[ -1 ]
 
 process.out.outputCommands.append( 'keep *_genEvt*_*_*' )
 process.out.outputCommands.append( 'keep *_initSubset*_*_*' )
 process.out.outputCommands.append( 'keep *_decaySubset*_*_*' )
-
-#from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag
-#from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
-#process.makeTtSemiLepEventMCMatchMuons = cloneProcessingSnippet( process
-                                                               #, process.makeTtSemiLepEvent
-                                                               #, 'MCMatchMuons'
-                                                               #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventMCMatchMuons
-                            #, 'selectedPatMuons'
-                            #, 'selectedPatMuonsMCMatch'
-                            #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventMCMatchMuons
-                            #, 'selectedPatJets'
-                            #, 'selectedPatJetsMCMatch'
-                            #)
-#process.ttSemiLepEventMCMatchMuons.hypotheses = [ 'ttSemiLepHypGenMatchMCMatchMuons'
-                                                #]
-#process.makeTtSemiLepEventMCMatchElectrons = cloneProcessingSnippet( process
-                                                                   #, process.makeTtSemiLepEvent
-                                                                   #, 'MCMatchElectrons'
-                                                                   #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventMCMatchElectrons
-                            #, 'selectedPatMuons'
-                            #, 'selectedPatElectronsMCMatch'
-                            #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventMCMatchElectrons
-                            #, 'selectedPatJets'
-                            #, 'selectedPatJetsMCMatch'
-                            #)
-#process.ttSemiLepEventMCMatchElectrons.hypotheses = [ 'ttSemiLepHypGenMatchMCMatchElectrons'
-                                                    #]
-#process.makeTtSemiLepEventHitFitMuons = cloneProcessingSnippet( process
-                                                              #, process.makeTtSemiLepEvent
-                                                              #, 'HitFitMuons'
-                                                              #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitMuons
-                            #, 'selectedPatMuons'
-                            #, 'selectedPatMuonsHitFit'
-                            #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitMuons
-                            #, 'selectedPatJets'
-                            #, 'selectedPatJetsHitFit'
-                            #)
-#process.ttSemiLepEventHitFitMuons.hypotheses = [ 'ttSemiLepHypGenMatchHitFitMuons'
-                                               #]
-#process.makeTtSemiLepEventHitFitElectrons = cloneProcessingSnippet( process
-                                                                  #, process.makeTtSemiLepEvent
-                                                                  #, 'HitFitElectrons'
-                                                                  #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitElectrons
-                            #, 'selectedPatMuons'
-                            #, 'selectedPatElectronsHitFit'
-                            #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventHitFitElectrons
-                            #, 'selectedPatJets'
-                            #, 'selectedPatJetsHitFit'
-                            #)
-#process.ttSemiLepEventHitFitElectrons.hypotheses = [ 'ttSemiLepHypGenMatchHitFitElectrons'
-                                                   #]
-#process.makeTtSemiLepEventReferenceMuons = cloneProcessingSnippet( process
-                                                                 #, process.makeTtSemiLepEvent
-                                                                 #, 'ReferenceMuons'
-                                                                 #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceMuons
-                            #, 'selectedPatMuons'
-                            #, 'referencePatMuons'
-                            #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceMuons
-                            #, 'selectedPatJets'
-                            #, 'referencePatJets'
-                            #)
-#process.ttSemiLepEventReferenceMuons.hypotheses = [ 'ttSemiLepHypGenMatchReferenceMuons'
-                                                  #]
-#process.makeTtSemiLepEventReferenceElectrons = cloneProcessingSnippet( process
-                                                                     #, process.makeTtSemiLepEvent
-                                                                     #, 'ReferenceElectrons'
-                                                                     #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceElectrons
-                            #, 'selectedPatMuons'
-                            #, 'referencePatElectrons'
-                            #)
-#massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceElectrons
-                            #, 'selectedPatJets'
-                            #, 'referencePatJets'
-                            #)
-#process.ttSemiLepEventReferenceElectrons.hypotheses = [ 'ttSemiLepHypGenMatchReferenceElectrons'
-                                                      #]
 
 
 ### Paths
@@ -590,43 +508,35 @@ process.pf2PatSequence = cms.Sequence( process.eventCleaning
                                      )
 process.pf2PatPathMuons = cms.Path( process.triggerResultsFilterMuons
                                   * process.pf2PatSequence
-                                  #* process.makeTtSemiLepEventMCMatchMuons
                                   * process.countSelectedPatMuons
                                   * process.countSelectedPatLeptons
                                   * process.countSelectedPatJets
                                   * process.patHitFitSequence
-                                  #* process.makeTtSemiLepEventHitFitMuons
                                   )
 process.pf2PatPathElectrons = cms.Path( process.triggerResultsFilterElectrons
                                       * process.pf2PatSequence
-                                      #* process.makeTtSemiLepEventMCMatchElectrons
                                       * process.countSelectedPatElectrons
                                       * process.countSelectedPatLeptons
                                       * process.countSelectedPatJets
                                       * process.patHitFitSequence
-                                      #* process.makeTtSemiLepEventHitFitElectrons
                                       )
 
 # Reference selections
 process.referencePathMuons = cms.Path( process.triggerResultsFilterMuons
                                      * process.pf2PatSequence
-                                     #* process.makeTtSemiLepEventMCMatchMuons
                                      * process.countSelectedPatMuons
                                      * process.countSelectedPatLeptons
                                      * process.patReferenceSequence
                                      * process.countReferencePatMuons
                                      * process.countReferencePatJets
-                                     #* process.makeTtSemiLepEventReferenceMuons
                                      )
 process.referencePathElectrons = cms.Path( process.triggerResultsFilterElectrons
                                          * process.pf2PatSequence
-                                         #* process.makeTtSemiLepEventMCMatchElectrons
                                          * process.countSelectedPatElectrons
                                          * process.countSelectedPatLeptons
                                          * process.patReferenceSequence
                                          * process.countReferencePatElectrons
                                          * process.countReferencePatJets
-                                         #* process.makeTtSemiLepEventReferenceElectrons
                                          )
 
 process.out.SelectEvents.SelectEvents = [ 'pf2PatPathMuons'
