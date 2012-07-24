@@ -14,7 +14,7 @@ RecoTauTag/Configuration                         V01-04-03-02   V01-03-04
 RecoTauTag/RecoTau                               V01-04-17-01   V01-04-12-01   
 TopQuarkAnalysis/Configuration                   V07-00-00      V06-02-05      
 TopQuarkAnalysis/Examples                        V06-07-13      V06-07-11      
-TopQuarkAnalysis/TopEventProducers               V06-09-10      V06-09-08-00   
+TopQuarkAnalysis/TopEventProducers               V06-09-11      V06-09-08-00   
 TopQuarkAnalysis/TopEventSelection               V06-07-15      V06-07-14      
 TopQuarkAnalysis/TopHitFit                       V00-00-06      V00-00-05      
 TopQuarkAnalysis/TopJetCombination               V06-08-04      V06-08-03      
