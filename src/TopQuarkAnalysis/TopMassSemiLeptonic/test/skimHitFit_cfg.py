@@ -6,7 +6,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 # Misc
-runCrab    = True
+runCrab    = False
 runTest    = True
 reportTime = False
 
@@ -14,11 +14,11 @@ reportTime = False
 #mc = 'Fall11_R3'
 mc = 'Fall11_R4'
 
-# RelVal Input
-cmsswVersion = 'CMSSW_4_4_2_patch10' # does not work :-(
-relVal       = 'RelValProdTTbar'
-dataTier     = 'AODSIM'
-globalTag    = 'START44_V7_special_120119'
+## RelVal Input
+#cmsswVersion = 'CMSSW_4_4_2_patch10' # does not work :-(
+#relVal       = 'RelValProdTTbar'
+#dataTier     = 'AODSIM'
+#globalTag    = 'START44_V7_special_120119'
 
 # Trigger
 hltProcess                = 'HLT'
@@ -153,12 +153,15 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 if not runCrab:
-  from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-  process.source.fileNames = [ '/store/relval/CMSSW_4_4_2_patch10/RelValProdTTbar/AODSIM/START44_V7_special_120119-v1/0084/1AFC5FFF-3143-E111-9E01-001BFCDBD1BC.root'
-                             , '/store/relval/CMSSW_4_4_2_patch10/RelValProdTTbar/AODSIM/START44_V7_special_120119-v1/0088/0ECC7FA5-7A43-E111-9B36-002618943861.root'
-                             ]
-  triggerSelectionMuons     = 'HLT_IsoMu24_v*'
-  triggerSelectionElectrons = 'HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v*'
+  from TopQuarkAnalysis.TopMassSemiLeptonic.input_cff import *
+  if mc == 'Fall11_R3':
+    process.source.fileNames = files_Fall11_R3_test
+    process.GlobalTag.globaltag = 'START44_V5D::All'
+  elif mc == 'Fall11_R4':
+    process.source.fileNames = files_Fall11_R4_test
+    process.GlobalTag.globaltag = 'START44_V9C::All'
+  #triggerSelectionMuons     = 'HLT_IsoMu24_v*'
+  #triggerSelectionElectrons = 'HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v*'
 
 
 ### Output
