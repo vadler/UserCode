@@ -10,7 +10,7 @@ PhysicsTools/KinFitter                           V00-03-06      V00-03-04
 PhysicsTools/PatAlgos                            V08-07-47      V08-07-39      
 PhysicsTools/PatUtils                            V03-09-18-03   V03-09-18-02   
 TopQuarkAnalysis/Configuration                   V06-01-23      V06-00-12      
-TopQuarkAnalysis/TopEventProducers               V06-07-14      V06-07-13      
+TopQuarkAnalysis/TopEventProducers               V06-07-15      V06-07-13      
 TopQuarkAnalysis/TopJetCombination               V06-07-10      V06-07-09      
 TopQuarkAnalysis/TopKinFitter                    V06-07-17      V06-07-11      
 TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-05      
