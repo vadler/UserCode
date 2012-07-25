@@ -7,7 +7,7 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-runOnRelVal   = True # If 'False', define input files in l. 182ff.
+runOnRelVal   = False # If 'False', define input files in l. 182ff.
 maxEvents     = -1
 gc            = True
 createNTuples = True
@@ -176,13 +176,13 @@ process.source = cms.Source( "PoolSource"
 
 inputFiles = cms.untracked.vstring()
 if runOnRelVal:
-  inputFiles = [ '/store/relval/CMSSW_4_4_2_patch10/RelValProdTTbar/AODSIM/START44_V7_special_120119-v1/0084/1AFC5FFF-3143-E111-9E01-001BFCDBD1BC.root'
-               , '/store/relval/CMSSW_4_4_2_patch10/RelValProdTTbar/AODSIM/START44_V7_special_120119-v1/0088/0ECC7FA5-7A43-E111-9B36-002618943861.root'
-               ]
+  inputFiles = []
 else:
   if lxplusTest:
-    inputFiles = [ '/store/user/vadler/cms/AT/CMSSW_4_4_4/data/Fall11_R3/copyFall11_1_2_ibi.root'
-                 ]
+    #inputFiles = [ '/store/user/vadler/cms/AT/CMSSW_4_4_4/data/Fall11_R3/copyFall11_1_2_ibi.root'
+                 #]
+    from PhysicsTools.PatAlgos.myPatTuple_mcFall11_R4_cff import fileNames
+    inputFiles = fileNames.fileNames
   else:
     inputFiles = [ 'file:////user/bklein/TTbar_44X.root'
                  ]
