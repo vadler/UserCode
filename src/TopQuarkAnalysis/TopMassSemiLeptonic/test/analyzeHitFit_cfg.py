@@ -56,9 +56,8 @@ process = cms.Process( "USER" )
 reportEvery = 1000
 if runTest:
   reportEvery = 1
-else:
-  if rfioInput:
-    reportEvery = 100000
+elif rfioInput:
+  reportEvery = 100000
 process.load( "FWCore.MessageService.MessageLogger_cfi" )
 process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.options = cms.untracked.PSet(
@@ -96,8 +95,6 @@ process.source = cms.Source(
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( -1 )
 )
-if runTest:
-  process.maxEvents.input = 25000
 
 
 ### Output
@@ -239,19 +236,15 @@ process.ttSemiLepEventReferenceElectrons.hypotheses = [ 'ttSemiLepHypGenMatchRef
                                                       ]
 
 from TopQuarkAnalysis.TopTools.ttSemiLepHypSelectionFilter_cfi import ttSemiLepHypSelectionFilter
-### FIXME BEGIN
-jetCut = 'pt > 30. && numberOfDaughters > 1 && chargedEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4) && (chargedMultiplicity > 0 || abs(eta) >= 2.4) && abs(eta) < 3.0 && abs(eta) < 2.5'
-### FIXME END
-
+muonCut     = 'isTrackerMuon && pt > 26. && abs(eta) < 2.1 && globalTrack.normalizedChi2 < 10. && globalTrack.hitPattern.numberOfValidMuonHits > 0 && abs(dB) < 0.02 && innerTrack.hitPattern.trackerLayersWithMeasurement > 8 && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1 && numberOfMatches > 1 && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.125'
+electronCut = 'et > 35. && abs(eta) < 2.5 && !(1.4442 < abs(superCluster.eta) && abs(superCluster.eta) < 1.5660) && abs(dB) < 0.02 && (electronID("eidHyperTight1MC") == 9. || electronID("eidHyperTight1MC") == 11. || electronID("eidHyperTight1MC") == 13. || electronID("eidHyperTight1MC") == 15.) && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.1 && passConversionVeto && gsfTrack.trackerExpectedHitsInner.numberOfLostHits == 0'
+jetCut      = 'pt > 30. && numberOfDaughters > 1 && chargedEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4) && (chargedMultiplicity > 0 || abs(eta) >= 2.4) && abs(eta) < 3.0 && abs(eta) < 2.5'
 process.ttSemiLepHypSelectionFilterMuons = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtMuons
                                                                             , ttSemiLepHypLeptons = ttSemiLepHypMuons
                                                                             , ttSemiLepHypJets    = ttSemiLepHypJets
                                                                             , processName         = skimProcess
                                                                             , leptonSelector      = patMuons
                                                                             , jetSelector         = patJets
-                                                                            ### FIXME BEGIN
-                                                                            , jetCut              = cms.string( jetCut )
-                                                                            ### FIXME END
                                                                             )
 process.ttSemiLepHypSelectionFilterElectrons = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtElectrons
                                                                                 , ttSemiLepHypLeptons = ttSemiLepHypElectrons
@@ -259,9 +252,6 @@ process.ttSemiLepHypSelectionFilterElectrons = ttSemiLepHypSelectionFilter.clone
                                                                                 , processName         = skimProcess
                                                                                 , leptonSelector      = patElectrons
                                                                                 , jetSelector         = patJets
-                                                                                ### FIXME BEGIN
-                                                                                , jetCut              = cms.string( jetCut )
-                                                                                ### FIXME END
                                                                                 )
 
 process.ttSemiLepHypSelectionFilterMuonsReference = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtMuons
@@ -270,9 +260,8 @@ process.ttSemiLepHypSelectionFilterMuonsReference = ttSemiLepHypSelectionFilter.
                                                                                      , processName         = skimProcess
                                                                                      , leptonSelector      = patMuonsReference
                                                                                      , jetSelector         = patJetsReference
-                                                                                     ### FIXME BEGIN
                                                                                      , jetCut              = cms.string( jetCut )
-                                                                                     ### FIXME END
+                                                                                     , leptonCut           = cms.string( muonCut )
                                                                                      )
 process.ttSemiLepHypSelectionFilterElectronsReference = ttSemiLepHypSelectionFilter.clone( ttSemiLepEvt        = ttSemiLepEvtElectrons
                                                                                          , ttSemiLepHypLeptons = ttSemiLepHypElectrons
@@ -280,9 +269,8 @@ process.ttSemiLepHypSelectionFilterElectronsReference = ttSemiLepHypSelectionFil
                                                                                          , processName         = skimProcess
                                                                                          , leptonSelector      = patElectronsReference
                                                                                          , jetSelector         = patJetsReference
-                                                                                         ### FIXME BEGIN
                                                                                          , jetCut              = cms.string( jetCut )
-                                                                                         ### FIXME END
+                                                                                         , leptonCut           = cms.string( electronCut )
                                                                                          )
 
 process.matcherSequenceBase = cms.Sequence(

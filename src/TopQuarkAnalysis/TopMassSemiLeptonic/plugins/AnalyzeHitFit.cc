@@ -369,11 +369,13 @@ void AnalyzeHitFit::beginJob()
     catData_.back()->Branch( "PhiAlt"       , &phiAlt_       , "phiAlt/D" );
     catData_.back()->Branch( "BinEtaAlt"    , &binEtaAlt_    , "binEtaAlt/I" );
     catData_.back()->Branch( "BinEtaSymmAlt", &binEtaSymmAlt_, "binEtaSymmAlt/I" );
-    catData_.back()->Branch( "PtGenJet"        , &ptGenJet_        , "ptGenJet/D" );
-    catData_.back()->Branch( "EtaGenJet"       , &etaGenJet_       , "etaGenJet/D" );
-    catData_.back()->Branch( "PhiGenJet"       , &phiGenJet_       , "phiGenJet/D" );
-    catData_.back()->Branch( "BinEtaGenJet"    , &binEtaGenJet_    , "binEtaGenJet/I" );
-    catData_.back()->Branch( "BinEtaSymmGenJet", &binEtaSymmGenJet_, "binEtaSymmGenJet/I" );
+    if ( cat == "UdscJet" || cat == "BJet" ) {
+      catData_.back()->Branch( "PtGenJet"        , &ptGenJet_        , "ptGenJet/D" );
+      catData_.back()->Branch( "EtaGenJet"       , &etaGenJet_       , "etaGenJet/D" );
+      catData_.back()->Branch( "PhiGenJet"       , &phiGenJet_       , "phiGenJet/D" );
+      catData_.back()->Branch( "BinEtaGenJet"    , &binEtaGenJet_    , "binEtaGenJet/I" );
+      catData_.back()->Branch( "BinEtaSymmGenJet", &binEtaSymmGenJet_, "binEtaSymmGenJet/I" );
+    }
     catData_.back()->Branch( "PtGen"        , &ptGen_        , "ptGen/D" );
     catData_.back()->Branch( "EtaGen"       , &etaGen_       , "etaGen/D" );
     catData_.back()->Branch( "PhiGen"       , &phiGen_       , "phiGen/D" );
@@ -498,18 +500,18 @@ void AnalyzeHitFit::analyze( const edm::Event & iEvent, const edm::EventSetup & 
           binEtaSymmAlt_    = -1;
           binEtaSymmGen_    = -1;
           binEtaSymmGenJet_ = -1;
-          pt_        = -5.;
-          ptAlt_     = -5.;
-          ptGenJet_  = -5.;
-          ptGen_     = -5.;
-          eta_       = -5.;
-          etaAlt_    = -5.;
-          etaGenJet_ = -5.;
-          etaGen_    = -5.;
-          phi_       = -5.;
-          phiAlt_    = -5.;
-          phiGenJet_ = -5.;
-          phiGen_    = -5.;
+          pt_        = -9.;
+          ptAlt_     = -9.;
+          ptGenJet_  = -9.;
+          ptGen_     = -9.;
+          eta_       = -9.;
+          etaAlt_    = -9.;
+          etaGenJet_ = -9.;
+          etaGen_    = -9.;
+          phi_       = -9.;
+          phiAlt_    = -9.;
+          phiGenJet_ = -9.;
+          phiGen_    = -9.;
           // Fill variables
           if ( objCats_.at( iCat ) == "Mu" ) {
             if ( ttGenEvent_->isSemiLeptonic( WDecay::kMuon ) ) {
@@ -548,15 +550,15 @@ void AnalyzeHitFit::analyze( const edm::Event & iEvent, const edm::EventSetup & 
             binEtaSymm_    = -1;
             binEtaSymmAlt_ = -1;
             binEtaSymmGen_ = -1;
-            pt_     = -5.;
-            ptAlt_  = -5.;
-            ptGen_  = -5.;
-            eta_    = -5.;
-            etaAlt_ = -5.;
-            etaGen_ = -5.;
-            phi_    = -5.;
-            phiAlt_ = -5.;
-            phiGen_ = -5.;
+            pt_     = -9.;
+            ptAlt_  = -9.;
+            ptGen_  = -9.;
+            eta_    = -9.;
+            etaAlt_ = -9.;
+            etaGen_ = -9.;
+            phi_    = -9.;
+            phiAlt_ = -9.;
+            phiGen_ = -9.;
             if ( ttSemiLeptonicEventMuons_.isValid() && ttSemiLeptonicEventMuons_->isHypoValid( TtEvent::kGenMatch )  ) {
               fill( iCat, ttSemiLeptonicEventMuons_, true );
             }
@@ -758,35 +760,35 @@ void AnalyzeHitFit::fill( unsigned iCat, const edm::Handle< TtSemiLeptonicEvent 
   }
 
   unsigned iEta;
-  if ( eta_ != -5. ) {
+  if ( eta_ != -9. ) {
     iEta = getEtaBin( iCat, eta_ );
     if ( iEta < etaBins_.at( iCat ).size() ) binEta_ = iEta;
   }
-  if ( etaAlt_ != -5. ) {
+  if ( etaAlt_ != -9. ) {
     iEta = getEtaBin( iCat, etaAlt_ );
     if ( iEta < etaBins_.at( iCat ).size() ) binEtaAlt_ = iEta;
   }
-  if ( etaGenJet_ != -5. ) {
+  if ( etaGenJet_ != -9. ) {
     iEta = getEtaBin( iCat, etaGenJet_ );
     if ( iEta < etaBins_.at( iCat ).size() ) binEtaGenJet_ = iEta;
   }
-  if ( etaGen_ != -5. ) {
+  if ( etaGen_ != -9. ) {
     iEta = getEtaBin( iCat, etaGen_ );
     if ( iEta < etaBins_.at( iCat ).size() ) binEtaGen_ = iEta;
   }
-  if ( eta_ != -5. ) {
+  if ( eta_ != -9. ) {
     iEta = getEtaBin( iCat, eta_, true );
     if ( iEta < etaSymmBins_.at( iCat ).size() ) binEtaSymm_ = iEta;
   }
-  if ( etaAlt_ != -5. ) {
+  if ( etaAlt_ != -9. ) {
     iEta = getEtaBin( iCat, etaAlt_, true );
     if ( iEta < etaSymmBins_.at( iCat ).size() ) binEtaSymmAlt_ = iEta;
   }
-  if ( etaGenJet_ != -5. ) {
+  if ( etaGenJet_ != -9. ) {
     iEta = getEtaBin( iCat, etaGenJet_, true );
     if ( iEta < etaSymmBins_.at( iCat ).size() ) binEtaSymmGenJet_ = iEta;
   }
-  if ( etaGen_ != -5. ) {
+  if ( etaGen_ != -9. ) {
     iEta = getEtaBin( iCat, etaGen_, true );
     if ( iEta < etaSymmBins_.at( iCat ).size() ) binEtaSymmGen_ = iEta;
   }
