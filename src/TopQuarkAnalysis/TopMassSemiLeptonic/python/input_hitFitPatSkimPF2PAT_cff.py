@@ -496,10 +496,10 @@ filesOld_Fall11_R4 = [ '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_ne
                      , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newest/skimHitFit_99_1_HBb.root'
                      , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4_newest/skimHitFit_9_1_v71.root'
                      ]
-filesOld_Fall11_R4_1 = files_Fall11_R4[   0 :  61 ]
-filesOld_Fall11_R4_2 = files_Fall11_R4[  61 : 122 ]
-filesOld_Fall11_R4_3 = files_Fall11_R4[ 122 : 183 ]
-filesOld_Fall11_R4_4 = files_Fall11_R4[ 183 : 244 ]
+filesOld_Fall11_R4_1 = filesOld_Fall11_R4[   0 :  61 ]
+filesOld_Fall11_R4_2 = filesOld_Fall11_R4[  61 : 122 ]
+filesOld_Fall11_R4_3 = filesOld_Fall11_R4[ 122 : 183 ]
+filesOld_Fall11_R4_4 = filesOld_Fall11_R4[ 183 : 244 ]
 
 files_Fall11_R3 = [ '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R3/skimHitFitResolutionFunctions_10_1_Lvc.root'
                   , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R3/skimHitFitResolutionFunctions_11_1_XLH.root'
