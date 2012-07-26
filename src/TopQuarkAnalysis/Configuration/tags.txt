@@ -2,7 +2,6 @@ Test Release based on: CMSSW_5_2_6
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_6
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_2_6
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-AnalysisDataFormats/TopObjects                   V06-08-07      V06-08-07      
 CommonTools/ParticleFlow                         V00-03-15      V00-03-08      
 CommonTools/RecoUtils                            V00-00-12      V00-00-03      
 DataFormats/PatCandidates                        V06-05-01      V06-05-00      
@@ -16,14 +15,9 @@ RecoMET/METAnalyzers                             V00-00-08
 RecoMET/METFilters                               V00-00-07                     
 RecoVertex/AdaptiveVertexFinder                  V02-02-00      V02-00-04-02   
 TopQuarkAnalysis/Configuration                   V07-00-01      V06-02-00      
-TopQuarkAnalysis/Examples                        V06-07-11      V06-07-11      
 TopQuarkAnalysis/TopEventProducers               V06-09-09      V06-09-08      
-TopQuarkAnalysis/TopEventSelection               V06-07-14      V06-07-14      
-TopQuarkAnalysis/TopHitFit                       V00-00-05      V00-00-05      
-TopQuarkAnalysis/TopJetCombination               V06-08-03      V06-08-03      
-TopQuarkAnalysis/TopKinFitter                    V06-07-19      V06-07-19      
 TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09      
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-03      
 TopQuarkAnalysis/TopTools                        V06-07-11-01   V06-07-11      
 ---------------------------------------
-total packages: 23 (23 displayed)
+total packages: 17 (17 displayed)
