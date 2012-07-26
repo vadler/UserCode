@@ -328,17 +328,6 @@ if not createNTuples:
     process.out
     )
 
-### DEBUG START ###
-#from RecoJets.JetProducers.kt4PFJets_cfi import *
-#process.kt6PFJetsForIsolation = kt4PFJets.clone( rParam       = 0.6
-                                               #, doRhoFastjet = True
-                                               #, Rho_EtaMax   = 2.5
-                                               #)
-#from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
-#process.kt6PFJetsForIsolation = kt6PFJets.clone( Rho_EtaMax = 2.5
-                                               #)
-### DEBUG END ###
-
 ### Cleaning
 
 process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
@@ -541,15 +530,16 @@ else:
 removeIfInSequence( process, 'ak7GenJetsNoNu', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'iterativeCone5GenJetsNoNu', 'patPF2PATSequence', '' )
 
-process.patJets.jetSource = cms.InputTag(pfJetCollection)#Added S
-process.jetTracksAssociatorAtVertex.jets = cms.InputTag(pfJetCollection)
-process.patJetCorrFactors.src = cms.InputTag(pfJetCollection)
-process.patJetGenJetMatch.src = cms.InputTag(pfJetCollection)
-process.patJetPartonAssociation.jets = cms.InputTag(pfJetCollection)
-process.patJetPartonMatch.src = cms.InputTag(pfJetCollection)
-process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag("pfJets")
-process.pfMET.jets = cms.InputTag("pfJets")
-process.softMuonTagInfosAOD.jets = cms.InputTag(pfJetCollection)
+process.patJets.jetSource = cms.InputTag( pfJetCollection )
+process.jetTracksAssociatorAtVertex.jets = cms.InputTag( pfJetCollection )
+process.patJetCorrFactors.src = cms.InputTag( pfJetCollection )
+process.patJetGenJetMatch.src = cms.InputTag( pfJetCollection )
+process.patJetPartonAssociation.jets = cms.InputTag( pfJetCollection )
+process.patJetPartonMatch.src = cms.InputTag( pfJetCollection )
+process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag( pfJetCollection )
+process.pfMET.jets = cms.InputTag( pfJetCollection )
+process.softMuonTagInfosAOD.jets = cms.InputTag( pfJetCollection )
+process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
 ### DEBUG START ###
 process.pfIsolatedElectrons.doDeltaBetaCorrection = True
 process.pfIsolatedMuons.doDeltaBetaCorrection = True
@@ -735,6 +725,7 @@ if writeNonIsoElectrons:
   #getattr(process,'pfIsolatedElectrons'+postfixNonIsoE).isolationCut = 999999.
 
 ### TQAF
+
 if addGenEvt:
   process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
 if filterDecayChannels:
@@ -752,7 +743,18 @@ if filterDecayChannels:
     if restrictTauChannelElectron:
       process.ttSemiLeptonicFilter.allowedTopDecays.restrictTauDecays.electron = cms.bool( True )
 
+### Additipnal reconstruction
+
+# For lepton isolation with rho corrections
+from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
+process.kt6PFJetsForIsolation = kt6PFJets.clone( Rho_EtaMax   = 2.5
+                                               , Ghost_EtaMax = 2.5
+                                               )
+process.out.outputCommands += [ 'keep double_kt6PFJetsForIsolation_*_*'
+                              ]
+
 ### Path
+
 process.p = cms.Path( process.eventCleaning
                     )
 
@@ -761,8 +763,8 @@ if addGenEvt:
 if filterDecayChannels:
   process.p *= process.ttSemiLeptonicFilter
 
+process.p *= process.kt6PFJetsForIsolation
 process.p *= process.patPF2PATSequence
-#process.p *= process.kt6PFJetsForIsolation
 
 if writeNonIsoMuons:
   process.p *= process.patPF2PATSequenceNonIsoMu
