@@ -504,22 +504,21 @@ process.out.outputCommands.append( 'keep *_decaySubset*_*_*' )
 
 # For lepton isolation with rho corrections
 from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
-process.kt6PFJetsForIsolation = kt6PFJets.clone( Rho_EtaMax   = 2.5
-                                               , Ghost_EtaMax = 2.5
-                                               )
-process.out.outputCommands.append( 'keep double_kt6PFJetsForIsolation_*_*' )
+process.kt6PFJetsForIso = kt6PFJets.clone( Rho_EtaMax = 2.5
+                                         )
+process.out.outputCommands.append( 'keep double_kt6PFJetsForIso_*_*' )
 
 
 ### Paths
 
 # Cleaning + PF2PAT
 process.pf2PatSequence = cms.Sequence( process.eventCleaning
-                                     * process.kt6PFJetsForIsolation
+                                     * process.kt6PFJetsForIso
                                      * process.patPF2PATSequence
                                      * process.makeGenEvt
                                      )
 process.pf2PatPathMuons = cms.Path( process.triggerResultsFilterMuons
-                                  * process.kt6PFJetsForIsolation
+                                  * process.kt6PFJetsForIso
                                   * process.pf2PatSequence
                                   * process.countSelectedPatMuons
                                   * process.countSelectedPatLeptons
@@ -527,7 +526,7 @@ process.pf2PatPathMuons = cms.Path( process.triggerResultsFilterMuons
                                   * process.patHitFitSequence
                                   )
 process.pf2PatPathElectrons = cms.Path( process.triggerResultsFilterElectrons
-                                      * process.kt6PFJetsForIsolation
+                                      * process.kt6PFJetsForIso
                                       * process.pf2PatSequence
                                       * process.countSelectedPatElectrons
                                       * process.countSelectedPatLeptons
@@ -537,7 +536,7 @@ process.pf2PatPathElectrons = cms.Path( process.triggerResultsFilterElectrons
 
 # Reference selections
 process.referencePathMuons = cms.Path( process.triggerResultsFilterMuons
-                                     * process.kt6PFJetsForIsolation
+                                     * process.kt6PFJetsForIso
                                      * process.pf2PatSequence
                                      * process.countSelectedPatMuons
                                      * process.countSelectedPatLeptons
@@ -546,7 +545,7 @@ process.referencePathMuons = cms.Path( process.triggerResultsFilterMuons
                                      * process.countReferencePatJets
                                      )
 process.referencePathElectrons = cms.Path( process.triggerResultsFilterElectrons
-                                         * process.kt6PFJetsForIsolation
+                                         * process.kt6PFJetsForIso
                                          * process.pf2PatSequence
                                          * process.countSelectedPatElectrons
                                          * process.countSelectedPatLeptons
