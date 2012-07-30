@@ -2,7 +2,7 @@ Test Release based on: CMSSW_5_2_6
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_6
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_2_6
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CommonTools/ParticleFlow                         V00-03-15      V00-03-08      
+CommonTools/ParticleFlow                         V00-03-16      V00-03-08      
 CommonTools/RecoUtils                            V00-00-12      V00-00-03      
 DataFormats/PatCandidates                        V06-05-01      V06-05-00      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
