@@ -541,7 +541,9 @@ process.patJetPartonMatch.src = cms.InputTag( pfJetCollection )
 process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag( pfJetCollection )
 process.pfMET.jets = cms.InputTag( pfJetCollection )
 process.softMuonTagInfosAOD.jets = cms.InputTag( pfJetCollection )
-process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
+#process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
+if lxplusTest:
+  process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection ) # due to difference in LXPLUS test setup and recommended stup from README
 
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
@@ -750,8 +752,9 @@ from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
 process.kt6PFJetsForIsolation = kt6PFJets.clone( Rho_EtaMax   = 2.5
                                                , Ghost_EtaMax = 2.5
                                                )
-process.out.outputCommands += [ 'keep double_kt6PFJetsForIsolation_*_*'
-                              ]
+if not createNTuples:
+  process.out.outputCommands += [ 'keep double_kt6PFJetsForIsolation_*_*'
+                                ]
 
 ### Path
 
