@@ -8,7 +8,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 runOnMC       = True
-runOnRelVal   = True # If 'False', define input files in l. 207ff.
+runOnRelVal   = True # If 'False', define input files in l. 217ff.
 maxEvents     = -1
 gc            = True
 createNTuples = True
@@ -19,7 +19,7 @@ if lxplusTest:
   if not runOnMC:
     maxEvents = 1000
 else:
-  runOnRelVal = False # If 'False', define input files in l. 207ff.
+  runOnRelVal = False # If 'False', define input files in l. 217ff.
 
 runMatch  = True
 runMVA    = True
@@ -62,6 +62,7 @@ pfMuonSelect = 'pt > 5.' # PF2PAT: 'pt > 5.'
 usePfMuonIsoConeR03 = False
 # muon top projection isolation
 pfMuonIso = 0.2 # PF2PAT: 0.15
+pfMuonIsoUseDeltaBeta = True
 postfixNonIsoMu = 'NonIsoMu'
 # muon object selection
 #muonSelect = 'isPFMuon && (isGlobalMuon || isTrackerMuon) && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
@@ -77,6 +78,7 @@ pfElectronSelect = 'pt > 10. && gsfTrackRef.isNonnull' # PF2PAT: 'pt > 5. && gsf
 usePfElectronIsoConeR03 = True
 # electron top projection isolation
 pfElectronIso = 0.2 # PF2PAT: 0.2
+pfElectronIsoUseDeltaBeta = False
 postfixNonIsoE = 'NonIsoE'
 # electron object selection
 #electronSelect = 'pt > 20. && abs(eta) < 2.5 && electronID("mvaTrigV0") > 0.' # RefSel (min. for veto)
@@ -540,10 +542,6 @@ process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag( pfJetCollection )
 process.pfMET.jets = cms.InputTag( pfJetCollection )
 process.softMuonTagInfosAOD.jets = cms.InputTag( pfJetCollection )
 process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
-### DEBUG START ###
-process.pfIsolatedElectrons.doDeltaBetaCorrection = True
-process.pfIsolatedMuons.doDeltaBetaCorrection = True
-### DEBUG END ###
 
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
@@ -590,7 +588,8 @@ if usePfMuonIsoConeR03:
   process.pfMuons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03' )
                                                             , cms.InputTag( 'muPFIsoValueGamma03' )
                                                             )
-process.pfIsolatedMuons.isolationCut = pfMuonIso
+process.pfIsolatedMuons.isolationCut          = pfMuonIso
+process.pfIsolatedMuons.doDeltaBetaCorrection = pfMuonIsoUseDeltaBeta
 process.patMuons.embedTrack = True
 if usePfMuonIsoConeR03:
   process.patMuons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'muPFIsoValueNeutral03' )
@@ -619,7 +618,8 @@ if usePfElectronIsoConeR03:
   process.pfElectrons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
                                                                 , cms.InputTag( 'elPFIsoValueGamma03PFId' )
                                                                 )
-process.pfIsolatedElectrons.isolationCut = pfElectronIso
+process.pfIsolatedElectrons.isolationCut          = pfElectronIso
+process.pfIsolatedElectrons.doDeltaBetaCorrection = pfElectronIsoUseDeltaBeta
 process.patElectrons.embedTrack = True
 if usePfElectronIsoConeR03:
   process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03PFId' )

@@ -68,6 +68,8 @@ parameters are availabel in all configuration files:
                                        isolation; "off" uses the radius 0.4 instead
 - pf{Muon, Electron}Iso              : cut value for combined isolation of objects to be
                                        kept in PF top projection procedure
+- pf{Muon, Electron}IsoUseDeltaBeta  : to switch on/off the use of Delta beta corrections
+                                       for the computation of the isolation sum compared to 'pf{Muon, Electron}Iso'
 - {muon, electron, jet}Select        : selection string cut for objects to be stored in the
                                        output
 - {muon, electron, jet}Cut           : selection string cut for objects used in the event
