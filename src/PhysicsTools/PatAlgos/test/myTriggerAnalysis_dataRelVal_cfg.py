@@ -3,16 +3,10 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process( "HLTPROV" )
 
 # Conditions
-condition = 'com10'
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-from Configuration.AlCa.autoCond import autoCond
-globalTag                   = autoCond[ condition ][ : -5 ]
-process.GlobalTag.globaltag = autoCond[ condition ]
-process.GlobalTag.toGet.append( cms.PSet( tag     = cms.string( 'L1GtTriggerMenu_L1Menu_Collisions2012_v0_mc' )
-                                        , record  = cms.string( 'L1GtTriggerMenuRcd' )
-                                        , connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_L1T' )
-                                        )
-                              )
+from HLTrigger.Configuration.AutoCondGlobalTag import AutoCondGlobalTag
+condition         = 'com10'
+process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
@@ -22,7 +16,7 @@ process.source = cms.Source("PoolSource",
                         , relVal        = 'SingleMu'
                         , dataTier      = 'RECO'
                         , condition     = condition
-                        , globalTag     = '%s_RelVal_mu2011B'%( globalTag )
+                        , globalTag     = '%s_RelVal_mu2011B'%( process.GlobalTag.globaltag.value()[ : -5 ] )
                         , maxVersions   = None
                         , skipFiles     = None
                         , numberOfFiles = None

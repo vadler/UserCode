@@ -22,10 +22,17 @@ process.maxEvents = cms.untracked.PSet(
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.Geometry.GeometryRecoDB_cff" )
+process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 from Configuration.AlCa.autoCond import autoCond
-process.GlobalTag.globaltag = cms.string( autoCond[ 'com10' ] )
-process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
+condition                   = 'com10_5E33v4'
+process.GlobalTag.globaltag = cms.string( autoCond[ condition ][ 0 ] )
+l1Menu                      = autoCond[ condition ][ 1 ].split( ',' )
+process.GlobalTag.toGet.append( cms.PSet( tag     = cms.string( l1Menu[ 0 ] )
+                                        , record  = cms.string( l1Menu[ 1 ] )
+                                        , connect = cms.untracked.string( l1Menu[ 2 ] )
+                                        )
+                              )
 
 ## RAW to DIGI and RECO pre-requisites
 process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )

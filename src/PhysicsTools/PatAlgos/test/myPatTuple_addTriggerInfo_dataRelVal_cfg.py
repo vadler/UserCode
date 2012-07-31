@@ -1,22 +1,20 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+
+from HLTrigger.Configuration.AutoCondGlobalTag import AutoCondGlobalTag
+condition         = 'com10'
+process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
+
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-condition                   = 'com10'
-globalTag                   = autoCond[ condition ][ : -5 ]
-process.GlobalTag.globaltag = autoCond[ condition ]
-process.GlobalTag.toGet.append( cms.PSet( tag     = cms.string( 'L1GtTriggerMenu_L1Menu_Collisions2012_v0_mc' )
-                                        , record  = cms.string( 'L1GtTriggerMenuRcd' )
-                                        , connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_L1T' )
-                                        )
-                              )
 process.source.fileNames    = pickRelValInputFiles( relVal      = 'SingleMu'
                                                   , dataTier    = 'RECO'
-                                                  , globalTag   = '%s_RelVal_mu2011B'%( globalTag )
+                                                  , globalTag   = '%s_RelVal_mu2011B'%( process.GlobalTag.globaltag.value()[ : -5 ] )
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
 
+process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
   process.patDefaultSequence
 )

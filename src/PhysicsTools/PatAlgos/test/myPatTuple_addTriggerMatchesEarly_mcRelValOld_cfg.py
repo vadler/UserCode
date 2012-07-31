@@ -1,9 +1,10 @@
 ## import skeleton process
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-cmsswVersion = 'CMSSW_5_3_0'
-globalTag    = 'START53_V4'
+cmsswVersion = 'CMSSW_6_0_0_pre8'
+globalTag    = 'START60_V1'
 process.GlobalTag.globaltag = '%s::All'%( globalTag )
 process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                     cmsswVersion  = cmsswVersion
@@ -19,6 +20,7 @@ process.options.wantSummary = False
 
 
 ## let it run
+process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
   process.patCandidates
 )

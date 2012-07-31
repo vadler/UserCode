@@ -11,6 +11,7 @@ process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRel
 process.options.wantSummary = False
 
 ## let it run
+process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
   process.patCandidates
 )

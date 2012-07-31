@@ -1,5 +1,6 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source.fileNames    = pickRelValInputFiles( relVal      = 'RelValProdTTbar'
                                                   , dataTier    = 'AODSIM'
@@ -14,6 +15,7 @@ process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelVal.root
 # , ignoreTotal      = cms.untracked.int32( 0 )
 # )
 
+process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
   process.patDefaultSequence
 )
