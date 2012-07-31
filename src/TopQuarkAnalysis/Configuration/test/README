@@ -11,12 +11,11 @@ cvs co -r V08-09-11-06 PhysicsTools/PatAlgos
 cvs co -r V03-09-22    PhysicsTools/PatUtils
 cvs co -r V07-01-04    TopQuarkAnalysis/TopSkimming
 cvs co -r V06-07-11-01 TopQuarkAnalysis/TopTools
-cvs co -r V00-03-16    CommonTools/ParticleFlow
+cvs co -r V00-03-14    CommonTools/ParticleFlow
 cvs co -r V00-00-09    CommonTools/RecoUtils
 cvs co -r V04-06-09    JetMETCorrections/Type1MET
 cvs co -r V00-00-08    RecoMET/METAnalyzers
 cvs co -r V00-00-07    RecoMET/METFilters
-cvs co -r V15-01-11    RecoParticleFlow/PFProducer
 cvs co -r V00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
 cd EGamma/EGammaAnalysisTools/data
 cat download.url | xargs wget
@@ -69,8 +68,6 @@ parameters are availabel in all configuration files:
                                        isolation; "off" uses the radius 0.4 instead
 - pf{Muon, Electron}Iso              : cut value for combined isolation of objects to be
                                        kept in PF top projection procedure
-- pf{Muon, Electron}IsoUseDeltaBeta  : to switch on/off the use of Delta beta corrections
-                                       for the computation of the isolation sum compared to 'pf{Muon, Electron}Iso'
 - {muon, electron, jet}Select        : selection string cut for objects to be stored in the
                                        output
 - {muon, electron, jet}Cut           : selection string cut for objects used in the event
