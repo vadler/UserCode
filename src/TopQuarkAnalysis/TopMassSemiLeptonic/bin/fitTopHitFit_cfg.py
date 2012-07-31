@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Config as cms
 # Steering
 
 runTest   = True
-rfioInput = True
+rfioInput = False
 
 # Origin of existing resolution functions
 # era    = 'Spring10'
@@ -15,7 +15,7 @@ sample = 'Fall11_R4_1'
 # Settings
 overwrite = True # to throw away earlier versions of histograms, trees and functions
 # Exclusive switches:
-usePileUp = False # switch overwrites!!!
+usePileUp = False
 useAlt    = False
 useSymm   = True
 refGen    = False
@@ -25,10 +25,10 @@ if runTest:
 
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
-fitOptions  = 'BRS+'
-widthFactor = 5. # for rebinning     (in units of orig. RMS)
+fitOptions  = 'RS'
+widthFactor = 5. # for rebinning (in units of orig. RMS)
 
-fitResFuncs             = False
+fitResFuncs             = True
 fitOptionsSigmaResFuncs = 'MERS'
 fitRangeResFuncs        = 2. # for Gaussian fits (in units of orig. RMS)
 
@@ -41,14 +41,17 @@ maxDRPartonL5L7    = 999999.
 #fitFunctionL5L7 = '[1]*exp(-0.5*((x-[0])/[2])**2)' # single ROOT-like Gaussian
 #fitFunctionL5L7 = '[1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
 #fitFunctionL5L7 = '[1]*exp(-0.5*((x-[0])/[2])**2) + [4]*exp(-0.5*((x-[0])/[5])**2)' # double ROOT-like Gaussian with common mean
-#fitFunctionL5L7 = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x )' # single ROOT-like Gaussian plus ROOT-like log-normal
-fitFunctionL5L7 = '( [1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi)) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/(x*[5]*sqrt(2*pi)) )' # single Gaussian plus log-normal
+fitFunctionL5L7 = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x )' # single ROOT-like Gaussian plus ROOT-like log-normal
+#fitFunctionL5L7 = '( [1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi)) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/(x*[5]*sqrt(2*pi)) )' # single Gaussian plus log-normal
+fitOptionsL5L7  = 'BRS+'
 #fitRangeJecsL5L7   = 2. # for Gaussian fits (in units of orig. RMS)
-fitRangeJecsL5L7   = 3. # for combined fits (in units of orig. RMS)
+fitRangeJecsL5L7   = 5. # for combined fits (in units of orig. RMS)
 
 bkgFunctionL5L7 = fitFunctionL5L7.split( ' + ' )[1]
 
 inputFile = 'fitTopHitFit_from%s.root'%( era )
+if not runTest and rfioInput:
+  inputFile = inputFile.replace( '.root', '_%s.root'%( sample ) )
 if usePileUp:
   inputFile = inputFile.replace( '.root', '_PileUp.root' )
 if runTest:
@@ -188,12 +191,13 @@ process.resFuncs = cms.PSet(
 , pathOut      = cms.string( '%s/src/TopQuarkAnalysis/TopHitFit/data/resolution_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the resolution functions
 )
 
-if runTest:
+if runTest or not rfioInput:
   process.resFuncs.writeFiles = False
 
 process.jecsL5L7 = cms.PSet(
   fit         = cms.bool( fitJecsL5L7 )
 , fitFunction = cms.string( fitFunctionL5L7 )
+, fitOptions  = cms.string( fitOptionsL5L7 )
 , fitRange    = cms.double( fitRangeJecsL5L7 )
 , bkgFunction = cms.string( bkgFunctionL5L7 )
 , minPtParton = cms.double( minPtPartonL5L7 )
@@ -202,7 +206,7 @@ process.jecsL5L7 = cms.PSet(
 , pathOut     = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/jecL5L7_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
 
-#if runTest:
+#if runTest or not rfioInput:
   #process.jecsL5L7.writeFiles = False
 
 

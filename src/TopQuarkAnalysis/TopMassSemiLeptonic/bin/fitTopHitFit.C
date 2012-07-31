@@ -18,6 +18,7 @@
 #include <TF1.h>
 #include <TF2.h>
 #include <TFitResult.h>
+#include <TMath.h>
 
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -32,8 +33,13 @@ namespace my
 
   void setParametersFit( TF1 * fit, TH1D * histo )
   {
-    double m( histo->GetMean() );
-    double c( histo->GetBinContent( histo->GetMaximumBin() ) );
+//     double m( histo->GetMean() );
+//     double c( histo->GetBinContent( histo->FindBin( histo->GetMean() ) ) );
+//     double m( histo->GetBinCenter( histo->GetMaximumBin() ) );
+//     double c( histo->GetBinContent( histo->GetMaximumBin() ) );
+    double m( 1. );
+    double c( histo->GetBinContent( histo->FindBin( 1. ) ) );
+// //     double c( histo->GetBinContent( histo->GetMaximumBin() ) * std::sqrt( TMath::TwoPi() ) * histo->GetRMS() );
     double s( histo->GetRMS() );
     // Gaussian part
     fit->SetParameter( 0, m );
@@ -43,11 +49,11 @@ namespace my
     fit->SetParameter( 2, s );
     fit->SetParLimits( 2, 0., 999999. );
     // Additional part
-//     fit->SetParameter( 3, log( (m-2.*s)*(m-2.*s) / sqrt( s*s + (m-2.*s)*(m-2.*s) ) ) );
+//     fit->SetParameter( 3, log( (m-2.*s)*(m-2.*s) / std::sqrt( s*s + (m-2.*s)*(m-2.*s) ) ) );
     fit->SetParameter( 3, 0. );
-    fit->SetParameter( 4, c ); // just a rough guess, which should serve both cases
-    fit->SetParLimits( 4, 0., 999999. );
-//     fit->SetParameter( 5, sqrt( log( s*s / (m-2.*s)*(m-2.*s) + 1. ) ) );
+    fit->SetParameter( 4, c ); // just a rough guess, which should serve both cases (highest peak in "signal" or background)
+    fit->SetParLimits( 4, 0., 2. * c );
+//     fit->SetParameter( 5, std::sqrt( log( s*s / (m-2.*s)*(m-2.*s) + 1. ) ) );
     fit->SetParameter( 5, 1. );
     fit->SetParLimits( 5, 0., 999999. );
     // Parameter names
@@ -113,7 +119,7 @@ int main( int argc, char * argv[] )
   const bool fitResFuncs_( resFuncs_.getParameter< bool >( "fit" ) );
   const std::string fitFunctionResFuncs_( resFuncs_.getParameter< std::string >( "fitFunction" ) );
   std::string fitOptionsSigmaResFuncs_( resFuncs_.getParameter< std::string >( "fitOptionsSigma" ) );
-  const double fitRangeResFuncs_( resFuncs_.getParameter< double >( "fitRange" ) );
+  const double fitRangeResFuncs_( std::min( resFuncs_.getParameter< double >( "fitRange" ), widthFactor_ ) );
   const std::string resFunc_( resFuncs_.getParameter< std::string >( "resolutionFunction" ) );
   const std::string resFuncInv_( resFuncs_.getParameter< std::string >( "resolutionFunctionInverse" ) );
   const std::string resFuncRel_( resFuncs_.getParameter< std::string >( "resolutionFunctionRel" ) );
@@ -127,7 +133,8 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & jecsL5L7_( process_.getParameter< edm::ParameterSet >( "jecsL5L7" ) );
   const bool fitJecsL5L7_( jecsL5L7_.getParameter< bool >( "fit" ) );
   const std::string fitFunctionJecsL5L7_( jecsL5L7_.getParameter< std::string >( "fitFunction" ) );
-  const double fitRangeJecsL5L7_( jecsL5L7_.getParameter< double >( "fitRange" ) );
+  std::string fitOptionsL5L7_( jecsL5L7_.getParameter< std::string >( "fitOptions" ) );
+  const double fitRangeJecsL5L7_( std::min( jecsL5L7_.getParameter< double >( "fitRange" ), widthFactor_ ) );
   const std::string bkgFunctionJecsL5L7_( jecsL5L7_.getParameter< std::string >( "bkgFunction" ) );
   const double minPtPartonL5L7_( jecsL5L7_.getParameter< double >( "minPtParton" ) );
   const double maxDRPartonL5L7_( jecsL5L7_.getParameter< double >( "maxDRParton" ) );
@@ -153,6 +160,8 @@ int main( int argc, char * argv[] )
   else if ( verbose_ > 4 ) fitOptions_.append( "V" );
   if      ( verbose_ < 2 ) fitOptionsSigmaResFuncs_.append( "Q" );
   else if ( verbose_ > 3 ) fitOptionsSigmaResFuncs_.append( "V" );
+  if      ( verbose_ < 3 ) fitOptionsL5L7_.append( "Q" );
+  else if ( verbose_ > 4 ) fitOptionsL5L7_.append( "V" );
   const std::string titleChi2( "#chi^{2} / ndf" );
   const std::string titleProb( "Probability" );
   const std::string titleNdf( "ndf" );
@@ -721,34 +730,6 @@ int main( int argc, char * argv[] )
             histEtaPtDeltaRebin->SetXTitle( histEtaPtDelta->GetXaxis()->GetTitle() );
             histEtaPtDeltaRebin->SetYTitle( histEtaPtDelta->GetYaxis()->GetTitle() );
 
-            const std::string nameEtaPtFracRebin( nameEtaPtFrac + "Rebin" );
-//             const Int_t fracBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
-            const Int_t fracBinsRebin( deltaBins );
-            const Double_t meanEtaPtFrac( histEtaPtFrac->GetMean() );
-            const Double_t widthEtaPtFrac( std::fabs( histEtaPtFrac->GetRMS() ) );
-            if ( widthEtaPtFrac == 0. && verbose_ > 2 ) {
-              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                        << "    no histogram \"width\" in '" << nameEtaPtFrac << "'" << std::endl;
-            }
-            const Double_t rangeEtaPtFracRebin( widthEtaPtFrac == 0. ? widthFactor_ * std::fabs( histEtaPtFrac->GetXaxis()->GetXmax() ) : widthFactor_ * widthEtaPtFrac ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-            TH1D * histEtaPtFracRebin( new TH1D( nameEtaPtFracRebin.c_str(), titleEtaPtDelta.c_str(), fracBinsRebin, std::max( 0., -rangeEtaPtFracRebin + meanEtaPtFrac ), rangeEtaPtFracRebin + meanEtaPtFrac ) );
-            histEtaPtFracRebin->SetXTitle( histEtaPtFrac->GetXaxis()->GetTitle() );
-            histEtaPtFracRebin->SetYTitle( histEtaPtFrac->GetYaxis()->GetTitle() );
-
-            const std::string nameEtaPtFracRestrRebin( nameEtaPtFracRestr + "Rebin" );
-//             const Int_t fracRestrBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
-            const Int_t fracRestrBinsRebin( deltaBins );
-            const Double_t meanEtaPtFracRestr( histEtaPtFracRestr->GetMean() );
-            const Double_t widthEtaPtFracRestr( std::fabs( histEtaPtFracRestr->GetRMS() ) );
-            if ( widthEtaPtFracRestr == 0. && verbose_ > 2 ) {
-              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                        << "    no histogram \"width\" in '" << nameEtaPtFracRestr << "'" << std::endl;
-            }
-            const Double_t rangeEtaPtFracRestrRebin( widthEtaPtFracRestr == 0. ? widthFactor_ * std::fabs( histEtaPtFracRestr->GetXaxis()->GetXmax() ) : widthFactor_ * widthEtaPtFracRestr ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-            TH1D * histEtaPtFracRestrRebin( new TH1D( nameEtaPtFracRestrRebin.c_str(), titleEtaPtDelta.c_str(), fracRestrBinsRebin, std::max( 0., -rangeEtaPtFracRestrRebin + meanEtaPtFracRestr ), rangeEtaPtFracRestrRebin + meanEtaPtFracRestr ) );
-            histEtaPtFracRestrRebin->SetXTitle( histEtaPtFracRestr->GetXaxis()->GetTitle() );
-            histEtaPtFracRestrRebin->SetYTitle( histEtaPtFracRestr->GetYaxis()->GetTitle() );
-
             const std::string nameEtaPtDeltaRelRebin( nameEtaPtDeltaRel + "Rebin" );
 //             const Int_t deltaBinsRebinRel( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
             const Int_t deltaBinsRebinRel( deltaBins );
@@ -768,9 +749,6 @@ int main( int argc, char * argv[] )
                 if ( inverse && kinProp == "Pt" ) histEtaPtDeltaRebin->Fill( 1. / propGenEtaBin.at( uPt ).at( uEntry ) - 1. / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 else                              histEtaPtDeltaRebin->Fill( propGenEtaBin.at( uPt ).at( uEntry ) - propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 if ( ! inverse && kinProp == "Pt" ) {
-                  histEtaPtFracRebin->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                  if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtPartonL5L7_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRPartonL5L7_ )
-                    histEtaPtFracRestrRebin->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                   histEtaPtDeltaRelRebin->Fill( ( propGenEtaBin.at( uPt ).at( uEntry ) - propEtaBin.at( uPt ).at( uEntry ) ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 }
               }
@@ -778,9 +756,6 @@ int main( int argc, char * argv[] )
                 if ( inverse && kinProp == "Pt" ) histEtaPtDeltaRebin->Fill( 1. / propEtaBin.at( uPt ).at( uEntry ) - 1. / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 else                              histEtaPtDeltaRebin->Fill( propEtaBin.at( uPt ).at( uEntry ) - propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 if ( ! inverse && kinProp == "Pt" ) {
-                  histEtaPtFracRebin->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                  if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtPartonL5L7_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRPartonL5L7_ )
-                    histEtaPtFracRestrRebin->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                   histEtaPtDeltaRelRebin->Fill( ( propEtaBin.at( uPt ).at( uEntry ) - propGenEtaBin.at( uPt ).at( uEntry ) ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 }
               }
@@ -788,8 +763,6 @@ int main( int argc, char * argv[] )
 
             histEtaPtFrac->Scale( 1. / histEtaPtFrac->Integral() );
             histEtaPtFracRestr->Scale( 1. / histEtaPtFracRestr->Integral() );
-            histEtaPtFracRebin->Scale( 1. / histEtaPtFracRebin->Integral() );
-            histEtaPtFracRestrRebin->Scale( 1. / histEtaPtFracRestrRebin->Integral() );
 
           } // loop: uPt < nPtBins_
 
@@ -806,34 +779,6 @@ int main( int argc, char * argv[] )
           TH1D * histEtaDeltaRebin( new TH1D( nameEtaDeltaRebin.c_str(), titleEtaDelta.c_str(), deltaBinsRebin, meanEtaDelta - rangeEtaDeltaRebin, meanEtaDelta + rangeEtaDeltaRebin ) );
           histEtaDeltaRebin->SetXTitle( histEtaDelta->GetXaxis()->GetTitle() );
           histEtaDeltaRebin->SetYTitle( histEtaDelta->GetYaxis()->GetTitle() );
-
-          const std::string nameEtaFracRebin( nameEtaFrac + "Rebin" );
-//           const Int_t fracBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
-          const Int_t fracBinsRebin( deltaBins );
-          const Double_t meanEtaFrac( histEtaFrac->GetMean() );
-          const Double_t widthEtaFrac( std::fabs( histEtaFrac->GetRMS() ) );
-          if ( widthEtaFrac == 0. && verbose_ > 2 ) {
-            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                      << "    no histogram \"width\" in '" << nameEtaFrac << "'" << std::endl;
-          }
-          const Double_t rangeEtaFracRebin( widthEtaFrac == 0. ? widthFactor_ * std::fabs( histEtaFrac->GetXaxis()->GetXmax() ) : widthFactor_ * widthEtaFrac ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-          TH1D * histEtaFracRebin( new TH1D( nameEtaFracRebin.c_str(), titleEtaDelta.c_str(), fracBinsRebin, std::max( 0., -rangeEtaFracRebin + meanEtaFrac ), rangeEtaFracRebin + meanEtaFrac ) );
-          histEtaFracRebin->SetXTitle( histEtaFrac->GetXaxis()->GetTitle() );
-          histEtaFracRebin->SetYTitle( histEtaFrac->GetYaxis()->GetTitle() );
-
-          const std::string nameEtaFracRestrRebin( nameEtaFracRestr + "Rebin" );
-//           const Int_t fracRestrBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
-          const Int_t fracRestrBinsRebin( deltaBins );
-          const Double_t meanEtaFracRestr( histEtaFracRestr->GetMean() );
-          const Double_t widthEtaFracRestr( std::fabs( histEtaFracRestr->GetRMS() ) );
-          if ( widthEtaFracRestr == 0. && verbose_ > 2 ) {
-            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                      << "    no histogram \"width\" in '" << nameEtaFracRestr << "'" << std::endl;
-          }
-          const Double_t rangeEtaFracRestrRebin( widthEtaFracRestr == 0. ? widthFactor_ * std::fabs( histEtaFracRestr->GetXaxis()->GetXmax() ) : widthFactor_ * widthEtaFracRestr ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-          TH1D * histEtaFracRestrRebin( new TH1D( nameEtaFracRestrRebin.c_str(), titleEtaDelta.c_str(), fracRestrBinsRebin, std::max( 0., -rangeEtaFracRestrRebin + meanEtaFracRestr ), rangeEtaFracRestrRebin + meanEtaFracRestr ) );
-          histEtaFracRestrRebin->SetXTitle( histEtaFracRestr->GetXaxis()->GetTitle() );
-          histEtaFracRestrRebin->SetYTitle( histEtaFracRestr->GetYaxis()->GetTitle() );
 
           const std::string nameEtaDeltaRelRebin( nameEtaDeltaRel + "Rebin" );
 //           const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
@@ -855,9 +800,6 @@ int main( int argc, char * argv[] )
                 if ( inverse && kinProp == "Pt" ) histEtaDeltaRebin->Fill( 1. / propGenEtaBin.at( uPt ).at( uEntry ) - 1. / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 else                              histEtaDeltaRebin->Fill( propGenEtaBin.at( uPt ).at( uEntry ) - propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 if ( ! inverse && kinProp == "Pt" ) {
-                  histEtaFracRebin->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                  if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtPartonL5L7_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRPartonL5L7_ )
-                    histEtaFracRestrRebin->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                   histEtaDeltaRelRebin->Fill( ( propGenEtaBin.at( uPt ).at( uEntry ) - propEtaBin.at( uPt ).at( uEntry ) ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 }
               }
@@ -865,9 +807,6 @@ int main( int argc, char * argv[] )
                 if ( inverse && kinProp == "Pt" ) histEtaDeltaRebin->Fill( 1. / propEtaBin.at( uPt ).at( uEntry ) - 1. / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 else                              histEtaDeltaRebin->Fill( propEtaBin.at( uPt ).at( uEntry ) - propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 if ( ! inverse && kinProp == "Pt" ) {
-                  histEtaFracRebin->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                  if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtPartonL5L7_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRPartonL5L7_ )
-                    histEtaFracRestrRebin->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                   histEtaDeltaRelRebin->Fill( ( propEtaBin.at( uPt ).at( uEntry ) - propGenEtaBin.at( uPt ).at( uEntry ) ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 }
               }
@@ -876,8 +815,6 @@ int main( int argc, char * argv[] )
 
           histEtaFrac->Scale( 1. / histEtaFrac->Integral() );
           histEtaFracRestr->Scale( 1. / histEtaFracRestr->Integral() );
-          histEtaFracRebin->Scale( 1. / histEtaFracRebin->Integral() );
-          histEtaFracRestrRebin->Scale( 1. / histEtaFracRestrRebin->Integral() );
 
         } // loop: keyEta
 
@@ -897,34 +834,6 @@ int main( int argc, char * argv[] )
         histDeltaRebin->SetXTitle( histDelta->GetXaxis()->GetTitle() );
         histDeltaRebin->SetYTitle( histDelta->GetYaxis()->GetTitle() );
 
-        const std::string nameFracRebin( nameFrac + "Rebin" );
-//         const Int_t fracBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
-        const Int_t fracBinsRebin( deltaBins );
-        const Double_t meanFrac( histFrac->GetMean() );
-        const Double_t widthFrac( std::fabs( histFrac->GetRMS() ) );
-        if ( widthFrac == 0. && verbose_ > 2 ) {
-          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                    << "    no histogram \"width\" in '" << nameFrac << "'" << std::endl;
-        }
-        const Double_t rangeFracRebin( widthFrac == 0. ? widthFactor_ * std::fabs( histFrac->GetXaxis()->GetXmax() ) : widthFactor_ * widthFrac ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-        TH1D * histFracRebin( new TH1D( nameFracRebin.c_str(), objCat.c_str(), fracBinsRebin, std::max( 0., -rangeFracRebin + meanFrac ), rangeFracRebin + meanFrac ) );
-        histFracRebin->SetXTitle( histFrac->GetXaxis()->GetTitle() );
-        histFracRebin->SetYTitle( histFrac->GetYaxis()->GetTitle() );
-
-        const std::string nameFracRestrRebin( nameFracRestr + "Rebin" );
-//         const Int_t fracRestrBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
-        const Int_t fracRestrBinsRebin( deltaBins );
-        const Double_t meanFracRestr( histFracRestr->GetMean() );
-        const Double_t widthFracRestr( std::fabs( histFracRestr->GetRMS() ) );
-        if ( widthFracRestr == 0. && verbose_ > 2 ) {
-          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                    << "    no histogram \"width\" in '" << nameFracRestr << "'" << std::endl;
-        }
-        const Double_t rangeFracRestrRebin( widthFracRestr == 0. ? widthFactor_ * std::fabs( histFracRestr->GetXaxis()->GetXmax() ) : widthFactor_ * widthFracRestr ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-        TH1D * histFracRestrRebin( new TH1D( nameFracRestrRebin.c_str(), objCat.c_str(), fracRestrBinsRebin, std::max( 0., -rangeFracRestrRebin + meanFracRestr ), rangeFracRestrRebin + meanFracRestr ) );
-        histFracRestrRebin->SetXTitle( histFracRestr->GetXaxis()->GetTitle() );
-        histFracRestrRebin->SetYTitle( histFracRestr->GetYaxis()->GetTitle() );
-
         const std::string nameDeltaRelRebin( nameDeltaRel + "Rebin" );
 //         const Int_t deltaBinsRebinRel( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
         const Int_t deltaBinsRebinRel( deltaBins );
@@ -940,8 +849,6 @@ int main( int argc, char * argv[] )
         histDeltaRelRebin->SetYTitle( histDeltaRel->GetYaxis()->GetTitle() );
 
         std::vector< TH1D * > histVecPtDeltaRebin;
-        std::vector< TH1D * > histVecPtFracRebin;
-        std::vector< TH1D * > histVecPtFracRestrRebin;
         std::vector< TH1D * > histVecPtDeltaRelRebin;
         for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
           const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
@@ -965,34 +872,6 @@ int main( int argc, char * argv[] )
           histVecPtDeltaRebin.push_back( histPtDeltaRebin );
 
           if ( ! inverse && kinProp == "Pt" ) {
-            const std::string namePtFrac( namePt + "_Frac" );
-            const std::string namePtFracRebin( namePtFrac + "Rebin" );
-//             const Int_t fracBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
-            const Double_t meanPtFrac( histVecPtFrac.at( uPt )->GetMean() );
-            const Double_t widthPtFrac( std::fabs( histVecPtFrac.at( uPt )->GetRMS() ) );
-            if ( widthPtFrac == 0. && verbose_ > 2 ) {
-              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                        << "    no histogram \"width\" in '" << namePtFrac << "'" << std::endl;
-            }
-            const Double_t rangePtFracRebin( widthPtFrac == 0. ? widthFactor_ * std::fabs( histVecPtFrac.at( uPt )->GetXaxis()->GetXmax() ) : widthFactor_ * widthPtFrac ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-            TH1D * histPtFracRebin( new TH1D( namePtFracRebin.c_str(), titlePtDelta.c_str(), deltaBinsRebinRel, std::max( 0., -rangePtFracRebin + meanPtFrac ), rangePtFracRebin + meanPtFrac ) );
-            histPtFracRebin->SetXTitle( titleDeltaRel.c_str() );
-            histPtFracRebin->SetYTitle( titleEvents.c_str() );
-            histVecPtFracRebin.push_back( histPtFracRebin );
-            const std::string namePtFracRestr( namePtFrac + "Restr" );
-            const std::string namePtFracRestrRebin( namePtFracRestr + "Rebin" );
-//             const Int_t fracRestrBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
-            const Double_t meanPtFracRestr( histVecPtFracRestr.at( uPt )->GetMean() );
-            const Double_t widthPtFracRestr( std::fabs( histVecPtFracRestr.at( uPt )->GetRMS() ) );
-            if ( widthPtFracRestr == 0. && verbose_ > 2 ) {
-              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                        << "    no histogram \"width\" in '" << namePtFracRestr << "'" << std::endl;
-            }
-            const Double_t rangePtFracRestrRebin( widthPtFracRestr == 0. ? widthFactor_ * std::fabs( histVecPtFracRestr.at( uPt )->GetXaxis()->GetXmax() ) : widthFactor_ * widthPtFracRestr ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-            TH1D * histPtFracRestrRebin( new TH1D( namePtFracRestrRebin.c_str(), titlePtDelta.c_str(), deltaBinsRebinRel, std::max( 0., -rangePtFracRestrRebin + meanPtFracRestr ), rangePtFracRestrRebin + meanPtFracRestr ) );
-            histPtFracRestrRebin->SetXTitle( titleDeltaRel.c_str() );
-            histPtFracRestrRebin->SetYTitle( titleEvents.c_str() );
-            histVecPtFracRestrRebin.push_back( histPtFracRestrRebin );
             const std::string namePtDeltaRel( namePtDelta + "Rel" );
             const std::string namePtDeltaRelRebin( namePtDeltaRel + "Rebin" );
 //             const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
@@ -1030,9 +909,6 @@ int main( int argc, char * argv[] )
               if ( inverse && kinProp == "Pt" ) histDeltaRebin->Fill( 1. / propGenData_.at( uEta ).at( uEntry ) - 1. / propData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
               else                              histDeltaRebin->Fill( propGenData_.at( uEta ).at( uEntry ) - propData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
               if ( ! inverse && kinProp == "Pt" ) {
-                histFracRebin->Fill( propData_.at( uEta ).at( uEntry ) / propGenData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
-                if ( ptGenData_.at( uEta ).at( uEntry ) >= minPtPartonL5L7_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDRPartonL5L7_ )
-                  histFracRestrRebin->Fill( propData_.at( uEta ).at( uEntry ) / propGenData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
                 histDeltaRelRebin->Fill( ( propGenData_.at( uEta ).at( uEntry ) - propData_.at( uEta ).at( uEntry ) ) / propGenData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
               }
             }
@@ -1040,9 +916,6 @@ int main( int argc, char * argv[] )
               if ( inverse && kinProp == "Pt" ) histDeltaRebin->Fill( 1. / propData_.at( uEta ).at( uEntry ) - 1. / propGenData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
               else                              histDeltaRebin->Fill( propData_.at( uEta ).at( uEntry ) - propGenData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
               if ( ! inverse && kinProp == "Pt" ) {
-                histFracRebin->Fill( propGenData_.at( uEta ).at( uEntry ) / propData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
-                if ( ptGenData_.at( uEta ).at( uEntry ) >= minPtPartonL5L7_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDRPartonL5L7_ )
-                  histFracRestrRebin->Fill( propGenData_.at( uEta ).at( uEntry ) / propData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
                 histDeltaRelRebin->Fill( ( propData_.at( uEta ).at( uEntry ) - propGenData_.at( uEta ).at( uEntry ) ) /propData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
               }
             }
@@ -1052,9 +925,6 @@ int main( int argc, char * argv[] )
                   if ( inverse && kinProp == "Pt" ) histVecPtDeltaRebin.at( uPt )->Fill( 1. / propGenData_.at( uEta ).at( uEntry ) - 1. / propData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
                   else                              histVecPtDeltaRebin.at( uPt )->Fill( propGenData_.at( uEta ).at( uEntry ) - propData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
                   if ( ! inverse && kinProp == "Pt" ) {
-                    histVecPtFracRebin.at( uPt )->Fill( propData_.at( uEta ).at( uEntry ) / propGenData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
-                    if ( ptGenData_.at( uEta ).at( uEntry ) >= minPtPartonL5L7_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDRPartonL5L7_ )
-                      histVecPtFracRestrRebin.at( uPt )->Fill( propData_.at( uEta ).at( uEntry ) / propGenData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
                     histVecPtDeltaRelRebin.at( uPt )->Fill( ( propGenData_.at( uEta ).at( uEntry ) - propData_.at( uEta ).at( uEntry ) ) / propGenData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
                   }
                 }
@@ -1062,9 +932,6 @@ int main( int argc, char * argv[] )
                   if ( inverse && kinProp == "Pt" ) histVecPtDeltaRebin.at( uPt )->Fill( 1. / propData_.at( uEta ).at( uEntry ) - 1. / propGenData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
                   else                              histVecPtDeltaRebin.at( uPt )->Fill( propData_.at( uEta ).at( uEntry ) - propGenData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
                   if ( ! inverse && kinProp == "Pt" ) {
-                    histVecPtFracRebin.at( uPt )->Fill( propGenData_.at( uEta ).at( uEntry ) / propData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
-                    if ( ptGenData_.at( uEta ).at( uEntry ) >= minPtPartonL5L7_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDRPartonL5L7_ )
-                      histVecPtFracRestrRebin.at( uPt )->Fill( propGenData_.at( uEta ).at( uEntry ) / propData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
                     histVecPtDeltaRelRebin.at( uPt )->Fill( ( propData_.at( uEta ).at( uEntry ) - propGenData_.at( uEta ).at( uEntry ) ) / propData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
                   }
                 }
@@ -1078,19 +945,11 @@ int main( int argc, char * argv[] )
 
         histFrac->Scale( 1. / histFrac->Integral() );
         histFracRestr->Scale( 1. / histFracRestr->Integral() );
-        histFracRebin->Scale( 1. / histFracRebin->Integral() );
-        histFracRestrRebin->Scale( 1. / histFracRestrRebin->Integral() );
         for ( unsigned uPt = 0; uPt < histVecPtFrac.size(); ++uPt ) {
           histVecPtFrac.at( uPt )->Scale( 1. / histVecPtFrac.at( uPt )->Integral() );
         }
         for ( unsigned uPt = 0; uPt < histVecPtFracRestr.size(); ++uPt ) {
           histVecPtFracRestr.at( uPt )->Scale( 1. / histVecPtFracRestr.at( uPt )->Integral() );
-        }
-        for ( unsigned uPt = 0; uPt < histVecPtFracRebin.size(); ++uPt ) {
-          histVecPtFracRebin.at( uPt )->Scale( 1. / histVecPtFracRebin.at( uPt )->Integral() );
-        }
-        for ( unsigned uPt = 0; uPt < histVecPtFracRestrRebin.size(); ++uPt ) {
-          histVecPtFracRestrRebin.at( uPt )->Scale( 1. / histVecPtFracRestrRebin.at( uPt )->Integral() );
         }
 
       } // loop: keyFit
@@ -1598,46 +1457,39 @@ int main( int argc, char * argv[] )
             const std::string titleSigma( "#sigma of " + titleFrac );
 
             // Single JEC bins
-            const std::string nameFracEtaPtFitMeanMap( name + "_FracEtaPt_FitMeanMap" );
-            TH2D * histFracEtaPtFitMeanMap( new TH2D( nameFracEtaPtFitMeanMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
-            histFracEtaPtFitMeanMap->SetXTitle( titleEta.c_str() );
-            histFracEtaPtFitMeanMap->SetYTitle( titlePt.c_str() );
-            const std::string nameFracEtaPtFitMean( name + "_FracEtaPt_FitMean" );
-            TH1D * histFracEtaPtFitMean( new TH1D( nameFracEtaPtFitMean.c_str(), titleProb.c_str(), 20, 0.75, 1.25 ) );
-            histFracEtaPtFitMean->SetXTitle( titleMean.c_str() );
+//             const std::string nameFracEtaPtFitMeanMap( name + "_FracEtaPt_FitMeanMap" );
+//             TH2D * histFracEtaPtFitMeanMap( new TH2D( nameFracEtaPtFitMeanMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+//             histFracEtaPtFitMeanMap->SetXTitle( titleEta.c_str() );
+//             histFracEtaPtFitMeanMap->SetYTitle( titlePt.c_str() );
+//             const std::string nameFracEtaPtFitMean( name + "_FracEtaPt_FitMean" );
+//             TH1D * histFracEtaPtFitMean( new TH1D( nameFracEtaPtFitMean.c_str(), titleProb.c_str(), 20, 0.75, 1.25 ) );
+//             histFracEtaPtFitMean->SetXTitle( titleMean.c_str() );
             const std::string nameFracEtaFitMean( name + "_FracEta_FitMeanMap" );
             TH1D * histFracEtaFitMean( new TH1D( nameFracEtaFitMean.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data() ) );
             histFracEtaFitMean->SetXTitle( titleEta.c_str() );
             histFracEtaFitMean->SetYTitle( titleMean.c_str() );
-            const std::string nameFracRestrEtaPtFitMeanMap( name + "_FracRestrEtaPt_FitMeanMap" );
-            TH2D * histFracRestrEtaPtFitMeanMap( new TH2D( nameFracRestrEtaPtFitMeanMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
-            histFracRestrEtaPtFitMeanMap->SetXTitle( titleEta.c_str() );
-            histFracRestrEtaPtFitMeanMap->SetYTitle( titlePt.c_str() );
-            const std::string nameFracRestrEtaPtFitMean( name + "_FracRestrEtaPt_FitMean" );
-            TH1D * histFracRestrEtaPtFitMean( new TH1D( nameFracRestrEtaPtFitMean.c_str(), titleProb.c_str(), 20, 0.75, 1.25 ) );
-            histFracRestrEtaPtFitMean->SetXTitle( titleMean.c_str() );
+//             const std::string nameFracRestrEtaPtFitMeanMap( name + "_FracRestrEtaPt_FitMeanMap" );
+//             TH2D * histFracRestrEtaPtFitMeanMap( new TH2D( nameFracRestrEtaPtFitMeanMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+//             histFracRestrEtaPtFitMeanMap->SetXTitle( titleEta.c_str() );
+//             histFracRestrEtaPtFitMeanMap->SetYTitle( titlePt.c_str() );
+//             const std::string nameFracRestrEtaPtFitMean( name + "_FracRestrEtaPt_FitMean" );
+//             TH1D * histFracRestrEtaPtFitMean( new TH1D( nameFracRestrEtaPtFitMean.c_str(), titleProb.c_str(), 20, 0.75, 1.25 ) );
+//             histFracRestrEtaPtFitMean->SetXTitle( titleMean.c_str() );
             const std::string nameFracRestrEtaFitMean( name + "_FracRestrEta_FitMeanMap" );
             TH1D * histFracRestrEtaFitMean( new TH1D( nameFracRestrEtaFitMean.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data() ) );
             histFracRestrEtaFitMean->SetXTitle( titleEta.c_str() );
             histFracRestrEtaFitMean->SetYTitle( titleMean.c_str() );
 
             const std::string nameFrac( name + "_Frac" );
-            const std::string nameFracRebin( nameFrac + "Rebin" );
-            TH1D * histFracRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameFracRebin.c_str() ) ) );
+            TH1D * histFrac( dynamic_cast< TH1D* >( gDirectory->Get( nameFrac.c_str() ) ) );
 
-            if ( histFracRebin != 0 ) {
+            if ( histFrac != 0 ) {
               const std::string nameFracFit( nameFrac + "_fit" );
-              const std::string nameFracRebinFit( nameFracRebin + "_fit" );
-              TF1 * fitFracRebin( new TF1( nameFracRebinFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histFracRebin->GetXaxis()->GetXmin(), histFracRebin->GetMean() - histFracRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histFracRebin->GetXaxis()->GetXmax(), histFracRebin->GetMean() + histFracRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-              my::setParametersFit( fitFracRebin, histFracRebin );
-              TFitResultPtr fitFracResultPtr( histFracRebin->Fit( fitFracRebin, fitOptions_.c_str() ) );
+              TF1 * fitFrac( new TF1( nameFracFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histFrac->GetXaxis()->GetXmin(), histFrac->GetMean() - histFrac->GetRMS() * fitRangeJecsL5L7_ ), std::min( histFrac->GetXaxis()->GetXmax(), histFrac->GetMean() + histFrac->GetRMS() * fitRangeJecsL5L7_ ) ) );
+              my::setParametersFit( fitFrac, histFrac );
+              TFitResultPtr fitFracResultPtr( histFrac->Fit( fitFrac, fitOptionsL5L7_.c_str() ) );
               if ( fitFracResultPtr >= 0 ) {
                 if ( fitFracResultPtr->Status() == 0 && fitFracResultPtr->Ndf() != 0. ) {
-                  const std::string nameFracRebinBkg( nameFracRebin + "_bkg" );
-                  TF1 * bkgFracRebin( new TF1( nameFracRebinBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histFracRebin->GetXaxis()->GetXmin(), histFracRebin->GetMean() - histFracRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histFracRebin->GetXaxis()->GetXmax(), histFracRebin->GetMean() + histFracRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                  my::setParametersBkg( fitFracRebin, bkgFracRebin );
-                  if ( overwrite_ ) bkgFracRebin->Write( 0, TObject::kOverwrite );
-                  else              bkgFracRebin->Write();
                 }
                 else {
                   if ( fitFracResultPtr->Prob() == 0. ) {
@@ -1647,7 +1499,7 @@ int main( int argc, char * argv[] )
                   if ( verbose_ > 2 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    failing fit in directory '"; gDirectory->pwd();
-                    std::cout << "    '" << nameFracRebin << "' status " << fitFracResultPtr->Status() << std::endl;
+                    std::cout << "    '" << nameFrac << "' status " << fitFracResultPtr->Status() << std::endl;
                   }
                 }
               }
@@ -1655,28 +1507,26 @@ int main( int argc, char * argv[] )
                 if ( verbose_ > 1 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    missing fit in directory '"; gDirectory->pwd();
-                  std::cout << "    '" << nameFracRebin << std::endl;
+                  std::cout << "    '" << nameFrac << std::endl;
                 }
               }
+              const std::string nameFracBkg( nameFrac + "_bkg" );
+              TF1 * bkgFrac( new TF1( nameFracBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histFrac->GetXaxis()->GetXmin(), histFrac->GetMean() - histFrac->GetRMS() * fitRangeJecsL5L7_ ), std::min( histFrac->GetXaxis()->GetXmax(), histFrac->GetMean() + histFrac->GetRMS() * fitRangeJecsL5L7_ ) ) );
+              my::setParametersBkg( fitFrac, bkgFrac );
+              if ( overwrite_ ) bkgFrac->Write( 0, TObject::kOverwrite );
+              else              bkgFrac->Write();
             }
 
             const std::string nameFracRestr( nameFrac + "Restr" );
-            const std::string nameFracRestrRebin( nameFracRestr + "Rebin" );
-            TH1D * histFracRestrRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameFracRestrRebin.c_str() ) ) );
+            TH1D * histFracRestr( dynamic_cast< TH1D* >( gDirectory->Get( nameFracRestr.c_str() ) ) );
 
-            if ( histFracRestrRebin != 0 ) {
+            if ( histFracRestr != 0 ) {
               const std::string nameFracRestrFit( nameFracRestr + "_fit" );
-              const std::string nameFracRestrRebinFit( nameFracRestrRebin + "_fit" );
-              TF1 * fitFracRestrRebin( new TF1( nameFracRestrRebinFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histFracRestrRebin->GetXaxis()->GetXmin(), histFracRestrRebin->GetMean() - histFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histFracRestrRebin->GetXaxis()->GetXmax(), histFracRestrRebin->GetMean() + histFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-              my::setParametersFit( fitFracRestrRebin, histFracRestrRebin );
-              TFitResultPtr fitFracRestrResultPtr( histFracRestrRebin->Fit( fitFracRestrRebin, fitOptions_.c_str() ) );
+              TF1 * fitFracRestr( new TF1( nameFracRestrFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histFracRestr->GetXaxis()->GetXmin(), histFracRestr->GetMean() - histFracRestr->GetRMS() * fitRangeJecsL5L7_ ), std::min( histFracRestr->GetXaxis()->GetXmax(), histFracRestr->GetMean() + histFracRestr->GetRMS() * fitRangeJecsL5L7_ ) ) );
+              my::setParametersFit( fitFracRestr, histFracRestr );
+              TFitResultPtr fitFracRestrResultPtr( histFracRestr->Fit( fitFracRestr, fitOptionsL5L7_.c_str() ) );
               if ( fitFracRestrResultPtr >= 0 ) {
                 if ( fitFracRestrResultPtr->Status() == 0 && fitFracRestrResultPtr->Ndf() != 0. ) {
-                  const std::string nameFracRestrRebinBkg( nameFracRestrRebin + "_bkg" );
-                  TF1 * bkgFracRestrRebin( new TF1( nameFracRestrRebinBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histFracRestrRebin->GetXaxis()->GetXmin(), histFracRestrRebin->GetMean() - histFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histFracRestrRebin->GetXaxis()->GetXmax(), histFracRestrRebin->GetMean() + histFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                  my::setParametersBkg( fitFracRestrRebin, bkgFracRestrRebin );
-                  if ( overwrite_ ) bkgFracRestrRebin->Write( 0, TObject::kOverwrite );
-                  else              bkgFracRestrRebin->Write();
                 }
                 else {
                   if ( fitFracRestrResultPtr->Prob() == 0. ) {
@@ -1686,7 +1536,7 @@ int main( int argc, char * argv[] )
                   if ( verbose_ > 2 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    failing fit in directory '"; gDirectory->pwd();
-                    std::cout << "    '" << nameFracRestrRebin << "' status " << fitFracRestrResultPtr->Status() << std::endl;
+                    std::cout << "    '" << nameFracRestr << "' status " << fitFracRestrResultPtr->Status() << std::endl;
                   }
                 }
               }
@@ -1694,9 +1544,14 @@ int main( int argc, char * argv[] )
                 if ( verbose_ > 1 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    missing fit in directory '"; gDirectory->pwd();
-                  std::cout << "    '" << nameFracRestrRebin << std::endl;
+                  std::cout << "    '" << nameFracRestr << std::endl;
                 }
               }
+              const std::string nameFracRestrBkg( nameFracRestr + "_bkg" );
+              TF1 * bkgFracRestr( new TF1( nameFracRestrBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histFracRestr->GetXaxis()->GetXmin(), histFracRestr->GetMean() - histFracRestr->GetRMS() * fitRangeJecsL5L7_ ), std::min( histFracRestr->GetXaxis()->GetXmax(), histFracRestr->GetMean() + histFracRestr->GetRMS() * fitRangeJecsL5L7_ ) ) );
+              my::setParametersBkg( fitFracRestr, bkgFracRestr );
+              if ( overwrite_ ) bkgFracRestr->Write( 0, TObject::kOverwrite );
+              else              bkgFracRestr->Write();
             }
 
             const std::string nameFracPtFitMean( name + "_FracPt_FitMeanMap" );
@@ -1712,24 +1567,17 @@ int main( int argc, char * argv[] )
               const std::string namePt( name + "_Pt" + binPt );
 
               const std::string namePtFrac( namePt + "_Frac" );
-              const std::string namePtFracRebin( namePtFrac + "Rebin" );
-              TH1D * histPtFracRebin( dynamic_cast< TH1D* >( gDirectory->Get( namePtFracRebin.c_str() ) ) );
+              TH1D * histPtFrac( dynamic_cast< TH1D* >( gDirectory->Get( namePtFrac.c_str() ) ) );
 
-              if ( histPtFracRebin != 0 ) {
+              if ( histPtFrac != 0 ) {
                 const std::string namePtFracFit( namePtFrac + "_fit" );
-                const std::string namePtFracRebinFit( namePtFracRebin + "_fit" );
-                TF1 * fitPtFracRebin( new TF1( namePtFracRebinFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histPtFracRebin->GetXaxis()->GetXmin(), histPtFracRebin->GetMean() - histPtFracRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histPtFracRebin->GetXaxis()->GetXmax(), histPtFracRebin->GetMean() + histPtFracRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                my::setParametersFit( fitPtFracRebin, histPtFracRebin );
-                TFitResultPtr fitPtFracResultPtr( histPtFracRebin->Fit( fitPtFracRebin, fitOptions_.c_str() ) );
+                TF1 * fitPtFrac( new TF1( namePtFracFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histPtFrac->GetXaxis()->GetXmin(), histPtFrac->GetMean() - histPtFrac->GetRMS() * fitRangeJecsL5L7_ ), std::min( histPtFrac->GetXaxis()->GetXmax(), histPtFrac->GetMean() + histPtFrac->GetRMS() * fitRangeJecsL5L7_ ) ) );
+                my::setParametersFit( fitPtFrac, histPtFrac );
+                TFitResultPtr fitPtFracResultPtr( histPtFrac->Fit( fitPtFrac, fitOptionsL5L7_.c_str() ) );
                 if ( fitPtFracResultPtr >= 0 ) {
                   if ( fitPtFracResultPtr->Status() == 0 && fitPtFracResultPtr->Ndf() != 0. ) {
                     histFracMean->SetBinContent( uPt + 1, fitPtFracResultPtr->Parameter( 0 ) );
                     histFracMean->SetBinError( uPt + 1, fitPtFracResultPtr->ParError( 0 ) );
-                    const std::string namePtFracRebinBkg( namePtFracRebin + "_bkg" );
-                    TF1 * bkgPtFracRebin( new TF1( namePtFracRebinBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histPtFracRebin->GetXaxis()->GetXmin(), histPtFracRebin->GetMean() - histPtFracRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histPtFracRebin->GetXaxis()->GetXmax(), histPtFracRebin->GetMean() + histPtFracRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                    my::setParametersBkg( fitPtFracRebin, bkgPtFracRebin );
-                    if ( overwrite_ ) bkgPtFracRebin->Write( 0, TObject::kOverwrite );
-                    else              bkgPtFracRebin->Write();
                   }
                   else {
                     if ( fitPtFracResultPtr->Prob() == 0. ) {
@@ -1739,7 +1587,7 @@ int main( int argc, char * argv[] )
                     if ( verbose_ > 2 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                                 << "    failing fit in directory '"; gDirectory->pwd();
-                      std::cout << "    '" << namePtFracRebin << "' status " << fitPtFracResultPtr->Status() << std::endl;
+                      std::cout << "    '" << namePtFrac << "' status " << fitPtFracResultPtr->Status() << std::endl;
                     }
                   }
                 }
@@ -1747,30 +1595,28 @@ int main( int argc, char * argv[] )
                   if ( verbose_ > 1 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    missing fit in directory '"; gDirectory->pwd();
-                    std::cout << "    '" << namePtFracRebin << std::endl;
+                    std::cout << "    '" << namePtFrac << std::endl;
                   }
                 }
+                const std::string namePtFracBkg( namePtFrac + "_bkg" );
+                TF1 * bkgPtFrac( new TF1( namePtFracBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histPtFrac->GetXaxis()->GetXmin(), histPtFrac->GetMean() - histPtFrac->GetRMS() * fitRangeJecsL5L7_ ), std::min( histPtFrac->GetXaxis()->GetXmax(), histPtFrac->GetMean() + histPtFrac->GetRMS() * fitRangeJecsL5L7_ ) ) );
+                my::setParametersBkg( fitPtFrac, bkgPtFrac );
+                if ( overwrite_ ) bkgPtFrac->Write( 0, TObject::kOverwrite );
+                else              bkgPtFrac->Write();
               }
 
               const std::string namePtFracRestr( namePtFrac + "Restr" );
-              const std::string namePtFracRestrRebin( namePtFracRestr + "Rebin" );
-              TH1D * histPtFracRestrRebin( dynamic_cast< TH1D* >( gDirectory->Get( namePtFracRestrRebin.c_str() ) ) );
+              TH1D * histPtFracRestr( dynamic_cast< TH1D* >( gDirectory->Get( namePtFracRestr.c_str() ) ) );
 
-              if ( histPtFracRestrRebin != 0 ) {
+              if ( histPtFracRestr != 0 ) {
                 const std::string namePtFracRestrFit( namePtFracRestr + "_fit" );
-                const std::string namePtFracRestrRebinFit( namePtFracRestrRebin + "_fit" );
-                TF1 * fitPtFracRestrRebin( new TF1( namePtFracRestrRebinFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histPtFracRestrRebin->GetXaxis()->GetXmin(), histPtFracRestrRebin->GetMean() - histPtFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histPtFracRestrRebin->GetXaxis()->GetXmax(), histPtFracRestrRebin->GetMean() + histPtFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                my::setParametersFit( fitPtFracRestrRebin, histPtFracRestrRebin );
-                TFitResultPtr fitPtFracRestrResultPtr( histPtFracRestrRebin->Fit( fitPtFracRestrRebin, fitOptions_.c_str() ) );
+                TF1 * fitPtFracRestr( new TF1( namePtFracRestrFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histPtFracRestr->GetXaxis()->GetXmin(), histPtFracRestr->GetMean() - histPtFracRestr->GetRMS() * fitRangeJecsL5L7_ ), std::min( histPtFracRestr->GetXaxis()->GetXmax(), histPtFracRestr->GetMean() + histPtFracRestr->GetRMS() * fitRangeJecsL5L7_ ) ) );
+                my::setParametersFit( fitPtFracRestr, histPtFracRestr );
+                TFitResultPtr fitPtFracRestrResultPtr( histPtFracRestr->Fit( fitPtFracRestr, fitOptionsL5L7_.c_str() ) );
                 if ( fitPtFracRestrResultPtr >= 0 ) {
                   if ( fitPtFracRestrResultPtr->Status() == 0 && fitPtFracRestrResultPtr->Ndf() != 0. ) {
                     histFracRestrMean->SetBinContent( uPt + 1, fitPtFracRestrResultPtr->Parameter( 0 ) );
                     histFracRestrMean->SetBinError( uPt + 1, fitPtFracRestrResultPtr->ParError( 0 ) );
-                    const std::string namePtFracRestrRebinBkg( namePtFracRestrRebin + "_bkg" );
-                    TF1 * bkgPtFracRestrRebin( new TF1( namePtFracRestrRebinBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histPtFracRestrRebin->GetXaxis()->GetXmin(), histPtFracRestrRebin->GetMean() - histPtFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histPtFracRestrRebin->GetXaxis()->GetXmax(), histPtFracRestrRebin->GetMean() + histPtFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                    my::setParametersBkg( fitPtFracRestrRebin, bkgPtFracRestrRebin );
-                    if ( overwrite_ ) bkgPtFracRestrRebin->Write( 0, TObject::kOverwrite );
-                    else              bkgPtFracRestrRebin->Write();
                   }
                   else {
                     if ( fitPtFracRestrResultPtr->Prob() == 0. ) {
@@ -1780,7 +1626,7 @@ int main( int argc, char * argv[] )
                     if ( verbose_ > 2 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                                 << "    failing fit in directory '"; gDirectory->pwd();
-                      std::cout << "    '" << namePtFracRestrRebin << "' status " << fitPtFracRestrResultPtr->Status() << std::endl;
+                      std::cout << "    '" << namePtFracRestr << "' status " << fitPtFracRestrResultPtr->Status() << std::endl;
                     }
                   }
                 }
@@ -1788,9 +1634,14 @@ int main( int argc, char * argv[] )
                   if ( verbose_ > 1 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    missing fit in directory '"; gDirectory->pwd();
-                    std::cout << "    '" << namePtFracRestrRebin << std::endl;
+                    std::cout << "    '" << namePtFracRestr << std::endl;
                   }
                 }
+                const std::string namePtFracRestrBkg( namePtFracRestr + "_bkg" );
+                TF1 * bkgPtFracRestr( new TF1( namePtFracRestrBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histPtFracRestr->GetXaxis()->GetXmin(), histPtFracRestr->GetMean() - histPtFracRestr->GetRMS() * fitRangeJecsL5L7_ ), std::min( histPtFracRestr->GetXaxis()->GetXmax(), histPtFracRestr->GetMean() + histPtFracRestr->GetRMS() * fitRangeJecsL5L7_ ) ) );
+                my::setParametersBkg( fitPtFracRestr, bkgPtFracRestr );
+                if ( overwrite_ ) bkgPtFracRestr->Write( 0, TObject::kOverwrite );
+                else              bkgPtFracRestr->Write();
               }
             } // loop: uPt < nPtBins_
 
@@ -1806,24 +1657,17 @@ int main( int argc, char * argv[] )
               const std::string nameEta( name + "_" + binEta );
 
               const std::string nameEtaFrac( nameEta + "_Frac" );
-              const std::string nameEtaFracRebin( nameEtaFrac + "Rebin" );
-              TH1D * histEtaFracRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaFracRebin.c_str() ) ) );
+              TH1D * histEtaFrac( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaFrac.c_str() ) ) );
 
-              if ( histEtaFracRebin != 0 ) {
+              if ( histEtaFrac != 0 ) {
                 const std::string nameEtaFracFit( nameEtaFrac + "_fit" );
-                const std::string nameEtaFracRebinFit( nameEtaFracRebin + "_fit" );
-                TF1 * fitEtaFracRebin( new TF1( nameEtaFracRebinFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histEtaFracRebin->GetXaxis()->GetXmin(), histEtaFracRebin->GetMean() - histEtaFracRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaFracRebin->GetXaxis()->GetXmax(), histEtaFracRebin->GetMean() + histEtaFracRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                my::setParametersFit( fitEtaFracRebin, histEtaFracRebin );
-                TFitResultPtr fitEtaFracResultPtr( histEtaFracRebin->Fit( fitEtaFracRebin, fitOptions_.c_str() ) );
+                TF1 * fitEtaFrac( new TF1( nameEtaFracFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histEtaFrac->GetXaxis()->GetXmin(), histEtaFrac->GetMean() - histEtaFrac->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaFrac->GetXaxis()->GetXmax(), histEtaFrac->GetMean() + histEtaFrac->GetRMS() * fitRangeJecsL5L7_ ) ) );
+                my::setParametersFit( fitEtaFrac, histEtaFrac );
+                TFitResultPtr fitEtaFracResultPtr( histEtaFrac->Fit( fitEtaFrac, fitOptionsL5L7_.c_str() ) );
                 if ( fitEtaFracResultPtr >= 0 ) {
                   if ( fitEtaFracResultPtr->Status() == 0 && fitEtaFracResultPtr->Ndf() != 0. ) {
                     histFracEtaFitMean->SetBinContent( uEta + 1, fitEtaFracResultPtr->Parameter( 0 ) );
                     histFracEtaFitMean->SetBinError( uEta + 1, fitEtaFracResultPtr->ParError( 0 ) );
-                    const std::string nameEtaFracRebinBkg( nameEtaFracRebin + "_bkg" );
-                    TF1 * bkgEtaFracRebin( new TF1( nameEtaFracRebinBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histEtaFracRebin->GetXaxis()->GetXmin(), histEtaFracRebin->GetMean() - histEtaFracRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaFracRebin->GetXaxis()->GetXmax(), histEtaFracRebin->GetMean() + histEtaFracRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                    my::setParametersBkg( fitEtaFracRebin, bkgEtaFracRebin );
-                    if ( overwrite_ ) bkgEtaFracRebin->Write( 0, TObject::kOverwrite );
-                    else              bkgEtaFracRebin->Write();
                   }
                   else {
                     if ( fitEtaFracResultPtr->Prob() == 0. ) {
@@ -1833,7 +1677,7 @@ int main( int argc, char * argv[] )
                     if ( verbose_ > 2 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                                 << "    failing fit in directory '"; gDirectory->pwd();
-                      std::cout << "    '" << nameEtaFracRebin << "' status " << fitEtaFracResultPtr->Status() << std::endl;
+                      std::cout << "    '" << nameEtaFrac << "' status " << fitEtaFracResultPtr->Status() << std::endl;
                     }
                   }
                 }
@@ -1841,30 +1685,28 @@ int main( int argc, char * argv[] )
                   if ( verbose_ > 1 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    missing fit in directory '"; gDirectory->pwd();
-                    std::cout << "    '" << nameEtaFracRebin << std::endl;
+                    std::cout << "    '" << nameEtaFrac << std::endl;
                   }
                 }
+                const std::string nameEtaFracBkg( nameEtaFrac + "_bkg" );
+                TF1 * bkgEtaFrac( new TF1( nameEtaFracBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histEtaFrac->GetXaxis()->GetXmin(), histEtaFrac->GetMean() - histEtaFrac->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaFrac->GetXaxis()->GetXmax(), histEtaFrac->GetMean() + histEtaFrac->GetRMS() * fitRangeJecsL5L7_ ) ) );
+                my::setParametersBkg( fitEtaFrac, bkgEtaFrac );
+                if ( overwrite_ ) bkgEtaFrac->Write( 0, TObject::kOverwrite );
+                else              bkgEtaFrac->Write();
               }
 
               const std::string nameEtaFracRestr( nameEtaFrac + "Restr" );
-              const std::string nameEtaFracRestrRebin( nameEtaFracRestr + "Rebin" );
-              TH1D * histEtaFracRestrRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaFracRestrRebin.c_str() ) ) );
+              TH1D * histEtaFracRestr( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaFracRestr.c_str() ) ) );
 
-              if ( histEtaFracRestrRebin != 0 ) {
+              if ( histEtaFracRestr != 0 ) {
                 const std::string nameEtaFracRestrFit( nameEtaFracRestr + "_fit" );
-                const std::string nameEtaFracRestrRebinFit( nameEtaFracRestrRebin + "_fit" );
-                TF1 * fitEtaFracRestrRebin( new TF1( nameEtaFracRestrRebinFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histEtaFracRestrRebin->GetXaxis()->GetXmin(), histEtaFracRestrRebin->GetMean() - histEtaFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaFracRestrRebin->GetXaxis()->GetXmax(), histEtaFracRestrRebin->GetMean() + histEtaFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                my::setParametersFit( fitEtaFracRestrRebin, histEtaFracRestrRebin );
-                TFitResultPtr fitEtaFracRestrResultPtr( histEtaFracRestrRebin->Fit( fitEtaFracRestrRebin, fitOptions_.c_str() ) );
+                TF1 * fitEtaFracRestr( new TF1( nameEtaFracRestrFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histEtaFracRestr->GetXaxis()->GetXmin(), histEtaFracRestr->GetMean() - histEtaFracRestr->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaFracRestr->GetXaxis()->GetXmax(), histEtaFracRestr->GetMean() + histEtaFracRestr->GetRMS() * fitRangeJecsL5L7_ ) ) );
+                my::setParametersFit( fitEtaFracRestr, histEtaFracRestr );
+                TFitResultPtr fitEtaFracRestrResultPtr( histEtaFracRestr->Fit( fitEtaFracRestr, fitOptionsL5L7_.c_str() ) );
                 if ( fitEtaFracRestrResultPtr >= 0 ) {
                   if ( fitEtaFracRestrResultPtr->Status() == 0 && fitEtaFracRestrResultPtr->Ndf() != 0. ) {
                     histFracRestrEtaFitMean->SetBinContent( uEta + 1, fitEtaFracRestrResultPtr->Parameter( 0 ) );
                     histFracRestrEtaFitMean->SetBinError( uEta + 1, fitEtaFracRestrResultPtr->ParError( 0 ) );
-                    const std::string nameEtaFracRestrRebinBkg( nameEtaFracRestrRebin + "_bkg" );
-                    TF1 * bkgEtaFracRestrRebin( new TF1( nameEtaFracRestrRebinBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histEtaFracRestrRebin->GetXaxis()->GetXmin(), histEtaFracRestrRebin->GetMean() - histEtaFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaFracRestrRebin->GetXaxis()->GetXmax(), histEtaFracRestrRebin->GetMean() + histEtaFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                    my::setParametersBkg( fitEtaFracRestrRebin, bkgEtaFracRestrRebin );
-                    if ( overwrite_ ) bkgEtaFracRestrRebin->Write( 0, TObject::kOverwrite );
-                    else              bkgEtaFracRestrRebin->Write();
                   }
                   else {
                     if ( fitEtaFracRestrResultPtr->Prob() == 0. ) {
@@ -1874,7 +1716,7 @@ int main( int argc, char * argv[] )
                     if ( verbose_ > 2 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                                 << "    failing fit in directory '"; gDirectory->pwd();
-                      std::cout << "    '" << nameEtaFracRestrRebin << "' status " << fitEtaFracRestrResultPtr->Status() << std::endl;
+                      std::cout << "    '" << nameEtaFracRestr << "' status " << fitEtaFracRestrResultPtr->Status() << std::endl;
                     }
                   }
                 }
@@ -1882,110 +1724,111 @@ int main( int argc, char * argv[] )
                   if ( verbose_ > 1 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    missing fit in directory '"; gDirectory->pwd();
-                    std::cout << "    '" << nameEtaFracRestrRebin << std::endl;
+                    std::cout << "    '" << nameEtaFracRestr << std::endl;
                   }
                 }
+                const std::string nameEtaFracRestrBkg( nameEtaFracRestr + "_bkg" );
+                TF1 * bkgEtaFracRestr( new TF1( nameEtaFracRestrBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histEtaFracRestr->GetXaxis()->GetXmin(), histEtaFracRestr->GetMean() - histEtaFracRestr->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaFracRestr->GetXaxis()->GetXmax(), histEtaFracRestr->GetMean() + histEtaFracRestr->GetRMS() * fitRangeJecsL5L7_ ) ) );
+                my::setParametersBkg( fitEtaFracRestr, bkgEtaFracRestr );
+                if ( overwrite_ ) bkgEtaFracRestr->Write( 0, TObject::kOverwrite );
+                else              bkgEtaFracRestr->Write();
               }
 
-              const std::string nameFracPtMean( nameEta + "_FracPt_Mean" );
-              const std::string titleFracPtMean( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) );
-              TH1D * histFracPtMean( new TH1D( nameFracPtMean.c_str(), titleFracPtMean.c_str(), nPtBins_, ptBins_.data() ) );
-              histFracPtMean->SetXTitle( titlePt.c_str() );
-              histFracPtMean->SetYTitle( titleMean.c_str() );
-              const std::string nameFracRestrPtMean( nameEta + "_FracRestrPt_Mean" );
-              TH1D * histFracRestrPtMean( new TH1D( nameFracRestrPtMean.c_str(), titleFracPtMean.c_str(), nPtBins_, ptBins_.data() ) );
-              histFracRestrPtMean->SetXTitle( titlePt.c_str() );
-              histFracRestrPtMean->SetYTitle( titleMean.c_str() );
-              for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
-                const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
-                const std::string nameEtaPt( nameEta + "_Pt" + binPt );
-
-                const std::string nameEtaPtFrac( nameEtaPt + "_Frac" );
-                const std::string nameEtaPtFracRebin( nameEtaPtFrac + "Rebin" );
-                TH1D * histEtaPtFracRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaPtFracRebin.c_str() ) ) );
-
-                if ( histEtaPtFracRebin != 0 ) {
-                  const std::string nameEtaPtFracFit( nameEtaPtFrac + "_fit" );
-                  const std::string nameEtaPtFracRebinFit( nameEtaPtFracRebin + "_fit" );
-                  TF1 * fitEtaPtFracRebin( new TF1( nameEtaPtFracRebinFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histEtaPtFracRebin->GetXaxis()->GetXmin(), histEtaPtFracRebin->GetMean() - histEtaPtFracRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaPtFracRebin->GetXaxis()->GetXmax(), histEtaPtFracRebin->GetMean() + histEtaPtFracRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                  my::setParametersFit( fitEtaPtFracRebin, histEtaPtFracRebin );
-                  TFitResultPtr fitEtaPtFracResultPtr( histEtaPtFracRebin->Fit( fitEtaPtFracRebin, fitOptions_.c_str() ) );
-                  if ( fitEtaPtFracResultPtr >= 0 ) {
-                    if ( fitEtaPtFracResultPtr->Status() == 0 && fitEtaPtFracResultPtr->Ndf() != 0. ) {
-                      histFracPtMean->SetBinContent( uPt + 1, fitEtaPtFracResultPtr->Parameter( 0 ) );
-                      histFracPtMean->SetBinError( uPt + 1, fitEtaPtFracResultPtr->ParError( 0 ) );
-                      histFracEtaPtFitMeanMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtFracResultPtr->Parameter( 0 ) );
-                      histFracEtaPtFitMean->Fill( fitEtaPtFracResultPtr->Parameter( 0 ) );
-                      const std::string nameEtaPtFracRebinBkg( nameEtaPtFracRebin + "_bkg" );
-                      TF1 * bkgEtaPtFracRebin( new TF1( nameEtaPtFracRebinBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histEtaPtFracRebin->GetXaxis()->GetXmin(), histEtaPtFracRebin->GetMean() - histEtaPtFracRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaPtFracRebin->GetXaxis()->GetXmax(), histEtaPtFracRebin->GetMean() + histEtaPtFracRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                      my::setParametersBkg( fitEtaPtFracRebin, bkgEtaPtFracRebin );
-                      if ( overwrite_ ) bkgEtaPtFracRebin->Write( 0, TObject::kOverwrite );
-                      else              bkgEtaPtFracRebin->Write();
-                    }
-                    else {
-                      if ( fitEtaPtFracResultPtr->Prob() == 0. ) {
-                      }
-                      else {
-                      }
-                      if ( verbose_ > 2 ) {
-                        std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                                  << "    failing fit in directory '"; gDirectory->pwd();
-                        std::cout << "    '" << nameEtaPtFracRebin << "' status " << fitEtaPtFracResultPtr->Status() << std::endl;
-                      }
-                    }
-                  }
-                  else {
-                    if ( verbose_ > 1 ) {
-                      std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                                << "    missing fit in directory '"; gDirectory->pwd();
-                      std::cout << "    '" << nameEtaPtFracRebin << std::endl;
-                    }
-                  }
-                }
-
-                const std::string nameEtaPtFracRestr( nameEtaPtFrac + "Restr" );
-                const std::string nameEtaPtFracRestrRebin( nameEtaPtFracRestr + "Rebin" );
-                TH1D * histEtaPtFracRestrRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaPtFracRestrRebin.c_str() ) ) );
-
-                if ( histEtaPtFracRestrRebin != 0 ) {
-                  const std::string nameEtaPtFracRestrFit( nameEtaPtFracRestr + "_fit" );
-                  const std::string nameEtaPtFracRestrRebinFit( nameEtaPtFracRestrRebin + "_fit" );
-                  TF1 * fitEtaPtFracRestrRebin( new TF1( nameEtaPtFracRestrRebinFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histEtaPtFracRestrRebin->GetXaxis()->GetXmin(), histEtaPtFracRestrRebin->GetMean() - histEtaPtFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaPtFracRestrRebin->GetXaxis()->GetXmax(), histEtaPtFracRestrRebin->GetMean() + histEtaPtFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                  my::setParametersFit( fitEtaPtFracRestrRebin, histEtaPtFracRestrRebin );
-                  TFitResultPtr fitEtaPtFracRestrResultPtr( histEtaPtFracRestrRebin->Fit( fitEtaPtFracRestrRebin, fitOptions_.c_str() ) );
-                  if ( fitEtaPtFracRestrResultPtr >= 0 ) {
-                    if ( fitEtaPtFracRestrResultPtr->Status() == 0 && fitEtaPtFracRestrResultPtr->Ndf() != 0. ) {
-                      histFracRestrPtMean->SetBinContent( uPt + 1, fitEtaPtFracRestrResultPtr->Parameter( 0 ) );
-                      histFracRestrPtMean->SetBinError( uPt + 1, fitEtaPtFracRestrResultPtr->ParError( 0 ) );
-                      histFracRestrEtaPtFitMeanMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtFracRestrResultPtr->Parameter( 0 ) );
-                      histFracRestrEtaPtFitMean->Fill( fitEtaPtFracRestrResultPtr->Parameter( 0 ) );
-                      const std::string nameEtaPtFracRestrRebinBkg( nameEtaPtFracRestrRebin + "_bkg" );
-                      TF1 * bkgEtaPtFracRestrRebin( new TF1( nameEtaPtFracRestrRebinBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histEtaPtFracRestrRebin->GetXaxis()->GetXmin(), histEtaPtFracRestrRebin->GetMean() - histEtaPtFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaPtFracRestrRebin->GetXaxis()->GetXmax(), histEtaPtFracRestrRebin->GetMean() + histEtaPtFracRestrRebin->GetRMS() * fitRangeJecsL5L7_ ) ) );
-                      my::setParametersBkg( fitEtaPtFracRestrRebin, bkgEtaPtFracRestrRebin );
-                      if ( overwrite_ ) bkgEtaPtFracRestrRebin->Write( 0, TObject::kOverwrite );
-                      else              bkgEtaPtFracRestrRebin->Write();
-                    }
-                    else {
-                      if ( fitEtaPtFracRestrResultPtr->Prob() == 0. ) {
-                      }
-                      else {
-                      }
-                      if ( verbose_ > 2 ) {
-                        std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                                  << "    failing fit in directory '"; gDirectory->pwd();
-                        std::cout << "    '" << nameEtaPtFracRestrRebin << "' status " << fitEtaPtFracRestrResultPtr->Status() << std::endl;
-                      }
-                    }
-                  }
-                  else {
-                    if ( verbose_ > 1 ) {
-                      std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                                << "    missing fit in directory '"; gDirectory->pwd();
-                      std::cout << "    '" << nameEtaPtFracRestrRebin << std::endl;
-                    }
-                  }
-                }
-              } // loop: uPt < nPtBins_
+//               const std::string nameFracPtMean( nameEta + "_FracPt_Mean" );
+//               const std::string titleFracPtMean( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) );
+//               TH1D * histFracPtMean( new TH1D( nameFracPtMean.c_str(), titleFracPtMean.c_str(), nPtBins_, ptBins_.data() ) );
+//               histFracPtMean->SetXTitle( titlePt.c_str() );
+//               histFracPtMean->SetYTitle( titleMean.c_str() );
+//               const std::string nameFracRestrPtMean( nameEta + "_FracRestrPt_Mean" );
+//               TH1D * histFracRestrPtMean( new TH1D( nameFracRestrPtMean.c_str(), titleFracPtMean.c_str(), nPtBins_, ptBins_.data() ) );
+//               histFracRestrPtMean->SetXTitle( titlePt.c_str() );
+//               histFracRestrPtMean->SetYTitle( titleMean.c_str() );
+//               for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+//                 const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
+//                 const std::string nameEtaPt( nameEta + "_Pt" + binPt );
+//
+//                 const std::string nameEtaPtFrac( nameEtaPt + "_Frac" );
+//                 TH1D * histEtaPtFrac( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaPtFrac.c_str() ) ) );
+//
+//                 if ( histEtaPtFrac != 0 ) {
+//                   const std::string nameEtaPtFracFit( nameEtaPtFrac + "_fit" );
+//                   TF1 * fitEtaPtFrac( new TF1( nameEtaPtFracFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histEtaPtFrac->GetXaxis()->GetXmin(), histEtaPtFrac->GetMean() - histEtaPtFrac->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaPtFrac->GetXaxis()->GetXmax(), histEtaPtFrac->GetMean() + histEtaPtFrac->GetRMS() * fitRangeJecsL5L7_ ) ) );
+//                   my::setParametersFit( fitEtaPtFrac, histEtaPtFrac );
+//                   TFitResultPtr fitEtaPtFracResultPtr( histEtaPtFrac->Fit( fitEtaPtFrac, fitOptionsL5L7_.c_str() ) );
+//                   if ( fitEtaPtFracResultPtr >= 0 ) {
+//                     if ( fitEtaPtFracResultPtr->Status() == 0 && fitEtaPtFracResultPtr->Ndf() != 0. ) {
+//                       histFracPtMean->SetBinContent( uPt + 1, fitEtaPtFracResultPtr->Parameter( 0 ) );
+//                       histFracPtMean->SetBinError( uPt + 1, fitEtaPtFracResultPtr->ParError( 0 ) );
+//                       histFracEtaPtFitMeanMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtFracResultPtr->Parameter( 0 ) );
+//                     }
+//                     else {
+//                       if ( fitEtaPtFracResultPtr->Prob() == 0. ) {
+//                       }
+//                       else {
+//                       }
+//                       if ( verbose_ > 2 ) {
+//                         std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+//                                   << "    failing fit in directory '"; gDirectory->pwd();
+//                         std::cout << "    '" << nameEtaPtFrac << "' status " << fitEtaPtFracResultPtr->Status() << std::endl;
+//                       }
+//                     }
+//                   }
+//                   else {
+//                     if ( verbose_ > 1 ) {
+//                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+//                                 << "    missing fit in directory '"; gDirectory->pwd();
+//                       std::cout << "    '" << nameEtaPtFrac << std::endl;
+//                     }
+//                   }
+//                   histFracEtaPtFitMean->Fill( fitEtaPtFracResultPtr->Parameter( 0 ) );
+//                   const std::string nameEtaPtFracBkg( nameEtaPtFrac + "_bkg" );
+//                   TF1 * bkgEtaPtFrac( new TF1( nameEtaPtFracBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histEtaPtFrac->GetXaxis()->GetXmin(), histEtaPtFrac->GetMean() - histEtaPtFrac->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaPtFrac->GetXaxis()->GetXmax(), histEtaPtFrac->GetMean() + histEtaPtFrac->GetRMS() * fitRangeJecsL5L7_ ) ) );
+//                   my::setParametersBkg( fitEtaPtFrac, bkgEtaPtFrac );
+//                   if ( overwrite_ ) bkgEtaPtFrac->Write( 0, TObject::kOverwrite );
+//                   else              bkgEtaPtFrac->Write();
+//                 }
+//
+//                 const std::string nameEtaPtFracRestr( nameEtaPtFrac + "Restr" );
+//                 TH1D * histEtaPtFracRestr( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaPtFracRestr.c_str() ) ) );
+//
+//                 if ( histEtaPtFracRestr != 0 ) {
+//                   const std::string nameEtaPtFracRestrFit( nameEtaPtFracRestr + "_fit" );
+//                   TF1 * fitEtaPtFracRestr( new TF1( nameEtaPtFracRestrFit.c_str(), fitFunctionJecsL5L7_.c_str(), std::max( histEtaPtFracRestr->GetXaxis()->GetXmin(), histEtaPtFracRestr->GetMean() - histEtaPtFracRestr->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaPtFracRestr->GetXaxis()->GetXmax(), histEtaPtFracRestr->GetMean() + histEtaPtFracRestr->GetRMS() * fitRangeJecsL5L7_ ) ) );
+//                   my::setParametersFit( fitEtaPtFracRestr, histEtaPtFracRestr );
+//                   TFitResultPtr fitEtaPtFracRestrResultPtr( histEtaPtFracRestr->Fit( fitEtaPtFracRestr, fitOptionsL5L7_.c_str() ) );
+//                   if ( fitEtaPtFracRestrResultPtr >= 0 ) {
+//                     if ( fitEtaPtFracRestrResultPtr->Status() == 0 && fitEtaPtFracRestrResultPtr->Ndf() != 0. ) {
+//                       histFracRestrPtMean->SetBinContent( uPt + 1, fitEtaPtFracRestrResultPtr->Parameter( 0 ) );
+//                       histFracRestrPtMean->SetBinError( uPt + 1, fitEtaPtFracRestrResultPtr->ParError( 0 ) );
+//                       histFracRestrEtaPtFitMeanMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtFracRestrResultPtr->Parameter( 0 ) );
+//                       histFracRestrEtaPtFitMean->Fill( fitEtaPtFracRestrResultPtr->Parameter( 0 ) );
+//                     }
+//                     else {
+//                       if ( fitEtaPtFracRestrResultPtr->Prob() == 0. ) {
+//                       }
+//                       else {
+//                       }
+//                       if ( verbose_ > 2 ) {
+//                         std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+//                                   << "    failing fit in directory '"; gDirectory->pwd();
+//                         std::cout << "    '" << nameEtaPtFracRestr << "' status " << fitEtaPtFracRestrResultPtr->Status() << std::endl;
+//                       }
+//                     }
+//                   }
+//                   else {
+//                     if ( verbose_ > 1 ) {
+//                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+//                                 << "    missing fit in directory '"; gDirectory->pwd();
+//                       std::cout << "    '" << nameEtaPtFracRestr << std::endl;
+//                     }
+//                   }
+//                   const std::string nameEtaPtFracRestrBkg( nameEtaPtFracRestr + "_bkg" );
+//                   TF1 * bkgEtaPtFracRestr( new TF1( nameEtaPtFracRestrBkg.c_str(), bkgFunctionJecsL5L7_.c_str(), std::max( histEtaPtFracRestr->GetXaxis()->GetXmin(), histEtaPtFracRestr->GetMean() - histEtaPtFracRestr->GetRMS() * fitRangeJecsL5L7_ ), std::min( histEtaPtFracRestr->GetXaxis()->GetXmax(), histEtaPtFracRestr->GetMean() + histEtaPtFracRestr->GetRMS() * fitRangeJecsL5L7_ ) ) );
+//                   my::setParametersBkg( fitEtaPtFracRestr, bkgEtaPtFracRestr );
+//                   if ( overwrite_ ) bkgEtaPtFracRestr->Write( 0, TObject::kOverwrite );
+//                   else              bkgEtaPtFracRestr->Write();
+//                 }
+//               } // loop: uPt < nPtBins_
 
             } // loop: keyEta
 
