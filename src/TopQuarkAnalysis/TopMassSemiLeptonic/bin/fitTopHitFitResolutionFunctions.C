@@ -24,51 +24,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
-#include "DataFormats/Math/interface/deltaR.h"
 #include "TopQuarkAnalysis/TopHitFit/interface/EtaDepResolution.h"
-
-
-namespace my
-{
-
-  void setParametersFit( TF1 * fit, TH1D * histo )
-  {
-//     double m( histo->GetMean() );
-//     double c( histo->GetBinContent( histo->FindBin( histo->GetMean() ) ) );
-//     double m( histo->GetBinCenter( histo->GetMaximumBin() ) );
-//     double c( histo->GetBinContent( histo->GetMaximumBin() ) );
-    double m( 1. );
-    double c( histo->GetBinContent( histo->FindBin( 1. ) ) );
-// //     double c( histo->GetBinContent( histo->GetMaximumBin() ) * std::sqrt( TMath::TwoPi() ) * histo->GetRMS() );
-    double s( histo->GetRMS() );
-    // Gaussian part
-    fit->SetParameter( 0, m );
-    fit->SetParLimits( 0, 0., 2. );
-    fit->SetParameter( 1, c );
-    fit->SetParLimits( 1, 0., 2. * c );
-    fit->SetParameter( 2, s );
-    fit->SetParLimits( 2, 0., 999999. );
-    // Additional part
-//     fit->SetParameter( 3, log( (m-2.*s)*(m-2.*s) / std::sqrt( s*s + (m-2.*s)*(m-2.*s) ) ) );
-    fit->SetParameter( 3, 0. );
-    fit->SetParameter( 4, c ); // just a rough guess, which should serve both cases (highest peak in "signal" or background)
-    fit->SetParLimits( 4, 0., 2. * c );
-//     fit->SetParameter( 5, std::sqrt( log( s*s / (m-2.*s)*(m-2.*s) + 1. ) ) );
-    fit->SetParameter( 5, 1. );
-    fit->SetParLimits( 5, 0., 999999. );
-    // Parameter names
-    fit->SetParNames( "Gaussian #Mu", "Gaussian c", "Gaussian #sigma", "log-normal #mu", "log-normal c", "log-normal #sigma" );
-  }
-
-  void setParametersBkg( TF1 * fit, TF1 * bkg )
-  {
-    Int_t n( fit->GetNumberFreeParameters() );
-    for ( Int_t i = 3; i < n; ++i ) {
-      bkg->SetParameter( i, fit->GetParameter( i ) );
-    }
-  }
-
-}
 
 
 int main( int argc, char * argv[] )
@@ -126,7 +82,7 @@ int main( int argc, char * argv[] )
   const std::string resFuncInvInv_( fit_.getParameter< std::string >( "resolutionFunctionInverseInv" ) );
   const std::string resFuncInvInvRel_( fit_.getParameter< std::string >( "resolutionFunctionInverseInvRel" ) );
   const bool onlyExisting_( fit_.getParameter< bool >( "onlyExisting" ) );
-  const bool writeResolutionFiles_( fit_.getParameter< bool >( "writeFiles" ) && onlyExisting_ );
+  const bool writeFiles_( fit_.getParameter< bool >( "writeFiles" ) && onlyExisting_ );
   const std::string pathOutResolution_( fit_.getParameter< std::string >( "pathOut" ) );
 
   std::vector< std::vector< bool > > nominalInv_( objCats_.size() );
@@ -151,9 +107,8 @@ int main( int argc, char * argv[] )
   const std::string titleChi2( "#chi^{2} / ndf" );
   const std::string titleProb( "Probability" );
   const std::string titleNdf( "ndf" );
-  std::string titlePt( "p_{t} (GeV)" );
-  std::string titleEta( "#eta" );
-  std::string titlePhi( "#phi" );
+  const std::string titlePt( refGen_ ? "p_{t}^GEN (GeV)" : "p_{t} (GeV)" );
+  const std::string titleEta( refGen_ ? "#eta^GEN" : "#eta" );
   std::vector< std::string > titlesDelta;
   titlesDelta.push_back( "#Deltap_{t} (GeV)" );
   titlesDelta.push_back( "#Delta#eta" );
@@ -348,7 +303,7 @@ int main( int argc, char * argv[] )
     ptBins_.push_back( histBinsPt->GetBinLowEdge( histBinsPt->GetNbinsX() ) + histBinsPt->GetBinWidth( histBinsPt->GetNbinsX() ) );
     const unsigned nPtBins_( ptBins_.size() - 1 );
 
-    // Read general n-tuple data
+    // Read kinematic property n-tuple data
     DataCont weightData_( nEtaBins_ );
     DataCont ptData_( nEtaBins_ );
     DataCont ptGenData_( nEtaBins_ );
@@ -415,10 +370,10 @@ int main( int argc, char * argv[] )
       TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
 
       // Histogram binning
-      const unsigned propDeltaBins_( histos_.getParameter< unsigned >( std::string( objCat + "Delta" + kinProp + "Bins" ) ) );
-      const double   propDeltaMax_( histos_.getParameter< double >( std::string( objCat + "Delta" + kinProp + "Max" ) ) );
-      const unsigned propInvDeltaBins_( histos_.getParameter< unsigned >( std::string( objCat + "Delta" + kinProp + "InvBins" ) ) );
-      const double   propInvDeltaMax_( histos_.getParameter< double >( std::string( objCat + "Delta" + kinProp + "InvMax" ) ) );
+      const unsigned propBins_( histos_.getParameter< unsigned >( std::string( objCat + kinProp + "Bins" ) ) );
+      const double   propMax_( histos_.getParameter< double >( std::string( objCat + kinProp + "Max" ) ) );
+      const unsigned propInvBins_( histos_.getParameter< unsigned >( std::string( objCat + kinProp + "InvBins" ) ) );
+      const double   propInvMax_( histos_.getParameter< double >( std::string( objCat + kinProp + "InvMax" ) ) );
 
       // Read kinematic property n-tuple data
       DataCont propData_( nEtaBins_ );
@@ -464,14 +419,9 @@ int main( int argc, char * argv[] )
           titleDelta    = titlesDeltaAlt.at( uProp );
           titleDeltaRel = titlesDeltaAltRel.at( uProp );
         }
-        if ( refGen_ ) {
-          titlePt  = "p_{t}^GEN (GeV)";
-          titleEta = "#eta^GEN";
-          titlePhi = "#phi^GEN";
-        }
 
-        const unsigned deltaBins( inverse ? propInvDeltaBins_ : propDeltaBins_ );
-        const double   deltaMax( inverse ? propInvDeltaMax_ : propDeltaMax_ );
+        const unsigned deltaBins( inverse ? propInvBins_ : propBins_ );
+        const double   deltaMax( inverse ? propInvMax_ : propMax_ );
 
         const std::string nameDelta( name + "_Delta" );
         TH1D * histDelta( new TH1D( nameDelta.c_str(), objCat.c_str(), deltaBins, -deltaMax, deltaMax ) );
@@ -624,7 +574,7 @@ int main( int argc, char * argv[] )
             }
 
             const std::string nameEtaPtDeltaRebin( nameEtaPtDelta + "Rebin" );
-//             const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+//             const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
             const Int_t deltaBinsRebin( deltaBins );
             const Double_t meanEtaPtDelta( histEtaPtDelta->GetMean() );
             const Double_t widthEtaPtDelta( std::fabs( histEtaPtDelta->GetRMS() ) );
@@ -638,7 +588,7 @@ int main( int argc, char * argv[] )
             histEtaPtDeltaRebin->SetYTitle( histEtaPtDelta->GetYaxis()->GetTitle() );
 
             const std::string nameEtaPtDeltaRelRebin( nameEtaPtDeltaRel + "Rebin" );
-//             const Int_t deltaBinsRebinRel( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+//             const Int_t deltaBinsRebinRel( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
             const Int_t deltaBinsRebinRel( deltaBins );
             const Double_t meanEtaPtDeltaRel( histEtaPtDeltaRel->GetMean() );
             const Double_t widthEtaPtDeltaRel( std::fabs( histEtaPtDeltaRel->GetRMS() ) );
@@ -671,7 +621,7 @@ int main( int argc, char * argv[] )
           } // loop: uPt < nPtBins_
 
           const std::string nameEtaDeltaRebin( nameEtaDelta + "Rebin" );
-//           const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+//           const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
           const Int_t deltaBinsRebin( deltaBins );
           const Double_t meanEtaDelta( histEtaDelta->GetMean() );
           const Double_t widthEtaDelta( std::fabs( histEtaDelta->GetRMS() ) );
@@ -685,7 +635,7 @@ int main( int argc, char * argv[] )
           histEtaDeltaRebin->SetYTitle( histEtaDelta->GetYaxis()->GetTitle() );
 
           const std::string nameEtaDeltaRelRebin( nameEtaDeltaRel + "Rebin" );
-//           const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+//           const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
           const Int_t deltaBinsRebinRel( deltaBins );
           const Double_t meanEtaDeltaRel( histEtaDeltaRel->GetMean() );
           const Double_t widthEtaDeltaRel( std::fabs( histEtaDeltaRel->GetRMS() ) );
@@ -722,7 +672,7 @@ int main( int argc, char * argv[] )
         dirFit_->cd();
 
         const std::string nameDeltaRebin( nameDelta + "Rebin" );
-//         const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+//         const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
         const Int_t deltaBinsRebin( deltaBins );
         const Double_t meanDelta( histDelta->GetMean() );
         const Double_t widthDelta( std::fabs( histDelta->GetRMS() ) );
@@ -736,7 +686,7 @@ int main( int argc, char * argv[] )
         histDeltaRebin->SetYTitle( histDelta->GetYaxis()->GetTitle() );
 
         const std::string nameDeltaRelRebin( nameDeltaRel + "Rebin" );
-//         const Int_t deltaBinsRebinRel( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+//         const Int_t deltaBinsRebinRel( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
         const Int_t deltaBinsRebinRel( deltaBins );
         const Double_t meanDeltaRel( histDeltaRel->GetMean() );
         const Double_t widthDeltaRel( std::fabs( histDeltaRel->GetRMS() ) );
@@ -758,7 +708,7 @@ int main( int argc, char * argv[] )
           const std::string namePtDelta( namePt + "_Delta" );
           const std::string titlePtDelta( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
           const std::string namePtDeltaRebin( namePtDelta + "Rebin" );
-//           const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+//           const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
           const Int_t deltaBinsRebin( deltaBins );
           const Double_t meanPtDelta( histVecPtDelta.at( uPt )->GetMean() );
           const Double_t widthPtDelta( std::fabs( histVecPtDelta.at( uPt )->GetRMS() ) );
@@ -775,7 +725,7 @@ int main( int argc, char * argv[] )
           if ( ! inverse && kinProp == "Pt" ) {
             const std::string namePtDeltaRel( namePtDelta + "Rel" );
             const std::string namePtDeltaRelRebin( namePtDeltaRel + "Rebin" );
-//             const Int_t deltaBinsRebin( inverse ? propInvDeltaBins_ : propDeltaBins_ ); // FIXME: tune number of bins
+//             const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
             const Double_t meanPtDeltaRel( histVecPtDeltaRel.at( uPt )->GetMean() );
             const Double_t widthPtDeltaRel( std::fabs( histVecPtDeltaRel.at( uPt )->GetRMS() ) );
             if ( widthPtDeltaRel == 0. && verbose_ > 2 ) {
@@ -839,7 +789,7 @@ int main( int argc, char * argv[] )
                 break;
               }
 
-            } // loop: uPt < nPtBins
+            } // loop: uPt < nPtBins_
           } // loop: uEntry < sizeEta_.at( uEta )
 
         } // loop: keyEta
@@ -879,8 +829,8 @@ int main( int argc, char * argv[] )
       TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
 
       // Histogram binning
-      const double propDeltaMax_( histos_.getParameter< double >( std::string( objCat + "Delta" + kinProp + "Max" ) ) );
-      const double propInvDeltaMax_( histos_.getParameter< double >( std::string( objCat + "Delta" + kinProp + "InvMax" ) ) );
+      const double propMax_( histos_.getParameter< double >( std::string( objCat + kinProp + "Max" ) ) );
+      const double propInvMax_( histos_.getParameter< double >( std::string( objCat + kinProp + "InvMax" ) ) );
 
       Cs.push_back( std::vector< double >( nEtaBins_ ) );
       Rs.push_back( std::vector< double >( nEtaBins_ ) );
@@ -928,17 +878,12 @@ int main( int argc, char * argv[] )
           titleDelta    = titlesDeltaAlt.at( uProp );
           titleDeltaRel = titlesDeltaAltRel.at( uProp );
         }
-        if ( refGen_ ) {
-          titlePt = "p_{t}^GEN (GeV)";
-          titleEta = "#eta^GEN";
-          titlePhi = "#phi^GEN";
-        }
 
         // Fit performance histograms
 
         const std::string titleMean( "#mu of " + titleDelta );
         const std::string titleSigma( "#sigma of " + titleDelta );
-        const double deltaMax( inverse ? propInvDeltaMax_ : propDeltaMax_ );
+        const double deltaMax( inverse ? propInvMax_ : propMax_ );
 
         // Single resolutions bins
         const std::string nameDeltaEtaPtFitChi2Map( name + "_DeltaEtaPt_FitChi2Map" );
@@ -1124,7 +1069,7 @@ int main( int argc, char * argv[] )
                   else              fitEtaSigmaInvRelFit->Write();
                 }
               }
-              if ( writeResolutionFiles_ ) {
+              if ( writeFiles_ ) {
                 Cs.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaFit->GetParameter( 0 ) );
                 Rs.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaFit->GetParameter( 1 ) );
                 Ns.at( uProp ).at( uEta ) = std::fabs( fitEtaSigmaFit->GetParameter( 2 ) );
@@ -1146,7 +1091,7 @@ int main( int argc, char * argv[] )
               }
               histSigmaEtaFitBadNdfMap->SetBinContent( uEta + 1, fitEtaSigmaFitResultPtr->Ndf() );
               histSigmaEtaFitBadNdf->Fill( fitEtaSigmaFitResultPtr->Ndf() );
-              if ( writeResolutionFiles_ ) {
+              if ( writeFiles_ ) {
                 Cs.at( uProp ).at( uEta ) = -1.;
                 Rs.at( uProp ).at( uEta ) = -1.;
                 Ns.at( uProp ).at( uEta ) = -1.;
@@ -1160,7 +1105,7 @@ int main( int argc, char * argv[] )
           }
           else {
             histSigmaEtaFitMissingMap->AddBinContent( uEta + 1 );
-            if ( writeResolutionFiles_ ) {
+            if ( writeFiles_ ) {
               Cs.at( uProp ).at( uEta ) = -1.;
               Rs.at( uProp ).at( uEta ) = -1.;
               Ns.at( uProp ).at( uEta ) = -1.;
@@ -1181,7 +1126,7 @@ int main( int argc, char * argv[] )
     } // loop: keyProp
 
     // Write fit results to text files
-    if ( writeResolutionFiles_ ) {
+    if ( writeFiles_ ) {
 
       // File name
       std::string nameOut( pathOutResolution_ + "/gentResolution_" + sample_ + "_" + objCat );
