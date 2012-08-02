@@ -503,7 +503,7 @@ int main( int argc, char * argv[] )
           DataCont propGenEtaBin( nPtBins_ );
           std::vector< unsigned > sizePt( nPtBins_ );
           for ( unsigned uEntry = 0; uEntry < sizeEta_.at( uEta ); ++uEntry ) {
-            if ( propData_.at( uEta ).at( uEntry ) == -5. ) continue; // no match
+            if ( propData_.at( uEta ).at( uEntry ) == -9. || propGenData_.at( uEta ).at( uEntry ) == -9. ) continue; // no match
             for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
               if ( ptBins_.at( uPt ) <= ptData_.at( uEta ).at( uEntry ) && ptData_.at( uEta ).at( uEntry ) < ptBins_.at( uPt + 1 ) ) {
                 sizePt.at( uPt ) += 1;
