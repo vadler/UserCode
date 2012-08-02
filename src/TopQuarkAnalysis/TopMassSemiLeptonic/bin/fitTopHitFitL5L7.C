@@ -113,6 +113,8 @@ int main( int argc, char * argv[] )
   const double widthFactor_( histos_.getParameter< double >( "widthFactor" ) );
   // Configuration for fitting L5L7 JECs
   const edm::ParameterSet & fit_( process_.getParameter< edm::ParameterSet >( "fit" ) );
+  const bool fitNonRestr_( fit_.getParameter< bool >( "fitNonRestr" ) );
+  const bool fitEtaPt_( fit_.getParameter< bool >( "fitEtaPt" ) );
   const std::string fitFunction_( fit_.getParameter< std::string >( "fitFunction" ) );
   std::string fitOptions_( fit_.getParameter< std::string >( "fitOptions" ) );
   const double fitRange_( std::min( fit_.getParameter< double >( "fitRange" ), widthFactor_ ) );
@@ -139,7 +141,9 @@ int main( int argc, char * argv[] )
   if      ( verbose_ < 3 ) fitOptions_.append( "Q" );
   else if ( verbose_ > 4 ) fitOptions_.append( "V" );
   const std::string titleChi2( "#chi^{2} / ndf" );
-  const std::string titleProb( "Probability" );
+  const std::string titleProb( "Fit robability" );
+  const std::string titleMean( "Fit mean" );
+  const std::string titleSigma( "Fit uncertainty" );
   const std::string titleNdf( "ndf" );
   const std::string titlePt( refGen_ ? "p_{t}^GEN (GeV)" : "p_{t} (GeV)" );
   const std::string titleEta( refGen_ ? "#eta^GEN" : "#eta" );
@@ -147,7 +151,10 @@ int main( int argc, char * argv[] )
   if ( useAlt_ ) {
     titleFrac = ( refGen_ ? "#frac{p_{t}^{RECO,alt.}}{p_{t}^{GEN}}" : "#frac{p_{t}^{GEN}}{p_{t}^{RECO,alt.}}" );
   }
+  const std::string titleFracMean( "#mu of " + titleFrac );
+  const std::string titleFracSigma( "#sigma of " + titleFrac );
   const std::string titleEvents( "events" );
+  const std::string titleFits( "fits" );
 
   if ( returnStatus_ != 0 ) return returnStatus_;
 
@@ -409,33 +416,57 @@ int main( int argc, char * argv[] )
 
           for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
             if ( refGen_ ) {
-              histEtaPtFrac->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtParton_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRParton_ )
-                histEtaPtFracRestr->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+              if ( fitNonRestr_ ) {
+                if ( fitEtaPt_ ) histEtaPtFrac->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histVecPtFrac.at( uPt )->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaFrac->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histFrac->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+              }
+              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtParton_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRParton_ ) {
+                if ( fitEtaPt_ ) histEtaPtFracRestr->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histVecPtFracRestr.at( uPt )->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaFracRestr->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histFracRestr->Fill( propEtaBin.at( uPt ).at( uEntry ) / propGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+              }
             }
             else {
-              histEtaPtFrac->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtParton_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRParton_ )
-                histEtaPtFracRestr->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+              if ( fitNonRestr_ ) {
+                if ( fitEtaPt_ ) histEtaPtFrac->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histVecPtFrac.at( uPt )->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaFrac->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histFrac->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+              }
+              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtParton_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRParton_ ) {
+                if ( fitEtaPt_ ) histEtaPtFracRestr->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histVecPtFracRestr.at( uPt )->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaFracRestr->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+                histFracRestr->Fill( propGenEtaBin.at( uPt ).at( uEntry ) / propEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+              }
             }
           } // loop: uEntry < ptEtaBin.at( uPt ).size()
 
-          histFrac->Add( histEtaPtFrac );
-          histFracRestr->Add( histEtaPtFracRestr );
-          histEtaFrac->Add( histEtaPtFrac );
-          histEtaFracRestr->Add( histEtaPtFracRestr );
-          histVecPtFrac.at( uPt )->Add( histEtaPtFrac );
-          histVecPtFracRestr.at( uPt )->Add( histEtaPtFracRestr );
-
-          histEtaPtFrac->Scale( 1. / histEtaPtFrac->Integral() );
-          histEtaPtFracRestr->Scale( 1. / histEtaPtFracRestr->Integral() );
+          if ( fitEtaPt_ ) {
+            if ( fitNonRestr_ ) histEtaPtFrac->Scale( 1. / histEtaPtFrac->Integral() );
+            histEtaPtFracRestr->Scale( 1. / histEtaPtFracRestr->Integral() );
+          }
 
         } // loop: uPt < nPtBins_
 
-        histEtaFrac->Scale( 1. / histEtaFrac->Integral() );
+        if ( fitNonRestr_ ) histEtaFrac->Scale( 1. / histEtaFrac->Integral() );
         histEtaFracRestr->Scale( 1. / histEtaFracRestr->Integral() );
 
       } // loop: keyEta
+
+      if ( fitNonRestr_ ) histFrac->Scale( 1. / histFrac->Integral() );
+      histFracRestr->Scale( 1. / histFracRestr->Integral() );
+      if ( fitNonRestr_ ) {
+        for ( unsigned uPt = 0; uPt < histVecPtFrac.size(); ++uPt ) {
+          histVecPtFrac.at( uPt )->Scale( 1. / histVecPtFrac.at( uPt )->Integral() );
+        }
+      }
+      for ( unsigned uPt = 0; uPt < histVecPtFracRestr.size(); ++uPt ) {
+        histVecPtFracRestr.at( uPt )->Scale( 1. / histVecPtFracRestr.at( uPt )->Integral() );
+      }
 
       dirFit_->cd();
 
@@ -444,15 +475,6 @@ int main( int argc, char * argv[] )
                   << "    mismatch of eta binning for object category '" << objCat << "':" << std::endl
                   << "        bins in directory structure: " << sizeEtaBins                << std::endl
                   << "        bins in binning histogram  : " << nEtaBins_                  << std::endl;
-      }
-
-      histFrac->Scale( 1. / histFrac->Integral() );
-      histFracRestr->Scale( 1. / histFracRestr->Integral() );
-      for ( unsigned uPt = 0; uPt < histVecPtFrac.size(); ++uPt ) {
-        histVecPtFrac.at( uPt )->Scale( 1. / histVecPtFrac.at( uPt )->Integral() );
-      }
-      for ( unsigned uPt = 0; uPt < histVecPtFracRestr.size(); ++uPt ) {
-        histVecPtFracRestr.at( uPt )->Scale( 1. / histVecPtFracRestr.at( uPt )->Integral() );
       }
 
     } // loop: keyFit
@@ -465,8 +487,6 @@ int main( int argc, char * argv[] )
         std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                   << "    JEC L5L7 determination for " << objCat << " started" << std::endl;
       }
-
-      // Loop over kinematic properties
 
       TDirectory * dirPt_( dynamic_cast< TDirectory* >( dirCat_->Get( "Pt" ) ) );
 
@@ -486,25 +506,9 @@ int main( int argc, char * argv[] )
 
         const std::string name( objCat + "_Pt_" + subFit );
 
-        // Fit performance histograms
-
-        const std::string titleMean( "#mu of " + titleFrac );
-        const std::string titleSigma( "#sigma of " + titleFrac );
-
-        // Single JEC bins
-        const std::string nameFracEtaFitMean( name + "_FracEta_FitMeanMap" );
-        TH1D * histFracEtaFitMean( new TH1D( nameFracEtaFitMean.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data() ) );
-        histFracEtaFitMean->SetXTitle( titleEta.c_str() );
-        histFracEtaFitMean->SetYTitle( titleMean.c_str() );
-        const std::string nameFracRestrEtaFitMean( name + "_FracRestrEta_FitMeanMap" );
-        TH1D * histFracRestrEtaFitMean( new TH1D( nameFracRestrEtaFitMean.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data() ) );
-        histFracRestrEtaFitMean->SetXTitle( titleEta.c_str() );
-        histFracRestrEtaFitMean->SetYTitle( titleMean.c_str() );
-
         const std::string nameFrac( name + "_Frac" );
         TH1D * histFrac( dynamic_cast< TH1D* >( gDirectory->Get( nameFrac.c_str() ) ) );
-
-        if ( histFrac != 0 ) {
+        if ( fitNonRestr_ && histFrac != 0 ) {
           const std::string nameFracFit( nameFrac + "_fit" );
           TF1 * fitFrac( new TF1( nameFracFit.c_str(), fitFunction_.c_str(), std::max( histFrac->GetXaxis()->GetXmin(), histFrac->GetMean() - histFrac->GetRMS() * fitRange_ ), std::min( histFrac->GetXaxis()->GetXmax(), histFrac->GetMean() + histFrac->GetRMS() * fitRange_ ) ) );
           my::setParametersFit( fitFrac, histFrac );
@@ -536,7 +540,6 @@ int main( int argc, char * argv[] )
 
         const std::string nameFracRestr( nameFrac + "Restr" );
         TH1D * histFracRestr( dynamic_cast< TH1D* >( gDirectory->Get( nameFracRestr.c_str() ) ) );
-
         if ( histFracRestr != 0 ) {
           const std::string nameFracRestrFit( nameFracRestr + "_fit" );
           TF1 * fitFracRestr( new TF1( nameFracRestrFit.c_str(), fitFunction_.c_str(), std::max( histFracRestr->GetXaxis()->GetXmin(), histFracRestr->GetMean() - histFracRestr->GetRMS() * fitRange_ ), std::min( histFracRestr->GetXaxis()->GetXmax(), histFracRestr->GetMean() + histFracRestr->GetRMS() * fitRange_ ) ) );
@@ -567,30 +570,33 @@ int main( int argc, char * argv[] )
           else              bkgFracRestr->Write();
         }
 
-        const std::string nameFracPtFitMean( name + "_FracPt_FitMeanMap" );
-        TH1D * histFracMean( new TH1D( nameFracPtFitMean.c_str(), objCat.c_str(), nPtBins_, ptBins_.data() ) );
-        histFracMean->SetXTitle( titlePt.c_str() );
-        histFracMean->SetYTitle( titleMean.c_str() );
-        const std::string nameFracRestrPtFitMean( name + "_FracRestrPt_FitMeanMap" );
-        TH1D * histFracRestrMean( new TH1D( nameFracRestrPtFitMean.c_str(), objCat.c_str(), nPtBins_, ptBins_.data() ) );
-        histFracRestrMean->SetXTitle( titlePt.c_str() );
-        histFracRestrMean->SetYTitle( titleMean.c_str() );
+        // Loop over pt bins
+
+        // Fit performance histograms
+        const std::string nameFracPtFitMeanMap( name + "_FracPt_FitMeanMap" );
+        TH1D * histFracPtFitMeanMap( new TH1D( nameFracPtFitMeanMap.c_str(), objCat.c_str(), nPtBins_, ptBins_.data() ) );
+        histFracPtFitMeanMap->SetXTitle( titlePt.c_str() );
+        histFracPtFitMeanMap->SetYTitle( titleFracMean.c_str() );
+        const std::string nameFracRestrPtFitMeanMap( name + "_FracRestrPt_FitMeanMap" );
+        TH1D * histFracRestrPtFitMeanMap( new TH1D( nameFracRestrPtFitMeanMap.c_str(), objCat.c_str(), nPtBins_, ptBins_.data() ) );
+        histFracRestrPtFitMeanMap->SetXTitle( titlePt.c_str() );
+        histFracRestrPtFitMeanMap->SetYTitle( titleFracMean.c_str() );
+
         for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
           const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
           const std::string namePt( name + "_Pt" + binPt );
 
           const std::string namePtFrac( namePt + "_Frac" );
           TH1D * histPtFrac( dynamic_cast< TH1D* >( gDirectory->Get( namePtFrac.c_str() ) ) );
-
-          if ( histPtFrac != 0 ) {
+          if ( fitNonRestr_ && histPtFrac != 0 ) {
             const std::string namePtFracFit( namePtFrac + "_fit" );
             TF1 * fitPtFrac( new TF1( namePtFracFit.c_str(), fitFunction_.c_str(), std::max( histPtFrac->GetXaxis()->GetXmin(), histPtFrac->GetMean() - histPtFrac->GetRMS() * fitRange_ ), std::min( histPtFrac->GetXaxis()->GetXmax(), histPtFrac->GetMean() + histPtFrac->GetRMS() * fitRange_ ) ) );
             my::setParametersFit( fitPtFrac, histPtFrac );
             TFitResultPtr fitPtFracResultPtr( histPtFrac->Fit( fitPtFrac, fitOptions_.c_str() ) );
             if ( fitPtFracResultPtr >= 0 ) {
               if ( fitPtFracResultPtr->Status() == 0 && fitPtFracResultPtr->Ndf() != 0. ) {
-                histFracMean->SetBinContent( uPt + 1, fitPtFracResultPtr->Parameter( 0 ) );
-                histFracMean->SetBinError( uPt + 1, fitPtFracResultPtr->ParError( 0 ) );
+                histFracPtFitMeanMap->SetBinContent( uPt + 1, fitPtFracResultPtr->Parameter( 0 ) );
+                histFracPtFitMeanMap->SetBinError( uPt + 1, fitPtFracResultPtr->ParError( 0 ) );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -616,7 +622,6 @@ int main( int argc, char * argv[] )
 
           const std::string namePtFracRestr( namePtFrac + "Restr" );
           TH1D * histPtFracRestr( dynamic_cast< TH1D* >( gDirectory->Get( namePtFracRestr.c_str() ) ) );
-
           if ( histPtFracRestr != 0 ) {
             const std::string namePtFracRestrFit( namePtFracRestr + "_fit" );
             TF1 * fitPtFracRestr( new TF1( namePtFracRestrFit.c_str(), fitFunction_.c_str(), std::max( histPtFracRestr->GetXaxis()->GetXmin(), histPtFracRestr->GetMean() - histPtFracRestr->GetRMS() * fitRange_ ), std::min( histPtFracRestr->GetXaxis()->GetXmax(), histPtFracRestr->GetMean() + histPtFracRestr->GetRMS() * fitRange_ ) ) );
@@ -624,8 +629,8 @@ int main( int argc, char * argv[] )
             TFitResultPtr fitPtFracRestrResultPtr( histPtFracRestr->Fit( fitPtFracRestr, fitOptions_.c_str() ) );
             if ( fitPtFracRestrResultPtr >= 0 ) {
               if ( fitPtFracRestrResultPtr->Status() == 0 && fitPtFracRestrResultPtr->Ndf() != 0. ) {
-                histFracRestrMean->SetBinContent( uPt + 1, fitPtFracRestrResultPtr->Parameter( 0 ) );
-                histFracRestrMean->SetBinError( uPt + 1, fitPtFracRestrResultPtr->ParError( 0 ) );
+                histFracRestrPtFitMeanMap->SetBinContent( uPt + 1, fitPtFracRestrResultPtr->Parameter( 0 ) );
+                histFracRestrPtFitMeanMap->SetBinError( uPt + 1, fitPtFracRestrResultPtr->ParError( 0 ) );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -648,9 +653,47 @@ int main( int argc, char * argv[] )
             if ( overwrite_ ) bkgPtFracRestr->Write( 0, TObject::kOverwrite );
             else              bkgPtFracRestr->Write();
           }
+
         } // loop: uPt < nPtBins_
 
         // Loop over eta bins
+
+        // Fit performance histograms
+        const std::string nameFracEtaFitMeanMap( name + "_FracEta_FitMeanMap" );
+        TH1D * histFracEtaFitMeanMap( new TH1D( nameFracEtaFitMeanMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data() ) );
+        histFracEtaFitMeanMap->SetXTitle( titleEta.c_str() );
+        histFracEtaFitMeanMap->SetYTitle( titleFracMean.c_str() );
+        const std::string nameFracEtaPtFitMeanMap( name + "_FracEtaPt_FitMeanMap" );
+        TH2D * histFracEtaPtFitMeanMap( new TH2D( nameFracEtaPtFitMeanMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+        histFracEtaPtFitMeanMap->SetXTitle( titleEta.c_str() );
+        histFracEtaPtFitMeanMap->SetYTitle( titlePt.c_str() );
+        histFracEtaPtFitMeanMap->SetZTitle( titleFracMean.c_str() );
+        const std::string nameFracEtaPtFitMean( name + "_FracEtaPt_FitMean" );
+        TH1D * histFracEtaPtFitMean( new TH1D( nameFracEtaPtFitMean.c_str(), titleMean.c_str(), 20, 0.75, 1.25 ) );
+        histFracEtaPtFitMean->SetXTitle( titleFracMean.c_str() );
+        histFracEtaPtFitMean->SetYTitle( titleFits.c_str() );
+        const std::string nameFracEtaPtFitSigma( name + "_FracEtaPt_FitSigma" );
+        TH1D * histFracEtaPtFitSigma( new TH1D( nameFracEtaPtFitSigma.c_str(), titleSigma.c_str(), 20, 0., 1. ) );
+        histFracEtaPtFitSigma->SetXTitle( titleFracSigma.c_str() );
+        histFracEtaPtFitSigma->SetYTitle( titleFits.c_str() );
+        const std::string nameFracRestrEtaFitMeanMap( name + "_FracRestrEta_FitMeanMap" );
+        TH1D * histFracRestrEtaFitMeanMap( new TH1D( nameFracRestrEtaFitMeanMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data() ) );
+        histFracRestrEtaFitMeanMap->SetXTitle( titleEta.c_str() );
+        histFracRestrEtaFitMeanMap->SetYTitle( titleFracMean.c_str() );
+        const std::string nameFracRestrEtaPtFitMeanMap( name + "_FracRestrEtaPt_FitMeanMap" );
+        TH2D * histFracRestrEtaPtFitMeanMap( new TH2D( nameFracRestrEtaPtFitMeanMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), nPtBins_, ptBins_.data() ) );
+        histFracRestrEtaPtFitMeanMap->SetXTitle( titleEta.c_str() );
+        histFracRestrEtaPtFitMeanMap->SetYTitle( titlePt.c_str() );
+        histFracRestrEtaPtFitMeanMap->SetZTitle( titleFracMean.c_str() );
+        const std::string nameFracRestrEtaPtFitMean( name + "_FracRestrEtaPt_FitMean" );
+        TH1D * histFracRestrEtaPtFitMean( new TH1D( nameFracRestrEtaPtFitMean.c_str(), titleMean.c_str(), 20, 0.75, 1.25 ) );
+        histFracRestrEtaPtFitMean->SetXTitle( titleFracMean.c_str() );
+        histFracRestrEtaPtFitMean->SetYTitle( titleFits.c_str() );
+        const std::string nameFracRestrEtaPtFitSigma( name + "_FracRestrEtaPt_FitSigma" );
+        TH1D * histFracRestrEtaPtFitSigma( new TH1D( nameFracRestrEtaPtFitSigma.c_str(), titleSigma.c_str(), 20, 0., 1. ) );
+        histFracRestrEtaPtFitSigma->SetXTitle( titleFracSigma.c_str() );
+        histFracRestrEtaPtFitSigma->SetYTitle( titleFits.c_str() );
+
         TList * listFit( dirFit_->GetListOfKeys() );
         TIter nextInListFit( listFit );
         while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
@@ -663,16 +706,15 @@ int main( int argc, char * argv[] )
 
           const std::string nameEtaFrac( nameEta + "_Frac" );
           TH1D * histEtaFrac( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaFrac.c_str() ) ) );
-
-          if ( histEtaFrac != 0 ) {
+          if ( fitNonRestr_ && histEtaFrac != 0 ) {
             const std::string nameEtaFracFit( nameEtaFrac + "_fit" );
             TF1 * fitEtaFrac( new TF1( nameEtaFracFit.c_str(), fitFunction_.c_str(), std::max( histEtaFrac->GetXaxis()->GetXmin(), histEtaFrac->GetMean() - histEtaFrac->GetRMS() * fitRange_ ), std::min( histEtaFrac->GetXaxis()->GetXmax(), histEtaFrac->GetMean() + histEtaFrac->GetRMS() * fitRange_ ) ) );
             my::setParametersFit( fitEtaFrac, histEtaFrac );
             TFitResultPtr fitEtaFracResultPtr( histEtaFrac->Fit( fitEtaFrac, fitOptions_.c_str() ) );
             if ( fitEtaFracResultPtr >= 0 ) {
               if ( fitEtaFracResultPtr->Status() == 0 && fitEtaFracResultPtr->Ndf() != 0. ) {
-                histFracEtaFitMean->SetBinContent( uEta + 1, fitEtaFracResultPtr->Parameter( 0 ) );
-                histFracEtaFitMean->SetBinError( uEta + 1, fitEtaFracResultPtr->ParError( 0 ) );
+                histFracEtaFitMeanMap->SetBinContent( uEta + 1, fitEtaFracResultPtr->Parameter( 0 ) );
+                histFracEtaFitMeanMap->SetBinError( uEta + 1, fitEtaFracResultPtr->ParError( 0 ) );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -698,7 +740,6 @@ int main( int argc, char * argv[] )
 
           const std::string nameEtaFracRestr( nameEtaFrac + "Restr" );
           TH1D * histEtaFracRestr( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaFracRestr.c_str() ) ) );
-
           if ( histEtaFracRestr != 0 ) {
             const std::string nameEtaFracRestrFit( nameEtaFracRestr + "_fit" );
             TF1 * fitEtaFracRestr( new TF1( nameEtaFracRestrFit.c_str(), fitFunction_.c_str(), std::max( histEtaFracRestr->GetXaxis()->GetXmin(), histEtaFracRestr->GetMean() - histEtaFracRestr->GetRMS() * fitRange_ ), std::min( histEtaFracRestr->GetXaxis()->GetXmax(), histEtaFracRestr->GetMean() + histEtaFracRestr->GetRMS() * fitRange_ ) ) );
@@ -706,8 +747,8 @@ int main( int argc, char * argv[] )
             TFitResultPtr fitEtaFracRestrResultPtr( histEtaFracRestr->Fit( fitEtaFracRestr, fitOptions_.c_str() ) );
             if ( fitEtaFracRestrResultPtr >= 0 ) {
               if ( fitEtaFracRestrResultPtr->Status() == 0 && fitEtaFracRestrResultPtr->Ndf() != 0. ) {
-                histFracRestrEtaFitMean->SetBinContent( uEta + 1, fitEtaFracRestrResultPtr->Parameter( 0 ) );
-                histFracRestrEtaFitMean->SetBinError( uEta + 1, fitEtaFracRestrResultPtr->ParError( 0 ) );
+                histFracRestrEtaFitMeanMap->SetBinContent( uEta + 1, fitEtaFracRestrResultPtr->Parameter( 0 ) );
+                histFracRestrEtaFitMeanMap->SetBinError( uEta + 1, fitEtaFracRestrResultPtr->ParError( 0 ) );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -729,6 +770,104 @@ int main( int argc, char * argv[] )
             my::setParametersBkg( fitEtaFracRestr, bkgEtaFracRestr );
             if ( overwrite_ ) bkgEtaFracRestr->Write( 0, TObject::kOverwrite );
             else              bkgEtaFracRestr->Write();
+          }
+
+          // Loop over pt bins
+
+          if ( fitEtaPt_ ) {
+
+            // Fit performance histograms
+            const std::string nameEtaFracPtFitMeanMap( nameEta + "_FracPt_FitMeanMap" );
+            TH1D * histEtaFracPtFitMeanMap( new TH1D( nameEtaFracPtFitMeanMap.c_str(), objCat.c_str(), nPtBins_, ptBins_.data() ) );
+            histEtaFracPtFitMeanMap->SetXTitle( titlePt.c_str() );
+            histEtaFracPtFitMeanMap->SetYTitle( titleFracMean.c_str() );
+            const std::string nameEtaFracRestrPtFitMeanMap( nameEta + "_FracRestrPt_FitMeanMap" );
+            TH1D * histEtaFracRestrPtFitMeanMap( new TH1D( nameEtaFracRestrPtFitMeanMap.c_str(), objCat.c_str(), nPtBins_, ptBins_.data() ) );
+            histEtaFracRestrPtFitMeanMap->SetXTitle( titlePt.c_str() );
+            histEtaFracRestrPtFitMeanMap->SetYTitle( titleFracMean.c_str() );
+
+            for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+              const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
+              const std::string nameEtaPt( nameEta + "_Pt" + binPt );
+
+              const std::string nameEtaPtFrac( nameEtaPt + "_Frac" );
+              TH1D * histEtaPtFrac( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaPtFrac.c_str() ) ) );
+              if ( fitNonRestr_ && histEtaPtFrac != 0 ) {
+                const std::string nameEtaPtFracFit( nameEtaPtFrac + "_fit" );
+                TF1 * fitEtaPtFrac( new TF1( nameEtaPtFracFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtFrac->GetXaxis()->GetXmin(), histEtaPtFrac->GetMean() - histEtaPtFrac->GetRMS() * fitRange_ ), std::min( histEtaPtFrac->GetXaxis()->GetXmax(), histEtaPtFrac->GetMean() + histEtaPtFrac->GetRMS() * fitRange_ ) ) );
+                my::setParametersFit( fitEtaPtFrac, histEtaPtFrac );
+                TFitResultPtr fitEtaPtFracResultPtr( histEtaPtFrac->Fit( fitEtaPtFrac, fitOptions_.c_str() ) );
+                if ( fitEtaPtFracResultPtr >= 0 ) {
+                  if ( fitEtaPtFracResultPtr->Status() == 0 && fitEtaPtFracResultPtr->Ndf() != 0. ) {
+                    histEtaFracPtFitMeanMap->SetBinContent( uPt + 1, fitEtaPtFracResultPtr->Parameter( 0 ) );
+                    histEtaFracPtFitMeanMap->SetBinError( uPt + 1, fitEtaPtFracResultPtr->ParError( 0 ) );
+                    histFracEtaPtFitMeanMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtFracResultPtr->Parameter( 0 ) );
+                    histFracEtaPtFitMeanMap->SetBinError( uEta + 1, uPt + 1, fitEtaPtFracResultPtr->ParError( 0 ) );
+                    histFracEtaPtFitMean->Fill( fitEtaPtFracResultPtr->Parameter( 0 ) );
+                    histFracEtaPtFitSigma->Fill( fitEtaPtFracResultPtr->ParError( 0 ) );
+                  }
+                  else {
+                    if ( verbose_ > 2 ) {
+                      std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                                << "    failing fit in directory '"; gDirectory->pwd();
+                      std::cout << "    '" << nameEtaPtFrac << "' status " << fitEtaPtFracResultPtr->Status() << std::endl;
+                    }
+                  }
+                }
+                else {
+                  if ( verbose_ > 1 ) {
+                    std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                              << "    missing fit in directory '"; gDirectory->pwd();
+                    std::cout << "    '" << nameEtaPtFrac << std::endl;
+                  }
+                }
+                const std::string nameEtaPtFracBkg( nameEtaPtFrac + "_bkg" );
+                TF1 * bkgEtaPtFrac( new TF1( nameEtaPtFracBkg.c_str(), bkgFunction_.c_str(), std::max( histEtaPtFrac->GetXaxis()->GetXmin(), histEtaPtFrac->GetMean() - histEtaPtFrac->GetRMS() * fitRange_ ), std::min( histEtaPtFrac->GetXaxis()->GetXmax(), histEtaPtFrac->GetMean() + histEtaPtFrac->GetRMS() * fitRange_ ) ) );
+                my::setParametersBkg( fitEtaPtFrac, bkgEtaPtFrac );
+                if ( overwrite_ ) bkgEtaPtFrac->Write( 0, TObject::kOverwrite );
+                else              bkgEtaPtFrac->Write();
+              }
+
+              const std::string nameEtaPtFracRestr( nameEtaPtFrac + "Restr" );
+              TH1D * histEtaPtFracRestr( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaPtFracRestr.c_str() ) ) );
+              if ( histEtaPtFracRestr != 0 ) {
+                const std::string nameEtaPtFracRestrFit( nameEtaPtFracRestr + "_fit" );
+                TF1 * fitEtaPtFracRestr( new TF1( nameEtaPtFracRestrFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtFracRestr->GetXaxis()->GetXmin(), histEtaPtFracRestr->GetMean() - histEtaPtFracRestr->GetRMS() * fitRange_ ), std::min( histEtaPtFracRestr->GetXaxis()->GetXmax(), histEtaPtFracRestr->GetMean() + histEtaPtFracRestr->GetRMS() * fitRange_ ) ) );
+                my::setParametersFit( fitEtaPtFracRestr, histEtaPtFracRestr );
+                TFitResultPtr fitEtaPtFracRestrResultPtr( histEtaPtFracRestr->Fit( fitEtaPtFracRestr, fitOptions_.c_str() ) );
+                if ( fitEtaPtFracRestrResultPtr >= 0 ) {
+                  if ( fitEtaPtFracRestrResultPtr->Status() == 0 && fitEtaPtFracRestrResultPtr->Ndf() != 0. ) {
+                    histEtaFracRestrPtFitMeanMap->SetBinContent( uPt + 1, fitEtaPtFracRestrResultPtr->Parameter( 0 ) );
+                    histEtaFracRestrPtFitMeanMap->SetBinError( uPt + 1, fitEtaPtFracRestrResultPtr->ParError( 0 ) );
+                    histFracRestrEtaPtFitMeanMap->SetBinContent( uEta + 1, uPt + 1, fitEtaPtFracRestrResultPtr->Parameter( 0 ) );
+                    histFracRestrEtaPtFitMeanMap->SetBinError( uEta + 1, uPt + 1, fitEtaPtFracRestrResultPtr->ParError( 0 ) );
+                    histFracRestrEtaPtFitMean->Fill( fitEtaPtFracRestrResultPtr->Parameter( 0 ) );
+                    histFracRestrEtaPtFitSigma->Fill( fitEtaPtFracRestrResultPtr->ParError( 0 ) );
+                  }
+                  else {
+                    if ( verbose_ > 2 ) {
+                      std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                                << "    failing fit in directory '"; gDirectory->pwd();
+                      std::cout << "    '" << nameEtaPtFracRestr << "' status " << fitEtaPtFracRestrResultPtr->Status() << std::endl;
+                    }
+                  }
+                }
+                else {
+                  if ( verbose_ > 1 ) {
+                    std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                              << "    missing fit in directory '"; gDirectory->pwd();
+                    std::cout << "    '" << nameEtaPtFracRestr << std::endl;
+                  }
+                }
+                const std::string nameEtaPtFracRestrBkg( nameEtaPtFracRestr + "_bkg" );
+                TF1 * bkgEtaPtFracRestr( new TF1( nameEtaPtFracRestrBkg.c_str(), bkgFunction_.c_str(), std::max( histEtaPtFracRestr->GetXaxis()->GetXmin(), histEtaPtFracRestr->GetMean() - histEtaPtFracRestr->GetRMS() * fitRange_ ), std::min( histEtaPtFracRestr->GetXaxis()->GetXmax(), histEtaPtFracRestr->GetMean() + histEtaPtFracRestr->GetRMS() * fitRange_ ) ) );
+                my::setParametersBkg( fitEtaPtFracRestr, bkgEtaPtFracRestr );
+                if ( overwrite_ ) bkgEtaPtFracRestr->Write( 0, TObject::kOverwrite );
+                else              bkgEtaPtFracRestr->Write();
+              }
+
+            } // loop: uPt < nPtBins_
+
           }
 
         } // loop: keyEta

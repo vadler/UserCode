@@ -4,8 +4,8 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 
-runTest   = False
-rfioInput = True
+runTest   = True
+rfioInput = False
 
 # Origin of existing resolution functions
 # era    = 'Spring10'
@@ -19,7 +19,7 @@ usePileUp = False
 useAlt    = False
 useSymm   = True
 refGen    = False
-refSel    = False
+refSel    = True
 if runTest:
   refSel = False
 
@@ -29,7 +29,8 @@ pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 widthFactor = 5. # for rebinning (in units of orig. RMS)
 
 # Fitting
-fitJecs        = True
+fitNonRestr    = True
+fitEtaPt       = True
 #minPtParton    = 0.
 #maxDRParton    = 0.2
 minPtParton    = 20.
@@ -120,7 +121,9 @@ process.histos = cms.PSet(
 )
 
 process.fit = cms.PSet(
-  fitFunction  = cms.string( fitFunction )
+  fitNonRestr  = cms.bool( fitNonRestr )
+, fitEtaPt     = cms.bool( fitEtaPt )
+, fitFunction  = cms.string( fitFunction )
 , fitOptions   = cms.string( fitOptions )
 , fitRange     = cms.double( fitRange )
 , bkgFunction  = cms.string( bkgFunction )
