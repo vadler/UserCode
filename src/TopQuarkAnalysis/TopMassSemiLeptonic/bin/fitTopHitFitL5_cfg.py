@@ -4,8 +4,8 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 
-runTest   = True
-rfioInput = False
+runTest   = False
+rfioInput = True
 
 # Origin of existing resolution functions
 # era    = 'Spring10'
