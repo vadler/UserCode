@@ -76,13 +76,10 @@ process = cms.PSet()
 process.verbose = cms.uint32( 1 )
 if runTest:
   process.verbose = 3
-process.objectCategories = cms.vstring( 'Mu'
-                                      , 'UdscJet'
+process.objectCategories = cms.vstring( 'UdscJet'
                                       )
 if not runTest:
-  process.objectCategories.append( 'Elec' )
   process.objectCategories.append( 'BJet' )
-  process.objectCategories.append( 'MET' )
 process.overwrite = cms.bool( overwrite )
 process.usePileUp = cms.bool( usePileUp )
 process.useAlt    = cms.bool( useAlt )
