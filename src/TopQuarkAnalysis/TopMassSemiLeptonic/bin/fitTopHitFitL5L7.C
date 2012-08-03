@@ -25,49 +25,7 @@
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
-
-
-namespace my
-{
-
-  void setParametersFit( TF1 * fit, TH1D * histo )
-  {
-//     double m( histo->GetMean() );
-//     double c( histo->GetBinContent( histo->FindBin( histo->GetMean() ) ) );
-//     double m( histo->GetBinCenter( histo->GetMaximumBin() ) );
-//     double c( histo->GetBinContent( histo->GetMaximumBin() ) );
-    double m( 1. );
-    double c( histo->GetBinContent( histo->FindBin( 1. ) ) );
-// //     double c( histo->GetBinContent( histo->GetMaximumBin() ) * std::sqrt( TMath::TwoPi() ) * histo->GetRMS() );
-    double s( histo->GetRMS() );
-    // Gaussian part
-    fit->SetParameter( 0, m );
-    fit->SetParLimits( 0, 0., 2. );
-    fit->SetParameter( 1, c );
-    fit->SetParLimits( 1, 0., 2. * c );
-    fit->SetParameter( 2, s );
-    fit->SetParLimits( 2, 0., 999999. );
-    // Additional part
-//     fit->SetParameter( 3, log( (m-2.*s)*(m-2.*s) / std::sqrt( s*s + (m-2.*s)*(m-2.*s) ) ) );
-    fit->SetParameter( 3, 0. );
-    fit->SetParameter( 4, c ); // just a rough guess, which should serve both cases (highest peak in "signal" or background)
-    fit->SetParLimits( 4, 0., 2. * c );
-//     fit->SetParameter( 5, std::sqrt( log( s*s / (m-2.*s)*(m-2.*s) + 1. ) ) );
-    fit->SetParameter( 5, 1. );
-    fit->SetParLimits( 5, 0., 999999. );
-    // Parameter names
-    fit->SetParNames( "Gaussian #Mu", "Gaussian c", "Gaussian #sigma", "log-normal #mu", "log-normal c", "log-normal #sigma" );
-  }
-
-  void setParametersBkg( TF1 * fit, TF1 * bkg )
-  {
-    Int_t n( fit->GetNumberFreeParameters() );
-    for ( Int_t i = 3; i < n; ++i ) {
-      bkg->SetParameter( i, fit->GetParameter( i ) );
-    }
-  }
-
-}
+#include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/MyTools.h"
 
 
 int main( int argc, char * argv[] )
@@ -119,6 +77,7 @@ int main( int argc, char * argv[] )
   std::string fitOptions_( fit_.getParameter< std::string >( "fitOptions" ) );
   const double fitRange_( std::min( fit_.getParameter< double >( "fitRange" ), widthFactor_ ) );
   const std::string bkgFunction_( fit_.getParameter< std::string >( "bkgFunction" ) );
+  const bool useBkgFunction_( bkgFunction_ != "0" );
   const double minPtParton_( fit_.getParameter< double >( "minPtParton" ) );
   const double maxDRParton_( fit_.getParameter< double >( "maxDRParton" ) );
   const bool onlyExisting_( fit_.getParameter< bool >( "onlyExisting" ) );
@@ -507,7 +466,7 @@ int main( int argc, char * argv[] )
         if ( fitNonRestr_ && histFracL5L7 != 0 ) {
           const std::string nameFracL5L7Fit( nameFracL5L7 + "_fit" );
           TF1 * fitFracL5L7( new TF1( nameFracL5L7Fit.c_str(), fitFunction_.c_str(), std::max( histFracL5L7->GetXaxis()->GetXmin(), histFracL5L7->GetMean() - histFracL5L7->GetRMS() * fitRange_ ), std::min( histFracL5L7->GetXaxis()->GetXmax(), histFracL5L7->GetMean() + histFracL5L7->GetRMS() * fitRange_ ) ) );
-          my::setParametersFit( fitFracL5L7, histFracL5L7 );
+          my::setParametersFit( fitFracL5L7, histFracL5L7, useBkgFunction_ );
           TFitResultPtr fitFracL5L7ResultPtr( histFracL5L7->Fit( fitFracL5L7, fitOptions_.c_str() ) );
           if ( fitFracL5L7ResultPtr >= 0 ) {
             if ( fitFracL5L7ResultPtr->Status() == 0 && fitFracL5L7ResultPtr->Ndf() != 0. ) {
@@ -539,7 +498,7 @@ int main( int argc, char * argv[] )
         if ( histFracL5L7Restr != 0 ) {
           const std::string nameFracL5L7RestrFit( nameFracL5L7Restr + "_fit" );
           TF1 * fitFracL5L7Restr( new TF1( nameFracL5L7RestrFit.c_str(), fitFunction_.c_str(), std::max( histFracL5L7Restr->GetXaxis()->GetXmin(), histFracL5L7Restr->GetMean() - histFracL5L7Restr->GetRMS() * fitRange_ ), std::min( histFracL5L7Restr->GetXaxis()->GetXmax(), histFracL5L7Restr->GetMean() + histFracL5L7Restr->GetRMS() * fitRange_ ) ) );
-          my::setParametersFit( fitFracL5L7Restr, histFracL5L7Restr );
+          my::setParametersFit( fitFracL5L7Restr, histFracL5L7Restr, useBkgFunction_ );
           TFitResultPtr fitFracL5L7RestrResultPtr( histFracL5L7Restr->Fit( fitFracL5L7Restr, fitOptions_.c_str() ) );
           if ( fitFracL5L7RestrResultPtr >= 0 ) {
             if ( fitFracL5L7RestrResultPtr->Status() == 0 && fitFracL5L7RestrResultPtr->Ndf() != 0. ) {
@@ -587,7 +546,7 @@ int main( int argc, char * argv[] )
           if ( fitNonRestr_ && histPtFracL5L7 != 0 ) {
             const std::string namePtFracL5L7Fit( namePtFracL5L7 + "_fit" );
             TF1 * fitPtFracL5L7( new TF1( namePtFracL5L7Fit.c_str(), fitFunction_.c_str(), std::max( histPtFracL5L7->GetXaxis()->GetXmin(), histPtFracL5L7->GetMean() - histPtFracL5L7->GetRMS() * fitRange_ ), std::min( histPtFracL5L7->GetXaxis()->GetXmax(), histPtFracL5L7->GetMean() + histPtFracL5L7->GetRMS() * fitRange_ ) ) );
-            my::setParametersFit( fitPtFracL5L7, histPtFracL5L7 );
+            my::setParametersFit( fitPtFracL5L7, histPtFracL5L7, useBkgFunction_ );
             TFitResultPtr fitPtFracL5L7ResultPtr( histPtFracL5L7->Fit( fitPtFracL5L7, fitOptions_.c_str() ) );
             if ( fitPtFracL5L7ResultPtr >= 0 ) {
               if ( fitPtFracL5L7ResultPtr->Status() == 0 && fitPtFracL5L7ResultPtr->Ndf() != 0. ) {
@@ -621,7 +580,7 @@ int main( int argc, char * argv[] )
           if ( histPtFracL5L7Restr != 0 ) {
             const std::string namePtFracL5L7RestrFit( namePtFracL5L7Restr + "_fit" );
             TF1 * fitPtFracL5L7Restr( new TF1( namePtFracL5L7RestrFit.c_str(), fitFunction_.c_str(), std::max( histPtFracL5L7Restr->GetXaxis()->GetXmin(), histPtFracL5L7Restr->GetMean() - histPtFracL5L7Restr->GetRMS() * fitRange_ ), std::min( histPtFracL5L7Restr->GetXaxis()->GetXmax(), histPtFracL5L7Restr->GetMean() + histPtFracL5L7Restr->GetRMS() * fitRange_ ) ) );
-            my::setParametersFit( fitPtFracL5L7Restr, histPtFracL5L7Restr );
+            my::setParametersFit( fitPtFracL5L7Restr, histPtFracL5L7Restr, useBkgFunction_ );
             TFitResultPtr fitPtFracL5L7RestrResultPtr( histPtFracL5L7Restr->Fit( fitPtFracL5L7Restr, fitOptions_.c_str() ) );
             if ( fitPtFracL5L7RestrResultPtr >= 0 ) {
               if ( fitPtFracL5L7RestrResultPtr->Status() == 0 && fitPtFracL5L7RestrResultPtr->Ndf() != 0. ) {
@@ -705,7 +664,7 @@ int main( int argc, char * argv[] )
           if ( fitNonRestr_ && histEtaFracL5L7 != 0 ) {
             const std::string nameEtaFracL5L7Fit( nameEtaFracL5L7 + "_fit" );
             TF1 * fitEtaFracL5L7( new TF1( nameEtaFracL5L7Fit.c_str(), fitFunction_.c_str(), std::max( histEtaFracL5L7->GetXaxis()->GetXmin(), histEtaFracL5L7->GetMean() - histEtaFracL5L7->GetRMS() * fitRange_ ), std::min( histEtaFracL5L7->GetXaxis()->GetXmax(), histEtaFracL5L7->GetMean() + histEtaFracL5L7->GetRMS() * fitRange_ ) ) );
-            my::setParametersFit( fitEtaFracL5L7, histEtaFracL5L7 );
+            my::setParametersFit( fitEtaFracL5L7, histEtaFracL5L7, useBkgFunction_ );
             TFitResultPtr fitEtaFracL5L7ResultPtr( histEtaFracL5L7->Fit( fitEtaFracL5L7, fitOptions_.c_str() ) );
             if ( fitEtaFracL5L7ResultPtr >= 0 ) {
               if ( fitEtaFracL5L7ResultPtr->Status() == 0 && fitEtaFracL5L7ResultPtr->Ndf() != 0. ) {
@@ -739,7 +698,7 @@ int main( int argc, char * argv[] )
           if ( histEtaFracL5L7Restr != 0 ) {
             const std::string nameEtaFracL5L7RestrFit( nameEtaFracL5L7Restr + "_fit" );
             TF1 * fitEtaFracL5L7Restr( new TF1( nameEtaFracL5L7RestrFit.c_str(), fitFunction_.c_str(), std::max( histEtaFracL5L7Restr->GetXaxis()->GetXmin(), histEtaFracL5L7Restr->GetMean() - histEtaFracL5L7Restr->GetRMS() * fitRange_ ), std::min( histEtaFracL5L7Restr->GetXaxis()->GetXmax(), histEtaFracL5L7Restr->GetMean() + histEtaFracL5L7Restr->GetRMS() * fitRange_ ) ) );
-            my::setParametersFit( fitEtaFracL5L7Restr, histEtaFracL5L7Restr );
+            my::setParametersFit( fitEtaFracL5L7Restr, histEtaFracL5L7Restr, useBkgFunction_ );
             TFitResultPtr fitEtaFracL5L7RestrResultPtr( histEtaFracL5L7Restr->Fit( fitEtaFracL5L7Restr, fitOptions_.c_str() ) );
             if ( fitEtaFracL5L7RestrResultPtr >= 0 ) {
               if ( fitEtaFracL5L7RestrResultPtr->Status() == 0 && fitEtaFracL5L7RestrResultPtr->Ndf() != 0. ) {
@@ -791,7 +750,7 @@ int main( int argc, char * argv[] )
               if ( fitNonRestr_ && histEtaPtFracL5L7 != 0 ) {
                 const std::string nameEtaPtFracL5L7Fit( nameEtaPtFracL5L7 + "_fit" );
                 TF1 * fitEtaPtFracL5L7( new TF1( nameEtaPtFracL5L7Fit.c_str(), fitFunction_.c_str(), std::max( histEtaPtFracL5L7->GetXaxis()->GetXmin(), histEtaPtFracL5L7->GetMean() - histEtaPtFracL5L7->GetRMS() * fitRange_ ), std::min( histEtaPtFracL5L7->GetXaxis()->GetXmax(), histEtaPtFracL5L7->GetMean() + histEtaPtFracL5L7->GetRMS() * fitRange_ ) ) );
-                my::setParametersFit( fitEtaPtFracL5L7, histEtaPtFracL5L7 );
+                my::setParametersFit( fitEtaPtFracL5L7, histEtaPtFracL5L7, useBkgFunction_ );
                 TFitResultPtr fitEtaPtFracL5L7ResultPtr( histEtaPtFracL5L7->Fit( fitEtaPtFracL5L7, fitOptions_.c_str() ) );
                 if ( fitEtaPtFracL5L7ResultPtr >= 0 ) {
                   if ( fitEtaPtFracL5L7ResultPtr->Status() == 0 && fitEtaPtFracL5L7ResultPtr->Ndf() != 0. ) {
@@ -829,7 +788,7 @@ int main( int argc, char * argv[] )
               if ( histEtaPtFracL5L7Restr != 0 ) {
                 const std::string nameEtaPtFracL5L7RestrFit( nameEtaPtFracL5L7Restr + "_fit" );
                 TF1 * fitEtaPtFracL5L7Restr( new TF1( nameEtaPtFracL5L7RestrFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtFracL5L7Restr->GetXaxis()->GetXmin(), histEtaPtFracL5L7Restr->GetMean() - histEtaPtFracL5L7Restr->GetRMS() * fitRange_ ), std::min( histEtaPtFracL5L7Restr->GetXaxis()->GetXmax(), histEtaPtFracL5L7Restr->GetMean() + histEtaPtFracL5L7Restr->GetRMS() * fitRange_ ) ) );
-                my::setParametersFit( fitEtaPtFracL5L7Restr, histEtaPtFracL5L7Restr );
+                my::setParametersFit( fitEtaPtFracL5L7Restr, histEtaPtFracL5L7Restr, useBkgFunction_ );
                 TFitResultPtr fitEtaPtFracL5L7RestrResultPtr( histEtaPtFracL5L7Restr->Fit( fitEtaPtFracL5L7Restr, fitOptions_.c_str() ) );
                 if ( fitEtaPtFracL5L7RestrResultPtr >= 0 ) {
                   if ( fitEtaPtFracL5L7RestrResultPtr->Status() == 0 && fitEtaPtFracL5L7RestrResultPtr->Ndf() != 0. ) {

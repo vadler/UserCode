@@ -13,7 +13,7 @@ era    = 'Summer11'
 sample = 'Fall11_R4_1'
 
 # Settings
-overwrite = True # to throw away earlier versions of histograms, trees and functions
+overwrite = False # to throw away earlier versions of histograms, trees and functions
 # Exclusive switches:
 usePileUp = False
 useAlt    = False
@@ -36,15 +36,17 @@ fitEtaPt       = True
 minPtGenJet    = 20.
 minDRGenJet    = 999999.
 # Fit function: a Gaussian is always required for the first three function parameters
-#fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2)' # single ROOT-like Gaussian
-#fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
-#fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2) + [4]*exp(-0.5*((x-[0])/[5])**2)' # double ROOT-like Gaussian with common mean
-fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x )' # single ROOT-like Gaussian plus ROOT-like log-normal
-#fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi)) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/(x*[5]*sqrt(2*pi)) )' # single Gaussian plus log-normal
+fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2)' # single ROOT-like Gaussian
+##fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
+##fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((x-[0])/[5])**2) )' # double ROOT-like Gaussian with common mean
+#fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x )' # single ROOT-like Gaussian plus ROOT-like log-normal
+##fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi)) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/(x*[5]*sqrt(2*pi)) )' # single Gaussian plus log-normal
 fitOptions  = 'BRS+'
-#fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
-fitRange    = 5. # for combined fits (in units of orig. RMS)
-bkgFunction = fitFunction.split( ' + ' )[1]
+bkgFunction = '0'
+fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
+if len( fitFunction.split( ' + ' ) ) > 0: # a background function is defined
+  bkgFunction = fitFunction.split( ' + ' )[1]
+  fitRange    = 5. # for combined fits (in units of orig. RMS)
 
 # I/O
 inputFile = 'fitTopHitFit_from%s.root'%( era )
@@ -144,6 +146,12 @@ print
 print 'Input file:'
 print '------------'
 print inputFile
+if overwrite:
+  print
+  print 'WARNING: existing L5 fit results will be overwritten!'
+else:
+  print
+  print 'INFO: existing L5 fit results will be kept.'
 print
 print 'Log file destination:'
 print '---------------------'

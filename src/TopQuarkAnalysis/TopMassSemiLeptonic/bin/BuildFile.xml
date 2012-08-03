@@ -6,6 +6,7 @@
 <use   name="FWCore/ParameterSet"/>
 <use   name="FWCore/PythonParameterSet"/>
 <use   name="TopQuarkAnalysis/TopHitFit"/>
+<use   name="TopQuarkAnalysis/TopMassSemiLeptonic"/>
 <environment>
   <bin   file="produceExistingTopHitFitResolutionFunctions.C"></bin>
   <bin   file="produceExistingTopTQAFResolutionFunctions.C"></bin>
