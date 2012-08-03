@@ -44,7 +44,7 @@ fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2)' # single ROOT-like Gaussian
 fitOptions  = 'BRS+'
 bkgFunction = '0'
 fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
-if len( fitFunction.split( ' + ' ) ) > 0: # a background function is defined
+if len( fitFunction.split( ' + ' ) ) > 1: # a background function is defined
   bkgFunction = fitFunction.split( ' + ' )[1]
   fitRange    = 5. # for combined fits (in units of orig. RMS)
 
