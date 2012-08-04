@@ -17,10 +17,10 @@ void my::setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
   fit->SetParLimits( 0, 0., 2. );
   fit->SetParName( 0, "Gaussian #Mu" );
   fit->SetParameter( 1, c );
-  fit->SetParLimits( 1, 0., c );
+  fit->SetParLimits( 1, 0., 2. * c );
   fit->SetParName( 1, "Gaussian c" );
   fit->SetParameter( 2, s );
-  fit->SetParLimits( 2, 0., 999999. );
+  fit->SetParLimits( 2, 0., 2. );
   fit->SetParName( 2, "Gaussian #sigma" );
   // Additional part
   if ( useBkgFunction ) {
@@ -28,11 +28,11 @@ void my::setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
     fit->SetParameter( 3, 0. );
     fit->SetParName( 3, "bkg #mu" );
     fit->SetParameter( 4, c ); // just a rough guess, which should serve both cases (highest peak in "signal" or background)
-    fit->SetParLimits( 4, 0., 2. * c );
+    fit->SetParLimits( 4, 0., 99. );
     fit->SetParName( 4, "bkg c" );
 //     fit->SetParameter( 5, std::sqrt( log( s*s / (m-2.*s)*(m-2.*s) + 1. ) ) );
     fit->SetParameter( 5, 1. );
-    fit->SetParLimits( 5, 0., 999999. );
+    fit->SetParLimits( 5, 0., 99. );
     fit->SetParName( 5, "bkg #sigma" );
   }
 }
