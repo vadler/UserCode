@@ -311,7 +311,7 @@ int main( int argc, char * argv[] )
         const std::string nameEta( name + "_" + binEta );
 
         const std::string nameEtaFracL5( nameEta + "_FracL5" );
-        const std::string titleEtaFracL5( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) );
+        const std::string titleEtaFracL5( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta #lt " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) );
         TH1D * histEtaFracL5( new TH1D( nameEtaFracL5.c_str(), titleEtaFracL5.c_str(), nPtBins, 0., 2. ) );
         histEtaFracL5->SetXTitle( titleFracL5.c_str() );
         histEtaFracL5->SetYTitle( titleEvents.c_str() );
@@ -359,7 +359,7 @@ int main( int argc, char * argv[] )
           const std::string nameEtaPt( nameEta + "_Pt" + binPt );
 
           const std::string nameEtaPtFracL5( nameEtaPt + "_FracL5" );
-          const std::string titleEtaPtFracL5( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta #leq " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
+          const std::string titleEtaPtFracL5( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta #lt " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
           TH1D * histEtaPtFracL5( new TH1D( nameEtaPtFracL5.c_str(), titleEtaPtFracL5.c_str(), nPtBins, 0., 2. ) );
           histEtaPtFracL5->SetXTitle( titleFracL5.c_str() );
           histEtaPtFracL5->SetYTitle( titleEvents.c_str() );
