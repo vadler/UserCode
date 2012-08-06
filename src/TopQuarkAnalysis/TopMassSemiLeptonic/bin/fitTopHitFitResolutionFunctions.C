@@ -533,7 +533,7 @@ int main( int argc, char * argv[] )
             const std::string nameEtaPt( nameEta + "_Pt" + binPt );
 
             const std::string nameEtaPtDelta( nameEtaPt + "_Delta" );
-            const std::string titleEtaPtDelta( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
+            const std::string titleEtaPtDelta( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
             TH1D * histEtaPtDelta( new TH1D( nameEtaPtDelta.c_str(), titleEtaPtDelta.c_str(), deltaBins, -deltaMax, deltaMax ) );
             histEtaPtDelta->SetXTitle( titleDelta.c_str() );
             histEtaPtDelta->SetYTitle( titleEvents.c_str() );
@@ -706,7 +706,7 @@ int main( int argc, char * argv[] )
           const std::string namePt( name + "_Pt" + binPt );
 
           const std::string namePtDelta( namePt + "_Delta" );
-          const std::string titlePtDelta( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
+          const std::string titlePtDelta( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
           const std::string namePtDeltaRebin( namePtDelta + "Rebin" );
 //           const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
           const Int_t deltaBinsRebin( deltaBins );

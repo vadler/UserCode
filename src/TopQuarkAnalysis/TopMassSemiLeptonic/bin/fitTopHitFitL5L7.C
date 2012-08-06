@@ -282,7 +282,7 @@ int main( int argc, char * argv[] )
       for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
         const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
         const std::string namePt( name + "_Pt" + binPt );
-        const std::string titlePtDelta( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
+        const std::string titlePtDelta( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
         const std::string namePtFracL5L7( namePt + "_FracL5L7" );
         TH1D * histPtFracL5L7( new TH1D( namePtFracL5L7.c_str(), titlePtDelta.c_str(), nPtBins, 0., 2. ) );
         histPtFracL5L7->SetXTitle( titleFracL5L7.c_str() );
@@ -359,7 +359,7 @@ int main( int argc, char * argv[] )
           const std::string nameEtaPt( nameEta + "_Pt" + binPt );
 
           const std::string nameEtaPtFracL5L7( nameEtaPt + "_FracL5L7" );
-          const std::string titleEtaPtFracL5L7( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
+          const std::string titleEtaPtFracL5L7( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
           TH1D * histEtaPtFracL5L7( new TH1D( nameEtaPtFracL5L7.c_str(), titleEtaPtFracL5L7.c_str(), nPtBins, 0., 2. ) );
           histEtaPtFracL5L7->SetXTitle( titleFracL5L7.c_str() );
           histEtaPtFracL5L7->SetYTitle( titleEvents.c_str() );

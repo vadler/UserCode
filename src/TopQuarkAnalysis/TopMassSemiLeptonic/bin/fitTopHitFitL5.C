@@ -282,7 +282,7 @@ int main( int argc, char * argv[] )
       for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
         const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
         const std::string namePt( name + "_Pt" + binPt );
-        const std::string titlePtDelta( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
+        const std::string titlePtDelta( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
         const std::string namePtFracL5( namePt + "_FracL5" );
         TH1D * histPtFracL5( new TH1D( namePtFracL5.c_str(), titlePtDelta.c_str(), nPtBins, 0., 2. ) );
         histPtFracL5->SetXTitle( titleFracL5.c_str() );
@@ -359,7 +359,7 @@ int main( int argc, char * argv[] )
           const std::string nameEtaPt( nameEta + "_Pt" + binPt );
 
           const std::string nameEtaPtFracL5( nameEtaPt + "_FracL5" );
-          const std::string titleEtaPtFracL5( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} #leq " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
+          const std::string titleEtaPtFracL5( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
           TH1D * histEtaPtFracL5( new TH1D( nameEtaPtFracL5.c_str(), titleEtaPtFracL5.c_str(), nPtBins, 0., 2. ) );
           histEtaPtFracL5->SetXTitle( titleFracL5.c_str() );
           histEtaPtFracL5->SetYTitle( titleEvents.c_str() );
