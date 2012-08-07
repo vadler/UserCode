@@ -46,7 +46,7 @@ if not runTest:
     logFile = logFile.replace( '.', '_Ref.', 1 )
 inputFile  = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
 logFile    = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
-logFile    = logFile.replace( 'fitTopHitFit', 'plotTopHitFitL5L7' )
+logFile    = logFile.replace( 'fitTopHitFit', 'plotTopHitFitL5' )
 outputFile = logFile.replace( 'log', 'root' )
 logFile    = logFile.replace( 'file:', '' )
 plotPath  = '%s/output/plots'%( os.getenv( "CMSSW_BASE" ) )
