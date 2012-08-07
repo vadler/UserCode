@@ -1,6 +1,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <cmath>
+
+#include "boost/lexical_cast.hpp"
 
 #include <TROOT.h>
 #include <TSystem.h>
@@ -11,6 +14,7 @@
 #include <TH2D.h>
 #include <TF1.h>
 #include <TCanvas.h>
+#include <TLegend.h>
 
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -32,10 +36,10 @@ int main(  int argc, char * argv[] )
   gStyle->SetPadColor( kWhite );
   gStyle->SetPadTickX( 1 );
   gStyle->SetPadTickY( 1 );
-  gStyle->SetPadTopMargin( 0.075 );
-  gStyle->SetPadRightMargin( 0.075 );
-  gStyle->SetPadBottomMargin( 0.15 );
-  gStyle->SetPadLeftMargin( 0.15 );
+  gStyle->SetPadTopMargin( 0.05 );
+  gStyle->SetPadRightMargin( 0.05 );
+  gStyle->SetPadBottomMargin( 0.1 );
+  gStyle->SetPadLeftMargin( 0.1 );
   gStyle->SetTitleSize( 0.06, "XYZ" );
   gStyle->SetTitleFillColor( kWhite );
   gStyle->SetTitleBorderSize( 1 );
@@ -43,6 +47,7 @@ int main(  int argc, char * argv[] )
   gStyle->SetStatBorderSize( 1 );
   gStyle->SetOptStat( 0 );
   gStyle->SetOptFit( 0 );
+  gStyle->SetOptTitle( 0 );
   gStyle->SetMarkerStyle( 8 );
 
   // Check configuration file
@@ -74,11 +79,13 @@ int main(  int argc, char * argv[] )
   const std::vector< std::string > inFiles_( io_.getParameter< std::vector< std::string > >( "inputFiles" ) );
   const std::string sample_( io_.getParameter< std::string >( "sample" ) );
   const std::string outFile_( io_.getParameter< std::string >( "outputFile" ) );
+  const std::string plotPath_( io_.getParameter< std::string >( "plotPath" ) );
   const std::string resolutionFile_( io_.getParameter< std::string >( "resolutionFile" ) );
   // Configuration for plotting resolution functions
   const edm::ParameterSet & plot_( process_.getParameter< edm::ParameterSet >( "plot" ) );
   const bool onlyExisting_( plot_.getParameter< bool >( "onlyExisting" ) );
   const bool writeFiles_( plot_.getParameter< bool >( "writeFiles" ) && onlyExisting_ );
+  const unsigned accuEvery_( plot_.getParameter< unsigned >( "accuEvery" ) );
 
   std::vector< std::vector< bool > > nominalInv_( objCats_.size() );
 
@@ -87,13 +94,26 @@ int main(  int argc, char * argv[] )
   if ( refSel_ ) evtSel_.append( "Reference" );
   const std::string nameDirClass( "TDirectoryFile" );
   const std::string nameFuncClass( "TF1" );
+  std::map< std::string, std::string > titleCat;
+  titleCat[ "Pt" ]  = "p_{t}";
+  titleCat[ "Eta" ] = "#eta";
+  titleCat[ "Phi" ] = "#phi";
+  std::map< std::string, std::string > titleYPropSigma;
+  titleYPropSigma[ "Pt" ]  = "#sigma of p_{t} (GeV)";
+  titleYPropSigma[ "Eta" ] = "#sigma of #eta";
+  titleYPropSigma[ "Phi" ] = "#sigma of #phi";
+  std::map< std::string, std::string > titleYPropInvSigma;
+  titleYPropInvSigma[ "Pt" ]  = "#sigma of #frac{1}{p_{t}} (#frac{1}{GeV})";
+  titleYPropInvSigma[ "Eta" ] = "";
+  titleYPropInvSigma[ "Phi" ] = "";
 
 
   // Use existing resolution functions
 
   std::cout << std::endl
             << argv[ 0 ] << " --> INFO:" << std::endl
-            << "    accessing existing resolution functions from resolution file '" << resolutionFile_ << "'" << std::endl;
+            << "    accessing existing resolution functions from resolution file '" << resolutionFile_ << "'" << std::endl
+            << std::endl;
 
   // Open resolution file
   TFile * resolutionFile( TFile::Open( resolutionFile_.c_str(), "READ" ) );
@@ -108,7 +128,7 @@ int main(  int argc, char * argv[] )
 
   for ( unsigned uCat = 0; uCat < objCats_.size(); ++uCat ) {
     const std::string objCat( objCats_.at( uCat ) );
-    TDirectory * dirCatRes_( dynamic_cast< TDirectory* >( resolutionFile->Get( objCat.c_str() ) ) );
+    TDirectory * dirCatRes_( ( TDirectory* )( resolutionFile->Get( objCat.c_str() ) ) );
     if ( ! dirCatRes_ ) {
       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                 << "    object category '" << objCat << "' does not exist in resolution file" << std::endl;
@@ -120,7 +140,7 @@ int main(  int argc, char * argv[] )
     while ( TKey * keyPropRes = ( TKey* )nextInListCatRes() ) {
       if ( std::string( keyPropRes->GetClassName() ) != nameDirClass ) continue;
       const std::string kinProp( keyPropRes->GetName() );
-      TDirectory * dirPropRes_( dynamic_cast< TDirectory* >( dirCatRes_->Get( kinProp.c_str() ) ) );
+      TDirectory * dirPropRes_( ( TDirectory* )( dirCatRes_->Get( kinProp.c_str() ) ) );
 
       TList * listPropRes( dirPropRes_->GetListOfKeys() );
       TIter nextInListPropRes( listPropRes );
@@ -128,27 +148,27 @@ int main(  int argc, char * argv[] )
       while ( TKey * keyEtaRes = ( TKey* )nextInListPropRes() ) {
         if ( std::string( keyEtaRes->GetClassName() ) != nameDirClass ) continue;
         const std::string binEta( keyEtaRes->GetName() );
-        TDirectory * dirEtaRes_( dynamic_cast< TDirectory* >( dirPropRes_->Get( binEta.c_str() ) ) );
+        TDirectory * dirEtaRes_( ( TDirectory* )( dirPropRes_->Get( binEta.c_str() ) ) );
 
         const std::string nameEtaRes( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
         const std::string nameEtaInvRes( "fitExist_" + objCat + "_Inv_" + kinProp + "_" + binEta );
 
         TList * listEtaRes( dirEtaRes_->GetListOfKeys() );
         TIter nextInListEtaRes( listEtaRes );
-        TF1 * resSigma( 0 );
-        TF1 * resSigmaInv( 0 );
+        TF1 * resEtaSigma( 0 );
+        TF1 * resEtaSigmaInv( 0 );
         while ( TKey * keyFunc = ( TKey* )nextInListEtaRes() ) {
           if ( std::string( keyFunc->GetClassName() ) != nameFuncClass ) continue;
-          resSigma    = dynamic_cast< TF1* >( dirEtaRes_->Get( nameEtaRes.c_str() ) );
-          resSigmaInv = dynamic_cast< TF1* >( dirEtaRes_->Get( nameEtaInvRes.c_str() ) );
+          resEtaSigma    = ( TF1* )( dirEtaRes_->Get( nameEtaRes.c_str() ) );
+          resEtaSigmaInv = ( TF1* )( dirEtaRes_->Get( nameEtaInvRes.c_str() ) );
         }
-        if ( ( resSigma && resSigmaInv ) || ( ! resSigma && ! resSigmaInv ) ) {
+        if ( ( resEtaSigma && resEtaSigmaInv ) || ( ! resEtaSigma && ! resEtaSigmaInv ) ) {
           std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                     << "    inconsistent resolution functions in '" << objCat << "', '" << kinProp << "', '" << binEta << std::endl;
           continue;
         }
         if ( ! bEta ) {
-          nominalInv_.at( uCat ).push_back( resSigmaInv ? true : false );
+          nominalInv_.at( uCat ).push_back( resEtaSigmaInv ? true : false );
           bEta = true;
         }
 
@@ -166,9 +186,10 @@ int main(  int argc, char * argv[] )
 
 
   std::vector< TFile* > files_;
+  TCanvas * canv( new TCanvas( "canv", "", 768, 512 ) );
 
-  std::vector< std::vector< double > > etaBins_;
-  std::vector< std::vector< double > > ptBins_;
+  std::vector< std::vector< double > > etaBins;
+  std::vector< std::vector< double > > ptBins;
 
   // Open input files
 
@@ -183,46 +204,8 @@ int main(  int argc, char * argv[] )
       continue;
     }
     files_.push_back( file );
-
-//     // Get binning (onyl once; has to be identical for all input files)
-//     if ( first ) {
-//       if ( verbose_ )
-//         std::cout << std::endl
-//                   << argv[ 0 ] << " --> INFO:" << std::endl
-//                   << "   extract binning from input file '" << inFiles_.at( uFile ) << "'" << std::endl;
-//       TDirectory * dirSel_ = ( TDirectory* )( file->Get( evtSel_.c_str() ) );
-//
-//       for ( unsigned uCat = 0; uCat < objCats_.size(); ++uCat ) {
-//         const std::string objCat( objCats_.at( uCat ) );
-//         TDirectory * dirCat_( ( TDirectory* )( dirSel_->Get( objCat.c_str() ) ) );
-//         if ( ! dirCat_ ) {
-//           std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-//                     << "   object category '" << objCat << "' does not exist in input file '" << inFile << "'" << std::endl;
-//           continue;
-//         }
-//
-//         // Eta binning
-//         std::vector< double > etaBins;
-//         TH1D * histEtaBins( ( TH1D* )( dirCat_->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
-//         for ( int iEta = 1; iEta <= histEtaBins->GetNbinsX(); ++iEta ) {
-//           etaBins.push_back( histEtaBins->GetBinLowEdge( iEta ) );
-//         }
-//         etaBins.push_back( histEtaBins->GetBinLowEdge( histEtaBins->GetNbinsX() ) + histEtaBins->GetBinWidth( histEtaBins->GetNbinsX() ) );
-//         etaBins_.push_back( etaBins );
-//
-//         // Pt binning
-//         std::vector< double > ptBins;
-//         TH1D * histPtBins( ( TH1D* )( dirCat_->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
-//         for ( int iPt = 1; iPt <= histPtBins->GetNbinsX(); ++iPt ) {
-//           ptBins.push_back( histPtBins->GetBinLowEdge( iPt ) );
-//         }
-//         ptBins.push_back( histPtBins->GetBinLowEdge( histPtBins->GetNbinsX() ) + histPtBins->GetBinWidth( histPtBins->GetNbinsX() ) );
-//         ptBins_.push_back( ptBins );
-//       }
-//
-//       first = false;
-//     }
   }  // loop: uFile
+
   if ( files_.empty() ) {
       std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
                 << "   no input files found" << std::endl;
@@ -235,7 +218,7 @@ int main(  int argc, char * argv[] )
   if ( ! dirSel_ ) {
     std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
               << "   selection '" << evtSel_ << "' does not exist in reference file '" << refFile->GetName() << "'" << std::endl;
-    returnStatus_ += 0x20;
+    returnStatus_ += 0x30;
     return returnStatus_;
   }
 
@@ -249,7 +232,33 @@ int main(  int argc, char * argv[] )
       continue;
     }
 
-    TDirectory * dirCatRes_( dynamic_cast< TDirectory* >( resolutionFile->Get( objCat.c_str() ) ) );
+    // Eta binning
+    std::vector< double > etaBins;
+    TH1D * histBinsEta( ( TH1D* )( dirCat_->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
+    const bool objMetLike( histBinsEta->GetNbinsX() == 1 );
+    if ( objMetLike ) {
+      etaBins.push_back( histBinsEta->GetBinLowEdge( 1 ) );
+    }
+    else {
+      for ( int iEta = 0; iEta < histBinsEta->GetNbinsX(); ++iEta ) {
+        double edge( histBinsEta->GetBinLowEdge( iEta + 1 ) );
+        if ( useSymm_  && edge < 0. ) continue;
+        etaBins.push_back( edge );
+      }
+    }
+    etaBins.push_back( histBinsEta->GetBinLowEdge( histBinsEta->GetNbinsX() ) + histBinsEta->GetBinWidth( histBinsEta->GetNbinsX() ) );
+    const unsigned nEtaBins_( etaBins.size() - 1 );
+
+    // Pt binning
+    std::vector< double > ptBins;
+    TH1D * histBinsPt( ( TH1D* )( dirCat_->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
+    for ( int uPt = 0; uPt < histBinsPt->GetNbinsX(); ++uPt ) {
+      ptBins.push_back( histBinsPt->GetBinLowEdge( uPt + 1 ) );
+    }
+    ptBins.push_back( histBinsPt->GetBinLowEdge( histBinsPt->GetNbinsX() ) + histBinsPt->GetBinWidth( histBinsPt->GetNbinsX() ) );
+    const unsigned nPtBins_( ptBins.size() - 1 );
+
+    TDirectory * dirCatRes_( ( TDirectory* )( resolutionFile->Get( objCat.c_str() ) ) );
     if ( ! dirCatRes_ ) {
       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                 << "    object category '" << objCat << "' does not exist in resolution file" << std::endl;
@@ -282,72 +291,221 @@ int main(  int argc, char * argv[] )
 
         const std::string name( objCat + "_" + kinProp + "_" + subFit );
 
-        // Inversion flag from directory nameEta
+        // Inversion flag from directory name
         const bool inverse( subFit.find( "Inv" ) != std::string::npos );
         if ( onlyExisting_ && nominalInv_.at( uCat ).at( uProp ) != inverse ) continue;
 
+        const std::string titleLegend( objCat + ", " + titleCat[ kinProp ] );
+        const std::string titleYSigma( inverse && kinProp == "Pt" ? titleYPropInvSigma[ kinProp ] : titleYPropSigma[ kinProp ] );
+
         // Loop over eta bins
+        Double_t minY;
+        Double_t maxY;
+        bool startMinMax( true );
         TList * listFit( dirFit_->GetListOfKeys() );
         TIter nextInListFit( listFit );
         while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
           if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
           const std::string binEta( keyEta->GetName() );
-          TDirectory * dirEta_( dynamic_cast< TDirectory* >( dirFit_->Get( binEta.c_str() ) ) );
+          const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
+          TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
           if ( verbose_ ) dirEta_->pwd();
 
           const std::string nameEta( name + "_" + binEta );
-          const std::string nameSigma( nameEta + "_Sigma" );
-          TH1D * histSigma( ( TH1D* )( dirEta_->Get( nameSigma.c_str() ) ) );
-
-          TDirectory * dirEtaRes_( dynamic_cast< TDirectory* >( dirPropRes_->Get( binEta.c_str() ) ) );
+          const std::string nameEtaSigma( nameEta + "_Sigma" );
+          const std::string nameEtaSigmaFit( nameEtaSigma + "_fit" );
           const std::string nameEtaExist( inverse ? "fitExist_" + objCat + "_Inv_" + kinProp + "_" + binEta  : "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
-          TF1 * resSigma( 0 );
-          TList * listEtaRes( dirEtaRes_->GetListOfKeys() );
-          TIter nextInListEtaRes( listEtaRes );
-          while ( TKey * keyFuncRes = ( TKey* )nextInListEtaRes() ) {
-            if ( std::string( keyFuncRes->GetClassName() ) != nameFuncClass ) continue;
-            resSigma = dynamic_cast< TF1* >( dirEtaRes_->Get( nameEtaExist.c_str() ) );
-          }
-          if ( resSigma == 0 ) {
+          const std::string nameEtaSigmaPrint( plotPath_ + "/" + evtSel_ + "_" + nameEtaSigma + ".png" );
+          const std::string strEta( useSymm_ ? " #leq |#eta| < " :  " #leq #eta < ");
+          const std::string titleLegendEta( titleLegend + ", " + boost::lexical_cast< std::string >( etaBins.at( uEta ) ) + strEta + boost::lexical_cast< std::string >( etaBins.at( uEta + 1 ) ) );
+
+          canv->cd();
+          TLegend * legEtaSigma( new TLegend( 0.33, 0.67, 0.67, 0.9, titleLegendEta.c_str() ) );
+          legEtaSigma->SetTextSize( 0.03 );
+          legEtaSigma->SetFillColor( kWhite );
+          legEtaSigma->SetFillStyle( 0 );
+          legEtaSigma->SetBorderSize( 0 );
+          bool useSame( false );
+
+          TDirectory * dirEtaRes_( ( TDirectory* )( dirPropRes_->Get( binEta.c_str() ) ) );
+          TF1 * resEtaSigma( ( TF1* )( dirEtaRes_->Get( nameEtaExist.c_str() ) ) );
+          if ( resEtaSigma == 0 ) {
             std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
                       << "    no resolution function in "; dirEtaRes_->pwd();
+            returnStatus_ += 0x1000;
+            return returnStatus_;
           }
+          Double_t resEtaLow( resEtaSigma->Eval( ptBins.front() ) );
+          Double_t resEtaHigh( resEtaSigma->Eval( ptBins.back() ) );
+          Double_t minYEta( std::min( resEtaLow, resEtaHigh ) );
+          Double_t maxYEta( std::max( resEtaLow, resEtaHigh ) );
 
-          if ( histSigma != 0 ) {
-            const std::string nameCanvSigma( "canv_" + nameSigma );
-            TCanvas * canvSigma( new TCanvas( nameCanvSigma.c_str(), "", 768, 512 ) );
-            histSigma->Draw();
-            if ( resSigma != 0 ) {
-              resSigma->SetLineColor( kRed );
-              resSigma->Draw( "Same" );
+          TH1D * histSigmaEta( ( TH1D* )( dirEta_->Get( nameEtaSigma.c_str() ) ) );
+          if ( histSigmaEta != 0 ) {
+            histSigmaEta->SetYTitle( titleYSigma.c_str() );
+            TF1 * fitEtaSigmaFit( histSigmaEta->GetFunction( nameEtaSigmaFit.c_str() ) );
+            if ( fitEtaSigmaFit != 0 ) {
+              Double_t fitEtaLow( fitEtaSigmaFit->Eval( ptBins.front() ) );
+              Double_t fitEtaHigh( fitEtaSigmaFit->Eval( ptBins.back() ) );
+              Double_t minYFitEta( std::min( fitEtaLow, fitEtaHigh ) );
+              Double_t maxYFitEta( std::max( fitEtaLow, fitEtaHigh ) );
+              minYEta = std::min( minYFitEta, minYEta );
+              maxYEta = std::max( maxYFitEta, maxYEta );
             }
-
-//             const std::string nameDirEta( evtSel_ + "/" + objCat + "/" + kinProp + "/" + subFit + "/" + binEta );
-//             for ( unsigned uFile = 1; uFile < files_.size(); ++uFile ) { // skip 1st file (we have it already)
-//               files_.at( uFile )->cd( nameDirEta.c_str() );
-//               if ( verbose_ ) gDirectory->pwd();
-//               canvSigma->cd();
-//               TH1D * histSigmaFile( ( TH1D* )( gDirectory->Get( nameSigma.c_str() ) ) );
-//               if ( histSigmaFile != 0 ) {
-//                 TF1 * fitSigmaFile( histSigmaFile->GetFunction( nameFitSigma.c_str() ) );
-//                 fitSigma->DrawCopy( "Same" );
-//               }
-//             }
-
-            canvSigma->Update();
-            canvSigma->SaveAs( ".png" );
-
-            delete canvSigma;
-
+            else {
+              minYEta = std::min( histSigmaEta->GetBinContent( histSigmaEta->GetMinimumBin() ), minYEta );
+              maxYEta = std::max( histSigmaEta->GetBinContent( histSigmaEta->GetMaximumBin() ), maxYEta );
+            }
+            histSigmaEta->SetMinimum( minYEta * 0.95 );
+            histSigmaEta->SetMaximum( maxYEta * 1.05 );
+            histSigmaEta->Draw();
+            legEtaSigma->AddEntry( fitEtaSigmaFit, "fit");
+            useSame = true;
           }
           else {
-            std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+            std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                       << "   no resolution histogram in "; dirEta_->pwd();
-            returnStatus_ += 0x1000;
+            continue;
+          }
+          if ( startMinMax ) {
+            minY = minYEta;
+            maxY = maxYEta;
+            startMinMax = false;
+          }
+          else {
+            minY = std::min( minYEta, minY );
+            maxY = std::min( maxYEta, maxY );
+          }
+
+          resEtaSigma->SetLineColor( kRed );
+          if ( useSame ) {
+            resEtaSigma->Draw( "Same" );
+          }
+          else {
+            resEtaSigma->Draw();
+            useSame = true;
+          }
+          legEtaSigma->AddEntry( resEtaSigma, "HitFit existing" );
+
+          legEtaSigma->Draw();
+          canv->Update();
+          canv->Print( nameEtaSigmaPrint.c_str() );
+          delete legEtaSigma;
+
+          for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+            const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
+            const std::string nameEtaPt( nameEta + "_Pt" + binPt );
+
+            const std::string nameEtaPtDelta( nameEtaPt + "_Delta" );
+            const std::string nameEtaPtDeltaRebin( nameEtaPtDelta + "Rebin" );
+            const std::string nameEtaPtDeltaFit( nameEtaPtDelta + "_fit" );
+            const std::string nameEtaPtDeltaRebinFit( nameEtaPtDeltaRebin + "_fit" );
+            const std::string nameEtaPtDeltaPrint( plotPath_ + "/" + evtSel_ + "_" + nameEtaPtDelta + ".png" );
+            const std::string titleLegendEtaPt( titleLegendEta + ", " + boost::lexical_cast< std::string >( ptBins.at( uPt ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( ptBins.at( uPt + 1 ) ) + " GeV" );
+
+            canv->cd();
+            TLegend * legEtaPtDelta( new TLegend( 0.1, 0.67, 0.9, 0.9, titleLegendEtaPt.c_str() ) );
+            legEtaPtDelta->SetTextSize( 0.03 );
+            legEtaPtDelta->SetFillColor( kWhite );
+            legEtaPtDelta->SetFillStyle( 0 );
+            legEtaPtDelta->SetBorderSize( 0 );
+
+            TH1D * histEtaPtDelta( ( TH1D* )( dirEta_->Get( nameEtaPtDelta.c_str() ) ) );
+
+            TH1D * histEtaPtDeltaRebin( ( TH1D* )( dirEta_->Get( nameEtaPtDeltaRebin.c_str() ) ) );
+            if ( histEtaPtDeltaRebin != 0 ) {
+              if ( histEtaPtDelta != 0 ) histEtaPtDeltaRebin->SetMaximum( std::max( histEtaPtDeltaRebin->GetBinContent( histEtaPtDeltaRebin->GetMaximumBin() ), histEtaPtDelta->GetBinContent( histEtaPtDelta->GetMaximumBin() ) ) * 1.05 );
+              histEtaPtDeltaRebin->Draw();
+              TF1 * fitEtaPtDeltaRebin( histEtaPtDeltaRebin->GetFunction( nameEtaPtDeltaRebinFit.c_str() ) );
+              if ( fitEtaPtDeltaRebin ) legEtaPtDelta->AddEntry( fitEtaPtDeltaRebin, "re-binned");
+              else                      legEtaPtDelta->AddEntry( histEtaPtDeltaRebin, "re-binned");
+            }
+
+            if ( histEtaPtDelta != 0 ) {
+              histEtaPtDelta->SetLineColor( kRed );
+              if ( histEtaPtDeltaRebin != 0 ) histEtaPtDelta->Draw( "Same" );
+              else                            histEtaPtDelta->Draw();
+              legEtaPtDelta->AddEntry( histEtaPtDelta, "not re-binned");
+            }
+
+            legEtaPtDelta->Draw();
+            canv->Update();
+            canv->Print( nameEtaPtDeltaPrint.c_str() );
+            delete legEtaPtDelta;
+          } // loop: uPt
+
+        } // loop: keyEta
+
+        canv->cd();
+        const std::string nameSigmasPrint( plotPath_ + "/" + evtSel_ + "_" + name + "_Sigmas.png" );
+        TLegend * legSigma( new TLegend( 0.33, 0.67, 0.67, 0.9, titleLegend.c_str() ) );
+        legSigma->SetTextSize( 0.03 );
+        legSigma->SetFillColor( kWhite );
+        legSigma->SetFillStyle( 0 );
+        legSigma->SetBorderSize( 0 );
+        bool useSame( false );
+        nextInListFit.Reset();
+        unsigned cEta( 0 );
+        while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
+          if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
+          const std::string binEta( keyEta->GetName() );
+          const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
+          if ( uEta % accuEvery_ != 0 ) continue;
+          ++cEta;
+          TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
+          if ( verbose_ ) dirEta_->pwd();
+
+          const std::string nameEta( name + "_" + binEta );
+          const std::string nameEtaSigma( nameEta + "_Sigma" );
+          const std::string nameEtaSigmaFit( nameEtaSigma + "_fit" );
+          const std::string strEta( useSymm_ ? " #leq |#eta| < " :  " #leq #eta < ");
+          const std::string titleLegendEta( boost::lexical_cast< std::string >( etaBins.at( uEta ) ) + strEta + boost::lexical_cast< std::string >( etaBins.at( uEta + 1 ) ) );
+
+          TH1D * histSigmaEta( ( TH1D* )( dirEta_->Get( nameEtaSigma.c_str() ) ) );
+          if ( histSigmaEta != 0 ) {
+            histSigmaEta->SetLineColor( cEta );
+            histSigmaEta->SetTitle( titleLegendEta.c_str() );
+            histSigmaEta->SetYTitle( titleYSigma.c_str() );
+            TF1 * fitEtaSigmaFit( histSigmaEta->GetFunction( nameEtaSigmaFit.c_str() ) );
+            if ( fitEtaSigmaFit ) fitEtaSigmaFit->SetLineColor( cEta );
+            if ( ! useSame ) {
+              histSigmaEta->SetMinimum( minY * 0.95 );
+              histSigmaEta->SetMaximum( maxY * 1.05 );
+              histSigmaEta->Draw();
+              useSame = true;
+            }
+            else {
+              histSigmaEta->Draw( "Same" );
+            }
+            if ( fitEtaSigmaFit ) legSigma->AddEntry( fitEtaSigmaFit, titleLegendEta.c_str() );
+            else                  legSigma->AddEntry( histSigmaEta, titleLegendEta.c_str() );
+          }
+          else {
+            std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                      << "   no resolution histogram in "; dirEta_->pwd();
             continue;
           }
 
         } // loop: keyEta
+
+        legSigma->Draw();
+        canv->Update();
+        canv->Print( nameSigmasPrint.c_str() );
+        delete legSigma;
+
+        canv->cd();
+        canv->SetLogz();
+        const std::string nameDeltaEtaPtFitSigmaMap( name + "_DeltaEtaPt_FitSigmaMap" );
+        const std::string nameDeltaEtaPtFitSigmaMapPrint( plotPath_ + "/" + evtSel_ + "_" + nameDeltaEtaPtFitSigmaMap + ".png" );
+        TH2D * histDeltaEtaPtFitSigmaMap( ( TH2D* )( dirFit_->Get( nameDeltaEtaPtFitSigmaMap.c_str() ) ) );
+        histDeltaEtaPtFitSigmaMap->GetXaxis()->SetTitleOffset( 1.5 );
+        histDeltaEtaPtFitSigmaMap->GetYaxis()->SetTitleOffset( 1.5 );
+        histDeltaEtaPtFitSigmaMap->GetZaxis()->SetTitleOffset( 1.5 );
+        histDeltaEtaPtFitSigmaMap->GetZaxis()->SetRangeUser( 0.0001, 0.01 );
+        histDeltaEtaPtFitSigmaMap->Draw( "Lego2" );
+        canv->Update();
+        canv->Print( nameDeltaEtaPtFitSigmaMapPrint.c_str() );
+        canv->SetLogz( 0 );
 
       } // loop: keyFit
 
@@ -355,6 +513,8 @@ int main(  int argc, char * argv[] )
     } // loop: keyProp
 
   } // loop: uCat
+
+  delete canv;
 
   // Close input files
   for ( unsigned uFile = 0; uFile < files_.size(); ++uFile ) files_.at( uFile )->Close();
