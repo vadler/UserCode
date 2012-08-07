@@ -87,7 +87,6 @@ int main(  int argc, char * argv[] )
   const std::string plotCycle_( plot_.getParameter< std::string >( "plotCycle" ) );
   const bool plotNonRestr_( plot_.getParameter< bool >( "plotNonRestr" ) );
   const bool plotEtaPt_( plot_.getParameter< bool >( "plotEtaPt" ) );
-  const unsigned accuEvery_( plot_.getParameter< unsigned >( "accuEvery" ) );
 
   // Set constants
   std::string evtSel_( "analyzeHitFit" );

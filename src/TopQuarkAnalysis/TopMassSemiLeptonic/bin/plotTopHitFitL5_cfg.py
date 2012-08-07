@@ -25,7 +25,6 @@ if runTest:
 plotCycle    = '1'
 plotNonRestr = False
 plotEtaPt    = False
-accuEvery    = 5
 if runTest:
   plotNonRestr = False
   plotEtaPt    = False
@@ -82,7 +81,6 @@ process.plot = cms.PSet(
 , plotCycle    = cms.string( plotCycle )
 , plotNonRestr = cms.bool( plotNonRestr )
 , plotEtaPt    = cms.bool( plotEtaPt )
-, accuEvery    = cms.uint32( accuEvery )
 )
 
 

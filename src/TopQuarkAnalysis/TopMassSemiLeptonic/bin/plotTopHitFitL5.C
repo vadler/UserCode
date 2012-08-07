@@ -87,15 +87,14 @@ int main(  int argc, char * argv[] )
   const std::string plotCycle_( plot_.getParameter< std::string >( "plotCycle" ) );
   const bool plotNonRestr_( plot_.getParameter< bool >( "plotNonRestr" ) );
   const bool plotEtaPt_( plot_.getParameter< bool >( "plotEtaPt" ) );
-  const unsigned accuEvery_( plot_.getParameter< unsigned >( "accuEvery" ) );
 
   // Set constants
   std::string evtSel_( "analyzeHitFit" );
   if ( refSel_ ) evtSel_.append( "Reference" );
   const std::string nameDirClass( "TDirectoryFile" );
   const std::string nameFuncClass( "TF1" );
-  const std::string fitFunc( plotCycle_ == "2" ? "Gaussian + log-normal" : "Gaussian" );
-  const std::string bkgFunc( plotCycle_ == "2" ? "Log-normal" : "" );
+  const std::string fitFunc( plotCycle_ == "1" ? "Gaussian" : "Gaussian + log-normal" );
+  const std::string bkgFunc( plotCycle_ == "1" ? "" : "Log-normal" );
 
 
   std::vector< TFile* > files_;
