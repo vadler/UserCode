@@ -73,18 +73,19 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & fit_( process_.getParameter< edm::ParameterSet >( "fit" ) );
   const bool fitNonRestr_( fit_.getParameter< bool >( "fitNonRestr" ) );
   const bool fitEtaPt_( fit_.getParameter< bool >( "fitEtaPt" ) );
-  const std::string fitFunction_( fit_.getParameter< std::string >( "fitFunction" ) );
-  std::string fitOptions_( fit_.getParameter< std::string >( "fitOptions" ) );
-  const double fitRange_( std::min( fit_.getParameter< double >( "fitRange" ), widthFactor_ ) );
-  const std::string bkgFunction_( fit_.getParameter< std::string >( "bkgFunction" ) );
-  const bool useBkgFunction_( bkgFunction_ != "0" );
   const double minPtParton_( fit_.getParameter< double >( "minPtParton" ) );
   const double maxDRParton_( fit_.getParameter< double >( "maxDRParton" ) );
   // Configuration for fitting starting transfer functions
-  const edm::ParameterSet & transfer_( process_.getParameter< edm::ParameterSet >( "transfer" ) );
-  const bool fitTransfer_( transfer_.getParameter< bool >( "fit" ) );
-  const bool writeFiles_( transfer_.getParameter< bool >( "writeFiles" ) );
-  const std::string pathOut_( transfer_.getParameter< std::string >( "pathOut" ) );
+  const edm::ParameterSet & transfer1D_( process_.getParameter< edm::ParameterSet >( "transfer1D" ) );
+  const bool fit1D_( transfer1D_.getParameter< bool >( "fit" ) );
+  const std::string fitFunction1D_( transfer1D_.getParameter< std::string >( "fitFunction" ) );
+  std::string fitOptions1D_( transfer1D_.getParameter< std::string >( "fitOptions" ) );
+  const double fitRange1D_( std::min( transfer1D_.getParameter< double >( "fitRange" ), widthFactor_ ) );
+  const std::string bkgFunction1D_( transfer1D_.getParameter< std::string >( "bkgFunction" ) );
+  const bool useBkgFunction1D_( bkgFunction1D_ != "0" );
+  const std::string fitTransfer1D_( transfer1D_.getParameter< std::string >( "fitTransfer" ) );
+  const bool writeFiles1D_( transfer1D_.getParameter< bool >( "writeFiles" ) );
+  const std::string pathOut1D_( transfer1D_.getParameter< std::string >( "pathOut" ) );
 
   if ( verbose_ > 0 ) {
     std::cout << std::endl
@@ -99,14 +100,11 @@ int main( int argc, char * argv[] )
   if ( refSel_ ) evtSel_.append( "Reference" );
   const std::string nameDirClass( "TDirectoryFile" );
   const std::string nameFuncClass( "TF1" );
-  if      ( verbose_ < 3 ) fitOptions_.append( "Q" );
-  else if ( verbose_ > 4 ) fitOptions_.append( "V" );
+  if      ( verbose_ < 3 ) fitOptions1D_.append( "Q" );
+  else if ( verbose_ > 4 ) fitOptions1D_.append( "V" );
   const std::string titlePt( refGen_ ? "p_{t}^{GEN} (GeV)" : "p_{t} (GeV)" );
-  const std::string titleEta( refGen_ ? "#eta^GEN" : "#eta" );
-  std::string titleTrans( refGen_ ? "#Deltap_{t}^{GEN} (GeV)" : "#Deltap_{t}^{RECO} (GeV)" );
-  if ( useAlt_ ) {
-    titleTrans = ( refGen_ ?  "#Deltap_{t}^{GEN} (GeV)": "#Deltap_{t}^{RECO,alt.} (GeV)" );
-  }
+  const std::string titleEta( refGen_ ? "#eta^{GEN}" : "#eta" );
+  const std::string titleTrans( refGen_ ? "#Deltap_{t}^{GEN} (GeV)" : "#Deltap_{t}^{RECO} (GeV)" );
   const std::string titleTransMean( "#mu of " + titleTrans );
   const std::string titleTransSigma( "#sigma of " + titleTrans );
   const std::string titleEvents( "events" );
@@ -607,6 +605,7 @@ int main( int argc, char * argv[] )
         histVecPtTransRestrRebin.push_back( histPtTransRestrRebin );
       }  // loop: uPt < nPtBins_
 
+      // Loop over eta bins
       nextInListFit.Reset();
       while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
         if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
@@ -687,7 +686,7 @@ int main( int argc, char * argv[] )
 
     // Fit transfer functions
 
-    if ( fitTransfer_ ) {
+    if ( fit1D_ ) {
       if ( verbose_ > 1 ) {
         std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                   << "    1D transfer function determination for " << objCat << " started" << std::endl;
@@ -709,19 +708,19 @@ int main( int argc, char * argv[] )
         const std::string name( objCat + "_Pt_" + subFit );
         const std::string nameTrans( name + "_Trans" );
         const std::string nameTransRebin( nameTrans + "Rebin" );
-        TH1D * histTransRebin( ( TH1D* )( gDirectory->Get( nameTransRebin.c_str() ) ) );
+        TH1D * histTransRebin( ( TH1D* )( dirFit_->Get( nameTransRebin.c_str() ) ) );
         if ( fitNonRestr_ && histTransRebin != 0 ) {
           const std::string nameTransRebinFit( nameTransRebin + "_fit" );
-          TF1 * fitTransRebin( new TF1( nameTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange_ ) ) );
-          my::setParametersFit( fitTransRebin, histTransRebin, useBkgFunction_ );
-          TFitResultPtr fitTransRebinResultPtr( histTransRebin->Fit( fitTransRebin, fitOptions_.c_str() ) );
+          TF1 * fitTransRebin( new TF1( nameTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange1D_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange1D_ ) ) );
+          my::setParametersFitDelta( fitTransRebin, histTransRebin, useBkgFunction1D_ );
+          TFitResultPtr fitTransRebinResultPtr( histTransRebin->Fit( fitTransRebin, fitOptions1D_.c_str() ) );
           if ( fitTransRebinResultPtr >= 0 ) {
             if ( fitTransRebinResultPtr->Status() == 0 && fitTransRebinResultPtr->Ndf() != 0. ) {
             }
             else {
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    failing fit in directory '"; gDirectory->pwd();
+                          << "    failing fit in directory '"; dirFit_->pwd();
                 std::cout << "    '" << nameTransRebin << "' status " << fitTransRebinResultPtr->Status() << std::endl;
               }
             }
@@ -729,13 +728,13 @@ int main( int argc, char * argv[] )
           else {
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "    missing fit in directory '"; gDirectory->pwd();
+                        << "    missing fit in directory '"; dirFit_->pwd();
               std::cout << "    '" << nameTransRebin << std::endl;
             }
           }
-          if ( useBkgFunction_ ) {
+          if ( useBkgFunction1D_ ) {
             const std::string nameTransRebinBkg( nameTransRebin + "_bkg" );
-            TF1 * bkgTransRebin( new TF1( nameTransRebinBkg.c_str(), bkgFunction_.c_str(), std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange_ ) ) );
+            TF1 * bkgTransRebin( new TF1( nameTransRebinBkg.c_str(), bkgFunction1D_.c_str(), std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange1D_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange1D_ ) ) );
             my::setParametersBkg( fitTransRebin, bkgTransRebin );
             if ( overwrite_ ) bkgTransRebin->Write( 0, TObject::kOverwrite );
             else              bkgTransRebin->Write();
@@ -744,19 +743,19 @@ int main( int argc, char * argv[] )
 
         const std::string nameTransRestr( nameTrans + "Restr" );
         const std::string nameTransRestrRebin( nameTransRestr + "Rebin" );
-        TH1D * histTransRestrRebin( ( TH1D* )( gDirectory->Get( nameTransRestrRebin.c_str() ) ) );
+        TH1D * histTransRestrRebin( ( TH1D* )( dirFit_->Get( nameTransRestrRebin.c_str() ) ) );
         if ( histTransRestrRebin != 0 ) {
           const std::string nameTransRestrRebinFit( nameTransRestrRebin + "_fit" );
-          TF1 * fitTransRestrRebin( new TF1( nameTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange_ ) ) );
-          my::setParametersFit( fitTransRestrRebin, histTransRestrRebin, useBkgFunction_ );
-          TFitResultPtr fitTransRestrRebinResultPtr( histTransRestrRebin->Fit( fitTransRestrRebin, fitOptions_.c_str() ) );
+          TF1 * fitTransRestrRebin( new TF1( nameTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
+          my::setParametersFitDelta( fitTransRestrRebin, histTransRestrRebin, useBkgFunction1D_ );
+          TFitResultPtr fitTransRestrRebinResultPtr( histTransRestrRebin->Fit( fitTransRestrRebin, fitOptions1D_.c_str() ) );
           if ( fitTransRestrRebinResultPtr >= 0 ) {
             if ( fitTransRestrRebinResultPtr->Status() == 0 && fitTransRestrRebinResultPtr->Ndf() != 0. ) {
             }
             else {
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    failing fit in directory '"; gDirectory->pwd();
+                          << "    failing fit in directory '"; dirFit_->pwd();
                 std::cout << "    '" << nameTransRestrRebin << "' status " << fitTransRestrRebinResultPtr->Status() << std::endl;
               }
             }
@@ -764,13 +763,13 @@ int main( int argc, char * argv[] )
           else {
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "    missing fit in directory '"; gDirectory->pwd();
+                        << "    missing fit in directory '"; dirFit_->pwd();
               std::cout << "    '" << nameTransRestrRebin << std::endl;
             }
           }
-          if ( useBkgFunction_ ) {
+          if ( useBkgFunction1D_ ) {
             const std::string nameTransRestrRebinBkg( nameTransRestrRebin + "_bkg" );
-            TF1 * bkgTransRestrRebin( new TF1( nameTransRestrRebinBkg.c_str(), bkgFunction_.c_str(), std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange_ ) ) );
+            TF1 * bkgTransRestrRebin( new TF1( nameTransRestrRebinBkg.c_str(), bkgFunction1D_.c_str(), std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
             my::setParametersBkg( fitTransRestrRebin, bkgTransRestrRebin );
             if ( overwrite_ ) bkgTransRestrRebin->Write( 0, TObject::kOverwrite );
             else              bkgTransRestrRebin->Write();
@@ -779,7 +778,6 @@ int main( int argc, char * argv[] )
 
         // Loop over pt bins
 
-        // Fit performance histograms
         const std::string nameTransRebinPtFitMeanMap( name + "_TransRebinPt_FitMeanMap" );
         TH1D * histTransRebinPtFitMeanMap( new TH1D( nameTransRebinPtFitMeanMap.c_str(), objCat.c_str(), nPtBins_, ptBins_.data() ) );
         histTransRebinPtFitMeanMap->SetXTitle( titlePt.c_str() );
@@ -789,29 +787,37 @@ int main( int argc, char * argv[] )
         histTransRestrRebinPtFitMeanMap->SetXTitle( titlePt.c_str() );
         histTransRestrRebinPtFitMeanMap->SetYTitle( titleTransMean.c_str() );
 
+        const std::string nameTransRebinPtFitSigmaMap( name + "_TransRebinPt_FitSigmaMap" );
+        TH1D * histTransRebinPtFitSigmaMap( new TH1D( nameTransRebinPtFitSigmaMap.c_str(), objCat.c_str(), nPtBins_, ptBins_.data() ) );
+        histTransRebinPtFitSigmaMap->SetXTitle( titlePt.c_str() );
+        histTransRebinPtFitSigmaMap->SetYTitle( titleTransSigma.c_str() );
+        const std::string nameTransRestrRebinPtFitSigmaMap( name + "_TransRestrRebinPt_FitSigmaMap" );
+        TH1D * histTransRestrRebinPtFitSigmaMap( new TH1D( nameTransRestrRebinPtFitSigmaMap.c_str(), objCat.c_str(), nPtBins_, ptBins_.data() ) );
+        histTransRestrRebinPtFitSigmaMap->SetXTitle( titlePt.c_str() );
+        histTransRestrRebinPtFitSigmaMap->SetYTitle( titleTransSigma.c_str() );
+
         for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
           const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
           const std::string namePt( name + "_Pt" + binPt );
 
           const std::string namePtTransRebin( namePt + "_TransRebin" );
-          TH1D * histPtTransRebin( ( TH1D* )( gDirectory->Get( namePtTransRebin.c_str() ) ) );
-          std::cout << "DEBUG histPtTransRebin: " << namePtTransRebin << "\t " << histPtTransRebin << std::endl;
+          TH1D * histPtTransRebin( ( TH1D* )( dirFit_->Get( namePtTransRebin.c_str() ) ) );
           if ( fitNonRestr_ && histPtTransRebin != 0 ) {
             const std::string namePtTransRebinFit( namePtTransRebin + "_fit" );
-            TF1 * fitPtTransRebin( new TF1( namePtTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange_ ) ) );
-            my::setParametersFit( fitPtTransRebin, histPtTransRebin, useBkgFunction_ );
-            TFitResultPtr fitPtTransRebinResultPtr( histPtTransRebin->Fit( fitPtTransRebin, fitOptions_.c_str() ) );
-            std::cout << "DEBUG fitPtTransRebinResultPtr: " << namePtTransRebinFit << "\t " << fitPtTransRebinResultPtr << std::endl;
+            TF1 * fitPtTransRebin( new TF1( namePtTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange1D_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange1D_ ) ) );
+            my::setParametersFitDelta( fitPtTransRebin, histPtTransRebin, useBkgFunction1D_ );
+            TFitResultPtr fitPtTransRebinResultPtr( histPtTransRebin->Fit( fitPtTransRebin, fitOptions1D_.c_str() ) );
             if ( fitPtTransRebinResultPtr >= 0 ) {
-              std::cout << "DEBUG fitPtTransRebinResultPtr->Ndf(): " << fitPtTransRebinResultPtr->Ndf() << std::endl;
               if ( fitPtTransRebinResultPtr->Status() == 0 && fitPtTransRebinResultPtr->Ndf() != 0. ) {
                 histTransRebinPtFitMeanMap->SetBinContent( uPt + 1, fitPtTransRebinResultPtr->Parameter( 0 ) );
                 histTransRebinPtFitMeanMap->SetBinError( uPt + 1, fitPtTransRebinResultPtr->ParError( 0 ) );
+                histTransRebinPtFitSigmaMap->SetBinContent( uPt + 1, fitPtTransRebinResultPtr->Parameter( 2 ) );
+                histTransRebinPtFitSigmaMap->SetBinError( uPt + 1, fitPtTransRebinResultPtr->ParError( 2 ) );
               }
               else {
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "    failing fit in directory '"; gDirectory->pwd();
+                            << "    failing fit in directory '"; dirFit_->pwd();
                   std::cout << "    '" << namePtTransRebin << "' status " << fitPtTransRebinResultPtr->Status() << std::endl;
                 }
               }
@@ -819,13 +825,13 @@ int main( int argc, char * argv[] )
             else {
               if ( verbose_ > 1 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    missing fit in directory '"; gDirectory->pwd();
+                          << "    missing fit in directory '"; dirFit_->pwd();
                 std::cout << "    '" << namePtTransRebin << std::endl;
               }
             }
-            if ( useBkgFunction_ ) {
+            if ( useBkgFunction1D_ ) {
               const std::string namePtTransRebinBkg( namePtTransRebin + "_bkg" );
-              TF1 * bkgPtTransRebin( new TF1( namePtTransRebinBkg.c_str(), bkgFunction_.c_str(), std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange_ ) ) );
+              TF1 * bkgPtTransRebin( new TF1( namePtTransRebinBkg.c_str(), bkgFunction1D_.c_str(), std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange1D_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange1D_ ) ) );
               my::setParametersBkg( fitPtTransRebin, bkgPtTransRebin );
               if ( overwrite_ ) bkgPtTransRebin->Write( 0, TObject::kOverwrite );
               else              bkgPtTransRebin->Write();
@@ -834,24 +840,23 @@ int main( int argc, char * argv[] )
 
           const std::string namePtTransRestr( namePt + "_TransRestr" );
           const std::string namePtTransRestrRebin( namePtTransRestr + "Rebin" );
-          TH1D * histPtTransRestrRebin( ( TH1D* )( gDirectory->Get( namePtTransRestrRebin.c_str() ) ) );
-          std::cout << "DEBUG histPtTransRestrRebin: " << namePtTransRestrRebin << "\t " << histPtTransRestrRebin << std::endl;
+          TH1D * histPtTransRestrRebin( ( TH1D* )( dirFit_->Get( namePtTransRestrRebin.c_str() ) ) );
           if ( histPtTransRestrRebin != 0 ) {
             const std::string namePtTransRestrRebinFit( namePtTransRestrRebin + "_fit" );
-            TF1 * fitPtTransRestrRebin( new TF1( namePtTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange_ ) ) );
-            my::setParametersFit( fitPtTransRestrRebin, histPtTransRestrRebin, useBkgFunction_ );
-            TFitResultPtr fitPtTransRestrRebinResultPtr( histPtTransRestrRebin->Fit( fitPtTransRestrRebin, fitOptions_.c_str() ) );
-            std::cout << "DEBUG fitPtTransRestrRebinResultPtr: " << namePtTransRestrRebinFit << "\t " << fitPtTransRestrRebinResultPtr << std::endl;
+            TF1 * fitPtTransRestrRebin( new TF1( namePtTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
+            my::setParametersFitDelta( fitPtTransRestrRebin, histPtTransRestrRebin, useBkgFunction1D_ );
+            TFitResultPtr fitPtTransRestrRebinResultPtr( histPtTransRestrRebin->Fit( fitPtTransRestrRebin, fitOptions1D_.c_str() ) );
             if ( fitPtTransRestrRebinResultPtr >= 0 ) {
-              std::cout << "DEBUG fitPtTransRestrRebinResultPtr->Ndf(): " << fitPtTransRestrRebinResultPtr->Ndf() << std::endl;
               if ( fitPtTransRestrRebinResultPtr->Status() == 0 && fitPtTransRestrRebinResultPtr->Ndf() != 0. ) {
                 histTransRestrRebinPtFitMeanMap->SetBinContent( uPt + 1, fitPtTransRestrRebinResultPtr->Parameter( 0 ) );
                 histTransRestrRebinPtFitMeanMap->SetBinError( uPt + 1, fitPtTransRestrRebinResultPtr->ParError( 0 ) );
+                histTransRestrRebinPtFitSigmaMap->SetBinContent( uPt + 1, fitPtTransRestrRebinResultPtr->Parameter( 2 ) );
+                histTransRestrRebinPtFitSigmaMap->SetBinError( uPt + 1, fitPtTransRestrRebinResultPtr->ParError( 2 ) );
               }
               else {
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "    failing fit in directory '"; gDirectory->pwd();
+                            << "    failing fit in directory '"; dirFit_->pwd();
                   std::cout << "    '" << namePtTransRestrRebin << "' status " << fitPtTransRestrRebinResultPtr->Status() << std::endl;
                 }
               }
@@ -859,13 +864,13 @@ int main( int argc, char * argv[] )
             else {
               if ( verbose_ > 1 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    missing fit in directory '"; gDirectory->pwd();
+                          << "    missing fit in directory '"; dirFit_->pwd();
                 std::cout << "    '" << namePtTransRestrRebin << std::endl;
               }
             }
-            if ( useBkgFunction_ ) {
+            if ( useBkgFunction1D_ ) {
               const std::string namePtTransRestrRebinBkg( namePtTransRestrRebin + "_bkg" );
-              TF1 * bkgPtTransRestrRebin( new TF1( namePtTransRestrRebinBkg.c_str(), bkgFunction_.c_str(), std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange_ ) ) );
+              TF1 * bkgPtTransRestrRebin( new TF1( namePtTransRestrRebinBkg.c_str(), bkgFunction1D_.c_str(), std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
               my::setParametersBkg( fitPtTransRestrRebin, bkgPtTransRestrRebin );
               if ( overwrite_ ) bkgPtTransRestrRebin->Write( 0, TObject::kOverwrite );
               else              bkgPtTransRestrRebin->Write();
@@ -873,6 +878,117 @@ int main( int argc, char * argv[] )
           }
 
         } // loop: uPt < nPtBins_
+
+        // Loop over eta bins
+
+        const std::string nameTransRebinEtaFitMeanMap( name + "_TransRebinEta_FitMeanMap" );
+        TH1D * histTransRebinEtaFitMeanMap( new TH1D( nameTransRebinEtaFitMeanMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data() ) );
+        histTransRebinEtaFitMeanMap->SetXTitle( titleEta.c_str() );
+        histTransRebinEtaFitMeanMap->SetYTitle( titleTransMean.c_str() );
+        const std::string nameTransRestrRebinEtaFitMeanMap( name + "_TransRestrRebinEta_FitMeanMap" );
+        TH1D * histTransRestrRebinEtaFitMeanMap( new TH1D( nameTransRestrRebinEtaFitMeanMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data() ) );
+        histTransRestrRebinEtaFitMeanMap->SetXTitle( titleEta.c_str() );
+        histTransRestrRebinEtaFitMeanMap->SetYTitle( titleTransMean.c_str() );
+
+        const std::string nameTransRebinEtaFitSigmaMap( name + "_TransRebinEta_FitSigmaMap" );
+        TH1D * histTransRebinEtaFitSigmaMap( new TH1D( nameTransRebinEtaFitSigmaMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data() ) );
+        histTransRebinEtaFitSigmaMap->SetXTitle( titleEta.c_str() );
+        histTransRebinEtaFitSigmaMap->SetYTitle( titleTransSigma.c_str() );
+        const std::string nameTransRestrRebinEtaFitSigmaMap( name + "_TransRestrRebinEta_FitSigmaMap" );
+        TH1D * histTransRestrRebinEtaFitSigmaMap( new TH1D( nameTransRestrRebinEtaFitSigmaMap.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data() ) );
+        histTransRestrRebinEtaFitSigmaMap->SetXTitle( titleEta.c_str() );
+        histTransRestrRebinEtaFitSigmaMap->SetYTitle( titleTransSigma.c_str() );
+
+        TList * listFit( dirFit_->GetListOfKeys() );
+        TIter nextInListFit( listFit );
+        while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
+          if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
+          const std::string binEta( keyEta->GetName() );
+          const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
+          TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
+          dirEta_->cd();
+
+          const std::string nameEta( name + "_" + binEta );
+
+          const std::string nameEtaTransRebin( nameEta + "_TransRebin" );
+          TH1D * histEtaTransRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRebin.c_str() ) ) );
+          if ( fitNonRestr_ && histEtaTransRebin != 0 ) {
+            const std::string nameEtaTransRebinFit( nameEtaTransRebin + "_fit" );
+            TF1 * fitEtaTransRebin( new TF1( nameEtaTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histEtaTransRebin->GetXaxis()->GetXmin(), histEtaTransRebin->GetMean() - histEtaTransRebin->GetRMS() * fitRange1D_ ), std::min( histEtaTransRebin->GetXaxis()->GetXmax(), histEtaTransRebin->GetMean() + histEtaTransRebin->GetRMS() * fitRange1D_ ) ) );
+            my::setParametersFitDelta( fitEtaTransRebin, histEtaTransRebin, useBkgFunction1D_ );
+            TFitResultPtr fitEtaTransRebinResultPtr( histEtaTransRebin->Fit( fitEtaTransRebin, fitOptions1D_.c_str() ) );
+            if ( fitEtaTransRebinResultPtr >= 0 ) {
+              if ( fitEtaTransRebinResultPtr->Status() == 0 && fitEtaTransRebinResultPtr->Ndf() != 0. ) {
+                histTransRebinEtaFitMeanMap->SetBinContent( uEta + 1, fitEtaTransRebinResultPtr->Parameter( 0 ) );
+                histTransRebinEtaFitMeanMap->SetBinError( uEta + 1, fitEtaTransRebinResultPtr->ParError( 0 ) );
+                histTransRebinEtaFitSigmaMap->SetBinContent( uEta + 1, fitEtaTransRebinResultPtr->Parameter( 2 ) );
+                histTransRebinEtaFitSigmaMap->SetBinError( uEta + 1, fitEtaTransRebinResultPtr->ParError( 2 ) );
+              }
+              else {
+                if ( verbose_ > 2 ) {
+                  std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                            << "    failing fit in directory '"; dirEta_->pwd();
+                  std::cout << "    '" << nameEtaTransRebin << "' status " << fitEtaTransRebinResultPtr->Status() << std::endl;
+                }
+              }
+            }
+            else {
+              if ( verbose_ > 1 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "    missing fit in directory '"; dirEta_->pwd();
+                std::cout << "    '" << nameEtaTransRebin << std::endl;
+              }
+            }
+            if ( useBkgFunction1D_ ) {
+              const std::string nameEtaTransRebinBkg( nameEtaTransRebin + "_bkg" );
+              TF1 * bkgEtaTransRebin( new TF1( nameEtaTransRebinBkg.c_str(), bkgFunction1D_.c_str(), std::max( histEtaTransRebin->GetXaxis()->GetXmin(), histEtaTransRebin->GetMean() - histEtaTransRebin->GetRMS() * fitRange1D_ ), std::min( histEtaTransRebin->GetXaxis()->GetXmax(), histEtaTransRebin->GetMean() + histEtaTransRebin->GetRMS() * fitRange1D_ ) ) );
+              my::setParametersBkg( fitEtaTransRebin, bkgEtaTransRebin );
+              if ( overwrite_ ) bkgEtaTransRebin->Write( 0, TObject::kOverwrite );
+              else              bkgEtaTransRebin->Write();
+            }
+          }
+
+          const std::string nameEtaTransRestr( nameEta + "_TransRestr" );
+          const std::string nameEtaTransRestrRebin( nameEtaTransRestr + "Rebin" );
+          TH1D * histEtaTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRestrRebin.c_str() ) ) );
+          if ( histEtaTransRestrRebin != 0 ) {
+            const std::string nameEtaTransRestrRebinFit( nameEtaTransRestrRebin + "_fit" );
+            TF1 * fitEtaTransRestrRebin( new TF1( nameEtaTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histEtaTransRestrRebin->GetXaxis()->GetXmin(), histEtaTransRestrRebin->GetMean() - histEtaTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histEtaTransRestrRebin->GetXaxis()->GetXmax(), histEtaTransRestrRebin->GetMean() + histEtaTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
+            my::setParametersFitDelta( fitEtaTransRestrRebin, histEtaTransRestrRebin, useBkgFunction1D_ );
+            TFitResultPtr fitEtaTransRestrRebinResultPtr( histEtaTransRestrRebin->Fit( fitEtaTransRestrRebin, fitOptions1D_.c_str() ) );
+            if ( fitEtaTransRestrRebinResultPtr >= 0 ) {
+              if ( fitEtaTransRestrRebinResultPtr->Status() == 0 && fitEtaTransRestrRebinResultPtr->Ndf() != 0. ) {
+                histTransRestrRebinEtaFitMeanMap->SetBinContent( uEta + 1, fitEtaTransRestrRebinResultPtr->Parameter( 0 ) );
+                histTransRestrRebinEtaFitMeanMap->SetBinError( uEta + 1, fitEtaTransRestrRebinResultPtr->ParError( 0 ) );
+                histTransRestrRebinEtaFitSigmaMap->SetBinContent( uEta + 1, fitEtaTransRestrRebinResultPtr->Parameter( 2 ) );
+                histTransRestrRebinEtaFitSigmaMap->SetBinError( uEta + 1, fitEtaTransRestrRebinResultPtr->ParError( 2 ) );
+              }
+              else {
+                if ( verbose_ > 2 ) {
+                  std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                            << "    failing fit in directory '"; dirEta_->pwd();
+                  std::cout << "    '" << nameEtaTransRestrRebin << "' status " << fitEtaTransRestrRebinResultPtr->Status() << std::endl;
+                }
+              }
+            }
+            else {
+              if ( verbose_ > 1 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "    missing fit in directory '"; dirEta_->pwd();
+                std::cout << "    '" << nameEtaTransRestrRebin << std::endl;
+              }
+            }
+            if ( useBkgFunction1D_ ) {
+              const std::string nameEtaTransRestrRebinBkg( nameEtaTransRestrRebin + "_bkg" );
+              TF1 * bkgEtaTransRestrRebin( new TF1( nameEtaTransRestrRebinBkg.c_str(), bkgFunction1D_.c_str(), std::max( histEtaTransRestrRebin->GetXaxis()->GetXmin(), histEtaTransRestrRebin->GetMean() - histEtaTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histEtaTransRestrRebin->GetXaxis()->GetXmax(), histEtaTransRestrRebin->GetMean() + histEtaTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
+              my::setParametersBkg( fitEtaTransRestrRebin, bkgEtaTransRestrRebin );
+              if ( overwrite_ ) bkgEtaTransRestrRebin->Write( 0, TObject::kOverwrite );
+              else              bkgEtaTransRestrRebin->Write();
+            }
+          }
+
+
+        } // loop: keyEta
 
       } // loop: keyFit
 
