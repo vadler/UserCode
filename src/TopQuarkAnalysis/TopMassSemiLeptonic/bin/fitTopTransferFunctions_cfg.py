@@ -5,54 +5,68 @@ import FWCore.ParameterSet.Config as cms
 # Steering
 
 runTest   = True
-rfioInput = True
 
 # Origin of existing resolution functions
-# era = 'Spring10'
-era = 'Summer11'
+# era    = 'Spring10'
+era    = 'Summer11'
+sample = 'Fall11_R4_1'
 
 # Settings
 overwrite = True # to throw away earlier versions of histograms, trees and functions
-# !!! Exclusive switches:
+# Exclusive switches:
 usePileUp = False
 useAlt    = False
 useSymm   = True
-refGen    = False
-refSel    = False
+refGen    = True
+refSel    = True
 if runTest:
   refSel = False
 
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
-useMinuit2 = False
-fitOptions  = 'RS+'
-#fitOptions  = 'IRS+'
-# fails mostly for both #fitOptions  = 'MRS+'
-# fails mostly for both #fitOptions  = 'IMRS+'
-#fitOptions  = 'WRS+' # not for pile-up
-#fitOptions  = 'WMRS+' # not for pile-up
-#fitOptions  = 'WWRS+' # not for pile-up
-#fitOptions  = 'WWMRS+' # not for pile-up
-# fails for 1D #fitOptions  = 'LRS+' # possibly not for pile-up?
-# fails for both #fitOptions  = 'LMRS+' # possibly not for pile-up?
-# fails for 1D #fitOptions  = 'WLRS+'
-# fails for both #fitOptions  = 'WLMRS+'
-widthFactor = 5. # for rebinning     (in units of orig. RMS)
+# Histograms
+widthFactor = 5. # for rebinning (in units of orig. RMS)
 
-fitTransfer1D          = True
-fitFromStartTransfer1D = True
-fitRangeTransfer1D     = 5. # for Gaussian fits (in units of orig. RMS)
+# Fitting
+fitNonRestr    = True
+fitEtaPt       = True
+#minPtParton    = 0.
+#maxDRParton    = 999999.
+minPtParton    = 20.
+maxDRParton    = 0.2
+# Fit function: a Gaussian is always required for the first three function parameters
+fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2)' # single ROOT-like Gaussian
+##fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
+##fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((x-[0])/[5])**2) )' # double ROOT-like Gaussian with common mean
+#fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x )' # single ROOT-like Gaussian plus ROOT-like log-normal
+##fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi)) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/(x*[5]*sqrt(2*pi)) )' # single Gaussian plus log-normal
+fitOptions  = 'BRS+'
+bkgFunction = '0'
+fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
+if len( fitFunction.split( ' + ' ) ) > 1: # a background function is defined
+  bkgFunction = fitFunction.split( ' + ' )[1]
+  fitRange    = 5. # for combined fits (in units of orig. RMS)
 
-fitTransfer2D          = True
-fitFromStartTransfer2D = True
-widthFactorTransfer2D = 10. # for rebinning     (in units of orig. RMS)
+# Transfer functions
+fitTransfer = True
 
-inputFile = 'file:%s/output/fitTopTransferFunctions_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
-if runTest:
-  inputFile = inputFile.replace( 'root', 'test.root' )
-if not rfioInput:
-  inputFile = inputFile.replace( 'root', 'local.root' )
+# I/O
+inputFile = 'fitTopHitFit_from%s_%s.root'%( era, sample )
+if usePileUp:
+  inputFile = inputFile.replace( '.root', '_PileUp.root' )
 logFile = inputFile.replace( 'root', 'log' )
+if not runTest:
+  if useAlt:
+    logFile = logFile.replace( '.', '_Alt.', 1 )
+  if useSymm:
+    logFile = logFile.replace( '.', '_Symm.', 1 )
+  if refGen:
+    logFile = logFile.replace( '.', '_Gen.', 1 )
+  if refSel:
+    logFile = logFile.replace( '.', '_Ref.', 1 )
+inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
+logFile   = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
+logFile   = logFile.replace( 'fitTopHitFit', 'fitTopTransferFunctions' )
 
 
 # Processing
@@ -75,113 +89,40 @@ process.refSel    = cms.bool( refSel )
 process.pileUp    = cms.string( pileUp )
 
 process.io = cms.PSet(
-  inputFile      = cms.string( inputFile )
-, resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era ) )
+  inputFile = cms.string( inputFile )
+, sample    = cms.string( sample )
 )
 
 process.histos = cms.PSet(
-  # Muons
-  MuDeltaPtBins = cms.uint32( 50 )
-, MuDeltaPtMax  = cms.double( 12.5 )
-, MuDeltaPtInvBins = cms.uint32( 50 )
-, MuDeltaPtInvMax  = cms.double( 0.0025 )
-, MuDeltaEtaBins = cms.uint32( 50 )
-, MuDeltaEtaMax  = cms.double( 0.02 )
-, MuDeltaEtaInvBins = cms.uint32( 50 )
-, MuDeltaEtaInvMax  = cms.double( 0.02 )
-, MuDeltaPhiBins = cms.uint32( 50 )
-, MuDeltaPhiMax  = cms.double( 0.002 )
-, MuDeltaPhiInvBins = cms.uint32( 50 )
-, MuDeltaPhiInvMax  = cms.double( 0.002 )
-  # Electrons
-, ElecDeltaPtBins = cms.uint32( 50 )
-, ElecDeltaPtMax  = cms.double( 12.5 )
-, ElecDeltaPtInvBins = cms.uint32( 50 )
-, ElecDeltaPtInvMax  = cms.double( 0.0025 )
-, ElecDeltaEtaBins = cms.uint32( 50 )
-, ElecDeltaEtaMax  = cms.double( 0.02 )
-, ElecDeltaEtaInvBins = cms.uint32( 50 )
-, ElecDeltaEtaInvMax  = cms.double( 0.02 )
-, ElecDeltaPhiBins = cms.uint32( 50 )
-, ElecDeltaPhiMax  = cms.double( 0.002 )
-, ElecDeltaPhiInvBins = cms.uint32( 50 )
-, ElecDeltaPhiInvMax  = cms.double( 0.002 )
   # Light jets
-, UdscJetDeltaPtBins = cms.uint32( 50 )
-, UdscJetDeltaPtMax  = cms.double( 50. )
-, UdscJetDeltaPtInvBins = cms.uint32( 50 )
-, UdscJetDeltaPtInvMax  = cms.double( 0.02 )
-, UdscJetDeltaEtaBins = cms.uint32( 50 )
-, UdscJetDeltaEtaMax  = cms.double( 0.5 )
-, UdscJetDeltaEtaInvBins = cms.uint32( 50 )
-, UdscJetDeltaEtaInvMax  = cms.double( 0.5 )
-, UdscJetDeltaPhiBins = cms.uint32( 50 )
-, UdscJetDeltaPhiMax  = cms.double( 0.5 )
-, UdscJetDeltaPhiInvBins = cms.uint32( 50 )
-, UdscJetDeltaPhiInvMax  = cms.double( 0.5 )
+  UdscJetPtBins = cms.uint32( 50 )
+, UdscJetPtMax  = cms.double( 50. )
   # B-jets
-, BJetDeltaPtBins = cms.uint32( 50 )
-, BJetDeltaPtMax  = cms.double( 50. )
-, BJetDeltaPtInvBins = cms.uint32( 50 )
-, BJetDeltaPtInvMax  = cms.double( 0.02 )
-, BJetDeltaEtaBins = cms.uint32( 50 )
-, BJetDeltaEtaMax  = cms.double( 0.5 )
-, BJetDeltaEtaInvBins = cms.uint32( 50 )
-, BJetDeltaEtaInvMax  = cms.double( 0.5 )
-, BJetDeltaPhiBins = cms.uint32( 50 )
-, BJetDeltaPhiMax  = cms.double( 0.5 )
-, BJetDeltaPhiInvBins = cms.uint32( 50 )
-, BJetDeltaPhiInvMax  = cms.double( 0.5 )
-  # MET
-, METDeltaPtBins = cms.uint32( 50 )
-, METDeltaPtMax  = cms.double( 100. )
-, METDeltaPtInvBins = cms.uint32( 50 )
-, METDeltaPtInvMax  = cms.double( 0.025 )
-, METDeltaEtaBins = cms.uint32( 50 )
-, METDeltaEtaMax  = cms.double( 10. )
-, METDeltaEtaInvBins = cms.uint32( 50 )
-, METDeltaEtaInvMax  = cms.double( 10. )
-, METDeltaPhiBins = cms.uint32( 50 )
-, METDeltaPhiMax  = cms.double( 1.6 )
-, METDeltaPhiInvBins = cms.uint32( 50 )
-, METDeltaPhiInvMax  = cms.double( 1.6 )
-  # Fitting (general)
-, useMinuit2  = cms.bool( useMinuit2 )
-, fitOptions  = cms.string( fitOptions )
+, BJetPtBins = cms.uint32( 50 )
+, BJetPtMax  = cms.double( 50. )
   # Rebinning
 , widthFactor = cms.double( widthFactor )
 )
 
+process.fit = cms.PSet(
+  fitNonRestr  = cms.bool( fitNonRestr )
+, fitEtaPt     = cms.bool( fitEtaPt )
+, fitFunction  = cms.string( fitFunction )
+, fitOptions   = cms.string( fitOptions )
+, fitRange     = cms.double( fitRange )
+, bkgFunction  = cms.string( bkgFunction )
+, minPtParton  = cms.double( minPtParton )
+, maxDRParton  = cms.double( maxDRParton )
+)
+
 process.transfer = cms.PSet(
-  transferFunction = cms.string( 'gaus' )
-)
-
-process.transfer1D = cms.PSet(
-  fit          = cms.bool( fitTransfer1D )
-, fitFromStart = cms.bool( fitFromStartTransfer1D )
-, fitRange     = cms.double( fitRangeTransfer1D )
-  # transfer function formulas
-, transferFunction = cms.string( '[0]*(1/(sqrt(2*pi)*([2]+[3]*[5])))*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))' )
-#, transferFunction = cms.string( 'gaus(0)+gaus(3)' )
-#, transferFunction = cms.string( 'gaus' )
+  fit        = cms.bool( fitTransfer )
 , writeFiles = cms.bool( True )
-, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer1D_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
-)
-
-process.transfer2D = cms.PSet(
-  fit          = cms.bool( fitTransfer2D )
-, fitFromStart = cms.bool( fitFromStartTransfer2D )
-, widthFactor  = cms.double( widthFactorTransfer2D )
-  # transfer function formulas
-#, transferFunction = cms.string( '[0]*(1/(sqrt(2*pi)*(([2]+[7]*x)+([3]+[8]*x)*([5]+[10]*x)))))*(exp(-0.5*((y-([1]+[6]*x))/([2]+[7]*x))**2)+([3]+[8]*x)*exp(-0.5*((y-([4]+[9]*x))/([5]+[10]*x))**2))' )
-, transferFunction = cms.string( '[0]*(1/(sqrt(2*pi)*([2]+[7]*x)))*(exp(-0.5*((y-([1]+[6]*x))/([2]+[7]*x))**2))' )
-, writeFiles = cms.bool( True )
-, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer2D_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
+, pathOut    = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
 
 #if runTest:
-  #process.transfer1D.writeFiles = False
-  #process.transfer2D.writeFiles = False
+  #process.transfer.writeFiles = False
 
 
 # Messaging
