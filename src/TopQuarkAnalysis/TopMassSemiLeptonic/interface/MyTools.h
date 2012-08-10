@@ -9,7 +9,8 @@
 namespace my {
 
   void setParametersFitFrac( TF1 * fit, TH1D * histo, bool useBkgFunction );
-  void setParametersFitDelta( TF1 * fit, TH1D * histo, bool useBkgFunction );
+  void setParametersFitDelta( TF1 * fit, TH1D * histo );
+  void setParametersFitTransfer1D( TF1 * fit, TH1D * histo );
   void setParametersBkg( TF1 * fit, TF1 * bkg );
 
 }

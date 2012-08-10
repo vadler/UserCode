@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 
-runTest   = True
+runTest = True
 
 # Origin of existing resolution functions
 # era    = 'Spring10'
@@ -29,26 +29,23 @@ widthFactor = 5. # for rebinning (in units of orig. RMS)
 
 # Fitting
 fitNonRestr    = True
-fitEtaPt       = True
+fitEtaPt       = False
 #minPtParton    = 0.
 #maxDRParton    = 999999.
 minPtParton    = 20.
 maxDRParton    = 0.2
 
 # Transfer functions
-fit1D = True
+fit1D      = True
+fitMaxPt1D = 999.
+#fitMaxPt1D = 200.
 # Fit function: a Gaussian is always required for the first three function parameters
-fitFunction1D = '[1]*exp(-0.5*((x-[0])/[2])**2)' # single ROOT-like Gaussian
-##fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
-##fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((x-[0])/[5])**2) )' # double ROOT-like Gaussian with common mean
-#fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x )' # single ROOT-like Gaussian plus ROOT-like log-normal
-##fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi)) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/(x*[5]*sqrt(2*pi)) )' # single Gaussian plus log-normal
+fitFunction1D = '[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
+#fitFunction1D = '[0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi))' # single Gaussian
 fitOptions1D  = 'BRS+'
-bkgFunction1D = '0'
 fitRange1D    = 2. # for Gaussian fits (in units of orig. RMS)
 if len( fitFunction1D.split( ' + ' ) ) > 1: # a background function is defined
-  bkgFunction1D = fitFunction1D.split( ' + ' )[1]
-  fitRange1D    = 5. # for combined fits (in units of orig. RMS)
+  fitRange1D = 5. # for combined fits (in units of orig. RMS)
 
 # I/O
 inputFile = 'fitTopHitFit_from%s_%s.root'%( era, sample )
@@ -113,17 +110,17 @@ process.fit = cms.PSet(
 
 process.transfer1D = cms.PSet(
   fit         = cms.bool( fit1D )
+, fitMaxPt    = cms.double( fitMaxPt1D )
 , fitFunction = cms.string( fitFunction1D )
 , fitOptions  = cms.string( fitOptions1D )
 , fitRange    = cms.double( fitRange1D )
-, bkgFunction = cms.string( bkgFunction1D )
 , fitTransfer = cms.string( '[0]+[1]*x' )
 , writeFiles  = cms.bool( True )
 , pathOut     = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer1D_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
 
-#if runTest:
-  #process.transfer1D.writeFiles = False
+if runTest:
+  process.transfer1D.writeFiles = False
 
 
 # Messaging
