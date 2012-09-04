@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.60.2.1 2012/07/09 16:40:54 tjkim Exp $
+// $Id: PATElectronProducer.cc,v 1.60.2.2 2012/08/30 00:20:59 tjkim Exp $
 //
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
 
@@ -439,27 +439,32 @@ void PATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
       // Is this GsfElectron also identified as an e- in the particle flow?
       bool pfId = false;
 
-      if( valMapPresent ) {
-	const edm::ValueMap<reco::PFCandidatePtr> & myValMap(*ValMapH);
-
-	// Get the PFCandidate
-	const reco::PFCandidatePtr& pfElePtr(myValMap[elecsRef]);
-	pfId= pfElePtr.isNonnull();
-      }
-      else if ( pfCandsPresent ) {
+      if ( pfCandsPresent ) {
 	// PF electron collection not available.
 	const reco::GsfTrackRef& trkRef = itElectron->gsfTrack();
+        int index = 0;
 	for( reco::PFCandidateConstIterator ie = pfElectrons->begin();
-	     ie != pfElectrons->end(); ++ie) {
+	     ie != pfElectrons->end(); ++ie, ++index) {
 	  if(ie->particleId()!=reco::PFCandidate::e) continue;
 	  const reco::GsfTrackRef& pfTrkRef= ie->gsfTrackRef();
 	  if( trkRef == pfTrkRef ) {
 	    pfId = true;
+            anElectron.setIsPF( pfId );
+            reco::PFCandidateRef pfRef(pfElectrons, index);
+            anElectron.setPFCandidateRef( pfRef );
 	    break;
 	  }
 	}
       }
-
+      else if ( valMapPresent) {
+        // use value map if PF collection not available
+        const edm::ValueMap<reco::PFCandidatePtr> & myValMap(*ValMapH);
+        // Get the PFCandidate
+        const reco::PFCandidatePtr& pfElePtr(myValMap[elecsRef]);
+        pfId= pfElePtr.isNonnull();
+        anElectron.setIsPF( pfId );
+      }
+      
       // add resolution info
 
       // Isolation

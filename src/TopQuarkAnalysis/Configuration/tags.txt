@@ -5,10 +5,10 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_2_6
 CommonTools/ParticleFlow                         V00-03-16      V00-03-08      
 CommonTools/RecoUtils                            V00-00-12      V00-00-03      
 DataFormats/HLTReco                              V02-06-05      V02-06-04      
-DataFormats/PatCandidates                        V06-05-04      V06-05-00      
+DataFormats/PatCandidates                        V06-05-06      V06-05-00      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
 JetMETCorrections/Type1MET                       V04-06-09      V04-06-05      
-PhysicsTools/PatAlgos                            V08-09-24      V08-09-04-01   
+PhysicsTools/PatAlgos                            V08-09-28      V08-09-04-01   
 PhysicsTools/PatUtils                            V03-09-26      V03-09-18-03   
 RecoBTag/SecondaryVertex                         V01-08-00      V01-06-02      
 RecoMET/METAnalyzers                             V00-00-08                     
