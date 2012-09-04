@@ -7,7 +7,7 @@ CommonTools/ParticleFlow                         V00-03-16      V00-03-11
 CommonTools/RecoUtils                            V00-00-12      V00-00-03      
 DataFormats/PatCandidates                        V06-05-06      V06-05-01      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
-PhysicsTools/PatAlgos                            V08-09-28      V08-09-07-05   
+PhysicsTools/PatAlgos                            V08-09-29      V08-09-07-05   
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
 PhysicsTools/PatUtils                            V03-09-26      V03-09-18-03   
 RecoParticleFlow/PFProducer                      V15-02-06      V15-02-05-00   
