@@ -27,8 +27,6 @@ process.patJetCorrFactors.levels = [ 'L1Offset'
                                    , 'L2Relative'
                                    , 'L3Absolute'
                                    , 'L2L3Residual'
-                                   , 'L5Flavor'
-                                   , 'L7Parton'
                                    ]
 process.patJetCorrFactors.useRho = cms.bool( False )
 
