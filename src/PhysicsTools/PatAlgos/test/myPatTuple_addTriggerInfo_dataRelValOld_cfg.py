@@ -1,20 +1,22 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-cmsswVersion = 'CMSSW_5_3_0'
-globalTag    = 'GR_R_53_V1'
+cmsswVersion = 'CMSSW_6_0_0'
+globalTag    = 'GR_R_60_V3'
 process.GlobalTag.globaltag = '%s::All'%( globalTag )
 process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                     cmsswVersion  = cmsswVersion
                                                   , relVal        = 'SingleMu'
                                                   , dataTier      = 'RECO'
-                                                  , globalTag     = '%s_RelVal_wMu2011B'%( globalTag )
+                                                  , globalTag     = '%s_RelVal_mu2012A'%( globalTag )
                                                   , maxVersions   = 1
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
 
+process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
   process.patDefaultSequence
 )
@@ -30,8 +32,6 @@ process.patJetCorrFactors.levels = [ 'L1Offset'
                                    , 'L2Relative'
                                    , 'L3Absolute'
                                    , 'L2L3Residual'
-                                   , 'L5Flavor'
-                                   , 'L7Parton'
                                    ]
 process.patJetCorrFactors.useRho = cms.bool( False )
 

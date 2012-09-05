@@ -8,7 +8,7 @@ process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source.fileNames    = pickRelValInputFiles( relVal      = 'SingleMu'
                                                   , dataTier    = 'RECO'
-                                                  , globalTag   = '%s_RelVal_mu2011B'%( process.GlobalTag.globaltag.value()[ : -5 ] )
+                                                  , globalTag   = '%s_RelVal_mu2012A'%( process.GlobalTag.globaltag.value()[ : -5 ] )
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
@@ -30,8 +30,6 @@ process.patJetCorrFactors.levels = [ 'L1Offset'
                                    , 'L2Relative'
                                    , 'L3Absolute'
                                    , 'L2L3Residual'
-                                   , 'L5Flavor'
-                                   , 'L7Parton'
                                    ]
 process.patJetCorrFactors.useRho = cms.bool( False )
 
