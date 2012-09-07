@@ -1,6 +1,6 @@
-Test Release based on: CMSSW_4_4_4
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_4
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_4_4_4
+Test Release based on: CMSSW_4_4_5
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_4_5
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_4_4_5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-07-09      V06-07-07      
 CommonTools/ParticleFlow                         V00-03-05-10   V00-03-05-02   
