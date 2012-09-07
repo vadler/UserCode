@@ -16,6 +16,7 @@ overwrite = True # to throw away earlier versions of histograms, trees and funct
 # Exclusive switches:
 usePileUp = False
 useAlt    = True
+useNonT   = True
 useSymm   = True
 refGen    = True
 refSel    = True
@@ -55,6 +56,8 @@ logFile = inputFile.replace( 'root', 'log' )
 if not runTest:
   if useAlt:
     logFile = logFile.replace( '.', '_Alt.', 1 )
+  if useNonT:
+    logFile = logFile.replace( '.', '_NonT.', 1 )
   if useSymm:
     logFile = logFile.replace( '.', '_Symm.', 1 )
   if refGen:
@@ -79,6 +82,7 @@ if not runTest:
 process.overwrite = cms.bool( overwrite )
 process.usePileUp = cms.bool( usePileUp )
 process.useAlt    = cms.bool( useAlt )
+process.useNonT   = cms.bool( useNonT )
 process.useSymm   = cms.bool( useSymm )
 process.refGen    = cms.bool( refGen )
 process.refSel    = cms.bool( refSel )

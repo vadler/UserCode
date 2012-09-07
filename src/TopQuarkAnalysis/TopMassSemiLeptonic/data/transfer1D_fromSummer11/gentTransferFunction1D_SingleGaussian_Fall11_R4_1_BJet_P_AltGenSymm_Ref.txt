@@ -1,0 +1,30 @@
+
+fitted function:
+[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))
+for p_t_parton <= 500
+
+
+unrestricted
+
+total
+transfer_1 = 1.062
+transfer_2 = 10.58
+
+over p_t
+transfer_1 = -1.353 + 0.03743 * E_parton
+transfer_2 = 2.386 + 0.1045 * E_parton
+
+
+restricted
+p_t_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = 0.858
+transfer_2 = 10.38
+
+over p_t
+transfer_1 = -1.366 + 0.03409 * E_parton
+
+transfer_2 = 2.392 + 0.1012 * E_parton
+

@@ -59,6 +59,7 @@ int main( int argc, char * argv[] )
   const bool overwrite_(  process_.getParameter< bool >( "overwrite" ));
   const bool usePileUp_( process_.getParameter< bool >( "usePileUp" ) );
   const bool useAlt_( process_.getParameter< bool >( "useAlt" ) );
+  const bool useNonT_( process_.getParameter< bool >( "useNonT" ) );
   const bool useSymm_( process_.getParameter< bool >( "useSymm" ) );
   const bool refGen_( process_.getParameter< bool >( "refGen" ) );
   const bool refSel_( process_.getParameter< bool >( "refSel" ) );
@@ -103,9 +104,11 @@ int main( int argc, char * argv[] )
   const std::string nameFuncClass( "TF1" );
   if      ( verbose_ < 3 ) fitOptions1D_.append( "Q" );
   else if ( verbose_ > 4 ) fitOptions1D_.append( "V" );
+  const std::string nameVar( useNonT_ ? "P" : "Pt" );
+  const std::string titleVar( useNonT_ ? "p" : "p_{t}" );
   const std::string titlePt( refGen_ ? "p_{t}^{GEN} (GeV)" : "p_{t} (GeV)" );
   const std::string titleEta( refGen_ ? "#eta^{GEN}" : "#eta" );
-  const std::string titleTrans( refGen_ ? "#Deltap_{t}^{GEN} (GeV)" : "#Deltap_{t}^{RECO} (GeV)" );
+  const std::string titleTrans( refGen_ ? "#Delta" + titleVar + "^{GEN} (GeV)" : "#Delta" + titleVar + "^{RECO} (GeV)" );
   const std::string titleTransMean( "#mu of " + titleTrans );
   const std::string titleTransNorm( "c of " + titleTrans );
   const std::string titleTransSigma( "#sigma of " + titleTrans );
@@ -282,7 +285,7 @@ int main( int argc, char * argv[] )
       }
       dirFit_->cd();
 
-      const std::string name( objCat + "_Pt_" + subFit );
+      const std::string name( objCat + "_" + nameVar + "_" + subFit );
 
       const std::string nameTrans( name + "_Trans" );
       TH1D * histTrans( new TH1D( nameTrans.c_str(), objCat.c_str(), histBins_, -histMax_, histMax_ ) );
@@ -352,9 +355,11 @@ int main( int argc, char * argv[] )
           for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
             if ( ptBins_.at( uPt ) <= ptData_.at( uEta ).at( uEntry ) && ptData_.at( uEta ).at( uEntry ) < ptBins_.at( uPt + 1 ) ) {
               sizePt.at( uPt ) += 1;
+              Double_t ptVal( useNonT_ ? ptData_.at( uEta ).at( uEntry ) * std::cosh( etaData_.at( uEta ).at( uEntry ) ) : ptData_.at( uEta ).at( uEntry ) );
+              Double_t ptGenVal( useNonT_ ? ptGenData_.at( uEta ).at( uEntry ) * std::cosh( etaGenData_.at( uEta ).at( uEntry ) ) : ptGenData_.at( uEta ).at( uEntry ) );
               weightEtaBin.at( uPt ).push_back( weightData_.at( uEta ).at( uEntry ) );
-              ptEtaBin.at( uPt ).push_back( ptData_.at( uEta ).at( uEntry ) );
-              ptGenEtaBin.at( uPt ).push_back( ptGenData_.at( uEta ).at( uEntry ) );
+              ptEtaBin.at( uPt ).push_back( ptVal );
+              ptGenEtaBin.at( uPt ).push_back( ptGenVal );
               etaEtaBin.at( uPt ).push_back( etaData_.at( uEta ).at( uEntry ) );
               etaGenEtaBin.at( uPt ).push_back( etaGenData_.at( uEta ).at( uEntry ) );
               phiEtaBin.at( uPt ).push_back( phiData_.at( uEta ).at( uEntry ) );
@@ -667,7 +672,7 @@ int main( int argc, char * argv[] )
       const std::string fileName( "file" + objCat + ".pdf" );
       const std::string fileOpen( fileName + "[" );
       const std::string fileClose( fileName + "]" );
-      c1.Print( fileOpen.c_str() );
+      if ( plot1D_ ) c1.Print( fileOpen.c_str() );
 
       // Loop over fit versions
       nextInListProp.Reset();
@@ -682,7 +687,7 @@ int main( int argc, char * argv[] )
         TDirectory * dirFit_( ( TDirectory* )( dirPt_->Get( subFit.c_str() ) ) );
         dirFit_->cd();
 
-        const std::string name( objCat + "_Pt_" + subFit );
+        const std::string name( objCat + "_" + nameVar + "_" + subFit );
 
         // Transfer function parameters
         TF1 * fitTest( new TF1( "test", fitFunction1D_.c_str() ) );
@@ -732,7 +737,7 @@ int main( int argc, char * argv[] )
             }
           }
           histTransRebin->Draw();
-          c1.Print( fileName.c_str() );
+          if ( plot1D_ ) c1.Print( fileName.c_str() );
         }
 
         const std::string nameTransRestr( nameTrans + "Restr" );
@@ -765,7 +770,7 @@ int main( int argc, char * argv[] )
             }
           }
           histTransRestrRebin->Draw();
-          c1.Print( fileName.c_str() );
+          if ( plot1D_ ) c1.Print( fileName.c_str() );
         }
 
         // Loop over pt bins
@@ -819,7 +824,7 @@ int main( int argc, char * argv[] )
               }
             }
             histPtTransRebin->Draw();
-            c1.Print( fileName.c_str() );
+            if ( plot1D_ ) c1.Print( fileName.c_str() );
           }
 
           const std::string namePtTransRestr( namePt + "_TransRestr" );
@@ -853,7 +858,7 @@ int main( int argc, char * argv[] )
               }
             }
             histPtTransRestrRebin->Draw();
-            c1.Print( fileName.c_str() );
+            if ( plot1D_ ) c1.Print( fileName.c_str() );
           }
 
         } // loop: uPt < nPtBins_
@@ -886,7 +891,7 @@ int main( int argc, char * argv[] )
               }
             }
             histVecTransRebinPtFitMap.at( uPar )->Draw();
-            c1.Print( fileName.c_str() );
+            if ( plot1D_ ) c1.Print( fileName.c_str() );
           }
 
           const std::string nameTransRestrRebinPtFitMap( name + "_TransRestrRebinPt_FitMap_Par" + parFit );
@@ -914,7 +919,7 @@ int main( int argc, char * argv[] )
             }
           }
           histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
-          c1.Print( fileName.c_str() );
+          if ( plot1D_ ) c1.Print( fileName.c_str() );
         }
 
         // Loop over eta bins
@@ -1013,9 +1018,9 @@ int main( int argc, char * argv[] )
 
         for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
           histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
-          c1.Print( fileName.c_str() );
+          if ( plot1D_ ) c1.Print( fileName.c_str() );
           histVecTransRestrRebinEtaFitMap.at( uPar )->Draw();
-          c1.Print( fileName.c_str() );
+          if ( plot1D_ ) c1.Print( fileName.c_str() );
         }
 
         if ( writeFiles1D_ ) {
@@ -1031,7 +1036,7 @@ int main( int argc, char * argv[] )
 
           fileOut << std::endl << "fitted function:";
           fileOut << std::endl << fitFunction1D_;
-          fileOut << std::endl << "for p_t_oarton <= " << fitMaxPt1D_;
+          fileOut << std::endl << "for p_t_parton <= " << fitMaxPt1D_;
           fileOut << std::endl << std::endl;
 
 
@@ -1099,7 +1104,7 @@ int main( int argc, char * argv[] )
 
       } // loop: keyFit
 
-      c1.Print( fileClose.c_str() );
+      if ( plot1D_ ) c1.Print( fileClose.c_str() );
 
     }
 
