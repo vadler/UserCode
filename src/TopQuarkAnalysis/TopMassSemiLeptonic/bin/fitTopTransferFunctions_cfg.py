@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 
-runTest = True
+runTest = False
 
 # Origin of existing resolution functions
 # era    = 'Spring10'
@@ -15,7 +15,7 @@ sample = 'Fall11_R4_1'
 overwrite = True # to throw away earlier versions of histograms, trees and functions
 # Exclusive switches:
 usePileUp = False
-useAlt    = False
+useAlt    = True
 useSymm   = True
 refGen    = True
 refSel    = True
@@ -110,6 +110,7 @@ process.fit = cms.PSet(
 
 process.transfer1D = cms.PSet(
   fit         = cms.bool( fit1D )
+, plot        = cms.bool( True )
 , fitMaxPt    = cms.double( fitMaxPt1D )
 , fitFunction = cms.string( fitFunction1D )
 , fitOptions  = cms.string( fitOptions1D )

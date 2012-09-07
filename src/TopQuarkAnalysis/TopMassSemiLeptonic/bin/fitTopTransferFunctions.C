@@ -19,6 +19,7 @@
 #include <TF2.h>
 #include <TFitResult.h>
 #include <TMath.h>
+#include <TCanvas.h>
 
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -78,6 +79,7 @@ int main( int argc, char * argv[] )
   // Configuration for fitting starting transfer functions
   const edm::ParameterSet & transfer1D_( process_.getParameter< edm::ParameterSet >( "transfer1D" ) );
   const bool fit1D_( transfer1D_.getParameter< bool >( "fit" ) );
+  const bool plot1D_( transfer1D_.getParameter< bool >( "plot" ) );
   double fitMaxPt1D_( transfer1D_.getParameter< double >( "fitMaxPt" ) );
   const std::string fitFunction1D_( transfer1D_.getParameter< std::string >( "fitFunction" ) );
   std::string fitOptions1D_( transfer1D_.getParameter< std::string >( "fitOptions" ) );
@@ -660,6 +662,12 @@ int main( int argc, char * argv[] )
         std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                   << "    1D transfer function determination for " << objCat << " started" << std::endl;
       }
+      TCanvas c1( "c1" );
+      c1.cd();
+      const std::string fileName( "file" + objCat + ".pdf" );
+      const std::string fileOpen( fileName + "[" );
+      const std::string fileClose( fileName + "]" );
+      c1.Print( fileOpen.c_str() );
 
       // Loop over fit versions
       nextInListProp.Reset();
@@ -723,6 +731,8 @@ int main( int argc, char * argv[] )
               std::cout << "    '" << nameTransRebin << std::endl;
             }
           }
+          histTransRebin->Draw();
+          c1.Print( fileName.c_str() );
         }
 
         const std::string nameTransRestr( nameTrans + "Restr" );
@@ -754,6 +764,8 @@ int main( int argc, char * argv[] )
               std::cout << "    '" << nameTransRestrRebin << std::endl;
             }
           }
+          histTransRestrRebin->Draw();
+          c1.Print( fileName.c_str() );
         }
 
         // Loop over pt bins
@@ -806,6 +818,8 @@ int main( int argc, char * argv[] )
                 std::cout << "    '" << namePtTransRebin << std::endl;
               }
             }
+            histPtTransRebin->Draw();
+            c1.Print( fileName.c_str() );
           }
 
           const std::string namePtTransRestr( namePt + "_TransRestr" );
@@ -838,6 +852,8 @@ int main( int argc, char * argv[] )
                 std::cout << "    '" << namePtTransRestrRebin << std::endl;
               }
             }
+            histPtTransRestrRebin->Draw();
+            c1.Print( fileName.c_str() );
           }
 
         } // loop: uPt < nPtBins_
@@ -869,6 +885,8 @@ int main( int argc, char * argv[] )
                 std::cout << "    '" << nameTransRebinPtFitMap << std::endl;
               }
             }
+            histVecTransRebinPtFitMap.at( uPar )->Draw();
+            c1.Print( fileName.c_str() );
           }
 
           const std::string nameTransRestrRebinPtFitMap( name + "_TransRestrRebinPt_FitMap_Par" + parFit );
@@ -895,6 +913,8 @@ int main( int argc, char * argv[] )
               std::cout << "    '" << nameTransRestrRebinPtFitMap << std::endl;
             }
           }
+          histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
+          c1.Print( fileName.c_str() );
         }
 
         // Loop over eta bins
@@ -991,6 +1011,13 @@ int main( int argc, char * argv[] )
 
         } // loop: keyEta
 
+        for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+          histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
+          c1.Print( fileName.c_str() );
+          histVecTransRestrRebinEtaFitMap.at( uPar )->Draw();
+          c1.Print( fileName.c_str() );
+        }
+
         if ( writeFiles1D_ ) {
 
           // File name
@@ -1071,6 +1098,8 @@ int main( int argc, char * argv[] )
         }
 
       } // loop: keyFit
+
+      c1.Print( fileClose.c_str() );
 
     }
 
