@@ -8,7 +8,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 runOnMC       = True
-runOnRelVal   = True # If 'False', define input files in l. 217ff.
+runOnRelVal   = True # If 'False', define input files in l. 218ff.
 maxEvents     = -1
 gc            = True
 createNTuples = True
@@ -19,7 +19,7 @@ if lxplusTest:
   if not runOnMC:
     maxEvents = 1000
 else:
-  runOnRelVal = False # If 'False', define input files in l. 217ff.
+  runOnRelVal = False # If 'False', define input files in l. 218ff.
 
 runMatch  = True
 runMVA    = True
@@ -128,13 +128,13 @@ process = cms.Process( 'PF2PAT' )
 
 ### Conditions
 
-process.load( "Configuration.StandardSequences.Geometry_cff" )
+process.load( "Configuration.Geometry.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START52_V9C::All'
+  process.GlobalTag.globaltag = 'START53_V11::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_52_V7D::All'
+  process.GlobalTag.globaltag = 'GR_R_53_V13::All'
 
 if gc:
 	runOnMC   = eval('@MC@')
@@ -201,18 +201,20 @@ from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 inputFiles = cms.untracked.vstring()
 if runOnRelVal:
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_5_cand1'
-                                     , globalTag     = 'START52_V9'
-                                     , maxVersions   = 1
+    inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
+                                     , dataTier     = 'AODSIM'
+                                     , relVal       = 'RelValProdTTbar'
+                                     , globalTag    = 'START53_V10'
+                                     , maxVersions  = 1
                                      )
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_5_cand1'
-                                     , dataTier      = 'RECO'
-                                     , relVal        = 'SingleMu'
-                                     , globalTag     = 'GR_R_52_V7_RelVal_mu2011B'
-                                     #, relVal        = 'SingleElectron'
-                                     #, globalTag     = 'GR_R_52_V7_RelVal_electron2011B'
-                                     , maxVersions   = 1
+    inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
+                                     , dataTier     = 'RECO'
+                                     , relVal       = 'SingleMu'
+                                     , globalTag    = 'GR_R_53_V12_RelVal_mu2011B'
+                                     #, relVal       = 'SingleElectron'
+                                     #, globalTag    = 'GR_R_53_V12_RelVal_electron2011B'
+                                     , maxVersions  = 1
                                      )
 else:
   if runOnMC:
@@ -541,9 +543,7 @@ process.patJetPartonMatch.src = cms.InputTag( pfJetCollection )
 process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag( pfJetCollection )
 process.pfMET.jets = cms.InputTag( pfJetCollection )
 process.softMuonTagInfosAOD.jets = cms.InputTag( pfJetCollection )
-#process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
-if lxplusTest:
-  process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection ) # due to difference in LXPLUS test setup and recommended stup from README
+process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
 
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
