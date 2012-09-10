@@ -132,9 +132,9 @@ process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START52_V9C::All'
+  process.GlobalTag.globaltag = 'START52_V9D::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_52_V7D::All'
+  process.GlobalTag.globaltag = 'GR_R_52_V7E::All'
 
 if gc:
 	runOnMC   = eval('@MC@')
@@ -543,7 +543,7 @@ process.pfMET.jets = cms.InputTag( pfJetCollection )
 process.softMuonTagInfosAOD.jets = cms.InputTag( pfJetCollection )
 #process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
 if lxplusTest:
-  process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection ) # due to difference in LXPLUS test setup and recommended stup from README
+  process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection ) # FIXME: temporary; due to difference in LXPLUS test setup and recommended stup from README
 
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
