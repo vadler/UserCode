@@ -3,13 +3,13 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 cmsswVersion = 'CMSSW_5_3_2'
-globalTag    = 'GR_R_53_V2'
+globalTag    = 'GR_P_V39_AN1'
 process.GlobalTag.globaltag = '%s::All'%( globalTag )
 process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                     cmsswVersion  = cmsswVersion
                                                   , relVal        = 'SingleMu'
                                                   , dataTier      = 'RECO'
-                                                  , globalTag     = '%s_RelVal_mu2011B'%( globalTag )
+                                                  , globalTag     = 'GR_R_53_V2_RelVal_mu2011B'
                                                   , maxVersions   = 1
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
@@ -27,11 +27,6 @@ process.out.outputCommands += [
 
 from PhysicsTools.PatAlgos.tools.coreTools import runOnData
 runOnData( process )
-process.patJetCorrFactors.levels = [ 'L1Offset'
-                                   , 'L2Relative'
-                                   , 'L3Absolute'
-                                   , 'L2L3Residual'
-                                   ]
 process.patJetCorrFactors.useRho = cms.bool( False )
 
 # from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning

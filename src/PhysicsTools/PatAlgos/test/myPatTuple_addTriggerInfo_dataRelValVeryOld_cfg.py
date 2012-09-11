@@ -1,17 +1,20 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
-condition                   = 'com10'
-globalTag                   = autoCond[ condition ][ : -5 ]
-process.GlobalTag.globaltag = autoCond[ condition ]
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-process.source.fileNames    = pickRelValInputFiles( relVal      = 'SingleMu'
-                                                  , dataTier    = 'RECO'
-                                                  , globalTag   = '%s_RelVal_mu2012A'%( globalTag )
+cmsswVersion = 'CMSSW_5_2_5_cand1'
+globalTag    = 'GR_P_V39_AN1'
+process.GlobalTag.globaltag = '%s::All'%( globalTag )
+process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
+                                                    cmsswVersion  = cmsswVersion
+                                                  , relVal        = 'SingleMu'
+                                                  , dataTier      = 'RECO'
+                                                  , globalTag     = 'GR_R_52_V7_RelVal_mu2011B'
+                                                  , maxVersions   = 1
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
-process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
+process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelValVeryOld.root'%( os.getenv( "CMSSW_BASE" ) )
 
 process.p = cms.Path(
   process.patDefaultSequence
