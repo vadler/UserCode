@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-fileNamesOld = cms.PSet(
+fileNames2011 = cms.PSet(
   fileNames = cms.untracked.vstring(
     '/store/data/Run2011A/MuHad/RAW/v1/000/165/121/30B69E98-C67F-E011-8697-003048D37560.root'
   , '/store/data/Run2011A/MuHad/RAW/v1/000/165/121/80E66677-C27F-E011-8A15-001D09F29321.root'
