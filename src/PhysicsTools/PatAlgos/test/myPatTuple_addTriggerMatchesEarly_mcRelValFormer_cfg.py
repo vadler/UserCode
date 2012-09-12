@@ -2,18 +2,22 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
+# Steering
+cmsswVersion = 'CMSSW_6_0_0'
+globalTag    = 'START60_V4'
+
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_6_0_0'
+process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = cmsswVersion
                                                   , relVal        = 'RelValProdTTbar'
                                                   , dataTier      = 'AODSIM'
-                                                  , globalTag     = 'START60_V4'
+                                                  , globalTag     = globalTag
                                                   , maxVersions   = 1
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
-process.GlobalTag.globaltag = 'START60_V5::All'
+process.GlobalTag.globaltag = '%s::All'%( globalTag )
 process.maxEvents.input     = 10
 process.options.wantSummary = False
-process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
+process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelValFormer.root'%( os.getenv( "CMSSW_BASE" ) )
 
 
 ## let it run

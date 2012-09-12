@@ -5,7 +5,7 @@ process = cms.Process( "HLTPROV" )
 # Conditions
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from HLTrigger.Configuration.AutoCondGlobalTag import AutoCondGlobalTag
-condition         = 'com10_5E33v4'
+condition         = 'com10'
 process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 
 # Source
@@ -33,13 +33,13 @@ process.maxEvents = cms.untracked.PSet(
 # Trigger analyzers
 process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
 process.hltEventAnalyzerAOD.triggerName    = cms.string( '@' )
-process.hltEventAnalyzerReAOD = process.hltEventAnalyzerAOD.clone( processName    = cms.string( 'HLT' )
-                                                                 , triggerResults = cms.InputTag( 'TriggerResults', '', 'HLT' )
-                                                                 , triggerEvent   = cms.InputTag( 'hltTriggerSummaryAOD', '', 'HLT' )
+process.hltEventAnalyzerReAOD = process.hltEventAnalyzerAOD.clone( processName    = cms.string( 'reHLT' )
+                                                                 , triggerResults = cms.InputTag( 'TriggerResults', '', 'reHLT' )
+                                                                 , triggerEvent   = cms.InputTag( 'hltTriggerSummaryAOD', '', 'reHLT' )
                                                                  )
 process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
-process.triggerSummaryAnalyzerAOD.inputTag = cms.InputTag( 'hltTriggerSummaryAOD', '', 'HLT' )
-process.triggerSummaryAnalyzerReAOD = process.triggerSummaryAnalyzerAOD.clone( inputTag = cms.InputTag( 'hltTriggerSummaryAOD', '', 'HLT' )
+process.triggerSummaryAnalyzerAOD.inputTag = cms.InputTag( 'hltTriggerSummaryAOD', '', 'reHLT' )
+process.triggerSummaryAnalyzerReAOD = process.triggerSummaryAnalyzerAOD.clone( inputTag = cms.InputTag( 'hltTriggerSummaryAOD', '', 'reHLT' )
                                                                              )
 process.load( "L1Trigger.GlobalTriggerAnalyzer.l1GtAnalyzer_cfi" )
 process.l1GtAnalyzer.AlgorithmName = "L1_SingleMu7"

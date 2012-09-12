@@ -2,7 +2,9 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-condition = 'com10'
+cmsswVersion = 'CMSSW_6_0_0'
+globalTag    = 'GR_R_60_V3'
+condition    = 'com10'
 
 process = cms.Process("PAT")
 
@@ -27,9 +29,11 @@ process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source(
   "PoolSource"
-, fileNames = cms.untracked.vstring( pickRelValInputFiles( relVal      = 'SingleMu'
-                                                         , dataTier    = 'RECO'
-                                                         , globalTag   = '%s_RelVal_mu2012A'%( process.GlobalTag.globaltag.value()[ : -5 ] )
+, fileNames = cms.untracked.vstring( pickRelValInputFiles( cmsswVersion  = cmsswVersion
+                                                         , relVal        = 'SingleMu'
+                                                         , dataTier      = 'RECO'
+                                                         , globalTag     = '%s_RelVal_mu2012A'%( globalTag )
+                                                         , maxVersions   = 1
                                                          )
                                    )
 , skipBadFiles = cms.untracked.bool( True )
@@ -47,7 +51,7 @@ process.out = cms.OutputModule(
       'p'
     )
   )
-, fileName = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) ) )
+, fileName = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfo_dataRelValFormer.root'%( os.getenv( "CMSSW_BASE" ) ) )
 , outputCommands = cms.untracked.vstring(
     *patEventContentNoCleaning
   )
@@ -71,8 +75,6 @@ runOnData( process )
 process.patJetCorrFactors.useRho = cms.bool( False )
 process.out.outputCommands += [ 'drop recoGenJets_*_*_*' ]
 
-# from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
-# removeCleaning( process )
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *

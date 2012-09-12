@@ -4,15 +4,9 @@ process = cms.Process( "HLTPROV" )
 
 # Conditions
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-from Configuration.AlCa.autoCond import autoCond
-condition                   = 'com10_5E33v4'
-process.GlobalTag.globaltag = cms.string( autoCond[ condition ][ 0 ] )
-l1Menu                      = autoCond[ condition ][ 1 ].split( ',' )
-process.GlobalTag.toGet.append( cms.PSet( tag     = cms.string( l1Menu[ 0 ] )
-                                        , record  = cms.string( l1Menu[ 1 ] )
-                                        , connect = cms.untracked.string( l1Menu[ 2 ] )
-                                        )
-                              )
+from HLTrigger.Configuration.AutoCondGlobalTag import AutoCondGlobalTag
+condition = 'com10_5E33v4'
+process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 
 # Source
 from PhysicsTools.PatAlgos.myPatTuple_dataFromRAW_cff import fileNames

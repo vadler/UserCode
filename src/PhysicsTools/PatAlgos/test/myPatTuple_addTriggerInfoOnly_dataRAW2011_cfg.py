@@ -1,41 +1,57 @@
 import os
-cmsswBase = os.getenv( "CMSSW_BASE" )
-
 import FWCore.ParameterSet.Config as cms
+
+# Steering
+condition = 'com10_5E33v4'
 
 process = cms.Process( "PAT" )
 
-## Options and Output Report
+## Options
 process.options = cms.untracked.PSet(
-  wantSummary = cms.untracked.bool( False )
+  wantSummary      = cms.untracked.bool( False )
+, allowUnscheduled = cms.untracked.bool( False )
 )
 
-## Source
-from PhysicsTools.PatAlgos.myPatTuple_dataFromRAW_cff import fileNamesOld
-process.source = cms.Source( "PoolSource"
-, fileNamesOld
+## Messaging
+process.load("FWCore.MessageLogger.MessageLogger_cfi")
+#process.Tracer = cms.Service("Tracer")
+
+## Conditions
+process.load( "Configuration.StandardSequences.Services_cff" )
+process.load( "Configuration.Geometry.GeometryIdeal_cff" )
+process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
+process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
+from HLTrigger.Configuration.AutoCondGlobalTag import AutoCondGlobalTag
+process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
+
+## Input
+from PhysicsTools.PatAlgos.myPatTuple_dataFromRAW_cff import fileNames2011
+process.source = cms.Source(
+  "PoolSource"
+, fileNames2011
+, skipBadFiles = cms.untracked.bool( True )
 )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 100 )
 )
-## FIXME: Is this still needed?
-#process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskAlgoTrigConfig_cff" )
-#process.load( "L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff" )
 
-## Geometry and Detector Conditions (needed for a few patTuple production steps)
-process.load( "Configuration.StandardSequences.Services_cff" )
-process.load( "Configuration.Geometry.GeometryRecoDB_cff" )
-process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-from Configuration.AlCa.autoCond import autoCond
-condition                   = 'com10_5E33v4'
-process.GlobalTag.globaltag = cms.string( autoCond[ condition ][ 0 ] )
-l1Menu                      = autoCond[ condition ][ 1 ].split( ',' )
-process.GlobalTag.toGet.append( cms.PSet( tag     = cms.string( l1Menu[ 0 ] )
-                                        , record  = cms.string( l1Menu[ 1 ] )
-                                        , connect = cms.untracked.string( l1Menu[ 2 ] )
-                                        )
-                              )
-process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
+## Output
+from L1Trigger.Configuration.L1Trigger_EventContent_cff import L1TriggerAOD
+process.out = cms.OutputModule(
+  "PoolOutputModule"
+, SelectEvents = cms.untracked.PSet(
+    SelectEvents = cms.vstring(
+      'p'
+    )
+  )
+, fileName       = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfoOnly_dataRAW2011.root'%( os.getenv( "CMSSW_BASE" ) ) )
+, outputCommands = cms.untracked.vstring(
+    *L1TriggerAOD.outputCommands
+  )
+)
+process.outpath = cms.EndPath(
+  process.out
+)
 
 ## RAW to DIGI and RECO pre-requisites
 process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )
@@ -46,25 +62,6 @@ process.p = cms.Path(
 * process.gtEvmDigis
 * process.scalersRawToDigi
 * process.L1Reco
-)
-
-## Output
-from L1Trigger.Configuration.L1Trigger_EventContent_cff import L1TriggerAOD
-process.out = cms.OutputModule(
-  "PoolOutputModule"
-, fileName       = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfoOnly_dataFromRAWOld.root'%( cmsswBase ) )
-, SelectEvents   = cms.untracked.PSet(
-    SelectEvents = cms.vstring(
-      'p'
-    )
-  )
-, outputCommands = cms.untracked.vstring(
-    'drop *'
-  , *L1TriggerAOD.outputCommands
-  )
-)
-process.outpath = cms.EndPath(
-  process.out
 )
 
 ## PAT trigger
