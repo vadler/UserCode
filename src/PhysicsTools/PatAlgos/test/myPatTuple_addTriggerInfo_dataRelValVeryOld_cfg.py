@@ -1,18 +1,17 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
-from HLTrigger.Configuration.AutoCondGlobalTag import AutoCondGlobalTag
-condition         = 'com10'
-process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
-
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-process.source.fileNames    = pickRelValInputFiles( relVal      = 'SingleMu'
-                                                  , dataTier    = 'RECO'
-                                                  , globalTag   = '%s_RelVal_mu2012A'%( process.GlobalTag.globaltag.value()[ : -5 ] )
+process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_3_2'
+                                                  , relVal        = 'SingleMu'
+                                                  , dataTier      = 'RECO'
+                                                  , globalTag     = 'GR_R_53_V2_RelVal_mu2011B'
+                                                  , maxVersions   = 1
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
+process.GlobalTag.globaltag = 'GR_P_V39_AN1::All'
 process.options.wantSummary = False
-process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
+process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelValVeryOld.root'%( os.getenv( "CMSSW_BASE" ) )
 
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
@@ -42,7 +41,7 @@ process.tschuess           = patTriggerEvent.clone()
 process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
 process.moin = cleanMuonTriggerMatchPDSingleMu.clone()
-process.tach = metTriggerMatchHLTMu17.clone()
+process.tach = metTriggerMatchHLTMu20.clone()
 switchOnTrigger( process )
 # process.patTrigger.saveL1Refs = cms.bool( True )
 # switchOnTrigger( process ) # to update event content

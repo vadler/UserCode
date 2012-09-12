@@ -2,17 +2,14 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-cmsswVersion = 'CMSSW_6_0_0'
-globalTag    = 'GR_R_60_V3'
-process.GlobalTag.globaltag = '%s::All'%( globalTag )
-process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
-                                                    cmsswVersion  = cmsswVersion
+process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = 'CMSSW_6_0_0'
                                                   , relVal        = 'SingleMu'
                                                   , dataTier      = 'RECO'
-                                                  , globalTag     = '%s_RelVal_mu2012A'%( globalTag )
+                                                  , globalTag     = 'GR_R_60_V3_RelVal_mu2012A'
                                                   , maxVersions   = 1
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
+process.GlobalTag.globaltag = 'GR_R_60_V6::All'
 process.options.wantSummary = False
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_dataRelValOld.root'%( os.getenv( "CMSSW_BASE" ) )
 
@@ -28,11 +25,6 @@ process.out.outputCommands += [
 
 from PhysicsTools.PatAlgos.tools.coreTools import runOnData
 runOnData( process )
-process.patJetCorrFactors.levels = [ 'L1Offset'
-                                   , 'L2Relative'
-                                   , 'L3Absolute'
-                                   , 'L2L3Residual'
-                                   ]
 process.patJetCorrFactors.useRho = cms.bool( False )
 
 # from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
