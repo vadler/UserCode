@@ -15,8 +15,8 @@ process.options = cms.untracked.PSet(
 )
 
 ## Messaging
-process.load("FWCore.MessageLogger.MessageLogger_cfi")
-#process.Tracer = cms.Service("Tracer")
+process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
+#process.Tracer = cms.Service( "Tracer" )
 
 ## Conditions
 process.load( "Configuration.Geometry.GeometryIdeal_cff" )
@@ -64,17 +64,16 @@ process.outpath = cms.EndPath(
   process.out
 )
 
+## Processing
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
   process.patDefaultSequence
 )
 
-
 from PhysicsTools.PatAlgos.tools.myTools import runOnData
 runOnData( process )
 process.patJetCorrFactors.useRho = cms.bool( False )
 process.out.outputCommands += [ 'drop recoGenJets_*_*_*' ]
-
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
@@ -86,11 +85,11 @@ process.hallo.addPathModuleLabels = cms.bool( True )
 process.tschuess           = patTriggerEvent.clone()
 process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
-process.moin = cleanMuonTriggerMatchPDSingleMu.clone()
+process.moin = selectedMuonTriggerMatchPDSingleMu.clone()
 process.tach = metTriggerMatchHLTMu17.clone()
 switchOnTrigger( process )
-# process.patTrigger.saveL1Refs = cms.bool( True )
-# switchOnTrigger( process ) # to update event content
+process.patTrigger.saveL1Refs = cms.bool( True )
+switchOnTrigger( process ) # to update event content
 switchOnTriggerMatching( process )
 switchOnTriggerStandAlone( process )
 switchOnTriggerMatchingStandAlone( process )
@@ -100,7 +99,6 @@ switchOnTriggerMatching( process, triggerMatchers = [ 'moin', 'tach' ], triggerP
 switchOnTriggerStandAlone( process, triggerProducer = 'hallo', hltProcess = '*' )
 switchOnTriggerMatchingStandAlone( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo' )
 switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo' )
-# removeCleaningFromTriggerMatching( process )
 # print
 # print 'Path p'
 # print '--> %s'%( process.p )

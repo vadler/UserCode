@@ -1,4 +1,3 @@
-## import skeleton process
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
@@ -6,6 +5,14 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 cmsswVersion = 'CMSSW_6_0_0'
 globalTag    = 'START60_V4'
 
+## Options
+process.options.wantSummary      = False
+process.options.allowUnscheduled = cms.untracked.bool( False )
+
+## Messaging
+#process.Tracer = cms.Service( "Tracer" )
+
+## Input
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = cmsswVersion
                                                   , relVal        = 'RelValProdTTbar'
@@ -14,28 +21,27 @@ process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = cmsswVersion
                                                   , maxVersions   = 1
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
-process.GlobalTag.globaltag = '%s::All'%( globalTag )
 process.maxEvents.input     = 10
-process.options.wantSummary = False
-process.out.fileName        = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelValFormer.root'%( os.getenv( "CMSSW_BASE" ) )
 
+## Output
+process.out.fileName = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelValFormer.root'%( os.getenv( "CMSSW_BASE" ) )
 
-## let it run
+## Processing
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
   process.patCandidates
 )
 
-## add trigger information to the configuration
+# Trigger
 from PhysicsTools.PatAlgos.triggerLayer1.triggerMatcher_cfi import *
-process.muonTriggerMatchHLTMu17                                     = cleanMuonTriggerMatchHLTMu17.clone( src = 'patMuons' )
-process.muonTriggerMatchHLTDoubleMu5IsoMu5                          = cleanMuonTriggerMatchHLTDoubleMu5IsoMu5.clone( src = 'patMuons' )
-process.photonTriggerMatchHLTPhoton26Photon18                       = cleanPhotonTriggerMatchHLTPhoton26Photon18.clone( src = 'patPhotons' )
-process.electronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL = cleanElectronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL.clone( src = 'patElectrons' )
-process.tauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1          = cleanTauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1.clone( src = 'patTaus' )
-process.jetTriggerMatchHLTPFJet40                                   = cleanJetTriggerMatchHLTPFJet40.clone( src = 'patJets' )
-process.muonTriggerMatchHLTMu8DiJet30                               = cleanMuonTriggerMatchHLTMu8DiJet30.clone( src = 'patMuons' )
-process.jetTriggerMatchHLTMu8DiJet30                                = cleanJetTriggerMatchHLTMu8DiJet30.clone( src = 'patJets' )
+process.muonTriggerMatchHLTMu17                                     = selectedMuonTriggerMatchHLTMu17.clone( src = 'patMuons' )
+process.muonTriggerMatchHLTDoubleMu5IsoMu5                          = selectedMuonTriggerMatchHLTDoubleMu5IsoMu5.clone( src = 'patMuons' )
+process.photonTriggerMatchHLTPhoton26Photon18                       = selectedPhotonTriggerMatchHLTPhoton26Photon18.clone( src = 'patPhotons' )
+process.electronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL = selectedElectronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL.clone( src = 'patElectrons' )
+process.tauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1          = selectedTauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1.clone( src = 'patTaus' )
+process.jetTriggerMatchHLTPFJet40                                   = selectedJetTriggerMatchHLTPFJet40.clone( src = 'patJets' )
+process.muonTriggerMatchHLTMu8DiJet30                               = selectedMuonTriggerMatchHLTMu8DiJet30.clone( src = 'patMuons' )
+process.jetTriggerMatchHLTMu8DiJet30                                = selectedJetTriggerMatchHLTMu8DiJet30.clone( src = 'patJets' )
 from PhysicsTools.PatAlgos.tools.trigTools import switchOnTriggerMatchEmbedding
 switchOnTriggerMatchEmbedding( process
                              , [ 'muonTriggerMatchHLTMu17'
@@ -62,8 +68,6 @@ process.out.outputCommands += [ 'drop *_patMETs_*_*'
                               ]
 
 process.p *= process.selectedPatCandidates
-process.p *= process.cleanPatCandidates
-process.p *= process.countPatCandidates
 print
 print process.patCandidatesTrigger
 print

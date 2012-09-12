@@ -13,8 +13,8 @@ process.options = cms.untracked.PSet(
 )
 
 ## Messaging
-process.load("FWCore.MessageLogger.MessageLogger_cfi")
-#process.Tracer = cms.Service("Tracer")
+process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
+#process.Tracer = cms.Service( "Tracer" )
 
 ## Conditions
 process.load( "Configuration.StandardSequences.Services_cff" )

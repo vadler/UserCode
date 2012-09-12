@@ -5,6 +5,14 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 cmsswVersion = 'CMSSW_6_0_0'
 globalTag    = 'START60_V4'
 
+## Options
+process.options.wantSummary      = False
+process.options.allowUnscheduled = cms.untracked.bool( False )
+
+## Messaging
+#process.Tracer = cms.Service( "Tracer" )
+
+## Input
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = cmsswVersion
                                                   , relVal        = 'RelValProdTTbar'
@@ -13,28 +21,19 @@ process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = cmsswVersion
                                                   , maxVersions   = 1
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
-process.GlobalTag.globaltag = '%s::All'%( globalTag )
-process.options.wantSummary = False
+
+## Output
 process.out.fileName        = '%s/output/myPatTuple_addTriggerInfo_mcRelValFormer.root'%( os.getenv( "CMSSW_BASE" ) )
-
-# # memory check
-# process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck"
-# # , oncePerEventMode = cms.untracked.bool( True )
-# , ignoreTotal      = cms.untracked.int32( 0 )
-# )
-
-process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
-process.p = cms.Path(
-  process.patDefaultSequence
-)
-
 process.out.outputCommands += [
   'keep edmTriggerResults_TriggerResults_*_HLT'
 , 'keep *_hltTriggerSummaryAOD_*_*'
 ]
 
-# from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
-# removeCleaning( process )
+## Processing
+process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
+process.p = cms.Path(
+  process.patDefaultSequence
+)
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
@@ -47,11 +46,11 @@ process.hallo.addPathModuleLabels = cms.bool( True )
 process.tschuess           = patTriggerEvent.clone()
 process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
-process.moin = cleanMuonTriggerMatchPDSingleMu.clone()
+process.moin = selectedMuonTriggerMatchPDSingleMu.clone()
 process.tach = metTriggerMatchHLTMu17.clone()
 switchOnTrigger( process )
-# process.patTrigger.saveL1Refs = cms.bool( True )
-# switchOnTrigger( process ) # to update event content
+process.patTrigger.saveL1Refs = cms.bool( True )
+switchOnTrigger( process ) # to update event content
 switchOnTriggerMatching( process )
 switchOnTriggerStandAlone( process )
 switchOnTriggerMatchingStandAlone( process )
@@ -61,7 +60,6 @@ switchOnTriggerMatching( process, triggerMatchers = [ 'moin', 'tach' ], triggerP
 switchOnTriggerStandAlone( process, triggerProducer = 'hallo', hltProcess = '*' )
 switchOnTriggerMatchingStandAlone( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo' )
 switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo' )
-# removeCleaningFromTriggerMatching( process )
 # print
 # print 'Path p'
 # print '--> %s'%( process.p )
