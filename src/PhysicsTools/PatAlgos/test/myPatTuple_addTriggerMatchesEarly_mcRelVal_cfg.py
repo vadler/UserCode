@@ -18,6 +18,8 @@ process.maxEvents.input     = 10
 
 ## Output
 process.out.fileName = '%s/output/myPatTuple_addTriggerMatchesEarly_mcRelVal.root'%( os.getenv( "CMSSW_BASE" ) )
+process.out.outputCommands.append( 'keep edmTriggerResults_TriggerResults_*_*' )
+process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
 
 ## Processing
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
@@ -27,25 +29,26 @@ process.p = cms.Path(
 
 # Trigger
 from PhysicsTools.PatAlgos.triggerLayer1.triggerMatcher_cfi import *
-process.muonTriggerMatchHLTMu17                                     = selectedMuonTriggerMatchHLTMu17.clone( src = 'patMuons' )
-process.muonTriggerMatchHLTDoubleMu5IsoMu5                          = selectedMuonTriggerMatchHLTDoubleMu5IsoMu5.clone( src = 'patMuons' )
-process.photonTriggerMatchHLTPhoton26Photon18                       = selectedPhotonTriggerMatchHLTPhoton26Photon18.clone( src = 'patPhotons' )
-process.electronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL = selectedElectronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL.clone( src = 'patElectrons' )
-process.tauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1          = selectedTauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1.clone( src = 'patTaus' )
-process.jetTriggerMatchHLTPFJet40                                   = selectedJetTriggerMatchHLTPFJet40.clone( src = 'patJets' )
-process.muonTriggerMatchHLTMu8DiJet30                               = selectedMuonTriggerMatchHLTMu8DiJet30.clone( src = 'patMuons' )
-process.jetTriggerMatchHLTMu8DiJet30                                = selectedJetTriggerMatchHLTMu8DiJet30.clone( src = 'patJets' )
+process.patMuonTriggerMatchHLTMu17                                     = somePatMuonTriggerMatchHLTMu17.clone( src = 'patMuons' )
+process.patMuonTriggerMatchHLTDoubleMu5IsoMu5                          = somePatMuonTriggerMatchHLTDoubleMu5IsoMu5.clone( src = 'patMuons' )
+process.patPhotonTriggerMatchHLTPhoton26Photon18                       = somePatPhotonTriggerMatchHLTPhoton26Photon18.clone( src = 'patPhotons' )
+process.patElectronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL = somePatElectronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL.clone( src = 'patElectrons' )
+process.patTauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1          = somePatTauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1.clone( src = 'patTaus' )
+process.patJetTriggerMatchHLTPFJet40                                   = somePatJetTriggerMatchHLTPFJet40.clone( src = 'patJets' )
+process.patMetTriggerMatchHLTMET120                                    = somePatMetTriggerMatchHLTMET120.clone()
+process.patMuonTriggerMatchHLTMu8DiJet30                               = somePatMuonTriggerMatchHLTMu8DiJet30.clone( src = 'patMuons' )
+process.patJetTriggerMatchHLTMu8DiJet30                                = somePatJetTriggerMatchHLTMu8DiJet30.clone( src = 'patJets' )
 from PhysicsTools.PatAlgos.tools.trigTools import switchOnTriggerMatchEmbedding
 switchOnTriggerMatchEmbedding( process
-                             , [ 'muonTriggerMatchHLTMu17'
-                               , 'muonTriggerMatchHLTDoubleMu5IsoMu5'
-                               , 'photonTriggerMatchHLTPhoton26Photon18'
-                               , 'electronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL'
-                               , 'tauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1'
-                               , 'jetTriggerMatchHLTPFJet40'
-                               , 'metTriggerMatchHLTMET120'
-                               , 'muonTriggerMatchHLTMu8DiJet30'
-                               , 'jetTriggerMatchHLTMu8DiJet30'
+                             , [ 'patMuonTriggerMatchHLTMu17'
+                               , 'patMuonTriggerMatchHLTDoubleMu5IsoMu5'
+                               , 'patPhotonTriggerMatchHLTPhoton26Photon18'
+                               , 'patElectronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL'
+                               , 'patTauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1'
+                               , 'patJetTriggerMatchHLTPFJet40'
+                               , 'patMetTriggerMatchHLTMET120'
+                               , 'patMuonTriggerMatchHLTMu8DiJet30'
+                               , 'patJetTriggerMatchHLTMu8DiJet30'
                                ]
                              , sequence = 'patCandidates'
                              , outputModule = ''
@@ -55,10 +58,6 @@ process.selectedPatPhotons.src   = 'patPhotonsTriggerMatch'
 process.selectedPatElectrons.src = 'patElectronsTriggerMatch'
 process.selectedPatTaus.src      = 'patTausTriggerMatch'
 process.selectedPatJets.src      = 'patJetsTriggerMatch'
-# special for MET
-process.out.outputCommands += [ 'drop *_patMETs_*_*'
-                              , 'keep *_patMETsTriggerMatch_*_*'
-                              ]
 
 process.p *= process.selectedPatCandidates
 print

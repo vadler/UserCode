@@ -21,8 +21,8 @@ process.load( "Configuration.StandardSequences.Services_cff" )
 process.load( "Configuration.Geometry.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-from HLTrigger.Configuration.AutoCondGlobalTag import AutoCondGlobalTag
-process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 
 ## Input
 from PhysicsTools.PatAlgos.myPatTuple_dataFromRAW_cff import fileNames
@@ -46,6 +46,8 @@ process.out = cms.OutputModule(
 , fileName       = cms.untracked.string( '%s/output/myPatTuple_addTriggerStandAloneInfoOnly_dataRAW.root'%( os.getenv( "CMSSW_BASE" ) ) )
 , outputCommands = cms.untracked.vstring()
 )
+process.out.outputCommands.append( 'keep edmTriggerResults_TriggerResults_*_*' )
+process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
 process.outpath = cms.EndPath(
   process.out
 )

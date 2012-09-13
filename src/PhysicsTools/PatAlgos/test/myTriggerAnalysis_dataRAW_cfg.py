@@ -17,8 +17,8 @@ process.MessageLogger.cerr.L1GtTrigReport = cms.untracked.PSet( limit = cms.untr
 
 # Conditions
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-from HLTrigger.Configuration.AutoCondGlobalTag import AutoCondGlobalTag
-process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 
 ## Input
 from PhysicsTools.PatAlgos.myPatTuple_dataFromRAW_cff import fileNames

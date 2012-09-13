@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 # Steering
 cmsswVersion = 'CMSSW_6_0_0'
 globalTag    = 'GR_R_60_V3'
-condition    = 'com10'
+condition    = 'com10_7E33v3'
 
 process = cms.Process("PAT")
 
@@ -22,8 +22,8 @@ process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
 process.load( "Configuration.Geometry.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-from HLTrigger.Configuration.AutoCondGlobalTag import AutoCondGlobalTag
-process.GlobalTag = AutoCondGlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 
 ## Input
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
@@ -56,10 +56,8 @@ process.out = cms.OutputModule(
     *patEventContentNoCleaning
   )
 )
-process.out.outputCommands += [
-  'keep edmTriggerResults_TriggerResults_*_HLT'
-, 'keep *_hltTriggerSummaryAOD_*_*'
-]
+process.out.outputCommands.append( 'keep edmTriggerResults_TriggerResults_*_*' )
+process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
 process.outpath = cms.EndPath(
   process.out
 )
@@ -85,20 +83,18 @@ process.hallo.addPathModuleLabels = cms.bool( True )
 process.tschuess           = patTriggerEvent.clone()
 process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
 process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
-process.moin = selectedMuonTriggerMatchPDSingleMu.clone()
-process.tach = metTriggerMatchHLTMu17.clone()
+process.moin = somePatMuonTriggerMatchPDSingleMu.clone()
+process.tach = somePatMetTriggerMatchHLTMu17.clone()
 switchOnTrigger( process )
-process.patTrigger.saveL1Refs = cms.bool( True )
-switchOnTrigger( process ) # to update event content
 switchOnTriggerMatching( process )
 switchOnTriggerStandAlone( process )
 switchOnTriggerMatchingStandAlone( process )
-switchOnTriggerMatchEmbedding( process )
+#switchOnTriggerMatchEmbedding( process )
 switchOnTrigger( process, triggerProducer = 'hallo', triggerEventProducer = 'tschuess', hltProcess = '*' )
-switchOnTriggerMatching( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo', triggerEventProducer = 'tschuess' )
+switchOnTriggerMatching( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo', triggerEventProducer = 'tschuess', hltProcess = '*' )
 switchOnTriggerStandAlone( process, triggerProducer = 'hallo', hltProcess = '*' )
-switchOnTriggerMatchingStandAlone( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo' )
-switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo' )
+switchOnTriggerMatchingStandAlone( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo', hltProcess = '*' )
+switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo', hltProcess = '*' )
 # print
 # print 'Path p'
 # print '--> %s'%( process.p )
