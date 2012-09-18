@@ -106,7 +106,7 @@ int main( int argc, char * argv[] )
   else if ( verbose_ > 4 ) fitOptions1D_.append( "V" );
   const std::string nameVar( useNonT_ ? "P" : "Pt" );
   const std::string titleVar( useNonT_ ? "p" : "p_{t}" );
-  const std::string titlePt( refGen_ ? "p_{t}^{GEN} (GeV)" : "p_{t} (GeV)" );
+  const std::string titleX( refGen_ ? titleVar + "^{GEN} (GeV)" : titleVar + " (GeV)" );
   const std::string titleEta( refGen_ ? "#eta^{GEN}" : "#eta" );
   const std::string titleTrans( refGen_ ? "#Delta" + titleVar + "^{GEN} (GeV)" : "#Delta" + titleVar + "^{RECO} (GeV)" );
   const std::string titleTransMean( "#mu of " + titleTrans );
@@ -353,10 +353,11 @@ int main( int argc, char * argv[] )
         for ( unsigned uEntry = 0; uEntry < sizeEta_.at( uEta ); ++uEntry ) {
           if ( ptData_.at( uEta ).at( uEntry ) == -9. || ptGenData_.at( uEta ).at( uEntry ) == -9. ) continue; // no match
           for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
-            if ( ptBins_.at( uPt ) <= ptData_.at( uEta ).at( uEntry ) && ptData_.at( uEta ).at( uEntry ) < ptBins_.at( uPt + 1 ) ) {
+            Double_t ptVal( useNonT_ ? ptData_.at( uEta ).at( uEntry ) * std::cosh( etaData_.at( uEta ).at( uEntry ) ) : ptData_.at( uEta ).at( uEntry ) );
+            Double_t ptGenVal( useNonT_ ? ptGenData_.at( uEta ).at( uEntry ) * std::cosh( etaGenData_.at( uEta ).at( uEntry ) ) : ptGenData_.at( uEta ).at( uEntry ) );
+            Double_t ptRef( refGen_ ? ptGenVal : ptVal );
+            if ( ptBins_.at( uPt ) <= ptRef && ptRef < ptBins_.at( uPt + 1 ) ) {
               sizePt.at( uPt ) += 1;
-              Double_t ptVal( useNonT_ ? ptData_.at( uEta ).at( uEntry ) * std::cosh( etaData_.at( uEta ).at( uEntry ) ) : ptData_.at( uEta ).at( uEntry ) );
-              Double_t ptGenVal( useNonT_ ? ptGenData_.at( uEta ).at( uEntry ) * std::cosh( etaGenData_.at( uEta ).at( uEntry ) ) : ptGenData_.at( uEta ).at( uEntry ) );
               weightEtaBin.at( uPt ).push_back( weightData_.at( uEta ).at( uEntry ) );
               ptEtaBin.at( uPt ).push_back( ptVal );
               ptGenEtaBin.at( uPt ).push_back( ptGenVal );
@@ -782,11 +783,11 @@ int main( int argc, char * argv[] )
           const std::string nameTransRebinPtFitMap( name + "_TransRebinPt_FitMap_Par" + parFit );
           const std::string titleTransRebinPtFitMap( objCat + ", par. " + parFit );
           TH1D * histTransRebinPtFitMap( new TH1D( nameTransRebinPtFitMap.c_str(), titleTransRebinPtFitMap.c_str(), nPtBins_, ptBins_.data() ) );
-          histTransRebinPtFitMap->SetXTitle( titlePt.c_str() );
+          histTransRebinPtFitMap->SetXTitle( titleX.c_str() );
           histVecTransRebinPtFitMap.push_back( histTransRebinPtFitMap );
           const std::string nameTransRestrRebinPtFitMap( name + "_TransRestrRebinPt_FitMap_Par" + parFit );
           TH1D * histTransRestrRebinPtFitMap( new TH1D( nameTransRestrRebinPtFitMap.c_str(), titleTransRebinPtFitMap.c_str(), nPtBins_, ptBins_.data() ) );
-          histTransRestrRebinPtFitMap->SetXTitle( titlePt.c_str() );
+          histTransRestrRebinPtFitMap->SetXTitle( titleX.c_str() );
           histVecTransRestrRebinPtFitMap.push_back( histTransRestrRebinPtFitMap );
         }
 
@@ -1031,12 +1032,14 @@ int main( int argc, char * argv[] )
           if ( refSel_)     nameOut.append( "_Ref" );
           nameOut.append( ".txt" );
 
+          std::string pStr( useNonT_ ? "E" : "p_t" );
+
           ofstream fileOut;
           fileOut.open( nameOut.c_str(), std::ios_base::out );
 
           fileOut << std::endl << "fitted function:";
           fileOut << std::endl << fitFunction1D_;
-          fileOut << std::endl << "for p_t_parton <= " << fitMaxPt1D_;
+          fileOut << std::endl << "for " + pStr + "_parton <= " << fitMaxPt1D_;
           fileOut << std::endl << std::endl;
 
 
@@ -1053,7 +1056,7 @@ int main( int argc, char * argv[] )
             }
             fileOut << std::endl;
 
-            fileOut << std::endl << "over p_t";
+            fileOut << std::endl << "over " + pStr;
             for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
               fileOut << std::endl << "transfer_" << uPar << " = ";
               fileOut << std::setprecision( 4 );
@@ -1062,13 +1065,13 @@ int main( int argc, char * argv[] )
               fileOut << " + ";
               if ( parVecB.at( uPar ) == -999999. ) fileOut << "NAN";
               else                                  fileOut << parVecB.at( uPar );
-              fileOut << " * E_parton";
+              fileOut << " * " + pStr + "_parton";
             }
             fileOut << std::endl << std::endl;
           }
 
           fileOut << std::endl << "restricted";
-          fileOut << std::endl << "p_t_parton          >= " << minPtParton_;
+          fileOut << std::endl << pStr + "_parton          >= " << minPtParton_;
           fileOut << std::endl << "DeltaR(parton, jet) <= " << maxDRParton_;
           fileOut << std::endl;
 
@@ -1081,7 +1084,7 @@ int main( int argc, char * argv[] )
           }
           fileOut << std::endl;
 
-           fileOut << std::endl << "over p_t";
+           fileOut << std::endl << "over " + pStr;
           for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
             fileOut << std::endl << "transfer_" << uPar << " = ";
             fileOut << std::setprecision( 4 );
@@ -1090,7 +1093,7 @@ int main( int argc, char * argv[] )
             fileOut << " + ";
             if ( parVecBRestr.at( uPar ) == -999999. ) fileOut << "NAN";
             else                                       fileOut << parVecBRestr.at( uPar );
-            fileOut << " * E_parton";
+            fileOut << " * " + pStr + "_parton";
             fileOut << std::endl;
           }
           fileOut << std::endl;
