@@ -2,26 +2,30 @@
 Environment:
 ============
 
-setenv SCRAM_ARCH slc5_amd64_gcc462
-cmsrel CMSSW_5_2_6
-cd CMSSW_5_2_6/src
+cmsrel CMSSW_5_3_4_cand2
+cd CMSSW_5_3_4_cand2/src
 cmsenv
-cvs co -r V06-05-01    DataFormats/PatCandidates
-cvs co -r V08-09-11-06 PhysicsTools/PatAlgos
-cvs co -r V03-09-22    PhysicsTools/PatUtils
+cvs co -r V06-05-06    DataFormats/PatCandidates
+cvs co -r V08-09-35    PhysicsTools/PatAlgos
+cvs co -r V03-09-26    PhysicsTools/PatUtils
 cvs co -r V07-01-04    TopQuarkAnalysis/TopSkimming
-cvs co -r V06-07-11-01 TopQuarkAnalysis/TopTools
+cvs co -r V06-07-13    TopQuarkAnalysis/TopTools
 cvs co -r V00-03-16    CommonTools/ParticleFlow
-cvs co -r V00-00-09    CommonTools/RecoUtils
-cvs co -r V04-06-09    JetMETCorrections/Type1MET
+cvs co -r V00-03-23    CommonTools/RecoAlgos
+cvs co -r V00-00-12    CommonTools/RecoUtils
+cvs co -r V15-03-02    DataFormats/ParticleFlowCandidate
+cvs co -r V10-02-02    DataFormats/TrackReco
+cvs co -r V02-00-04    DataFormats/VertexReco
 cvs co -r V00-00-08    RecoMET/METAnalyzers
 cvs co -r V00-00-07    RecoMET/METFilters
-cvs co -r V15-01-11    RecoParticleFlow/PFProducer
+cvs co -r V15-02-06    RecoParticleFlow/PFProducer
 cvs co -r V00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
 cd EGamma/EGammaAnalysisTools/data
 cat download.url | xargs wget
 cd -
 scram b -j 9
+
+The additional DataFormats packages include REFLEX updatees needed for PAT in CMSSW_5_3_X, which have not been integrated into the release yet.
 
 Steering:
 =========
