@@ -11,7 +11,7 @@ DataFormats/PatCandidates                        V06-05-06      V06-05-01
 DataFormats/TrackReco                            V10-02-02      V10-02-01      
 DataFormats/VertexReco                           V02-00-04      V02-00-03      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
-PhysicsTools/PatAlgos                            V08-09-33      V08-09-07-05   
+PhysicsTools/PatAlgos                            V08-09-35      V08-09-07-05   
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
 PhysicsTools/PatUtils                            V03-09-26      V03-09-18-03   
 RecoMET/METAnalyzers                             V00-00-08                     
