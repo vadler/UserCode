@@ -2,12 +2,11 @@
 Environment:
 ============
 
-cmsrel CMSSW_5_3_4_cand1
-cd CMSSW_5_3_4_cand1/src
+cmsrel CMSSW_5_3_4_cand2
+cd CMSSW_5_3_4_cand2/src
 cmsenv
 cvs co -r V06-05-06    DataFormats/PatCandidates
-cvs co -r V08-09-33    PhysicsTools/PatAlgos
-cvs up -r V08-09-07-05 PhysicsTools/PatAlgos/python/patTemplate_cfg.py
+cvs co -r V08-09-35    PhysicsTools/PatAlgos
 cvs co -r V03-09-26    PhysicsTools/PatUtils
 cvs co -r V07-01-04    TopQuarkAnalysis/TopSkimming
 cvs co -r V06-07-13    TopQuarkAnalysis/TopTools
