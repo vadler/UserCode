@@ -1,13 +1,13 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
-condition                   = 'com10'
-globalTag                   = autoCond[ condition ][ : -5 ]
-process.GlobalTag.globaltag = autoCond[ condition ]
+condition = 'com10_7E33v2'
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source.fileNames    = pickRelValInputFiles( relVal      = 'SingleMu'
                                                   , dataTier    = 'RECO'
-                                                  , globalTag   = '%s_RelVal_mu2012A'%( globalTag )
+                                                  , globalTag   = '%s_RelVal_mu2012A'%( process.GlobalTag.globaltag.value()[ : -5 ] )
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False

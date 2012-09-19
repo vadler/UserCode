@@ -2,15 +2,15 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-cmsswVersion = 'CMSSW_5_3_2'
-globalTag    = 'START53_V6'
+cmsswVersion = 'CMSSW_5_3_4_cand1'
+globalTag    = 'START53_V10'
 process.GlobalTag.globaltag = '%s::All'%( globalTag )
 process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                     cmsswVersion  = cmsswVersion
                                                   , relVal        = 'RelValProdTTbar'
                                                   , dataTier      = 'AODSIM'
                                                   , globalTag     = globalTag
-                                                  , maxVersions   = 2
+                                                  , maxVersions   = 1
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False

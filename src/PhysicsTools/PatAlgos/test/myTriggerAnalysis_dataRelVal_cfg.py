@@ -3,11 +3,10 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process( "HLTPROV" )
 
 # Conditions
-condition = 'com10'
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-from Configuration.AlCa.autoCond import autoCond
-globalTag                   = autoCond[ condition ][ : -5 ]
-process.GlobalTag.globaltag = autoCond[ condition ]
+condition = 'com10_7E33v2'
+process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
@@ -17,7 +16,7 @@ process.source = cms.Source("PoolSource",
                         , relVal        = 'SingleMu'
                         , dataTier      = 'RECO'
                         , condition     = condition
-                        , globalTag     = '%s_RelVal_mu2011B'%( globalTag )
+                        , globalTag     = '%s_RelVal_mu2012A'%( process.GlobalTag.globaltag.value()[ : -5 ] )
                         , maxVersions   = None
                         , skipFiles     = None
                         , numberOfFiles = None
