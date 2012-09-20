@@ -1396,10 +1396,10 @@ int main( int argc, char * argv[] )
 //           std::string nameOut( pathOut1D_ + "/gentTransferFunction1D_" + sample_ + "_" + name );
           std::string nameOut( pathOut1D_ + "/gentTransferFunction1D_SingleGaussian_" + sample_ + "_" + name );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
-          if ( useAlt_ )    nameOut.append( "_Alt" );
-          if ( useNonT_ )   nameOut.append( "_NonT" );
-          if ( useSymm_ )   nameOut.append( "_Symm" );
-          if ( refGen_)     nameOut.append( "_Gen" );
+//           if ( useAlt_ )    nameOut.append( "_Alt" );
+//           if ( useNonT_ )   nameOut.append( "_NonT" );
+//           if ( useSymm_ )   nameOut.append( "_Symm" );
+//           if ( refGen_)     nameOut.append( "_Gen" );
           if ( refSel_)     nameOut.append( "_Ref" );
           nameOut.append( ".txt" );
 
@@ -1605,10 +1605,10 @@ int main( int argc, char * argv[] )
 //           std::string nameOut( pathOut2D_ + "/gentTransferFunction2D_" + sample_ + "_" + name );
           std::string nameOut( pathOut2D_ + "/gentTransferFunction2D_SingleGaussian_" + sample_ + "_" + name );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
-          if ( useAlt_ )    nameOut.append( "_Alt" );
-          if ( useSymm_ )   nameOut.append( "_Symm" );
-          if ( useNonT_ )   nameOut.append( "_NonT" );
-          if ( refGen_)     nameOut.append( "_Gen" );
+//           if ( useAlt_ )    nameOut.append( "_Alt" );
+//           if ( useSymm_ )   nameOut.append( "_Symm" );
+//           if ( useNonT_ )   nameOut.append( "_NonT" );
+//           if ( refGen_)     nameOut.append( "_Gen" );
           if ( refSel_)     nameOut.append( "_Ref" );
           nameOut.append( ".txt" );
 
