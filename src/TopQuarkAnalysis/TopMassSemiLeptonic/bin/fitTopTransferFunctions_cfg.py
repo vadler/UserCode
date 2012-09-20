@@ -30,7 +30,7 @@ widthFactor = 5. # for rebinning (in units of orig. RMS)
 
 # Fitting
 fitNonRestr    = True
-fitEtaPt       = True
+fitEtaBins       = True
 #minPtParton    = 0.
 #maxDRParton    = 999999.
 minPtParton    = 20.
@@ -119,7 +119,7 @@ process.histos = cms.PSet(
 
 process.fit = cms.PSet(
   fitNonRestr  = cms.bool( fitNonRestr )
-, fitEtaPt     = cms.bool( fitEtaPt )
+, fitEtaBins     = cms.bool( fitEtaBins )
 , minPtParton  = cms.double( minPtParton )
 , maxDRParton  = cms.double( maxDRParton )
 )
