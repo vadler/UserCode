@@ -9,6 +9,7 @@
 #include "boost/lexical_cast.hpp"
 
 #include <TROOT.h>
+#include <TStyle.h>
 #include <TSystem.h>
 #include <TFile.h>
 #include <TKey.h>
@@ -34,7 +35,27 @@ int main( int argc, char * argv[] )
 
   int returnStatus_( 0 );
 
-  // Load libraries
+  // Set up ROOT
+  gStyle->SetPalette(1,0);
+  gStyle->SetCanvasColor(kWhite);
+  gStyle->SetPadColor(kWhite);
+  gStyle->SetPadTickX(1);
+  gStyle->SetPadTickY(1);
+  gStyle->SetPadTopMargin(.075);
+  gStyle->SetPadRightMargin(.075);
+  gStyle->SetPadBottomMargin(.15);
+  gStyle->SetPadLeftMargin(.15);
+  gStyle->SetTitleSize(.06,"XYZ");
+  gStyle->SetTitleFillColor(kWhite);
+  gStyle->SetTitleBorderSize(1);
+  gStyle->SetStatColor(kWhite);
+  gStyle->SetStatBorderSize(1);
+  gStyle->SetOptStat(111111);
+  gStyle->SetOptFit(1111);
+  gROOT->ProcessLine(".L $ROOTSYS/lib/libPhysics.so");
+  TString libs = gSystem->GetLinkedLibs();
+  libs.Append(" -L$ROOTSYS/lib -lPhysics");
+  gSystem->SetLinkedLibs(libs.Data());
   gSystem->Load( "libFWCoreFWLite" );
   AutoLibraryLoader::enable();
 
@@ -536,8 +557,8 @@ int main( int argc, char * argv[] )
         histEtaTransRestrRebin->SetYTitle( titleEvents.c_str() );
 
         const std::string nameEtaTransRebinMap( nameEtaTrans + "Rebin_Map" );
-        const Double_t meanEtaTransMap( histEtaTransMap->GetMean() );
-        const Double_t widthEtaTransMap( std::fabs( histEtaTransMap->GetRMS() ) );
+        const Double_t meanEtaTransMap( histEtaTransMap->GetMean( 2 ) );
+        const Double_t widthEtaTransMap( std::fabs( histEtaTransMap->GetRMS( 2 ) ) );
         if ( widthEtaTransMap == 0. && verbose_ > 2 ) {
           std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                     << "    no histogram \"width\" in '" << nameEtaTransMap << "'" << std::endl;
@@ -549,8 +570,8 @@ int main( int argc, char * argv[] )
         histEtaTransRebinMap->SetZTitle( titleEvents.c_str() );
 
         const std::string nameEtaTransRestrRebinMap( nameEtaTransRestr + "Rebin_Map" );
-        const Double_t meanEtaTransRestrMap( histEtaTransRestrMap->GetMean() );
-        const Double_t widthEtaTransRestrMap( std::fabs( histEtaTransRestrMap->GetRMS() ) );
+        const Double_t meanEtaTransRestrMap( histEtaTransRestrMap->GetMean( 2 ) );
+        const Double_t widthEtaTransRestrMap( std::fabs( histEtaTransRestrMap->GetRMS( 2 ) ) );
         if ( widthEtaTransRestrMap == 0. && verbose_ > 2 ) {
           std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                     << "    no histogram \"width\" in '" << nameEtaTransRestrMap << "'" << std::endl;
@@ -657,8 +678,8 @@ int main( int argc, char * argv[] )
       }  // loop: uPt < nPtBins_
 
       const std::string nameTransRebinMap( nameTrans + "Rebin_Map" );
-      const Double_t meanTransMap( histTransMap->GetMean() );
-      const Double_t widthTransMap( std::fabs( histTransMap->GetRMS() ) );
+      const Double_t meanTransMap( histTransMap->GetMean( 2 ) );
+      const Double_t widthTransMap( std::fabs( histTransMap->GetRMS( 2 ) ) );
       if ( widthTransMap == 0. && verbose_ > 2 ) {
         std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                   << "    no histogram \"width\" in '" << nameTransMap << "'" << std::endl;
@@ -670,8 +691,8 @@ int main( int argc, char * argv[] )
       histTransRebinMap->SetZTitle( titleEvents.c_str() );
 
       const std::string nameTransRestrRebinMap( nameTransRestr + "Rebin_Map" );
-      const Double_t meanTransRestrMap( histTransRestrMap->GetMean() );
-      const Double_t widthTransRestrMap( std::fabs( histTransRestrMap->GetRMS() ) );
+      const Double_t meanTransRestrMap( histTransRestrMap->GetMean( 2 ) );
+      const Double_t widthTransRestrMap( std::fabs( histTransRestrMap->GetRMS( 2 ) ) );
       if ( widthTransRestrMap == 0. && verbose_ > 2 ) {
         std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                   << "    no histogram \"width\" in '" << nameTransRestrMap << "'" << std::endl;
@@ -852,8 +873,10 @@ int main( int argc, char * argv[] )
               std::cout << "    '" << nameTransRebin << std::endl;
             }
           }
-          histTransRebin->Draw();
-          if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+          if ( plot1D_ ) {
+            histTransRebin->Draw();
+            c1.Print( fileName1D.c_str() );
+          }
         }
 
         const std::string nameTransRestr( nameTrans + "Restr" );
@@ -885,8 +908,10 @@ int main( int argc, char * argv[] )
               std::cout << "    '" << nameTransRestrRebin << std::endl;
             }
           }
-          histTransRestrRebin->Draw();
-          if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+          if ( plot1D_ ) {
+            histTransRestrRebin->Draw();
+            c1.Print( fileName1D.c_str() );
+          }
         }
 
         // Loop over pt bins
@@ -900,7 +925,7 @@ int main( int argc, char * argv[] )
           TH1D * histTransRebinPtFitMap( new TH1D( nameTransRebinPtFitMap.c_str(), titleTransRebinPtFitMap.c_str(), nPtBins_, ptBins_.data() ) );
           histTransRebinPtFitMap->SetXTitle( titleX.c_str() );
           histVecTransRebinPtFitMap.push_back( histTransRebinPtFitMap );
-          const std::string nameTransRestrRebinPtFitMap( name + "_TransRestrRebin" + nameVar + "FitMap_Par" + parFit );
+          const std::string nameTransRestrRebinPtFitMap( name + "_TransRestrRebin" + nameVar + "_FitMap_Par" + parFit );
           TH1D * histTransRestrRebinPtFitMap( new TH1D( nameTransRestrRebinPtFitMap.c_str(), titleTransRebinPtFitMap.c_str(), nPtBins_, ptBins_.data() ) );
           histTransRestrRebinPtFitMap->SetXTitle( titleX.c_str() );
           histVecTransRestrRebinPtFitMap.push_back( histTransRestrRebinPtFitMap );
@@ -939,8 +964,10 @@ int main( int argc, char * argv[] )
                 std::cout << "    '" << namePtTransRebin << std::endl;
               }
             }
-            histPtTransRebin->Draw();
-            if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+            if ( plot1D_ ) {
+              histPtTransRebin->Draw();
+              c1.Print( fileName1D.c_str() );
+            }
           }
 
           const std::string namePtTransRestr( namePt + "_TransRestr" );
@@ -973,8 +1000,10 @@ int main( int argc, char * argv[] )
                 std::cout << "    '" << namePtTransRestrRebin << std::endl;
               }
             }
-            histPtTransRestrRebin->Draw();
-            if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+            if ( plot1D_ ) {
+              histPtTransRestrRebin->Draw();
+              c1.Print( fileName1D.c_str() );
+            }
           }
 
         } // loop: uPt < nPtBins_
@@ -1007,8 +1036,10 @@ int main( int argc, char * argv[] )
                 std::cout << "    '" << nameTransRebinPtFitMap << std::endl;
               }
             }
-            histVecTransRebinPtFitMap.at( uPar )->Draw();
-            if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+            if ( plot1D_ ) {
+              histVecTransRebinPtFitMap.at( uPar )->Draw();
+              c1.Print( fileName1D.c_str() );
+            }
           }
 
           const std::string nameTransRestrRebinPtFitMap( name + "_TransRestrRebin" + nameVar + "_FitMap_Par" + parFit );
@@ -1035,9 +1066,11 @@ int main( int argc, char * argv[] )
               std::cout << "    '" << nameTransRestrRebinPtFitMap << std::endl;
             }
           }
-          histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
-          if ( plot1D_ ) c1.Print( fileName1D.c_str() );
-        }
+          if ( plot1D_ ) {
+            histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
+            c1.Print( fileName1D.c_str() );
+          }
+        } // loop: uPar < nPar
 
         // Loop over eta bins
 
@@ -1054,6 +1087,31 @@ int main( int argc, char * argv[] )
           TH1D * histTransRestrRebinEtaFitMap( new TH1D( nameTransRestrRebinEtaFitMap.c_str(), titleTransRebinEtaFitMap.c_str(), nEtaBins_, etaBins_.data() ) );
           histTransRestrRebinEtaFitMap->SetXTitle( titleEta.c_str() );
           histVecTransRestrRebinEtaFitMap.push_back( histTransRestrRebinEtaFitMap );
+        }
+
+        std::vector< TH1D * > histVecTransRebinEtaParAMap;
+        std::vector< TH1D * > histVecTransRebinEtaParBMap;
+        std::vector< TH1D * > histVecTransRestrRebinEtaParAMap;
+        std::vector< TH1D * > histVecTransRestrRebinEtaParBMap;
+        if ( fitEtaBins_ ) {
+          for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
+            const std::string parFit( boost::lexical_cast< std::string >( uPar ) );
+            const std::string nameTransRebinEtaParMap( name + "_TransRebinEta_ParMap_Par" + parFit );
+            const std::string titleTransRebinEtaParMap( objCat + ", par. " + parFit + ", " );
+            TH1D * histTransRebinEtaParAMap( new TH1D( std::string( nameTransRebinEtaParMap + "-A" ).c_str(), std::string( titleTransRebinEtaParMap + "A" ).c_str(), nEtaBins_, etaBins_.data() ) );
+            histTransRebinEtaParAMap->SetXTitle( titleEta.c_str() );
+            histVecTransRebinEtaParAMap.push_back( histTransRebinEtaParAMap );
+            TH1D * histTransRebinEtaParBMap( new TH1D( std::string( nameTransRebinEtaParMap + "-B" ).c_str(), std::string( titleTransRebinEtaParMap + "B" ).c_str(), nEtaBins_, etaBins_.data() ) );
+            histTransRebinEtaParBMap->SetXTitle( titleEta.c_str() );
+            histVecTransRebinEtaParBMap.push_back( histTransRebinEtaParBMap );
+            const std::string nameTransRestrRebinEtaParMap( name + "_TransRestrRebinEta_ParMap_Par" + parFit );
+            TH1D * histTransRestrRebinEtaParAMap( new TH1D( std::string( nameTransRestrRebinEtaParMap + "-A" ).c_str(), std::string( titleTransRebinEtaParMap + "A" ).c_str(), nEtaBins_, etaBins_.data() ) );
+            histTransRestrRebinEtaParAMap->SetXTitle( titleEta.c_str() );
+            histVecTransRestrRebinEtaParAMap.push_back( histTransRestrRebinEtaParAMap );
+            TH1D * histTransRestrRebinEtaParBMap( new TH1D( std::string( nameTransRestrRebinEtaParMap + "-B" ).c_str(), std::string( titleTransRebinEtaParMap + "B" ).c_str(), nEtaBins_, etaBins_.data() ) );
+            histTransRestrRebinEtaParBMap->SetXTitle( titleEta.c_str() );
+            histVecTransRestrRebinEtaParBMap.push_back( histTransRestrRebinEtaParBMap );
+          }
         }
 
         TList * listFit( dirFit_->GetListOfKeys() );
@@ -1189,8 +1247,10 @@ int main( int argc, char * argv[] )
                       std::cout << "    '" << nameEtaPtTransRebin << std::endl;
                     }
                   }
-                  histEtaPtTransRebin->Draw();
-                  if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+                  if ( plot1D_ ) {
+                    histEtaPtTransRebin->Draw();
+                    c1.Print( fileName1D.c_str() );
+                  }
                 }
               }
 
@@ -1223,8 +1283,10 @@ int main( int argc, char * argv[] )
                     std::cout << "    '" << nameEtaPtTransRestrRebin << std::endl;
                   }
                 }
-                histEtaPtTransRestrRebin->Draw();
-                if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+                if ( plot1D_ ) {
+                  histEtaPtTransRestrRebin->Draw();
+                  c1.Print( fileName1D.c_str() );
+                }
               }
 
             } // loop: uPt < nPtBins_
@@ -1239,8 +1301,12 @@ int main( int argc, char * argv[] )
                 TFitResultPtr fitTransRebinEtaPtFitMapResultPtr( histVecTransRebinEtaPtFitMap.at( uPar )->Fit( fitTransRebinEtaPtFitMap, fitOptions1D_.c_str() ) );
                 if ( fitTransRebinEtaPtFitMapResultPtr >= 0 ) {
                   if ( fitTransRebinEtaPtFitMapResultPtr->Status() == 0 && fitTransRebinEtaPtFitMapResultPtr->Ndf() != 0. ) {
-                    parVecEtaA.at( uPar ).at( uEta ) = fitTransRebinEtaPtFitMap->GetParameter( 0 );
-                    parVecEtaB.at( uPar ).at( uEta ) = fitTransRebinEtaPtFitMap->GetParameter( 1 );
+                    parVecEtaA.at( uPar ).at( uEta ) = fitTransRebinEtaPtFitMapResultPtr->Parameter( 0 );
+                    histVecTransRebinEtaParAMap.at( uPar )->SetBinContent( uEta + 1, fitTransRebinEtaPtFitMapResultPtr->Parameter( 0 ) );
+                    histVecTransRebinEtaParAMap.at( uPar )->SetBinError( uEta + 1, fitTransRebinEtaPtFitMapResultPtr->ParError( 0 ) );
+                    parVecEtaB.at( uPar ).at( uEta ) = fitTransRebinEtaPtFitMapResultPtr->Parameter( 1 );
+                    histVecTransRebinEtaParBMap.at( uPar )->SetBinContent( uEta + 1, fitTransRebinEtaPtFitMapResultPtr->Parameter( 1 ) );
+                    histVecTransRebinEtaParBMap.at( uPar )->SetBinError( uEta + 1, fitTransRebinEtaPtFitMapResultPtr->ParError( 1 ) );
                   }
                   else {
                     if ( verbose_ > 2 ) {
@@ -1257,8 +1323,10 @@ int main( int argc, char * argv[] )
                     std::cout << "    '" << nameTransRebinEtaPtFitMap << std::endl;
                   }
                 }
-                histVecTransRebinEtaPtFitMap.at( uPar )->Draw();
-                if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+                if ( plot1D_ ) {
+                  histVecTransRebinEtaPtFitMap.at( uPar )->Draw();
+                  c1.Print( fileName1D.c_str() );
+                }
               }
 
               const std::string nameTransRestrRebinEtaPtFitMap( nameEta + "_TransRestrRebin" + nameVar + "_FitMap_Par" + parFit );
@@ -1267,8 +1335,12 @@ int main( int argc, char * argv[] )
               TFitResultPtr fitTransRestrRebinEtaPtFitMapResultPtr( histVecTransRestrRebinEtaPtFitMap.at( uPar )->Fit( fitTransRestrRebinEtaPtFitMap, fitOptions1D_.c_str() ) );
               if ( fitTransRestrRebinEtaPtFitMapResultPtr >= 0 ) {
                 if ( fitTransRestrRebinEtaPtFitMapResultPtr->Status() == 0 && fitTransRestrRebinEtaPtFitMapResultPtr->Ndf() != 0. ) {
-                  parVecEtaARestr.at( uPar ).at( uEta ) = fitTransRestrRebinEtaPtFitMap->GetParameter( 0 );
-                  parVecEtaBRestr.at( uPar ).at( uEta ) = fitTransRestrRebinEtaPtFitMap->GetParameter( 1 );
+                  parVecEtaARestr.at( uPar ).at( uEta ) = fitTransRestrRebinEtaPtFitMapResultPtr->Parameter( 0 );
+                  histVecTransRestrRebinEtaParAMap.at( uPar )->SetBinContent( uEta + 1, fitTransRestrRebinEtaPtFitMapResultPtr->Parameter( 0 ) );
+                  histVecTransRestrRebinEtaParAMap.at( uPar )->SetBinError( uEta + 1, fitTransRestrRebinEtaPtFitMapResultPtr->ParError( 0 ) );
+                  parVecEtaBRestr.at( uPar ).at( uEta ) = fitTransRestrRebinEtaPtFitMapResultPtr->Parameter( 1 );
+                  histVecTransRestrRebinEtaParBMap.at( uPar )->SetBinContent( uEta + 1, fitTransRestrRebinEtaPtFitMapResultPtr->Parameter( 1 ) );
+                  histVecTransRestrRebinEtaParBMap.at( uPar )->SetBinError( uEta + 1, fitTransRestrRebinEtaPtFitMapResultPtr->ParError( 1 ) );
                 }
                 else {
                   if ( verbose_ > 2 ) {
@@ -1285,42 +1357,60 @@ int main( int argc, char * argv[] )
                   std::cout << "    '" << nameTransRestrRebinEtaPtFitMap << std::endl;
                 }
               }
-              histVecTransRestrRebinEtaPtFitMap.at( uPar )->Draw();
-              if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+              if ( plot1D_ ) {
+                histVecTransRestrRebinEtaPtFitMap.at( uPar )->Draw();
+                c1.Print( fileName1D.c_str() );
+              }
             }
 
           }
 
         } // loop: keyEta
 
-        for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
-          if ( fitNonRestr_ ) {
+        if ( plot1D_ ) {
+          for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+            if ( fitNonRestr_ ) {
+              histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
+              c1.Print( fileName1D.c_str() );
+              histVecTransRestrRebinEtaFitMap.at( uPar )->Draw();
+              c1.Print( fileName1D.c_str() );
+              histVecTransRebinEtaParAMap.at( uPar )->Draw();
+              c1.Print( fileName1D.c_str() );
+              histVecTransRebinEtaParBMap.at( uPar )->Draw();
+              c1.Print( fileName1D.c_str() );
+            }
             histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
-            if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+            c1.Print( fileName1D.c_str() );
             histVecTransRestrRebinEtaFitMap.at( uPar )->Draw();
-            if ( plot1D_ ) c1.Print( fileName1D.c_str() );
+            c1.Print( fileName1D.c_str() );
+            histVecTransRestrRebinEtaParAMap.at( uPar )->Draw();
+            c1.Print( fileName1D.c_str() );
+            histVecTransRestrRebinEtaParBMap.at( uPar )->Draw();
+            c1.Print( fileName1D.c_str() );
           }
-          histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
-          if ( plot1D_ ) c1.Print( fileName1D.c_str() );
-          histVecTransRestrRebinEtaFitMap.at( uPar )->Draw();
-          if ( plot1D_ ) c1.Print( fileName1D.c_str() );
         }
 
         if ( writeFiles1D_ ) {
 
           // File name
-          std::string nameOut( pathOut1D_ + "/gentTransferFunction1D_" + sample_ + "_" + name );
+//           std::string nameOut( pathOut1D_ + "/gentTransferFunction1D_" + sample_ + "_" + name );
+          std::string nameOut( pathOut1D_ + "/gentTransferFunction1D_SingleGaussian_" + sample_ + "_" + name );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
+          if ( useAlt_ )    nameOut.append( "_Alt" );
           if ( useNonT_ )   nameOut.append( "_NonT" );
+          if ( useSymm_ )   nameOut.append( "_Symm" );
+          if ( refGen_)     nameOut.append( "_Gen" );
           if ( refSel_)     nameOut.append( "_Ref" );
           nameOut.append( ".txt" );
 
           ofstream fileOut;
           fileOut.open( nameOut.c_str(), std::ios_base::out );
 
+          const std::string part( refGen_ ? "_parton" : "_jet" );
+
           fileOut << std::endl << "fitted function:";
           fileOut << std::endl << fitFunction1D_;
-          fileOut << std::endl << "for " + nameVar + "_parton <= " << fitMaxPt1D_;
+          fileOut << std::endl << "for " + nameVar + part + " <= " << fitMaxPt1D_;
           fileOut << std::endl << std::endl;
 
           if ( fitNonRestr_ ) {
@@ -1345,13 +1435,13 @@ int main( int argc, char * argv[] )
               fileOut << " + ";
               if ( parVecB.at( uPar ) == -999999. ) fileOut << "NAN";
               else                                  fileOut << parVecB.at( uPar );
-              fileOut << " * " + nameVar + "_parton";
+              fileOut << " * " + nameVar + part;
             }
             fileOut << std::endl << std::endl;
           }
 
           fileOut << std::endl << "restricted";
-          fileOut << std::endl << nameVar + "_parton          >= " << minPtParton_;
+          fileOut << std::endl << nameVar + part + "          >= " << minPtParton_;
           fileOut << std::endl << "DeltaR(parton, jet) <= " << maxDRParton_;
           fileOut << std::endl;
 
@@ -1373,13 +1463,15 @@ int main( int argc, char * argv[] )
             fileOut << " + ";
             if ( parVecBRestr.at( uPar ) == -999999. ) fileOut << "NAN";
             else                                       fileOut << parVecBRestr.at( uPar );
-            fileOut << " * " + nameVar + "_parton";
+            fileOut << " * " + nameVar + part;
             fileOut << std::endl;
           }
           fileOut << std::endl;
 
           if ( fitEtaBins_ ) {
+            fileOut << "================================================================================" << std::endl;
             for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
+              if ( uEta > 0 ) fileOut << "--------------------------------------------------------------------------------" << std::endl;
               fileOut << std::endl << "for " << etaBins_.at( uEta ) << " <= eta < " << etaBins_.at( uEta + 1 );
               fileOut << std::endl;
 
@@ -1405,13 +1497,13 @@ int main( int argc, char * argv[] )
                   fileOut << " + ";
                   if ( parVecEtaB.at( uPar ).at( uEta ) == -999999. ) fileOut << "NAN";
                   else                                                fileOut << parVecEtaB.at( uPar ).at( uEta );
-                  fileOut << " * " + nameVar + "_parton";
+                  fileOut << " * " + nameVar + part;
                 }
                 fileOut << std::endl << std::endl;
               }
 
               fileOut << std::endl << "restricted";
-              fileOut << std::endl << nameVar + "_parton          >= " << minPtParton_;
+              fileOut << std::endl << nameVar + part + "          >= " << minPtParton_;
               fileOut << std::endl << "DeltaR(parton, jet) <= " << maxDRParton_;
               fileOut << std::endl;
 
@@ -1433,7 +1525,7 @@ int main( int argc, char * argv[] )
                 fileOut << " + ";
                 if ( parVecEtaBRestr.at( uPar ).at( uEta ) == -999999. ) fileOut << "NAN";
                 else                                                     fileOut << parVecEtaBRestr.at( uPar ).at( uEta );
-                fileOut << " * " + nameVar + "_parton";
+                fileOut << " * " + nameVar + part;
                 fileOut << std::endl;
               }
               fileOut << std::endl;
@@ -1510,19 +1602,150 @@ int main( int argc, char * argv[] )
         if ( writeFiles2D_ ) {
 
           // File name
-          std::string nameOut( pathOut2D_ + "/gentTransferFunction2D_" + sample_ + "_" + name );
+//           std::string nameOut( pathOut2D_ + "/gentTransferFunction2D_" + sample_ + "_" + name );
+          std::string nameOut( pathOut2D_ + "/gentTransferFunction2D_SingleGaussian_" + sample_ + "_" + name );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
+          if ( useAlt_ )    nameOut.append( "_Alt" );
+          if ( useSymm_ )   nameOut.append( "_Symm" );
           if ( useNonT_ )   nameOut.append( "_NonT" );
+          if ( refGen_)     nameOut.append( "_Gen" );
           if ( refSel_)     nameOut.append( "_Ref" );
           nameOut.append( ".txt" );
 
           ofstream fileOut;
           fileOut.open( nameOut.c_str(), std::ios_base::out );
 
+          const std::string part( refGen_ ? "_parton" : "_jet" );
+
           fileOut << std::endl << "fitted function:";
           fileOut << std::endl << fitFunction2D_;
-          fileOut << std::endl << "for " + nameVar + "_parton <= " << fitMaxPt2D_;
+          fileOut << std::endl << "for " + nameVar + part + " <= " << fitMaxPt2D_;
           fileOut << std::endl << std::endl;
+
+          if ( fitNonRestr_ ) {
+            fileOut << std::endl << "unrestricted";
+            fileOut << std::endl;
+
+            fileOut << std::endl << "total";
+//             for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+//               fileOut << std::endl << "transfer_" << uPar << " = ";
+//               fileOut << std::setprecision( 4 );
+//               if ( parVec.at( uPar ) == -999999. ) fileOut << "NAN";
+//               else                                 fileOut << parVec.at( uPar );
+//             }
+            fileOut << std::endl;
+
+            fileOut << std::endl << "over " + nameVar;
+//             for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+//               fileOut << std::endl << "transfer_" << uPar << " = ";
+//               fileOut << std::setprecision( 4 );
+//               if ( parVecA.at( uPar ) == -999999. ) fileOut << "NAN";
+//               else                                  fileOut << parVecA.at( uPar );
+//               fileOut << " + ";
+//               if ( parVecB.at( uPar ) == -999999. ) fileOut << "NAN";
+//               else                                  fileOut << parVecB.at( uPar );
+//               fileOut << " * " + nameVar + part;
+//             }
+            fileOut << std::endl << std::endl;
+          }
+
+          fileOut << std::endl << "restricted";
+          fileOut << std::endl << nameVar + part + "          >= " << minPtParton_;
+          fileOut << std::endl << "DeltaR(parton, jet) <= " << maxDRParton_;
+          fileOut << std::endl;
+
+          fileOut << std::endl << "total";
+//           for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+//             fileOut << std::endl << "transfer_" << uPar << " = ";
+//             fileOut << std::setprecision( 4 );
+//             if ( parVecRestr.at( uPar ) == -999999. ) fileOut << "NAN";
+//             else                                      fileOut << parVecRestr.at( uPar );
+//           }
+          fileOut << std::endl;
+
+          fileOut << std::endl << "over " + nameVar;
+//           for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+//             fileOut << std::endl << "transfer_" << uPar << " = ";
+//             fileOut << std::setprecision( 4 );
+//             if ( parVecARestr.at( uPar ) == -999999. ) fileOut << "NAN";
+//             else                                       fileOut << parVecARestr.at( uPar );
+//             fileOut << " + ";
+//             if ( parVecBRestr.at( uPar ) == -999999. ) fileOut << "NAN";
+//             else                                       fileOut << parVecBRestr.at( uPar );
+//             fileOut << " * " + nameVar + part;
+//             fileOut << std::endl;
+//           }
+          fileOut << std::endl;
+
+          if ( fitEtaBins_ ) {
+            fileOut << "================================================================================" << std::endl;
+            for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
+              if ( uEta > 0 ) fileOut << "--------------------------------------------------------------------------------" << std::endl;
+              fileOut << std::endl << "for " << etaBins_.at( uEta ) << " <= eta < " << etaBins_.at( uEta + 1 );
+              fileOut << std::endl;
+
+              if ( fitNonRestr_ ) {
+                fileOut << std::endl << "unrestricted";
+                fileOut << std::endl;
+
+                fileOut << std::endl << "total";
+//                 for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+//                   fileOut << std::endl << "transfer_" << uPar << " = ";
+//                   fileOut << std::setprecision( 4 );
+//                   if ( parVecEta.at( uPar ).at( uEta ) == -999999. ) fileOut << "NAN";
+//                   else                                               fileOut << parVecEta.at( uPar ).at( uEta );
+//                 }
+                fileOut << std::endl;
+
+                fileOut << std::endl << "over " + nameVar;
+//                 for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+//                   fileOut << std::endl << "transfer_" << uPar << " = ";
+//                   fileOut << std::setprecision( 4 );
+//                   if ( parVecEtaA.at( uPar ).at( uEta ) == -999999. ) fileOut << "NAN";
+//                   else                                                fileOut << parVecEtaA.at( uPar ).at( uEta );
+//                   fileOut << " + ";
+//                   if ( parVecEtaB.at( uPar ).at( uEta ) == -999999. ) fileOut << "NAN";
+//                   else                                                fileOut << parVecEtaB.at( uPar ).at( uEta );
+//                   fileOut << " * " + nameVar + part;
+//                 }
+                fileOut << std::endl << std::endl;
+              }
+
+              fileOut << std::endl << "restricted";
+              fileOut << std::endl << nameVar + part + "          >= " << minPtParton_;
+              fileOut << std::endl << "DeltaR(parton, jet) <= " << maxDRParton_;
+              fileOut << std::endl;
+
+              fileOut << std::endl << "total";
+//               for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+//                 fileOut << std::endl << "transfer_" << uPar << " = ";
+//                 fileOut << std::setprecision( 4 );
+//                 if ( parVecEtaRestr.at( uPar ).at( uEta ) == -999999. ) fileOut << "NAN";
+//                 else                                                    fileOut << parVecEtaRestr.at( uPar ).at( uEta );
+//               }
+              fileOut << std::endl;
+
+              fileOut << std::endl << "over " + nameVar;
+//               for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+//                 fileOut << std::endl << "transfer_" << uPar << " = ";
+//                 fileOut << std::setprecision( 4 );
+//                 if ( parVecEtaARestr.at( uPar ).at( uEta ) == -999999. ) fileOut << "NAN";
+//                 else                                                     fileOut << parVecEtaARestr.at( uPar ).at( uEta );
+//                 fileOut << " + ";
+//                 if ( parVecEtaBRestr.at( uPar ).at( uEta ) == -999999. ) fileOut << "NAN";
+//                 else                                                     fileOut << parVecEtaBRestr.at( uPar ).at( uEta );
+//                 fileOut << " * " + nameVar + part;
+//                 fileOut << std::endl;
+//               }
+              fileOut << std::endl;
+
+            }
+          }
+
+          fileOut.close();
+          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                    << "    written 2D transfer function file:" << std::endl
+                    << "        " << nameOut << std::endl;
 
         }
 

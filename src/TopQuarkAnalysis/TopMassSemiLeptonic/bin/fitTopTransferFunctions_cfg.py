@@ -30,7 +30,7 @@ widthFactor = 5. # for rebinning (in units of orig. RMS)
 
 # Fitting
 fitNonRestr    = True
-fitEtaBins       = True
+fitEtaBins     = True
 #minPtParton    = 0.
 #maxDRParton    = 999999.
 minPtParton    = 20.
