@@ -1,30 +1,758 @@
 
 fitted function:
 [0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))
-for p_t_oarton <= 500
+for Pt_parton <= 500
 
 
 unrestricted
 
 total
-transfer_1 = -3.049
-transfer_2 = 9.004
+transfer_1 = -3.021
+transfer_2 = 9.006
 
-over p_t
-transfer_1 = -3.064 + 0.01472 * E_parton
-transfer_2 = 2.052 + 0.111 * E_parton
+over Pt
+transfer_1 = -3.109 + 0.01537 * Pt_parton
+transfer_2 = 1.649 + 0.1161 * Pt_parton
 
 
 restricted
-p_t_parton          >= 20
+Pt_parton          >= 20
 DeltaR(parton, jet) <= 0.2
 
 total
-transfer_1 = -3.149
-transfer_2 = 8.527
+transfer_1 = -3.131
+transfer_2 = 8.541
 
-over p_t
-transfer_1 = -3.02 + 0.008549 * E_parton
+over Pt
+transfer_1 = -3.05 + 0.008828 * Pt_parton
 
-transfer_2 = 2.003 + 0.1065 * E_parton
+transfer_2 = 1.94 + 0.1071 * Pt_parton
+
+================================================================================
+
+for 0 <= eta < 0.087
+
+unrestricted
+
+total
+transfer_1 = -2.286
+transfer_2 = 8.952
+
+over Pt
+transfer_1 = -2.977 + 0.01421 * Pt_parton
+transfer_2 = 1.335 + 0.1185 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.595
+transfer_2 = 8.671
+
+over Pt
+transfer_1 = -2.976 + 0.008676 * Pt_parton
+
+transfer_2 = 1.747 + 0.1079 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.087 <= eta < 0.174
+
+unrestricted
+
+total
+transfer_1 = -2.428
+transfer_2 = 9.098
+
+over Pt
+transfer_1 = -2.889 + 0.01194 * Pt_parton
+transfer_2 = 1.361 + 0.1183 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.676
+transfer_2 = 8.718
+
+over Pt
+transfer_1 = -2.872 + 0.006678 * Pt_parton
+
+transfer_2 = 1.815 + 0.1072 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.174 <= eta < 0.261
+
+unrestricted
+
+total
+transfer_1 = -2.349
+transfer_2 = 8.932
+
+over Pt
+transfer_1 = -2.813 + 0.0108 * Pt_parton
+transfer_2 = 1.499 + 0.1153 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.639
+transfer_2 = 8.658
+
+over Pt
+transfer_1 = -2.83 + 0.005694 * Pt_parton
+
+transfer_2 = 1.921 + 0.105 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.261 <= eta < 0.348
+
+unrestricted
+
+total
+transfer_1 = -2.324
+transfer_2 = 8.97
+
+over Pt
+transfer_1 = -2.913 + 0.01221 * Pt_parton
+transfer_2 = 2.075 + 0.1069 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.58
+transfer_2 = 8.612
+
+over Pt
+transfer_1 = -2.976 + 0.008066 * Pt_parton
+
+transfer_2 = 2.125 + 0.1022 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.348 <= eta < 0.435
+
+unrestricted
+
+total
+transfer_1 = -2.135
+transfer_2 = 9.034
+
+over Pt
+transfer_1 = -2.731 + 0.01345 * Pt_parton
+transfer_2 = 1.994 + 0.1076 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.375
+transfer_2 = 8.637
+
+over Pt
+transfer_1 = -2.747 + 0.008439 * Pt_parton
+
+transfer_2 = 2.155 + 0.1006 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.435 <= eta < 0.522
+
+unrestricted
+
+total
+transfer_1 = -2.225
+transfer_2 = 8.858
+
+over Pt
+transfer_1 = -2.795 + 0.01149 * Pt_parton
+transfer_2 = 2.104 + 0.1068 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.515
+transfer_2 = 8.612
+
+over Pt
+transfer_1 = -2.768 + 0.005887 * Pt_parton
+
+transfer_2 = 2.323 + 0.09899 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.522 <= eta < 0.609
+
+unrestricted
+
+total
+transfer_1 = -2.36
+transfer_2 = 8.869
+
+over Pt
+transfer_1 = -2.756 + 0.01057 * Pt_parton
+transfer_2 = 1.959 + 0.1079 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.623
+transfer_2 = 8.497
+
+over Pt
+transfer_1 = -2.753 + 0.004927 * Pt_parton
+
+transfer_2 = 1.692 + 0.1061 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.609 <= eta < 0.696
+
+unrestricted
+
+total
+transfer_1 = -2.322
+transfer_2 = 8.738
+
+over Pt
+transfer_1 = -2.896 + 0.01204 * Pt_parton
+transfer_2 = 1.766 + 0.109 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.613
+transfer_2 = 8.478
+
+over Pt
+transfer_1 = -2.874 + 0.006527 * Pt_parton
+
+transfer_2 = 2.095 + 0.1001 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.696 <= eta < 0.783
+
+unrestricted
+
+total
+transfer_1 = -2.38
+transfer_2 = 8.862
+
+over Pt
+transfer_1 = -3.016 + 0.01413 * Pt_parton
+transfer_2 = 1.379 + 0.1185 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.659
+transfer_2 = 8.462
+
+over Pt
+transfer_1 = -3.021 + 0.008388 * Pt_parton
+
+transfer_2 = 1.729 + 0.1077 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.783 <= eta < 0.87
+
+unrestricted
+
+total
+transfer_1 = -2.395
+transfer_2 = 8.902
+
+over Pt
+transfer_1 = -3.08 + 0.01317 * Pt_parton
+transfer_2 = 1.438 + 0.1168 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.707
+transfer_2 = 8.621
+
+over Pt
+transfer_1 = -2.934 + 0.005273 * Pt_parton
+
+transfer_2 = 1.771 + 0.1068 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.87 <= eta < 0.957
+
+unrestricted
+
+total
+transfer_1 = -2.346
+transfer_2 = 9.062
+
+over Pt
+transfer_1 = -3.209 + 0.01806 * Pt_parton
+transfer_2 = 1.336 + 0.1225 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.678
+transfer_2 = 8.796
+
+over Pt
+transfer_1 = -3.061 + 0.009397 * Pt_parton
+
+transfer_2 = 1.695 + 0.1126 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 0.957 <= eta < 1.044
+
+unrestricted
+
+total
+transfer_1 = -2.487
+transfer_2 = 9.161
+
+over Pt
+transfer_1 = -3.356 + 0.01589 * Pt_parton
+transfer_2 = 1.825 + 0.1154 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.814
+transfer_2 = 8.896
+
+over Pt
+transfer_1 = -3.266 + 0.008425 * Pt_parton
+
+transfer_2 = 2.093 + 0.1069 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.044 <= eta < 1.131
+
+unrestricted
+
+total
+transfer_1 = -2.568
+transfer_2 = 9.198
+
+over Pt
+transfer_1 = -3.267 + 0.01306 * Pt_parton
+transfer_2 = 2.135 + 0.1134 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.891
+transfer_2 = 8.931
+
+over Pt
+transfer_1 = -3.146 + 0.005539 * Pt_parton
+
+transfer_2 = 2.415 + 0.1042 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.131 <= eta < 1.218
+
+unrestricted
+
+total
+transfer_1 = -2.547
+transfer_2 = 9.376
+
+over Pt
+transfer_1 = -3.553 + 0.01971 * Pt_parton
+transfer_2 = 1.802 + 0.1193 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.829
+transfer_2 = 9.04
+
+over Pt
+transfer_1 = -3.556 + 0.01457 * Pt_parton
+
+transfer_2 = 2.031 + 0.1128 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.218 <= eta < 1.305
+
+unrestricted
+
+total
+transfer_1 = -2.743
+transfer_2 = 9.507
+
+over Pt
+transfer_1 = -3.662 + 0.01902 * Pt_parton
+transfer_2 = 1.805 + 0.1246 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -3.058
+transfer_2 = 9.13
+
+over Pt
+transfer_1 = -3.508 + 0.009847 * Pt_parton
+
+transfer_2 = 1.988 + 0.1159 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.305 <= eta < 1.392
+
+unrestricted
+
+total
+transfer_1 = -2.778
+transfer_2 = 9.617
+
+over Pt
+transfer_1 = -3.856 + 0.01964 * Pt_parton
+transfer_2 = 1.711 + 0.1316 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -3.136
+transfer_2 = 9.397
+
+over Pt
+transfer_1 = -3.791 + 0.01241 * Pt_parton
+
+transfer_2 = 2.082 + 0.1211 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.392 <= eta < 1.479
+
+unrestricted
+
+total
+transfer_1 = -2.836
+transfer_2 = 9.926
+
+over Pt
+transfer_1 = -3.996 + 0.02388 * Pt_parton
+transfer_2 = 1.768 + 0.1314 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -3.144
+transfer_2 = 9.586
+
+over Pt
+transfer_1 = -3.98 + 0.0164 * Pt_parton
+
+transfer_2 = 2.123 + 0.1205 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.479 <= eta < 1.566
+
+unrestricted
+
+total
+transfer_1 = -2.49
+transfer_2 = 9.395
+
+over Pt
+transfer_1 = -4.302 + 0.03328 * Pt_parton
+transfer_2 = 2.143 + 0.1173 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.801
+transfer_2 = 9.146
+
+over Pt
+transfer_1 = -4.297 + 0.02767 * Pt_parton
+
+transfer_2 = 2.56 + 0.1066 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.566 <= eta < 1.653
+
+unrestricted
+
+total
+transfer_1 = -2.464
+transfer_2 = 8.804
+
+over Pt
+transfer_1 = -3.494 + 0.02 * Pt_parton
+transfer_2 = 2.515 + 0.1005 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.77
+transfer_2 = 8.559
+
+over Pt
+transfer_1 = -3.5 + 0.0151 * Pt_parton
+
+transfer_2 = 2.781 + 0.09445 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.653 <= eta < 1.74
+
+unrestricted
+
+total
+transfer_1 = -2.402
+transfer_2 = 8.555
+
+over Pt
+transfer_1 = -3.609 + 0.02397 * Pt_parton
+transfer_2 = 2.093 + 0.1059 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.696
+transfer_2 = 8.304
+
+over Pt
+transfer_1 = -3.495 + 0.01698 * Pt_parton
+
+transfer_2 = 2.625 + 0.09239 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.74 <= eta < 1.83
+
+unrestricted
+
+total
+transfer_1 = -2.318
+transfer_2 = 8.015
+
+over Pt
+transfer_1 = -3.598 + 0.0272 * Pt_parton
+transfer_2 = 2.397 + 0.09477 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.596
+transfer_2 = 7.768
+
+over Pt
+transfer_1 = -3.659 + 0.02284 * Pt_parton
+
+transfer_2 = 2.74 + 0.08274 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.83 <= eta < 1.93
+
+unrestricted
+
+total
+transfer_1 = -2.129
+transfer_2 = 7.921
+
+over Pt
+transfer_1 = -3.719 + 0.03051 * Pt_parton
+transfer_2 = 2.128 + 0.09955 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.403
+transfer_2 = 7.669
+
+over Pt
+transfer_1 = -3.339 + 0.0175 * Pt_parton
+
+transfer_2 = 2.627 + 0.08823 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 1.93 <= eta < 2.043
+
+unrestricted
+
+total
+transfer_1 = -1.92
+transfer_2 = 7.383
+
+over Pt
+transfer_1 = -3.383 + 0.02927 * Pt_parton
+transfer_2 = 2.117 + 0.09369 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.18
+transfer_2 = 7.134
+
+over Pt
+transfer_1 = -3.105 + 0.0185 * Pt_parton
+
+transfer_2 = 2.539 + 0.08158 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 2.043 <= eta < 2.172
+
+unrestricted
+
+total
+transfer_1 = -1.782
+transfer_2 = 7.279
+
+over Pt
+transfer_1 = -4.593 + 0.05765 * Pt_parton
+transfer_2 = 1.268 + 0.1122 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -1.974
+transfer_2 = 7.098
+
+over Pt
+transfer_1 = -4.329 + 0.04763 * Pt_parton
+
+transfer_2 = 1.566 + 0.1013 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 2.172 <= eta < 2.322
+
+unrestricted
+
+total
+transfer_1 = -1.865
+transfer_2 = 7.238
+
+over Pt
+transfer_1 = -3.844 + 0.04388 * Pt_parton
+transfer_2 = 2.305 + 0.09158 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -2.132
+transfer_2 = 7.072
+
+over Pt
+transfer_1 = -3.784 + 0.03725 * Pt_parton
+
+transfer_2 = 2.509 + 0.08446 * Pt_parton
+
+--------------------------------------------------------------------------------
+
+for 2.322 <= eta < 2.5
+
+unrestricted
+
+total
+transfer_1 = -1.585
+transfer_2 = 6.638
+
+over Pt
+transfer_1 = -3.425 + 0.03918 * Pt_parton
+transfer_2 = 2.546 + 0.07374 * Pt_parton
+
+
+restricted
+Pt_parton          >= 20
+DeltaR(parton, jet) <= 0.2
+
+total
+transfer_1 = -1.747
+transfer_2 = 6.459
+
+over Pt
+transfer_1 = -3.356 + 0.03498 * Pt_parton
+
+transfer_2 = 2.21 + 0.07982 * Pt_parton
 
