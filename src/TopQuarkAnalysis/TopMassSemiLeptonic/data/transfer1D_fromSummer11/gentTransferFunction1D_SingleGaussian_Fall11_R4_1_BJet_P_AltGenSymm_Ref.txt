@@ -7,12 +7,12 @@ for P_parton <= 500
 unrestricted
 
 total
-transfer_1 = 1.063
-transfer_2 = 10.58
+transfer_1 = 1.79
+transfer_2 = 15.32
 
 over P
-transfer_1 = -1.397 + 0.03845 * P_parton
-transfer_2 = 1.011 + 0.1194 * P_parton
+transfer_1 = -2.283 + 0.04424 * P_parton
+transfer_2 = 1.824 + 0.1223 * P_parton
 
 
 restricted
@@ -20,13 +20,13 @@ P_parton          >= 20
 DeltaR(parton, jet) <= 0.2
 
 total
-transfer_1 = 0.8574
-transfer_2 = 10.38
+transfer_1 = 18.94
+transfer_2 = 21.29
 
 over P
-transfer_1 = -1.427 + 0.03529 * P_parton
+transfer_1 = -2.33 + 0.04035 * P_parton
 
-transfer_2 = 1.842 + 0.1072 * P_parton
+transfer_2 = 1.845 + 0.1186 * P_parton
 
 
 for 0 <= eta < 0.087
