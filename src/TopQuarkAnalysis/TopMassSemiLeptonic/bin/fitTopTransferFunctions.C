@@ -773,17 +773,6 @@ int main( int argc, char * argv[] )
       }
       TCanvas c1( "c1" );
       c1.cd();
-      std::string fileName1D( "file1D" + objCat );
-      if ( usePileUp_ ) fileName1D.append( "_PileUp" );
-      if ( useAlt_ )    fileName1D.append( "_Alt" );
-      if ( useNonT_ )   fileName1D.append( "_NonT" );
-      if ( useSymm_ )   fileName1D.append( "_Symm" );
-      if ( refGen_ )    fileName1D.append( "_Gen" );
-      if ( refSel_ )    fileName1D.append( "_Ref" );
-      fileName1D.append( ".pdf" );
-      const std::string fileOpen( fileName1D + "[" );
-      const std::string fileClose( fileName1D + "]" );
-      if ( plot1D_ ) c1.Print( fileOpen.c_str() );
 
       // Loop over fit versions
       nextInListProp.Reset();
@@ -799,6 +788,14 @@ int main( int argc, char * argv[] )
         dirFit_->cd();
 
         const std::string name( objCat + "_" + nameVar + "_" + subFit );
+
+        std::string fileName1D( "file1D_" + sample_ + "_" + name );
+        if ( usePileUp_ ) fileName1D.append( "_PileUp" );
+        if ( refSel_ )    fileName1D.append( "_Ref" );
+        fileName1D.append( ".pdf" );
+        const std::string fileOpen( fileName1D + "[" );
+        const std::string fileClose( fileName1D + "]" );
+        if ( plot1D_ ) c1.Print( fileOpen.c_str() );
 
         // Transfer function parameters
         TF1 * fitTest( new TF1( "test", fitFunction1D_.c_str() ) );
@@ -1393,13 +1390,8 @@ int main( int argc, char * argv[] )
         if ( writeFiles1D_ ) {
 
           // File name
-//           std::string nameOut( pathOut1D_ + "/gentTransferFunction1D_" + sample_ + "_" + name );
-          std::string nameOut( pathOut1D_ + "/gentTransferFunction1D_SingleGaussian_" + sample_ + "_" + name );
+          std::string nameOut( pathOut1D_ + "/gentTransferFunction1D_" + sample_ + "_" + name );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
-//           if ( useAlt_ )    nameOut.append( "_Alt" );
-//           if ( useNonT_ )   nameOut.append( "_NonT" );
-//           if ( useSymm_ )   nameOut.append( "_Symm" );
-//           if ( refGen_)     nameOut.append( "_Gen" );
           if ( refSel_)     nameOut.append( "_Ref" );
           nameOut.append( ".txt" );
 
@@ -1441,7 +1433,7 @@ int main( int argc, char * argv[] )
           }
 
           fileOut << std::endl << "restricted";
-          fileOut << std::endl << nameVar + part + "          >= " << minPtParton_;
+          fileOut << std::endl << nameVar + part + " >= " << minPtParton_;
           fileOut << std::endl << "DeltaR(parton, jet) <= " << maxDRParton_;
           fileOut << std::endl;
 
@@ -1503,7 +1495,7 @@ int main( int argc, char * argv[] )
               }
 
               fileOut << std::endl << "restricted";
-              fileOut << std::endl << nameVar + part + "          >= " << minPtParton_;
+              fileOut << std::endl << nameVar + part + " >= " << minPtParton_;
               fileOut << std::endl << "DeltaR(parton, jet) <= " << maxDRParton_;
               fileOut << std::endl;
 
@@ -1540,9 +1532,9 @@ int main( int argc, char * argv[] )
 
         }
 
-      } // loop: keyFit
+        if ( plot1D_ ) c1.Print( fileClose.c_str() );
 
-      if ( plot1D_ ) c1.Print( fileClose.c_str() );
+      } // loop: keyFit
 
     }
 
@@ -1553,17 +1545,6 @@ int main( int argc, char * argv[] )
       }
       TCanvas c2( "c2" );
       c2.cd();
-      std::string fileName2D( "file2D" + objCat );
-      if ( usePileUp_ ) fileName2D.append( "_PileUp" );
-      if ( useAlt_ )    fileName2D.append( "_Alt" );
-      if ( useNonT_ )   fileName2D.append( "_NonT" );
-      if ( useSymm_ )   fileName2D.append( "_Symm" );
-      if ( refGen_ )    fileName2D.append( "_Gen" );
-      if ( refSel_ )    fileName2D.append( "_Ref" );
-      fileName2D.append( ".pdf" );
-      const std::string fileOpen( fileName2D + "[" );
-      const std::string fileClose( fileName2D + "]" );
-      if ( plot2D_ ) c2.Print( fileOpen.c_str() );
 
       // Loop over fit versions
       nextInListProp.Reset();
@@ -1579,6 +1560,14 @@ int main( int argc, char * argv[] )
         dirFit_->cd();
 
         const std::string name( objCat + "_" + nameVar + "_" + subFit );
+
+        std::string fileName2D( "file2D_" + sample_ + "_" + name );
+        if ( usePileUp_ ) fileName2D.append( "_PileUp" );
+        if ( refSel_ )    fileName2D.append( "_Ref" );
+        fileName2D.append( ".pdf" );
+        const std::string fileOpen( fileName2D + "[" );
+        const std::string fileClose( fileName2D + "]" );
+        if ( plot2D_ ) c2.Print( fileOpen.c_str() );
 
         if ( fitEtaBins_ ) {
 
@@ -1602,13 +1591,8 @@ int main( int argc, char * argv[] )
         if ( writeFiles2D_ ) {
 
           // File name
-//           std::string nameOut( pathOut2D_ + "/gentTransferFunction2D_" + sample_ + "_" + name );
-          std::string nameOut( pathOut2D_ + "/gentTransferFunction2D_SingleGaussian_" + sample_ + "_" + name );
+          std::string nameOut( pathOut2D_ + "/gentTransferFunction2D_" + sample_ + "_" + name );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
-//           if ( useAlt_ )    nameOut.append( "_Alt" );
-//           if ( useSymm_ )   nameOut.append( "_Symm" );
-//           if ( useNonT_ )   nameOut.append( "_NonT" );
-//           if ( refGen_)     nameOut.append( "_Gen" );
           if ( refSel_)     nameOut.append( "_Ref" );
           nameOut.append( ".txt" );
 
@@ -1650,7 +1634,7 @@ int main( int argc, char * argv[] )
           }
 
           fileOut << std::endl << "restricted";
-          fileOut << std::endl << nameVar + part + "          >= " << minPtParton_;
+          fileOut << std::endl << nameVar + part + " >= " << minPtParton_;
           fileOut << std::endl << "DeltaR(parton, jet) <= " << maxDRParton_;
           fileOut << std::endl;
 
@@ -1712,7 +1696,7 @@ int main( int argc, char * argv[] )
               }
 
               fileOut << std::endl << "restricted";
-              fileOut << std::endl << nameVar + part + "          >= " << minPtParton_;
+              fileOut << std::endl << nameVar + part + " >= " << minPtParton_;
               fileOut << std::endl << "DeltaR(parton, jet) <= " << maxDRParton_;
               fileOut << std::endl;
 
@@ -1749,9 +1733,9 @@ int main( int argc, char * argv[] )
 
         }
 
-      } // loop: keyFit
+        if ( plot2D_ ) c2.Print( fileClose.c_str() );
 
-      if ( plot2D_ ) c2.Print( fileClose.c_str() );
+      } // loop: keyFit
 
     }
 
