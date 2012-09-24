@@ -41,16 +41,20 @@ void my::setParametersFitFrac( TF1 * fit, TH1D * histo, bool useBkgFunction )
 void my::setParametersFitDelta( TF1 * fit, TH1D * histo )
 {
   // Starting points
-  Double_t c( histo->Integral() );
-  Double_t m( histo->GetMean() );
-  Double_t s( histo->GetRMS() );
+  Double_t c( histo->Integral() );                             // Constant
+  Double_t m( histo->GetMean() );                              // Mean
+  Double_t p( histo->GetBinCenter( histo->GetMaximumBin() ) ); // Peak
+  Double_t s( histo->GetRMS() );                               // RMS
   // Gaussian part
+  // Constant
   fit->SetParameter( 0, c );
 //   fit->SetParLimits( 0, 0., 2. * c );
   fit->SetParName( 0, "Constant" );
+  // Mean
   fit->SetParameter( 1, m );
   fit->SetParLimits( 1, -2. * s, 2. * s );
   fit->SetParName( 1, "Gaussian #Mu" );
+  // Sigma
   fit->SetParameter( 2, s );
   fit->SetParLimits( 2, 0., 2. * s );
   fit->SetParName( 2, "Gaussian #sigma" );
@@ -60,21 +64,31 @@ void my::setParametersFitDelta( TF1 * fit, TH1D * histo )
 void my::setParametersFitTransfer1D( TF1 * fit, TH1D * histo, bool useBkgFunction )
 {
   // Starting points
-  Double_t c( histo->Integral() );
-  Double_t m( histo->GetMean() );
-  Double_t s( histo->GetRMS() );
+  Double_t c( histo->Integral() );                             // Constant
+  Double_t m( histo->GetMean() );                              // Mean
+  Double_t p( histo->GetBinCenter( histo->GetMaximumBin() ) ); // Peak
+  Double_t s( histo->GetRMS() );                               // RMS
   // Gaussian part
+  // Constant
   fit->SetParameter( 0, c );
 //   fit->SetParLimits( 0, 0., 2. * c );
   fit->SetParName( 0, "Constant" );
-  fit->SetParameter( 1, m );
-  fit->SetParLimits( 1, -2. * s, 2. * s );
+  // Mean
+  fit->SetParameter( 1, p ); // No double peak structure in this case
+  fit->SetParLimits( 1, -1. * s, 1. * s );
   fit->SetParName( 1, "Gaussian #Mu" );
+  // Sigma
   fit->SetParameter( 2, s );
   fit->SetParLimits( 2, 0., 2. * s );
   fit->SetParName( 2, "Gaussian #sigma" );
   // Additional part
   if ( useBkgFunction ) {
+    fit->SetParameter( 3, 0. );
+    fit->SetParName( 3, "bkg c" );
+    fit->SetParameter( 4, 0. );
+    fit->SetParName( 4, "bkg #mu" );
+    fit->SetParameter( 5, 1. );
+    fit->SetParName( 5, "bkg #sigma" );
   }
 }
 

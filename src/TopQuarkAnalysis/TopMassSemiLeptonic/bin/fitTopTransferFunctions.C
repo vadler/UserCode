@@ -104,6 +104,7 @@ int main( int argc, char * argv[] )
   const bool plot1D_( transfer1D_.getParameter< bool >( "plot" ) );
   double fitMaxPt1D_( transfer1D_.getParameter< double >( "fitMaxPt" ) );
   const std::string fitFunction1D_( transfer1D_.getParameter< std::string >( "fitFunction" ) );
+  const bool useBkg1D_( transfer1D_.getParameter< bool >( "useBkg" ) );
   std::string fitOptions1D_( transfer1D_.getParameter< std::string >( "fitOptions" ) );
   const double fitRange1D_( std::min( transfer1D_.getParameter< double >( "fitRange" ), widthFactor_ ) );
   const std::string fitTransfer1D_( transfer1D_.getParameter< std::string >( "fitTransfer" ) );
@@ -847,7 +848,7 @@ int main( int argc, char * argv[] )
         if ( fitNonRestr_ && histTransRebin != 0 ) {
           const std::string nameTransRebinFit( nameTransRebin + "_fit" );
           TF1 * fitTransRebin( new TF1( nameTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange1D_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange1D_ ) ) );
-          my::setParametersFitTransfer1D( fitTransRebin, histTransRebin );
+          my::setParametersFitTransfer1D( fitTransRebin, histTransRebin, useBkg1D_ );
           TFitResultPtr fitTransRebinResultPtr( histTransRebin->Fit( fitTransRebin, fitOptions1D_.c_str() ) );
           if ( fitTransRebinResultPtr >= 0 ) {
             if ( fitTransRebinResultPtr->Status() == 0 && fitTransRebinResultPtr->Ndf() != 0. ) {
@@ -882,7 +883,7 @@ int main( int argc, char * argv[] )
         if ( histTransRestrRebin != 0 ) {
           const std::string nameTransRestrRebinFit( nameTransRestrRebin + "_fit" );
           TF1 * fitTransRestrRebin( new TF1( nameTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
-          my::setParametersFitTransfer1D( fitTransRestrRebin, histTransRestrRebin );
+          my::setParametersFitTransfer1D( fitTransRestrRebin, histTransRestrRebin, useBkg1D_ );
           TFitResultPtr fitTransRestrRebinResultPtr( histTransRestrRebin->Fit( fitTransRestrRebin, fitOptions1D_.c_str() ) );
           if ( fitTransRestrRebinResultPtr >= 0 ) {
             if ( fitTransRestrRebinResultPtr->Status() == 0 && fitTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -937,7 +938,7 @@ int main( int argc, char * argv[] )
           if ( fitNonRestr_ && histPtTransRebin != 0 ) {
             const std::string namePtTransRebinFit( namePtTransRebin + "_fit" );
             TF1 * fitPtTransRebin( new TF1( namePtTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange1D_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange1D_ ) ) );
-            my::setParametersFitTransfer1D( fitPtTransRebin, histPtTransRebin );
+            my::setParametersFitTransfer1D( fitPtTransRebin, histPtTransRebin, useBkg1D_ );
             TFitResultPtr fitPtTransRebinResultPtr( histPtTransRebin->Fit( fitPtTransRebin, fitOptions1D_.c_str() ) );
             if ( fitPtTransRebinResultPtr >= 0 ) {
               if ( fitPtTransRebinResultPtr->Status() == 0 && fitPtTransRebinResultPtr->Ndf() != 0. ) {
@@ -973,7 +974,7 @@ int main( int argc, char * argv[] )
           if ( histPtTransRestrRebin != 0 ) {
             const std::string namePtTransRestrRebinFit( namePtTransRestrRebin + "_fit" );
             TF1 * fitPtTransRestrRebin( new TF1( namePtTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
-            my::setParametersFitTransfer1D( fitPtTransRestrRebin, histPtTransRestrRebin );
+            my::setParametersFitTransfer1D( fitPtTransRestrRebin, histPtTransRestrRebin, useBkg1D_ );
             TFitResultPtr fitPtTransRestrRebinResultPtr( histPtTransRestrRebin->Fit( fitPtTransRestrRebin, fitOptions1D_.c_str() ) );
             if ( fitPtTransRestrRebinResultPtr >= 0 ) {
               if ( fitPtTransRestrRebinResultPtr->Status() == 0 && fitPtTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -1128,7 +1129,7 @@ int main( int argc, char * argv[] )
             if ( fitNonRestr_ && histEtaTransRebin != 0 ) {
               const std::string nameEtaTransRebinFit( nameEtaTransRebin + "_fit" );
               TF1 * fitEtaTransRebin( new TF1( nameEtaTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histEtaTransRebin->GetXaxis()->GetXmin(), histEtaTransRebin->GetMean() - histEtaTransRebin->GetRMS() * fitRange1D_ ), std::min( histEtaTransRebin->GetXaxis()->GetXmax(), histEtaTransRebin->GetMean() + histEtaTransRebin->GetRMS() * fitRange1D_ ) ) );
-              my::setParametersFitTransfer1D( fitEtaTransRebin, histEtaTransRebin );
+              my::setParametersFitTransfer1D( fitEtaTransRebin, histEtaTransRebin, useBkg1D_ );
               TFitResultPtr fitEtaTransRebinResultPtr( histEtaTransRebin->Fit( fitEtaTransRebin, fitOptions1D_.c_str() ) );
               if ( fitEtaTransRebinResultPtr >= 0 ) {
                 if ( fitEtaTransRebinResultPtr->Status() == 0 && fitEtaTransRebinResultPtr->Ndf() != 0. ) {
@@ -1162,7 +1163,7 @@ int main( int argc, char * argv[] )
           if ( histEtaTransRestrRebin != 0 ) {
             const std::string nameEtaTransRestrRebinFit( nameEtaTransRestrRebin + "_fit" );
             TF1 * fitEtaTransRestrRebin( new TF1( nameEtaTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histEtaTransRestrRebin->GetXaxis()->GetXmin(), histEtaTransRestrRebin->GetMean() - histEtaTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histEtaTransRestrRebin->GetXaxis()->GetXmax(), histEtaTransRestrRebin->GetMean() + histEtaTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
-            my::setParametersFitTransfer1D( fitEtaTransRestrRebin, histEtaTransRestrRebin );
+            my::setParametersFitTransfer1D( fitEtaTransRestrRebin, histEtaTransRestrRebin, useBkg1D_ );
             TFitResultPtr fitEtaTransRestrRebinResultPtr( histEtaTransRestrRebin->Fit( fitEtaTransRestrRebin, fitOptions1D_.c_str() ) );
             if ( fitEtaTransRestrRebinResultPtr >= 0 ) {
               if ( fitEtaTransRestrRebinResultPtr->Status() == 0 && fitEtaTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -1220,7 +1221,7 @@ int main( int argc, char * argv[] )
                 if ( histEtaPtTransRebin != 0 ) {
                   const std::string nameEtaPtTransRebinFit( nameEtaPtTransRebin + "_fit" );
                   TF1 * fitEtaPtTransRebin( new TF1( nameEtaPtTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histEtaPtTransRebin->GetXaxis()->GetXmin(), histEtaPtTransRebin->GetMean() - histEtaPtTransRebin->GetRMS() * fitRange1D_ ), std::min( histEtaPtTransRebin->GetXaxis()->GetXmax(), histEtaPtTransRebin->GetMean() + histEtaPtTransRebin->GetRMS() * fitRange1D_ ) ) );
-                  my::setParametersFitTransfer1D( fitEtaPtTransRebin, histEtaPtTransRebin );
+                  my::setParametersFitTransfer1D( fitEtaPtTransRebin, histEtaPtTransRebin, useBkg1D_ );
                   TFitResultPtr fitEtaPtTransRebinResultPtr( histEtaPtTransRebin->Fit( fitEtaPtTransRebin, fitOptions1D_.c_str() ) );
                   if ( fitEtaPtTransRebinResultPtr >= 0 ) {
                     if ( fitEtaPtTransRebinResultPtr->Status() == 0 && fitEtaPtTransRebinResultPtr->Ndf() != 0. ) {
@@ -1256,7 +1257,7 @@ int main( int argc, char * argv[] )
               if ( histEtaPtTransRestrRebin != 0 ) {
                 const std::string nameEtaPtTransRestrRebinFit( nameEtaPtTransRestrRebin + "_fit" );
                 TF1 * fitEtaPtTransRestrRebin( new TF1( nameEtaPtTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histEtaPtTransRestrRebin->GetXaxis()->GetXmin(), histEtaPtTransRestrRebin->GetMean() - histEtaPtTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histEtaPtTransRestrRebin->GetXaxis()->GetXmax(), histEtaPtTransRestrRebin->GetMean() + histEtaPtTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
-                my::setParametersFitTransfer1D( fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin );
+                my::setParametersFitTransfer1D( fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin, useBkg1D_ );
                 TFitResultPtr fitEtaPtTransRestrRebinResultPtr( histEtaPtTransRestrRebin->Fit( fitEtaPtTransRestrRebin, fitOptions1D_.c_str() ) );
                 if ( fitEtaPtTransRestrRebinResultPtr >= 0 ) {
                   if ( fitEtaPtTransRestrRebinResultPtr->Status() == 0 && fitEtaPtTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -1456,7 +1457,6 @@ int main( int argc, char * argv[] )
             if ( parVecBRestr.at( uPar ) == -999999. ) fileOut << "NAN";
             else                                       fileOut << parVecBRestr.at( uPar );
             fileOut << " * " + nameVar + part;
-            fileOut << std::endl;
           }
           fileOut << std::endl;
 
@@ -1518,7 +1518,6 @@ int main( int argc, char * argv[] )
                 if ( parVecEtaBRestr.at( uPar ).at( uEta ) == -999999. ) fileOut << "NAN";
                 else                                                     fileOut << parVecEtaBRestr.at( uPar ).at( uEta );
                 fileOut << " * " + nameVar + part;
-                fileOut << std::endl;
               }
               fileOut << std::endl;
 
