@@ -15,7 +15,7 @@ sample = 'Fall11_R4_1'
 overwrite = True # to throw away earlier versions of histograms, trees and functions
 # Exclusive switches:
 usePileUp = False
-useAlt    = True
+useAlt    = True # E instead of p
 useNonT   = True
 useSymm   = True
 refGen    = True
