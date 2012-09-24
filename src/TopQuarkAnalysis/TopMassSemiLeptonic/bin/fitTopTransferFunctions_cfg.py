@@ -49,7 +49,7 @@ if len( fitFunction1D.split( ' + ' ) ) > 1: # a background function is defined
   fitRange1D = 5. # for combined fits (in units of orig. RMS)
 
 # Transfer functions
-fit2D      = True
+fit2D      = False
 fitMaxPt2D = 999.
 #fitMaxPt2D = 200.
 # Fit function: a Gaussian is always required for the first three function parameters
