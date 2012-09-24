@@ -2,8 +2,8 @@
 Environment:
 ============
 
-cmsrel CMSSW_5_3_4_cand2
-cd CMSSW_5_3_4_cand2/src
+cmsrel CMSSW_5_3_4
+cd CMSSW_5_3_4/src
 cmsenv
 cvs co -r V06-05-06    DataFormats/PatCandidates
 cvs co -r V08-09-37    PhysicsTools/PatAlgos
