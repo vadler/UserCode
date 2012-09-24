@@ -227,7 +227,8 @@ else:
   else:
     if lxplusTest:
       process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange( '191226:81-191226:831'
-                                                                       )
+                                                                         , '201197:1-201197:23'
+                                                                         )
     inputFiles = [ '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/EEFA1B9F-E687-E111-9C6D-BCAEC5364C62.root'
                  , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/EC6F55F7-E187-E111-9C56-0030486780EC.root'
                  , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/D6979235-D787-E111-8E2F-001D09F2527B.root'
