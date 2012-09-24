@@ -3,7 +3,9 @@
 
 
 #include <TH1D.h>
+#include <TH2D.h>
 #include <TF1.h>
+#include <TF2.h>
 
 
 namespace my {

@@ -57,12 +57,34 @@ void my::setParametersFitDelta( TF1 * fit, TH1D * histo )
 }
 
 
-void my::setParametersFitTransfer1D( TF1 * fit, TH1D * histo )
+void my::setParametersFitTransfer1D( TF1 * fit, TH1D * histo, bool useBkgFunction )
 {
-  double a( histo->GetBinContent( 1 ) );
-  double b( ( histo->GetBinContent( histo->GetNbinsX() ) - histo->GetBinContent( 1 ) ) / ( histo->GetBinCenter( histo->GetNbinsX() ) - histo->GetBinCenter( 1 ) ) );
-  fit->SetParameter( 0, a );
-  fit->SetParameter( 0, b );
+  // Starting points
+  Double_t c( histo->Integral() );
+  Double_t m( histo->GetMean() );
+  Double_t s( histo->GetRMS() );
+  // Gaussian part
+  fit->SetParameter( 0, c );
+//   fit->SetParLimits( 0, 0., 2. * c );
+  fit->SetParName( 0, "Constant" );
+  fit->SetParameter( 1, m );
+  fit->SetParLimits( 1, -2. * s, 2. * s );
+  fit->SetParName( 1, "Gaussian #Mu" );
+  fit->SetParameter( 2, s );
+  fit->SetParLimits( 2, 0., 2. * s );
+  fit->SetParName( 2, "Gaussian #sigma" );
+  // Additional part
+  if ( useBkgFunction ) {
+  }
+}
+
+
+void my::setParametersFitTransfer2D( TF2 * fit, TH2D * histo, bool useBkgFunction )
+{
+  // Starting points
+  // Additional part
+  if ( useBkgFunction ) {
+  }
 }
 
 
