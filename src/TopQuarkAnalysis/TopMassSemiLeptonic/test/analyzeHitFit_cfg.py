@@ -43,7 +43,7 @@ jecLevels = [ 'L1FastJet'
 matchMaxNJets   = 6                 # min: 4; default: 4
 matchAlgorithm  = 'unambiguousOnly' # default: 'totalMinDist'
 matchUseDeltaR  = True              # default: True
-matchUseMaxDist = False             # default: False
+matchUseMaxDist = False             # default: False, True enforced for 'unambiguousOnly' algorithm
 matchMaxDist    = 0.3               # default: 0.3
 
 ### Initialization
@@ -341,6 +341,11 @@ if not runTest:
 
 
 ### Messages
+
+cfgFile = logFile.replace( '.log', '_cfg.py' )
+f = open( cfgFile, 'w' )
+print >> f, process.dumpPython()
+f.close()
 
 print
 print 'Output file:'
