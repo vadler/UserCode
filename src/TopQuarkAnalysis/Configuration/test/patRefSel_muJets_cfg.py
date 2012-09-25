@@ -12,6 +12,19 @@ import FWCore.ParameterSet.Config as cms
 import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing ('standard')
 options.register('runOnMC', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "decide if run on MC or data")
+# parsing command line arguments
+if( hasattr(sys, "argv") ):
+  #options.parseArguments()
+  if(len(sys.argv) > 1):
+    print "Parsing command line arguments:"
+  for args in sys.argv :
+    arg = args.split(',')
+    for val in arg:
+      val = val.split('=')
+      if(len(val)==2):
+        print "Setting *", val[0], "* to:", val[1]
+        setattr(options,val[0], val[1])
+
 
 process = cms.Process( 'PAT' )
 
@@ -26,6 +39,7 @@ process = cms.Process( 'PAT' )
 
 ### Data or MC?
 runOnMC = options.runOnMC
+print runOnMC
 
 ### Switch on/off selection steps
 
@@ -130,6 +144,7 @@ inputFiles = [] # overwritten, if "useRelVals" is 'True'
 
 # maximum number of events
 maxEvents = -1 # reduce for testing
+maxEvents = 1000
 
 ### Conditions
 
@@ -184,7 +199,7 @@ if useRelVals:
     inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
                                      , dataTier     = 'RECO'
                                      , relVal       = 'SingleMu'
-                                     , globalTag    = 'GR_R_53_V12_RelVal_mu2011B'
+                                     , globalTag    = 'GR_R_53_V12_RelVal_mu2012A'
                                      , maxVersions  = 1
                                      )
 process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )

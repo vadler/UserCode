@@ -6,7 +6,6 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 # setup 'standard' options
 options = VarParsing.VarParsing ('standard')
 options.register('runOnMC', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "decide if run on MC or data")
-
 # parsing command line arguments
 if( hasattr(sys, "argv") ):
   #options.parseArguments()
@@ -19,6 +18,7 @@ if( hasattr(sys, "argv") ):
       if(len(val)==2):
         print "Setting *", val[0], "* to:", val[1]
         setattr(options,val[0], val[1])
+
 
 process = cms.Process( 'PAT' )
 
@@ -127,6 +127,7 @@ inputFiles = []   # overwritten, if "useRelVals" is 'True'
 
 # maximum number of events
 maxEvents = -1 # reduce for testing
+maxEvents = 1000
 
 ### Conditions
 
@@ -183,7 +184,7 @@ if useRelVals:
     inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
                                      , dataTier     = 'RECO'
                                      , relVal       = 'Jet'
-                                     , globalTag    = 'GR_R_53_V12_RelVal_jet2011B'
+                                     , globalTag    = 'GR_R_53_V12_RelVal_jet2012B'
                                      , maxVersions  = 1
                                      )
 process.source.fileNames = inputFiles
