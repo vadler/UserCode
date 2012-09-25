@@ -2,7 +2,7 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-condition = 'com10_5E33v4'
+condition = 'com10'
 
 process = cms.Process( "PAT" )
 
