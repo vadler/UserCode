@@ -134,8 +134,8 @@ maxEvents = -1 # reduce for testing
 ### Conditions
 
 # GlobalTags
-globalTagData = 'GR_R_52_V7D::All' # incl. Summer12 JEC and new b-tag SF
-globalTagMC   = 'START52_V9C::All' # incl. Summer12 JEC and new b-tag SF
+globalTagData = 'GR_R_53_V13::All'
+globalTagMC   = 'START53_V11::All'
 
 ### Output
 
@@ -174,17 +174,18 @@ else:
 if useRelVals:
   from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_5_cand1'
-                                     , relVal        = 'RelValTTbar'
-                                     , globalTag     = 'START52_V9'
-                                     , maxVersions   = 1
+    inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
+                                     , dataTier     = 'AODSIM'
+                                     , relVal       = 'RelValProdTTbar'
+                                     , globalTag    = 'START53_V10'
+                                     , maxVersions  = 1
                                      )
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_5_cand1'
-                                     , relVal        = 'SingleMu'
-                                     , dataTier      = 'RECO'
-                                     , globalTag     = 'GR_R_52_V7_RelVal_mu2011B'
-                                     , maxVersions   = 1
+    inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
+                                     , dataTier     = 'RECO'
+                                     , relVal       = 'SingleMu'
+                                     , globalTag    = 'GR_R_53_V12_RelVal_mu2011B'
+                                     , maxVersions  = 1
                                      )
 process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 process.source.fileNames = inputFiles
