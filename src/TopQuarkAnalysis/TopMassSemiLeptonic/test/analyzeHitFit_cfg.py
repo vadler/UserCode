@@ -43,7 +43,7 @@ jecLevels = [ 'L1FastJet'
 matchMaxNJets   = 6                 # min: 4; default: 4
 matchAlgorithm  = 'unambiguousOnly' # default: 'totalMinDist'
 matchUseDeltaR  = True              # default: True
-matchUseMaxDist = False             # default: False, True enforced for 'unambiguousOnly' algorithm
+matchUseMaxDist = True              # default: False, True enforced for 'unambiguousOnly' algorithm
 matchMaxDist    = 0.3               # default: 0.3
 
 ### Initialization
@@ -101,6 +101,8 @@ process.maxEvents = cms.untracked.PSet(
 
 outputFile = '%s/output/analyzeHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
 
+if matchAlgorithm == 'totalMinDist':
+  outputFile = outputFile.replace( era, era + '_' + matchAlgorithm )
 if runTest:
   outputFile = outputFile.replace( 'root', 'test.root' )
 if not rfioInput:
