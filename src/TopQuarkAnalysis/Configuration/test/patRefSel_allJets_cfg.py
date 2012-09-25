@@ -184,7 +184,7 @@ if useRelVals:
     inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
                                      , dataTier     = 'RECO'
                                      , relVal       = 'Jet'
-                                     , globalTag    = 'GR_R_53_V12_RelVal_jet2012B'
+                                     , globalTag    = 'GR_R_53_V12_RelVal_jet2012A'
                                      , maxVersions  = 1
                                      )
 process.source.fileNames = inputFiles
