@@ -27,7 +27,12 @@
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
-#include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/MyTools.h"
+
+#include "CommonTools/MyTools/interface/RootTools.h"
+
+
+void setParameters1D( TF1 * fit, TH1D * histo, bool useBkgFunction = false );
+void setParameters2D( TF2 * fit, TH2D * histo, bool useBkgFunction = false );
 
 
 int main( int argc, char * argv[] )
@@ -36,28 +41,9 @@ int main( int argc, char * argv[] )
   int returnStatus_( 0 );
 
   // Set up ROOT
-  gStyle->SetPalette(1,0);
-  gStyle->SetCanvasColor(kWhite);
-  gStyle->SetPadColor(kWhite);
-  gStyle->SetPadTickX(1);
-  gStyle->SetPadTickY(1);
-  gStyle->SetPadTopMargin(.075);
-  gStyle->SetPadRightMargin(.075);
-  gStyle->SetPadBottomMargin(.15);
-  gStyle->SetPadLeftMargin(.15);
-  gStyle->SetTitleSize(.06,"XYZ");
-  gStyle->SetTitleFillColor(kWhite);
-  gStyle->SetTitleBorderSize(1);
-  gStyle->SetStatColor(kWhite);
-  gStyle->SetStatBorderSize(1);
-  gStyle->SetOptStat(111111);
-  gStyle->SetOptFit(1111);
-  gROOT->ProcessLine(".L $ROOTSYS/lib/libPhysics.so");
-  TString libs = gSystem->GetLinkedLibs();
-  libs.Append(" -L$ROOTSYS/lib -lPhysics");
-  gSystem->SetLinkedLibs(libs.Data());
-  gSystem->Load( "libFWCoreFWLite" );
-  AutoLibraryLoader::enable();
+  my::setPlotEnvironment( gStyle );
+  gStyle->SetOptStat( 111111 );
+  gStyle->SetOptFit( 1111 );
 
   // Check configuration file
   if ( argc < 2 ) {
@@ -89,6 +75,8 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & io_( process_.getParameter< edm::ParameterSet >( "io" ) );
   const std::string inFile_( io_.getParameter< std::string >( "inputFile" ) );
   const std::string sample_( io_.getParameter< std::string >( "sample" ) );
+  const std::string pathPlots_( io_.getParameter< std::string >( "pathPlots" ) );
+  const bool plot_( ! pathPlots_.empty() );
   // Configuration for histogram binning
   const edm::ParameterSet & histos_( process_.getParameter< edm::ParameterSet >( "histos" ) );
   const double widthFactor_( histos_.getParameter< double >( "widthFactor" ) );
@@ -101,7 +89,6 @@ int main( int argc, char * argv[] )
   // Configuration for fitting 1D transfer functions
   const edm::ParameterSet & transfer1D_( process_.getParameter< edm::ParameterSet >( "transfer1D" ) );
   const bool fit1D_( transfer1D_.getParameter< bool >( "fit" ) );
-  const bool plot1D_( transfer1D_.getParameter< bool >( "plot" ) );
   double fitMaxPt1D_( transfer1D_.getParameter< double >( "fitMaxPt" ) );
   const std::string fitFunction1D_( transfer1D_.getParameter< std::string >( "fitFunction" ) );
   const bool useBkg1D_( transfer1D_.getParameter< bool >( "useBkg" ) );
@@ -113,7 +100,6 @@ int main( int argc, char * argv[] )
   // Configuration for fitting 2D transfer functions
   const edm::ParameterSet & transfer2D_( process_.getParameter< edm::ParameterSet >( "transfer2D" ) );
   const bool fit2D_( transfer2D_.getParameter< bool >( "fit" ) );
-  const bool plot2D_( transfer2D_.getParameter< bool >( "plot" ) );
   double fitMaxPt2D_( transfer2D_.getParameter< double >( "fitMaxPt" ) );
   const std::string fitFunction2D_( transfer2D_.getParameter< std::string >( "fitFunction" ) );
   std::string fitOptions2D_( transfer2D_.getParameter< std::string >( "fitOptions" ) );
@@ -790,14 +776,6 @@ int main( int argc, char * argv[] )
 
         const std::string name( objCat + "_" + nameVar + "_" + subFit );
 
-        std::string fileName1D( "file1D_" + sample_ + "_" + name );
-        if ( usePileUp_ ) fileName1D.append( "_PileUp" );
-        if ( refSel_ )    fileName1D.append( "_Ref" );
-        fileName1D.append( ".pdf" );
-        const std::string fileOpen( fileName1D + "[" );
-        const std::string fileClose( fileName1D + "]" );
-        if ( plot1D_ ) c1.Print( fileOpen.c_str() );
-
         // Transfer function parameters
         TF1 * fitTest( new TF1( "test", fitFunction1D_.c_str() ) );
         const unsigned nPar( fitTest->GetNumberFreeParameters() );
@@ -848,7 +826,7 @@ int main( int argc, char * argv[] )
         if ( fitNonRestr_ && histTransRebin != 0 ) {
           const std::string nameTransRebinFit( nameTransRebin + "_fit" );
           TF1 * fitTransRebin( new TF1( nameTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange1D_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange1D_ ) ) );
-          my::setParametersFitTransfer1D( fitTransRebin, histTransRebin, useBkg1D_ );
+          setParameters1D( fitTransRebin, histTransRebin, useBkg1D_ );
           TFitResultPtr fitTransRebinResultPtr( histTransRebin->Fit( fitTransRebin, fitOptions1D_.c_str() ) );
           if ( fitTransRebinResultPtr >= 0 ) {
             if ( fitTransRebinResultPtr->Status() == 0 && fitTransRebinResultPtr->Ndf() != 0. ) {
@@ -871,9 +849,9 @@ int main( int argc, char * argv[] )
               std::cout << "    '" << nameTransRebin << std::endl;
             }
           }
-          if ( plot1D_ ) {
+          if ( plot_ ) {
             histTransRebin->Draw();
-            c1.Print( fileName1D.c_str() );
+            c1.Print( std::string( pathPlots_ + histTransRebin->GetName() + ".png" ).c_str() );
           }
         }
 
@@ -883,7 +861,7 @@ int main( int argc, char * argv[] )
         if ( histTransRestrRebin != 0 ) {
           const std::string nameTransRestrRebinFit( nameTransRestrRebin + "_fit" );
           TF1 * fitTransRestrRebin( new TF1( nameTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
-          my::setParametersFitTransfer1D( fitTransRestrRebin, histTransRestrRebin, useBkg1D_ );
+          setParameters1D( fitTransRestrRebin, histTransRestrRebin, useBkg1D_ );
           TFitResultPtr fitTransRestrRebinResultPtr( histTransRestrRebin->Fit( fitTransRestrRebin, fitOptions1D_.c_str() ) );
           if ( fitTransRestrRebinResultPtr >= 0 ) {
             if ( fitTransRestrRebinResultPtr->Status() == 0 && fitTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -906,9 +884,9 @@ int main( int argc, char * argv[] )
               std::cout << "    '" << nameTransRestrRebin << std::endl;
             }
           }
-          if ( plot1D_ ) {
+          if ( plot_ ) {
             histTransRestrRebin->Draw();
-            c1.Print( fileName1D.c_str() );
+            c1.Print( std::string( pathPlots_ + histTransRestrRebin->GetName() + ".png" ).c_str() );
           }
         }
 
@@ -938,7 +916,7 @@ int main( int argc, char * argv[] )
           if ( fitNonRestr_ && histPtTransRebin != 0 ) {
             const std::string namePtTransRebinFit( namePtTransRebin + "_fit" );
             TF1 * fitPtTransRebin( new TF1( namePtTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange1D_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange1D_ ) ) );
-            my::setParametersFitTransfer1D( fitPtTransRebin, histPtTransRebin, useBkg1D_ );
+            setParameters1D( fitPtTransRebin, histPtTransRebin, useBkg1D_ );
             TFitResultPtr fitPtTransRebinResultPtr( histPtTransRebin->Fit( fitPtTransRebin, fitOptions1D_.c_str() ) );
             if ( fitPtTransRebinResultPtr >= 0 ) {
               if ( fitPtTransRebinResultPtr->Status() == 0 && fitPtTransRebinResultPtr->Ndf() != 0. ) {
@@ -962,9 +940,9 @@ int main( int argc, char * argv[] )
                 std::cout << "    '" << namePtTransRebin << std::endl;
               }
             }
-            if ( plot1D_ ) {
+            if ( plot_ ) {
               histPtTransRebin->Draw();
-              c1.Print( fileName1D.c_str() );
+              c1.Print( std::string( pathPlots_ + histPtTransRebin->GetName() + ".png" ).c_str() );
             }
           }
 
@@ -974,7 +952,7 @@ int main( int argc, char * argv[] )
           if ( histPtTransRestrRebin != 0 ) {
             const std::string namePtTransRestrRebinFit( namePtTransRestrRebin + "_fit" );
             TF1 * fitPtTransRestrRebin( new TF1( namePtTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
-            my::setParametersFitTransfer1D( fitPtTransRestrRebin, histPtTransRestrRebin, useBkg1D_ );
+            setParameters1D( fitPtTransRestrRebin, histPtTransRestrRebin, useBkg1D_ );
             TFitResultPtr fitPtTransRestrRebinResultPtr( histPtTransRestrRebin->Fit( fitPtTransRestrRebin, fitOptions1D_.c_str() ) );
             if ( fitPtTransRestrRebinResultPtr >= 0 ) {
               if ( fitPtTransRestrRebinResultPtr->Status() == 0 && fitPtTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -998,9 +976,9 @@ int main( int argc, char * argv[] )
                 std::cout << "    '" << namePtTransRestrRebin << std::endl;
               }
             }
-            if ( plot1D_ ) {
+            if ( plot_ ) {
               histPtTransRestrRebin->Draw();
-              c1.Print( fileName1D.c_str() );
+              c1.Print( std::string( pathPlots_ + histPtTransRestrRebin->GetName() + ".png" ).c_str() );
             }
           }
 
@@ -1034,9 +1012,9 @@ int main( int argc, char * argv[] )
                 std::cout << "    '" << nameTransRebinPtFitMap << std::endl;
               }
             }
-            if ( plot1D_ ) {
+            if ( plot_ ) {
               histVecTransRebinPtFitMap.at( uPar )->Draw();
-              c1.Print( fileName1D.c_str() );
+              c1.Print( std::string( pathPlots_ + histVecTransRebinPtFitMap.at( uPar )->GetName() + ".png" ).c_str() );
             }
           }
 
@@ -1064,9 +1042,9 @@ int main( int argc, char * argv[] )
               std::cout << "    '" << nameTransRestrRebinPtFitMap << std::endl;
             }
           }
-          if ( plot1D_ ) {
+          if ( plot_ ) {
             histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
-            c1.Print( fileName1D.c_str() );
+            c1.Print( std::string( pathPlots_ + histVecTransRestrRebinPtFitMap.at( uPar )->GetName() + ".png" ).c_str() );
           }
         } // loop: uPar < nPar
 
@@ -1129,7 +1107,7 @@ int main( int argc, char * argv[] )
             if ( fitNonRestr_ && histEtaTransRebin != 0 ) {
               const std::string nameEtaTransRebinFit( nameEtaTransRebin + "_fit" );
               TF1 * fitEtaTransRebin( new TF1( nameEtaTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histEtaTransRebin->GetXaxis()->GetXmin(), histEtaTransRebin->GetMean() - histEtaTransRebin->GetRMS() * fitRange1D_ ), std::min( histEtaTransRebin->GetXaxis()->GetXmax(), histEtaTransRebin->GetMean() + histEtaTransRebin->GetRMS() * fitRange1D_ ) ) );
-              my::setParametersFitTransfer1D( fitEtaTransRebin, histEtaTransRebin, useBkg1D_ );
+              setParameters1D( fitEtaTransRebin, histEtaTransRebin, useBkg1D_ );
               TFitResultPtr fitEtaTransRebinResultPtr( histEtaTransRebin->Fit( fitEtaTransRebin, fitOptions1D_.c_str() ) );
               if ( fitEtaTransRebinResultPtr >= 0 ) {
                 if ( fitEtaTransRebinResultPtr->Status() == 0 && fitEtaTransRebinResultPtr->Ndf() != 0. ) {
@@ -1163,7 +1141,7 @@ int main( int argc, char * argv[] )
           if ( histEtaTransRestrRebin != 0 ) {
             const std::string nameEtaTransRestrRebinFit( nameEtaTransRestrRebin + "_fit" );
             TF1 * fitEtaTransRestrRebin( new TF1( nameEtaTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histEtaTransRestrRebin->GetXaxis()->GetXmin(), histEtaTransRestrRebin->GetMean() - histEtaTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histEtaTransRestrRebin->GetXaxis()->GetXmax(), histEtaTransRestrRebin->GetMean() + histEtaTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
-            my::setParametersFitTransfer1D( fitEtaTransRestrRebin, histEtaTransRestrRebin, useBkg1D_ );
+            setParameters1D( fitEtaTransRestrRebin, histEtaTransRestrRebin, useBkg1D_ );
             TFitResultPtr fitEtaTransRestrRebinResultPtr( histEtaTransRestrRebin->Fit( fitEtaTransRestrRebin, fitOptions1D_.c_str() ) );
             if ( fitEtaTransRestrRebinResultPtr >= 0 ) {
               if ( fitEtaTransRestrRebinResultPtr->Status() == 0 && fitEtaTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -1221,7 +1199,7 @@ int main( int argc, char * argv[] )
                 if ( histEtaPtTransRebin != 0 ) {
                   const std::string nameEtaPtTransRebinFit( nameEtaPtTransRebin + "_fit" );
                   TF1 * fitEtaPtTransRebin( new TF1( nameEtaPtTransRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histEtaPtTransRebin->GetXaxis()->GetXmin(), histEtaPtTransRebin->GetMean() - histEtaPtTransRebin->GetRMS() * fitRange1D_ ), std::min( histEtaPtTransRebin->GetXaxis()->GetXmax(), histEtaPtTransRebin->GetMean() + histEtaPtTransRebin->GetRMS() * fitRange1D_ ) ) );
-                  my::setParametersFitTransfer1D( fitEtaPtTransRebin, histEtaPtTransRebin, useBkg1D_ );
+                  setParameters1D( fitEtaPtTransRebin, histEtaPtTransRebin, useBkg1D_ );
                   TFitResultPtr fitEtaPtTransRebinResultPtr( histEtaPtTransRebin->Fit( fitEtaPtTransRebin, fitOptions1D_.c_str() ) );
                   if ( fitEtaPtTransRebinResultPtr >= 0 ) {
                     if ( fitEtaPtTransRebinResultPtr->Status() == 0 && fitEtaPtTransRebinResultPtr->Ndf() != 0. ) {
@@ -1245,9 +1223,9 @@ int main( int argc, char * argv[] )
                       std::cout << "    '" << nameEtaPtTransRebin << std::endl;
                     }
                   }
-                  if ( plot1D_ ) {
+                  if ( plot_ ) {
                     histEtaPtTransRebin->Draw();
-                    c1.Print( fileName1D.c_str() );
+                    c1.Print( std::string( pathPlots_ + histEtaPtTransRebin->GetName() + ".png" ).c_str() );
                   }
                 }
               }
@@ -1257,7 +1235,7 @@ int main( int argc, char * argv[] )
               if ( histEtaPtTransRestrRebin != 0 ) {
                 const std::string nameEtaPtTransRestrRebinFit( nameEtaPtTransRestrRebin + "_fit" );
                 TF1 * fitEtaPtTransRestrRebin( new TF1( nameEtaPtTransRestrRebinFit.c_str(), fitFunction1D_.c_str(), std::max( histEtaPtTransRestrRebin->GetXaxis()->GetXmin(), histEtaPtTransRestrRebin->GetMean() - histEtaPtTransRestrRebin->GetRMS() * fitRange1D_ ), std::min( histEtaPtTransRestrRebin->GetXaxis()->GetXmax(), histEtaPtTransRestrRebin->GetMean() + histEtaPtTransRestrRebin->GetRMS() * fitRange1D_ ) ) );
-                my::setParametersFitTransfer1D( fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin, useBkg1D_ );
+                setParameters1D( fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin, useBkg1D_ );
                 TFitResultPtr fitEtaPtTransRestrRebinResultPtr( histEtaPtTransRestrRebin->Fit( fitEtaPtTransRestrRebin, fitOptions1D_.c_str() ) );
                 if ( fitEtaPtTransRestrRebinResultPtr >= 0 ) {
                   if ( fitEtaPtTransRestrRebinResultPtr->Status() == 0 && fitEtaPtTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -1281,9 +1259,9 @@ int main( int argc, char * argv[] )
                     std::cout << "    '" << nameEtaPtTransRestrRebin << std::endl;
                   }
                 }
-                if ( plot1D_ ) {
+                if ( plot_ ) {
                   histEtaPtTransRestrRebin->Draw();
-                  c1.Print( fileName1D.c_str() );
+                  c1.Print( std::string( pathPlots_ + histEtaPtTransRestrRebin->GetName() + ".png" ).c_str() );
                 }
               }
 
@@ -1321,9 +1299,9 @@ int main( int argc, char * argv[] )
                     std::cout << "    '" << nameTransRebinEtaPtFitMap << std::endl;
                   }
                 }
-                if ( plot1D_ ) {
+                if ( plot_ ) {
                   histVecTransRebinEtaPtFitMap.at( uPar )->Draw();
-                  c1.Print( fileName1D.c_str() );
+                  c1.Print( std::string( pathPlots_ + histVecTransRebinEtaPtFitMap.at( uPar )->GetName() + ".png" ).c_str() );
                 }
               }
 
@@ -1355,9 +1333,9 @@ int main( int argc, char * argv[] )
                   std::cout << "    '" << nameTransRestrRebinEtaPtFitMap << std::endl;
                 }
               }
-              if ( plot1D_ ) {
+              if ( plot_ ) {
                 histVecTransRestrRebinEtaPtFitMap.at( uPar )->Draw();
-                c1.Print( fileName1D.c_str() );
+                c1.Print( std::string( pathPlots_ + histVecTransRestrRebinEtaPtFitMap.at( uPar )->GetName() + ".png" ).c_str() );
               }
             }
 
@@ -1365,36 +1343,36 @@ int main( int argc, char * argv[] )
 
         } // loop: keyEta
 
-        if ( plot1D_ ) {
+        if ( plot_ ) {
           for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
             if ( fitNonRestr_ ) {
               histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
-              c1.Print( fileName1D.c_str() );
+              c1.Print( std::string( pathPlots_ + histVecTransRestrRebinPtFitMap.at( uPar )->GetName() + ".png" ).c_str() );
               histVecTransRestrRebinEtaFitMap.at( uPar )->Draw();
-              c1.Print( fileName1D.c_str() );
+              c1.Print( std::string( pathPlots_ + histVecTransRestrRebinEtaFitMap.at( uPar )->GetName() + ".png" ).c_str() );
               histVecTransRebinEtaParAMap.at( uPar )->Draw();
-              c1.Print( fileName1D.c_str() );
+              c1.Print( std::string( pathPlots_ + histVecTransRebinEtaParAMap.at( uPar )->GetName() + ".png" ).c_str() );
               histVecTransRebinEtaParBMap.at( uPar )->Draw();
-              c1.Print( fileName1D.c_str() );
+              c1.Print( std::string( pathPlots_ + histVecTransRebinEtaParBMap.at( uPar )->GetName() + ".png" ).c_str() );
             }
             histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
-            c1.Print( fileName1D.c_str() );
+            c1.Print( std::string( pathPlots_ + histVecTransRestrRebinPtFitMap.at( uPar )->GetName() + ".png" ).c_str() );
             histVecTransRestrRebinEtaFitMap.at( uPar )->Draw();
-            c1.Print( fileName1D.c_str() );
+            c1.Print( std::string( pathPlots_ + histVecTransRestrRebinEtaFitMap.at( uPar )->GetName() + ".png" ).c_str() );
             histVecTransRestrRebinEtaParAMap.at( uPar )->Draw();
-            c1.Print( fileName1D.c_str() );
+            c1.Print( std::string( pathPlots_ + histVecTransRestrRebinEtaParAMap.at( uPar )->GetName() + ".png" ).c_str() );
             histVecTransRestrRebinEtaParBMap.at( uPar )->Draw();
-            c1.Print( fileName1D.c_str() );
+            c1.Print( std::string( pathPlots_ + histVecTransRestrRebinEtaParBMap.at( uPar )->GetName() + ".png" ).c_str() );
           }
         }
 
         if ( writeFiles1D_ ) {
 
           // File name
-          std::string nameOut( pathOut1D_ + "/gentTransferFunction1D_" + sample_ + "_" + name );
+          std::string nameOut( pathOut1D_ + "/gentTransferFunction1D_" + sample_ );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
           if ( refSel_)     nameOut.append( "_Ref" );
-          nameOut.append( ".txt" );
+          nameOut.append( "_" + name + ".txt" );
 
           ofstream fileOut;
           fileOut.open( nameOut.c_str(), std::ios_base::out );
@@ -1531,8 +1509,6 @@ int main( int argc, char * argv[] )
 
         }
 
-        if ( plot1D_ ) c1.Print( fileClose.c_str() );
-
       } // loop: keyFit
 
     }
@@ -1560,14 +1536,6 @@ int main( int argc, char * argv[] )
 
         const std::string name( objCat + "_" + nameVar + "_" + subFit );
 
-        std::string fileName2D( "file2D_" + sample_ + "_" + name );
-        if ( usePileUp_ ) fileName2D.append( "_PileUp" );
-        if ( refSel_ )    fileName2D.append( "_Ref" );
-        fileName2D.append( ".pdf" );
-        const std::string fileOpen( fileName2D + "[" );
-        const std::string fileClose( fileName2D + "]" );
-        if ( plot2D_ ) c2.Print( fileOpen.c_str() );
-
         if ( fitEtaBins_ ) {
 
           // Loop over eta bins
@@ -1590,10 +1558,10 @@ int main( int argc, char * argv[] )
         if ( writeFiles2D_ ) {
 
           // File name
-          std::string nameOut( pathOut2D_ + "/gentTransferFunction2D_" + sample_ + "_" + name );
+          std::string nameOut( pathOut2D_ + "/gentTransferFunction2D_" + sample_ );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
           if ( refSel_)     nameOut.append( "_Ref" );
-          nameOut.append( ".txt" );
+          nameOut.append( "_" + name + ".txt" );
 
           ofstream fileOut;
           fileOut.open( nameOut.c_str(), std::ios_base::out );
@@ -1732,8 +1700,6 @@ int main( int argc, char * argv[] )
 
         }
 
-        if ( plot2D_ ) c2.Print( fileClose.c_str() );
-
       } // loop: keyFit
 
     }
@@ -1752,4 +1718,45 @@ int main( int argc, char * argv[] )
               << "    return status " << returnStatus_ << std::endl;
   return returnStatus_;
 
+}
+
+
+void setParameters1D( TF1 * fit, TH1D * histo, bool useBkgFunction )
+{
+  // Starting points
+  Double_t c( histo->Integral() );                             // Constant
+  Double_t m( histo->GetMean() );                              // Mean
+  Double_t p( histo->GetBinCenter( histo->GetMaximumBin() ) ); // Peak
+  Double_t s( histo->GetRMS() );                               // RMS
+  // Gaussian part
+  // Constant
+  fit->SetParameter( 0, c );
+//   fit->SetParLimits( 0, 0., 2. * c );
+  fit->SetParName( 0, "Constant" );
+  // Mean
+  fit->SetParameter( 1, p ); // No double peak structure in this case
+  fit->SetParLimits( 1, -1. * s, 1. * s );
+  fit->SetParName( 1, "Gaussian #Mu" );
+  // Sigma
+  fit->SetParameter( 2, s );
+  fit->SetParLimits( 2, 0., 2. * s );
+  fit->SetParName( 2, "Gaussian #sigma" );
+  // Additional part
+  if ( useBkgFunction ) {
+    fit->SetParameter( 3, 0. );
+    fit->SetParName( 3, "bkg c" );
+    fit->SetParameter( 4, p - ( m - p ) );
+    fit->SetParName( 4, "bkg #mu" );
+    fit->SetParameter( 5, 2. * s );
+    fit->SetParName( 5, "bkg #sigma" );
+  }
+}
+
+
+void setParameters2D( TF2 * fit, TH2D * histo, bool useBkgFunction )
+{
+  // Starting points
+  // Additional part
+  if ( useBkgFunction ) {
+  }
 }
