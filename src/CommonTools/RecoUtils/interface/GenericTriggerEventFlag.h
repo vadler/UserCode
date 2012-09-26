@@ -4,19 +4,19 @@
 
 // -*- C++ -*-
 //
-// Package:    CommonTools/TriggerUtils
+// Package:    CommonTools/RecoUtils
 // Class:      GenericTriggerEventFlag
 //
-// $Id: GenericTriggerEventFlag.h,v 1.1 2010/06/08 10:39:13 vadler Exp $
+// $Id: GenericTriggerEventFlag.h,v 1.8 2010/03/27 12:09:10 dutta Exp $
 //
 /**
-  \class    GenericTriggerEventFlag GenericTriggerEventFlag.h "CommonTools/TriggerUtils/interface/GenericTriggerEventFlag.h"
+  \class    GenericTriggerEventFlag GenericTriggerEventFlag.h "CommonTools/RecoUtils/interface/GenericTriggerEventFlag.h"
   \brief    Provides a code based selection for trigger and DCS information in order to have no failing filters in the CMSSW path.
 
    [...]
 
   \author   Volker Adler
-  \version  $Id: GenericTriggerEventFlag.h,v 1.1 2010/06/08 10:39:13 vadler Exp $
+  \version  $Id$
 */
 
 
@@ -40,9 +40,7 @@ class GenericTriggerEventFlag {
     HLTConfigProvider                          hltConfig_;
     bool                                       hltConfigInit_;
     // Configuration parameters
-    bool        andOr_;
-    std::string dbLabel_;
-    unsigned    verbose_;
+    bool andOr_;
     bool               andOrDcs_;
     edm::InputTag      dcsInputTag_;
     std::vector< int > dcsPartitions_;
@@ -53,7 +51,6 @@ class GenericTriggerEventFlag {
     std::vector< std::string > gtLogicalExpressions_;
     bool                       errorReplyGt_;
     bool                       andOrL1_;
-    bool                       l1BeforeMask_;
     std::string                l1DBKey_;
     std::vector< std::string > l1LogicalExpressions_;
     bool                       errorReplyL1_;
