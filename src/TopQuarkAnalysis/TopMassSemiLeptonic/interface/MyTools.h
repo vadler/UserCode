@@ -12,8 +12,6 @@ namespace my {
 
   void setParametersFitFrac( TF1 * fit, TH1D * histo, bool useBkgFunction = false );
   void setParametersFitDelta( TF1 * fit, TH1D * histo );
-  void setParametersFitTransfer1D( TF1 * fit, TH1D * histo, bool useBkgFunction = false );
-  void setParametersFitTransfer2D( TF2 * fit, TH2D * histo, bool useBkgFunction = false );
   void setParametersBkg( TF1 * fit, TF1 * bkg );
 
 }

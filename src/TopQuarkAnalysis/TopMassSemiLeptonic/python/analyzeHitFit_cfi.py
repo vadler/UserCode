@@ -27,7 +27,7 @@ analyzeHitFit = cms.EDAnalyzer(
 , patMETs      = cms.InputTag( 'patMETs' )              # 'patMETs' (TypeI) or 'patMETsUncorr' (none)
 
   # JEC level to be considered
-, jecLevel   = cms.string( 'L3Absolute' )
+, jecLevel = cms.string( 'L3Absolute' )
 
   # HitFit resolution file paths (only used, if eta binning empty per objects category)
 , muonResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafMuonResolution.txt' )
@@ -35,6 +35,10 @@ analyzeHitFit = cms.EDAnalyzer(
 , udscJetResolutions  = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution.txt' )
 , bJetResolutions     = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution.txt' )
 , metResolutions      = cms.string( 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution.txt' )
+
+  ### Output ###
+
+, pathPlots = cms.string( '' ) # empty string prevents from plotting
 
   # Eta binning (overrides input from resolution files, if not empty)
 , muonEtaBins     = cms.vdouble()

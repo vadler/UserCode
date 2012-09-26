@@ -9,8 +9,9 @@ runTest   = True
 rfioInput = False
 
 # Origin of existing resolution functions
-# era = 'Spring10'
-era = 'Summer11'
+# era    = 'Spring10'
+era    = 'Summer11'
+sample = 'Fall11_R4_1'
 
 # Correlation to input
 pileUpFileMCTrue       = 'CommonTools/MyTools/data/pileUpFileMC_Fall11.root'
@@ -42,8 +43,9 @@ jecLevels = [ 'L1FastJet'
 # TQAF MC match
 matchMaxNJets   = 6                 # min: 4; default: 4
 matchAlgorithm  = 'unambiguousOnly' # default: 'totalMinDist'
+#matchAlgorithm  = 'totalMinDist' # default: 'totalMinDist'
 matchUseDeltaR  = True              # default: True
-matchUseMaxDist = True              # default: False, True enforced for 'unambiguousOnly' algorithm
+matchUseMaxDist = False             # default: False, True enforced for 'unambiguousOnly' algorithm
 matchMaxDist    = 0.3               # default: 0.3
 
 ### Initialization
@@ -80,11 +82,11 @@ if runTest:
 inputFiles = [ 'file:%s/output/skimHitFit.local.root'%( os.getenv( "CMSSW_BASE" ) )
              ]
 if rfioInput:
-  from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import *
+  from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import files
   if runTest:
-    inputFiles = files_Fall11_R4_test
+    inputFiles = files[ 'Fall11_R4_test' ]
   else:
-    inputFiles = files_Fall11_R4_1
+    inputFiles = files[ sample ]
 elif runTest:
   inputFiles = [ 'file:%s/output/skimHitFit.test.local.root'%( os.getenv( "CMSSW_BASE" ) )
                ]
@@ -99,10 +101,8 @@ process.maxEvents = cms.untracked.PSet(
 
 ### Output
 
-outputFile = '%s/output/analyzeHitFit_from%s.root'%( os.getenv( "CMSSW_BASE" ), era )
+outputFile = '%s/output/analyzeHitFit_from%s_%s_%s.root'%( os.getenv( "CMSSW_BASE" ), era, sample, matchAlgorithm )
 
-if matchAlgorithm == 'totalMinDist':
-  outputFile = outputFile.replace( era, era + '_' + matchAlgorithm )
 if runTest:
   outputFile = outputFile.replace( 'root', 'test.root' )
 if not rfioInput:
@@ -112,6 +112,8 @@ process.TFileService = cms.Service(
 , fileName = cms.string( outputFile )
 )
 logFile = outputFile.replace( 'root', 'log' )
+cfgFile = logFile.replace( '.log', '_cfg.py' )
+pathPlots = '%s/output/plots/analyzeHitFit_from%s_%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample, matchAlgorithm )
 
 
 ### Event selection
@@ -312,6 +314,11 @@ process.analyzeHitFit.electronResolutions = 'TopQuarkAnalysis/TopHitFit/data/res
 process.analyzeHitFit.udscJetResolutions  = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafUdscJetResolution_%s.txt'%( era )
 process.analyzeHitFit.bJetResolutions     = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafBJetResolution_%s.txt'%( era )
 process.analyzeHitFit.metResolutions      = 'TopQuarkAnalysis/TopHitFit/data/resolution/tqafKtResolution_%s.txt'%( era )
+if runTest:
+  pathPlots = pathPlots.replace( 'analyzeHitFit', 'analyzeHitFitTest', 1 )
+else:
+  process.analyzeHitFit.pathPlots = pathPlots
+#process.analyzeHitFit.pathPlots = pathPlots
 # process.analyzeHitFit_L5Flavor = process.analyzeHitFit.clone( jecLevel = 'L5Flavor'
 #                                                                                            )
 # process.analyzeHitFit_L7Parton = process.analyzeHitFit.clone( jecLevel = 'L7Parton'
@@ -350,9 +357,18 @@ print >> f, process.dumpPython()
 f.close()
 
 print
+print 'Config file:'
+print '------------'
+print cfgFile
+print
 print 'Output file:'
 print '------------'
 print outputFile
+if process.analyzeHitFit.pathPlots != '':
+  print
+  print 'Plots destination:'
+  print '------------------'
+  print pathPlots + '*.png'
 print
 print 'Log file destination:'
 print '---------------------'

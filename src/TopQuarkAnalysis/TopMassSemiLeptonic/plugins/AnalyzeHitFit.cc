@@ -98,6 +98,8 @@ class AnalyzeHitFit : public edm::EDAnalyzer {
     edm::InputTag patJetsTag_;
     edm::InputTag patMETsTag_;
     std::string jecLevel_;
+    std::string pathPlots_;
+    bool        plot_;
     // Eta binning
     std::vector< std::vector< double > > etaBins_;
     std::vector< std::vector< double > > etaSymmBins_;
@@ -171,6 +173,11 @@ class AnalyzeHitFit : public edm::EDAnalyzer {
 #include "boost/algorithm/string/replace.hpp"
 #include <boost/shared_ptr.hpp>
 
+#include <TROOT.h>
+#include <TSystem.h>
+#include "TStyle.h"
+#include "TCanvas.h"
+
 #include "Math/GenVector/VectorUtil.h"
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -179,6 +186,8 @@ class AnalyzeHitFit : public edm::EDAnalyzer {
 
 #include "AnalysisDataFormats/TopObjects/interface/TtSemiLepEvtPartons.h"
 #include "TopQuarkAnalysis/TopHitFit/interface/EtaDepResolution.h"
+
+#include "CommonTools/MyTools/interface/RootTools.h"
 
 
 // Default constructor
@@ -203,6 +212,8 @@ AnalyzeHitFit::AnalyzeHitFit( const edm::ParameterSet & iConfig )
 , patJetsTag_( iConfig.getParameter< edm::InputTag >( "patJets" ) )
 , patMETsTag_( iConfig.getParameter< edm::InputTag >( "patMETs" ) )
 , jecLevel_( iConfig.getParameter< std::string >( "jecLevel" ) )
+, pathPlots_( iConfig.getParameter< std::string >( "pathPlots" ) )
+, plot_( ! pathPlots_.empty() )
 , filledEvents_( 0 )
 {
 
@@ -589,6 +600,97 @@ void AnalyzeHitFit::endJob()
 {
 
   edm::LogPrint( "AnalyzeHitFit" ) << "\n\n**************\nFilled events: " << filledEvents_ << "\n**************\n";
+
+  if ( plot_ ) {
+
+    gStyle->SetPalette( 1, 0 );
+    gStyle->SetCanvasColor( kWhite );
+    gStyle->SetPadColor( kWhite) ;
+    gStyle->SetPadTickX( 1 );
+    gStyle->SetPadTickY( 1 );
+    gStyle->SetPadTopMargin( .075 );
+    gStyle->SetPadRightMargin( .075 );
+    gStyle->SetPadBottomMargin( .15 );
+    gStyle->SetPadLeftMargin( .15 );
+    gStyle->SetTitleSize( .06, "XYZ" );
+    gStyle->SetTitleFillColor( kWhite );
+    gStyle->SetTitleBorderSize( 1 );
+    gStyle->SetStatColor( kWhite );
+    gStyle->SetStatBorderSize( 1 );
+    gStyle->SetOptStat( 1 );
+    gStyle->SetOptFit( 0 );
+    gStyle->SetMarkerStyle( 8 );
+
+    TCanvas c1( "c1" );
+    c1.cd();
+
+    histo_pileUpWeightTrue_->Draw();
+    c1.Print( std::string( pathPlots_ + histo_pileUpWeightTrue_->GetName() + ".png" ).c_str() );
+    histo_pileUpWeightObserved_->Draw();
+    c1.Print( std::string( pathPlots_ + histo_pileUpWeightObserved_->GetName() + ".png" ).c_str() );
+
+    data_->Draw( "NPVTrue" );
+    c1.Print( std::string( pathPlots_ + "NPVTrue.png" ).c_str() );
+    data_->Draw( "NPVObserved" );
+    c1.Print( std::string( pathPlots_ + "NPVObserved.png" ).c_str() );
+    data_->Draw( "PileUpWeightTrue" );
+    c1.Print( std::string( pathPlots_ + "PileUpWeightTrue.png" ).c_str() );
+    data_->Draw( "PileUpWeightObserved" );
+    c1.Print( std::string( pathPlots_ + "PileUpWeightObserved.png" ).c_str() );
+
+    for ( unsigned iCat = 0; iCat < objCats_.size(); ++iCat ) {
+      const std::string cat( objCats_.at( iCat ) );
+
+      histos_EtaBins_.at( iCat )->Draw();
+      c1.Print( std::string( pathPlots_ + histos_EtaBins_.at( iCat )->GetName() + ".png" ).c_str() );
+      histos_PtBins_.at( iCat )->Draw();
+      c1.Print( std::string( pathPlots_ + histos_PtBins_.at( iCat )->GetName() + ".png" ).c_str() );
+      catData_.at( iCat )->Draw( "Pt" );
+      c1.Print( std::string( pathPlots_ + cat + "_Pt.png" ).c_str() );
+      catData_.at( iCat )->Draw( "Eta" );
+      c1.Print( std::string( pathPlots_ + cat + "_Eta.png" ).c_str() );
+      catData_.at( iCat )->Draw( "Phi" );
+      c1.Print( std::string( pathPlots_ + cat + "_Phi.png" ).c_str() );
+      catData_.at( iCat )->Draw( "BinEta" );
+      c1.Print( std::string( pathPlots_ + cat + "_BinEta.png" ).c_str() );
+      catData_.at( iCat )->Draw( "BinEtaSymm" );
+      c1.Print( std::string( pathPlots_ + cat + "_BinEtaSymm.png" ).c_str() );
+      catData_.at( iCat )->Draw( "PtAlt" );
+      c1.Print( std::string( pathPlots_ + cat + "_PtAlt.png" ).c_str() );
+      catData_.at( iCat )->Draw( "EtaAlt" );
+      c1.Print( std::string( pathPlots_ + cat + "_EtaAlt.png" ).c_str() );
+      catData_.at( iCat )->Draw( "PhiAlt" );
+      c1.Print( std::string( pathPlots_ + cat + "_PhiAlt.png" ).c_str() );
+      catData_.at( iCat )->Draw( "BinEtaAlt" );
+      c1.Print( std::string( pathPlots_ + cat + "_BinEtaAlt.png" ).c_str() );
+      catData_.at( iCat )->Draw( "BinEtaSymmAlt" );
+      c1.Print( std::string( pathPlots_ + cat + "_BinEtaSymmAlt.png" ).c_str() );
+      if ( cat == "UdscJet" || cat == "BJet" ) {
+        catData_.at( iCat )->Draw( "PtGenJet" );
+        c1.Print( std::string( pathPlots_ + cat + "_PtGenJet.png" ).c_str() );
+        catData_.at( iCat )->Draw( "EtaGenJet" );
+        c1.Print( std::string( pathPlots_ + cat + "_EtaGenJet.png" ).c_str() );
+        catData_.at( iCat )->Draw( "PhiGenJet" );
+        c1.Print( std::string( pathPlots_ + cat + "_PhiGenJet.png" ).c_str() );
+        catData_.at( iCat )->Draw( "BinEtaGenJet" );
+        c1.Print( std::string( pathPlots_ + cat + "_BinEtaGenJet.png" ).c_str() );
+        catData_.at( iCat )->Draw( "BinEtaSymmGenJet" );
+        c1.Print( std::string( pathPlots_ + cat + "_BinEtaSymmGenJet.png" ).c_str() );
+      }
+      catData_.at( iCat )->Draw( "PtGen" );
+      c1.Print( std::string( pathPlots_ + cat + "_PtGen.png" ).c_str() );
+      catData_.at( iCat )->Draw( "EtaGen" );
+      c1.Print( std::string( pathPlots_ + cat + "_EtaGen.png" ).c_str() );
+      catData_.at( iCat )->Draw( "PhiGen" );
+      c1.Print( std::string( pathPlots_ + cat + "_PhiGen.png" ).c_str() );
+      catData_.at( iCat )->Draw( "BinEtaGen" );
+      c1.Print( std::string( pathPlots_ + cat + "_BinEtaGen.png" ).c_str() );
+      catData_.at( iCat )->Draw( "BinEtaSymmGen" );
+      c1.Print( std::string( pathPlots_ + cat + "_BinEtaSymmGen.png" ).c_str() );
+
+    }
+
+  }
 
 }
 
