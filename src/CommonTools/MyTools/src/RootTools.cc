@@ -20,6 +20,6 @@ void my::setPlotEnvironment( TStyle * style )
   style->SetStatBorderSize( 1 );
   style->SetOptStat( 1 );
   style->SetOptFit( 0 );
-  style->SetMarkerStyle( 8 );
+  style->SetMarkerStyle( kFullDotSmall );
 
 }

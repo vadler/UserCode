@@ -603,23 +603,7 @@ void AnalyzeHitFit::endJob()
 
   if ( plot_ ) {
 
-    gStyle->SetPalette( 1, 0 );
-    gStyle->SetCanvasColor( kWhite );
-    gStyle->SetPadColor( kWhite) ;
-    gStyle->SetPadTickX( 1 );
-    gStyle->SetPadTickY( 1 );
-    gStyle->SetPadTopMargin( .075 );
-    gStyle->SetPadRightMargin( .075 );
-    gStyle->SetPadBottomMargin( .15 );
-    gStyle->SetPadLeftMargin( .15 );
-    gStyle->SetTitleSize( .06, "XYZ" );
-    gStyle->SetTitleFillColor( kWhite );
-    gStyle->SetTitleBorderSize( 1 );
-    gStyle->SetStatColor( kWhite );
-    gStyle->SetStatBorderSize( 1 );
-    gStyle->SetOptStat( 1 );
-    gStyle->SetOptFit( 0 );
-    gStyle->SetMarkerStyle( 8 );
+    my::setPlotEnvironment( gStyle );
 
     TCanvas c1( "c1" );
     c1.cd();
