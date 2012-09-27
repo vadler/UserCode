@@ -5,7 +5,7 @@ Environment:
 cmsrel CMSSW_5_3_4
 cd CMSSW_5_3_4/src
 cmsenv
-cvs co -r V06-05-06    DataFormats/PatCandidates
+cvs co -r V06-05-06-01 DataFormats/PatCandidates
 cvs co -r V08-09-37    PhysicsTools/PatAlgos
 cvs co -r V03-09-26    PhysicsTools/PatUtils
 cvs co -r V07-01-04    TopQuarkAnalysis/TopSkimming
