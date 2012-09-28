@@ -13,7 +13,7 @@ sample = 'Fall11_R4_1_unambiguousOnly'
 #sample = 'Fall11_R4_1_totalMinDist'
 
 # Settings
-overwrite = False # to throw away earlier versions of histograms, trees and functions
+overwrite = True # to throw away earlier versions of histograms, trees and functions
 # Exclusive switches:
 usePileUp = False
 useAlt    = True # E instead of p
@@ -21,8 +21,6 @@ useNonT   = True
 useSymm   = True
 refGen    = True
 refSel    = True
-if runTest:
-  refSel = False
 
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
@@ -48,7 +46,7 @@ fitFunction = '[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussia
 fitOptions  = 'BRS+'
 fitRange    = 1. # for Gaussian fits (in units of orig. RMS)
 if len( fitFunction.split( ' + ' ) ) > 1: # a background function is defined
-  fitRange = 5. # for combined fits (in units of orig. RMS)
+  fitRange = widthFactor # for combined fits (in units of orig. RMS)
   useBkg   = True
 
 # I/O
@@ -80,6 +78,7 @@ if refSel:
   pathPlots += 'Ref_'
 if runTest:
   pathPlots = ''
+  #pathPlots = pathPlots.replace( 'fitTopTransferFunctions', 'fitTopTransferFunctionsTest' )
 
 
 # Processing
@@ -121,10 +120,13 @@ process.histos = cms.PSet(
 
 process.fit = cms.PSet(
   fitNonRestr  = cms.bool( fitNonRestr )
-, fitEtaBins     = cms.bool( fitEtaBins )
+, fitEtaBins   = cms.bool( fitEtaBins )
 , minPtParton  = cms.double( minPtParton )
 , maxDRParton  = cms.double( maxDRParton )
 )
+if runTest:
+  process.fit.fitNonRestr = False
+  process.fit.fitEtaBins  = False
 
 process.transfer = cms.PSet(
   doFit       = cms.bool( doFit )
@@ -143,15 +145,15 @@ if runTest:
 
 # Messaging
 
-cfgFile = logFile.replace( '.log', '_cfg.py' )
-f = open( cfgFile, 'w' )
-print >> f, process.dumpPython()
-f.close()
-
-print
-print 'Config file:'
-print '------------'
-print cfgFile
+if  not runTest:
+  cfgFile = logFile.replace( '.log', '_cfg.py' )
+  f = open( cfgFile, 'w' )
+  print >> f, process.dumpPython()
+  f.close()
+  print
+  print 'Config file:'
+  print '------------'
+  print cfgFile
 print
 print 'ROOT file:'
 print '----------'
