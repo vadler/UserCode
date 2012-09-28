@@ -1337,7 +1337,7 @@ int main( int argc, char * argv[] )
         if ( writeFiles_ ) {
 
           // File name
-          std::string nameOut( pathOut_ + "/gentTransferFunction1D_" + sample_ );
+          std::string nameOut( pathOut_ + "/gentTransferFunction_" + sample_ );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
           if ( refSel_)     nameOut.append( "_Ref" );
           nameOut.append( "_" + name + ".txt" );
