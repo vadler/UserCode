@@ -832,7 +832,7 @@ int main( int argc, char * argv[] )
                   histVecTransRebinPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitPtTransRebinResultPtr->Parameter( uPar ) );
                   histVecTransRebinPtFitMap.at( uPar )->SetBinError( uPt + 1, fitPtTransRebinResultPtr->ParError( uPar ) );
                 }
-                histTransRebinPtFitMapProb->SetBinContent( uPt + 1, log10( fitPtTransRebinResultPtr->Prob() ) );
+                if ( fitPtTransRebinResultPtr->Prob() > 0 ) histTransRebinPtFitMapProb->SetBinContent( uPt + 1, log10( fitPtTransRebinResultPtr->Prob() ) );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -865,7 +865,7 @@ int main( int argc, char * argv[] )
                   histVecTransRestrRebinPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitPtTransRestrRebinResultPtr->Parameter( uPar ) );
                   histVecTransRestrRebinPtFitMap.at( uPar )->SetBinError( uPt + 1, fitPtTransRestrRebinResultPtr->ParError( uPar ) );
                 }
-                histTransRestrRebinPtFitMapProb->SetBinContent( uPt + 1, log10( fitPtTransRestrRebinResultPtr->Prob() ) );
+                if ( fitPtTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinPtFitMapProb->SetBinContent( uPt + 1, log10( fitPtTransRestrRebinResultPtr->Prob() ) );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -1046,7 +1046,7 @@ int main( int argc, char * argv[] )
                     histVecTransRebinEtaFitMap.at( uPar )->SetBinError( uEta + 1, fitEtaTransRebinResultPtr->ParError( uPar ) );
                     parVecEta.at( uPar ).at( uEta ) = fitEtaTransRebin->GetParameter( uPar );
                   }
-                  histTransRebinEtaFitMapProb->SetBinContent( uEta + 1, log10( fitEtaTransRebinResultPtr->Prob() ) );
+                  if ( fitEtaTransRebinResultPtr->Prob() > 0 ) histTransRebinEtaFitMapProb->SetBinContent( uEta + 1, log10( fitEtaTransRebinResultPtr->Prob() ) );
                 }
                 else {
                   if ( verbose_ > 2 ) {
@@ -1085,7 +1085,7 @@ int main( int argc, char * argv[] )
                   histVecTransRestrRebinEtaFitMap.at( uPar )->SetBinError( uEta + 1, fitEtaTransRestrRebinResultPtr->ParError( uPar ) );
                   parVecEtaRestr.at( uPar ).at( uEta ) = fitEtaTransRestrRebin->GetParameter( uPar );
                 }
-                histTransRestrRebinEtaFitMapProb->SetBinContent( uEta + 1, log10( fitEtaTransRestrRebinResultPtr->Prob() ) );
+                if ( fitEtaTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinEtaFitMapProb->SetBinContent( uEta + 1, log10( fitEtaTransRestrRebinResultPtr->Prob() ) );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -1156,7 +1156,7 @@ int main( int argc, char * argv[] )
                         histVecTransRebinEtaPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitEtaPtTransRebinResultPtr->Parameter( uPar ) );
                         histVecTransRebinEtaPtFitMap.at( uPar )->SetBinError( uPt + 1, fitEtaPtTransRebinResultPtr->ParError( uPar ) );
                       }
-                      histTransRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRebinResultPtr->Prob() ) );
+                      if ( fitEtaPtTransRebinResultPtr->Prob() > 0 ) histTransRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRebinResultPtr->Prob() ) );
                     }
                     else {
                       if ( verbose_ > 2 ) {
@@ -1193,7 +1193,7 @@ int main( int argc, char * argv[] )
                       histVecTransRestrRebinEtaPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitEtaPtTransRestrRebinResultPtr->Parameter( uPar ) );
                       histVecTransRestrRebinEtaPtFitMap.at( uPar )->SetBinError( uPt + 1, fitEtaPtTransRestrRebinResultPtr->ParError( uPar ) );
                     }
-                    histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRestrRebinResultPtr->Prob() ) );
+                    if ( fitEtaPtTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRestrRebinResultPtr->Prob() ) );
                   }
                   else {
                     if ( verbose_ > 2 ) {
