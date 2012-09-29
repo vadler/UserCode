@@ -42,8 +42,8 @@ jecLevels = [ 'L1FastJet'
 
 # TQAF MC match
 matchMaxNJets   = 6                 # min: 4; default: 4
-matchAlgorithm  = 'unambiguousOnly' # default: 'totalMinDist'
-#matchAlgorithm  = 'totalMinDist' # default: 'totalMinDist'
+#matchAlgorithm  = 'unambiguousOnly' # default: 'totalMinDist'
+matchAlgorithm  = 'totalMinDist' # default: 'totalMinDist'
 matchUseDeltaR  = True              # default: True
 matchUseMaxDist = False             # default: False, True enforced for 'unambiguousOnly' algorithm
 matchMaxDist    = 0.3               # default: 0.3
@@ -113,7 +113,7 @@ process.TFileService = cms.Service(
 )
 logFile = outputFile.replace( 'root', 'log' )
 cfgFile = logFile.replace( '.log', '_cfg.py' )
-pathPlots = '%s/output/plots/analyzeHitFit_from%s_%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample, matchAlgorithm )
+pathPlots = '%s/output/plots/analyzeHitFit/analyzeHitFit_from%s_%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample, matchAlgorithm )
 
 
 ### Event selection

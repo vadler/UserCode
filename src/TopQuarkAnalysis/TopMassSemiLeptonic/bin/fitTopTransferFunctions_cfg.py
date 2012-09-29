@@ -13,7 +13,7 @@ sample = 'Fall11_R4_1_unambiguousOnly'
 #sample = 'Fall11_R4_1_totalMinDist'
 
 # Settings
-overwrite = True # to throw away earlier versions of histograms, trees and functions
+overwrite = False # to throw away earlier versions of histograms, trees and functions
 # Exclusive switches:
 usePileUp = False
 useAlt    = True # E instead of p
@@ -73,12 +73,12 @@ if not runTest:
 inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
 logFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
 logFile   = logFile.replace( 'fitTopHitFit', 'fitTopTransferFunctions' )
-pathPlots = '%s/output/plots/fitTopTransferFunctions_from%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample )
+pathPlots = '%s/output/plots/fitTopTransferFunctions/fitTopTransferFunctions_from%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample )
 if refSel:
   pathPlots += 'Ref_'
 if runTest:
   pathPlots = ''
-  #pathPlots = pathPlots.replace( 'fitTopTransferFunctions', 'fitTopTransferFunctionsTest' )
+  #pathPlots = pathPlots.replace( 'fitTopTransferFunctions', 'fitTopTransferFunctionsTest', 2 )
 
 
 # Processing
