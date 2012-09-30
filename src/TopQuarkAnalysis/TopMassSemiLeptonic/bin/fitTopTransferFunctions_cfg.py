@@ -25,7 +25,7 @@ refSel    = True
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
 # Histograms
-widthFactor = 5. # for rebinning (in units of orig. RMS)
+widthFactor = 8. # for rebinning (in units of orig. RMS)
 
 # Fitting
 fitNonRestr    = True
@@ -72,6 +72,7 @@ else:
 logFile = logFile.replace( '_.', '_' + name + '.', 1 )
 logFile = logFile.replace( '_.', '.', 1 )
 inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
+outputFile = inputFile.replace( 'fitTopHitFit', 'fitTopTransferFunctions' )
 logFile   = logFile.replace( 'fitTopHitFit', 'fitTopTransferFunctions' )
 cfgFile   = logFile.replace( '.', '_cfg.', 1 )
 cfgFile   = cfgFile.replace( '.log', '.py' )
@@ -105,9 +106,11 @@ process.refSel    = cms.bool( refSel )
 process.pileUp    = cms.string( pileUp )
 
 process.io = cms.PSet(
-  inputFile = cms.string( inputFile )
-, sample    = cms.string( sample )
-, pathPlots = cms.string( pathPlots )
+  inputFile  = cms.string( inputFile )
+, outputFile = cms.string( outputFile )
+, overwrite  = cms.bool( overwrite )
+, sample     = cms.string( sample )
+, pathPlots  = cms.string( pathPlots )
 )
 
 process.histos = cms.PSet(
@@ -156,9 +159,13 @@ print 'Config file:'
 print '------------'
 print cfgFile
 print
-print 'ROOT file:'
+print 'Input file:'
 print '----------'
 print inputFile
+print
+print 'Output file:'
+print '-----------'
+print outputFile
 if pathPlots != '':
   print
   print 'Plots destination:'

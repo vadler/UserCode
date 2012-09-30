@@ -62,7 +62,6 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & process_( edm::readPSetsFrom( argv[ 1 ] )->getParameter< edm::ParameterSet >( "process" ) );
   const unsigned verbose_( process_.getParameter< unsigned >( "verbose" ) );
   const std::vector< std::string > objCats_( process_.getParameter< std::vector< std::string > >( "objectCategories" ) );   // object categories
-  const bool overwrite_(  process_.getParameter< bool >( "overwrite" ));
   const bool usePileUp_( process_.getParameter< bool >( "usePileUp" ) );
   const bool useAlt_( process_.getParameter< bool >( "useAlt" ) );
   const bool useNonT_( process_.getParameter< bool >( "useNonT" ) );
@@ -73,6 +72,8 @@ int main( int argc, char * argv[] )
   // Configuration for in- & output
   const edm::ParameterSet & io_( process_.getParameter< edm::ParameterSet >( "io" ) );
   const std::string inFile_( io_.getParameter< std::string >( "inputFile" ) );
+  const std::string outFile_( io_.getParameter< std::string >( "outputFile" ) );
+  const bool overwrite_( io_.getParameter< bool >( "overwrite" ));
   const std::string sample_( io_.getParameter< std::string >( "sample" ) );
   const std::string pathPlots_( io_.getParameter< std::string >( "pathPlots" ) );
   const bool plot_( ! pathPlots_.empty() );
@@ -130,7 +131,8 @@ int main( int argc, char * argv[] )
   if ( verbose_ > 0 )
     std::cout << std::endl
               << argv[ 0 ] << " --> INFO:" << std::endl
-              << "    using input file '" << inFile_ << "'" << std::endl;
+              << "    using      input  file '" << inFile_  << "'" << std::endl
+              << "    writing to output file '" << outFile_ << "'" << std::endl;
 
   TFile * fileIn_( TFile::Open( inFile_.c_str(), "UPDATE" ) );
   if ( ! fileIn_ ) {
@@ -161,6 +163,26 @@ int main( int argc, char * argv[] )
     else              pileUpWeights_.push_back( 1. );
   }
 
+  // Open output file
+
+  bool newOut( false );
+  TFile * fileOut_( TFile::Open( outFile_.c_str(), "UPDATE" ) );
+  if ( ! fileOut_ ) {
+    fileOut_ = TFile::Open( outFile_.c_str(), "NEW" );
+    newOut = true;
+  }
+  if ( ! fileOut_ ) {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "    output file '" << outFile_ << "' could not be opened" << std::endl;
+    returnStatus_ += 0x30;
+    return returnStatus_;
+  }
+  TDirectory * dirOutSel_( ( TDirectory* )( fileOut_->Get( evtSel_.c_str() ) ) );
+  if ( ! dirOutSel_ ) {
+    fileOut_->cd();
+    dirOutSel_ = new TDirectory( evtSel_.c_str(), "" );
+  }
+
   // Loops through directory structure
 
   typedef std::vector< std::vector< Double_t > > DataCont;
@@ -175,6 +197,11 @@ int main( int argc, char * argv[] )
                 << "    object category '" << objCat << "' does not exist in input file" << std::endl;
       returnStatus_ += 0x100;
       continue;
+    }
+    TDirectory * dirOutCat_( ( TDirectory* )( dirOutSel_->Get( objCat.c_str() ) ) );
+    if ( ! dirOutCat_ ) {
+      dirOutSel_->cd();
+      dirOutCat_ = new TDirectory( objCat.c_str(), "" );
     }
 
     // Get binning per object category
@@ -267,6 +294,11 @@ int main( int argc, char * argv[] )
                 << "    kinematic property 'Pt' does not exist in input file" << std::endl;
       returnStatus_ += 0x1000;
       continue;
+    }
+    TDirectory * dirOutPt_( ( TDirectory* )( dirOutCat_->Get( "Pt" ) ) );
+    if ( ! dirOutPt_ ) {
+      dirOutCat_->cd();
+      dirOutPt_ = new TDirectory( "Pt", "" );
     }
 
     // Histogram binning
@@ -671,13 +703,18 @@ int main( int argc, char * argv[] )
         if ( useSymm_ == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
         if ( refGen_  == ( subFit.find( "Gen" )  == std::string::npos ) ) continue;
         TDirectory * dirFit_( ( TDirectory* )( dirPt_->Get( subFit.c_str() ) ) );
+        TDirectory * dirOutFit_( ( TDirectory* )( dirOutPt_->Get( subFit.c_str() ) ) );
+        if ( ! dirOutFit_ ) {
+          dirOutPt_->cd();
+          dirOutFit_ = new TDirectory( subFit.c_str(), "" );
+        }
         dirFit_->cd();
 
         const std::string name( objCat + "_" + nameVar + "_" + subFit );
 
         // Transfer function parameters
-        TF1 * fitTest( new TF1( "test", fitFunction_.c_str() ) );
-        const unsigned nPar( fitTest->GetNumberFreeParameters() );
+        TF1 fitTest( "test", fitFunction_.c_str() );
+        const unsigned nPar( fitTest.GetNumberFreeParameters() );
         std::vector< double > parVec;
         std::vector< double > parVecA;
         std::vector< double > parVecB;
@@ -1026,6 +1063,11 @@ int main( int argc, char * argv[] )
           const std::string binEta( keyEta->GetName() );
           const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
           TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
+          TDirectory * dirOutEta_( ( TDirectory* )( dirOutFit_->Get( binEta.c_str() ) ) );
+          if ( ! dirOutEta_ ) {
+            dirOutFit_->cd();
+            dirOutEta_ = new TDirectory( binEta.c_str(), "" );
+          }
           dirEta_->cd();
 
           const std::string nameEta( name + "_" + binEta );
@@ -1409,6 +1451,7 @@ int main( int argc, char * argv[] )
           if ( fitEtaBins_ ) {
             fileOut << "================================================================================" << std::endl;
             for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
+
               if ( uEta > 0 ) fileOut << "--------------------------------------------------------------------------------" << std::endl;
               fileOut << std::endl << "for " << etaBins_.at( uEta ) << " <= eta < " << etaBins_.at( uEta + 1 );
               fileOut << std::endl;
@@ -1484,10 +1527,17 @@ int main( int argc, char * argv[] )
   } // loop: uCat < objCats_.size()
 
 
-  // Write and close input file
-  if ( overwrite_ ) fileIn_->Write( 0, TObject::kOverwrite );
-  else              fileIn_->Write();
+  // Write and close ROOT files
+  if ( overwrite_ ) {
+     fileIn_->Write( 0, TObject::kOverwrite );
+     fileOut_->Write( 0, TObject::kOverwrite );
+  }
+  else {
+    fileIn_->Write();
+    fileOut_->Write();
+  }
   fileIn_->Close();
+  fileOut_->Close();
 
   if ( verbose_ > 0 )
     std::cout << std::endl
