@@ -72,8 +72,11 @@ else:
 logFile = logFile.replace( '_.', '_' + name + '.', 1 )
 logFile = logFile.replace( '_.', '.', 1 )
 inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
-logFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
 logFile   = logFile.replace( 'fitTopHitFit', 'fitTopTransferFunctions' )
+cfgFile   = logFile.replace( '.', '_cfg.', 1 )
+cfgFile   = cfgFile.replace( '.log', '.py' )
+logFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
+cfgFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), cfgFile )
 pathPlots = '%s/output/plots/fitTopTransferFunctions/fitTopTransferFunctions_from%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample )
 if refSel:
   pathPlots += 'Ref_'
@@ -145,7 +148,6 @@ if runTest:
 
 # Messaging
 
-cfgFile = logFile.replace( '.log', '_cfg.py' )
 f = open( cfgFile, 'w' )
 print >> f, process.dumpPython()
 f.close()
