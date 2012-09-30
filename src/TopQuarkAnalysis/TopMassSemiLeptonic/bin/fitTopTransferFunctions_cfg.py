@@ -13,7 +13,7 @@ sample = 'Fall11_R4_1_unambiguousOnly'
 #sample = 'Fall11_R4_1_totalMinDist'
 
 # Settings
-overwrite = False # to throw away earlier versions of histograms, trees and functions
+overwrite = True # to throw away earlier versions of histograms, trees and functions
 # Exclusive switches:
 usePileUp = False
 useAlt    = True # E instead of p
@@ -60,16 +60,17 @@ if useSymm:
 inputFile = 'fitTopHitFit_from%s_%s.root'%( era, sample )
 if usePileUp:
   inputFile = inputFile.replace( '.root', '_PileUp.root' )
+if runTest:
+  inputFile = inputFile.replace( '.root', '.test.root' )
 logFile = inputFile.replace( 'root', 'log' )
-if not runTest:
-  if refSel:
-    logFile = logFile.replace( '.', '_Ref.', 1 )
-  if useNonT:
-    logFile = logFile.replace( '.', '_P_.', 1 )
-  else:
-    logFile = logFile.replace( '.', '_Pt_.', 1 )
-  logFile = logFile.replace( '_.', '_' + name + '.', 1 )
-  logFile = logFile.replace( '_.', '.', 1 )
+if refSel:
+  logFile = logFile.replace( '.', '_Ref.', 1 )
+if useNonT:
+  logFile = logFile.replace( '.', '_P_.', 1 )
+else:
+  logFile = logFile.replace( '.', '_Pt_.', 1 )
+logFile = logFile.replace( '_.', '_' + name + '.', 1 )
+logFile = logFile.replace( '_.', '.', 1 )
 inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
 logFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
 logFile   = logFile.replace( 'fitTopHitFit', 'fitTopTransferFunctions' )
@@ -88,9 +89,8 @@ process.verbose = cms.uint32( 1 )
 if runTest:
   process.verbose = 3
 process.objectCategories = cms.vstring( 'UdscJet'
+                                      , 'BJet'
                                       )
-if not runTest:
-  process.objectCategories.append( 'BJet' )
 process.overwrite = cms.bool( overwrite )
 process.usePileUp = cms.bool( usePileUp )
 process.useAlt    = cms.bool( useAlt )
@@ -124,9 +124,9 @@ process.fit = cms.PSet(
 , minPtParton  = cms.double( minPtParton )
 , maxDRParton  = cms.double( maxDRParton )
 )
-if runTest:
-  process.fit.fitNonRestr = False
-  process.fit.fitEtaBins  = False
+#if runTest:
+  #process.fit.fitNonRestr = False
+  #process.fit.fitEtaBins  = False
 
 process.transfer = cms.PSet(
   doFit       = cms.bool( doFit )
@@ -145,15 +145,14 @@ if runTest:
 
 # Messaging
 
-if  not runTest:
-  cfgFile = logFile.replace( '.log', '_cfg.py' )
-  f = open( cfgFile, 'w' )
-  print >> f, process.dumpPython()
-  f.close()
-  print
-  print 'Config file:'
-  print '------------'
-  print cfgFile
+cfgFile = logFile.replace( '.log', '_cfg.py' )
+f = open( cfgFile, 'w' )
+print >> f, process.dumpPython()
+f.close()
+print
+print 'Config file:'
+print '------------'
+print cfgFile
 print
 print 'ROOT file:'
 print '----------'
