@@ -146,7 +146,7 @@ std::string TransferFunction::Print() const
   std::stringstream print( std::ios_base::out );
   print << std::endl;
   print << "FitFunction       : \t" << FitFunction() << std::endl;
-  print << "DependencyFunction: \t" << DependencyFunction() << " \ton" << Dependency() << std::endl;
+  print << "DependencyFunction: \t" << DependencyFunction() << " \ton " << Dependency() << std::endl;
   print << "Comment           : \t" << Comment() << std::endl << std::endl;
 
   print << "Parameters 1D:" << std::endl;
