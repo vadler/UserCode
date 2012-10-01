@@ -145,29 +145,31 @@ std::string TransferFunction::Print() const
 {
   std::stringstream print( std::ios_base::out );
   print << std::endl;
-  print << "Formula: \t" << FitFunction() << std::endl;
-  print << "Comment: \t" << Comment() << std::endl;
-  print << std::endl;
+  print << "FitFunction       : \t" << FitFunction() << std::endl;
+  print << "DependencyFunction: \t" << DependencyFunction() << std::endl;
+  print << "Comment           : \t" << Comment() << std::endl << std::endl;
+
   print << "Parameters 1D:" << std::endl;
   for ( size_t i = 0; i < NParFit(); ++i ) {
     print << "[" << i << "]: \t";
-    if ( pars1D_.at( i ) == initConst_ ) print << "NAN";
-    else print << pars1D_.at( i );
+    if ( Parameters1D().at( i ) == initConst_ ) print << "NAN";
+    else print << Parameters1D().at( i );
     print << std::endl;
   }
   print << std::endl;
+
   print << "Parameters 2D:" << std::endl;
   for ( size_t i = 0; i < NParFit(); ++i ) {
     TFormula depFunc( dependencyFunction_ );
     for ( size_t j = 0; j < NParDependency(); ++j ) {
-      depFunc.SetParameter( ( Int_t )j, ( Double_t )( pars2D_.at( j ).at( i ) ) );
+      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameters2D( j ).at( i ) ) );
     }
     TString str( depFunc.GetExpFormula( "p" ) );
-    str.ReplaceAll( "x", dependency_.c_str() );
+    str.ReplaceAll( "x", Dependency() );
     str.ReplaceAll( boost::lexical_cast< std::string >( initConst_ ).c_str(), "NAN" );
-    print << "[" << i << "]: \t";
-    print << str << std::endl;
+    print << "[" << i << "]: \t"  << str << std::endl;
   }
+
   return print.str();
 }
 

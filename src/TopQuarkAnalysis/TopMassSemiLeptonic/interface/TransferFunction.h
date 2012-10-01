@@ -77,9 +77,11 @@ namespace my {
       void ResizeParameters();
 
       /// Getters
-      std::string FitFunction() const { return std::string( fitFunction_.GetExpFormula().Data() ); };
+//       std::string FitFunction() const { return std::string( fitFunction_.GetExpFormula().Data() ); };
+      std::string FitFunction() const { return std::string( fitFunction_.GetTitle() ); };
       size_t NParFit() const { return pars1D_.size(); };
-      std::string DependencyFunction() const { return std::string( dependencyFunction_.GetExpFormula().Data() ); };
+//       std::string DependencyFunction() const { return std::string( dependencyFunction_.GetExpFormula().Data() ); };
+      std::string DependencyFunction() const { return std::string( dependencyFunction_.GetTitle() ); };
       size_t NParDependency() const { return pars2D_.size(); };
       std::string Dependency() const { return dependency_; };
       std::string Comment() const { return comment_; };
