@@ -1,5 +1,5 @@
-#ifndef PhysicsTools_PatAlgos_PATTriggerProducer_h
-#define PhysicsTools_PatAlgos_PATTriggerProducer_h
+#ifndef TopQuarkPhysics_TopMassSemiLeptonic_MyTools_h
+#define TopQuarkPhysics_TopMassSemiLeptonic_MyTools_h
 
 
 #include <TH1D.h>
