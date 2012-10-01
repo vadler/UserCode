@@ -2,8 +2,8 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-cmsswVersion = 'CMSSW_6_1_0_pre1'
-globalTag    = 'GR_R_60_V5'
+cmsswVersion = 'CMSSW_6_1_0_pre2'
+globalTag    = 'GR_R_60_V7'
 condition    = 'com10_7E33v3'
 
 process = cms.Process("PAT")

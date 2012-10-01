@@ -14,8 +14,8 @@ process.MessageLogger.cerr.L1GtTrigReport = cms.untracked.PSet( limit = cms.untr
 
 # Conditions
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-from Configuration.AlCa.autoCond import autoCond
-process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:startup' )
 
 ## Input
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
