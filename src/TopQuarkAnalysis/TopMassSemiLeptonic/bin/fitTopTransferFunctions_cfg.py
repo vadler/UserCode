@@ -141,7 +141,7 @@ process.transfer = cms.PSet(
 , useBkg      = cms.bool( useBkg )
 , fitOptions  = cms.string( fitOptions )
 , fitRange    = cms.double( fitRange )
-, fitTransfer = cms.string( '[0]+[1]*x' )
+, dependencyFunction = cms.string( '[0]+[1]*x' )
 , writeFiles  = cms.bool( True )
 , pathOut     = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
