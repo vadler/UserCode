@@ -55,43 +55,40 @@ void TransferFunction::SetDependencyFunction( const std::string & dependencyFunc
   clear ? ClearParameters() : ResizeParameters();
 }
 
-bool TransferFunction::SetParameter( double par, size_t i, int j )
+bool TransferFunction::SetParameter( double par, size_t i )
 {
-  if ( i >= NParFit() ) return false;
-  if ( j < 0 ) {
+  if ( i < NParFit() ) {
     pars1D_.at( i ) = par;
     return true;
   }
-  if ( j >= ( int )NParDependency() ) return false;
-  pars2D_.at( j ).at( i ) = par;
-  return true;
+  return false;
 }
 
-bool TransferFunction::SetParameters( std::vector< double > pars, int j )
+bool TransferFunction::SetParameter( double par, size_t i, size_t j )
 {
-  if ( j < 0 ) {
-    if ( pars.size() != NParFit() ) return false;
+  if ( i < NParFit() && j < NParDependency() ) {
+    pars2D_.at( j ).at( i ) = par;
+    return true;
+  }
+  return false;
+}
+
+bool TransferFunction::SetParameters( std::vector< double > pars )
+{
+  if ( pars.size() == NParFit() ) {
     pars1D_ = pars;
     return true;
   }
-  if ( j >= ( int )NParDependency() ) return false;
-  if ( pars.size() != NParFit() ) return false;
-  pars2D_.at( j ) = pars;
-  return true;
+  return false;
 }
 
-bool TransferFunction::SetParameters( std::vector< std::vector< double > > pars )
+bool TransferFunction::SetParameters( std::vector< double > pars, size_t j )
 {
-  if ( pars.size() != NParDependency() ) return false;
-  for ( unsigned j = 0; j < NParDependency(); ++j ) {
-    if ( pars.at( j ).size() != NParFit() ) {
-      pars2D_.clear();
-      pars2D_.resize( dependencyFunction_.GetNpar(), std::vector< double >( fitFunction_.GetNpar() ) );
-      return false;
-    }
-    pars2D_.at( j ) = pars.at( j );
+  if ( j < NParDependency() && pars.size() == NParFit() ) {
+    pars2D_.at( j ) = pars;
+    return true;
   }
-  return true;
+  return false;
 }
 
 void TransferFunction::ClearParameters()
@@ -100,9 +97,9 @@ void TransferFunction::ClearParameters()
   pars2D_.clear();
   ResizeParameters();
   for ( size_t i = 0; i < NParFit(); ++i ) {
-    pars1D_.at( i ) = initConst_;
+    pars1D_.at( i ) = InitConst();
     for ( size_t j = 0; j < NParDependency(); ++j ) {
-      pars2D_.at( j ).at( i ) = initConst_;
+      pars2D_.at( j ).at( i ) = InitConst();
     }
   }
 }
@@ -113,6 +110,20 @@ void TransferFunction::ResizeParameters()
   pars2D_.resize( dependencyFunction_.GetNpar(), std::vector< double >( fitFunction_.GetNpar() ) );
 }
 
+// Getters
+
+double TransferFunction::Parameter( size_t i, size_t j ) const
+{
+  if ( i < NParFit() && j < NParDependency() ) return Parameters2D().at( j ).at( i );
+  return InitConst();
+}
+
+std::vector< double > TransferFunction::Parameters( size_t j ) const
+{
+  if ( j < NParDependency() ) return Parameters2D().at( j );
+  return std::vector< double >();
+}
+
 // Evaluate
 
 std::string TransferFunction::Formula( double dependencyValue ) const
@@ -121,7 +132,7 @@ std::string TransferFunction::Formula( double dependencyValue ) const
   TFormula depFunc( dependencyFunction_ );
   for ( size_t i = 0; i < NParFit(); ++i ) {
     for ( size_t j = 0; j < NParDependency(); ++j ) {
-      depFunc.SetParameter( ( Int_t )j, ( Double_t )( pars2D_.at( j ).at( i ) ) );
+      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
     fitFunc.SetParameter( ( Int_t )i, ( Double_t )( depFunc.Eval( dependencyValue ) ) );
   }
@@ -134,12 +145,14 @@ double TransferFunction::Eval( double dependencyValue, double value ) const
   TFormula depFunc( dependencyFunction_ );
   for ( size_t i = 0; i < NParFit(); ++i ) {
     for ( size_t j = 0; j < NParDependency(); ++j ) {
-      depFunc.SetParameter( ( Int_t )j, ( Double_t )( pars2D_.at( j ).at( i ) ) );
+      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
     fitFunc.SetParameter( ( Int_t )i, ( Double_t )( depFunc.Eval( dependencyValue ) ) );
   }
   return fitFunc.Eval( value );
 }
+
+// Communication
 
 std::string TransferFunction::Print() const
 {
@@ -152,8 +165,8 @@ std::string TransferFunction::Print() const
   print << "Parameters 1D:" << std::endl;
   for ( size_t i = 0; i < NParFit(); ++i ) {
     print << "[" << i << "]: \t";
-    if ( Parameters1D().at( i ) == initConst_ ) print << "NAN";
-    else print << Parameters1D().at( i );
+    if ( Parameter( i ) == InitConst() ) print << "NAN";
+    else print << Parameter( i );
     print << std::endl;
   }
   print << std::endl;
@@ -162,11 +175,11 @@ std::string TransferFunction::Print() const
   for ( size_t i = 0; i < NParFit(); ++i ) {
     TFormula depFunc( dependencyFunction_ );
     for ( size_t j = 0; j < NParDependency(); ++j ) {
-      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameters2D( j ).at( i ) ) );
+      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
     TString str( depFunc.GetExpFormula( "p" ) );
     str.ReplaceAll( "x", Dependency() );
-    str.ReplaceAll( boost::lexical_cast< std::string >( initConst_ ).c_str(), "NAN" );
+    str.ReplaceAll( boost::lexical_cast< std::string >( InitConst() ).c_str(), "NAN" );
     print << "[" << i << "]: \t"  << str << std::endl;
   }
 

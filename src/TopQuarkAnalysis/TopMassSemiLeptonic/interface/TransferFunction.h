@@ -70,13 +70,15 @@ namespace my {
       void SetDependencyFunction( const std::string & dependencyFunction, bool clear = true );
       void SetDependency( const std::string & dependency ) { dependency_ = dependency; };
       void SetComment( const std::string & comment ) { comment_ = comment; };
-      bool SetParameter( double par, size_t i, int j = -1 );
-      bool SetParameters( std::vector< double > pars, int j = -1 );
-      bool SetParameters( std::vector< std::vector< double > > pars );
+      bool SetParameter( double par, size_t i );
+      bool SetParameter( double par, size_t i, size_t j );
+      bool SetParameters( std::vector< double > pars );
+      bool SetParameters( std::vector< double > pars, size_t j );
       void ClearParameters();
       void ResizeParameters();
 
       /// Getters
+      double InitConst() const { return initConst_; };
 //       std::string FitFunction() const { return std::string( fitFunction_.GetExpFormula().Data() ); };
       std::string FitFunction() const { return std::string( fitFunction_.GetTitle() ); };
       size_t NParFit() const { return pars1D_.size(); };
@@ -85,13 +87,18 @@ namespace my {
       size_t NParDependency() const { return pars2D_.size(); };
       std::string Dependency() const { return dependency_; };
       std::string Comment() const { return comment_; };
-      std::vector< double > Parameters1D() const { return pars1D_; };
-      std::vector< std::vector< double > > Parameters2D() const { return pars2D_; };
-      std::vector< double > Parameters2D( size_t j ) const { if ( j < pars2D_.size() ) return pars2D_.at( j ); else return std::vector< double >(); };
+      double Parameter( size_t i ) const { return i < NParFit() ? pars1D_.at( i ) :  InitConst(); };
+      double Parameter( size_t i, size_t j ) const;
+      std::vector< double > Parameters() const { return Parameters1D(); };
+      std::vector< double > Parameters( size_t j ) const;
+      std::vector< double > Parameters1D() const { return pars1D_;};
+      std::vector< std::vector< double > > Parameters2D() const { return pars2D_ ;};
 
       /// Evaluate
       std::string Formula( double dependencyValue ) const;
       double Eval( double dependencyValue, double value ) const;
+
+      /// Communication
       std::string Print() const;
       static TransferFunction Read( const std::string & stream );
 
