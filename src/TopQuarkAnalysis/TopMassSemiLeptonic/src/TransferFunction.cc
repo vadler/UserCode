@@ -146,7 +146,7 @@ std::string TransferFunction::Print() const
   std::stringstream print( std::ios_base::out );
   print << std::endl;
   print << "FitFunction       : \t" << FitFunction() << std::endl;
-  print << "DependencyFunction: \t" << DependencyFunction() << std::endl;
+  print << "DependencyFunction: \t" << DependencyFunction() << " \ton" << Dependency() << std::endl;
   print << "Comment           : \t" << Comment() << std::endl << std::endl;
 
   print << "Parameters 1D:" << std::endl;
@@ -158,7 +158,7 @@ std::string TransferFunction::Print() const
   }
   print << std::endl;
 
-  print << "Parameters 2D:" << std::endl;
+  print << "Parameters 2D (DependencyFunction):" << std::endl;
   for ( size_t i = 0; i < NParFit(); ++i ) {
     TFormula depFunc( dependencyFunction_ );
     for ( size_t j = 0; j < NParDependency(); ++j ) {
