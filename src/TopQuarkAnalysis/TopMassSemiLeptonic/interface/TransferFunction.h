@@ -70,10 +70,10 @@ namespace my {
       void SetDependencyFunction( const std::string & dependencyFunction, bool clear = true );
       void SetDependency( const std::string & dependency ) { dependency_ = dependency; };
       void SetComment( const std::string & comment ) { comment_ = comment; };
-      bool SetParameter( double par, size_t i );
-      bool SetParameter( double par, size_t i, size_t j );
+      bool SetParameter( size_t i, double par );
+      bool SetParameter( size_t i, size_t j, double par );
       bool SetParameters( std::vector< double > pars );
-      bool SetParameters( std::vector< double > pars, size_t j );
+      bool SetParameters( size_t j, std::vector< double > pars );
       void ClearParameters();
       void ResizeParameters();
 

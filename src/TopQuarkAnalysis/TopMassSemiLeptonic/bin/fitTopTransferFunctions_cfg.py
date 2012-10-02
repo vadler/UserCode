@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 
-runTest = False
+runTest = True
 
 # Origin of existing resolution functions
 # era    = 'Spring10'
@@ -13,7 +13,7 @@ sample = 'Fall11_R4_1_unambiguousOnly'
 #sample = 'Fall11_R4_1_totalMinDist'
 
 # Settings
-overwrite = True # to throw away earlier versions of histograms, trees and functions
+overwrite = False # to throw away earlier versions of histograms, trees and functions
 # Exclusive switches:
 usePileUp = False
 useAlt    = True # E instead of p
@@ -25,15 +25,18 @@ refSel    = True
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
 # Histograms
-widthFactor = 8. # for rebinning (in units of orig. RMS)
+widthFactor = 5. # for rebinning (in units of orig. RMS)
+#widthFactor = 8. # for rebinning (in units of orig. RMS)
 
 # Fitting
 fitNonRestr    = True
-fitEtaBins     = True
+fitEtaBins     = False
 #minPtParton    = 0.
+#minPtParton    = 20.
+minPtParton    = 50.
 #maxDRParton    = 999999.
-minPtParton    = 20.
 maxDRParton    = 0.1
+#maxDRParton    = 0.2
 
 # Transfer functions
 doFit    = True
@@ -41,10 +44,11 @@ fitMaxPt = 999.
 #fitMaxPt = 200.
 # Fit function: a Gaussian is always required for the first three function parameters
 useBkg   = False
-fitFunction = '[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
-#fitFunction = '[0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi))' # double Gaussian
-fitOptions  = 'BRS+'
+#fitFunction = '[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
+fitFunction = '[0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi))' # double Gaussian
+fitOptions  = 'IBRS+'
 fitRange    = 1. # for Gaussian fits (in units of orig. RMS)
+#fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
 if len( fitFunction.split( ' + ' ) ) > 1: # a background function is defined
   fitRange = widthFactor # for combined fits (in units of orig. RMS)
   useBkg   = True

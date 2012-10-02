@@ -55,7 +55,7 @@ void TransferFunction::SetDependencyFunction( const std::string & dependencyFunc
   clear ? ClearParameters() : ResizeParameters();
 }
 
-bool TransferFunction::SetParameter( double par, size_t i )
+bool TransferFunction::SetParameter( size_t i, double par )
 {
   if ( i < NParFit() ) {
     pars1D_.at( i ) = par;
@@ -64,7 +64,7 @@ bool TransferFunction::SetParameter( double par, size_t i )
   return false;
 }
 
-bool TransferFunction::SetParameter( double par, size_t i, size_t j )
+bool TransferFunction::SetParameter( size_t i, size_t j, double par )
 {
   if ( i < NParFit() && j < NParDependency() ) {
     pars2D_.at( j ).at( i ) = par;
@@ -82,7 +82,7 @@ bool TransferFunction::SetParameters( std::vector< double > pars )
   return false;
 }
 
-bool TransferFunction::SetParameters( std::vector< double > pars, size_t j )
+bool TransferFunction::SetParameters( size_t j, std::vector< double > pars )
 {
   if ( j < NParDependency() && pars.size() == NParFit() ) {
     pars2D_.at( j ) = pars;
