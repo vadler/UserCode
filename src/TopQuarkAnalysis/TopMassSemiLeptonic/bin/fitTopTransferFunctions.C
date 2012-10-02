@@ -1427,11 +1427,11 @@ void setParameters( TF1 * fit, TH1D * histo, bool useBkgFunction )
   // Constant
   fit->SetParameter( 0, c );
 //   fit->SetParLimits( 0, 0., 2. * c );
-  fit->SetParName( 0, "Constant" );
+  fit->SetParName( 0, "Constant c" );
   // Mean
   fit->SetParameter( 1, p ); // No double peak structure in this case
   fit->SetParLimits( 1, -1. * s, 1. * s );
-  fit->SetParName( 1, "Gaussian #Mu" );
+  fit->SetParName( 1, "Gaussian #mu" );
   // Sigma
   fit->SetParameter( 2, s );
   fit->SetParLimits( 2, 0., 2. * s );
@@ -1440,9 +1440,11 @@ void setParameters( TF1 * fit, TH1D * histo, bool useBkgFunction )
   if ( useBkgFunction ) {
     fit->SetParameter( 3, 0. );
     fit->SetParName( 3, "bkg c" );
-    fit->SetParameter( 4, p - ( m - p ) );
+    fit->SetParameter( 4, m + ( m - p ) ); // shift into opposite direction compared to main Gaussian
     fit->SetParName( 4, "bkg #mu" );
-    fit->SetParameter( 5, 2. * s );
+    Double_t fitMin, fitMax;
+    fit->GetRange( fitMin, fitMax );
+    fit->SetParameter( 5, ( fitMax - fitMin ) / 4. ); // starting from sigma covering half of the fit range
     fit->SetParName( 5, "bkg #sigma" );
   }
 }
