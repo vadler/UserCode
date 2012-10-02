@@ -648,7 +648,7 @@ int main( int argc, char * argv[] )
           }
           if ( ptRef >= minPtParton_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDRParton_ ) {
             if ( refGen_ ) {
-              histTransRestrRebin->Fill( ptGenVal - ptData_.at( uEta ).at( uEntry ), weightData_.at( uEta ).at( uEntry ) );
+              histTransRestrRebin->Fill( ptGenVal - ptVal, weightData_.at( uEta ).at( uEntry ) );
             }
             else {
               histTransRestrRebin->Fill( ptVal - ptGenVal, weightData_.at( uEta ).at( uEntry ) );
@@ -984,7 +984,7 @@ int main( int argc, char * argv[] )
         std::vector< TH1D * > histVecTransRestrRebinEtaFitMap;
         for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
           const std::string parFit( boost::lexical_cast< std::string >( uPar ) );
-          const std::string nameTransRebinEtaFitMap( name + "_TransRebinEta_FitMap_Par" + parFit );
+          const std::string nameTransRebinEtaFitMap( nameTransRebin + "Eta_FitMap_Par" + parFit );
           const std::string titleTransRebinEtaFitMap( objCat + ", par. " + parFit );
           TH1D * histTransRebinEtaFitMap( new TH1D( nameTransRebinEtaFitMap.c_str(), titleTransRebinEtaFitMap.c_str(), nEtaBins_, etaBins_.data() ) );
           histTransRebinEtaFitMap->SetXTitle( titleEta.c_str() );
@@ -995,12 +995,12 @@ int main( int argc, char * argv[] )
           histVecTransRestrRebinEtaFitMap.push_back( histTransRestrRebinEtaFitMap );
         }
         const std::string titleTransRebinEtaFitMapProb( objCat + ", fit prob." );
-        const std::string nameTransRebinEtaFitMapProb( nameTransRebin + nameVar + "_FitMap_Prob" );
-        TH1D * histTransRebinEtaFitMapProb( new TH1D( nameTransRebinEtaFitMapProb.c_str(), titleTransRebinEtaFitMapProb.c_str(), nPtBins_, ptBins_.data() ) );
+        const std::string nameTransRebinEtaFitMapProb( nameTransRebin + "Eta_FitMap_Prob" );
+        TH1D * histTransRebinEtaFitMapProb( new TH1D( nameTransRebinEtaFitMapProb.c_str(), titleTransRebinEtaFitMapProb.c_str(), nEtaBins_, etaBins_.data() ) );
         histTransRebinEtaFitMapProb->SetXTitle( titleEta.c_str() );
         histTransRebinEtaFitMapProb->SetYTitle( titleProb.c_str() );
-        const std::string nameTransRestrRebinEtaFitMapProb( nameTransRestrRebin + nameVar + "_FitMap_Prob" );
-        TH1D * histTransRestrRebinEtaFitMapProb( new TH1D( nameTransRestrRebinEtaFitMapProb.c_str(), titleTransRebinEtaFitMapProb.c_str(), nPtBins_, ptBins_.data() ) );
+        const std::string nameTransRestrRebinEtaFitMapProb( nameTransRestrRebin + "Eta_FitMap_Prob" );
+        TH1D * histTransRestrRebinEtaFitMapProb( new TH1D( nameTransRestrRebinEtaFitMapProb.c_str(), titleTransRebinEtaFitMapProb.c_str(), nEtaBins_, etaBins_.data() ) );
         histTransRestrRebinEtaFitMapProb->SetXTitle( titleEta.c_str() );
         histTransRestrRebinEtaFitMapProb->SetYTitle( titleProb.c_str() );
 
