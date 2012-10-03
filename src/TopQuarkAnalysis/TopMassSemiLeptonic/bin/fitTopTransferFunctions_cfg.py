@@ -33,7 +33,7 @@ doFit          = True
 fitMaxPt       = 999999.
 #fitMaxPt       = 200.
 fitNonRestr    = True
-fitEtaBins     = False
+fitEtaBins     = True
 #minPtParton    = 0.
 #minPtParton    = 20.
 minPtParton    = 50.
@@ -97,7 +97,7 @@ process.verbose = cms.uint32( 1 )
 if runTest:
   process.verbose = 3
 process.objectCategories = cms.vstring( 'UdscJet'
-                                      #, 'BJet'
+                                      , 'BJet'
                                       )
 process.overwrite = cms.bool( overwrite )
 process.usePileUp = cms.bool( usePileUp )
