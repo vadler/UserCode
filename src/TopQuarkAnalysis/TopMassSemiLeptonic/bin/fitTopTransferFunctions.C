@@ -32,7 +32,16 @@
 #include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/TransferFunction.h"
 
 
-void setParameters( TF1 * fit, TH1D * histo, bool useBkgFunction = false );
+// Initialise parametrs for fit function
+void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction = false );
+// Check correct assignment of signal and background to the fit function parameters
+bool checkParametersFit( TF1 * fit, bool useBkgFunction = false );
+// Interchange signal and background parameters of fit function
+void mixParametersFit( my::TransferFunction & transfer, TF1 * fit );
+// Interchange signal and background parameters of fit function in histogram filling
+void fillMixedParametersFit( int bin, std::vector< TH1D * > & histoVec, TFitResultPtr & fitResultPtr );
+// Initialise parametrs for dependency function
+void setParametersDependency( TF1 * fit, TH1D * histo );
 
 
 int main( int argc, char * argv[] )
@@ -733,12 +742,17 @@ int main( int argc, char * argv[] )
         if ( fitNonRestr_ && histTransRebin != 0 ) {
           const std::string nameTransRebinFit( nameTransRebin + "_fit" );
           TF1 * fitTransRebin( new TF1( nameTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange_ ) ) );
-          setParameters( fitTransRebin, histTransRebin, useBkg_ );
+          setParametersFit( fitTransRebin, histTransRebin, useBkg_ );
           TFitResultPtr fitTransRebinResultPtr( histTransRebin->Fit( fitTransRebin, fitOptions_.c_str() ) );
           if ( fitTransRebinResultPtr >= 0 ) {
             if ( fitTransRebinResultPtr->Status() == 0 && fitTransRebinResultPtr->Ndf() != 0. ) {
-              for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
-                transferPt.SetParameter( fitTransRebin->GetParameter( uPar ), uPar );
+              if ( checkParametersFit( fitTransRebin, useBkg_ ) ) {
+                mixParametersFit( transferPt, fitTransRebin );
+              }
+              else {
+                for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+                  transferPt.SetParameter( uPar, fitTransRebin->GetParameter( uPar ) );
+                }
               }
             }
             else {
@@ -768,12 +782,17 @@ int main( int argc, char * argv[] )
         if ( histTransRestrRebin != 0 ) {
           const std::string nameTransRestrRebinFit( nameTransRestrRebin + "_fit" );
           TF1 * fitTransRestrRebin( new TF1( nameTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange_ ) ) );
-          setParameters( fitTransRestrRebin, histTransRestrRebin, useBkg_ );
+          setParametersFit( fitTransRestrRebin, histTransRestrRebin, useBkg_ );
           TFitResultPtr fitTransRestrRebinResultPtr( histTransRestrRebin->Fit( fitTransRestrRebin, fitOptions_.c_str() ) );
           if ( fitTransRestrRebinResultPtr >= 0 ) {
             if ( fitTransRestrRebinResultPtr->Status() == 0 && fitTransRestrRebinResultPtr->Ndf() != 0. ) {
-              for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
-                transferPtRestr.SetParameter( fitTransRestrRebin->GetParameter( uPar ), uPar );
+              if ( checkParametersFit( fitTransRestrRebin, useBkg_ ) ) {
+                mixParametersFit( transferPtRestr, fitTransRestrRebin );
+              }
+              else {
+                for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+                  transferPtRestr.SetParameter( uPar, fitTransRestrRebin->GetParameter( uPar ) );
+                }
               }
             }
             else {
@@ -832,15 +851,21 @@ int main( int argc, char * argv[] )
           if ( fitNonRestr_ && histPtTransRebin != 0 ) {
             const std::string namePtTransRebinFit( namePtTransRebin + "_fit" );
             TF1 * fitPtTransRebin( new TF1( namePtTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange_ ) ) );
-            setParameters( fitPtTransRebin, histPtTransRebin, useBkg_ );
+            setParametersFit( fitPtTransRebin, histPtTransRebin, useBkg_ );
             TFitResultPtr fitPtTransRebinResultPtr( histPtTransRebin->Fit( fitPtTransRebin, fitOptions_.c_str() ) );
             if ( fitPtTransRebinResultPtr >= 0 ) {
               if ( fitPtTransRebinResultPtr->Status() == 0 && fitPtTransRebinResultPtr->Ndf() != 0. ) {
-                for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
-                  histVecTransRebinPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitPtTransRebinResultPtr->Parameter( uPar ) );
-                  histVecTransRebinPtFitMap.at( uPar )->SetBinError( uPt + 1, fitPtTransRebinResultPtr->ParError( uPar ) );
+                if ( checkParametersFit( fitPtTransRebin, useBkg_ ) ) {
+                  fillMixedParametersFit( uPt + 1, histVecTransRebinPtFitMap, fitPtTransRebinResultPtr );
+                }
+                else {
+                  for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
+                    histVecTransRebinPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitPtTransRebinResultPtr->Parameter( uPar ) );
+                    histVecTransRebinPtFitMap.at( uPar )->SetBinError( uPt + 1, fitPtTransRebinResultPtr->ParError( uPar ) );
+                  }
                 }
                 if ( fitPtTransRebinResultPtr->Prob() > 0 ) histTransRebinPtFitMapProb->SetBinContent( uPt + 1, log10( fitPtTransRebinResultPtr->Prob() ) );
+                else histTransRebinPtFitMapProb->SetBinContent( uPt + 1, 1 );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -865,15 +890,21 @@ int main( int argc, char * argv[] )
           if ( histPtTransRestrRebin != 0 ) {
             const std::string namePtTransRestrRebinFit( namePtTransRestrRebin + "_fit" );
             TF1 * fitPtTransRestrRebin( new TF1( namePtTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange_ ) ) );
-            setParameters( fitPtTransRestrRebin, histPtTransRestrRebin, useBkg_ );
+            setParametersFit( fitPtTransRestrRebin, histPtTransRestrRebin, useBkg_ );
             TFitResultPtr fitPtTransRestrRebinResultPtr( histPtTransRestrRebin->Fit( fitPtTransRestrRebin, fitOptions_.c_str() ) );
             if ( fitPtTransRestrRebinResultPtr >= 0 ) {
               if ( fitPtTransRestrRebinResultPtr->Status() == 0 && fitPtTransRestrRebinResultPtr->Ndf() != 0. ) {
-                for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
-                  histVecTransRestrRebinPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitPtTransRestrRebinResultPtr->Parameter( uPar ) );
-                  histVecTransRestrRebinPtFitMap.at( uPar )->SetBinError( uPt + 1, fitPtTransRestrRebinResultPtr->ParError( uPar ) );
+                if ( checkParametersFit( fitPtTransRestrRebin, useBkg_ ) ) {
+                  fillMixedParametersFit( uPt + 1, histVecTransRestrRebinPtFitMap, fitPtTransRestrRebinResultPtr );
+                }
+                else {
+                  for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
+                    histVecTransRestrRebinPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitPtTransRestrRebinResultPtr->Parameter( uPar ) );
+                    histVecTransRestrRebinPtFitMap.at( uPar )->SetBinError( uPt + 1, fitPtTransRestrRebinResultPtr->ParError( uPar ) );
+                  }
                 }
                 if ( fitPtTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinPtFitMapProb->SetBinContent( uPt + 1, log10( fitPtTransRestrRebinResultPtr->Prob() ) );
+                else histTransRestrRebinPtFitMapProb->SetBinContent( uPt + 1, 1 );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -910,11 +941,12 @@ int main( int argc, char * argv[] )
             const std::string nameTransRebinPtFitMap( name + "_TransRebin" + nameVar + "_FitMap_Par" + parFit );
             const std::string nameTransRebinPtFitMapFit( nameTransRebinPtFitMap + "_fit" );
             TF1 * fitTransRebinPtFitMap( new TF1( nameTransRebinPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
+            setParametersDependency( fitTransRebinPtFitMap, histVecTransRebinPtFitMap.at( uPar ) );
             TFitResultPtr fitTransRebinPtFitMapResultPtr( histVecTransRebinPtFitMap.at( uPar )->Fit( fitTransRebinPtFitMap, fitOptions_.c_str() ) );
             if ( fitTransRebinPtFitMapResultPtr >= 0 ) {
               if ( fitTransRebinPtFitMapResultPtr->Status() == 0 && fitTransRebinPtFitMapResultPtr->Ndf() != 0. ) {
                 for ( size_t j = 0; j < transferPt.NParDependency(); ++j ) {
-                  transferPt.SetParameter( fitTransRebinPtFitMap->GetParameter( j ), uPar, j );
+                  transferPt.SetParameter( uPar, j, fitTransRebinPtFitMap->GetParameter( j ) );
                 }
               }
               else {
@@ -937,11 +969,12 @@ int main( int argc, char * argv[] )
           const std::string nameTransRestrRebinPtFitMap( name + "_TransRestrRebin" + nameVar + "_FitMap_Par" + parFit );
           const std::string nameTransRestrRebinPtFitMapFit( nameTransRestrRebinPtFitMap + "_fit" );
           TF1 * fitTransRestrRebinPtFitMap( new TF1( nameTransRestrRebinPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
+          setParametersDependency( fitTransRestrRebinPtFitMap, histVecTransRestrRebinPtFitMap.at( uPar ) );
           TFitResultPtr fitTransRestrRebinPtFitMapResultPtr( histVecTransRestrRebinPtFitMap.at( uPar )->Fit( fitTransRestrRebinPtFitMap, fitOptions_.c_str() ) );
           if ( fitTransRestrRebinPtFitMapResultPtr >= 0 ) {
             if ( fitTransRestrRebinPtFitMapResultPtr->Status() == 0 && fitTransRestrRebinPtFitMapResultPtr->Ndf() != 0. ) {
               for ( size_t j = 0; j < transferPtRestr.NParDependency(); ++j ) {
-                transferPtRestr.SetParameter( fitTransRestrRebinPtFitMap->GetParameter( j ), uPar, j );
+                transferPtRestr.SetParameter( uPar, j, fitTransRestrRebinPtFitMap->GetParameter( j ) );
               }
             }
             else {
@@ -1052,16 +1085,23 @@ int main( int argc, char * argv[] )
             if ( fitNonRestr_ && histEtaTransRebin != 0 ) {
               const std::string nameEtaTransRebinFit( nameEtaTransRebin + "_fit" );
               TF1 * fitEtaTransRebin( new TF1( nameEtaTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaTransRebin->GetXaxis()->GetXmin(), histEtaTransRebin->GetMean() - histEtaTransRebin->GetRMS() * fitRange_ ), std::min( histEtaTransRebin->GetXaxis()->GetXmax(), histEtaTransRebin->GetMean() + histEtaTransRebin->GetRMS() * fitRange_ ) ) );
-              setParameters( fitEtaTransRebin, histEtaTransRebin, useBkg_ );
+              setParametersFit( fitEtaTransRebin, histEtaTransRebin, useBkg_ );
               TFitResultPtr fitEtaTransRebinResultPtr( histEtaTransRebin->Fit( fitEtaTransRebin, fitOptions_.c_str() ) );
               if ( fitEtaTransRebinResultPtr >= 0 ) {
                 if ( fitEtaTransRebinResultPtr->Status() == 0 && fitEtaTransRebinResultPtr->Ndf() != 0. ) {
-                  for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
-                    histVecTransRebinEtaFitMap.at( uPar )->SetBinContent( uEta + 1, fitEtaTransRebinResultPtr->Parameter( uPar ) );
-                    histVecTransRebinEtaFitMap.at( uPar )->SetBinError( uEta + 1, fitEtaTransRebinResultPtr->ParError( uPar ) );
-                    if ( uPar > 0 ) transferVecEtaPt.at( uEta ).SetParameter( fitEtaTransRebin->GetParameter( uPar ), uPar );
+                  if ( checkParametersFit( fitEtaTransRebin, useBkg_ ) ) {
+                    mixParametersFit( transferVecEtaPt.at( uEta ), fitEtaTransRebin );
+                    fillMixedParametersFit( uEta + 1, histVecTransRebinEtaFitMap, fitEtaTransRebinResultPtr );
+                  }
+                  else {
+                    for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
+                      histVecTransRebinEtaFitMap.at( uPar )->SetBinContent( uEta + 1, fitEtaTransRebinResultPtr->Parameter( uPar ) );
+                      histVecTransRebinEtaFitMap.at( uPar )->SetBinError( uEta + 1, fitEtaTransRebinResultPtr->ParError( uPar ) );
+                      if ( uPar > 0 ) transferVecEtaPt.at( uEta ).SetParameter( uPar, fitEtaTransRebin->GetParameter( uPar ) );
+                    }
                   }
                   if ( fitEtaTransRebinResultPtr->Prob() > 0 ) histTransRebinEtaFitMapProb->SetBinContent( uEta + 1, log10( fitEtaTransRebinResultPtr->Prob() ) );
+                  else histTransRebinEtaFitMapProb->SetBinContent( uEta + 1, 1 );
                 }
                 else {
                   if ( verbose_ > 2 ) {
@@ -1091,16 +1131,23 @@ int main( int argc, char * argv[] )
           if ( histEtaTransRestrRebin != 0 ) {
             const std::string nameEtaTransRestrRebinFit( nameEtaTransRestrRebin + "_fit" );
             TF1 * fitEtaTransRestrRebin( new TF1( nameEtaTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaTransRestrRebin->GetXaxis()->GetXmin(), histEtaTransRestrRebin->GetMean() - histEtaTransRestrRebin->GetRMS() * fitRange_ ), std::min( histEtaTransRestrRebin->GetXaxis()->GetXmax(), histEtaTransRestrRebin->GetMean() + histEtaTransRestrRebin->GetRMS() * fitRange_ ) ) );
-            setParameters( fitEtaTransRestrRebin, histEtaTransRestrRebin, useBkg_ );
+            setParametersFit( fitEtaTransRestrRebin, histEtaTransRestrRebin, useBkg_ );
             TFitResultPtr fitEtaTransRestrRebinResultPtr( histEtaTransRestrRebin->Fit( fitEtaTransRestrRebin, fitOptions_.c_str() ) );
             if ( fitEtaTransRestrRebinResultPtr >= 0 ) {
               if ( fitEtaTransRestrRebinResultPtr->Status() == 0 && fitEtaTransRestrRebinResultPtr->Ndf() != 0. ) {
-                for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
-                  histVecTransRestrRebinEtaFitMap.at( uPar )->SetBinContent( uEta + 1, fitEtaTransRestrRebinResultPtr->Parameter( uPar ) );
-                  histVecTransRestrRebinEtaFitMap.at( uPar )->SetBinError( uEta + 1, fitEtaTransRestrRebinResultPtr->ParError( uPar ) );
-                  if ( uPar > 0 ) transferVecEtaPtRestr.at( uEta ).SetParameter( fitEtaTransRestrRebin->GetParameter( uPar ), uPar );
+                if ( checkParametersFit( fitEtaTransRestrRebin, useBkg_ ) ) {
+                  mixParametersFit( transferVecEtaPtRestr.at( uEta ),fitEtaTransRestrRebin  );
+                  fillMixedParametersFit( uEta + 1, histVecTransRestrRebinEtaFitMap, fitEtaTransRestrRebinResultPtr );
+                }
+                else {
+                  for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
+                    histVecTransRestrRebinEtaFitMap.at( uPar )->SetBinContent( uEta + 1, fitEtaTransRestrRebinResultPtr->Parameter( uPar ) );
+                    histVecTransRestrRebinEtaFitMap.at( uPar )->SetBinError( uEta + 1, fitEtaTransRestrRebinResultPtr->ParError( uPar ) );
+                    if ( uPar > 0 ) transferVecEtaPtRestr.at( uEta ).SetParameter( uPar, fitEtaTransRestrRebin->GetParameter( uPar ) );
+                  }
                 }
                 if ( fitEtaTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinEtaFitMapProb->SetBinContent( uEta + 1, log10( fitEtaTransRestrRebinResultPtr->Prob() ) );
+                else histTransRestrRebinEtaFitMapProb->SetBinContent( uEta + 1, 1 );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -1163,15 +1210,21 @@ int main( int argc, char * argv[] )
                 if ( histEtaPtTransRebin != 0 ) {
                   const std::string nameEtaPtTransRebinFit( nameEtaPtTransRebin + "_fit" );
                   TF1 * fitEtaPtTransRebin( new TF1( nameEtaPtTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtTransRebin->GetXaxis()->GetXmin(), histEtaPtTransRebin->GetMean() - histEtaPtTransRebin->GetRMS() * fitRange_ ), std::min( histEtaPtTransRebin->GetXaxis()->GetXmax(), histEtaPtTransRebin->GetMean() + histEtaPtTransRebin->GetRMS() * fitRange_ ) ) );
-                  setParameters( fitEtaPtTransRebin, histEtaPtTransRebin, useBkg_ );
+                  setParametersFit( fitEtaPtTransRebin, histEtaPtTransRebin, useBkg_ );
                   TFitResultPtr fitEtaPtTransRebinResultPtr( histEtaPtTransRebin->Fit( fitEtaPtTransRebin, fitOptions_.c_str() ) );
                   if ( fitEtaPtTransRebinResultPtr >= 0 ) {
                     if ( fitEtaPtTransRebinResultPtr->Status() == 0 && fitEtaPtTransRebinResultPtr->Ndf() != 0. ) {
-                      for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
-                        histVecTransRebinEtaPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitEtaPtTransRebinResultPtr->Parameter( uPar ) );
-                        histVecTransRebinEtaPtFitMap.at( uPar )->SetBinError( uPt + 1, fitEtaPtTransRebinResultPtr->ParError( uPar ) );
+                      if ( checkParametersFit( fitEtaPtTransRebin, useBkg_ ) ) {
+                        fillMixedParametersFit( uPt + 1, histVecTransRebinEtaPtFitMap, fitEtaPtTransRebinResultPtr );
+                      }
+                      else {
+                        for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
+                          histVecTransRebinEtaPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitEtaPtTransRebinResultPtr->Parameter( uPar ) );
+                          histVecTransRebinEtaPtFitMap.at( uPar )->SetBinError( uPt + 1, fitEtaPtTransRebinResultPtr->ParError( uPar ) );
+                        }
                       }
                       if ( fitEtaPtTransRebinResultPtr->Prob() > 0 ) histTransRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRebinResultPtr->Prob() ) );
+                      else histTransRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1 );
                     }
                     else {
                       if ( verbose_ > 2 ) {
@@ -1200,15 +1253,21 @@ int main( int argc, char * argv[] )
               if ( histEtaPtTransRestrRebin != 0 ) {
                 const std::string nameEtaPtTransRestrRebinFit( nameEtaPtTransRestrRebin + "_fit" );
                 TF1 * fitEtaPtTransRestrRebin( new TF1( nameEtaPtTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtTransRestrRebin->GetXaxis()->GetXmin(), histEtaPtTransRestrRebin->GetMean() - histEtaPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histEtaPtTransRestrRebin->GetXaxis()->GetXmax(), histEtaPtTransRestrRebin->GetMean() + histEtaPtTransRestrRebin->GetRMS() * fitRange_ ) ) );
-                setParameters( fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin, useBkg_ );
+                setParametersFit( fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin, useBkg_ );
                 TFitResultPtr fitEtaPtTransRestrRebinResultPtr( histEtaPtTransRestrRebin->Fit( fitEtaPtTransRestrRebin, fitOptions_.c_str() ) );
                 if ( fitEtaPtTransRestrRebinResultPtr >= 0 ) {
                   if ( fitEtaPtTransRestrRebinResultPtr->Status() == 0 && fitEtaPtTransRestrRebinResultPtr->Ndf() != 0. ) {
-                    for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
-                      histVecTransRestrRebinEtaPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitEtaPtTransRestrRebinResultPtr->Parameter( uPar ) );
-                      histVecTransRestrRebinEtaPtFitMap.at( uPar )->SetBinError( uPt + 1, fitEtaPtTransRestrRebinResultPtr->ParError( uPar ) );
+                    if ( checkParametersFit( fitEtaPtTransRestrRebin, useBkg_ ) ) {
+                      fillMixedParametersFit( uPt + 1, histVecTransRestrRebinEtaPtFitMap, fitEtaPtTransRestrRebinResultPtr );
                     }
+                    else {
+                      for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
+                        histVecTransRestrRebinEtaPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitEtaPtTransRestrRebinResultPtr->Parameter( uPar ) );
+                        histVecTransRestrRebinEtaPtFitMap.at( uPar )->SetBinError( uPt + 1, fitEtaPtTransRestrRebinResultPtr->ParError( uPar ) );
+                    }
+                      }
                     if ( fitEtaPtTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRestrRebinResultPtr->Prob() ) );
+                    else histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1 );
                   }
                   else {
                     if ( verbose_ > 2 ) {
@@ -1257,6 +1316,7 @@ int main( int argc, char * argv[] )
                 const std::string nameTransRebinEtaPtFitMap( nameEta + "_TransRebin" + nameVar + "_FitMap_Par" + parFit );
                 const std::string nameTransRebinEtaPtFitMapFit( nameTransRebinEtaPtFitMap + "_fit" );
                 TF1 * fitTransRebinEtaPtFitMap( new TF1( nameTransRebinEtaPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
+                setParametersDependency( fitTransRebinEtaPtFitMap, histVecTransRebinEtaPtFitMap.at( uPar ) );
                 TFitResultPtr fitTransRebinEtaPtFitMapResultPtr( histVecTransRebinEtaPtFitMap.at( uPar )->Fit( fitTransRebinEtaPtFitMap, fitOptions_.c_str() ) );
                 if ( fitTransRebinEtaPtFitMapResultPtr >= 0 ) {
                   if ( fitTransRebinEtaPtFitMapResultPtr->Status() == 0 && fitTransRebinEtaPtFitMapResultPtr->Ndf() != 0. ) {
@@ -1265,7 +1325,7 @@ int main( int argc, char * argv[] )
                     histVecTransRebinEtaParBMap.at( uPar )->SetBinContent( uEta + 1, fitTransRebinEtaPtFitMapResultPtr->Parameter( 1 ) );
                     histVecTransRebinEtaParBMap.at( uPar )->SetBinError( uEta + 1, fitTransRebinEtaPtFitMapResultPtr->ParError( 1 ) );
                     for ( size_t j = 0; j < transferVecEtaPt.at( uEta ).NParDependency(); ++j ) {
-                      transferVecEtaPt.at( uEta ).SetParameter( fitTransRebinEtaPtFitMapResultPtr->Parameter( j ), uPar, j );
+                      transferVecEtaPt.at( uEta ).SetParameter( uPar, j, fitTransRebinEtaPtFitMapResultPtr->Parameter( j ) );
                     }
                   }
                   else {
@@ -1288,6 +1348,7 @@ int main( int argc, char * argv[] )
               const std::string nameTransRestrRebinEtaPtFitMap( nameEta + "_TransRestrRebin" + nameVar + "_FitMap_Par" + parFit );
               const std::string nameTransRestrRebinEtaPtFitMapFit( nameTransRestrRebinEtaPtFitMap + "_fit" );
               TF1 * fitTransRestrRebinEtaPtFitMap( new TF1( nameTransRestrRebinEtaPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
+              setParametersDependency( fitTransRestrRebinEtaPtFitMap, histVecTransRestrRebinEtaPtFitMap.at( uPar ) );
               TFitResultPtr fitTransRestrRebinEtaPtFitMapResultPtr( histVecTransRestrRebinEtaPtFitMap.at( uPar )->Fit( fitTransRestrRebinEtaPtFitMap, fitOptions_.c_str() ) );
               if ( fitTransRestrRebinEtaPtFitMapResultPtr >= 0 ) {
                 if ( fitTransRestrRebinEtaPtFitMapResultPtr->Status() == 0 && fitTransRestrRebinEtaPtFitMapResultPtr->Ndf() != 0. ) {
@@ -1296,7 +1357,7 @@ int main( int argc, char * argv[] )
                   histVecTransRestrRebinEtaParBMap.at( uPar )->SetBinContent( uEta + 1, fitTransRestrRebinEtaPtFitMapResultPtr->Parameter( 1 ) );
                   histVecTransRestrRebinEtaParBMap.at( uPar )->SetBinError( uEta + 1, fitTransRestrRebinEtaPtFitMapResultPtr->ParError( 1 ) );
                   for ( size_t j = 0; j < transferVecEtaPtRestr.at( uEta ).NParDependency(); ++j ) {
-                    transferVecEtaPtRestr.at( uEta ).SetParameter( fitTransRestrRebinEtaPtFitMapResultPtr->Parameter( j ), uPar, j );
+                    transferVecEtaPtRestr.at( uEta ).SetParameter( uPar, j, fitTransRestrRebinEtaPtFitMapResultPtr->Parameter( j ) );
                   }
                 }
                 else {
@@ -1416,8 +1477,13 @@ int main( int argc, char * argv[] )
 }
 
 
-void setParameters( TF1 * fit, TH1D * histo, bool useBkgFunction )
+// Initialise parametrs for fit function
+void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
 {
+  //. This function assumes fit functions of the forms
+  // - [0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi)) (single Gaissian) or
+  // - [0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
+
   // Starting points
   Double_t c( histo->Integral() );                             // Constant
   Double_t m( histo->GetMean() );                              // Mean
@@ -1426,7 +1492,7 @@ void setParameters( TF1 * fit, TH1D * histo, bool useBkgFunction )
   // Gaussian part
   // Constant
   fit->SetParameter( 0, c );
-//   fit->SetParLimits( 0, 0., 2. * c );
+  fit->SetParLimits( 0, 0., 2. * c * s );
   fit->SetParName( 0, "Constant c" );
   // Mean
   fit->SetParameter( 1, p ); // No double peak structure in this case
@@ -1438,13 +1504,92 @@ void setParameters( TF1 * fit, TH1D * histo, bool useBkgFunction )
   fit->SetParName( 2, "Gaussian #sigma" );
   // Additional part
   if ( useBkgFunction ) {
-    fit->SetParameter( 3, 0. );
-    fit->SetParName( 3, "bkg c" );
-    fit->SetParameter( 4, m + ( m - p ) ); // shift into opposite direction compared to main Gaussian
-    fit->SetParName( 4, "bkg #mu" );
     Double_t fitMin, fitMax;
     fit->GetRange( fitMin, fitMax );
+    fit->SetParameter( 3, 0.25 );
+    fit->SetParLimits( 3, 0., 100. );
+    fit->SetParName( 3, "bkg c" );
+    fit->SetParameter( 4, m + ( m - p ) ); // shift into opposite direction compared to main Gaussian
+    fit->SetParLimits( 4, fitMin, fitMax );
+    fit->SetParName( 4, "bkg #mu" );
     fit->SetParameter( 5, ( fitMax - fitMin ) / 4. ); // starting from sigma covering half of the fit range
+    fit->SetParLimits( 5, 0., fitMax - fitMin );
     fit->SetParName( 5, "bkg #sigma" );
   }
+}
+
+
+// Check correct assignment of signal and background to the fit function parameters
+bool checkParametersFit( TF1 * fit, bool useBkgFunction )
+{
+  //. This function assumes fit functions of the form
+  // - [0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
+
+  // Check, if background is described at all in function
+  if ( ! useBkgFunction || fit->GetNpar() < 6 ) return false;
+  // Signal distributions are narrower
+  if ( fit->GetParameter( 2 ) < fit->GetParameter( 5 ) ) return false;
+  // Signal distributions (are expected to) contribute a larger fraction to the distribution
+  if ( std::fabs( fit->GetParameter( 3 ) ) < 1. ) return false;
+  std::cout << std::endl
+            << " --> INFO:" << std::endl
+            << "    function " << fit->GetName() << " mixed parameters." << std::endl;
+  return true;
+}
+
+
+// Interchange signal and background parameters of fit function
+void mixParametersFit( my::TransferFunction & transfer, TF1 * fit )
+{
+  //. This function assumes fit functions of the form
+  // - [0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
+
+  transfer.SetParameter( 1, fit->GetParameter( 4 ) );
+  transfer.SetParameter( 2, fit->GetParameter( 5 ) );
+  transfer.SetParameter( 3, 1. / fit->GetParameter( 3 ) );
+  transfer.SetParameter( 4, fit->GetParameter( 1 ) );
+  transfer.SetParameter( 5, fit->GetParameter( 2 ) );
+}
+
+
+// Interchange signal and background parameters of fit function in histogram filling
+void fillMixedParametersFit( int bin, std::vector< TH1D * > & histoVec, TFitResultPtr & fitResultPtr )
+{
+  //. This function assumes fit functions of the form
+  // - [0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
+
+  histoVec.at( 0 )->SetBinContent( bin, fitResultPtr->Parameter( 0 ) );
+  histoVec.at( 0 )->SetBinError( bin, fitResultPtr->ParError( 0 ) );
+  histoVec.at( 1 )->SetBinContent( bin, fitResultPtr->Parameter( 4 ) );
+  histoVec.at( 1 )->SetBinError( bin, fitResultPtr->ParError( 4 ) );
+  histoVec.at( 2 )->SetBinContent( bin, fitResultPtr->Parameter( 5 ) );
+  histoVec.at( 2 )->SetBinError( bin, fitResultPtr->ParError( 5 ) );
+  histoVec.at( 3 )->SetBinContent( bin, 1. / fitResultPtr->Parameter( 3 ) );
+  histoVec.at( 3 )->SetBinError( bin, fitResultPtr->ParError( 3 ) / ( fitResultPtr->Parameter( 3 ) * fitResultPtr->Parameter( 3 ) ) );
+  histoVec.at( 4 )->SetBinContent( bin, fitResultPtr->Parameter( 1 ) );
+  histoVec.at( 4 )->SetBinError( bin, fitResultPtr->ParError( 1 ) );
+  histoVec.at( 5 )->SetBinContent( bin, fitResultPtr->Parameter( 2 ) );
+  histoVec.at( 5 )->SetBinError( bin, fitResultPtr->ParError( 2 ) );
+}
+
+
+// Initialise parametrs for dependency function
+void setParametersDependency( TF1 * fit, TH1D * histo )
+{
+  //. This function assumes dependency functions of the form
+  // - [0]+[1]*x (line)
+
+  // Starting points
+  // Bins are away from unstable low/high momentum regions
+  Double_t x1( histo->GetBinCenter( 5 ) );
+  Double_t y1( histo->GetBinContent( 5 ) );
+  Double_t x2( histo->GetBinCenter( histo->GetNbinsX() - 2 ) );
+  Double_t y2( histo->GetBinContent( histo->GetNbinsX() - 2 ) );
+  // Linear part
+  // Constant
+  fit->SetParameter( 0, ( x2 * y1 - x1 * y2 ) / ( x2 - x1 ) );
+  fit->SetParName( 0, "Constant a" );
+  // Slope
+  fit->SetParameter( 1, ( y2 - y1 ) / ( x2 - x1 ) );
+  fit->SetParName( 1, "Slope b" );
 }

@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 
-runTest = True
+runTest = False
 
 # Origin of existing resolution functions
 # era    = 'Spring10'
@@ -13,7 +13,7 @@ sample = 'Fall11_R4_1_unambiguousOnly'
 #sample = 'Fall11_R4_1_totalMinDist'
 
 # Settings
-overwrite = False # to throw away earlier versions of histograms, trees and functions
+overwrite = True # to throw away earlier versions of histograms, trees and functions
 # Exclusive switches:
 usePileUp = False
 useAlt    = True # E instead of p
@@ -29,6 +29,9 @@ widthFactor = 5. # for rebinning (in units of orig. RMS)
 #widthFactor = 8. # for rebinning (in units of orig. RMS)
 
 # Fitting
+doFit          = True
+fitMaxPt       = 999999.
+#fitMaxPt       = 200.
 fitNonRestr    = True
 fitEtaBins     = False
 #minPtParton    = 0.
@@ -39,9 +42,6 @@ maxDRParton    = 0.1
 #maxDRParton    = 0.2
 
 # Transfer functions
-doFit    = True
-fitMaxPt = 999.
-#fitMaxPt = 200.
 # Fit function: a Gaussian is always required for the first three function parameters
 useBkg   = False
 #fitFunction = '[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
@@ -97,7 +97,7 @@ process.verbose = cms.uint32( 1 )
 if runTest:
   process.verbose = 3
 process.objectCategories = cms.vstring( 'UdscJet'
-                                      , 'BJet'
+                                      #, 'BJet'
                                       )
 process.overwrite = cms.bool( overwrite )
 process.usePileUp = cms.bool( usePileUp )
