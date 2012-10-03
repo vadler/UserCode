@@ -16,8 +16,7 @@ using namespace my;
 
 // Constructor from TransferFunction (copy c'tor)
 TransferFunction::TransferFunction( const TransferFunction & transfer )
-: initConst_( -999999. )
-, fitFunction_( "fitFunction", transfer.FitFunction().c_str() )
+: fitFunction_( "fitFunction", transfer.FitFunction().c_str() )
 , dependencyFunction_( "dependencyFunction", transfer.DependencyFunction().c_str() )
 , dependency_( transfer.Dependency() )
 , comment_( transfer.Comment() )
@@ -29,8 +28,7 @@ TransferFunction::TransferFunction( const TransferFunction & transfer )
 
 // Constructor from strings
 TransferFunction::TransferFunction( const std::string & fitFunction, const std::string & dependencyFunction, const std::string & dependency )
-: initConst_( -999999. )
-, fitFunction_( "fitFunction", fitFunction.c_str() )
+: fitFunction_( "fitFunction", fitFunction.c_str() )
 , dependencyFunction_( "dependencyFunction", dependencyFunction.c_str() )
 , dependency_( dependency )
 , comment_()
@@ -97,9 +95,9 @@ void TransferFunction::ClearParameters()
   pars2D_.clear();
   ResizeParameters();
   for ( size_t i = 0; i < NParFit(); ++i ) {
-    pars1D_.at( i ) = InitConst();
+    pars1D_.at( i ) = transferFunctionInitConst;
     for ( size_t j = 0; j < NParDependency(); ++j ) {
-      pars2D_.at( j ).at( i ) = InitConst();
+      pars2D_.at( j ).at( i ) = transferFunctionInitConst;
     }
   }
 }
@@ -115,7 +113,7 @@ void TransferFunction::ResizeParameters()
 double TransferFunction::Parameter( size_t i, size_t j ) const
 {
   if ( i < NParFit() && j < NParDependency() ) return Parameters2D().at( j ).at( i );
-  return InitConst();
+  return transferFunctionInitConst;
 }
 
 std::vector< double > TransferFunction::Parameters( size_t j ) const
@@ -165,7 +163,7 @@ std::string TransferFunction::Print() const
   print << "Parameters 1D:" << std::endl;
   for ( size_t i = 0; i < NParFit(); ++i ) {
     print << "[" << i << "]: \t";
-    if ( Parameter( i ) == InitConst() ) print << "NAN";
+    if ( Parameter( i ) == transferFunctionInitConst ) print << "NAN";
     else print << Parameter( i );
     print << std::endl;
   }
@@ -179,7 +177,7 @@ std::string TransferFunction::Print() const
     }
     TString str( depFunc.GetExpFormula( "p" ) );
     str.ReplaceAll( "x", Dependency() );
-    str.ReplaceAll( boost::lexical_cast< std::string >( InitConst() ).c_str(), "NAN" );
+    str.ReplaceAll( boost::lexical_cast< std::string >( transferFunctionInitConst ).c_str(), "NAN" );
     print << "[" << i << "]: \t"  << str << std::endl;
   }
 
