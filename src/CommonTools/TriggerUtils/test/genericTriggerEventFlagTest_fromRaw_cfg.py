@@ -16,8 +16,8 @@ process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:com10' )
 
 ## Source
 process.source = cms.Source( "PoolSource"
-, fileNames  = cms.untracked.vstring( '/store/relval/CMSSW_6_1_0_pre3-GR_R_60_V7_RelVal_mu2012A/SingleMu/RAW/v1/00000/00FD61D0-990C-E211-A7BC-002618943809.root'
-#, fileNames  = cms.untracked.vstring( '/store/relval/CMSSW_6_1_0_pre3-GR_R_60_V7_RelVal_mu2012B/SingleMu/RAW/v1/00000/0E41BD63-950C-E211-B701-00261894390E.root'
+#, fileNames  = cms.untracked.vstring( '/store/relval/CMSSW_6_1_0_pre3-GR_R_60_V7_RelVal_mu2012A/SingleMu/RAW/v1/00000/00FD61D0-990C-E211-A7BC-002618943809.root'
+, fileNames  = cms.untracked.vstring( '/store/relval/CMSSW_6_1_0_pre3-GR_R_60_V7_RelVal_mu2012B/SingleMu/RAW/v1/00000/0E41BD63-950C-E211-B701-00261894390E.root'
                                     )
 #, skipEvents = cms.untracked.uint32( 0 )
 )
@@ -35,6 +35,20 @@ process.s = cms.Sequence(
 )
 
 # Test modules
+# GT
+process.genericTriggerEventFlagGTPass = cms.EDFilter( "GenericTriggerEventFlagTest"
+, andOr          = cms.bool( False )
+, verbosityLevel = cms.uint32( 2 )
+, andOrGt        = cms.bool( False )
+, gtInputTag     = cms.InputTag( 'gtDigis' )
+, gtEvmInputTag  = cms.InputTag( 'gtEvmDigis' )
+, gtStatusBits   = cms.vstring( 'PhysDecl'
+                              )
+, errorReplyGt   = cms.bool( False )
+)
+process.genericTriggerEventFlagGTFail     = process.genericTriggerEventFlagGTPass.clone( gtStatusBits = [ '900GeV' ] )
+process.genericTriggerEventFlagGTTest     = process.genericTriggerEventFlagGTPass.clone( gtStatusBits = [ '8TeV' ] )
+process.genericTriggerEventFlagGTTestFail = process.genericTriggerEventFlagGTPass.clone( gtInputTag   = 'whateverDigis' )
 # L1
 process.genericTriggerEventFlagL1Pass = cms.EDFilter( "GenericTriggerEventFlagTest"
 , andOr          = cms.bool( False )
@@ -63,6 +77,23 @@ process.genericTriggerEventFlagHLTTestLoose = process.genericTriggerEventFlagHLT
 process.genericTriggerEventFlagHLTTestFail  = process.genericTriggerEventFlagHLTPass.clone( hltPaths = [ 'HLT_IsoMu2*_v*' ] )        # does not fail, in fact :-)
 
 # Paths
+# GT
+process.pGTPass = cms.Path(
+  process.s
+* process.genericTriggerEventFlagGTPass
+)
+process.pGTFail = cms.Path(
+  process.s
+* process.genericTriggerEventFlagGTFail
+)
+process.pGTTest = cms.Path(
+  process.s
+* process.genericTriggerEventFlagGTTest
+)
+process.pGTTestFail = cms.Path(
+  process.s
+* process.genericTriggerEventFlagGTTestFail
+)
 # L1
 process.pL1Pass = cms.Path(
   process.s
