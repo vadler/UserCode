@@ -11,6 +11,7 @@ DataFormats/PatCandidates                        V06-05-06-01   V06-05-01
 DataFormats/TrackReco                            V10-02-02      V10-02-01      
 DataFormats/VertexReco                           V02-00-04      V02-00-03      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
+HLTrigger/HLTcore                                V03-02-06-04   V03-02-06      
 PatExercise10c/PatL1PhysAlgo                     NoCVS                         
 PhysicsTools/PatAlgos                            V08-09-37      V08-09-07-05   
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
@@ -30,4 +31,4 @@ TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-03      
 TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-12      
 ---------------------------------------
-total packages: 27 (27 displayed)
+total packages: 28 (28 displayed)
