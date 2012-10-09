@@ -9,8 +9,11 @@ runTest = False
 # Origin of existing resolution functions
 # era    = 'Spring10'
 era    = 'Summer11'
+# Input sample
 sample = 'Fall11_R4_1_unambiguousOnly'
 #sample = 'Fall11_R4_1_totalMinDist'
+# JEC level
+jecLevel = "L3"
 
 # Settings
 overwrite = True # to throw away earlier versions of histograms, trees and functions
@@ -97,7 +100,9 @@ process.verbose = cms.uint32( 1 )
 if runTest:
   process.verbose = 3
 process.objectCategories = cms.vstring( 'UdscJet'
-                                      , 'BJet'
+#process.objectCategories = cms.vstring( 'BJet'
+#process.objectCategories = cms.vstring( 'Mu'
+#process.objectCategories = cms.vstring( 'Elec'
                                       )
 process.overwrite = cms.bool( overwrite )
 process.usePileUp = cms.bool( usePileUp )
@@ -114,12 +119,19 @@ process.io = cms.PSet(
 , outputFile = cms.string( outputFile )
 , overwrite  = cms.bool( overwrite )
 , sample     = cms.string( sample )
+, jecLevel   = cms.string( jecLevel )
 , pathPlots  = cms.string( pathPlots )
 )
 
 process.histos = cms.PSet(
+  # Muons
+  MuPtBins = cms.uint32( 50 )
+, MuPtMax  = cms.double( 50. )
+  # Electrons
+, ElecPtBins = cms.uint32( 50 )
+, ElecPtMax  = cms.double( 50. )
   # Light jets
-  UdscJetPtBins = cms.uint32( 50 )
+, UdscJetPtBins = cms.uint32( 50 )
 , UdscJetPtMax  = cms.double( 50. )
   # B-jets
 , BJetPtBins = cms.uint32( 50 )

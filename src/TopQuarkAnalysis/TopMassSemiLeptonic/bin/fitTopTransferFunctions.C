@@ -85,6 +85,7 @@ int main( int argc, char * argv[] )
   const std::string outFile_( io_.getParameter< std::string >( "outputFile" ) );
   const bool overwrite_( io_.getParameter< bool >( "overwrite" ));
   const std::string sample_( io_.getParameter< std::string >( "sample" ) );
+  const std::string jecLevel_( io_.getParameter< std::string >( "jecLevel" ) );
   const std::string pathPlots_( io_.getParameter< std::string >( "pathPlots" ) );
   const bool plot_( ! pathPlots_.empty() );
   // Configuration for histogram binning
@@ -200,7 +201,7 @@ int main( int argc, char * argv[] )
   // Loop over configured object categories
   for ( unsigned uCat = 0; uCat < objCats_.size(); ++uCat ) {
     const std::string objCat( objCats_.at( uCat ) );
-    if ( objCat != "UdscJet" && objCat != "BJet" ) continue;
+//     if ( objCat != "UdscJet" && objCat != "BJet" ) continue;
     TDirectory * dirCat_( ( TDirectory* )( dirSel_->Get( objCat.c_str() ) ) );
     if ( ! dirCat_ ) {
       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
@@ -726,7 +727,7 @@ int main( int argc, char * argv[] )
         const std::string part( refGen_ ? "_parton" : "_jet" );
         std::stringstream comment( std::ios_base::out );
         my::TransferFunction transferPt( fitFunction_, dependencyFunction_, std::string( titleVar + part ) );
-        comment << "for " << nameVar << part << " <= " << fitMaxPt_;
+        comment << "for JEC level " << jecLevel_ << ", " << nameVar << part << " <= " << fitMaxPt_;
         transferPt.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPt( nEtaBins_, transferPt );
         my::TransferFunction transferPtRestr( transferPt );
@@ -998,7 +999,7 @@ int main( int argc, char * argv[] )
           for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
             if ( fitNonRestr_ ) {
               histVecTransRebinPtFitMap.at( uPar )->Draw();
-              c1.Print( std::string( pathPlots_ + histVecTransRestrRebinPtFitMap.at( uPar )->GetName() + ".png" ).c_str() );
+              c1.Print( std::string( pathPlots_ + histVecTransRebinPtFitMap.at( uPar )->GetName() + ".png" ).c_str() );
             }
             histVecTransRestrRebinPtFitMap.at( uPar )->Draw();
             c1.Print( std::string( pathPlots_ + histVecTransRestrRebinPtFitMap.at( uPar )->GetName() + ".png" ).c_str() );
@@ -1415,7 +1416,7 @@ int main( int argc, char * argv[] )
         if ( writeFiles_ ) {
 
           // File name
-          std::string nameOut( pathOut_ + "/gentTransferFunction_" + sample_ );
+          std::string nameOut( pathOut_ + "/gentTransferFunction_" + sample_ + "_" + jecLevel_ );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
           if ( refSel_)     nameOut.append( "_Ref" );
           nameOut.append( "_" + name + ".txt" );
