@@ -90,6 +90,8 @@ int main( int argc, char * argv[] )
   const bool plot_( ! pathPlots_.empty() );
   // Configuration for histogram binning
   const edm::ParameterSet & histos_( process_.getParameter< edm::ParameterSet >( "histos" ) );
+  const unsigned histBins_( histos_.getParameter< unsigned >( "DeltaPtBins" ) );
+  const double   histMax_( histos_.getParameter< double >( "DeltaPtMax" ) );
   const double widthFactor_( histos_.getParameter< double >( "widthFactor" ) );
   // Configuration for fitting transfer functions
   const edm::ParameterSet & fit_( process_.getParameter< edm::ParameterSet >( "fit" ) );
@@ -201,7 +203,6 @@ int main( int argc, char * argv[] )
   // Loop over configured object categories
   for ( unsigned uCat = 0; uCat < objCats_.size(); ++uCat ) {
     const std::string objCat( objCats_.at( uCat ) );
-//     if ( objCat != "UdscJet" && objCat != "BJet" ) continue;
     TDirectory * dirCat_( ( TDirectory* )( dirSel_->Get( objCat.c_str() ) ) );
     if ( ! dirCat_ ) {
       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
@@ -312,10 +313,6 @@ int main( int argc, char * argv[] )
       dirOutPt_ = new TDirectory( "Pt", "" );
     }
 
-    // Histogram binning
-    const unsigned histBins_( histos_.getParameter< unsigned >( std::string( objCat + "PtBins" ) ) );
-    const double   histMax_( histos_.getParameter< double >( std::string( objCat + "PtMax" ) ) );
-
     // Loop over fit versions
     TList * listProp( dirPt_->GetListOfKeys() );
     if ( verbose_ > 3 ) listProp->Print();
@@ -337,7 +334,8 @@ int main( int argc, char * argv[] )
       }
       dirFit_->cd();
 
-      const std::string name( objCat + "_" + nameVar + "_" + subFit );
+      std::string name( objCat + "_" + nameVar + "_" + subFit );
+      if ( objCat == "UdscJet" || objCat == "BJet" ) name.insert( name.find( objCat ) + objCat.size(), std::string( "_" + jecLevel_ ) );
 
       const std::string nameTrans( name + "_Trans" );
       TH1D * histTrans( new TH1D( nameTrans.c_str(), objCat.c_str(), histBins_, -histMax_, histMax_ ) );
@@ -721,17 +719,19 @@ int main( int argc, char * argv[] )
         }
         dirFit_->cd();
 
-        const std::string name( objCat + "_" + nameVar + "_" + subFit );
+        std::string name( objCat + "_" + nameVar + "_" + subFit );
+        if ( objCat == "UdscJet" || objCat == "BJet" ) name.insert( name.find( objCat ) + objCat.size(), std::string( "_" + jecLevel_ ) );
 
         // Transfer function parameters
-        const std::string part( refGen_ ? "_parton" : "_jet" );
+        const std::string part( refGen_ ? "_parton" : "_reco" );
         std::stringstream comment( std::ios_base::out );
         my::TransferFunction transferPt( fitFunction_, dependencyFunction_, std::string( titleVar + part ) );
-        comment << "for JEC level " << jecLevel_ << ", " << nameVar << part << " <= " << fitMaxPt_;
+        if ( objCat == "UdscJet" || objCat == "BJet" ) comment << "for JEC level " << jecLevel_ << ", ";
+        comment << nameVar << part << " <= " << fitMaxPt_;
         transferPt.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPt( nEtaBins_, transferPt );
         my::TransferFunction transferPtRestr( transferPt );
-        comment << ", " << nameVar << part << " >= " << minPtParton_ << ", " << "DeltaR(parton, jet) <= " << maxDRParton_;
+        comment << ", " << nameVar << part << " >= " << minPtParton_ << ", " << "DeltaR(parton, reco) <= " << maxDRParton_;
         transferPtRestr.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPtRestr( nEtaBins_, transferPtRestr );
 
@@ -1416,7 +1416,7 @@ int main( int argc, char * argv[] )
         if ( writeFiles_ ) {
 
           // File name
-          std::string nameOut( pathOut_ + "/gentTransferFunction_" + sample_ + "_" + jecLevel_ );
+          std::string nameOut( pathOut_ + "/gentTransferFunction_" + sample_ );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
           if ( refSel_)     nameOut.append( "_Ref" );
           nameOut.append( "_" + name + ".txt" );

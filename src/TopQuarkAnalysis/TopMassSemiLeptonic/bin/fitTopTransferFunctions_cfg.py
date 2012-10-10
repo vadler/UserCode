@@ -13,7 +13,7 @@ era    = 'Summer11'
 sample = 'Fall11_R4_1_unambiguousOnly'
 #sample = 'Fall11_R4_1_totalMinDist'
 # JEC level
-jecLevel = "L3"
+jecLevel = "L3" # only used for jets
 
 # Settings
 overwrite = True # to throw away earlier versions of histograms, trees and functions
@@ -124,18 +124,9 @@ process.io = cms.PSet(
 )
 
 process.histos = cms.PSet(
-  # Muons
-  MuPtBins = cms.uint32( 50 )
-, MuPtMax  = cms.double( 50. )
-  # Electrons
-, ElecPtBins = cms.uint32( 50 )
-, ElecPtMax  = cms.double( 50. )
-  # Light jets
-, UdscJetPtBins = cms.uint32( 50 )
-, UdscJetPtMax  = cms.double( 50. )
-  # B-jets
-, BJetPtBins = cms.uint32( 50 )
-, BJetPtMax  = cms.double( 50. )
+  # Binning
+  DeltaPtBins = cms.uint32( 50 )
+, DeltaPtMax  = cms.double( 50. )
   # Rebinning
 , widthFactor = cms.double( widthFactor )
 )
