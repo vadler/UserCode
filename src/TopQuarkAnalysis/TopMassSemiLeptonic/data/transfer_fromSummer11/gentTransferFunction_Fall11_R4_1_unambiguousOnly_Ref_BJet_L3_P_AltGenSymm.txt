@@ -23,7 +23,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -69,7 +69,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -115,7 +115,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -161,7 +161,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -207,7 +207,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -253,7 +253,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -299,7 +299,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -345,7 +345,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -391,7 +391,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -437,7 +437,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -483,7 +483,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -529,7 +529,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -575,7 +575,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -621,7 +621,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -667,7 +667,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -713,7 +713,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -759,7 +759,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -805,7 +805,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -851,7 +851,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -897,7 +897,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -943,7 +943,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -989,7 +989,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -1035,7 +1035,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -1081,7 +1081,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -1127,7 +1127,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -1173,7 +1173,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
@@ -1219,7 +1219,7 @@ Parameters 2D (DependencyFunction):
 
 FitFunction       : 	[0]*(exp(-0.5*((x-[1])/[2])^2)+[3]*exp(-0.5*((x-[4])/[5])^2))/(([2]+[3]*[5])*sqrt(2*pi))
 DependencyFunction: 	[0]+[1]*x 	on p_parton
-Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, jet) <= 0.1
+Comment           : 	for JEC level L3, P_parton <= 500, P_parton >= 50, DeltaR(parton, reco) <= 0.1
 
 Parameters 1D:
 [0]: 	NAN
