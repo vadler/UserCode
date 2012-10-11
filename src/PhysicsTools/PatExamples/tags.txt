@@ -4,12 +4,10 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_3_5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-08-09      V06-08-07      
 DataFormats/PatCandidates                        V06-05-06-02   V06-05-06-01   
-EGamma/EGammaAnalysisTools                       V00-00-28                     
-EgammaAnalysis/ElectronTools                     FB_4Oct2012-2                 
+EGamma/EGammaAnalysisTools                       V00-00-13                     
 PatExercise10c/PatL1PhysAlgo                     NoCVS                         
 PhysicsTools/PatAlgos                            V08-09-42      V08-09-37      
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
-RecoEgamma/EgammaTools                           V09-00-00      V08-11-22      
 RecoMET/METAnalyzers                             V00-00-08                     
 RecoParticleFlow/PFProducer                      V15-02-06      V15-02-05-01   
 TopQuarkAnalysis/Configuration                   V07-00-02      V06-02-05      
@@ -23,4 +21,4 @@ TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-03      
 TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-12      
 ---------------------------------------
-total packages: 20 (20 displayed)
+total packages: 18 (18 displayed)
