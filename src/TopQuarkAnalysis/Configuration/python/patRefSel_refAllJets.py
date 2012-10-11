@@ -22,7 +22,7 @@ from TopQuarkAnalysis.Configuration.patRefSel_PF2PAT import *
 ### Trigger selection
 
 # HLT selection
-triggerSelectionDataRelVals = 'HLT_QuadJet50_DiJet40_v*' # 2011B RelVals
+triggerSelectionDataRelVals = 'HLT_SixJet45_v*' # 2012A RelVals
 triggerSelectionData        = 'HLT_*' # not defined yet
 triggerSelectionMC          = 'HLT_QuadJet60_DiJet20_v*' # not defined yet
 
