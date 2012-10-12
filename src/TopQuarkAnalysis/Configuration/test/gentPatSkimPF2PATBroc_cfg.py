@@ -211,11 +211,12 @@ if runOnRelVal:
     inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
                                      , dataTier     = 'RECO'
                                      , relVal       = 'SingleMu'
-                                     , globalTag    = 'GR_R_53_V12_RelVal_mu2011B'
+                                     , globalTag    = 'GR_R_53_V12_RelVal_mu2012B'
                                      #, relVal       = 'SingleElectron'
-                                     #, globalTag    = 'GR_R_53_V12_RelVal_electron2011B'
+                                     #, globalTag    = 'GR_R_53_V12_RelVal_electron2012B'
                                      , maxVersions  = 1
                                      )
+    hltProcess = 'reHLT'
 else:
   if runOnMC:
     if lxplusTest:
