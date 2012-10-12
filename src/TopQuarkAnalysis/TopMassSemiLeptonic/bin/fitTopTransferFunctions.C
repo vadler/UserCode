@@ -32,7 +32,7 @@
 #include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/TransferFunction.h"
 
 
-// Initialise parametrs for fit function
+// Initialise parameters for fit function
 void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction = false );
 // Check correct assignment of signal and background to the fit function parameters
 bool checkParametersFit( TF1 * fit, bool useBkgFunction = false );
@@ -125,8 +125,10 @@ int main( int argc, char * argv[] )
   const std::string nameFuncClass( "TF1" );
   if      ( verbose_ < 3 ) fitOptions_.append( "Q" );
   else if ( verbose_ > 4 ) fitOptions_.append( "V" );
-  const std::string nameVar( useNonT_ ? "P" : "Pt" );
-  const std::string titleVar( useNonT_ ? "p" : "p_{t}" );
+  const std::string baseVarL( useAlt_ ? "E" : "p" );
+  const std::string baseVarC( useAlt_ ? "E" : "P" );
+  const std::string nameVar( useNonT_ ? baseVarC : baseVarC + "t" );
+  const std::string titleVar( useNonT_ ? baseVarL : baseVarL + "_{t}" );
   const std::string titleX( refGen_ ? titleVar + "^{GEN} (GeV)" : titleVar + " (GeV)" );
   const std::string titleEta( refGen_ ? "#eta^{GEN}" : "#eta" );
   const std::string titleTrans( refGen_ ? "#Delta" + titleVar + "^{GEN} (GeV)" : "#Delta" + titleVar + "^{RECO} (GeV)" );
@@ -1261,8 +1263,8 @@ int main( int argc, char * argv[] )
                       for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
                         histVecTransRestrRebinEtaPtFitMap.at( uPar )->SetBinContent( uPt + 1, fitEtaPtTransRestrRebinResultPtr->Parameter( uPar ) );
                         histVecTransRestrRebinEtaPtFitMap.at( uPar )->SetBinError( uPt + 1, fitEtaPtTransRestrRebinResultPtr->ParError( uPar ) );
-                    }
                       }
+                    }
                     if ( fitEtaPtTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRestrRebinResultPtr->Prob() ) );
                     else histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1 );
                   }
@@ -1455,8 +1457,8 @@ int main( int argc, char * argv[] )
 
   // Write and close ROOT files
   if ( overwrite_ ) {
-     fileIn_->Write( 0, TObject::kOverwrite );
-     fileOut_->Write( 0, TObject::kOverwrite );
+    fileIn_->Write( 0, TObject::kOverwrite );
+    fileOut_->Write( 0, TObject::kOverwrite );
   }
   else {
     fileIn_->Write();
@@ -1474,7 +1476,7 @@ int main( int argc, char * argv[] )
 }
 
 
-// Initialise parametrs for fit function
+// Initialise parameters for fit function
 void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
 {
   //. This function assumes fit functions of the forms
@@ -1519,7 +1521,7 @@ void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
 // Check correct assignment of signal and background to the fit function parameters
 bool checkParametersFit( TF1 * fit, bool useBkgFunction )
 {
-  //. This function assumes fit functions of the form
+  // This function assumes fit functions of the form
   // - [0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
 
   // Check, if background is described at all in function
