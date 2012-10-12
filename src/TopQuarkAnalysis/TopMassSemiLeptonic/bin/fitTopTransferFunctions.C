@@ -85,7 +85,6 @@ int main( int argc, char * argv[] )
   const std::string outFile_( io_.getParameter< std::string >( "outputFile" ) );
   const bool overwrite_( io_.getParameter< bool >( "overwrite" ));
   const std::string sample_( io_.getParameter< std::string >( "sample" ) );
-  const std::string jecLevel_( io_.getParameter< std::string >( "jecLevel" ) );
   const std::string pathPlots_( io_.getParameter< std::string >( "pathPlots" ) );
   const bool plot_( ! pathPlots_.empty() );
   // Configuration for histogram binning
@@ -335,7 +334,6 @@ int main( int argc, char * argv[] )
       dirFit_->cd();
 
       std::string name( objCat + "_" + nameVar + "_" + subFit );
-      if ( objCat == "UdscJet" || objCat == "BJet" ) name.insert( name.find( objCat ) + objCat.size(), std::string( "_" + jecLevel_ ) );
 
       const std::string nameTrans( name + "_Trans" );
       TH1D * histTrans( new TH1D( nameTrans.c_str(), objCat.c_str(), histBins_, -histMax_, histMax_ ) );
@@ -720,13 +718,11 @@ int main( int argc, char * argv[] )
         dirFit_->cd();
 
         std::string name( objCat + "_" + nameVar + "_" + subFit );
-        if ( objCat == "UdscJet" || objCat == "BJet" ) name.insert( name.find( objCat ) + objCat.size(), std::string( "_" + jecLevel_ ) );
 
         // Transfer function parameters
         const std::string part( refGen_ ? "_parton" : "_reco" );
         std::stringstream comment( std::ios_base::out );
         my::TransferFunction transferPt( fitFunction_, dependencyFunction_, std::string( titleVar + part ) );
-        if ( objCat == "UdscJet" || objCat == "BJet" ) comment << "for JEC level " << jecLevel_ << ", ";
         comment << nameVar << part << " <= " << fitMaxPt_;
         transferPt.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPt( nEtaBins_, transferPt );

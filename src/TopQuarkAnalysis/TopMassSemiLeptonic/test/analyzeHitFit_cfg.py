@@ -39,6 +39,7 @@ jecLevels = [ 'L1FastJet'
             , 'L2Relative'
             , 'L3Absolute'
             ]
+jecLevel = jecLevels[ -1 ][ 0 : 2 ]
 
 # TQAF MC match
 matchMaxNJets   = 6                 # min: 4; default: 4
@@ -101,7 +102,7 @@ process.maxEvents = cms.untracked.PSet(
 
 ### Output
 
-outputFile = '%s/output/analyzeHitFit_from%s_%s_%s.root'%( os.getenv( "CMSSW_BASE" ), era, sample, matchAlgorithm )
+outputFile = '%s/output/analyzeHitFit_from%s_%s_%s_%s.root'%( os.getenv( "CMSSW_BASE" ), era, sample, jecLevel, matchAlgorithm )
 
 if runTest:
   outputFile = outputFile.replace( 'root', 'test.root' )
@@ -113,7 +114,7 @@ process.TFileService = cms.Service(
 )
 logFile = outputFile.replace( 'root', 'log' )
 cfgFile = logFile.replace( '.log', '_cfg.py' )
-pathPlots = '%s/output/plots/analyzeHitFit/analyzeHitFit_from%s_%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample, matchAlgorithm )
+pathPlots = '%s/output/plots/analyzeHitFit/analyzeHitFit_from%s_%s_%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample, jecLevel, matchAlgorithm )
 
 
 ### Event selection

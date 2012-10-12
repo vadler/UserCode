@@ -10,10 +10,8 @@ runTest = False
 # era    = 'Spring10'
 era    = 'Summer11'
 # Input sample
-sample = 'Fall11_R4_1_unambiguousOnly'
-#sample = 'Fall11_R4_1_totalMinDist'
-# JEC level
-jecLevel = "L3" # only used for jets
+sample = 'Fall11_R4_1_L3_unambiguousOnly'
+#sample = 'Fall11_R4_1_L3_totalMinDist'
 
 # Settings
 overwrite = True # to throw away earlier versions of histograms, trees and functions
@@ -119,7 +117,6 @@ process.io = cms.PSet(
 , outputFile = cms.string( outputFile )
 , overwrite  = cms.bool( overwrite )
 , sample     = cms.string( sample )
-, jecLevel   = cms.string( jecLevel )
 , pathPlots  = cms.string( pathPlots )
 )
 
