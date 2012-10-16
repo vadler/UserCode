@@ -209,7 +209,7 @@ files[ 'Fall11_R4' ] = [ '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4/
                        , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4/skimHitFit_57_1_Kts.root'
                        , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4/skimHitFit_58_1_OQr.root'
                        , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4/skimHitFit_59_1_m9r.root'
-                       , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4/skimHitFit_5_1_8Or.root'
+                       #, '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4/skimHitFit_5_1_8Or.root'
                        , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4/skimHitFit_5_1_VL7.root'
                        , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4/skimHitFit_60_1_wZD.root'
                        , '/store/user/vadler/cms/Top/CMSSW_4_4_4/data/Fall11_R4/skimHitFit_61_1_eMj.root'
