@@ -8,6 +8,7 @@
 <use   name="TopQuarkAnalysis/TopHitFit"/>
 <use   name="TopQuarkAnalysis/TopMassSemiLeptonic"/>
 <use   name="CommonTools/MyTools"/>
+<use   name="CondFormats/JetMETObjects"/>
 <environment>
   <bin   file="produceExistingTopHitFitResolutionFunctions.C"></bin>
   <bin   file="produceExistingTopTQAFResolutionFunctions.C"></bin>

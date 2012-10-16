@@ -28,14 +28,12 @@
 #include "DataFormats/Math/interface/deltaR.h"
 
 #include "CommonTools/MyTools/interface/RootTools.h"
-// #include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/MyTools.h"
 #include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/TransferFunction.h" // DEBUG
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 
 
 // Initialise parameters for fit function
 void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction = false );
-// Initialise parametrs for background function
-void setParametersBkg( TF1 * fit, TH1D * histo );
 
 
 int main( int argc, char * argv[] )
@@ -87,7 +85,7 @@ int main( int argc, char * argv[] )
   const unsigned histBins_( histos_.getParameter< unsigned >( "FracPtBins" ) );
   const double   histMax_( histos_.getParameter< double >( "FracPtMax" ) );
   const double widthFactor_( histos_.getParameter< double >( "widthFactor" ) );
-  // Configuration for fitting transfer functions
+  // Configuration for fitting L5 JECs
   const edm::ParameterSet & fit_( process_.getParameter< edm::ParameterSet >( "fit" ) );
   const bool fitNonRestr_( fit_.getParameter< bool >( "fitNonRestr" ) );
   const bool fitEtaBins_( fit_.getParameter< bool >( "fitEtaBins" ) );
@@ -97,12 +95,30 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & jecL5_( process_.getParameter< edm::ParameterSet >( "jecL5" ) );
   const bool doFit_( jecL5_.getParameter< bool >( "doFit" ) );
   const std::string fitFunction_( jecL5_.getParameter< std::string >( "fitFunction" ) );
+  const std::string bkgFunction_( jecL5_.getParameter< std::string >( "bkgFunction" ) );
+  const bool useBkg_( bkgFunction_ != "" || bkgFunction_ != "0" );
   std::string fitOptions_( jecL5_.getParameter< std::string >( "fitOptions" ) );
   const double fitRange_( std::min( jecL5_.getParameter< double >( "fitRange" ), widthFactor_ ) );
-  const std::string bkgFunction_( jecL5_.getParameter< std::string >( "bkgFunction" ) );
-  const bool useBkgFunction_( bkgFunction_ != "" || bkgFunction_ != "0" );
+  const std::vector< std::string > jecVars_( jecL5_.getParameter< std::vector< std::string > >( "jecVars" ) );
+  const std::vector< std::string > jecDims_( jecL5_.getParameter< std::vector< std::string > >( "jecDims" ) );
+  const std::string jecFunction_( jecL5_.getParameter< std::string >( "jecFunction" ) );
   const bool writeFiles_( jecL5_.getParameter< bool >( "writeFiles" ) );
   const std::string pathOut_( jecL5_.getParameter< std::string >( "pathOut" ) );
+
+  // Check configuration
+  const TFormula jecFormula( "jecFormula", jecFunction_.c_str() );
+  if ( ( size_t )( jecFormula.GetNdim() ) != jecDims_.size() ) {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "    mismatch of number of dimensions in JEC function '" << jecFunction_ << "' with size of dimension list " << jecDims_.size() << std::endl;
+    returnStatus_ += 0x3;
+    return returnStatus_;
+  }
+  if ( jecFormula.GetNpar() != 1 ) {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "    exactly 1 parameter needed for L5 corrections, not " << jecFormula.GetNpar() << std::endl;
+    returnStatus_ += 0x4;
+    return returnStatus_;
+  }
 
   if ( verbose_ > 0 ) {
     std::cout << std::endl
@@ -113,6 +129,7 @@ int main( int argc, char * argv[] )
   }
 
   // Set constants
+  const unsigned nPar( jecFormula.GetNpar() );
   std::string evtSel_( "analyzeHitFit" );
   if ( refSel_ ) evtSel_.append( "Reference" );
   const std::string nameDirClass( "TDirectoryFile" );
@@ -266,9 +283,9 @@ int main( int argc, char * argv[] )
       data_->SetBranchAddress( "PtAlt" , &ptData );
       data_->SetBranchAddress( "EtaAlt", &etaData );
       data_->SetBranchAddress( "PhiAlt", &phiData );
-      data_->SetBranchAddress( "PtAltGenJet" , &ptGenJetData );
-      data_->SetBranchAddress( "EtaAltGenJet", &etaGenJetData );
-      data_->SetBranchAddress( "PhiAltGenJet", &phiGenJetData );
+      data_->SetBranchAddress( "PtGenJetAlt" , &ptGenJetData );
+      data_->SetBranchAddress( "EtaGenJetAlt", &etaGenJetData );
+      data_->SetBranchAddress( "PhiGenJetAlt", &phiGenJetData );
     }
     else {
       data_->SetBranchAddress( "Pt" , &ptData );
@@ -506,12 +523,12 @@ int main( int argc, char * argv[] )
     }  // loop: keyFit
 
 
-    // Fit transfer functions
+    // Fit JECs
 
     if ( doFit_ ) {
       if ( verbose_ > 1 ) {
         std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                  << "    transfer function determination for " << objCat << " started" << std::endl;
+                  << "    L5 JEC determination for " << objCat << " started" << std::endl;
       }
       TCanvas c1( "c1" );
       c1.cd();
@@ -523,8 +540,8 @@ int main( int argc, char * argv[] )
         const std::string subFit( keyFit->GetName() );
         if ( subFit.find( "Inv" ) != std::string::npos ) continue; // nothing to do for inverse
         // These are real switches: depending on configuration, only one setting combination can be run at a time
-        if ( useAlt_  == ( subFit.find( "Alt" )  == std::string::npos ) ) continue;
-        if ( useSymm_ == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
+        if ( useAlt_     == ( subFit.find( "Alt" )  == std::string::npos ) ) continue;
+        if ( useSymm_    == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
         if ( refGenJet_  == ( subFit.find( "Gen" )  == std::string::npos ) ) continue;
         TDirectory * dirFit_( ( TDirectory* )( dirPt_->Get( subFit.c_str() ) ) );
         TDirectory * dirOutFit_( ( TDirectory* )( dirOutPt_->Get( subFit.c_str() ) ) );
@@ -534,34 +551,33 @@ int main( int argc, char * argv[] )
         }
         dirFit_->cd();
 
-        std::string name( objCat + "_" + nameVar + "_" + subFit );
+        const std::string name( objCat + "_" + nameVar + "_" + subFit );
 
-        // JEC L5 parameters
-        const std::string type( refGenJet_ ? "_genJet" : "_recoJet" );
-        std::stringstream comment( std::ios_base::out );
-        my::TransferFunction transferPt( fitFunction_, bkgFunction_, std::string( titleVar + type ) );
-        comment << nameVar << type;
-        transferPt.SetComment( comment.str() );
+        // Transfer function parameters
+        const std::string part( refGenJet_ ? "_parton" : "_reco" );
+        my::TransferFunction transferPt( fitFunction_, jecFunction_, std::string( titleVar + part ) );
         my::TransferFunctionCollection transferVecEtaPt( nEtaBins_, transferPt );
         my::TransferFunction transferPtRestr( transferPt );
-        comment << ", " << nameVar << type << " >= " << minPtGenJet_ << ", " << "DeltaR(genJet, recoJet) <= " << maxDRGenJet_;
-        transferPtRestr.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPtRestr( nEtaBins_, transferPtRestr );
-
-        const unsigned nPar( transferPt.NParFit() );
 
         const std::string nameFracL5( name + "_FracL5" );
         TH1D * histFracL5( ( TH1D* )( dirFit_->Get( nameFracL5.c_str() ) ) );
         if ( fitNonRestr_ && histFracL5 != 0 ) {
+          JetCorrectorParameters::Definitions           jecDefinitions( jecVars_, jecDims_, jecFunction_, false );
+          std::vector< JetCorrectorParameters::Record > jecRecords;
+          std::vector< float > jecVarsMins;
+          if ( useSymm_ ) jecVarsMins.push_back( ( float )( -etaBins_.back() ) );
+          else            jecVarsMins.push_back( ( float )( etaBins_.front() ) );
+          std::vector< float > jecVarsMaxs;
+          jecVarsMaxs.push_back( ( float )( etaBins_.back() ) );
+          std::vector< float > jecPars( jecDims_.size(), 0. );
           const std::string nameFracL5Fit( nameFracL5 + "_fit" );
-          TF1 * fitFracL5( new TF1( nameFracL5Fit.c_str(), fitFunction_.c_str(), 0., std::min( histFracL5->GetXaxis()->GetXmax(), histFracL5->GetMean() + histFracL5->GetRMS() * fitRange_ ) ) );
-          setParametersFit( fitFracL5, histFracL5 );
+          TF1 * fitFracL5( new TF1( nameFracL5Fit.c_str(), fitFunction_.c_str(), std::max( histFracL5->GetXaxis()->GetXmin(), histFracL5->GetMean() - histFracL5->GetRMS() * fitRange_ ), std::min( histFracL5->GetXaxis()->GetXmax(), histFracL5->GetMean() + histFracL5->GetRMS() * fitRange_ ) ) );
+          setParametersFit( fitFracL5, histFracL5, useBkg_ );
           TFitResultPtr fitFracL5ResultPtr( histFracL5->Fit( fitFracL5, fitOptions_.c_str() ) );
           if ( fitFracL5ResultPtr >= 0 ) {
             if ( fitFracL5ResultPtr->Status() == 0 && fitFracL5ResultPtr->Ndf() != 0. ) {
-              for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
-                transferPt.SetParameter( uPar, fitFracL5->GetParameter( uPar ) );
-              }
+              jecPars[ 0 ] = ( float)( fitFracL5->GetParameter( 1 ) );
             }
             else {
               if ( verbose_ > 2 ) {
@@ -582,20 +598,39 @@ int main( int argc, char * argv[] )
             histFracL5->Draw();
             c1.Print( std::string( pathPlots_ + histFracL5->GetName() + ".png" ).c_str() );
           }
+          JetCorrectorParameters::Record jecRecord( jecVars_.size(), jecVarsMins, jecVarsMaxs, jecPars );
+          jecRecords.push_back( jecRecord );
+          JetCorrectorParameters jec( jecDefinitions, jecRecords );
+          if ( writeFiles_ ) {
+            std::string nameOut( pathOut_ + "/gentJecL5_" + sample_ );
+            if ( usePileUp_ ) nameOut.append( "_PileUp" );
+            if ( refSel_)     nameOut.append( "_Ref" );
+            nameOut.append( "_" + name + ".txt" );
+            jec.printFile( nameOut );
+            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                      << "    written L5 JEC file:" << std::endl
+                      << "        " << nameOut << std::endl;
+          }
         }
 
         const std::string nameFracL5Restr( nameFracL5 + "Restr" );
         TH1D * histFracL5Restr( ( TH1D* )( dirFit_->Get( nameFracL5Restr.c_str() ) ) );
         if ( histFracL5Restr != 0 ) {
+          JetCorrectorParameters::Definitions           jecDefinitionsRestr( jecVars_, jecDims_, jecFunction_, false );
+          std::vector< JetCorrectorParameters::Record > jecRecordsRestr;
+          std::vector< float > jecVarsMinsRestr;
+          if ( useSymm_ ) jecVarsMinsRestr.push_back( ( float )( -etaBins_.back() ) );
+          else            jecVarsMinsRestr.push_back( ( float )( etaBins_.front() ) );
+          std::vector< float > jecVarsMaxsRestr;
+          jecVarsMaxsRestr.push_back( ( float )( etaBins_.back() ) );
+          std::vector< float > jecParsRestr( jecDims_.size(), 0. );
           const std::string nameFracL5RestrFit( nameFracL5Restr + "_fit" );
-          TF1 * fitFracL5Restr( new TF1( nameFracL5RestrFit.c_str(), fitFunction_.c_str(), 0., std::min( histFracL5Restr->GetXaxis()->GetXmax(), histFracL5Restr->GetMean() + histFracL5Restr->GetRMS() * fitRange_ ) ) );
-          setParametersFit( fitFracL5Restr, histFracL5Restr );
+          TF1 * fitFracL5Restr( new TF1( nameFracL5RestrFit.c_str(), fitFunction_.c_str(), std::max( histFracL5Restr->GetXaxis()->GetXmin(), histFracL5Restr->GetMean() - histFracL5Restr->GetRMS() * fitRange_ ), std::min( histFracL5Restr->GetXaxis()->GetXmax(), histFracL5Restr->GetMean() + histFracL5Restr->GetRMS() * fitRange_ ) ) );
+          setParametersFit( fitFracL5Restr, histFracL5Restr, useBkg_ );
           TFitResultPtr fitFracL5RestrResultPtr( histFracL5Restr->Fit( fitFracL5Restr, fitOptions_.c_str() ) );
           if ( fitFracL5RestrResultPtr >= 0 ) {
             if ( fitFracL5RestrResultPtr->Status() == 0 && fitFracL5RestrResultPtr->Ndf() != 0. ) {
-              for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
-                transferPtRestr.SetParameter( uPar, fitFracL5Restr->GetParameter( uPar ) );
-              }
+              jecParsRestr[ 0 ] = ( float)( fitFracL5Restr->GetParameter( 1 ) );
             }
             else {
               if ( verbose_ > 2 ) {
@@ -615,6 +650,19 @@ int main( int argc, char * argv[] )
           if ( plot_ ) {
             histFracL5Restr->Draw();
             c1.Print( std::string( pathPlots_ + histFracL5Restr->GetName() + ".png" ).c_str() );
+          }
+          JetCorrectorParameters::Record jecRecordRestr( jecVars_.size(), jecVarsMinsRestr, jecVarsMaxsRestr, jecParsRestr );
+          jecRecordsRestr.push_back( jecRecordRestr );
+          JetCorrectorParameters jecRestr( jecDefinitionsRestr, jecRecordsRestr );
+          if ( writeFiles_ ) {
+            std::string nameOutRestr( pathOut_ + "/gentJecL5_" + sample_ );
+            if ( usePileUp_ ) nameOutRestr.append( "_PileUp" );
+            if ( refSel_)     nameOutRestr.append( "_Ref" );
+            nameOutRestr.append( "_" + name + "Restr.txt" );
+            jecRestr.printFile( nameOutRestr );
+            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                      << "    written L5 JEC file:" << std::endl
+                      << "        " << nameOutRestr << std::endl;
           }
         }
 
@@ -652,8 +700,8 @@ int main( int argc, char * argv[] )
           TH1D * histPtFracL5( ( TH1D* )( dirFit_->Get( namePtFracL5.c_str() ) ) );
           if ( fitNonRestr_ && histPtFracL5 != 0 ) {
             const std::string namePtFracL5Fit( namePtFracL5 + "_fit" );
-            TF1 * fitPtFracL5( new TF1( namePtFracL5Fit.c_str(), fitFunction_.c_str(), 0., std::min( histPtFracL5->GetXaxis()->GetXmax(), histPtFracL5->GetMean() + histPtFracL5->GetRMS() * fitRange_ ) ) );
-            setParametersFit( fitPtFracL5, histPtFracL5 );
+            TF1 * fitPtFracL5( new TF1( namePtFracL5Fit.c_str(), fitFunction_.c_str(), std::max( histPtFracL5->GetXaxis()->GetXmin(), histPtFracL5->GetMean() - histPtFracL5->GetRMS() * fitRange_ ), std::min( histPtFracL5->GetXaxis()->GetXmax(), histPtFracL5->GetMean() + histPtFracL5->GetRMS() * fitRange_ ) ) );
+            setParametersFit( fitPtFracL5, histPtFracL5, useBkg_ );
             TFitResultPtr fitPtFracL5ResultPtr( histPtFracL5->Fit( fitPtFracL5, fitOptions_.c_str() ) );
             if ( fitPtFracL5ResultPtr >= 0 ) {
               if ( fitPtFracL5ResultPtr->Status() == 0 && fitPtFracL5ResultPtr->Ndf() != 0. ) {
@@ -685,8 +733,8 @@ int main( int argc, char * argv[] )
           TH1D * histPtFracL5Restr( ( TH1D* )( dirFit_->Get( namePtFracL5Restr.c_str() ) ) );
           if ( histPtFracL5Restr != 0 ) {
             const std::string namePtFracL5RestrFit( namePtFracL5Restr + "_fit" );
-            TF1 * fitPtFracL5Restr( new TF1( namePtFracL5RestrFit.c_str(), fitFunction_.c_str(), 0., std::min( histPtFracL5Restr->GetXaxis()->GetXmax(), histPtFracL5Restr->GetMean() + histPtFracL5Restr->GetRMS() * fitRange_ ) ) );
-            setParametersFit( fitPtFracL5Restr, histPtFracL5Restr );
+            TF1 * fitPtFracL5Restr( new TF1( namePtFracL5RestrFit.c_str(), fitFunction_.c_str(), std::max( histPtFracL5Restr->GetXaxis()->GetXmin(), histPtFracL5Restr->GetMean() - histPtFracL5Restr->GetRMS() * fitRange_ ), std::min( histPtFracL5Restr->GetXaxis()->GetXmax(), histPtFracL5Restr->GetMean() + histPtFracL5Restr->GetRMS() * fitRange_ ) ) );
+            setParametersFit( fitPtFracL5Restr, histPtFracL5Restr, useBkg_ );
             TFitResultPtr fitPtFracL5RestrResultPtr( histPtFracL5Restr->Fit( fitPtFracL5Restr, fitOptions_.c_str() ) );
             if ( fitPtFracL5RestrResultPtr >= 0 ) {
               if ( fitPtFracL5RestrResultPtr->Status() == 0 && fitPtFracL5RestrResultPtr->Ndf() != 0. ) {
@@ -797,8 +845,8 @@ int main( int argc, char * argv[] )
             TH1D * histEtaFracL5( ( TH1D* )( dirEta_->Get( nameEtaFracL5.c_str() ) ) );
             if ( fitNonRestr_ && histEtaFracL5 != 0 ) {
               const std::string nameEtaFracL5Fit( nameEtaFracL5 + "_fit" );
-              TF1 * fitEtaFracL5( new TF1( nameEtaFracL5Fit.c_str(), fitFunction_.c_str(), 0., std::min( histEtaFracL5->GetXaxis()->GetXmax(), histEtaFracL5->GetMean() + histEtaFracL5->GetRMS() * fitRange_ ) ) );
-              setParametersFit( fitEtaFracL5, histEtaFracL5 );
+              TF1 * fitEtaFracL5( new TF1( nameEtaFracL5Fit.c_str(), fitFunction_.c_str(), std::max( histEtaFracL5->GetXaxis()->GetXmin(), histEtaFracL5->GetMean() - histEtaFracL5->GetRMS() * fitRange_ ), std::min( histEtaFracL5->GetXaxis()->GetXmax(), histEtaFracL5->GetMean() + histEtaFracL5->GetRMS() * fitRange_ ) ) );
+              setParametersFit( fitEtaFracL5, histEtaFracL5, useBkg_ );
               TFitResultPtr fitEtaFracL5ResultPtr( histEtaFracL5->Fit( fitEtaFracL5, fitOptions_.c_str() ) );
               if ( fitEtaFracL5ResultPtr >= 0 ) {
                 if ( fitEtaFracL5ResultPtr->Status() == 0 && fitEtaFracL5ResultPtr->Ndf() != 0. ) {
@@ -836,8 +884,8 @@ int main( int argc, char * argv[] )
           TH1D * histEtaFracL5Restr( ( TH1D* )( dirEta_->Get( nameEtaFracL5Restr.c_str() ) ) );
           if ( histEtaFracL5Restr != 0 ) {
             const std::string nameEtaFracL5RestrFit( nameEtaFracL5Restr + "_fit" );
-            TF1 * fitEtaFracL5Restr( new TF1( nameEtaFracL5RestrFit.c_str(), fitFunction_.c_str(), 0., std::min( histEtaFracL5Restr->GetXaxis()->GetXmax(), histEtaFracL5Restr->GetMean() + histEtaFracL5Restr->GetRMS() * fitRange_ ) ) );
-            setParametersFit( fitEtaFracL5Restr, histEtaFracL5Restr );
+            TF1 * fitEtaFracL5Restr( new TF1( nameEtaFracL5RestrFit.c_str(), fitFunction_.c_str(), std::max( histEtaFracL5Restr->GetXaxis()->GetXmin(), histEtaFracL5Restr->GetMean() - histEtaFracL5Restr->GetRMS() * fitRange_ ), std::min( histEtaFracL5Restr->GetXaxis()->GetXmax(), histEtaFracL5Restr->GetMean() + histEtaFracL5Restr->GetRMS() * fitRange_ ) ) );
+            setParametersFit( fitEtaFracL5Restr, histEtaFracL5Restr, useBkg_ );
             TFitResultPtr fitEtaFracL5RestrResultPtr( histEtaFracL5Restr->Fit( fitEtaFracL5Restr, fitOptions_.c_str() ) );
             if ( fitEtaFracL5RestrResultPtr >= 0 ) {
               if ( fitEtaFracL5RestrResultPtr->Status() == 0 && fitEtaFracL5RestrResultPtr->Ndf() != 0. ) {
@@ -908,8 +956,8 @@ int main( int argc, char * argv[] )
                 TH1D * histEtaPtFracL5( ( TH1D* )( dirEta_->Get( nameEtaPtFracL5.c_str() ) ) );
                 if ( histEtaPtFracL5 != 0 ) {
                   const std::string nameEtaPtFracL5Fit( nameEtaPtFracL5 + "_fit" );
-                  TF1 * fitEtaPtFracL5( new TF1( nameEtaPtFracL5Fit.c_str(), fitFunction_.c_str(), 0., std::min( histEtaPtFracL5->GetXaxis()->GetXmax(), histEtaPtFracL5->GetMean() + histEtaPtFracL5->GetRMS() * fitRange_ ) ) );
-                  setParametersFit( fitEtaPtFracL5, histEtaPtFracL5 );
+                  TF1 * fitEtaPtFracL5( new TF1( nameEtaPtFracL5Fit.c_str(), fitFunction_.c_str(), std::max( histEtaPtFracL5->GetXaxis()->GetXmin(), histEtaPtFracL5->GetMean() - histEtaPtFracL5->GetRMS() * fitRange_ ), std::min( histEtaPtFracL5->GetXaxis()->GetXmax(), histEtaPtFracL5->GetMean() + histEtaPtFracL5->GetRMS() * fitRange_ ) ) );
+                  setParametersFit( fitEtaPtFracL5, histEtaPtFracL5, useBkg_ );
                   TFitResultPtr fitEtaPtFracL5ResultPtr( histEtaPtFracL5->Fit( fitEtaPtFracL5, fitOptions_.c_str() ) );
                   if ( fitEtaPtFracL5ResultPtr >= 0 ) {
                     if ( fitEtaPtFracL5ResultPtr->Status() == 0 && fitEtaPtFracL5ResultPtr->Ndf() != 0. ) {
@@ -946,8 +994,8 @@ int main( int argc, char * argv[] )
               TH1D * histEtaPtFracL5Restr( ( TH1D* )( dirEta_->Get( nameEtaPtFracL5Restr.c_str() ) ) );
               if ( histEtaPtFracL5Restr != 0 ) {
                 const std::string nameEtaPtFracL5RestrFit( nameEtaPtFracL5Restr + "_fit" );
-                TF1 * fitEtaPtFracL5Restr( new TF1( nameEtaPtFracL5RestrFit.c_str(), fitFunction_.c_str(), 0., std::min( histEtaPtFracL5Restr->GetXaxis()->GetXmax(), histEtaPtFracL5Restr->GetMean() + histEtaPtFracL5Restr->GetRMS() * fitRange_ ) ) );
-                setParametersFit( fitEtaPtFracL5Restr, histEtaPtFracL5Restr );
+                TF1 * fitEtaPtFracL5Restr( new TF1( nameEtaPtFracL5RestrFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtFracL5Restr->GetXaxis()->GetXmin(), histEtaPtFracL5Restr->GetMean() - histEtaPtFracL5Restr->GetRMS() * fitRange_ ), std::min( histEtaPtFracL5Restr->GetXaxis()->GetXmax(), histEtaPtFracL5Restr->GetMean() + histEtaPtFracL5Restr->GetRMS() * fitRange_ ) ) );
+                setParametersFit( fitEtaPtFracL5Restr, histEtaPtFracL5Restr, useBkg_ );
                 TFitResultPtr fitEtaPtFracL5RestrResultPtr( histEtaPtFracL5Restr->Fit( fitEtaPtFracL5Restr, fitOptions_.c_str() ) );
                 if ( fitEtaPtFracL5RestrResultPtr >= 0 ) {
                   if ( fitEtaPtFracL5RestrResultPtr->Status() == 0 && fitEtaPtFracL5RestrResultPtr->Ndf() != 0. ) {
@@ -1033,43 +1081,6 @@ int main( int argc, char * argv[] )
           c1.Print( std::string( pathPlots_ + histFracL5RestrEtaFitMapProb->GetName() + ".png" ).c_str() );
         }
 
-        if ( writeFiles_ ) {
-
-          // File name
-          std::string nameOut( pathOut_ + "/gentJecL5_" + sample_ );
-          if ( usePileUp_ ) nameOut.append( "_PileUp" );
-          if ( refSel_)     nameOut.append( "_Ref" );
-          nameOut.append( "_" + name + ".txt" );
-
-          ofstream fileOut;
-          fileOut.open( nameOut.c_str(), std::ios_base::out );
-
-          if ( fitNonRestr_ ) {
-            fileOut << transferPt.Print() << std::endl << std::endl;
-          }
-          fileOut << transferPtRestr.Print() << std::endl;
-
-          if ( fitEtaBins_ ) {
-            fileOut << "================================================================================" << std::endl << std::endl;
-            for ( unsigned uEta = 0; uEta < nEtaBins_; ++uEta ) {
-              if ( uEta > 0 ) fileOut << "--------------------------------------------------------------------------------" << std::endl << std::endl;
-              fileOut << "for " << etaBins_.at( uEta ) << " <= eta < " << etaBins_.at( uEta + 1 ) << std::endl << std::endl;
-
-              if ( fitNonRestr_ ) {
-                fileOut << transferVecEtaPt.at( uEta ).Print() << std::endl;
-              }
-              fileOut << transferVecEtaPtRestr.at( uEta ).Print() << std::endl;
-
-            }
-          }
-
-          fileOut.close();
-          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                    << "    written transfer function file:" << std::endl
-                    << "        " << nameOut << std::endl;
-
-        }
-
       } // loop: keyFit
 
     }
@@ -1101,8 +1112,9 @@ int main( int argc, char * argv[] )
 // Initialise parameters for fit function
 void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
 {
-  // This function assumes fit functions of the forms
-  // -
+  //. This function assumes fit functions of the forms
+  // - [0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi)) (single Gaissian) or
+  // - [0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi)) + [3]*exp(-0.5*((x-[4])/[5])**2)/([5]*sqrt(2*pi)) (double Gaussian)
 
   // Starting points
   Double_t c( histo->Integral() );                             // Constant
@@ -1112,11 +1124,11 @@ void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
   // Gaussian part
   // Constant
   fit->SetParameter( 0, c );
-  fit->SetParLimits( 0, 0., 2. * c * s );
+  fit->SetParLimits( 0, 0., 2. * c );
   fit->SetParName( 0, "Constant c" );
   // Mean
   fit->SetParameter( 1, p ); // No double peak structure in this case
-  fit->SetParLimits( 1, -1. * s, 1. * s );
+  fit->SetParLimits( 1, 1. - 2. * s, 1. + 2. * s );
   fit->SetParName( 1, "Gaussian #mu" );
   // Sigma
   fit->SetParameter( 2, s );
@@ -1126,27 +1138,14 @@ void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
   if ( useBkgFunction ) {
     Double_t fitMin, fitMax;
     fit->GetRange( fitMin, fitMax );
+    fit->SetParameter( 3, 0.25 * c );
+    fit->SetParLimits( 3, 0., 0.5 * c );
+    fit->SetParName( 3, "bkg c" );
+    fit->SetParameter( 4, m + ( m - p ) ); // shift into opposite direction compared to main Gaussian
+    fit->SetParLimits( 4, fitMin, fitMax );
+    fit->SetParName( 4, "bkg #mu" );
+    fit->SetParameter( 5, ( fitMax - fitMin ) / 4. ); // starting from sigma covering half of the fit range
+    fit->SetParLimits( 5, 0., fitMax - fitMin );
+    fit->SetParName( 5, "bkg #sigma" );
   }
-}
-
-
-// Initialise parametrs for background function
-void setParametersBkg( TF1 * fit, TH1D * histo )
-{
-  //. This function assumes background functions of the form
-  // - [0]+[1]*x (line)
-
-  // Starting points
-  // Bins are away from unstable low/high momentum regions
-  Double_t x1( histo->GetBinCenter( 5 ) );
-  Double_t y1( histo->GetBinContent( 5 ) );
-  Double_t x2( histo->GetBinCenter( histo->GetNbinsX() - 2 ) );
-  Double_t y2( histo->GetBinContent( histo->GetNbinsX() - 2 ) );
-//   // Linear part
-//   // Constant
-//   fit->SetParameter( 0, ( x2 * y1 - x1 * y2 ) / ( x2 - x1 ) );
-//   fit->SetParName( 0, "Constant a" );
-//   // Slope
-//   fit->SetParameter( 1, ( y2 - y1 ) / ( x2 - x1 ) );
-//   fit->SetParName( 1, "Slope b" );
 }

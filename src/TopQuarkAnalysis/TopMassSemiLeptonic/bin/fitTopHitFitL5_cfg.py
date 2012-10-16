@@ -39,21 +39,34 @@ minPtGenJet    = 50.
 #maxDRGenJet    = 999999.
 maxDRGenJet    = 0.1
 #maxDRGenJet    = 0.2
+if runTest:
+  fitNonRestr = False
+  fitEtaBins  = False
 
 # L5 functions
 # Fit function: a Gaussian is always required for the first three function parameters
-fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2)' # single ROOT-like Gaussian
-##fitFunction = '[1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
-##fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((x-[0])/[5])**2) )' # double ROOT-like Gaussian with common mean
-#fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x )' # single ROOT-like Gaussian plus ROOT-like log-normal
-##fitFunction = '( [1]*exp(-0.5*((x-[0])/[2])**2)/([2]*sqrt(2*pi)) ) + ( [4]*exp(-0.5*((log(x)-[3])/[5])**2)/(x*[5]*sqrt(2*pi)) )' # single Gaussian plus log-normal
+#fitFunction = 'gaus' # single Gaussian
+#fitFunction = 'gaus + gaus(3)' # double Gaussian
+fitFunction = '[0]*exp(-0.5*((x-[1])/[2])**2) + [4]*exp(-0.5*((log(x)-[3])/[5])**2)/x' # single ROOT-like Gaussian plus ROOT-like log-normal
+#fitFunction = '[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi)) + [4]*exp(-0.5*((log(x)-[3])/[5])**2)/(x*[5]*sqrt(2*pi))' # single Gaussian plus log-normal
 bkgFunction = '0'
 fitOptions  = 'IBRS+'
-fitRange    = 1. # for Gaussian fits (in units of orig. RMS)
-#fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
+#fitRange    = 1. # for Gaussian fits (in units of orig. RMS)
+fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
+#fitRange    = 5. # for Gaussian fits (in units of orig. RMS)
+#fitRange    = 8. # for Gaussian fits (in units of orig. RMS)
 if len( fitFunction.split( ' + ' ) ) > 1: # a background function is defined
   fitRange    = widthFactor # for combined fits (in units of orig. RMS)
-  bkgFunction = fitFunction.split( ' + ' )[1]
+  bkgFunction = fitFunction.split( ' + ' )[0]
+### L1FastJet {1 JetEta 3 JetPt JetA Rho 1-(z-[1])*y*[0]*[2]/x Correction L1FastJet}
+### L2Relative {1 JetEta 1 JetPt [1]+[0]*log10(x)+[2]*pow(log10(x),2)+[3]*pow(log10(x),3)+[4]*pow(x/500.0,3) Correction L2Relative}
+### L3Absolute {1 JetEta 1 JetPt [1]+[0]/(pow(log10(x),2)+[2])+[3]*exp(-[4]*(log10(x)-[5])*(log10(x)-[5])) Correction L3Absolute}
+### L2L3Residual { 1 JetEta 1 JetPt [1] Correction L2Relative}
+### L5Flavor {1  JetEta  1   JetPt  [1] Correction L5Flavor}
+jecVars = [ 'JetEta' ]
+jecDims = [ 'JetPt' ]
+jecFunction = '[0]'
+### L7Parton {1  JetEta  2  JetPt  JetEta  1/([1]*x+[0])+[2]+([3]+[4]*log(x)+[5]*log(x)*log(x))*abs(y)+([6]+[7]*x)*y*y Response L7Parton}
 
 # I/O
 name = ''
@@ -99,7 +112,7 @@ process.verbose = cms.uint32( 1 )
 if runTest:
   process.verbose = 3
 process.objectCategories = cms.vstring( 'UdscJet'
-#process.objectCategories = cms.vstring( 'BJet'
+                                      , 'BJet'
                                       )
 process.usePileUp = cms.bool( usePileUp )
 process.useAlt    = cms.bool( useAlt )
@@ -121,7 +134,7 @@ process.io = cms.PSet(
 process.histos = cms.PSet(
   # Binning
   FracPtBins = cms.uint32( 50 )
-, FracPtMax  = cms.double( 50. )
+, FracPtMax  = cms.double(  2. )
   # Rebinning
 , widthFactor = cms.double( widthFactor )
 )
@@ -139,6 +152,9 @@ process.jecL5 = cms.PSet(
 , bkgFunction  = cms.string( bkgFunction )
 , fitOptions   = cms.string( fitOptions )
 , fitRange     = cms.double( fitRange )
+, jecVars      = cms.vstring( jecVars )
+, jecDims      = cms.vstring( jecDims )
+, jecFunction  = cms.string( jecFunction )
 , writeFiles   = cms.bool( True )
 , pathOut      = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/jecL5_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
