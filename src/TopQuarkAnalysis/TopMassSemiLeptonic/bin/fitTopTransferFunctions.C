@@ -864,7 +864,7 @@ int main( int argc, char * argv[] )
                   }
                 }
                 if ( fitPtTransRebinResultPtr->Prob() > 0 ) histTransRebinPtFitMapProb->SetBinContent( uPt + 1, log10( fitPtTransRebinResultPtr->Prob() ) );
-                else histTransRebinPtFitMapProb->SetBinContent( uPt + 1, 1 );
+                else histTransRebinPtFitMapProb->SetBinContent( uPt + 1, 1. );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -903,7 +903,7 @@ int main( int argc, char * argv[] )
                   }
                 }
                 if ( fitPtTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinPtFitMapProb->SetBinContent( uPt + 1, log10( fitPtTransRestrRebinResultPtr->Prob() ) );
-                else histTransRestrRebinPtFitMapProb->SetBinContent( uPt + 1, 1 );
+                else histTransRestrRebinPtFitMapProb->SetBinContent( uPt + 1, 1. );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -1223,7 +1223,7 @@ int main( int argc, char * argv[] )
                         }
                       }
                       if ( fitEtaPtTransRebinResultPtr->Prob() > 0 ) histTransRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRebinResultPtr->Prob() ) );
-                      else histTransRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1 );
+                      else histTransRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1. );
                     }
                     else {
                       if ( verbose_ > 2 ) {
@@ -1266,7 +1266,7 @@ int main( int argc, char * argv[] )
                       }
                     }
                     if ( fitEtaPtTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRestrRebinResultPtr->Prob() ) );
-                    else histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1 );
+                    else histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1. );
                   }
                   else {
                     if ( verbose_ > 2 ) {
