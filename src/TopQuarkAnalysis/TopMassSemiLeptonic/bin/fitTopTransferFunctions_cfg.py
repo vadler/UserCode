@@ -35,12 +35,12 @@ fitMaxPt       = 999999.
 #fitMaxPt       = 200.
 fitNonRestr    = True
 fitEtaBins     = True
-#minPtParton    = 0.
-#minPtParton    = 20.
-minPtParton    = 50.
-#maxDRParton    = 999999.
-maxDRParton    = 0.1
-#maxDRParton    = 0.2
+#minPt    = 0.
+#minPt    = 20.
+minPt    = 50.
+#maxDR    = 999999.
+maxDR    = 0.1
+#maxDR    = 0.2
 
 # Transfer functions
 # Fit function: a Gaussian is always required for the first three function parameters
@@ -131,8 +131,8 @@ process.histos = cms.PSet(
 process.fit = cms.PSet(
   fitNonRestr  = cms.bool( fitNonRestr )
 , fitEtaBins   = cms.bool( fitEtaBins )
-, minPtParton  = cms.double( minPtParton )
-, maxDRParton  = cms.double( maxDRParton )
+, minPt  = cms.double( minPt )
+, maxDR  = cms.double( maxDR )
 )
 #if runTest:
   #process.fit.fitNonRestr = False

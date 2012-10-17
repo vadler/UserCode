@@ -96,8 +96,8 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & fit_( process_.getParameter< edm::ParameterSet >( "fit" ) );
   const bool fitNonRestr_( fit_.getParameter< bool >( "fitNonRestr" ) );
   const bool fitEtaBins_( fit_.getParameter< bool >( "fitEtaBins" ) );
-  const double minPtParton_( fit_.getParameter< double >( "minPtParton" ) );
-  const double maxDRParton_( fit_.getParameter< double >( "maxDRParton" ) );
+  const double minPt_( fit_.getParameter< double >( "minPt" ) );
+  const double maxDR_( fit_.getParameter< double >( "maxDR" ) );
   // Configuration for fitting transfer functions
   const edm::ParameterSet & transfer_( process_.getParameter< edm::ParameterSet >( "transfer" ) );
   const bool doFit_( transfer_.getParameter< bool >( "doFit" ) );
@@ -451,7 +451,7 @@ int main( int argc, char * argv[] )
                 histEtaTrans->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 histTrans->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
               }
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtParton_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRParton_ ) {
+              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
                 histEtaPtTransRestr->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 histVecPtTransRestr.at( uPt )->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 histEtaTransRestr->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
@@ -465,7 +465,7 @@ int main( int argc, char * argv[] )
                 histEtaTrans->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 histTrans->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
               }
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtParton_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRParton_ ) {
+              if ( ptEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
                 histEtaPtTransRestr->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 histVecPtTransRestr.at( uPt )->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
                 histEtaTransRestr->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
@@ -503,7 +503,7 @@ int main( int argc, char * argv[] )
               if ( fitNonRestr_ ) {
                 histEtaPtTransRebin->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
               }
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtParton_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRParton_ ) {
+              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
                 histEtaPtTransRestrRebin->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
               }
             }
@@ -511,7 +511,7 @@ int main( int argc, char * argv[] )
               if ( fitNonRestr_ ) {
                 histEtaPtTransRebin->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
               }
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtParton_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRParton_ ) {
+              if ( ptEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
                 histEtaPtTransRestrRebin->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
               }
             }
@@ -549,7 +549,7 @@ int main( int argc, char * argv[] )
               if ( fitNonRestr_ ) {
                 histEtaTransRebin->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
               }
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtParton_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRParton_ ) {
+              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
                 histEtaTransRestrRebin->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
               }
             }
@@ -557,7 +557,7 @@ int main( int argc, char * argv[] )
               if ( fitNonRestr_ ) {
                 histEtaTransRebin->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
               }
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPtParton_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDRParton_ ) {
+              if ( ptEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
                 histEtaTransRestrRebin->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
               }
             }
@@ -654,7 +654,7 @@ int main( int argc, char * argv[] )
               histTransRebin->Fill( ptVal - ptGenVal, weightData_.at( uEta ).at( uEntry ) );
             }
           }
-          if ( ptRef >= minPtParton_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDRParton_ ) {
+          if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
             if ( refGen_ ) {
               histTransRestrRebin->Fill( ptGenVal - ptVal, weightData_.at( uEta ).at( uEntry ) );
             }
@@ -672,7 +672,7 @@ int main( int argc, char * argv[] )
                   histVecPtTransRebin.at( uPt )->Fill( ptVal - ptGenVal, weightData_.at( uEta ).at( uEntry ) );
                 }
               }
-              if ( ptRef >= minPtParton_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDRParton_ ) {
+              if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
                 if ( refGen_ ) {
                   histVecPtTransRestrRebin.at( uPt )->Fill( ptGenVal - ptVal, weightData_.at( uEta ).at( uEntry ) );
                 }
@@ -729,7 +729,7 @@ int main( int argc, char * argv[] )
         transferPt.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPt( nEtaBins_, transferPt );
         my::TransferFunction transferPtRestr( transferPt );
-        comment << ", " << nameVar << part << " >= " << minPtParton_ << ", " << "DeltaR(parton, reco) <= " << maxDRParton_;
+        comment << ", " << nameVar << part << " >= " << minPt_ << ", " << "DeltaR(parton, reco) <= " << maxDR_;
         transferPtRestr.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPtRestr( nEtaBins_, transferPtRestr );
 
@@ -864,7 +864,7 @@ int main( int argc, char * argv[] )
                   }
                 }
                 if ( fitPtTransRebinResultPtr->Prob() > 0 ) histTransRebinPtFitMapProb->SetBinContent( uPt + 1, log10( fitPtTransRebinResultPtr->Prob() ) );
-                else histTransRebinPtFitMapProb->SetBinContent( uPt + 1, 1. );
+                else histTransRebinPtFitMapProb->SetBinContent( uPt + 1, 1 );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -903,7 +903,7 @@ int main( int argc, char * argv[] )
                   }
                 }
                 if ( fitPtTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinPtFitMapProb->SetBinContent( uPt + 1, log10( fitPtTransRestrRebinResultPtr->Prob() ) );
-                else histTransRestrRebinPtFitMapProb->SetBinContent( uPt + 1, 1. );
+                else histTransRestrRebinPtFitMapProb->SetBinContent( uPt + 1, 1 );
               }
               else {
                 if ( verbose_ > 2 ) {
@@ -1223,7 +1223,7 @@ int main( int argc, char * argv[] )
                         }
                       }
                       if ( fitEtaPtTransRebinResultPtr->Prob() > 0 ) histTransRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRebinResultPtr->Prob() ) );
-                      else histTransRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1. );
+                      else histTransRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1 );
                     }
                     else {
                       if ( verbose_ > 2 ) {
@@ -1266,7 +1266,7 @@ int main( int argc, char * argv[] )
                       }
                     }
                     if ( fitEtaPtTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, log10( fitEtaPtTransRestrRebinResultPtr->Prob() ) );
-                    else histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1. );
+                    else histTransRestrRebinEtaPtFitMapProb->SetBinContent( uPt + 1, 1 );
                   }
                   else {
                     if ( verbose_ > 2 ) {
