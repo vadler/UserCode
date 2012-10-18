@@ -89,6 +89,7 @@ if refSel:
 if runTest:
   pathPlots = ''
   #pathPlots = pathPlots.replace( 'fitTopTransferFunctions', 'fitTopTransferFunctionsTest', 2 )
+  #pathPlots = pathPlots.replace( 'fitTopTransferFunctionsTest', 'fitTopTransferFunctions', 1 )
 
 
 # Processing
