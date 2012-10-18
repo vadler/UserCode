@@ -89,6 +89,7 @@ if refSel:
 if runTest:
   pathPlots = ''
   #pathPlots = pathPlots.replace( 'fitTopL5', 'fitTopL5Test', 2 )
+  #pathPlots = pathPlots.replace( 'fitTopL5Test', 'fitTopL5', 1 )
 
 
 # Processing
@@ -143,8 +144,8 @@ process.jecL5 = cms.PSet(
 , writeFiles   = cms.bool( True )
 , pathOut      = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/jecL5_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
-#if runTest:
-  #process.jecL5.writeFiles = False
+if runTest:
+  process.jecL5.writeFiles = False
 
 
 # Messaging

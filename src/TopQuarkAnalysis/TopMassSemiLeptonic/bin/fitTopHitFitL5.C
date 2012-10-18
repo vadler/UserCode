@@ -135,7 +135,7 @@ int main( int argc, char * argv[] )
   const std::string titleEta( refGenJet_ ? "#eta^{GenJet}" : "#eta" );
   std::vector< std::string > titlesVar( 1, titleEta );
   std::vector< std::string > titlesPar( 1, titlePt );
-  const std::string titleFracL5( refGenJet_ ? "#frac{" + titlePtT + "^{RECO}}{" + titlePtT + "^{GenJet}}" : "#frac{" + titlePtT + "^{GenJet}}{" + titlePtT + "^{RECO}}" );
+  const std::string titleFracL5( refGenJet_ ? "#frac{" + titlePtT + "^{L3}}{" + titlePtT + "^{GenJet}}" : "#frac{" + titlePtT + "^{GenJet}}{" + titlePtT + "^{L3}}" );
   const std::string titleFracL5Mean( "#mu of " + titleFracL5 );
   const std::string titleFracL5Norm( "c of " + titleFracL5 );
   const std::string titleFracL5Sigma( "#sigma of " + titleFracL5 );
@@ -548,8 +548,10 @@ int main( int argc, char * argv[] )
         const std::string name( objCat + "_" + baseTitlePt + "_" + subFit );
 
         std::vector< JetCorrectorParameters::Record > jecRecords;
+
         std::vector< float > jecVarsMins( nVar_, useSymm_ ? ( float )( -etaBins_.back() ) : ( float )( etaBins_.front() ) );
         std::vector< float > jecVarsMaxs( nVar_, ( float )( etaBins_.back() ) );
+
         std::vector< float > jecPars( nPar_, 0. );
 
         const std::string nameFracL5( name + "_FracL5" );
@@ -586,9 +588,9 @@ int main( int argc, char * argv[] )
 
         JetCorrectorParameters::Record jecRecord( nVar_, jecVarsMins, jecVarsMaxs, jecPars );
         jecRecords.push_back( jecRecord );
-        JetCorrectorParameters jec( jecDefinitions, jecRecords );
 
-        if ( writeFiles_ ) {
+        JetCorrectorParameters jec( jecDefinitions, jecRecords );
+        if ( writeFiles_ && fitNonRestr_ ) {
           std::string nameOut( pathOut_ + "/gentJecL5_" + sample_ );
           if ( usePileUp_ ) nameOut.append( "_PileUp" );
           if ( refSel_)     nameOut.append( "_Ref" );
@@ -600,6 +602,7 @@ int main( int argc, char * argv[] )
         }
 
         std::vector< JetCorrectorParameters::Record > jecRecordsRestr;
+
         std::vector< float > jecParsRestr( nPar_, 0. );
 
         const std::string nameFracL5Restr( nameFracL5 + "Restr" );
@@ -636,8 +639,8 @@ int main( int argc, char * argv[] )
 
         JetCorrectorParameters::Record jecRecordRestr( nVar_, jecVarsMins, jecVarsMaxs, jecParsRestr );
         jecRecordsRestr.push_back( jecRecordRestr );
-        JetCorrectorParameters jecRestr( jecDefinitions, jecRecordsRestr );
 
+        JetCorrectorParameters jecRestr( jecDefinitions, jecRecordsRestr );
         if ( writeFiles_ ) {
           std::string nameOutRestr( pathOut_ + "/gentJecL5_" + sample_ );
           if ( usePileUp_ ) nameOutRestr.append( "_PileUp" );
@@ -757,8 +760,9 @@ int main( int argc, char * argv[] )
         } // loop: uPt < nPtBins_
 
         std::vector< JetCorrectorParameters::Record > jecRecordsPt;
-        std::vector< float > jecParsPt( nPar_, 0. );
         std::vector< JetCorrectorParameters::Record > jecRecordsPtRestr;
+
+        std::vector< float > jecParsPt( nPar_, 0. );
         std::vector< float > jecParsPtRestr( nPar_, 0. );
 
         for ( unsigned uParFit = 0; uParFit < nParFit_; ++uParFit ) {
@@ -825,36 +829,6 @@ int main( int argc, char * argv[] )
           }
         } // loop: uParFit < nParFit_
 
-        JetCorrectorParameters::Record jecRecordPt( nVar_, jecVarsMins, jecVarsMaxs, jecParsPt );
-        jecRecordsPt.push_back( jecRecordPt );
-        JetCorrectorParameters jecPt( jecDefinitions, jecRecordsPt );
-
-        if ( writeFiles_ ) {
-          std::string nameOutPt( pathOut_ + "/gentJecL5_" + sample_ );
-          if ( usePileUp_ ) nameOutPt.append( "_PileUp" );
-          if ( refSel_)     nameOutPt.append( "_Ref" );
-          nameOutPt.append( "_" + name + "_" + baseTitlePt + ".txt" );
-          jecPt.printFile( nameOutPt );
-          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                    << "    written L5 JEC file:" << std::endl
-                    << "        " << nameOutPt << std::endl;
-        }
-
-        JetCorrectorParameters::Record jecRecordPtRestr( nVar_, jecVarsMins, jecVarsMaxs, jecParsPtRestr );
-        jecRecordsPtRestr.push_back( jecRecordPtRestr );
-        JetCorrectorParameters jecPtRestr( jecDefinitions, jecRecordsPtRestr );
-
-        if ( writeFiles_ ) {
-          std::string nameOutPtRestr( pathOut_ + "/gentJecL5_" + sample_ );
-          if ( usePileUp_ ) nameOutPtRestr.append( "_PileUp" );
-          if ( refSel_)     nameOutPtRestr.append( "_Ref" );
-          nameOutPtRestr.append( "_" + name + "_" + baseTitlePt + "Restr.txt" );
-          jecPtRestr.printFile( nameOutPtRestr );
-          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                    << "    written L5 JEC file:" << std::endl
-                    << "        " << nameOutPtRestr << std::endl;
-        }
-
         if ( plot_ ) {
           for ( unsigned uParFit = 0; uParFit < nParFit_; ++uParFit ) {
             if ( fitNonRestr_ ) {
@@ -872,10 +846,41 @@ int main( int argc, char * argv[] )
           c1.Print( std::string( pathPlots_ + histFracL5RestrPtFitMapProb->GetName() + ".png" ).c_str() );
         }
 
+        JetCorrectorParameters::Record jecRecordPt( nVar_, jecVarsMins, jecVarsMaxs, jecParsPt );
+        jecRecordsPt.push_back( jecRecordPt );
+        JetCorrectorParameters::Record jecRecordPtRestr( nVar_, jecVarsMins, jecVarsMaxs, jecParsPtRestr );
+        jecRecordsPtRestr.push_back( jecRecordPtRestr );
+
+        JetCorrectorParameters jecPt( jecDefinitions, jecRecordsPt );
+        if ( writeFiles_ && fitNonRestr_ ) {
+          std::string nameOutPt( pathOut_ + "/gentJecL5_" + sample_ );
+          if ( usePileUp_ ) nameOutPt.append( "_PileUp" );
+          if ( refSel_)     nameOutPt.append( "_Ref" );
+          nameOutPt.append( "_" + name + "_Pt.txt" );
+          jecPt.printFile( nameOutPt );
+          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                    << "    written L5 JEC file:" << std::endl
+                    << "        " << nameOutPt << std::endl;
+        }
+        JetCorrectorParameters jecPtRestr( jecDefinitions, jecRecordsPtRestr );
+        if ( writeFiles_ ) {
+          std::string nameOutPtRestr( pathOut_ + "/gentJecL5_" + sample_ );
+          if ( usePileUp_ ) nameOutPtRestr.append( "_PileUp" );
+          if ( refSel_)     nameOutPtRestr.append( "_Ref" );
+          nameOutPtRestr.append( "_" + name + "_PtRestr.txt" );
+          jecPtRestr.printFile( nameOutPtRestr );
+          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                    << "    written L5 JEC file:" << std::endl
+                    << "        " << nameOutPtRestr << std::endl;
+        }
+
         // Loop over eta bins
 
         std::vector< JetCorrectorParameters::Record > jecRecordsEta( useSymm_ ? 2 * nEtaBins_ : nEtaBins_ );
         std::vector< JetCorrectorParameters::Record > jecRecordsEtaRestr( useSymm_ ? 2 * nEtaBins_ : nEtaBins_ );
+
+        std::vector< JetCorrectorParameters::Record > jecRecordsEtaPt( useSymm_ ? 2 * nEtaBins_ : nEtaBins_ );
+        std::vector< JetCorrectorParameters::Record > jecRecordsEtaPtRestr( useSymm_ ? 2 * nEtaBins_ : nEtaBins_ );
 
         std::vector< TH1D * > histVecFracL5EtaFitMap;
         std::vector< TH1D * > histVecFracL5RestrEtaFitMap;
@@ -944,6 +949,7 @@ int main( int argc, char * argv[] )
           std::vector< float > jecVarsMaxsEtaMinus( nVar_, ( float )( -etaBins_.at( uEta ) ) );
           std::vector< float > jecVarsMinsEtaPlus( nVar_, ( float )( etaBins_.at( uEta ) ) );
           std::vector< float > jecVarsMaxsEtaPlus( nVar_, ( float )( etaBins_.at( uEta + 1 ) ) );
+
           std::vector< float > jecParsEta( nPar_, 0. );
           std::vector< float > jecParsEtaRestr( nPar_, 0. );
 
@@ -1021,6 +1027,11 @@ int main( int argc, char * argv[] )
             }
           }
 
+          if ( plot_ ) {
+            histEtaFracL5Restr->Draw();
+            c1.Print( std::string( pathPlots_ + histEtaFracL5Restr->GetName() + ".png" ).c_str() );
+          }
+
           if ( useSymm_ ) {
             JetCorrectorParameters::Record jecRecordEtaMinus( nVar_, jecVarsMinsEtaMinus, jecVarsMaxsEtaMinus, jecParsEta );
             jecRecordsEta.at( nEtaBins_ - uEta - 1 ) = jecRecordEtaMinus;
@@ -1038,12 +1049,10 @@ int main( int argc, char * argv[] )
             jecRecordsEtaRestr.at( uEta ) = jecRecordEtaRestr;
           }
 
-          if ( plot_ ) {
-            histEtaFracL5Restr->Draw();
-            c1.Print( std::string( pathPlots_ + histEtaFracL5Restr->GetName() + ".png" ).c_str() );
-          }
-
           // Loop over pt bins
+
+          std::vector< float > jecParsEtaPt( nPar_, 0. );
+          std::vector< float > jecParsEtaPtRestr( nPar_, 0. );
 
           std::vector< TH1D * > histVecFracL5EtaPtFitMap;
           std::vector< TH1D * > histVecFracL5RestrEtaPtFitMap;
@@ -1152,6 +1161,70 @@ int main( int argc, char * argv[] )
 
           } // loop: uPt < nPtBins_
 
+        for ( unsigned uParFit = 0; uParFit < nParFit_; ++uParFit ) {
+          const std::string parFit( boost::lexical_cast< std::string >( uParFit ) );
+
+          if ( fitNonRestr_ ) {
+            const std::string nameFracL5EtaPtFitMap( name + "_FracL5Eta" + baseTitlePt + "_FitMap_Par" + parFit );
+            const std::string nameFracL5EtaPtFitMapFit( nameFracL5EtaPtFitMap + "_fit" );
+            TF1 * fitFracL5EtaPtFitMap( new TF1( nameFracL5EtaPtFitMapFit.c_str(), jecFunction_.c_str(), ptBins_.front(), ptBins_.back() ) );
+            fitFracL5EtaPtFitMap->SetParameter( 0, 1. );
+            TFitResultPtr fitFracL5EtaPtFitMapResultPtr( histVecFracL5EtaPtFitMap.at( uParFit )->Fit( fitFracL5EtaPtFitMap, fitOptions_.c_str() ) );
+            if ( fitFracL5EtaPtFitMapResultPtr >= 0 ) {
+              if ( fitFracL5EtaPtFitMapResultPtr->Status() == 0 && fitFracL5EtaPtFitMapResultPtr->Ndf() != 0. ) {
+                if ( uParFit == 1 ) {
+                  for ( size_t uPar = 0; uPar < nPar_; ++uPar ) {
+                    jecParsEtaPt.at( uPar ) = ( float)( fitFracL5EtaPtFitMap->GetParameter( uPar ) );
+                  }
+                }
+              }
+              else {
+                if ( verbose_ > 2 ) {
+                  std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                            << "    failing fit in directory '"; dirFit_->pwd();
+                  std::cout << "    '" << nameFracL5EtaPtFitMap << "' status " << fitFracL5EtaPtFitMapResultPtr->Status() << std::endl;
+                }
+              }
+            }
+            else {
+              if ( verbose_ > 1 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "    missing fit in directory '"; dirFit_->pwd();
+                std::cout << "    '" << nameFracL5EtaPtFitMap << std::endl;
+              }
+            }
+          }
+
+          const std::string nameFracL5RestrEtaPtFitMap( name + "_FracL5RestrEta" + baseTitlePt + "_FitMap_Par" + parFit );
+          const std::string nameFracL5RestrEtaPtFitMapFit( nameFracL5RestrEtaPtFitMap + "_fit" );
+          TF1 * fitFracL5RestrEtaPtFitMap( new TF1( nameFracL5RestrEtaPtFitMapFit.c_str(), jecFunction_.c_str(), ptBins_.front(), ptBins_.back() ) );
+          fitFracL5RestrEtaPtFitMap->SetParameter( 0, 1. );
+          TFitResultPtr fitFracL5RestrEtaPtFitMapResultPtr( histVecFracL5RestrEtaPtFitMap.at( uParFit )->Fit( fitFracL5RestrEtaPtFitMap, fitOptions_.c_str() ) );
+          if ( fitFracL5RestrEtaPtFitMapResultPtr >= 0 ) {
+            if ( fitFracL5RestrEtaPtFitMapResultPtr->Status() == 0 && fitFracL5RestrEtaPtFitMapResultPtr->Ndf() != 0. ) {
+              if ( uParFit == 1 ) {
+                for ( size_t uPar = 0; uPar < nPar_; ++uPar ) {
+                  jecParsEtaPtRestr.at( uPar ) = ( float)( fitFracL5RestrEtaPtFitMap->GetParameter( uPar ) );
+                }
+              }
+            }
+            else {
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "    failing fit in directory '"; dirFit_->pwd();
+                std::cout << "    '" << nameFracL5RestrEtaPtFitMap << "' status " << fitFracL5RestrEtaPtFitMapResultPtr->Status() << std::endl;
+              }
+            }
+          }
+          else {
+            if ( verbose_ > 1 ) {
+              std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                        << "    missing fit in directory '"; dirFit_->pwd();
+              std::cout << "    '" << nameFracL5RestrEtaPtFitMap << std::endl;
+            }
+          }
+        } // loop: uParFit < nParFit_
+
           if ( plot_ ) {
             for ( unsigned uParFit = 0; uParFit < nParFit_; ++uParFit ) {
               if ( fitNonRestr_ ) {
@@ -1169,11 +1242,27 @@ int main( int argc, char * argv[] )
             c1.Print( std::string( pathPlots_ + histFracL5RestrEtaPtFitMapProb->GetName() + ".png" ).c_str() );
           }
 
+          if ( useSymm_ ) {
+            JetCorrectorParameters::Record jecRecordEtaMinus( nVar_, jecVarsMinsEtaMinus, jecVarsMaxsEtaMinus, jecParsEtaPt );
+            jecRecordsEtaPt.at( nEtaBins_ - uEta - 1 ) = jecRecordEtaMinus;
+            JetCorrectorParameters::Record jecRecordEtaPtRestrMinus( nVar_, jecVarsMinsEtaMinus, jecVarsMaxsEtaMinus, jecParsEtaPtRestr );
+            jecRecordsEtaPtRestr.at( nEtaBins_ - uEta - 1 ) = jecRecordEtaPtRestrMinus;
+            JetCorrectorParameters::Record jecRecordEtaPlus( nVar_, jecVarsMinsEtaPlus, jecVarsMaxsEtaPlus, jecParsEtaPt );
+            jecRecordsEtaPt.at( nEtaBins_ + uEta ) = jecRecordEtaPlus;
+            JetCorrectorParameters::Record jecRecordEtaPtRestrPlus( nVar_, jecVarsMinsEtaPlus, jecVarsMaxsEtaPlus, jecParsEtaPtRestr );
+            jecRecordsEtaPtRestr.at( nEtaBins_ + uEta ) = jecRecordEtaPtRestrPlus;
+          }
+          else {
+            JetCorrectorParameters::Record jecRecordEtaPt( nVar_, jecVarsMinsEtaPlus, jecVarsMaxsEtaPlus, jecParsEtaPt );
+            jecRecordsEtaPt.at( uEta ) = jecRecordEtaPt;
+            JetCorrectorParameters::Record jecRecordEtaPtRestr( nVar_, jecVarsMinsEtaPlus, jecVarsMaxsEtaPlus, jecParsEtaPtRestr );
+            jecRecordsEtaPtRestr.at( uEta ) = jecRecordEtaPtRestr;
+          }
+
         } // loop: keyEta
 
         JetCorrectorParameters jecEta( jecDefinitions, jecRecordsEta );
-
-        if ( writeFiles_ ) {
+        if ( writeFiles_ && fitNonRestr_ ) {
           std::string nameOutEta( pathOut_ + "/gentJecL5_" + sample_ );
           if ( usePileUp_ ) nameOutEta.append( "_PileUp" );
           if ( refSel_)     nameOutEta.append( "_Ref" );
@@ -1183,9 +1272,7 @@ int main( int argc, char * argv[] )
                     << "    written L5 JEC file:" << std::endl
                     << "        " << nameOutEta << std::endl;
         }
-
         JetCorrectorParameters jecEtaRestr( jecDefinitions, jecRecordsEtaRestr );
-
         if ( writeFiles_ ) {
           std::string nameOutEtaRestr( pathOut_ + "/gentJecL5_" + sample_ );
           if ( usePileUp_ ) nameOutEtaRestr.append( "_PileUp" );
@@ -1195,6 +1282,29 @@ int main( int argc, char * argv[] )
           std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                     << "    written L5 JEC file:" << std::endl
                     << "        " << nameOutEtaRestr << std::endl;
+        }
+
+        JetCorrectorParameters jecEtaPt( jecDefinitions, jecRecordsEtaPt );
+        if ( writeFiles_ && fitNonRestr_ ) {
+          std::string nameOutEtaPt( pathOut_ + "/gentJecL5_" + sample_ );
+          if ( usePileUp_ ) nameOutEtaPt.append( "_PileUp" );
+          if ( refSel_)     nameOutEtaPt.append( "_Ref" );
+          nameOutEtaPt.append( "_" + name + "_EtaPt.txt" );
+          jecEtaPt.printFile( nameOutEtaPt );
+          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                    << "    written L5 JEC file:" << std::endl
+                    << "        " << nameOutEtaPt << std::endl;
+        }
+        JetCorrectorParameters jecEtaPtRestr( jecDefinitions, jecRecordsEtaPtRestr );
+        if ( writeFiles_ ) {
+          std::string nameOutEtaPtRestr( pathOut_ + "/gentJecL5_" + sample_ );
+          if ( usePileUp_ ) nameOutEtaPtRestr.append( "_PileUp" );
+          if ( refSel_)     nameOutEtaPtRestr.append( "_Ref" );
+          nameOutEtaPtRestr.append( "_" + name + "_EtaPtRestr.txt" );
+          jecEtaPtRestr.printFile( nameOutEtaPtRestr );
+          std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                    << "    written L5 JEC file:" << std::endl
+                    << "        " << nameOutEtaPtRestr << std::endl;
         }
 
         if ( plot_ ) {
