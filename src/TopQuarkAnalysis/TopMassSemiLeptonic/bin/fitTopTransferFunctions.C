@@ -125,13 +125,14 @@ int main( int argc, char * argv[] )
   const std::string nameFuncClass( "TF1" );
   if      ( verbose_ < 3 ) fitOptions_.append( "Q" );
   else if ( verbose_ > 4 ) fitOptions_.append( "V" );
-  const std::string baseVarL( useAlt_ ? "E" : "p" );
-  const std::string baseVarC( useAlt_ ? "E" : "P" );
-  const std::string nameVar( useNonT_ ? baseVarC : baseVarC + "t" );
-  const std::string titleVar( useNonT_ ? baseVarL : baseVarL + "_{t}" );
-  const std::string titleX( refGen_ ? titleVar + "^{GEN} (GeV)" : titleVar + " (GeV)" );
-  const std::string titleEta( refGen_ ? "#eta^{GEN}" : "#eta" );
-  const std::string titleTrans( refGen_ ? "#Delta" + titleVar + "^{GEN} (GeV)" : "#Delta" + titleVar + "^{RECO} (GeV)" );
+  const std::string baseTitlePtL( useAlt_ ? "E" : "p" );
+  const std::string baseTitlePtU( useAlt_ ? "E" : "P" );
+  const std::string baseTitlePt( useNonT_ ? baseTitlePtU : baseTitlePtU + "t" );
+  const std::string titlePtT( useNonT_ ? baseTitlePtL : baseTitlePtL + "_{t}" );
+  const std::string titlePt( refGen_ ? titlePtT + "^{GEN} (GeV)" : titlePtT + " (GeV)" );
+  const std::string baseTitleEta( useSymm_ ? "|#eta|" : "#eta" );
+  const std::string titleEta( refGen_ ? baseTitleEta + "^{GEN}" : baseTitleEta + "^{RECO}" );
+  const std::string titleTrans( refGen_ ? "#Delta" + titlePtT + "^{GEN} (GeV)" : "#Delta" + titlePtT + "^{RECO} (GeV)" );
   const std::string titleTransMean( "#mu of " + titleTrans );
   const std::string titleTransNorm( "c of " + titleTrans );
   const std::string titleTransSigma( "#sigma of " + titleTrans );
@@ -335,7 +336,7 @@ int main( int argc, char * argv[] )
       }
       dirFit_->cd();
 
-      std::string name( objCat + "_" + nameVar + "_" + subFit );
+      std::string name( objCat + "_" + baseTitlePt + "_" + subFit );
 
       const std::string nameTrans( name + "_Trans" );
       TH1D * histTrans( new TH1D( nameTrans.c_str(), objCat.c_str(), histBins_, -histMax_, histMax_ ) );
@@ -351,9 +352,9 @@ int main( int argc, char * argv[] )
       std::vector< TH1D * > histVecPtTransRestr;
       for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
         const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
-        const std::string namePt( name + "_" + nameVar + binPt );
+        const std::string namePt( name + "_" + baseTitlePt + binPt );
         const std::string namePtTrans( namePt + "_Trans" );
-        const std::string titlePtTrans( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq " + titleVar + " < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
+        const std::string titlePtTrans( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq " + titlePtT + " < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
         TH1D * histPtTrans( new TH1D( namePtTrans.c_str(), titlePtTrans.c_str(), histBins_, -histMax_, histMax_ ) );
         histPtTrans->SetXTitle( titleTrans.c_str() );
         histPtTrans->SetYTitle( titleEvents.c_str() );
@@ -426,14 +427,14 @@ int main( int argc, char * argv[] )
           if ( sizePt.at( uPt ) == 0 ) {
             if ( verbose_ > 2 ) {
               std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                        << "    empty bin " << uPt << " in '" << nameEta << "' for " + titleVar + " bin " << uPt  << std::endl;
+                        << "    empty bin " << uPt << " in '" << nameEta << "' for " + titlePtT + " bin " << uPt  << std::endl;
             }
           }
 
-          const std::string nameEtaPt( nameEta + "_" + nameVar + binPt );
+          const std::string nameEtaPt( nameEta + "_" + baseTitlePt + binPt );
 
           const std::string nameEtaPtTrans( nameEtaPt + "_Trans" );
-          const std::string titleEtaPtTrans( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq " + titleVar + " < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
+          const std::string titleEtaPtTrans( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq " + titlePtT + " < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
           TH1D * histEtaPtTrans( new TH1D( nameEtaPtTrans.c_str(), titleEtaPtTrans.c_str(), histBins_, -histMax_, histMax_  ) );
           histEtaPtTrans->SetXTitle( titleTrans.c_str() );
           histEtaPtTrans->SetYTitle( titleEvents.c_str() );
@@ -604,10 +605,10 @@ int main( int argc, char * argv[] )
       std::vector< TH1D * > histVecPtTransRestrRebin;
       for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
         const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
-        const std::string namePt( name + "_" + nameVar + binPt );
+        const std::string namePt( name + "_" + baseTitlePt + binPt );
         const std::string namePtTrans( namePt + "_Trans" );
         const std::string namePtTransRebin( namePtTrans + "Rebin" );
-        const std::string titlePtTrans( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq " + titleVar + " < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
+        const std::string titlePtTrans( objCat + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq " + titlePtT + " < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
         const Double_t meanPtTrans( histVecPtTrans.at( uPt )->GetMean() );
         const Double_t widthPtTrans( std::fabs( histVecPtTrans.at( uPt )->GetRMS() ) );
         if ( fitNonRestr_ && widthPtTrans == 0. && verbose_ > 2 ) {
@@ -719,17 +720,17 @@ int main( int argc, char * argv[] )
         }
         dirFit_->cd();
 
-        std::string name( objCat + "_" + nameVar + "_" + subFit );
+        std::string name( objCat + "_" + baseTitlePt + "_" + subFit );
 
         // Transfer function parameters
         const std::string part( refGen_ ? "_parton" : "_reco" );
         std::stringstream comment( std::ios_base::out );
-        my::TransferFunction transferPt( fitFunction_, dependencyFunction_, std::string( titleVar + part ) );
-        comment << nameVar << part << " <= " << fitMaxPt_;
+        my::TransferFunction transferPt( fitFunction_, dependencyFunction_, std::string( titlePtT + part ) );
+        comment << baseTitlePt << part << " <= " << fitMaxPt_;
         transferPt.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPt( nEtaBins_, transferPt );
         my::TransferFunction transferPtRestr( transferPt );
-        comment << ", " << nameVar << part << " >= " << minPt_ << ", " << "DeltaR(parton, reco) <= " << maxDR_;
+        comment << ", " << baseTitlePt << part << " >= " << minPt_ << ", " << "DeltaR(parton, reco) <= " << maxDR_;
         transferPtRestr.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPtRestr( nEtaBins_, transferPtRestr );
 
@@ -821,29 +822,29 @@ int main( int argc, char * argv[] )
         std::vector< TH1D * > histVecTransRestrRebinPtFitMap;
         for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
           const std::string parFit( boost::lexical_cast< std::string >( uPar ) );
-          const std::string nameTransRebinPtFitMap( nameTransRebin + nameVar + "_FitMap_Par" + parFit );
+          const std::string nameTransRebinPtFitMap( nameTransRebin + baseTitlePt + "_FitMap_Par" + parFit );
           const std::string titleTransRebinPtFitMap( objCat + ", par. " + parFit );
           TH1D * histTransRebinPtFitMap( new TH1D( nameTransRebinPtFitMap.c_str(), titleTransRebinPtFitMap.c_str(), nPtBins_, ptBins_.data() ) );
-          histTransRebinPtFitMap->SetXTitle( titleX.c_str() );
+          histTransRebinPtFitMap->SetXTitle( titlePt.c_str() );
           histVecTransRebinPtFitMap.push_back( histTransRebinPtFitMap );
-          const std::string nameTransRestrRebinPtFitMap( nameTransRestrRebin + nameVar + "_FitMap_Par" + parFit );
+          const std::string nameTransRestrRebinPtFitMap( nameTransRestrRebin + baseTitlePt + "_FitMap_Par" + parFit );
           TH1D * histTransRestrRebinPtFitMap( new TH1D( nameTransRestrRebinPtFitMap.c_str(), titleTransRebinPtFitMap.c_str(), nPtBins_, ptBins_.data() ) );
-          histTransRestrRebinPtFitMap->SetXTitle( titleX.c_str() );
+          histTransRestrRebinPtFitMap->SetXTitle( titlePt.c_str() );
           histVecTransRestrRebinPtFitMap.push_back( histTransRestrRebinPtFitMap );
         }
         const std::string titleTransRebinPtFitMapProb( objCat + ", fit prob." );
-        const std::string nameTransRebinPtFitMapProb( nameTransRebin + nameVar + "_FitMap_Prob" );
+        const std::string nameTransRebinPtFitMapProb( nameTransRebin + baseTitlePt + "_FitMap_Prob" );
         TH1D * histTransRebinPtFitMapProb( new TH1D( nameTransRebinPtFitMapProb.c_str(), titleTransRebinPtFitMapProb.c_str(), nPtBins_, ptBins_.data() ) );
-        histTransRebinPtFitMapProb->SetXTitle( titleX.c_str() );
+        histTransRebinPtFitMapProb->SetXTitle( titlePt.c_str() );
         histTransRebinPtFitMapProb->SetYTitle( titleProb.c_str() );
-        const std::string nameTransRestrRebinPtFitMapProb( nameTransRestrRebin + nameVar + "_FitMap_Prob" );
+        const std::string nameTransRestrRebinPtFitMapProb( nameTransRestrRebin + baseTitlePt + "_FitMap_Prob" );
         TH1D * histTransRestrRebinPtFitMapProb( new TH1D( nameTransRestrRebinPtFitMapProb.c_str(), titleTransRebinPtFitMapProb.c_str(), nPtBins_, ptBins_.data() ) );
-        histTransRestrRebinPtFitMapProb->SetXTitle( titleX.c_str() );
+        histTransRestrRebinPtFitMapProb->SetXTitle( titlePt.c_str() );
         histTransRestrRebinPtFitMapProb->SetYTitle( titleProb.c_str() );
 
         for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
           const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
-          const std::string namePt( name + "_" + nameVar + binPt );
+          const std::string namePt( name + "_" + baseTitlePt + binPt );
 
           const std::string namePtTransRebin( namePt + "_TransRebin" );
           TH1D * histPtTransRebin( ( TH1D* )( dirFit_->Get( namePtTransRebin.c_str() ) ) );
@@ -937,7 +938,7 @@ int main( int argc, char * argv[] )
           const std::string parFit( boost::lexical_cast< std::string >( uPar ) );
 
           if ( fitNonRestr_ ) {
-            const std::string nameTransRebinPtFitMap( name + "_TransRebin" + nameVar + "_FitMap_Par" + parFit );
+            const std::string nameTransRebinPtFitMap( name + "_TransRebin" + baseTitlePt + "_FitMap_Par" + parFit );
             const std::string nameTransRebinPtFitMapFit( nameTransRebinPtFitMap + "_fit" );
             TF1 * fitTransRebinPtFitMap( new TF1( nameTransRebinPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
             setParametersDependency( fitTransRebinPtFitMap, histVecTransRebinPtFitMap.at( uPar ) );
@@ -965,7 +966,7 @@ int main( int argc, char * argv[] )
             }
           }
 
-          const std::string nameTransRestrRebinPtFitMap( name + "_TransRestrRebin" + nameVar + "_FitMap_Par" + parFit );
+          const std::string nameTransRestrRebinPtFitMap( name + "_TransRestrRebin" + baseTitlePt + "_FitMap_Par" + parFit );
           const std::string nameTransRestrRebinPtFitMapFit( nameTransRestrRebinPtFitMap + "_fit" );
           TF1 * fitTransRestrRebinPtFitMap( new TF1( nameTransRestrRebinPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
           setParametersDependency( fitTransRestrRebinPtFitMap, histVecTransRestrRebinPtFitMap.at( uPar ) );
@@ -1177,30 +1178,30 @@ int main( int argc, char * argv[] )
             std::vector< TH1D * > histVecTransRestrRebinEtaPtFitMap;
             for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
               const std::string parFit( boost::lexical_cast< std::string >( uPar ) );
-              const std::string nameTransRebinEtaPtFitMap( nameEta + "_TransRebin" + nameVar + "_FitMap_Par" + parFit );
+              const std::string nameTransRebinEtaPtFitMap( nameEta + "_TransRebin" + baseTitlePt + "_FitMap_Par" + parFit );
               const std::string titleTransRebinEtaPtFitMap( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", par. " + parFit );
               TH1D * histTransRebinEtaPtFitMap( new TH1D( nameTransRebinEtaPtFitMap.c_str(), titleTransRebinEtaPtFitMap.c_str(), nPtBins_, ptBins_.data() ) );
-              histTransRebinEtaPtFitMap->SetXTitle( titleX.c_str() );
+              histTransRebinEtaPtFitMap->SetXTitle( titlePt.c_str() );
               histVecTransRebinEtaPtFitMap.push_back( histTransRebinEtaPtFitMap );
-              const std::string nameTransRestrRebinEtaPtFitMap( nameEta + "_TransRestrRebin" + nameVar + "_FitMap_Par" + parFit );
+              const std::string nameTransRestrRebinEtaPtFitMap( nameEta + "_TransRestrRebin" + baseTitlePt + "_FitMap_Par" + parFit );
               TH1D * histTransRestrRebinEtaPtFitMap( new TH1D( nameTransRestrRebinEtaPtFitMap.c_str(), titleTransRebinEtaPtFitMap.c_str(), nPtBins_, ptBins_.data() ) );
-              histTransRestrRebinEtaPtFitMap->SetXTitle( titleX.c_str() );
+              histTransRestrRebinEtaPtFitMap->SetXTitle( titlePt.c_str() );
               histVecTransRestrRebinEtaPtFitMap.push_back( histTransRestrRebinEtaPtFitMap );
             }
             const std::string titleTransRebinEtaPtFitMapProb( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", fit prob." );
-            const std::string nameTransRebinEtaPtFitMapProb( nameEtaTransRebin + nameVar + "_FitMap_Prob" );
+            const std::string nameTransRebinEtaPtFitMapProb( nameEtaTransRebin + baseTitlePt + "_FitMap_Prob" );
             TH1D * histTransRebinEtaPtFitMapProb( new TH1D( nameTransRebinEtaPtFitMapProb.c_str(), titleTransRebinEtaPtFitMapProb.c_str(), nPtBins_, ptBins_.data() ) );
-            histTransRebinEtaPtFitMapProb->SetXTitle( titleX.c_str() );
+            histTransRebinEtaPtFitMapProb->SetXTitle( titlePt.c_str() );
             histTransRebinEtaPtFitMapProb->SetYTitle( titleProb.c_str() );
-            const std::string nameTransRestrRebinEtaPtFitMapProb( nameEtaTransRestrRebin + nameVar + "_FitMap_Prob" );
+            const std::string nameTransRestrRebinEtaPtFitMapProb( nameEtaTransRestrRebin + baseTitlePt + "_FitMap_Prob" );
             TH1D * histTransRestrRebinEtaPtFitMapProb( new TH1D( nameTransRestrRebinEtaPtFitMapProb.c_str(), titleTransRebinEtaPtFitMapProb.c_str(), nPtBins_, ptBins_.data() ) );
-            histTransRestrRebinEtaPtFitMapProb->SetXTitle( titleX.c_str() );
+            histTransRestrRebinEtaPtFitMapProb->SetXTitle( titlePt.c_str() );
             histTransRestrRebinEtaPtFitMapProb->SetYTitle( titleProb.c_str() );
 
             for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
               const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
 
-              const std::string nameEtaPt( nameEta + "_" + nameVar + binPt );
+              const std::string nameEtaPt( nameEta + "_" + baseTitlePt + binPt );
               const std::string nameEtaPtTrans( nameEtaPt + "_Trans" );
 
               if ( fitNonRestr_ ) {
@@ -1312,7 +1313,7 @@ int main( int argc, char * argv[] )
               const std::string parFit( boost::lexical_cast< std::string >( uPar ) );
 
               if ( fitNonRestr_ ) {
-                const std::string nameTransRebinEtaPtFitMap( nameEta + "_TransRebin" + nameVar + "_FitMap_Par" + parFit );
+                const std::string nameTransRebinEtaPtFitMap( nameEta + "_TransRebin" + baseTitlePt + "_FitMap_Par" + parFit );
                 const std::string nameTransRebinEtaPtFitMapFit( nameTransRebinEtaPtFitMap + "_fit" );
                 TF1 * fitTransRebinEtaPtFitMap( new TF1( nameTransRebinEtaPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
                 setParametersDependency( fitTransRebinEtaPtFitMap, histVecTransRebinEtaPtFitMap.at( uPar ) );
@@ -1344,7 +1345,7 @@ int main( int argc, char * argv[] )
                 }
               }
 
-              const std::string nameTransRestrRebinEtaPtFitMap( nameEta + "_TransRestrRebin" + nameVar + "_FitMap_Par" + parFit );
+              const std::string nameTransRestrRebinEtaPtFitMap( nameEta + "_TransRestrRebin" + baseTitlePt + "_FitMap_Par" + parFit );
               const std::string nameTransRestrRebinEtaPtFitMapFit( nameTransRestrRebinEtaPtFitMap + "_fit" );
               TF1 * fitTransRestrRebinEtaPtFitMap( new TF1( nameTransRestrRebinEtaPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
               setParametersDependency( fitTransRestrRebinEtaPtFitMap, histVecTransRestrRebinEtaPtFitMap.at( uPar ) );
