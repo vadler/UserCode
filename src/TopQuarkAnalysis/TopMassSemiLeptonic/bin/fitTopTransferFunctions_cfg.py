@@ -33,8 +33,8 @@ widthFactor = 5. # for rebinning (in units of orig. RMS)
 doFit          = True
 fitMaxPt       = 999999.
 #fitMaxPt       = 200.
-fitNonRestr    = True
-fitEtaBins     = True
+fitNonRestr    = False
+fitEtaBins     = False
 #minPt    = 0.
 #minPt    = 20.
 minPt    = 50.
@@ -87,9 +87,9 @@ pathPlots = '%s/output/plots/fitTopTransferFunctions/fitTopTransferFunctions_fro
 if refSel:
   pathPlots += 'Ref_'
 if runTest:
-  pathPlots = ''
-  #pathPlots = pathPlots.replace( 'fitTopTransferFunctions', 'fitTopTransferFunctionsTest', 2 )
-  #pathPlots = pathPlots.replace( 'fitTopTransferFunctionsTest', 'fitTopTransferFunctions', 1 )
+  #pathPlots = ''
+  pathPlots = pathPlots.replace( 'fitTopTransferFunctions', 'fitTopTransferFunctionsTest', 2 )
+  pathPlots = pathPlots.replace( 'fitTopTransferFunctionsTest', 'fitTopTransferFunctions', 1 )
 
 
 # Processing
@@ -135,9 +135,9 @@ process.fit = cms.PSet(
 , minPt  = cms.double( minPt )
 , maxDR  = cms.double( maxDR )
 )
-#if runTest:
-  #process.fit.fitNonRestr = False
-  #process.fit.fitEtaBins  = False
+if runTest:
+  process.fit.fitNonRestr = False
+  process.fit.fitEtaBins  = False
 
 process.transfer = cms.PSet(
   doFit       = cms.bool( doFit )
@@ -150,8 +150,8 @@ process.transfer = cms.PSet(
 , writeFiles  = cms.bool( True )
 , pathOut     = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
-if runTest:
-  process.transfer.writeFiles = False
+#if runTest:
+  #process.transfer.writeFiles = False
 
 
 # Messaging

@@ -132,7 +132,7 @@ int main( int argc, char * argv[] )
   const std::string titlePt( refGen_ ? titlePtT + "^{GEN} (GeV)" : titlePtT + " (GeV)" );
   const std::string baseTitleEta( useSymm_ ? "|#eta|" : "#eta" );
   const std::string titleEta( refGen_ ? baseTitleEta + "^{GEN}" : baseTitleEta + "^{RECO}" );
-  const std::string titleTrans( refGen_ ? "#Delta" + titlePtT + "^{GEN} (GeV)" : "#Delta" + titlePtT + "^{RECO} (GeV)" );
+  const std::string titleTrans( refGen_ ? "#Delta" + titlePtT + " (GeV)" : "#Delta" + titlePtT + " (GeV)" );
   const std::string titleTransMean( "#mu of " + titleTrans );
   const std::string titleTransNorm( "c of " + titleTrans );
   const std::string titleTransSigma( "#sigma of " + titleTrans );
@@ -197,6 +197,9 @@ int main( int argc, char * argv[] )
     fileOut_->cd();
     dirOutSel_ = new TDirectory( evtSel_.c_str(), "" );
   }
+
+  TCanvas c1( "c1" );
+  c1.cd();
 
   // Loops through directory structure
 
@@ -286,7 +289,7 @@ int main( int argc, char * argv[] )
       else                data_->SetBranchAddress( "BinEta"   , &iEta );
     Int_t nEntries( ( Int_t )data_->GetEntries() );
     if ( objCat == "UdscJet" || objCat == "BJet" ) assert( nEntries % 2 == 0 ); // need two jet entries per event
-    std::vector< unsigned > sizeEta_( nEtaBins_ );
+    std::vector< unsigned > sizeEta_( nEtaBins_, 0 );
     for ( Int_t iEntry = 0; iEntry < nEntries; ++iEntry ) {
       data_->GetEntry( iEntry );
       assert( iEta < ( Int_t )( nEtaBins_ ) ); // has to fit (and be consistent)
@@ -342,14 +345,36 @@ int main( int argc, char * argv[] )
       TH1D * histTrans( new TH1D( nameTrans.c_str(), objCat.c_str(), histBins_, -histMax_, histMax_ ) );
       histTrans->SetXTitle( titleTrans.c_str() );
       histTrans->SetYTitle( titleEvents.c_str() );
+      const std::string nameTransMapPt( nameTrans + "_Map_Pt" );
+      TH2D * histTransMapPt( new TH2D( nameTransMapPt.c_str(), objCat.c_str(), nPtBins_, ptBins_.data(), histBins_, -histMax_, histMax_ ) );
+      histTransMapPt->SetXTitle( titlePt.c_str() );
+      histTransMapPt->SetYTitle( titleTrans.c_str() );
+      histTransMapPt->SetZTitle( titleEvents.c_str() );
+      const std::string nameTransMapEta( nameTrans + "_Map_Eta" );
+      TH2D * histTransMapEta( new TH2D( nameTransMapEta.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), histBins_, -histMax_, histMax_ ) );
+      histTransMapEta->SetXTitle( titleEta.c_str() );
+      histTransMapEta->SetYTitle( titleTrans.c_str() );
+      histTransMapEta->SetZTitle( titleEvents.c_str() );
 
       const std::string nameTransRestr( nameTrans + "Restr" );
       TH1D * histTransRestr( new TH1D( nameTransRestr.c_str(), objCat.c_str(), histBins_, -histMax_, histMax_ ) );
       histTransRestr->SetXTitle( titleTrans.c_str() );
       histTransRestr->SetYTitle( titleEvents.c_str() );
+      const std::string nameTransRestrMapPt( nameTransRestr + "_Map_Pt" );
+      TH2D * histTransRestrMapPt( new TH2D( nameTransRestrMapPt.c_str(), objCat.c_str(), nPtBins_, ptBins_.data(), histBins_, -histMax_, histMax_ ) );
+      histTransRestrMapPt->SetXTitle( titlePt.c_str() );
+      histTransRestrMapPt->SetYTitle( titleTrans.c_str() );
+      histTransRestrMapPt->SetZTitle( titleEvents.c_str() );
+      const std::string nameTransRestrMapEta( nameTransRestr + "_Map_Eta" );
+      TH2D * histTransRestrMapEta( new TH2D( nameTransRestrMapEta.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), histBins_, -histMax_, histMax_ ) );
+      histTransRestrMapEta->SetXTitle( titleEta.c_str() );
+      histTransRestrMapEta->SetYTitle( titleTrans.c_str() );
+      histTransRestrMapEta->SetZTitle( titleEvents.c_str() );
 
       std::vector< TH1D * > histVecPtTrans;
+      std::vector< TH2D * > histVecPtTransMapEta;
       std::vector< TH1D * > histVecPtTransRestr;
+      std::vector< TH2D * > histVecPtTransRestrMapEta;
       for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
         const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
         const std::string namePt( name + "_" + baseTitlePt + binPt );
@@ -359,11 +384,23 @@ int main( int argc, char * argv[] )
         histPtTrans->SetXTitle( titleTrans.c_str() );
         histPtTrans->SetYTitle( titleEvents.c_str() );
         histVecPtTrans.push_back( histPtTrans );
+        const std::string namePtTransMapEta( namePtTrans + "_Map_Eta" );
+        TH2D * histPtTransMapEta( new TH2D( namePtTransMapEta.c_str(), titlePtTrans.c_str(), nEtaBins_, etaBins_.data(), histBins_, -histMax_, histMax_ ) );
+        histPtTransMapEta->SetXTitle( titleEta.c_str() );
+        histPtTransMapEta->SetYTitle( titleTrans.c_str() );
+        histPtTransMapEta->SetZTitle( titleEvents.c_str() );
+        histVecPtTransMapEta.push_back( histPtTransMapEta );
         const std::string namePtTransRestr( namePtTrans + "Restr" );
         TH1D * histPtTransRestr( new TH1D( namePtTransRestr.c_str(), titlePtTrans.c_str(), histBins_, -histMax_, histMax_ ) );
         histPtTransRestr->SetXTitle( titleTrans.c_str() );
         histPtTransRestr->SetYTitle( titleEvents.c_str() );
         histVecPtTransRestr.push_back( histPtTransRestr );
+        const std::string namePtTransRestrMapEta( namePtTransRestr + "_Map_Eta" );
+        TH2D * histPtTransRestrMapEta( new TH2D( namePtTransRestrMapEta.c_str(), titlePtTrans.c_str(), nEtaBins_, etaBins_.data(), histBins_, -histMax_, histMax_ ) );
+        histPtTransRestrMapEta->SetXTitle( titleEta.c_str() );
+        histPtTransRestrMapEta->SetYTitle( titleTrans.c_str() );
+        histPtTransRestrMapEta->SetZTitle( titleEvents.c_str() );
+        histVecPtTransRestrMapEta.push_back( histPtTransRestrMapEta );
       }
 
       // Loop over eta bins
@@ -376,7 +413,8 @@ int main( int argc, char * argv[] )
         ++sizeEtaBins;
         const std::string binEta( keyEta->GetName() );
         const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
-        dirFit_->cd( binEta.c_str() );
+        TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
+        dirEta_->cd();
         if ( verbose_ > 1 ) gDirectory->pwd();
 
         const std::string nameEta( name + "_" + binEta );
@@ -386,11 +424,21 @@ int main( int argc, char * argv[] )
         TH1D * histEtaTrans( new TH1D( nameEtaTrans.c_str(), titleEtaTrans.c_str(), histBins_, -histMax_, histMax_ ) );
         histEtaTrans->SetXTitle( titleTrans.c_str() );
         histEtaTrans->SetYTitle( titleEvents.c_str() );
+        const std::string nameEtaTransMapPt( nameEtaTrans + "_Map_Pt" );
+        TH2D * histEtaTransMapPt( new TH2D( nameEtaTransMapPt.c_str(), titleEtaTrans.c_str(), nPtBins_, ptBins_.data(), histBins_, -histMax_, histMax_ ) );
+        histEtaTransMapPt->SetXTitle( titlePt.c_str() );
+        histEtaTransMapPt->SetYTitle( titleTrans.c_str() );
+        histEtaTransMapPt->SetZTitle( titleEvents.c_str() );
 
         const std::string nameEtaTransRestr( nameEtaTrans + "Restr" );
         TH1D * histEtaTransRestr( new TH1D( nameEtaTransRestr.c_str(), titleEtaTrans.c_str(), histBins_, -histMax_, histMax_ ) );
         histEtaTransRestr->SetXTitle( titleTrans.c_str() );
         histEtaTransRestr->SetYTitle( titleEvents.c_str() );
+        const std::string nameEtaTransRestrMapPt( nameEtaTransRestr + "_Map_Pt" );
+        TH2D * histEtaTransRestrMapPt( new TH2D( nameEtaTransRestrMapPt.c_str(), titleEtaTrans.c_str(), nPtBins_, ptBins_.data(), histBins_, -histMax_, histMax_ ) );
+        histEtaTransRestrMapPt->SetXTitle( titlePt.c_str() );
+        histEtaTransRestrMapPt->SetYTitle( titleTrans.c_str() );
+        histEtaTransRestrMapPt->SetZTitle( titleEvents.c_str() );
 
         // Split data into p_t bins
         DataCont weightEtaBin( nPtBins_ );
@@ -435,45 +483,66 @@ int main( int argc, char * argv[] )
 
           const std::string nameEtaPtTrans( nameEtaPt + "_Trans" );
           const std::string titleEtaPtTrans( objCat + ", " + boost::lexical_cast< std::string >( etaBins_.at( uEta ) ) + " #leq #eta < " + boost::lexical_cast< std::string >( etaBins_.at( uEta + 1 ) ) + ", " + boost::lexical_cast< std::string >( ptBins_.at( uPt ) ) + " GeV #leq " + titlePtT + " < " + boost::lexical_cast< std::string >( ptBins_.at( uPt + 1 ) ) + " GeV" );
-          TH1D * histEtaPtTrans( new TH1D( nameEtaPtTrans.c_str(), titleEtaPtTrans.c_str(), histBins_, -histMax_, histMax_  ) );
+          TH1D * histEtaPtTrans( new TH1D( nameEtaPtTrans.c_str(), titleEtaPtTrans.c_str(), histBins_, -histMax_, histMax_ ) );
           histEtaPtTrans->SetXTitle( titleTrans.c_str() );
           histEtaPtTrans->SetYTitle( titleEvents.c_str() );
 
           const std::string nameEtaPtTransRestr( nameEtaPtTrans + "Restr" );
-          TH1D * histEtaPtTransRestr( new TH1D( nameEtaPtTransRestr.c_str(), titleEtaPtTrans.c_str(), histBins_, -histMax_, histMax_  ) );
+          TH1D * histEtaPtTransRestr( new TH1D( nameEtaPtTransRestr.c_str(), titleEtaPtTrans.c_str(), histBins_, -histMax_, histMax_ ) );
           histEtaPtTransRestr->SetXTitle( titleTrans.c_str() );
           histEtaPtTransRestr->SetYTitle( titleEvents.c_str() );
 
           for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
-            if ( refGen_ ) {
-              if ( fitNonRestr_ ) {
-                histEtaPtTrans->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histVecPtTrans.at( uPt )->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaTrans->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histTrans->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-                histEtaPtTransRestr->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histVecPtTransRestr.at( uPt )->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaTransRestr->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histTransRestr->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
+            const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
+            if ( fitNonRestr_ ) {
+              histEtaPtTrans->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histVecPtTrans.at( uPt )->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histEtaTrans->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histTrans->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
             }
-            else {
-              if ( fitNonRestr_ ) {
-                histEtaPtTrans->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histVecPtTrans.at( uPt )->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaTrans->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histTrans->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
-              if ( ptEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-                histEtaPtTransRestr->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histVecPtTransRestr.at( uPt )->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaTransRestr->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histTransRestr->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
+            if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
+              histEtaPtTransRestr->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histVecPtTransRestr.at( uPt )->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histEtaTransRestr->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histTransRestr->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
             }
           } // loop: uEntry < ptEtaBin.at( uPt ).size()
+          if ( fitNonRestr_ && histEtaPtTrans->GetSumOfWeights() != 0. ) {
+            for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
+              const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
+              const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
+              const Double_t etaGenSymm( useSymm_ ? std::fabs( etaGenEtaBin.at( uPt ).at( uEntry ) ) : etaGenEtaBin.at( uPt ).at( uEntry ) );
+              const Double_t etaSymm( useSymm_ ? std::fabs( etaEtaBin.at( uPt ).at( uEntry ) ) : etaEtaBin.at( uPt ).at( uEntry ) );
+              const Double_t etaRef( refGen_ ? etaGenSymm : etaSymm );
+              const Double_t weight( weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTrans->GetSumOfWeights() );
+              if ( fitNonRestr_ ) {
+                histEtaTransMapPt->Fill( ptRef, value, weight );
+                histVecPtTransMapEta.at( uPt )->Fill( etaRef, value, weight );
+                histTransMapPt->Fill( ptRef, value, weight );
+                histTransMapEta->Fill( etaRef, value, weight );
+              }
+            } // loop: uEntry < ptEtaBin.at( uPt ).size()
+          }
+          if ( histEtaPtTransRestr->GetSumOfWeights() != 0. ) {
+            for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
+              const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
+              const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
+              const Double_t etaGenSymm( useSymm_ ? std::fabs( etaGenEtaBin.at( uPt ).at( uEntry ) ) : etaGenEtaBin.at( uPt ).at( uEntry ) );
+              const Double_t etaSymm( useSymm_ ? std::fabs( etaEtaBin.at( uPt ).at( uEntry ) ) : etaEtaBin.at( uPt ).at( uEntry ) );
+              const Double_t etaRef( refGen_ ? etaGenSymm : etaSymm );
+              const Double_t weight( weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRestr->GetSumOfWeights() );
+              if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
+                histEtaTransRestrMapPt->Fill( ptRef, value, weight );
+                histVecPtTransRestrMapEta.at( uPt )->Fill( etaRef, value, weight);
+                histTransRestrMapPt->Fill( ptRef, value, weight );
+                histTransRestrMapEta->Fill( etaRef, value, weight );
+              }
+            } // loop: uEntry < ptEtaBin.at( uPt ).size()
+          }
+
+          if ( histEtaPtTrans->GetSumOfWeights() != 0. ) histEtaPtTrans->Scale( 1. / histEtaPtTrans->GetSumOfWeights() );
+          if ( histEtaPtTransRestr->GetSumOfWeights() != 0. ) histEtaPtTransRestr->Scale( 1. / histEtaPtTransRestr->GetSumOfWeights() );
 
           const std::string nameEtaPtTransRebin( nameEtaPtTrans + "Rebin" );
           const Double_t meanEtaPtTrans( histEtaPtTrans->GetMean() );
@@ -483,7 +552,7 @@ int main( int argc, char * argv[] )
                       << "    no histogram \"width\" in '" << nameEtaPtTrans << "'" << std::endl;
           }
           const Double_t rangeEtaPtTransRebin( widthEtaPtTrans == 0. ? widthFactor_ * std::fabs( histEtaPtTrans->GetXaxis()->GetXmax() ) : widthFactor_ * widthEtaPtTrans ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-          TH1D * histEtaPtTransRebin( new TH1D( nameEtaPtTransRebin.c_str(), titleEtaPtTrans.c_str(), histBins_, -rangeEtaPtTransRebin + meanEtaPtTrans, rangeEtaPtTransRebin + meanEtaPtTrans  ) );
+          TH1D * histEtaPtTransRebin( new TH1D( nameEtaPtTransRebin.c_str(), titleEtaPtTrans.c_str(), histBins_, -rangeEtaPtTransRebin + meanEtaPtTrans, rangeEtaPtTransRebin + meanEtaPtTrans ) );
           histEtaPtTransRebin->SetXTitle( titleTrans.c_str() );
           histEtaPtTransRebin->SetYTitle( titleEvents.c_str() );
 
@@ -495,30 +564,30 @@ int main( int argc, char * argv[] )
                       << "    no histogram \"width\" in '" << nameEtaPtTransRestr << "'" << std::endl;
           }
           const Double_t rangeEtaPtTransRestrRebin( widthEtaPtTransRestr == 0. ? widthFactor_ * std::fabs( histEtaPtTransRestr->GetXaxis()->GetXmax() ) : widthFactor_ * widthEtaPtTransRestr ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-          TH1D * histEtaPtTransRestrRebin( new TH1D( nameEtaPtTransRestrRebin.c_str(), titleEtaPtTrans.c_str(), histBins_, -rangeEtaPtTransRestrRebin + meanEtaPtTransRestr, rangeEtaPtTransRestrRebin + meanEtaPtTransRestr  ) );
+          TH1D * histEtaPtTransRestrRebin( new TH1D( nameEtaPtTransRestrRebin.c_str(), titleEtaPtTrans.c_str(), histBins_, -rangeEtaPtTransRestrRebin + meanEtaPtTransRestr, rangeEtaPtTransRestrRebin + meanEtaPtTransRestr ) );
           histEtaPtTransRestrRebin->SetXTitle( titleTrans.c_str() );
           histEtaPtTransRestrRebin->SetYTitle( titleEvents.c_str() );
 
           for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
-            if ( refGen_ ) {
-              if ( fitNonRestr_ ) {
-                histEtaPtTransRebin->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-                histEtaPtTransRestrRebin->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
+            const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
+            if ( fitNonRestr_ ) {
+              histEtaPtTransRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
             }
-            else {
-              if ( fitNonRestr_ ) {
-                histEtaPtTransRebin->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
-              if ( ptEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-                histEtaPtTransRestrRebin->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
+            if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
+              histEtaPtTransRestrRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
             }
           } // loop: uEntry < ptEtaBin.at( uPt ).size()
 
+          if ( histEtaPtTransRebin->GetSumOfWeights() != 0. ) histEtaPtTransRebin->Scale( 1. / histEtaPtTransRebin->GetSumOfWeights() );
+          if ( histEtaPtTransRestrRebin->GetSumOfWeights() != 0. ) histEtaPtTransRestrRebin->Scale( 1. / histEtaPtTransRestrRebin->GetSumOfWeights() );
+
         } // loop: uPt < nPtBins_
+
+        if ( histEtaTrans->GetSumOfWeights() != 0. ) histEtaTrans->Scale( 1. / histEtaTrans->GetSumOfWeights() );
+        if ( histEtaTransMapPt->GetSumOfWeights() != 0. ) histEtaTransMapPt->Scale( 1. / histEtaTransMapPt->GetSumOfWeights() );
+        if ( histEtaTransRestr->GetSumOfWeights() != 0. ) histEtaTransRestr->Scale( 1. / histEtaTransRestr->GetSumOfWeights() );
+        if ( histEtaTransRestrMapPt->GetSumOfWeights() != 0. ) histEtaTransRestrMapPt->Scale( 1. / histEtaTransRestrMapPt->GetSumOfWeights() );
 
         const std::string nameEtaTransRebin( nameEtaTrans + "Rebin" );
         const Double_t meanEtaTrans( histEtaTrans->GetMean() );
@@ -528,9 +597,14 @@ int main( int argc, char * argv[] )
                     << "    no histogram \"width\" in '" << nameEtaTrans << "'" << std::endl;
         }
         const Double_t rangeEtaTransRebin( widthEtaTrans == 0. ? widthFactor_ * std::fabs( histEtaTrans->GetXaxis()->GetXmax() ) : widthFactor_ * widthEtaTrans ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-        TH1D * histEtaTransRebin( new TH1D( nameEtaTransRebin.c_str(), titleEtaTrans.c_str(), histBins_, -rangeEtaTransRebin + meanEtaTrans, rangeEtaTransRebin + meanEtaTrans  ) );
+        TH1D * histEtaTransRebin( new TH1D( nameEtaTransRebin.c_str(), titleEtaTrans.c_str(), histBins_, -rangeEtaTransRebin + meanEtaTrans, rangeEtaTransRebin + meanEtaTrans ) );
         histEtaTransRebin->SetXTitle( titleTrans.c_str() );
         histEtaTransRebin->SetYTitle( titleEvents.c_str() );
+        const std::string nameEtaTransRebinMapPt( nameEtaTransRebin + "_Map_Pt" );
+        TH2D * histEtaTransRebinMapPt( new TH2D( nameEtaTransRebinMapPt.c_str(), titleEtaTrans.c_str(), nPtBins_, ptBins_.data(), histBins_, -rangeEtaTransRebin + meanEtaTrans, rangeEtaTransRebin + meanEtaTrans ) );
+        histEtaTransRebinMapPt->SetXTitle( titlePt.c_str() );
+        histEtaTransRebinMapPt->SetYTitle( titleTrans.c_str() );
+        histEtaTransRebinMapPt->SetZTitle( titleEvents.c_str() );
 
         const std::string nameEtaTransRestrRebin( nameEtaTransRestr + "Rebin" );
         const Double_t meanEtaTransRestr( histEtaTransRestr->GetMean() );
@@ -540,32 +614,70 @@ int main( int argc, char * argv[] )
                     << "    no histogram \"width\" in '" << nameEtaTransRestr << "'" << std::endl;
         }
         const Double_t rangeEtaTransRestrRebin( widthEtaTransRestr == 0. ? widthFactor_ * std::fabs( histEtaTransRestr->GetXaxis()->GetXmax() ) : widthFactor_ * widthEtaTransRestr ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-        TH1D * histEtaTransRestrRebin( new TH1D( nameEtaTransRestrRebin.c_str(), titleEtaTrans.c_str(), histBins_, -rangeEtaTransRestrRebin + meanEtaTransRestr, rangeEtaTransRestrRebin + meanEtaTransRestr  ) );
+        TH1D * histEtaTransRestrRebin( new TH1D( nameEtaTransRestrRebin.c_str(), titleEtaTrans.c_str(), histBins_, -rangeEtaTransRestrRebin + meanEtaTransRestr, rangeEtaTransRestrRebin + meanEtaTransRestr ) );
         histEtaTransRestrRebin->SetXTitle( titleTrans.c_str() );
         histEtaTransRestrRebin->SetYTitle( titleEvents.c_str() );
+        const std::string nameEtaTransRestrRebinMapPt( nameEtaTransRestrRebin + "_Map_Pt" );
+        TH2D * histEtaTransRestrRebinMapPt( new TH2D( nameEtaTransRestrRebinMapPt.c_str(), titleEtaTrans.c_str(), nPtBins_, ptBins_.data(), histBins_, -rangeEtaTransRestrRebin + meanEtaTrans, rangeEtaTransRestrRebin + meanEtaTrans ) );
+        histEtaTransRestrRebinMapPt->SetXTitle( titlePt.c_str() );
+        histEtaTransRestrRebinMapPt->SetYTitle( titleTrans.c_str() );
+        histEtaTransRestrRebinMapPt->SetZTitle( titleEvents.c_str() );
 
         for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+          const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
+          const std::string nameEtaPt( nameEta + "_" + baseTitlePt + binPt );
+          const std::string nameEtaPtTrans( nameEtaPt + "_Trans" );
           for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
-            if ( refGen_ ) {
-              if ( fitNonRestr_ ) {
-                histEtaTransRebin->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
-              if ( ptGenEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-                histEtaTransRestrRebin->Fill( ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
+            if ( fitNonRestr_ ) {
+              histEtaTransRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              const std::string nameEtaPtTransRebin( nameEtaPtTrans + "Rebin" );
+              TH1D * histEtaPtTransRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRebin.c_str() ) ) );
+              if ( histEtaPtTransRebin != 0 && histEtaPtTransRebin->GetSumOfWeights() != 0. ) {
+                histEtaTransRebinMapPt->Fill( ptRef, value, weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRebin->GetSumOfWeights() );
               }
             }
-            else {
-              if ( fitNonRestr_ ) {
-                histEtaTransRebin->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
-              if ( ptEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-                histEtaTransRestrRebin->Fill( ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
+            if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
+              histEtaTransRestrRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              const std::string nameEtaPtTransRestrRebin( nameEtaPtTrans + "RestrRebin" );
+              TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
+              if ( histEtaPtTransRestrRebin != 0 && histEtaPtTransRestrRebin->GetSumOfWeights() != 0. ) {
+                histEtaTransRestrRebinMapPt->Fill( ptRef, value, weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRestrRebin->GetSumOfWeights() );
               }
             }
           } // loop: uEntry < ptEtaBin.at( uPt ).size()
+
         } // loop: uPt < nPtBins_
 
+        if ( histEtaTransRebin->GetSumOfWeights() != 0. ) histEtaTransRebin->Scale( 1. / histEtaTransRebin->GetSumOfWeights() );
+        if ( histEtaTransRebinMapPt->GetSumOfWeights() != 0. ) histEtaTransRebinMapPt->Scale( 1. / histEtaTransRebinMapPt->GetSumOfWeights() );
+        if ( histEtaTransRestrRebin->GetSumOfWeights() != 0. ) histEtaTransRestrRebin->Scale( 1. / histEtaTransRestrRebin->GetSumOfWeights() );
+        if ( histEtaTransRestrRebinMapPt->GetSumOfWeights() != 0. ) histEtaTransRestrRebinMapPt->Scale( 1. / histEtaTransRestrRebinMapPt->GetSumOfWeights() );
+
+        if ( plot_ ) {
+          if ( fitNonRestr_ ) {
+            histEtaTransRebinMapPt->Draw();
+            c1.Print( std::string( pathPlots_ + histEtaTransRebinMapPt->GetName() + ".png" ).c_str() );
+          }
+          histEtaTransRestrRebinMapPt->Draw();
+          c1.Print( std::string( pathPlots_ + histEtaTransRestrRebinMapPt->GetName() + ".png" ).c_str() );
+        }
+
       } // loop: keyEta
+
+      if ( histTrans->GetSumOfWeights() != 0. ) histTrans->Scale( 1. / histTrans->GetSumOfWeights() );
+      if ( histTransMapPt->GetSumOfWeights() != 0. ) histTransMapPt->Scale( 1. / histTransMapPt->GetSumOfWeights() );
+      if ( histTransMapEta->GetSumOfWeights() != 0. ) histTransMapEta->Scale( 1. / histTransMapEta->GetSumOfWeights() );
+      if ( histTransRestr->GetSumOfWeights() != 0. ) histTransRestr->Scale( 1. / histTransRestr->GetSumOfWeights() );
+      if ( histTransRestrMapPt->GetSumOfWeights() != 0. ) histTransRestrMapPt->Scale( 1. / histTransRestrMapPt->GetSumOfWeights() );
+      if ( histTransRestrMapEta->GetSumOfWeights() != 0. ) histTransRestrMapEta->Scale( 1. / histTransRestrMapEta->GetSumOfWeights() );
+      for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+        if ( histVecPtTrans.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTrans.at( uPt )->Scale( 1. / histVecPtTrans.at( uPt )->GetSumOfWeights() );
+        if ( histVecPtTransMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransMapEta.at( uPt )->Scale( 1. / histVecPtTransMapEta.at( uPt )->GetSumOfWeights() );
+        if ( histVecPtTransRestr.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestr.at( uPt )->Scale( 1. / histVecPtTransRestr.at( uPt )->GetSumOfWeights() );
+        if ( histVecPtTransRestrMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestrMapEta.at( uPt )->Scale( 1. / histVecPtTransRestrMapEta.at( uPt )->GetSumOfWeights() );
+      }
 
       dirFit_->cd();
 
@@ -585,9 +697,19 @@ int main( int argc, char * argv[] )
                   << "    no histogram \"width\" in '" << nameTrans << "'" << std::endl;
       }
       const Double_t rangeTransRebin( widthTrans == 0. ? widthFactor_ * std::fabs( histTrans->GetXaxis()->GetXmax() ) : widthFactor_ * widthTrans ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-      TH1D * histTransRebin( new TH1D( nameTransRebin.c_str(), objCat.c_str(), histBins_, -rangeTransRebin + meanTrans, rangeTransRebin + meanTrans  ) );
+      TH1D * histTransRebin( new TH1D( nameTransRebin.c_str(), objCat.c_str(), histBins_, -rangeTransRebin + meanTrans, rangeTransRebin + meanTrans ) );
       histTransRebin->SetXTitle( titleTrans.c_str() );
       histTransRebin->SetYTitle( titleEvents.c_str() );
+      const std::string nameTransRebinMapPt( nameTransRebin + "_Map_Pt" );
+      TH2D * histTransRebinMapPt( new TH2D( nameTransRebinMapPt.c_str(), objCat.c_str(), nPtBins_, ptBins_.data(), histBins_, -rangeTransRebin + meanTrans, rangeTransRebin + meanTrans ) );
+      histTransRebinMapPt->SetXTitle( titlePt.c_str() );
+      histTransRebinMapPt->SetYTitle( titleTrans.c_str() );
+      histTransRebinMapPt->SetZTitle( titleEvents.c_str() );
+      const std::string nameTransRebinMapEta( nameTransRebin + "_Map_Eta" );
+      TH2D * histTransRebinMapEta( new TH2D( nameTransRebinMapEta.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), histBins_, -rangeTransRebin + meanTrans, rangeTransRebin + meanTrans ) );
+      histTransRebinMapEta->SetXTitle( titleEta.c_str() );
+      histTransRebinMapEta->SetYTitle( titleTrans.c_str() );
+      histTransRebinMapEta->SetZTitle( titleEvents.c_str() );
 
       const std::string nameTransRestrRebin( nameTransRestr + "Rebin" );
       const Double_t meanTransRestr( histTransRestr->GetMean() );
@@ -597,12 +719,24 @@ int main( int argc, char * argv[] )
                   << "    no histogram \"width\" in '" << nameTransRestr << "'" << std::endl;
       }
       const Double_t rangeTransRestrRebin( widthTransRestr == 0. ? widthFactor_ * std::fabs( histTransRestr->GetXaxis()->GetXmax() ) : widthFactor_ * widthTransRestr ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-      TH1D * histTransRestrRebin( new TH1D( nameTransRestrRebin.c_str(), objCat.c_str(), histBins_, -rangeTransRestrRebin + meanTransRestr, rangeTransRestrRebin + meanTransRestr  ) );
+      TH1D * histTransRestrRebin( new TH1D( nameTransRestrRebin.c_str(), objCat.c_str(), histBins_, -rangeTransRestrRebin + meanTransRestr, rangeTransRestrRebin + meanTransRestr ) );
       histTransRestrRebin->SetXTitle( titleTrans.c_str() );
       histTransRestrRebin->SetYTitle( titleEvents.c_str() );
+      const std::string nameTransRestrRebinMapPt( nameTransRestrRebin + "_Map_Pt" );
+      TH2D * histTransRestrRebinMapPt( new TH2D( nameTransRestrRebinMapPt.c_str(), objCat.c_str(), nPtBins_, ptBins_.data(), histBins_, -rangeTransRestrRebin + meanTrans, rangeTransRestrRebin + meanTrans ) );
+      histTransRestrRebinMapPt->SetXTitle( titlePt.c_str() );
+      histTransRestrRebinMapPt->SetYTitle( titleTrans.c_str() );
+      histTransRestrRebinMapPt->SetZTitle( titleEvents.c_str() );
+      const std::string nameTransRestrRebinMapEta( nameTransRestrRebin + "_Map_Eta" );
+      TH2D * histTransRestrRebinMapEta( new TH2D( nameTransRestrRebinMapEta.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), histBins_, -rangeTransRestrRebin + meanTrans, rangeTransRestrRebin + meanTrans ) );
+      histTransRestrRebinMapEta->SetXTitle( titleEta.c_str() );
+      histTransRestrRebinMapEta->SetYTitle( titleTrans.c_str() );
+      histTransRestrRebinMapEta->SetZTitle( titleEvents.c_str() );
 
       std::vector< TH1D * > histVecPtTransRebin;
+      std::vector< TH2D * > histVecPtTransRebinMapEta;
       std::vector< TH1D * > histVecPtTransRestrRebin;
+      std::vector< TH2D * > histVecPtTransRestrRebinMapEta;
       for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
         const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
         const std::string namePt( name + "_" + baseTitlePt + binPt );
@@ -616,10 +750,16 @@ int main( int argc, char * argv[] )
                     << "    no histogram \"width\" in '" << namePtTrans << "'" << std::endl;
         }
         const Double_t rangePtTransRebin( widthPtTrans == 0. ? widthFactor_ * std::fabs( histVecPtTrans.at( uPt )->GetXaxis()->GetXmax() ) : widthFactor_ * widthPtTrans ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-        TH1D * histPtTransRebin( new TH1D( namePtTransRebin.c_str(), titlePtTrans.c_str(), histBins_, -rangePtTransRebin + meanPtTrans, rangePtTransRebin + meanPtTrans  ) );
+        TH1D * histPtTransRebin( new TH1D( namePtTransRebin.c_str(), titlePtTrans.c_str(), histBins_, -rangePtTransRebin + meanPtTrans, rangePtTransRebin + meanPtTrans ) );
         histPtTransRebin->SetXTitle( titleTrans.c_str() );
         histPtTransRebin->SetYTitle( titleEvents.c_str() );
         histVecPtTransRebin.push_back( histPtTransRebin );
+        const std::string namePtTransRebinMapEta( namePtTransRebin + "_Map_Eta" );
+        TH2D * histPtTransRebinMapEta( new TH2D( namePtTransRebinMapEta.c_str(), titlePtTrans.c_str(), nEtaBins_, etaBins_.data(), histBins_, -rangePtTransRebin + meanPtTrans, rangePtTransRebin + meanPtTrans ) );
+        histPtTransRebinMapEta->SetXTitle( titleEta.c_str() );
+        histPtTransRebinMapEta->SetYTitle( titleTrans.c_str() );
+        histPtTransRebinMapEta->SetZTitle( titleEvents.c_str() );
+        histVecPtTransRebinMapEta.push_back( histPtTransRebinMapEta );
         const std::string namePtTransRestr( namePtTrans + "Restr" );
         const std::string namePtTransRestrRebin( namePtTransRestr + "Rebin" );
         const Double_t meanPtTransRestr( histVecPtTransRestr.at( uPt )->GetMean() );
@@ -629,10 +769,16 @@ int main( int argc, char * argv[] )
                     << "    no histogram \"width\" in '" << namePtTransRestr << "'" << std::endl;
         }
         const Double_t rangePtTransRestrRebin( widthPtTransRestr == 0. ? widthFactor_ * std::fabs( histVecPtTransRestr.at( uPt )->GetXaxis()->GetXmax() ) : widthFactor_ * widthPtTransRestr ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-        TH1D * histPtTransRestrRebin( new TH1D( namePtTransRestrRebin.c_str(), titlePtTrans.c_str(), histBins_, -rangePtTransRestrRebin + meanPtTransRestr, rangePtTransRestrRebin + meanPtTransRestr  ) );
+        TH1D * histPtTransRestrRebin( new TH1D( namePtTransRestrRebin.c_str(), titlePtTrans.c_str(), histBins_, -rangePtTransRestrRebin + meanPtTransRestr, rangePtTransRestrRebin + meanPtTransRestr ) );
         histPtTransRestrRebin->SetXTitle( titleTrans.c_str() );
         histPtTransRestrRebin->SetYTitle( titleEvents.c_str() );
         histVecPtTransRestrRebin.push_back( histPtTransRestrRebin );
+        const std::string namePtTransRestrRebinMapEta( namePtTransRestrRebin + "_Map_Eta" );
+        TH2D * histPtTransRestrRebinMapEta( new TH2D( namePtTransRestrRebinMapEta.c_str(), titlePtTrans.c_str(), nEtaBins_, etaBins_.data(), histBins_, -rangePtTransRestrRebin + meanPtTrans, rangePtTransRestrRebin + meanPtTrans ) );
+        histPtTransRestrRebinMapEta->SetXTitle( titleEta.c_str() );
+        histPtTransRestrRebinMapEta->SetYTitle( titleTrans.c_str() );
+        histPtTransRestrRebinMapEta->SetZTitle( titleEvents.c_str() );
+        histVecPtTransRestrRebinMapEta.push_back( histPtTransRestrRebinMapEta );
       }  // loop: uPt < nPtBins_
 
       // Loop over eta bins
@@ -644,42 +790,22 @@ int main( int argc, char * argv[] )
 
         for ( unsigned uEntry = 0; uEntry < sizeEta_.at( uEta ); ++uEntry ) {
           if ( ptData_.at( uEta ).at( uEntry ) == -9. || ptGenData_.at( uEta ).at( uEntry ) == -9. ) continue; // no match
-          Double_t ptVal( useNonT_ ? ptData_.at( uEta ).at( uEntry ) * std::cosh( etaData_.at( uEta ).at( uEntry ) ) : ptData_.at( uEta ).at( uEntry ) );
-          Double_t ptGenVal( useNonT_ ? ptGenData_.at( uEta ).at( uEntry ) * std::cosh( etaGenData_.at( uEta ).at( uEntry ) ) : ptGenData_.at( uEta ).at( uEntry ) );
-          Double_t ptRef( refGen_ ? ptGenVal : ptVal );
+          const Double_t value( refGen_ ? ptGenData_.at( uEta ).at( uEntry ) - ptData_.at( uEta ).at( uEntry ) : ptData_.at( uEta ).at( uEntry ) - ptGenData_.at( uEta ).at( uEntry ) );
+          const Double_t ptRef( refGen_ ? ptGenData_.at( uEta ).at( uEntry ) : ptData_.at( uEta ).at( uEntry ) );
+
           if ( fitNonRestr_ ) {
-            if ( refGen_ ) {
-              histTransRebin->Fill( ptGenVal - ptVal, weightData_.at( uEta ).at( uEntry ) );
-            }
-            else {
-              histTransRebin->Fill( ptVal - ptGenVal, weightData_.at( uEta ).at( uEntry ) );
-            }
+            histTransRebin->Fill( value, weightData_.at( uEta ).at( uEntry ) );
           }
           if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
-            if ( refGen_ ) {
-              histTransRestrRebin->Fill( ptGenVal - ptVal, weightData_.at( uEta ).at( uEntry ) );
-            }
-            else {
-              histTransRestrRebin->Fill( ptVal - ptGenVal, weightData_.at( uEta ).at( uEntry ) );
-            }
+            histTransRestrRebin->Fill( value, weightData_.at( uEta ).at( uEntry ) );
           }
           for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
             if ( ptBins_.at( uPt ) <= ptRef && ptRef < ptBins_.at( uPt + 1 ) ) {
               if ( fitNonRestr_ ) {
-                if ( refGen_ ) {
-                  histVecPtTransRebin.at( uPt )->Fill( ptGenVal - ptVal, weightData_.at( uEta ).at( uEntry ) );
-                }
-                else {
-                  histVecPtTransRebin.at( uPt )->Fill( ptVal - ptGenVal, weightData_.at( uEta ).at( uEntry ) );
-                }
+                histVecPtTransRebin.at( uPt )->Fill( value, weightData_.at( uEta ).at( uEntry ) );
               }
               if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
-                if ( refGen_ ) {
-                  histVecPtTransRestrRebin.at( uPt )->Fill( ptGenVal - ptVal, weightData_.at( uEta ).at( uEntry ) );
-                }
-                else {
-                  histVecPtTransRestrRebin.at( uPt )->Fill( ptVal - ptGenVal, weightData_.at( uEta ).at( uEntry ) );
-                }
+                histVecPtTransRestrRebin.at( uPt )->Fill( value, weightData_.at( uEta ).at( uEntry ) );
               }
               break;
             }
@@ -688,6 +814,92 @@ int main( int argc, char * argv[] )
         } // loop: uEntry < sizeEta_.at( uEta )
 
       } // loop: keyEta
+      nextInListFit.Reset();
+      while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
+        if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
+        const std::string binEta( keyEta->GetName() );
+        const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
+        TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
+        const std::string nameEta( name + "_" + binEta );
+
+        for ( unsigned uEntry = 0; uEntry < sizeEta_.at( uEta ); ++uEntry ) {
+          if ( ptData_.at( uEta ).at( uEntry ) == -9. || ptGenData_.at( uEta ).at( uEntry ) == -9. ) continue; // no match
+          const Double_t value( refGen_ ? ptGenData_.at( uEta ).at( uEntry ) - ptData_.at( uEta ).at( uEntry ) : ptData_.at( uEta ).at( uEntry ) - ptGenData_.at( uEta ).at( uEntry ) );
+          const Double_t ptRef( refGen_ ? ptGenData_.at( uEta ).at( uEntry ) : ptData_.at( uEta ).at( uEntry ) );
+          const Double_t etaGenSymm( useSymm_ ? std::fabs( etaGenData_.at( uEta ).at( uEntry ) ) : etaGenData_.at( uEta ).at( uEntry ) );
+          const Double_t etaSymm( useSymm_ ? std::fabs( etaData_.at( uEta ).at( uEntry ) ) : etaData_.at( uEta ).at( uEntry ) );
+          const Double_t etaRef( refGen_ ? etaGenSymm : etaSymm );
+
+          if ( fitNonRestr_ ) {
+            const std::string nameEtaTrans( nameEta + "_Trans" );
+            const std::string nameEtaTransRebin( nameEtaTrans + "Rebin" );
+            TH1D * histEtaTransRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRebin.c_str() ) ) );
+            if ( histEtaTransRebin != 0 && histEtaTransRebin->GetSumOfWeights() != 0. ) histTransRebinMapEta->Fill( etaRef, value, weightData_.at( uEta ).at( uEntry ) / histEtaTransRebin->GetSumOfWeights() );
+          }
+          if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
+            const std::string nameEtaTransRestr( nameEta + "_TransRestr" );
+            const std::string nameEtaTransRestrRebin( nameEtaTransRestr + "Rebin" );
+            TH1D * histEtaTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRestrRebin.c_str() ) ) );
+            if ( histEtaTransRestrRebin != 0 && histEtaTransRestrRebin->GetSumOfWeights() != 0. ) histTransRestrRebinMapEta->Fill( etaRef, value, weightData_.at( uEta ).at( uEntry ) / histEtaTransRestrRebin->GetSumOfWeights() );
+          }
+          for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+            if ( ptBins_.at( uPt ) <= ptRef && ptRef < ptBins_.at( uPt + 1 ) ) {
+              const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
+              const std::string nameEtaPt( nameEta + "_" + baseTitlePt + binPt );
+              const std::string nameEtaPtTrans( nameEtaPt + "_Trans" );
+              if ( fitNonRestr_ ) {
+                if ( histVecPtTransRebin.at( uPt)->GetSumOfWeights() != 0. ) histTransRebinMapPt->Fill( ptRef, value, weightData_.at( uEta ).at( uEntry ) / histVecPtTransRebin.at( uPt)->GetSumOfWeights() );
+                const std::string nameEtaPtTransRebin( nameEtaPtTrans + "Rebin" );
+                TH1D * histEtaPtTransRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRebin.c_str() ) ) );
+                if ( histEtaPtTransRebin != 0 && histEtaPtTransRebin->GetSumOfWeights() != 0. ) histVecPtTransRebinMapEta.at( uPt )->Fill( etaRef, value, weightData_.at( uEta ).at( uEntry ) / histEtaPtTransRebin->GetSumOfWeights() );
+              }
+              if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
+                if ( histVecPtTransRestrRebin.at( uPt)->GetSumOfWeights() != 0. ) histTransRestrRebinMapPt->Fill( ptRef, value, weightData_.at( uEta ).at( uEntry ) / histVecPtTransRestrRebin.at( uPt)->GetSumOfWeights() );
+                const std::string nameEtaPtTransRestrRebin( nameEtaPtTrans + "RestrRebin" );
+                TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
+                if ( histEtaPtTransRestrRebin != 0 && histEtaPtTransRestrRebin->GetSumOfWeights() != 0. ) histVecPtTransRestrRebinMapEta.at( uPt )->Fill( etaRef, value, weightData_.at( uEta ).at( uEntry ) / histEtaPtTransRestrRebin->GetSumOfWeights() );
+              }
+              break;
+            }
+          } // loop: uPt < nPtBins_
+
+        } // loop: uEntry < sizeEta_.at( uEta )
+
+      } // loop: keyEta
+
+      if ( histTransRebin->GetSumOfWeights() != 0. ) histTransRebin->Scale( 1. / histTransRebin->GetSumOfWeights() );
+      if ( histTransRebinMapPt->GetSumOfWeights() != 0. ) histTransRebinMapPt->Scale( 1. / histTransRebinMapPt->GetSumOfWeights() );
+      if ( histTransRebinMapEta->GetSumOfWeights() != 0. ) histTransRebinMapEta->Scale( 1. / histTransRebinMapEta->GetSumOfWeights() );
+      if ( histTransRestrRebin->GetSumOfWeights() != 0. ) histTransRestrRebin->Scale( 1. / histTransRestrRebin->GetSumOfWeights() );
+      if ( histTransRestrRebinMapPt->GetSumOfWeights() != 0. ) histTransRestrRebinMapPt->Scale( 1. / histTransRestrRebinMapPt->GetSumOfWeights() );
+      if ( histTransRestrRebinMapEta->GetSumOfWeights() != 0. ) histTransRestrRebinMapEta->Scale( 1. / histTransRestrRebinMapEta->GetSumOfWeights() );
+      for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+        if ( histVecPtTransRebin.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRebin.at( uPt )->Scale( 1. / histVecPtTransRebin.at( uPt )->GetSumOfWeights() );
+        if ( histVecPtTransRebinMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRebinMapEta.at( uPt )->Scale( 1. / histVecPtTransRebinMapEta.at( uPt )->GetSumOfWeights() );
+        if ( histVecPtTransRestrRebin.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestrRebin.at( uPt )->Scale( 1. / histVecPtTransRestrRebin.at( uPt )->GetSumOfWeights() );
+        if ( histVecPtTransRestrRebinMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestrRebinMapEta.at( uPt )->Scale( 1. / histVecPtTransRestrRebinMapEta.at( uPt )->GetSumOfWeights() );
+      }
+
+      if ( plot_ ) {
+        if ( fitNonRestr_ ) {
+          histTransRebinMapPt->Draw();
+          c1.Print( std::string( pathPlots_ + histTransRebinMapPt->GetName() + ".png" ).c_str() );
+          histTransRebinMapEta->Draw();
+          c1.Print( std::string( pathPlots_ + histTransRebinMapEta->GetName() + ".png" ).c_str() );
+          for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+            histVecPtTransRebinMapEta.at( uPt )->Draw();
+            c1.Print( std::string( pathPlots_ + histVecPtTransRebinMapEta.at( uPt )->GetName() + ".png" ).c_str() );
+          }
+        }
+        histTransRestrRebinMapPt->Draw();
+        c1.Print( std::string( pathPlots_ + histTransRestrRebinMapPt->GetName() + ".png" ).c_str() );
+        histTransRestrRebinMapEta->Draw();
+        c1.Print( std::string( pathPlots_ + histTransRestrRebinMapEta->GetName() + ".png" ).c_str() );
+        for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+          histVecPtTransRestrRebinMapEta.at( uPt )->Draw();
+          c1.Print( std::string( pathPlots_ + histVecPtTransRestrRebinMapEta.at( uPt )->GetName() + ".png" ).c_str() );
+        }
+      }
 
     }  // loop: keyFit
 
@@ -699,8 +911,6 @@ int main( int argc, char * argv[] )
         std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                   << "    transfer function determination for " << objCat << " started" << std::endl;
       }
-      TCanvas c1( "c1" );
-      c1.cd();
 
       // Loop over fit versions
       nextInListProp.Reset();
@@ -750,7 +960,7 @@ int main( int argc, char * argv[] )
                 mixParametersFit( transferPt, fitTransRebin );
               }
               else {
-                for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+                for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
                   transferPt.SetParameter( uPar, fitTransRebin->GetParameter( uPar ) );
                 }
               }
@@ -790,7 +1000,7 @@ int main( int argc, char * argv[] )
                 mixParametersFit( transferPtRestr, fitTransRestrRebin );
               }
               else {
-                for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+                for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
                   transferPtRestr.SetParameter( uPar, fitTransRestrRebin->GetParameter( uPar ) );
                 }
               }
@@ -934,7 +1144,7 @@ int main( int argc, char * argv[] )
 
         } // loop: uPt < nPtBins_
 
-        for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+        for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
           const std::string parFit( boost::lexical_cast< std::string >( uPar ) );
 
           if ( fitNonRestr_ ) {
@@ -1136,7 +1346,7 @@ int main( int argc, char * argv[] )
             if ( fitEtaTransRestrRebinResultPtr >= 0 ) {
               if ( fitEtaTransRestrRebinResultPtr->Status() == 0 && fitEtaTransRestrRebinResultPtr->Ndf() != 0. ) {
                 if ( checkParametersFit( fitEtaTransRestrRebin, useBkg_ ) ) {
-                  mixParametersFit( transferVecEtaPtRestr.at( uEta ),fitEtaTransRestrRebin  );
+                  mixParametersFit( transferVecEtaPtRestr.at( uEta ), fitEtaTransRestrRebin );
                   fillMixedParametersFit( uEta + 1, histVecTransRestrRebinEtaFitMap, fitEtaTransRestrRebinResultPtr );
                 }
                 else {
@@ -1309,7 +1519,7 @@ int main( int argc, char * argv[] )
               c1.Print( std::string( pathPlots_ + histTransRestrRebinEtaPtFitMapProb->GetName() + ".png" ).c_str() );
             }
 
-            for ( unsigned uPar = 1; uPar < nPar; ++uPar ) {
+            for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
               const std::string parFit( boost::lexical_cast< std::string >( uPar ) );
 
               if ( fitNonRestr_ ) {
@@ -1485,7 +1695,8 @@ void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
   // - [0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
 
   // Starting points
-  Double_t c( histo->Integral() );                             // Constant
+//   Double_t c( histo->GetSumOfWeights() );                      // Constant
+  Double_t c( 1. );                                            // Constant, after all histos have been scaled with GetSumOfWeights()
   Double_t m( histo->GetMean() );                              // Mean
   Double_t p( histo->GetBinCenter( histo->GetMaximumBin() ) ); // Peak
   Double_t s( histo->GetRMS() );                               // RMS
@@ -1506,7 +1717,7 @@ void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
   if ( useBkgFunction ) {
     Double_t fitMin, fitMax;
     fit->GetRange( fitMin, fitMax );
-    fit->SetParameter( 3, 0.25 );
+    fit->SetParameter( 3, 0. );
     fit->SetParLimits( 3, 0., 100. );
     fit->SetParName( 3, "bkg c" );
     fit->SetParameter( 4, m + ( m - p ) ); // shift into opposite direction compared to main Gaussian
