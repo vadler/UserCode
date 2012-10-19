@@ -117,7 +117,7 @@ int main( int argc, char * argv[] )
   const unsigned nParFit_( fitFormula.GetNpar() );
   const TFormula jecFormula( "jecFormula", jecFunction_.c_str() );
   const unsigned nVar_( jecVars_.size() );
-  const unsigned nDim_( jecDims_.size() );
+//   const unsigned nDim_( jecDims_.size() );
   const unsigned nPar_( jecFormula.GetNpar() );
 
   // Set string constants
@@ -131,8 +131,9 @@ int main( int argc, char * argv[] )
   const std::string baseTitlePtU( useAlt_ ? "E" : "P" );
   const std::string baseTitlePt( useNonT_ ? baseTitlePtU : baseTitlePtU + "t" );
   const std::string titlePtT( useNonT_ ? baseTitlePtL : baseTitlePtL + "_{t}" );
-  const std::string titlePt( refGenJet_ ? titlePtT + "^{GenJet} (GeV)" : titlePtT + " (GeV)" );
-  const std::string titleEta( refGenJet_ ? "#eta^{GenJet}" : "#eta" );
+  const std::string titlePt( refGenJet_ ? titlePtT + "^{GenJet} (GeV)" : titlePtT + "^{L3} (GeV)" );
+  const std::string baseTitleEta( useSymm_ ? "|#eta|" : "#eta" );
+  const std::string titleEta( refGenJet_ ? baseTitleEta + "^{GenJet}" : baseTitleEta + "^{L3}" );
   std::vector< std::string > titlesVar( 1, titleEta );
   std::vector< std::string > titlesPar( 1, titlePt );
   const std::string titleFracL5( refGenJet_ ? "#frac{" + titlePtT + "^{L3}}{" + titlePtT + "^{GenJet}}" : "#frac{" + titlePtT + "^{GenJet}}{" + titlePtT + "^{L3}}" );
@@ -199,6 +200,9 @@ int main( int argc, char * argv[] )
     fileOut_->cd();
     dirOutSel_ = new TDirectory( evtSel_.c_str(), "" );
   }
+
+  TCanvas c1( "c1" );
+  c1.cd();
 
   // Loops through directory structure
 
@@ -365,14 +369,36 @@ int main( int argc, char * argv[] )
       TH1D * histFracL5( new TH1D( nameFracL5.c_str(), objCat.c_str(), histBins_, 0., histMax_ ) );
       histFracL5->SetXTitle( titleFracL5.c_str() );
       histFracL5->SetYTitle( titleEvents.c_str() );
+      const std::string nameFracL5MapPt( nameFracL5 + "_Map_Pt" );
+      TH2D * histFracL5MapPt( new TH2D( nameFracL5MapPt.c_str(), objCat.c_str(), nPtBins_, ptBins_.data(), histBins_, 0., histMax_ ) );
+      histFracL5MapPt->SetXTitle( titlePt.c_str() );
+      histFracL5MapPt->SetYTitle( titleFracL5.c_str() );
+      histFracL5MapPt->SetZTitle( titleEvents.c_str() );
+      const std::string nameFracL5MapEta( nameFracL5 + "_Map_Eta" );
+      TH2D * histFracL5MapEta( new TH2D( nameFracL5MapEta.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), histBins_, 0., histMax_ ) );
+      histFracL5MapEta->SetXTitle( titleEta.c_str() );
+      histFracL5MapEta->SetYTitle( titleFracL5.c_str() );
+      histFracL5MapEta->SetZTitle( titleEvents.c_str() );
 
       const std::string nameFracL5Restr( nameFracL5 + "Restr" );
       TH1D * histFracL5Restr( new TH1D( nameFracL5Restr.c_str(), objCat.c_str(), histBins_, 0., histMax_ ) );
       histFracL5Restr->SetXTitle( titleFracL5.c_str() );
       histFracL5Restr->SetYTitle( titleEvents.c_str() );
+      const std::string nameFracL5RestrMapPt( nameFracL5Restr + "_Map_Pt" );
+      TH2D * histFracL5RestrMapPt( new TH2D( nameFracL5RestrMapPt.c_str(), objCat.c_str(), nPtBins_, ptBins_.data(), histBins_, 0., histMax_ ) );
+      histFracL5RestrMapPt->SetXTitle( titlePt.c_str() );
+      histFracL5RestrMapPt->SetYTitle( titleFracL5.c_str() );
+      histFracL5RestrMapPt->SetZTitle( titleEvents.c_str() );
+      const std::string nameFracL5RestrMapEta( nameFracL5Restr + "_Map_Eta" );
+      TH2D * histFracL5RestrMapEta( new TH2D( nameFracL5RestrMapEta.c_str(), objCat.c_str(), nEtaBins_, etaBins_.data(), histBins_, 0., histMax_ ) );
+      histFracL5RestrMapEta->SetXTitle( titleEta.c_str() );
+      histFracL5RestrMapEta->SetYTitle( titleFracL5.c_str() );
+      histFracL5RestrMapEta->SetZTitle( titleEvents.c_str() );
 
       std::vector< TH1D * > histVecPtFracL5;
+      std::vector< TH2D * > histVecPtFracL5MapEta;
       std::vector< TH1D * > histVecPtFracL5Restr;
+      std::vector< TH2D * > histVecPtFracL5RestrMapEta;
       for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
         const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
         const std::string namePt( name + "_" + baseTitlePt + binPt );
@@ -382,11 +408,23 @@ int main( int argc, char * argv[] )
         histPtFracL5->SetXTitle( titleFracL5.c_str() );
         histPtFracL5->SetYTitle( titleEvents.c_str() );
         histVecPtFracL5.push_back( histPtFracL5 );
+        const std::string namePtFracL5MapEta( namePtFracL5 + "_Map_Eta" );
+        TH2D * histPtFracL5MapEta( new TH2D( namePtFracL5MapEta.c_str(), titlePtFracL5.c_str(), nEtaBins_, etaBins_.data(), histBins_, 0., histMax_ ) );
+        histPtFracL5MapEta->SetXTitle( titleEta.c_str() );
+        histPtFracL5MapEta->SetYTitle( titleFracL5.c_str() );
+        histPtFracL5MapEta->SetZTitle( titleEvents.c_str() );
+        histVecPtFracL5MapEta.push_back( histPtFracL5MapEta );
         const std::string namePtFracL5Restr( namePtFracL5 + "Restr" );
         TH1D * histPtFracL5Restr( new TH1D( namePtFracL5Restr.c_str(), titlePtFracL5.c_str(), histBins_, 0., histMax_ ) );
         histPtFracL5Restr->SetXTitle( titleFracL5.c_str() );
         histPtFracL5Restr->SetYTitle( titleEvents.c_str() );
         histVecPtFracL5Restr.push_back( histPtFracL5Restr );
+        const std::string namePtFracL5RestrMapEta( namePtFracL5Restr + "_Map_Eta" );
+        TH2D * histPtFracL5RestrMapEta( new TH2D( namePtFracL5RestrMapEta.c_str(), titlePtFracL5.c_str(), nEtaBins_, etaBins_.data(), histBins_, 0., histMax_ ) );
+        histPtFracL5RestrMapEta->SetXTitle( titleEta.c_str() );
+        histPtFracL5RestrMapEta->SetYTitle( titleFracL5.c_str() );
+        histPtFracL5RestrMapEta->SetZTitle( titleEvents.c_str() );
+        histVecPtFracL5RestrMapEta.push_back( histPtFracL5RestrMapEta );
       }
 
       // Loop over eta bins
@@ -409,11 +447,21 @@ int main( int argc, char * argv[] )
         TH1D * histEtaFracL5( new TH1D( nameEtaFracL5.c_str(), titleEtaFracL5.c_str(), histBins_, 0., histMax_ ) );
         histEtaFracL5->SetXTitle( titleFracL5.c_str() );
         histEtaFracL5->SetYTitle( titleEvents.c_str() );
+        const std::string nameEtaFracL5MapPt( nameEtaFracL5 + "_Map_Pt" );
+        TH2D * histEtaFracL5MapPt( new TH2D( nameEtaFracL5MapPt.c_str(), titleEtaFracL5.c_str(), nPtBins_, ptBins_.data(), histBins_, 0., histMax_ ) );
+        histEtaFracL5MapPt->SetXTitle( titlePt.c_str() );
+        histEtaFracL5MapPt->SetYTitle( titleFracL5.c_str() );
+        histEtaFracL5MapPt->SetZTitle( titleEvents.c_str() );
 
         const std::string nameEtaFracL5Restr( nameEtaFracL5 + "Restr" );
         TH1D * histEtaFracL5Restr( new TH1D( nameEtaFracL5Restr.c_str(), titleEtaFracL5.c_str(), histBins_, 0., histMax_ ) );
         histEtaFracL5Restr->SetXTitle( titleFracL5.c_str() );
         histEtaFracL5Restr->SetYTitle( titleEvents.c_str() );
+        const std::string nameEtaFracL5RestrMapPt( nameEtaFracL5Restr + "_Map_Pt" );
+        TH2D * histEtaFracL5RestrMapPt( new TH2D( nameEtaFracL5RestrMapPt.c_str(), titleEtaFracL5.c_str(), nPtBins_, ptBins_.data(), histBins_, 0., histMax_ ) );
+        histEtaFracL5RestrMapPt->SetXTitle( titlePt.c_str() );
+        histEtaFracL5RestrMapPt->SetYTitle( titleFracL5.c_str() );
+        histEtaFracL5RestrMapPt->SetZTitle( titleEvents.c_str() );
 
         // Split data into p_t bins
         DataCont weightEtaBin( nPtBins_ );
@@ -468,39 +516,66 @@ int main( int argc, char * argv[] )
           histEtaPtFracL5Restr->SetYTitle( titleEvents.c_str() );
 
           for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
-            if ( refGenJet_ ) {
-              if ( fitNonRestr_ ) {
-                histEtaPtFracL5->Fill( ptEtaBin.at( uPt ).at( uEntry ) / ptGenJetEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histVecPtFracL5.at( uPt )->Fill( ptEtaBin.at( uPt ).at( uEntry ) / ptGenJetEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaFracL5->Fill( ptEtaBin.at( uPt ).at( uEntry ) / ptGenJetEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histFracL5->Fill( ptEtaBin.at( uPt ).at( uEntry ) / ptGenJetEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
-              if ( ptGenJetEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenJetEtaBin.at( uPt ).at( uEntry ), phiGenJetEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-                histEtaPtFracL5Restr->Fill( ptEtaBin.at( uPt ).at( uEntry ) / ptGenJetEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histVecPtFracL5Restr.at( uPt )->Fill( ptEtaBin.at( uPt ).at( uEntry ) / ptGenJetEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaFracL5Restr->Fill( ptEtaBin.at( uPt ).at( uEntry ) / ptGenJetEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histFracL5Restr->Fill( ptEtaBin.at( uPt ).at( uEntry ) / ptGenJetEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
+            const Double_t value( refGenJet_ ? ptEtaBin.at( uPt ).at( uEntry ) / ptGenJetEtaBin.at( uPt ).at( uEntry ) : ptGenJetEtaBin.at( uPt ).at( uEntry ) / ptEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t pt( refGenJet_ ? ptGenJetEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t etaGenJetSymm( useSymm_ ? std::fabs( etaGenJetEtaBin.at( uPt ).at( uEntry ) ) : etaGenJetEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t etaSymm( useSymm_ ? std::fabs( etaEtaBin.at( uPt ).at( uEntry ) ) : etaEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t eta( refGenJet_ ? etaGenJetSymm : etaSymm );
+            if ( fitNonRestr_ ) {
+              histEtaPtFracL5->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histVecPtFracL5.at( uPt )->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histEtaFracL5->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histFracL5->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histEtaFracL5MapPt->Fill( pt, value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histVecPtFracL5MapEta.at( uPt )->Fill( eta, value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histFracL5MapPt->Fill( pt, value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histFracL5MapEta->Fill( eta, value, weightEtaBin.at( uPt ).at( uEntry ) );
             }
-            else {
-              if ( fitNonRestr_ ) {
-                histEtaPtFracL5->Fill( ptGenJetEtaBin.at( uPt ).at( uEntry ) / ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histVecPtFracL5.at( uPt )->Fill( ptGenJetEtaBin.at( uPt ).at( uEntry ) / ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaFracL5->Fill( ptGenJetEtaBin.at( uPt ).at( uEntry ) / ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histFracL5->Fill( ptGenJetEtaBin.at( uPt ).at( uEntry ) / ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
-              if ( ptEtaBin.at( uPt ).at( uEntry ) >= minPt_ && reco::deltaR( etaGenJetEtaBin.at( uPt ).at( uEntry ), phiGenJetEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-                histEtaPtFracL5Restr->Fill( ptGenJetEtaBin.at( uPt ).at( uEntry ) / ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histVecPtFracL5Restr.at( uPt )->Fill( ptGenJetEtaBin.at( uPt ).at( uEntry ) / ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaFracL5Restr->Fill( ptGenJetEtaBin.at( uPt ).at( uEntry ) / ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-                histFracL5Restr->Fill( ptGenJetEtaBin.at( uPt ).at( uEntry ) / ptEtaBin.at( uPt ).at( uEntry ), weightEtaBin.at( uPt ).at( uEntry ) );
-              }
+            if ( pt >= minPt_ && reco::deltaR( etaGenJetEtaBin.at( uPt ).at( uEntry ), phiGenJetEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
+              histEtaPtFracL5Restr->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histVecPtFracL5Restr.at( uPt )->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histEtaFracL5Restr->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histFracL5Restr->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histEtaFracL5RestrMapPt->Fill( pt, value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histVecPtFracL5RestrMapEta.at( uPt )->Fill( eta, value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histFracL5RestrMapPt->Fill( pt, value, weightEtaBin.at( uPt ).at( uEntry ) );
+              histFracL5RestrMapEta->Fill( eta, value, weightEtaBin.at( uPt ).at( uEntry ) );
             }
           } // loop: uEntry < ptEtaBin.at( uPt ).size()
 
         } // loop: uPt < nPtBins_
 
+        if ( plot_ ) {
+          if ( fitNonRestr_ ) {
+            histEtaFracL5MapPt->Draw();
+            c1.Print( std::string( pathPlots_ + histEtaFracL5MapPt->GetName() + ".png" ).c_str() );
+          }
+          histEtaFracL5RestrMapPt->Draw();
+          c1.Print( std::string( pathPlots_ + histEtaFracL5RestrMapPt->GetName() + ".png" ).c_str() );
+        }
+
       } // loop: keyEta
+
+      if ( plot_ ) {
+        if ( fitNonRestr_ ) {
+          histFracL5MapPt->Draw();
+          c1.Print( std::string( pathPlots_ + histFracL5MapPt->GetName() + ".png" ).c_str() );
+          histFracL5MapEta->Draw();
+          c1.Print( std::string( pathPlots_ + histFracL5MapEta->GetName() + ".png" ).c_str() );
+          for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+            histVecPtFracL5MapEta.at( uPt )->Draw();
+            c1.Print( std::string( pathPlots_ + histVecPtFracL5MapEta.at( uPt )->GetName() + ".png" ).c_str() );
+          }
+        }
+        histFracL5RestrMapPt->Draw();
+        c1.Print( std::string( pathPlots_ + histFracL5RestrMapPt->GetName() + ".png" ).c_str() );
+        histFracL5RestrMapEta->Draw();
+        c1.Print( std::string( pathPlots_ + histFracL5RestrMapEta->GetName() + ".png" ).c_str() );
+        for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+          histVecPtFracL5RestrMapEta.at( uPt )->Draw();
+          c1.Print( std::string( pathPlots_ + histVecPtFracL5RestrMapEta.at( uPt )->GetName() + ".png" ).c_str() );
+        }
+      }
 
       dirFit_->cd();
 
@@ -512,7 +587,7 @@ int main( int argc, char * argv[] )
         returnStatus_ += 0x100000;
       }
 
-    }  // loop: keyFit
+    } // loop: keyFit
 
 
     // Fit JECs
@@ -522,8 +597,6 @@ int main( int argc, char * argv[] )
         std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                   << "    L5 JEC determination for " << objCat << " started" << std::endl;
       }
-      TCanvas c1( "c1" );
-      c1.cd();
 
       const JetCorrectorParameters::Definitions jecDefinitions( jecVars_, jecDims_, jecFunction_, false );
 
