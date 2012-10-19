@@ -124,11 +124,25 @@ std::vector< double > TransferFunction::Parameters( size_t j ) const
 
 // Evaluate
 
+std::string TransferFunction::Formula() const
+{
+  TString fitStr( FitFunction() );
+  for ( size_t i = 0; i < NParFit(); ++i ) {
+    TString depStr( PrintDependency( i, false ) );
+    depStr.ReplaceAll( Dependency(), "y" );
+    depStr.Prepend( "(" );
+    depStr.Append( ")" );
+    TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
+    fitStr.ReplaceAll( parStr, depStr );
+  }
+  return std::string( fitStr.Data() );
+}
+
 std::string TransferFunction::Formula( double dependencyValue ) const
 {
   TFormula fitFunc( fitFunction_ );
-  TFormula depFunc( dependencyFunction_ );
   for ( size_t i = 0; i < NParFit(); ++i ) {
+    TFormula depFunc( dependencyFunction_ );
     for ( size_t j = 0; j < NParDependency(); ++j ) {
       depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
@@ -140,8 +154,8 @@ std::string TransferFunction::Formula( double dependencyValue ) const
 double TransferFunction::Eval( double dependencyValue, double value ) const
 {
   TFormula fitFunc( fitFunction_ );
-  TFormula depFunc( dependencyFunction_ );
   for ( size_t i = 0; i < NParFit(); ++i ) {
+    TFormula depFunc( dependencyFunction_ );
     for ( size_t j = 0; j < NParDependency(); ++j ) {
       depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
@@ -152,7 +166,7 @@ double TransferFunction::Eval( double dependencyValue, double value ) const
 
 // Communication
 
-std::string TransferFunction::Print() const
+std::string TransferFunction::Print( bool useNan ) const
 {
   std::stringstream print( std::ios_base::out );
   print << std::endl;
@@ -163,25 +177,59 @@ std::string TransferFunction::Print() const
   print << "Parameters 1D:" << std::endl;
   for ( size_t i = 0; i < NParFit(); ++i ) {
     print << "[" << i << "]: \t";
-    if ( Parameter( i ) == transferFunctionInitConst ) print << "NAN";
+    if ( useNan && Parameter( i ) == transferFunctionInitConst ) print << "NAN";
     else print << Parameter( i );
     print << std::endl;
   }
+  print << "[all]: \t" << PrintFit1D( useNan ) << std::endl;
   print << std::endl;
 
   print << "Parameters 2D (DependencyFunction):" << std::endl;
   for ( size_t i = 0; i < NParFit(); ++i ) {
+    print << "[" << i << "]: \t"  << PrintDependency( i, useNan ) << std::endl;
+  }
+  print << "[all]: \t" << PrintFit2D( useNan ) << std::endl;
+
+  return print.str();
+}
+
+std::string TransferFunction::PrintFit1D( bool useNan ) const
+{
+  TString fitStr( FitFunction() );
+  for ( size_t i = 0; i < NParFit(); ++i ) {
+    TString valStr( boost::lexical_cast< std::string >( Parameter( i ) ) );
+    if ( useNan ) valStr.ReplaceAll( boost::lexical_cast< std::string >( transferFunctionInitConst ).c_str(), "NAN" );
+    valStr.Prepend( "(" );
+    valStr.Append( ")" );
+    TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
+    fitStr.ReplaceAll( parStr, valStr );
+  }
+  return std::string( fitStr.Data() );
+}
+
+std::string TransferFunction::PrintFit2D( bool useNan ) const
+{
+  TString fitStr( FitFunction() );
+  for ( size_t i = 0; i < NParFit(); ++i ) {
+    TString depStr( PrintDependency( i, useNan ) );
+    depStr.Prepend( "(" );
+    depStr.Append( ")" );
+    TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
+    fitStr.ReplaceAll( parStr, depStr );
+  }
+  return std::string( fitStr.Data() );
+}
+
+std::string TransferFunction::PrintDependency( size_t i, bool useNan ) const
+{
     TFormula depFunc( dependencyFunction_ );
     for ( size_t j = 0; j < NParDependency(); ++j ) {
       depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
-    TString str( depFunc.GetExpFormula( "p" ) );
-    str.ReplaceAll( "x", Dependency() );
-    str.ReplaceAll( boost::lexical_cast< std::string >( transferFunctionInitConst ).c_str(), "NAN" );
-    print << "[" << i << "]: \t"  << str << std::endl;
-  }
-
-  return print.str();
+    TString depStr( depFunc.GetExpFormula( "p" ) );
+    depStr.ReplaceAll( "x", Dependency() );
+    if ( useNan ) depStr.ReplaceAll( boost::lexical_cast< std::string >( transferFunctionInitConst ).c_str(), "NAN" );
+    return std::string( depStr.Data() );
 }
 
 TransferFunction TransferFunction::Read( const std::string & stream )

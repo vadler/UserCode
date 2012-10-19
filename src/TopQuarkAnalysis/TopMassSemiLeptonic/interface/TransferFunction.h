@@ -219,7 +219,12 @@ namespace my {
 
       /// Evaluate
 
-      /// Get the fit function with its parameters set to the numerical values
+      /// Get the 2D fit function.
+      /// The function is returned in the format for filling a TFormula (s.
+      /// data members).
+      std::string Formula() const;
+
+      /// Get the 1D fit function with its parameters set to the numerical values
       /// for the given value of the dependency variable.
       /// The function is returned in the format for filling a TFormula (s.
       /// data members).
@@ -233,7 +238,19 @@ namespace my {
 
       /// Returns a formatted string for human readability with all important
       /// parameters of the transfer function.
-      std::string Print() const;
+      std::string Print( bool useNan = true ) const;
+
+      /// Returns a formatted string for human readability of the 1D fit
+      /// function.
+      std::string PrintFit1D( bool useNan = true ) const;
+
+      /// Returns a formatted string for human readability of the 2D fit
+      /// function.
+      std::string PrintFit2D( bool useNan = true ) const;
+
+      /// Returns a formatted string for human readability of the dependency
+      /// function for the given parameter of the fit function.
+      std::string PrintDependency( size_t i, bool useNan = true ) const;
 
       /// Creates a transfer function from a string as produced by Print().
       /// NOT IMPLEMENTED YET!
