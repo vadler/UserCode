@@ -14,7 +14,7 @@ sample = 'Fall11_R4_1_L3_unambiguousOnly'
 #sample = 'Fall11_R4_1_L3_totalMinDist'
 
 # Settings
-overwrite = True # to throw away earlier versions of histograms, trees and functions
+overwrite = False # to throw away earlier versions of histograms, trees and functions
 # Exclusive switches:
 usePileUp = False
 useAlt    = True # E instead of p
@@ -31,10 +31,11 @@ widthFactor = 5. # for rebinning (in units of orig. RMS)
 
 # Fitting
 doFit          = True
+scale          = True
 fitMaxPt       = 999999.
 #fitMaxPt       = 200.
-fitNonRestr    = False
-fitEtaBins     = False
+fitNonRestr    = True
+fitEtaBins     = True
 #minPt    = 0.
 #minPt    = 20.
 minPt    = 50.
@@ -71,9 +72,15 @@ logFile = inputFile.replace( 'root', 'log' )
 if refSel:
   logFile = logFile.replace( '.', '_Ref.', 1 )
 if useNonT:
-  logFile = logFile.replace( '.', '_P_.', 1 )
+  if useAlt:
+    logFile = logFile.replace( '.', '_E_.', 1 )
+  else:
+    logFile = logFile.replace( '.', '_P_.', 1 )
 else:
-  logFile = logFile.replace( '.', '_Pt_.', 1 )
+  if useAlt:
+    logFile = logFile.replace( '.', '_Et_.', 1 )
+  else:
+    logFile = logFile.replace( '.', '_Pt_.', 1 )
 logFile = logFile.replace( '_.', '_' + name + '.', 1 )
 logFile = logFile.replace( '_.', '.', 1 )
 inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
@@ -87,9 +94,9 @@ pathPlots = '%s/output/plots/fitTopTransferFunctions/fitTopTransferFunctions_fro
 if refSel:
   pathPlots += 'Ref_'
 if runTest:
-  #pathPlots = ''
-  pathPlots = pathPlots.replace( 'fitTopTransferFunctions', 'fitTopTransferFunctionsTest', 2 )
-  pathPlots = pathPlots.replace( 'fitTopTransferFunctionsTest', 'fitTopTransferFunctions', 1 )
+  pathPlots = ''
+  #pathPlots = pathPlots.replace( 'fitTopTransferFunctions', 'fitTopTransferFunctionsTest', 2 )
+  #pathPlots = pathPlots.replace( 'fitTopTransferFunctionsTest', 'fitTopTransferFunctions', 1 )
 
 
 # Processing
@@ -135,12 +142,13 @@ process.fit = cms.PSet(
 , minPt  = cms.double( minPt )
 , maxDR  = cms.double( maxDR )
 )
-if runTest:
-  process.fit.fitNonRestr = False
-  process.fit.fitEtaBins  = False
+#if runTest:
+  #process.fit.fitNonRestr = False
+  #process.fit.fitEtaBins  = False
 
 process.transfer = cms.PSet(
   doFit       = cms.bool( doFit )
+, scale       = cms.bool( scale )
 , fitMaxPt    = cms.double( fitMaxPt )
 , fitFunction = cms.string( fitFunction )
 , useBkg      = cms.bool( useBkg )

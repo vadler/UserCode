@@ -33,7 +33,7 @@
 
 
 // Initialise parameters for fit function
-void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction = false );
+void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction = false, bool scale = false );
 // Check correct assignment of signal and background to the fit function parameters
 bool checkParametersFit( TF1 * fit, bool useBkgFunction = false );
 // Interchange signal and background parameters of fit function
@@ -101,6 +101,7 @@ int main( int argc, char * argv[] )
   // Configuration for fitting transfer functions
   const edm::ParameterSet & transfer_( process_.getParameter< edm::ParameterSet >( "transfer" ) );
   const bool doFit_( transfer_.getParameter< bool >( "doFit" ) );
+  const bool scale_( transfer_.getParameter< bool >( "scale" ) );
   double fitMaxPt_( transfer_.getParameter< double >( "fitMaxPt" ) );
   const std::string fitFunction_( transfer_.getParameter< std::string >( "fitFunction" ) );
   const bool useBkg_( transfer_.getParameter< bool >( "useBkg" ) );
@@ -508,41 +509,45 @@ int main( int argc, char * argv[] )
               histTransRestr->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
             }
           } // loop: uEntry < ptEtaBin.at( uPt ).size()
-          if ( fitNonRestr_ && histEtaPtTrans->GetSumOfWeights() != 0. ) {
+          if ( fitNonRestr_ && ! ( scale_ && histEtaPtTrans->GetSumOfWeights() == 0. ) ) {
             for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
               const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
               const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
               const Double_t etaGenSymm( useSymm_ ? std::fabs( etaGenEtaBin.at( uPt ).at( uEntry ) ) : etaGenEtaBin.at( uPt ).at( uEntry ) );
               const Double_t etaSymm( useSymm_ ? std::fabs( etaEtaBin.at( uPt ).at( uEntry ) ) : etaEtaBin.at( uPt ).at( uEntry ) );
               const Double_t etaRef( refGen_ ? etaGenSymm : etaSymm );
-              const Double_t weight( weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTrans->GetSumOfWeights() );
-              if ( fitNonRestr_ ) {
-                histEtaTransMapPt->Fill( ptRef, value, weight );
-                histVecPtTransMapEta.at( uPt )->Fill( etaRef, value, weight );
-                histTransMapPt->Fill( ptRef, value, weight );
-                histTransMapEta->Fill( etaRef, value, weight );
-              }
+              const Double_t weightPt( scale_ ? weightEtaBin.at( uPt ).at( uEntry ) / histVecPtTrans.at( uPt )->GetSumOfWeights() : weightEtaBin.at( uPt ).at( uEntry ) );
+              const Double_t weightEta( scale_ ? weightEtaBin.at( uPt ).at( uEntry ) / histEtaTrans->GetSumOfWeights() : weightEtaBin.at( uPt ).at( uEntry ) );
+              const Double_t weightEtaPt( scale_ ? weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTrans->GetSumOfWeights() : weightEtaBin.at( uPt ).at( uEntry ) );
+              histEtaTransMapPt->Fill( ptRef, value, weightEtaPt );
+              histVecPtTransMapEta.at( uPt )->Fill( etaRef, value, weightEtaPt );
+              histTransMapPt->Fill( ptRef, value, weightPt );
+              histTransMapEta->Fill( etaRef, value, weightEta );
             } // loop: uEntry < ptEtaBin.at( uPt ).size()
           }
-          if ( histEtaPtTransRestr->GetSumOfWeights() != 0. ) {
+          if ( ! ( scale_ && histEtaPtTransRestr->GetSumOfWeights() == 0. ) ) {
             for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
-              const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
               const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
-              const Double_t etaGenSymm( useSymm_ ? std::fabs( etaGenEtaBin.at( uPt ).at( uEntry ) ) : etaGenEtaBin.at( uPt ).at( uEntry ) );
-              const Double_t etaSymm( useSymm_ ? std::fabs( etaEtaBin.at( uPt ).at( uEntry ) ) : etaEtaBin.at( uPt ).at( uEntry ) );
-              const Double_t etaRef( refGen_ ? etaGenSymm : etaSymm );
-              const Double_t weight( weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRestr->GetSumOfWeights() );
               if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-                histEtaTransRestrMapPt->Fill( ptRef, value, weight );
-                histVecPtTransRestrMapEta.at( uPt )->Fill( etaRef, value, weight);
-                histTransRestrMapPt->Fill( ptRef, value, weight );
-                histTransRestrMapEta->Fill( etaRef, value, weight );
+                const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
+                const Double_t etaGenSymm( useSymm_ ? std::fabs( etaGenEtaBin.at( uPt ).at( uEntry ) ) : etaGenEtaBin.at( uPt ).at( uEntry ) );
+                const Double_t etaSymm( useSymm_ ? std::fabs( etaEtaBin.at( uPt ).at( uEntry ) ) : etaEtaBin.at( uPt ).at( uEntry ) );
+                const Double_t etaRef( refGen_ ? etaGenSymm : etaSymm );
+                const Double_t weightPt( scale_ ? weightEtaBin.at( uPt ).at( uEntry ) / histVecPtTransRestr.at( uPt )->GetSumOfWeights() : weightEtaBin.at( uPt ).at( uEntry ) );
+                const Double_t weightEta( scale_ ? weightEtaBin.at( uPt ).at( uEntry ) / histEtaTransRestr->GetSumOfWeights() : weightEtaBin.at( uPt ).at( uEntry ) );
+                const Double_t weightEtaPt( scale_ ? weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRestr->GetSumOfWeights() : weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaTransRestrMapPt->Fill( ptRef, value, weightEtaPt );
+                histVecPtTransRestrMapEta.at( uPt )->Fill( etaRef, value, weightEtaPt);
+                histTransRestrMapPt->Fill( ptRef, value, weightPt );
+                histTransRestrMapEta->Fill( etaRef, value, weightEta );
               }
             } // loop: uEntry < ptEtaBin.at( uPt ).size()
           }
 
-          if ( histEtaPtTrans->GetSumOfWeights() != 0. ) histEtaPtTrans->Scale( 1. / histEtaPtTrans->GetSumOfWeights() );
-          if ( histEtaPtTransRestr->GetSumOfWeights() != 0. ) histEtaPtTransRestr->Scale( 1. / histEtaPtTransRestr->GetSumOfWeights() );
+          if ( scale_ ) {
+            if ( histEtaPtTrans->GetSumOfWeights() != 0. ) histEtaPtTrans->Scale( 1. / histEtaPtTrans->GetSumOfWeights() );
+            if ( histEtaPtTransRestr->GetSumOfWeights() != 0. ) histEtaPtTransRestr->Scale( 1. / histEtaPtTransRestr->GetSumOfWeights() );
+          }
 
           const std::string nameEtaPtTransRebin( nameEtaPtTrans + "Rebin" );
           const Double_t meanEtaPtTrans( histEtaPtTrans->GetMean() );
@@ -579,15 +584,19 @@ int main( int argc, char * argv[] )
             }
           } // loop: uEntry < ptEtaBin.at( uPt ).size()
 
-          if ( histEtaPtTransRebin->GetSumOfWeights() != 0. ) histEtaPtTransRebin->Scale( 1. / histEtaPtTransRebin->GetSumOfWeights() );
-          if ( histEtaPtTransRestrRebin->GetSumOfWeights() != 0. ) histEtaPtTransRestrRebin->Scale( 1. / histEtaPtTransRestrRebin->GetSumOfWeights() );
+          if ( scale_ ) {
+            if ( histEtaPtTransRebin->GetSumOfWeights() != 0. ) histEtaPtTransRebin->Scale( 1. / histEtaPtTransRebin->GetSumOfWeights() );
+            if ( histEtaPtTransRestrRebin->GetSumOfWeights() != 0. ) histEtaPtTransRestrRebin->Scale( 1. / histEtaPtTransRestrRebin->GetSumOfWeights() );
+          }
 
         } // loop: uPt < nPtBins_
 
-        if ( histEtaTrans->GetSumOfWeights() != 0. ) histEtaTrans->Scale( 1. / histEtaTrans->GetSumOfWeights() );
-        if ( histEtaTransMapPt->GetSumOfWeights() != 0. ) histEtaTransMapPt->Scale( 1. / histEtaTransMapPt->GetSumOfWeights() );
-        if ( histEtaTransRestr->GetSumOfWeights() != 0. ) histEtaTransRestr->Scale( 1. / histEtaTransRestr->GetSumOfWeights() );
-        if ( histEtaTransRestrMapPt->GetSumOfWeights() != 0. ) histEtaTransRestrMapPt->Scale( 1. / histEtaTransRestrMapPt->GetSumOfWeights() );
+        if ( scale_ ) {
+          if ( histEtaTrans->GetSumOfWeights() != 0. ) histEtaTrans->Scale( 1. / histEtaTrans->GetSumOfWeights() );
+          if ( histEtaTransMapPt->GetSumOfWeights() != 0. ) histEtaTransMapPt->Scale( 1. / histEtaTransMapPt->GetSumOfWeights() );
+          if ( histEtaTransRestr->GetSumOfWeights() != 0. ) histEtaTransRestr->Scale( 1. / histEtaTransRestr->GetSumOfWeights() );
+          if ( histEtaTransRestrMapPt->GetSumOfWeights() != 0. ) histEtaTransRestrMapPt->Scale( 1. / histEtaTransRestrMapPt->GetSumOfWeights() );
+        }
 
         const std::string nameEtaTransRebin( nameEtaTrans + "Rebin" );
         const Double_t meanEtaTrans( histEtaTrans->GetMean() );
@@ -634,26 +643,30 @@ int main( int argc, char * argv[] )
               histEtaTransRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               const std::string nameEtaPtTransRebin( nameEtaPtTrans + "Rebin" );
               TH1D * histEtaPtTransRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRebin.c_str() ) ) );
-              if ( histEtaPtTransRebin != 0 && histEtaPtTransRebin->GetSumOfWeights() != 0. ) {
-                histEtaTransRebinMapPt->Fill( ptRef, value, weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRebin->GetSumOfWeights() );
+              if ( histEtaPtTransRebin != 0 && ! ( scale_ && histEtaPtTransRebin->GetSumOfWeights() == 0. ) ) {
+                const Double_t weight( scale_ ? weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRebin->GetSumOfWeights() : weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaTransRebinMapPt->Fill( ptRef, value, weight );
               }
             }
             if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
               histEtaTransRestrRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               const std::string nameEtaPtTransRestrRebin( nameEtaPtTrans + "RestrRebin" );
               TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
-              if ( histEtaPtTransRestrRebin != 0 && histEtaPtTransRestrRebin->GetSumOfWeights() != 0. ) {
-                histEtaTransRestrRebinMapPt->Fill( ptRef, value, weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRestrRebin->GetSumOfWeights() );
+              if ( histEtaPtTransRestrRebin != 0 && ! ( scale_ && histEtaPtTransRestrRebin->GetSumOfWeights() == 0. ) ) {
+                const Double_t weight( scale_ ? weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRestrRebin->GetSumOfWeights() : weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaTransRestrRebinMapPt->Fill( ptRef, value, weight );
               }
             }
           } // loop: uEntry < ptEtaBin.at( uPt ).size()
 
         } // loop: uPt < nPtBins_
 
-        if ( histEtaTransRebin->GetSumOfWeights() != 0. ) histEtaTransRebin->Scale( 1. / histEtaTransRebin->GetSumOfWeights() );
-        if ( histEtaTransRebinMapPt->GetSumOfWeights() != 0. ) histEtaTransRebinMapPt->Scale( 1. / histEtaTransRebinMapPt->GetSumOfWeights() );
-        if ( histEtaTransRestrRebin->GetSumOfWeights() != 0. ) histEtaTransRestrRebin->Scale( 1. / histEtaTransRestrRebin->GetSumOfWeights() );
-        if ( histEtaTransRestrRebinMapPt->GetSumOfWeights() != 0. ) histEtaTransRestrRebinMapPt->Scale( 1. / histEtaTransRestrRebinMapPt->GetSumOfWeights() );
+        if ( scale_ ) {
+          if ( histEtaTransRebin->GetSumOfWeights() != 0. ) histEtaTransRebin->Scale( 1. / histEtaTransRebin->GetSumOfWeights() );
+          if ( histEtaTransRebinMapPt->GetSumOfWeights() != 0. ) histEtaTransRebinMapPt->Scale( 1. / histEtaTransRebinMapPt->GetSumOfWeights() );
+          if ( histEtaTransRestrRebin->GetSumOfWeights() != 0. ) histEtaTransRestrRebin->Scale( 1. / histEtaTransRestrRebin->GetSumOfWeights() );
+          if ( histEtaTransRestrRebinMapPt->GetSumOfWeights() != 0. ) histEtaTransRestrRebinMapPt->Scale( 1. / histEtaTransRestrRebinMapPt->GetSumOfWeights() );
+        }
 
         if ( plot_ ) {
           if ( fitNonRestr_ ) {
@@ -666,17 +679,19 @@ int main( int argc, char * argv[] )
 
       } // loop: keyEta
 
-      if ( histTrans->GetSumOfWeights() != 0. ) histTrans->Scale( 1. / histTrans->GetSumOfWeights() );
-      if ( histTransMapPt->GetSumOfWeights() != 0. ) histTransMapPt->Scale( 1. / histTransMapPt->GetSumOfWeights() );
-      if ( histTransMapEta->GetSumOfWeights() != 0. ) histTransMapEta->Scale( 1. / histTransMapEta->GetSumOfWeights() );
-      if ( histTransRestr->GetSumOfWeights() != 0. ) histTransRestr->Scale( 1. / histTransRestr->GetSumOfWeights() );
-      if ( histTransRestrMapPt->GetSumOfWeights() != 0. ) histTransRestrMapPt->Scale( 1. / histTransRestrMapPt->GetSumOfWeights() );
-      if ( histTransRestrMapEta->GetSumOfWeights() != 0. ) histTransRestrMapEta->Scale( 1. / histTransRestrMapEta->GetSumOfWeights() );
-      for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
-        if ( histVecPtTrans.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTrans.at( uPt )->Scale( 1. / histVecPtTrans.at( uPt )->GetSumOfWeights() );
-        if ( histVecPtTransMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransMapEta.at( uPt )->Scale( 1. / histVecPtTransMapEta.at( uPt )->GetSumOfWeights() );
-        if ( histVecPtTransRestr.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestr.at( uPt )->Scale( 1. / histVecPtTransRestr.at( uPt )->GetSumOfWeights() );
-        if ( histVecPtTransRestrMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestrMapEta.at( uPt )->Scale( 1. / histVecPtTransRestrMapEta.at( uPt )->GetSumOfWeights() );
+      if ( scale_ ) {
+        if ( histTrans->GetSumOfWeights() != 0. ) histTrans->Scale( 1. / histTrans->GetSumOfWeights() );
+        if ( histTransMapPt->GetSumOfWeights() != 0. ) histTransMapPt->Scale( 1. / histTransMapPt->GetSumOfWeights() );
+        if ( histTransMapEta->GetSumOfWeights() != 0. ) histTransMapEta->Scale( 1. / histTransMapEta->GetSumOfWeights() );
+        if ( histTransRestr->GetSumOfWeights() != 0. ) histTransRestr->Scale( 1. / histTransRestr->GetSumOfWeights() );
+        if ( histTransRestrMapPt->GetSumOfWeights() != 0. ) histTransRestrMapPt->Scale( 1. / histTransRestrMapPt->GetSumOfWeights() );
+        if ( histTransRestrMapEta->GetSumOfWeights() != 0. ) histTransRestrMapEta->Scale( 1. / histTransRestrMapEta->GetSumOfWeights() );
+        for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+          if ( histVecPtTrans.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTrans.at( uPt )->Scale( 1. / histVecPtTrans.at( uPt )->GetSumOfWeights() );
+          if ( histVecPtTransMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransMapEta.at( uPt )->Scale( 1. / histVecPtTransMapEta.at( uPt )->GetSumOfWeights() );
+          if ( histVecPtTransRestr.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestr.at( uPt )->Scale( 1. / histVecPtTransRestr.at( uPt )->GetSumOfWeights() );
+          if ( histVecPtTransRestrMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestrMapEta.at( uPt )->Scale( 1. / histVecPtTransRestrMapEta.at( uPt )->GetSumOfWeights() );
+        }
       }
 
       dirFit_->cd();
@@ -790,8 +805,10 @@ int main( int argc, char * argv[] )
 
         for ( unsigned uEntry = 0; uEntry < sizeEta_.at( uEta ); ++uEntry ) {
           if ( ptData_.at( uEta ).at( uEntry ) == -9. || ptGenData_.at( uEta ).at( uEntry ) == -9. ) continue; // no match
-          const Double_t value( refGen_ ? ptGenData_.at( uEta ).at( uEntry ) - ptData_.at( uEta ).at( uEntry ) : ptData_.at( uEta ).at( uEntry ) - ptGenData_.at( uEta ).at( uEntry ) );
-          const Double_t ptRef( refGen_ ? ptGenData_.at( uEta ).at( uEntry ) : ptData_.at( uEta ).at( uEntry ) );
+          const Double_t ptVal( useNonT_ ? ptData_.at( uEta ).at( uEntry ) * std::cosh( etaData_.at( uEta ).at( uEntry ) ) : ptData_.at( uEta ).at( uEntry ) );
+          const Double_t ptGenVal( useNonT_ ? ptGenData_.at( uEta ).at( uEntry ) * std::cosh( etaGenData_.at( uEta ).at( uEntry ) ) : ptGenData_.at( uEta ).at( uEntry ) );
+          const Double_t value( refGen_ ? ptGenVal - ptVal : ptVal - ptGenVal );
+          const Double_t ptRef( refGen_ ? ptGenVal : ptVal );
 
           if ( fitNonRestr_ ) {
             histTransRebin->Fill( value, weightData_.at( uEta ).at( uEntry ) );
@@ -824,8 +841,10 @@ int main( int argc, char * argv[] )
 
         for ( unsigned uEntry = 0; uEntry < sizeEta_.at( uEta ); ++uEntry ) {
           if ( ptData_.at( uEta ).at( uEntry ) == -9. || ptGenData_.at( uEta ).at( uEntry ) == -9. ) continue; // no match
-          const Double_t value( refGen_ ? ptGenData_.at( uEta ).at( uEntry ) - ptData_.at( uEta ).at( uEntry ) : ptData_.at( uEta ).at( uEntry ) - ptGenData_.at( uEta ).at( uEntry ) );
-          const Double_t ptRef( refGen_ ? ptGenData_.at( uEta ).at( uEntry ) : ptData_.at( uEta ).at( uEntry ) );
+          const Double_t ptVal( useNonT_ ? ptData_.at( uEta ).at( uEntry ) * std::cosh( etaData_.at( uEta ).at( uEntry ) ) : ptData_.at( uEta ).at( uEntry ) );
+          const Double_t ptGenVal( useNonT_ ? ptGenData_.at( uEta ).at( uEntry ) * std::cosh( etaGenData_.at( uEta ).at( uEntry ) ) : ptGenData_.at( uEta ).at( uEntry ) );
+          const Double_t value( refGen_ ? ptGenVal - ptVal : ptVal - ptGenVal );
+          const Double_t ptRef( refGen_ ? ptGenVal : ptVal );
           const Double_t etaGenSymm( useSymm_ ? std::fabs( etaGenData_.at( uEta ).at( uEntry ) ) : etaGenData_.at( uEta ).at( uEntry ) );
           const Double_t etaSymm( useSymm_ ? std::fabs( etaData_.at( uEta ).at( uEntry ) ) : etaData_.at( uEta ).at( uEntry ) );
           const Double_t etaRef( refGen_ ? etaGenSymm : etaSymm );
@@ -834,13 +853,19 @@ int main( int argc, char * argv[] )
             const std::string nameEtaTrans( nameEta + "_Trans" );
             const std::string nameEtaTransRebin( nameEtaTrans + "Rebin" );
             TH1D * histEtaTransRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRebin.c_str() ) ) );
-            if ( histEtaTransRebin != 0 && histEtaTransRebin->GetSumOfWeights() != 0. ) histTransRebinMapEta->Fill( etaRef, value, weightData_.at( uEta ).at( uEntry ) / histEtaTransRebin->GetSumOfWeights() );
+            if ( histEtaTransRebin != 0 && ! ( scale_ && histEtaTransRebin->GetSumOfWeights() == 0. ) ) {
+              const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histEtaTransRebin->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
+              histTransRebinMapEta->Fill( etaRef, value, weight );
+            }
           }
           if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
             const std::string nameEtaTransRestr( nameEta + "_TransRestr" );
             const std::string nameEtaTransRestrRebin( nameEtaTransRestr + "Rebin" );
             TH1D * histEtaTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRestrRebin.c_str() ) ) );
-            if ( histEtaTransRestrRebin != 0 && histEtaTransRestrRebin->GetSumOfWeights() != 0. ) histTransRestrRebinMapEta->Fill( etaRef, value, weightData_.at( uEta ).at( uEntry ) / histEtaTransRestrRebin->GetSumOfWeights() );
+            if ( histEtaTransRestrRebin != 0 && ! ( scale_ && histEtaTransRestrRebin->GetSumOfWeights() == 0. ) ) {
+              const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histEtaTransRestrRebin->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
+              histTransRestrRebinMapEta->Fill( etaRef, value, weight );
+            }
           }
           for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
             if ( ptBins_.at( uPt ) <= ptRef && ptRef < ptBins_.at( uPt + 1 ) ) {
@@ -848,16 +873,28 @@ int main( int argc, char * argv[] )
               const std::string nameEtaPt( nameEta + "_" + baseTitlePt + binPt );
               const std::string nameEtaPtTrans( nameEtaPt + "_Trans" );
               if ( fitNonRestr_ ) {
-                if ( histVecPtTransRebin.at( uPt)->GetSumOfWeights() != 0. ) histTransRebinMapPt->Fill( ptRef, value, weightData_.at( uEta ).at( uEntry ) / histVecPtTransRebin.at( uPt)->GetSumOfWeights() );
+                if ( histVecPtTransRebin.at( uPt) != 0 && ! ( scale_ && histVecPtTransRebin.at( uPt)->GetSumOfWeights() == 0. ) ) {
+                  const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histVecPtTransRebin.at( uPt)->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
+                  histTransRebinMapPt->Fill( ptRef, value, weight );
+                }
                 const std::string nameEtaPtTransRebin( nameEtaPtTrans + "Rebin" );
                 TH1D * histEtaPtTransRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRebin.c_str() ) ) );
-                if ( histEtaPtTransRebin != 0 && histEtaPtTransRebin->GetSumOfWeights() != 0. ) histVecPtTransRebinMapEta.at( uPt )->Fill( etaRef, value, weightData_.at( uEta ).at( uEntry ) / histEtaPtTransRebin->GetSumOfWeights() );
+                if ( histEtaPtTransRebin != 0 && ! ( scale_ && histEtaPtTransRebin->GetSumOfWeights() == 0. ) ) {
+                  const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histEtaPtTransRebin->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
+                  histVecPtTransRebinMapEta.at( uPt )->Fill( etaRef, value, weight );
+                }
               }
               if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
-                if ( histVecPtTransRestrRebin.at( uPt)->GetSumOfWeights() != 0. ) histTransRestrRebinMapPt->Fill( ptRef, value, weightData_.at( uEta ).at( uEntry ) / histVecPtTransRestrRebin.at( uPt)->GetSumOfWeights() );
+                if ( histVecPtTransRestrRebin.at( uPt) != 0 && ! ( scale_ && histVecPtTransRestrRebin.at( uPt)->GetSumOfWeights() == 0. ) ) {
+                  const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histVecPtTransRestrRebin.at( uPt)->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
+                  histTransRestrRebinMapPt->Fill( ptRef, value, weight );
+                }
                 const std::string nameEtaPtTransRestrRebin( nameEtaPtTrans + "RestrRebin" );
                 TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
-                if ( histEtaPtTransRestrRebin != 0 && histEtaPtTransRestrRebin->GetSumOfWeights() != 0. ) histVecPtTransRestrRebinMapEta.at( uPt )->Fill( etaRef, value, weightData_.at( uEta ).at( uEntry ) / histEtaPtTransRestrRebin->GetSumOfWeights() );
+                if ( histEtaPtTransRestrRebin != 0 && ! ( scale_ && histEtaPtTransRestrRebin->GetSumOfWeights() == 0. ) ) {
+                  const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histEtaPtTransRestrRebin->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
+                  histVecPtTransRestrRebinMapEta.at( uPt )->Fill( etaRef, value, weight );
+                }
               }
               break;
             }
@@ -867,17 +904,19 @@ int main( int argc, char * argv[] )
 
       } // loop: keyEta
 
-      if ( histTransRebin->GetSumOfWeights() != 0. ) histTransRebin->Scale( 1. / histTransRebin->GetSumOfWeights() );
-      if ( histTransRebinMapPt->GetSumOfWeights() != 0. ) histTransRebinMapPt->Scale( 1. / histTransRebinMapPt->GetSumOfWeights() );
-      if ( histTransRebinMapEta->GetSumOfWeights() != 0. ) histTransRebinMapEta->Scale( 1. / histTransRebinMapEta->GetSumOfWeights() );
-      if ( histTransRestrRebin->GetSumOfWeights() != 0. ) histTransRestrRebin->Scale( 1. / histTransRestrRebin->GetSumOfWeights() );
-      if ( histTransRestrRebinMapPt->GetSumOfWeights() != 0. ) histTransRestrRebinMapPt->Scale( 1. / histTransRestrRebinMapPt->GetSumOfWeights() );
-      if ( histTransRestrRebinMapEta->GetSumOfWeights() != 0. ) histTransRestrRebinMapEta->Scale( 1. / histTransRestrRebinMapEta->GetSumOfWeights() );
-      for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
-        if ( histVecPtTransRebin.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRebin.at( uPt )->Scale( 1. / histVecPtTransRebin.at( uPt )->GetSumOfWeights() );
-        if ( histVecPtTransRebinMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRebinMapEta.at( uPt )->Scale( 1. / histVecPtTransRebinMapEta.at( uPt )->GetSumOfWeights() );
-        if ( histVecPtTransRestrRebin.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestrRebin.at( uPt )->Scale( 1. / histVecPtTransRestrRebin.at( uPt )->GetSumOfWeights() );
-        if ( histVecPtTransRestrRebinMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestrRebinMapEta.at( uPt )->Scale( 1. / histVecPtTransRestrRebinMapEta.at( uPt )->GetSumOfWeights() );
+      if ( scale_ ) {
+        if ( histTransRebin->GetSumOfWeights() != 0. ) histTransRebin->Scale( 1. / histTransRebin->GetSumOfWeights() );
+        if ( histTransRebinMapPt->GetSumOfWeights() != 0. ) histTransRebinMapPt->Scale( 1. / histTransRebinMapPt->GetSumOfWeights() );
+        if ( histTransRebinMapEta->GetSumOfWeights() != 0. ) histTransRebinMapEta->Scale( 1. / histTransRebinMapEta->GetSumOfWeights() );
+        if ( histTransRestrRebin->GetSumOfWeights() != 0. ) histTransRestrRebin->Scale( 1. / histTransRestrRebin->GetSumOfWeights() );
+        if ( histTransRestrRebinMapPt->GetSumOfWeights() != 0. ) histTransRestrRebinMapPt->Scale( 1. / histTransRestrRebinMapPt->GetSumOfWeights() );
+        if ( histTransRestrRebinMapEta->GetSumOfWeights() != 0. ) histTransRestrRebinMapEta->Scale( 1. / histTransRestrRebinMapEta->GetSumOfWeights() );
+        for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+          if ( histVecPtTransRebin.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRebin.at( uPt )->Scale( 1. / histVecPtTransRebin.at( uPt )->GetSumOfWeights() );
+          if ( histVecPtTransRebinMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRebinMapEta.at( uPt )->Scale( 1. / histVecPtTransRebinMapEta.at( uPt )->GetSumOfWeights() );
+          if ( histVecPtTransRestrRebin.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestrRebin.at( uPt )->Scale( 1. / histVecPtTransRestrRebin.at( uPt )->GetSumOfWeights() );
+          if ( histVecPtTransRestrRebinMapEta.at( uPt )->GetSumOfWeights() != 0. ) histVecPtTransRestrRebinMapEta.at( uPt )->Scale( 1. / histVecPtTransRestrRebinMapEta.at( uPt )->GetSumOfWeights() );
+        }
       }
 
       if ( plot_ ) {
@@ -952,7 +991,7 @@ int main( int argc, char * argv[] )
         if ( fitNonRestr_ && histTransRebin != 0 ) {
           const std::string nameTransRebinFit( nameTransRebin + "_fit" );
           TF1 * fitTransRebin( new TF1( nameTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange_ ) ) );
-          setParametersFit( fitTransRebin, histTransRebin, useBkg_ );
+          setParametersFit( fitTransRebin, histTransRebin, useBkg_, scale_ );
           TFitResultPtr fitTransRebinResultPtr( histTransRebin->Fit( fitTransRebin, fitOptions_.c_str() ) );
           if ( fitTransRebinResultPtr >= 0 ) {
             if ( fitTransRebinResultPtr->Status() == 0 && fitTransRebinResultPtr->Ndf() != 0. ) {
@@ -992,7 +1031,7 @@ int main( int argc, char * argv[] )
         if ( histTransRestrRebin != 0 ) {
           const std::string nameTransRestrRebinFit( nameTransRestrRebin + "_fit" );
           TF1 * fitTransRestrRebin( new TF1( nameTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange_ ) ) );
-          setParametersFit( fitTransRestrRebin, histTransRestrRebin, useBkg_ );
+          setParametersFit( fitTransRestrRebin, histTransRestrRebin, useBkg_, scale_ );
           TFitResultPtr fitTransRestrRebinResultPtr( histTransRestrRebin->Fit( fitTransRestrRebin, fitOptions_.c_str() ) );
           if ( fitTransRestrRebinResultPtr >= 0 ) {
             if ( fitTransRestrRebinResultPtr->Status() == 0 && fitTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -1061,7 +1100,7 @@ int main( int argc, char * argv[] )
           if ( fitNonRestr_ && histPtTransRebin != 0 ) {
             const std::string namePtTransRebinFit( namePtTransRebin + "_fit" );
             TF1 * fitPtTransRebin( new TF1( namePtTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange_ ) ) );
-            setParametersFit( fitPtTransRebin, histPtTransRebin, useBkg_ );
+            setParametersFit( fitPtTransRebin, histPtTransRebin, useBkg_, scale_ );
             TFitResultPtr fitPtTransRebinResultPtr( histPtTransRebin->Fit( fitPtTransRebin, fitOptions_.c_str() ) );
             if ( fitPtTransRebinResultPtr >= 0 ) {
               if ( fitPtTransRebinResultPtr->Status() == 0 && fitPtTransRebinResultPtr->Ndf() != 0. ) {
@@ -1100,7 +1139,7 @@ int main( int argc, char * argv[] )
           if ( histPtTransRestrRebin != 0 ) {
             const std::string namePtTransRestrRebinFit( namePtTransRestrRebin + "_fit" );
             TF1 * fitPtTransRestrRebin( new TF1( namePtTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange_ ) ) );
-            setParametersFit( fitPtTransRestrRebin, histPtTransRestrRebin, useBkg_ );
+            setParametersFit( fitPtTransRestrRebin, histPtTransRestrRebin, useBkg_, scale_ );
             TFitResultPtr fitPtTransRestrRebinResultPtr( histPtTransRestrRebin->Fit( fitPtTransRestrRebin, fitOptions_.c_str() ) );
             if ( fitPtTransRestrRebinResultPtr >= 0 ) {
               if ( fitPtTransRestrRebinResultPtr->Status() == 0 && fitPtTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -1292,10 +1331,10 @@ int main( int argc, char * argv[] )
           const std::string nameEtaTransRebin( nameEtaTrans + "Rebin" );
           if ( fitNonRestr_ ) {
             TH1D * histEtaTransRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRebin.c_str() ) ) );
-            if ( fitNonRestr_ && histEtaTransRebin != 0 ) {
+            if ( histEtaTransRebin != 0 ) {
               const std::string nameEtaTransRebinFit( nameEtaTransRebin + "_fit" );
               TF1 * fitEtaTransRebin( new TF1( nameEtaTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaTransRebin->GetXaxis()->GetXmin(), histEtaTransRebin->GetMean() - histEtaTransRebin->GetRMS() * fitRange_ ), std::min( histEtaTransRebin->GetXaxis()->GetXmax(), histEtaTransRebin->GetMean() + histEtaTransRebin->GetRMS() * fitRange_ ) ) );
-              setParametersFit( fitEtaTransRebin, histEtaTransRebin, useBkg_ );
+              setParametersFit( fitEtaTransRebin, histEtaTransRebin, useBkg_, scale_ );
               TFitResultPtr fitEtaTransRebinResultPtr( histEtaTransRebin->Fit( fitEtaTransRebin, fitOptions_.c_str() ) );
               if ( fitEtaTransRebinResultPtr >= 0 ) {
                 if ( fitEtaTransRebinResultPtr->Status() == 0 && fitEtaTransRebinResultPtr->Ndf() != 0. ) {
@@ -1307,7 +1346,7 @@ int main( int argc, char * argv[] )
                     for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
                       histVecTransRebinEtaFitMap.at( uPar )->SetBinContent( uEta + 1, fitEtaTransRebinResultPtr->Parameter( uPar ) );
                       histVecTransRebinEtaFitMap.at( uPar )->SetBinError( uEta + 1, fitEtaTransRebinResultPtr->ParError( uPar ) );
-                      if ( uPar > 0 ) transferVecEtaPt.at( uEta ).SetParameter( uPar, fitEtaTransRebin->GetParameter( uPar ) );
+                      transferVecEtaPt.at( uEta ).SetParameter( uPar, fitEtaTransRebin->GetParameter( uPar ) );
                     }
                   }
                   if ( fitEtaTransRebinResultPtr->Prob() > 0 ) histTransRebinEtaFitMapProb->SetBinContent( uEta + 1, log10( fitEtaTransRebinResultPtr->Prob() ) );
@@ -1341,7 +1380,7 @@ int main( int argc, char * argv[] )
           if ( histEtaTransRestrRebin != 0 ) {
             const std::string nameEtaTransRestrRebinFit( nameEtaTransRestrRebin + "_fit" );
             TF1 * fitEtaTransRestrRebin( new TF1( nameEtaTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaTransRestrRebin->GetXaxis()->GetXmin(), histEtaTransRestrRebin->GetMean() - histEtaTransRestrRebin->GetRMS() * fitRange_ ), std::min( histEtaTransRestrRebin->GetXaxis()->GetXmax(), histEtaTransRestrRebin->GetMean() + histEtaTransRestrRebin->GetRMS() * fitRange_ ) ) );
-            setParametersFit( fitEtaTransRestrRebin, histEtaTransRestrRebin, useBkg_ );
+            setParametersFit( fitEtaTransRestrRebin, histEtaTransRestrRebin, useBkg_, scale_ );
             TFitResultPtr fitEtaTransRestrRebinResultPtr( histEtaTransRestrRebin->Fit( fitEtaTransRestrRebin, fitOptions_.c_str() ) );
             if ( fitEtaTransRestrRebinResultPtr >= 0 ) {
               if ( fitEtaTransRestrRebinResultPtr->Status() == 0 && fitEtaTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -1353,7 +1392,7 @@ int main( int argc, char * argv[] )
                   for ( unsigned uPar = 0; uPar < nPar; ++uPar ) {
                     histVecTransRestrRebinEtaFitMap.at( uPar )->SetBinContent( uEta + 1, fitEtaTransRestrRebinResultPtr->Parameter( uPar ) );
                     histVecTransRestrRebinEtaFitMap.at( uPar )->SetBinError( uEta + 1, fitEtaTransRestrRebinResultPtr->ParError( uPar ) );
-                    if ( uPar > 0 ) transferVecEtaPtRestr.at( uEta ).SetParameter( uPar, fitEtaTransRestrRebin->GetParameter( uPar ) );
+                    transferVecEtaPtRestr.at( uEta ).SetParameter( uPar, fitEtaTransRestrRebin->GetParameter( uPar ) );
                   }
                 }
                 if ( fitEtaTransRestrRebinResultPtr->Prob() > 0 ) histTransRestrRebinEtaFitMapProb->SetBinContent( uEta + 1, log10( fitEtaTransRestrRebinResultPtr->Prob() ) );
@@ -1420,7 +1459,7 @@ int main( int argc, char * argv[] )
                 if ( histEtaPtTransRebin != 0 ) {
                   const std::string nameEtaPtTransRebinFit( nameEtaPtTransRebin + "_fit" );
                   TF1 * fitEtaPtTransRebin( new TF1( nameEtaPtTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtTransRebin->GetXaxis()->GetXmin(), histEtaPtTransRebin->GetMean() - histEtaPtTransRebin->GetRMS() * fitRange_ ), std::min( histEtaPtTransRebin->GetXaxis()->GetXmax(), histEtaPtTransRebin->GetMean() + histEtaPtTransRebin->GetRMS() * fitRange_ ) ) );
-                  setParametersFit( fitEtaPtTransRebin, histEtaPtTransRebin, useBkg_ );
+                  setParametersFit( fitEtaPtTransRebin, histEtaPtTransRebin, useBkg_, scale_ );
                   TFitResultPtr fitEtaPtTransRebinResultPtr( histEtaPtTransRebin->Fit( fitEtaPtTransRebin, fitOptions_.c_str() ) );
                   if ( fitEtaPtTransRebinResultPtr >= 0 ) {
                     if ( fitEtaPtTransRebinResultPtr->Status() == 0 && fitEtaPtTransRebinResultPtr->Ndf() != 0. ) {
@@ -1463,7 +1502,7 @@ int main( int argc, char * argv[] )
               if ( histEtaPtTransRestrRebin != 0 ) {
                 const std::string nameEtaPtTransRestrRebinFit( nameEtaPtTransRestrRebin + "_fit" );
                 TF1 * fitEtaPtTransRestrRebin( new TF1( nameEtaPtTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtTransRestrRebin->GetXaxis()->GetXmin(), histEtaPtTransRestrRebin->GetMean() - histEtaPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histEtaPtTransRestrRebin->GetXaxis()->GetXmax(), histEtaPtTransRestrRebin->GetMean() + histEtaPtTransRestrRebin->GetRMS() * fitRange_ ) ) );
-                setParametersFit( fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin, useBkg_ );
+                setParametersFit( fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin, useBkg_, scale_ );
                 TFitResultPtr fitEtaPtTransRestrRebinResultPtr( histEtaPtTransRestrRebin->Fit( fitEtaPtTransRestrRebin, fitOptions_.c_str() ) );
                 if ( fitEtaPtTransRestrRebinResultPtr >= 0 ) {
                   if ( fitEtaPtTransRestrRebinResultPtr->Status() == 0 && fitEtaPtTransRestrRebinResultPtr->Ndf() != 0. ) {
@@ -1688,18 +1727,19 @@ int main( int argc, char * argv[] )
 
 
 // Initialise parameters for fit function
-void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
+void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction, bool scale )
 {
   //. This function assumes fit functions of the forms
   // - [0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi)) (single Gaissian) or
   // - [0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
 
   // Starting points
-//   Double_t c( histo->GetSumOfWeights() );                      // Constant
-  Double_t c( 1. );                                            // Constant, after all histos have been scaled with GetSumOfWeights()
+  Double_t c( scale ? 1. : histo->GetSumOfWeights() );         // Constant
   Double_t m( histo->GetMean() );                              // Mean
   Double_t p( histo->GetBinCenter( histo->GetMaximumBin() ) ); // Peak
   Double_t s( histo->GetRMS() );                               // RMS
+  Double_t fitMin, fitMax;
+  fit->GetRange( fitMin, fitMax );                             // histogram limits
   // Gaussian part
   // Constant
   fit->SetParameter( 0, c );
@@ -1708,6 +1748,7 @@ void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
   // Mean
   fit->SetParameter( 1, p ); // No double peak structure in this case
   fit->SetParLimits( 1, -1. * s, 1. * s );
+  fit->SetParLimits( 4, fitMin, fitMax );
   fit->SetParName( 1, "Gaussian #mu" );
   // Sigma
   fit->SetParameter( 2, s );
@@ -1715,9 +1756,8 @@ void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction )
   fit->SetParName( 2, "Gaussian #sigma" );
   // Additional part
   if ( useBkgFunction ) {
-    Double_t fitMin, fitMax;
-    fit->GetRange( fitMin, fitMax );
-    fit->SetParameter( 3, 0. );
+    fit->SetParameter( 3, 0.25 );
+//     fit->SetParameter( 3, 0. );
     fit->SetParLimits( 3, 0., 100. );
     fit->SetParName( 3, "bkg c" );
     fit->SetParameter( 4, m + ( m - p ) ); // shift into opposite direction compared to main Gaussian
