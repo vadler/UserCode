@@ -222,21 +222,21 @@ namespace my {
       /// Get the 2D transfer function.
       /// The function is returned in the format for filling a TFormula (s.
       /// data members).
-      std::string Formula() const;
+      std::string Formula( bool norm = true ) const;
 
       /// Get the 1D transfer function with its parameters set to the numerical
       /// values for the given value of the dependency variable.
       /// The function is returned in the format for filling a TFormula (s.
       /// data members).
-      std::string Formula( double dependencyValue ) const;
+      std::string Formula( double dependencyValue, bool norm = true ) const;
 
       /// Get the  numerical value of the 1D fit function for given values of
       /// the fit variable.
-      double Eval( double value ) const;
+      double Eval( double value, bool norm = true ) const;
 
       /// Get the  numerical value of the 2D fit function for given values of
       /// the fit and dependency variables.
-      double Eval( double dependencyValue, double value ) const;
+      double Eval( double dependencyValue, double value, bool norm = true ) const;
 
       /// Communication
 

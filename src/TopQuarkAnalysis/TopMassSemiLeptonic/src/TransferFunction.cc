@@ -124,51 +124,71 @@ std::vector< double > TransferFunction::Parameters( unsigned j ) const
 
 // Evaluate
 
-std::string TransferFunction::Formula() const
+std::string TransferFunction::Formula( bool norm ) const
 {
   TString fitStr( FitFunction() );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
-    TString depStr( PrintDependency( i, false ) );
-    depStr.ReplaceAll( Dependency(), "y" );
-    depStr.Prepend( "(" );
-    depStr.Append( ")" );
     TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
-    fitStr.ReplaceAll( parStr, depStr );
+    if ( norm && i == 0 ) {
+      fitStr.ReplaceAll( parStr, "1." );
+    }
+    else {
+      TString depStr( PrintDependency( i, false ) );
+      depStr.ReplaceAll( Dependency(), "y" );
+      depStr.Prepend( "(" );
+      depStr.Append( ")" );
+      fitStr.ReplaceAll( parStr, depStr );
+    }
   }
   return std::string( fitStr.Data() );
 }
 
-std::string TransferFunction::Formula( double dependencyValue ) const
+std::string TransferFunction::Formula( double dependencyValue, bool norm ) const
 {
   TFormula fitFunc( fitFunction_ );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
-    TFormula depFunc( dependencyFunction_ );
-    for ( unsigned j = 0; j < NParDependency(); ++j ) {
-      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
+    if ( norm && i == 0 ) {
+      fitFunc.SetParameter( ( Int_t )i, 1. );
     }
-    fitFunc.SetParameter( ( Int_t )i, ( Double_t )( depFunc.Eval( dependencyValue ) ) );
+    else {
+      TFormula depFunc( dependencyFunction_ );
+      for ( unsigned j = 0; j < NParDependency(); ++j ) {
+        depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
+      }
+      fitFunc.SetParameter( ( Int_t )i, ( Double_t )( depFunc.Eval( dependencyValue ) ) );
+    }
   }
   return std::string( fitFunc.GetExpFormula( "p" ).Data() );
 }
 
-double TransferFunction::Eval( double value ) const
+double TransferFunction::Eval( double value, bool norm ) const
 {
   TFormula fitFunc( fitFunction_ );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
-    fitFunc.SetParameter( ( Int_t )i, ( Double_t )( Parameter( i ) ) );
+    if ( norm && i == 0 ) {
+      fitFunc.SetParameter( ( Int_t )i, 1. );
+    }
+    else {
+      fitFunc.SetParameter( ( Int_t )i, ( Double_t )( Parameter( i ) ) );
+    }
   }
   return fitFunc.Eval( value );
 }
 
-double TransferFunction::Eval( double dependencyValue, double value ) const
+double TransferFunction::Eval( double dependencyValue, double value, bool norm ) const
 {
   TFormula fitFunc( fitFunction_ );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
-    TFormula depFunc( dependencyFunction_ );
-    for ( unsigned j = 0; j < NParDependency(); ++j ) {
-      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
+    if ( norm && i == 0 ) {
+      fitFunc.SetParameter( ( Int_t )i, 1. );
     }
-    fitFunc.SetParameter( ( Int_t )i, ( Double_t )( depFunc.Eval( dependencyValue ) ) );
+    else {
+      TFormula depFunc( dependencyFunction_ );
+      for ( unsigned j = 0; j < NParDependency(); ++j ) {
+        depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
+      }
+      fitFunc.SetParameter( ( Int_t )i, ( Double_t )( depFunc.Eval( dependencyValue ) ) );
+    }
   }
   return fitFunc.Eval( value );
 }
