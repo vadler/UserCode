@@ -124,7 +124,7 @@ namespace my {
       /// 'i' denotes the parameter number as defined in the fit function
       /// string. If 'i' is beyond the number of available parameters in the
       /// fit function, 'false' is returned.
-      bool SetParameter( size_t i, double par );
+      bool SetParameter( unsigned i, double par );
 
       /// Set a fit parameter of the dependency function.
       /// 'i' denotes the parameter number as defined in the fit function
@@ -132,7 +132,7 @@ namespace my {
       /// function string. If 'i' is beyond the number of available parameters
       /// in the fit function or 'j' is beyond the number of available
       /// parameters in the dependency function, 'false' is returned.
-      bool SetParameter( size_t i, size_t j, double par );
+      bool SetParameter( unsigned i, unsigned j, double par );
 
       /// Set all fit parameter of the fit function, which is independent of
       /// the dependency variable.
@@ -151,7 +151,7 @@ namespace my {
       /// number of available parameters in the dependency function or the
       /// length of the vector does not agree with the number of available
       /// parameters in the fit function, 'false' is returned.
-      bool SetParameters( size_t j, std::vector< double > pars );
+      bool SetParameters( unsigned j, std::vector< double > pars );
 
       /// Resize all vectors according to the number of parameters in the
       /// functions and set them to the initialisation constant.
@@ -169,7 +169,7 @@ namespace my {
       std::string FitFunction() const { return std::string( fitFunction_.GetTitle() ); };
 
       /// Get the number of parameters in the fit function.
-      size_t NParFit() const { return pars1D_.size(); };
+      unsigned NParFit() const { return pars1D_.size(); };
 
       /// Get the dependency function.
       /// The function is returned in the format for filling a TFormula (s.
@@ -177,7 +177,7 @@ namespace my {
       std::string DependencyFunction() const { return std::string( dependencyFunction_.GetTitle() ); };
 
       /// Get the number of parameters in the dependency function.
-      size_t NParDependency() const { return pars2D_.size(); };
+      unsigned NParDependency() const { return pars2D_.size(); };
 
       /// Get the name of the dependency variable.
       std::string Dependency() const { return dependency_; };
@@ -190,7 +190,7 @@ namespace my {
       /// 'i' denotes the parameter number as defined in the fit function
       /// string. If 'i' is beyond the number of available parameters in the
       /// fit function, the initialisation constant is returned.
-      double Parameter( size_t i ) const { return i < NParFit() ? pars1D_.at( i ) :  transferFunctionInitConst; };
+      double Parameter( unsigned i ) const { return i < NParFit() ? pars1D_.at( i ) :  transferFunctionInitConst; };
 
       /// Get a fit parameter of the dependency function.
       /// 'i' denotes the parameter number as defined in the fit function
@@ -199,7 +199,7 @@ namespace my {
       /// in the fit function or 'j' is beyond the number of available
       /// parameters in the dependency function, the initialisation constant is
       /// returned.
-      double Parameter( size_t i, size_t j ) const;
+      double Parameter( unsigned i, unsigned j ) const;
 
       /// Get all fit parameter of the fit function, which is independent of
       /// the dependency variable.
@@ -215,23 +215,27 @@ namespace my {
       /// as defined in the fit function string. If'j' is beyond the
       /// number of available parameters in the dependency function, an empty
       /// vector is returned.
-      std::vector< double > Parameters( size_t j ) const;
+      std::vector< double > Parameters( unsigned j ) const;
 
       /// Evaluate
 
-      /// Get the 2D fit function.
+      /// Get the 2D transfer function.
       /// The function is returned in the format for filling a TFormula (s.
       /// data members).
       std::string Formula() const;
 
-      /// Get the 1D fit function with its parameters set to the numerical values
-      /// for the given value of the dependency variable.
+      /// Get the 1D transfer function with its parameters set to the numerical
+      /// values for the given value of the dependency variable.
       /// The function is returned in the format for filling a TFormula (s.
       /// data members).
       std::string Formula( double dependencyValue ) const;
 
-      /// Get the  numerical value of the fit function for given values of the
-      /// fit and dependency variables.
+      /// Get the  numerical value of the 1D fit function for given values of
+      /// the fit variable.
+      double Eval( double value ) const;
+
+      /// Get the  numerical value of the 2D fit function for given values of
+      /// the fit and dependency variables.
       double Eval( double dependencyValue, double value ) const;
 
       /// Communication
@@ -250,7 +254,7 @@ namespace my {
 
       /// Returns a formatted string for human readability of the dependency
       /// function for the given parameter of the fit function.
-      std::string PrintDependency( size_t i, bool useNan = true ) const;
+      std::string PrintDependency( unsigned i, bool useNan = true ) const;
 
       /// Creates a transfer function from a string as produced by Print().
       /// NOT IMPLEMENTED YET!
