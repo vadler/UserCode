@@ -6,7 +6,7 @@ AnalysisDataFormats/TopObjects                   V06-08-09      V06-08-07
 DataFormats/PatCandidates                        V06-05-06-03   V06-05-06-01   
 EGamma/EGammaAnalysisTools                       V00-00-13                     
 PatExercise10c/PatL1PhysAlgo                     NoCVS                         
-PhysicsTools/PatAlgos                            V08-09-42      V08-09-37      
+PhysicsTools/PatAlgos                            V08-09-43      V08-09-37      
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
 RecoMET/METAnalyzers                             V00-00-08                     
 RecoParticleFlow/PFProducer                      V15-02-06      V15-02-05-01   
