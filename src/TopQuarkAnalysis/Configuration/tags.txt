@@ -7,7 +7,7 @@ CommonTools/RecoUtils                            V00-00-12      V00-00-03
 DataFormats/PatCandidates                        V06-05-06-03   V06-05-00      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
 JetMETCorrections/Type1MET                       V04-06-09      V04-06-05      
-PhysicsTools/PatAlgos                            V08-09-42-00   V08-09-04-01   
+PhysicsTools/PatAlgos                            V08-09-43-00   V08-09-04-01   
 PhysicsTools/PatUtils                            V03-09-26      V03-09-18-03   
 RecoBTag/SecondaryVertex                         V01-08-00      V01-06-02      
 RecoMET/METAnalyzers                             V00-00-08                     
