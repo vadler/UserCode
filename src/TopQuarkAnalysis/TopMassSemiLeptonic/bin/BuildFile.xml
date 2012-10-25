@@ -16,6 +16,7 @@
   <bin   file="fitTopHitFitL5L7.C"></bin>
   <bin   file="fitTopHitFitResolutionFunctions.C"></bin>
   <bin   file="fitTopTransferFunctions.C"></bin>
+  <bin   file="closureTopTransferFunctions.C"></bin>
   <bin   file="plotTopHitFitL5.C"></bin>
   <bin   file="plotTopHitFitL5L7.C"></bin>
   <bin   file="plotTopHitFitResolutionFunctions.C"></bin>
