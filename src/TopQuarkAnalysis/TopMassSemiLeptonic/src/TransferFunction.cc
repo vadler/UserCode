@@ -124,71 +124,127 @@ std::vector< double > TransferFunction::Parameters( unsigned j ) const
 
 // Evaluate
 
-std::string TransferFunction::Formula( bool norm ) const
+TF2 TransferFunction::Function( int norm ) const
+{
+  TString fitStr( FitFunction() );
+  std::vector< double > pars;
+  for ( unsigned i = 0; i < NParFit(); ++i ) {
+    if ( ( int )i == norm ) continue;
+    TString depStr( DependencyFunction() );
+    for ( unsigned j = 0; j < NParDependency(); ++j ) {
+      TString parStr( "[" + boost::lexical_cast< std::string >( j ) + "]" );
+      TString parStrNew( "{" + boost::lexical_cast< std::string >( pars.size() ) + "}" ); // FIXME: Just stupid manipulation.
+      depStr.ReplaceAll( parStr, parStrNew );
+      depStr.ReplaceAll( "x", "y" ); // FIXME: This assumes no other 'x' than from the variable (e.g. no "exp")
+      pars.push_back( Parameters2D().at( j ).at( i ) );
+    }
+    depStr.Prepend( "(" );
+    depStr.Append( ")" );
+    TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
+    fitStr.ReplaceAll( parStr, depStr );
+  }
+  for ( unsigned i = 0; i < NParFit(); ++i ) {
+    TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
+    fitStr.ReplaceAll( parStr, "1." );
+  }
+  fitStr.ReplaceAll( "{", "[" ); // FIXME: Just stupid manipulation (s. above).
+  fitStr.ReplaceAll( "}", "]" ); // FIXME: Just stupid manipulation (s. above).
+  TF2 function( "", fitStr );
+  for ( unsigned i = 0; i < pars.size(); ++i ) {
+    function.SetParameter( ( Int_t )i, pars.at( i ) );
+  }
+  return function;
+}
+
+TF1 TransferFunction::Function( double dependencyValue, int norm ) const
+{
+  TString fitStr( FitFunction() );
+  std::vector< double > pars;
+  for ( unsigned i = 0; i < NParFit(); ++i ) {
+    if ( ( int )i == norm ) continue;
+    TFormula depFunc( dependencyFunction_ );
+    for ( unsigned j = 0; j < NParDependency(); ++j ) {
+      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
+    }
+    TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
+    TString parStrNew( "{" + boost::lexical_cast< std::string >( pars.size() ) + "}" ); // FIXME: Just stupid manipulation.
+    fitStr.ReplaceAll( parStr, parStrNew );
+    pars.push_back( depFunc.Eval( dependencyValue ) );
+  }
+  for ( unsigned i = 0; i < NParFit(); ++i ) {
+    TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
+    fitStr.ReplaceAll( parStr, "1." );
+  }
+  fitStr.ReplaceAll( "{", "[" ); // FIXME: Just stupid manipulation (s. above).
+  fitStr.ReplaceAll( "}", "]" ); // FIXME: Just stupid manipulation (s. above).
+  TF1 function( "", fitStr );
+  for ( unsigned i = 0; i < pars.size(); ++i ) {
+    function.SetParameter( ( Int_t )i, pars.at( i ) );
+  }
+  return function;
+}
+
+std::string TransferFunction::Formula( int norm ) const
 {
   TString fitStr( FitFunction() );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
-    if ( norm && i == 0 ) {
+    if ( ( int )i == norm ) {
       fitStr.ReplaceAll( parStr, "1." );
+      continue;
     }
-    else {
-      TString depStr( PrintDependency( i, false ) );
-      depStr.ReplaceAll( Dependency(), "y" );
-      depStr.Prepend( "(" );
-      depStr.Append( ")" );
-      fitStr.ReplaceAll( parStr, depStr );
-    }
+    TString depParStr( PrintDependency( i, false ) );
+    depParStr.ReplaceAll( Dependency(), "y" );
+    depParStr.Prepend( "(" );
+    depParStr.Append( ")" );
+    fitStr.ReplaceAll( parStr, depParStr );
   }
   return std::string( fitStr.Data() );
 }
 
-std::string TransferFunction::Formula( double dependencyValue, bool norm ) const
+std::string TransferFunction::Formula( double dependencyValue, int norm ) const
 {
   TFormula fitFunc( fitFunction_ );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
-    if ( norm && i == 0 ) {
+    if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
+      continue;
     }
-    else {
-      TFormula depFunc( dependencyFunction_ );
-      for ( unsigned j = 0; j < NParDependency(); ++j ) {
-        depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
-      }
-      fitFunc.SetParameter( ( Int_t )i, ( Double_t )( depFunc.Eval( dependencyValue ) ) );
+    TFormula depFunc( dependencyFunction_ );
+    for ( unsigned j = 0; j < NParDependency(); ++j ) {
+      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
+    fitFunc.SetParameter( ( Int_t )i, ( Double_t )( depFunc.Eval( dependencyValue ) ) );
   }
   return std::string( fitFunc.GetExpFormula( "p" ).Data() );
 }
 
-double TransferFunction::Eval( double value, bool norm ) const
+double TransferFunction::Eval( double value, int norm ) const
 {
   TFormula fitFunc( fitFunction_ );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
-    if ( norm && i == 0 ) {
+    if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
+      continue;
     }
-    else {
-      fitFunc.SetParameter( ( Int_t )i, ( Double_t )( Parameter( i ) ) );
-    }
+    fitFunc.SetParameter( ( Int_t )i, ( Double_t )( Parameter( i ) ) );
   }
   return fitFunc.Eval( value );
 }
 
-double TransferFunction::Eval( double dependencyValue, double value, bool norm ) const
+double TransferFunction::Eval( double dependencyValue, double value, int norm ) const
 {
   TFormula fitFunc( fitFunction_ );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
-    if ( norm && i == 0 ) {
+    if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
+      continue;
     }
-    else {
-      TFormula depFunc( dependencyFunction_ );
-      for ( unsigned j = 0; j < NParDependency(); ++j ) {
-        depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
-      }
-      fitFunc.SetParameter( ( Int_t )i, ( Double_t )( depFunc.Eval( dependencyValue ) ) );
+    TFormula depFunc( dependencyFunction_ );
+    for ( unsigned j = 0; j < NParDependency(); ++j ) {
+      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
+    fitFunc.SetParameter( ( Int_t )i, ( Double_t )( depFunc.Eval( dependencyValue ) ) );
   }
   return fitFunc.Eval( value );
 }
@@ -240,11 +296,11 @@ std::string TransferFunction::PrintFit2D( bool useNan ) const
 {
   TString fitStr( FitFunction() );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
-    TString depStr( PrintDependency( i, useNan ) );
-    depStr.Prepend( "(" );
-    depStr.Append( ")" );
+    TString depParStr( PrintDependency( i, useNan ) );
+    depParStr.Prepend( "(" );
+    depParStr.Append( ")" );
     TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
-    fitStr.ReplaceAll( parStr, depStr );
+    fitStr.ReplaceAll( parStr, depParStr );
   }
   return std::string( fitStr.Data() );
 }
