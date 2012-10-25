@@ -445,6 +445,10 @@ int main( int argc, char * argv[] )
       TH1D * histTransPullEtaPt( new TH1D( nameTransPullEtaPt.c_str(), objCat.c_str(), histBins_, -histMax_, histMax_ ) );
       histTransPullEtaPt->SetXTitle( titleTransPull.c_str() );
       histTransPullEtaPt->SetYTitle( titleEvents.c_str() );
+      const std::string nameTransPullEta( nameTransPull + "_Eta" );
+      TH1D * histTransPullEta( new TH1D( nameTransPullEta.c_str(), objCat.c_str(), histBins_, -histMax_, histMax_ ) );
+      histTransPullEta->SetXTitle( titleTransPull.c_str() );
+      histTransPullEta->SetYTitle( titleEvents.c_str() );
       const std::string nameTransPullMapPt( nameTransPull + "_Map_Pt" );
       TH2D * histTransPullMapPt( new TH2D( nameTransPullMapPt.c_str(), objCat.c_str(), nPtBins_, ptBins_.data(), histBins_, -histMax_, histMax_ ) );
       histTransPullMapPt->SetXTitle( titlePtRef.c_str() );
@@ -468,6 +472,10 @@ int main( int argc, char * argv[] )
       TH1D * histTransPullRestrEtaPt( new TH1D( nameTransPullRestrEtaPt.c_str(), objCat.c_str(), histBins_, -histMax_, histMax_ ) );
       histTransPullRestrEtaPt->SetXTitle( titleTransPull.c_str() );
       histTransPullRestrEtaPt->SetYTitle( titleEvents.c_str() );
+      const std::string nameTransPullRestrEta( nameTransPullRestr + "_Eta" );
+      TH1D * histTransPullRestrEta( new TH1D( nameTransPullRestrEta.c_str(), objCat.c_str(), histBins_, -histMax_, histMax_ ) );
+      histTransPullRestrEta->SetXTitle( titleTransPull.c_str() );
+      histTransPullRestrEta->SetYTitle( titleEvents.c_str() );
       const std::string nameTransPullRestrMapPt( nameTransPullRestr + "_Map_Pt" );
       TH2D * histTransPullRestrMapPt( new TH2D( nameTransPullRestrMapPt.c_str(), objCat.c_str(), nPtBins_, ptBins_.data(), histBins_, -histMax_, histMax_ ) );
       histTransPullRestrMapPt->SetXTitle( titlePtRef.c_str() );
@@ -711,20 +719,24 @@ int main( int argc, char * argv[] )
             const Double_t etaSymm( useSymm_ ? std::fabs( etaEtaBin.at( uPt ).at( uEntry ) ) : etaEtaBin.at( uPt ).at( uEntry ) );
             const Double_t etaRef( refGen_ ? etaGenSymm : etaSymm );
             if ( fitNonRestr_ ) {
-              smear = transferEta.Function( ptRef ).GetRandom();
-              sigma = transferEta.Sigma( ptRef );
-              histEtaPtTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histEtaTransPullPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histTransPullEtaPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+              if ( fitEtaBins_ ) {
+                smear = transferEta.Function( ptRef ).GetRandom();
+                sigma = transferEta.Sigma( ptRef );
+                histEtaPtTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaTransPullPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+                histTransPullEtaPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+              }
+                smear = fitEtaTransRebin->GetRandom();
+                sigma = transferEta.Sigma();
+                histEtaTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaTransPullMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+                histTransPullEta->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               }
               smear = transfer.Function( ptRef ).GetRandom();
               sigma = transfer.Sigma( ptRef );
               histVecPtTransPull.at( uPt )->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
               histVecPtTransPullMapEta.at( uPt )->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
               histTransPullPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              smear = fitEtaTransRebin->GetRandom();
-              sigma = transferEta.Sigma();
-              histEtaTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histEtaTransPullMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
               smear = fitTransRebin->GetRandom();
               sigma = transferRestr.Sigma();
               histTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
@@ -732,20 +744,24 @@ int main( int argc, char * argv[] )
               histTransPullMapEta->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
             }
             if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-              smear = transferEtaRestr.Function( ptRef ).GetRandom();
-              sigma = transferEtaRestr.Sigma( ptRef );
-              histEtaPtTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histEtaTransPullRestrPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histTransPullRestrEtaPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+              if ( fitEtaBins_ ) {
+                smear = transferEtaRestr.Function( ptRef ).GetRandom();
+                sigma = transferEtaRestr.Sigma( ptRef );
+                histEtaPtTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaTransPullRestrPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+                histTransPullRestrEtaPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+              }
+                smear = fitEtaTransRestrRebin->GetRandom();
+                sigma = transferEtaRestr.Sigma();
+                histEtaTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+                histEtaTransPullRestrMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+                histTransPullRestrEta->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               }
               smear = transferRestr.Function( ptRef ).GetRandom();
               sigma = transferRestr.Sigma( ptRef );
               histVecPtTransPullRestr.at( uPt )->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
               histVecPtTransPullRestrMapEta.at( uPt )->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ));
               histTransPullRestrPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              smear = fitEtaTransRestrRebin->GetRandom();
-              sigma = transferEtaRestr.Sigma();
-              histEtaTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histEtaTransPullRestrMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
               smear = fitTransRestrRebin->GetRandom();
               sigma = transferRestr.Sigma();
               histTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
@@ -802,6 +818,7 @@ int main( int argc, char * argv[] )
         const std::string nameTransPull( name + "_TransPull" );
         const std::string nameTransPullPt( nameTransPull + "_Pt" );
         const std::string nameTransPullEtaPt( nameTransPull + "_EtaPt" );
+        const std::string nameTransPullEta( nameTransPull + "_Eta" );
         TH1D * histTransPull( ( TH1D* )( dirFit_->Get( nameTransPull.c_str() ) ) );
         if ( fitNonRestr_ && histTransPull != 0 ) {
           const std::string nameTransPullFit( nameTransPull + "_fit" );
@@ -892,10 +909,41 @@ int main( int argc, char * argv[] )
             c1.Print( std::string( pathPlots_ + histTransPullEtaPt->GetName() + ".png" ).c_str() );
           }
         }
+        TH1D * histTransPullEta( ( TH1D* )( dirFit_->Get( nameTransPullEta.c_str() ) ) );
+        if ( fitNonRestr_ && histTransPullEta != 0 ) {
+          const std::string nameTransPullEtaFit( nameTransPullEta + "_fit" );
+          if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransPullEtaFit << std::endl;
+          TF1 * fitTransPullEta( new TF1( nameTransPullEtaFit.c_str(), "gaus", std::max( histTransPullEta->GetXaxis()->GetXmin(), histTransPullEta->GetMean() - histTransPullEta->GetRMS() * fitRange_ ), std::min( histTransPullEta->GetXaxis()->GetXmax(), histTransPullEta->GetMean() + histTransPullEta->GetRMS() * fitRange_ ) ) );
+          setParametersFit( fitTransPullEta, histTransPullEta );
+          TFitResultPtr fitTransPullEtaResultPtr( histTransPullEta->Fit( fitTransPullEta, fitOptions_.c_str() ) );
+          if ( fitTransPullEtaResultPtr >= 0 ) {
+            if ( fitTransPullEtaResultPtr->Status() == 0 && fitTransPullEtaResultPtr->Ndf() != 0. ) {
+            }
+            else {
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "    failing fit in directory '"; dirFit_->pwd();
+                std::cout << "    '" << nameTransPullEta << "' status " << fitTransPullEtaResultPtr->Status() << std::endl;
+              }
+            }
+          }
+          else {
+            if ( verbose_ > 1 ) {
+              std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                        << "    missing fit in directory '"; dirFit_->pwd();
+              std::cout << "    '" << nameTransPullEta << std::endl;
+            }
+          }
+          if ( plot_ ) {
+            histTransPullEta->Draw();
+            c1.Print( std::string( pathPlots_ + histTransPullEta->GetName() + ".png" ).c_str() );
+          }
+        }
 
         const std::string nameTransPullRestr( nameTransPull + "Restr" );
         const std::string nameTransPullRestrPt( nameTransPullRestr + "_Pt" );
         const std::string nameTransPullRestrEtaPt( nameTransPullRestr + "_EtaPt" );
+        const std::string nameTransPullRestrEta( nameTransPullRestr + "_Eta" );
         TH1D * histTransPullRestr( ( TH1D* )( dirFit_->Get( nameTransPullRestr.c_str() ) ) );
         if ( histTransPullRestr != 0 ) {
           const std::string nameTransPullRestrFit( nameTransPullRestr + "_fit" );
@@ -984,6 +1032,36 @@ int main( int argc, char * argv[] )
           if ( plot_ ) {
             histTransPullRestrEtaPt->Draw();
             c1.Print( std::string( pathPlots_ + histTransPullRestrEtaPt->GetName() + ".png" ).c_str() );
+          }
+        }
+        TH1D * histTransPullRestrEta( ( TH1D* )( dirFit_->Get( nameTransPullRestrEta.c_str() ) ) );
+        if ( histTransPullRestrEta != 0 ) {
+          const std::string nameTransPullRestrEtaFit( nameTransPullRestrEta + "_fit" );
+          if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransPullRestrEtaFit << std::endl;
+          TF1 * fitTransPullRestrEta( new TF1( nameTransPullRestrEtaFit.c_str(), "gaus", std::max( histTransPullRestrEta->GetXaxis()->GetXmin(), histTransPullRestrEta->GetMean() - histTransPullRestrEta->GetRMS() * fitRange_ ), std::min( histTransPullRestrEta->GetXaxis()->GetXmax(), histTransPullRestrEta->GetMean() + histTransPullRestrEta->GetRMS() * fitRange_ ) ) );
+          setParametersFit( fitTransPullRestrEta, histTransPullRestrEta );
+          TFitResultPtr fitTransPullRestrEtaResultPtr( histTransPullRestrEta->Fit( fitTransPullRestrEta, fitOptions_.c_str() ) );
+          if ( fitTransPullRestrEtaResultPtr >= 0 ) {
+            if ( fitTransPullRestrEtaResultPtr->Status() == 0 && fitTransPullRestrEtaResultPtr->Ndf() != 0. ) {
+            }
+            else {
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                          << "    failing fit in directory '"; dirFit_->pwd();
+                std::cout << "    '" << nameTransPullRestrEta << "' status " << fitTransPullRestrEtaResultPtr->Status() << std::endl;
+              }
+            }
+          }
+          else {
+            if ( verbose_ > 1 ) {
+              std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
+                        << "    missing fit in directory '"; dirFit_->pwd();
+              std::cout << "    '" << nameTransPullRestrEta << std::endl;
+            }
+          }
+          if ( plot_ ) {
+            histTransPullRestrEta->Draw();
+            c1.Print( std::string( pathPlots_ + histTransPullRestrEta->GetName() + ".png" ).c_str() );
           }
         }
 

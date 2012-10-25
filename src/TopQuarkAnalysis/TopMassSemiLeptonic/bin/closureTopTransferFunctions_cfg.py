@@ -91,7 +91,7 @@ if refSel:
   pathPlots += 'Ref_'
 if runTest:
   #pathPlots = ''
-  pathPlots = pathPlots.replace( 'fitTopTransfePulls', 'fitTopTransferPullsTest', 2 )
+  pathPlots = pathPlots.replace( 'fitTopTransferPulls', 'fitTopTransferPullsTest', 2 )
   pathPlots = pathPlots.replace( 'fitTopTransferPullsTest', 'fitTopTransferPulls', 1 )
 
 
