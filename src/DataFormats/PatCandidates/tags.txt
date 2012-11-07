@@ -11,7 +11,7 @@ EgammaAnalysis/ElectronTools                     FB_4Oct2012-2
 PhysicsTools/PatAlgos                            V08-10-25      V08-09-11-08   
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
 PhysicsTools/PatUtils                            V03-09-26      V03-09-22      
-RecoEgamma/EgammaTools                           V09-00-00      V08-11-22      
+RecoEgamma/EgammaTools                           V09-00-01      V08-11-22      
 RecoTauTag/Configuration                         V01-04-03-02   V01-03-04-00   
 RecoTauTag/RecoTau                               V01-04-17-01   V01-04-12-04   
 TopQuarkAnalysis/Examples                        V06-07-13      V06-07-13      
