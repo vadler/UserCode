@@ -2,7 +2,7 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 # Steering
-cmsswVersion = 'CMSSW_6_1_0_pre3'
+cmsswVersion = 'CMSSW_6_1_0_pre4'
 globalTag    = 'START61_V1'
 
 # only for transaition from 610p2 to 610p3:
