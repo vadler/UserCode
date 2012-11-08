@@ -2,7 +2,7 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-cmsswVersion = 'CMSSW_5_2_5_cand1'
+cmsswVersion = 'CMSSW_5_2_7'
 globalTag    = 'GR_R_52_V7'
 condition    = 'com10'
 
