@@ -16,10 +16,10 @@ fileNames = cms.PSet(
   fileNames = cms.untracked.vstring(
     '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/2C9ED901-88E9-E111-8291-001D09F24399.root'
   , '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/4CB91800-88E9-E111-9F8F-001D09F24D4E.root'
-  , '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/608E326C-87E9-E111-A26C-001D09F24FEC.root'
-  , '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/60CA5C6A-87E9-E111-A8A4-001D09F2AD4D.root'
+  #, '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/608E326C-87E9-E111-A26C-001D09F24FEC.root'
+  #, '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/60CA5C6A-87E9-E111-A8A4-001D09F2AD4D.root'
   , '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/8050FDC2-88E9-E111-88DE-001D09F2512C.root'
-  , '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/860943C3-88E9-E111-972F-001D09F2983F.root'
+  #, '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/860943C3-88E9-E111-972F-001D09F2983F.root'
   , '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/868257C2-88E9-E111-9EDF-001D09F2910A.root'
   , '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/86F1CC01-88E9-E111-B30B-001D09F2512C.root'
   , '/store/express/Run2012C/ExpressPhysics/FEVT/Express-v1/000/201/197/90929CC2-88E9-E111-B2EC-001D09F24399.root'
