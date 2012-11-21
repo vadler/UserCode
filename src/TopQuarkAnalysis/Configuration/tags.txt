@@ -16,8 +16,9 @@ RecoParticleFlow/PFProducer                      V15-01-11      V15-01-06-01
 RecoVertex/AdaptiveVertexFinder                  V02-02-00      V02-00-04-02   
 TopQuarkAnalysis/Configuration                   V07-00-02      V06-02-00      
 TopQuarkAnalysis/TopEventProducers               V06-09-09      V06-09-08      
+TopQuarkAnalysis/TopJetCombination               V06-08-06      V06-08-03      
 TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09      
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-03      
 TopQuarkAnalysis/TopTools                        V06-07-11-01   V06-07-11      
 ---------------------------------------
-total packages: 17 (17 displayed)
+total packages: 18 (18 displayed)
