@@ -17,7 +17,7 @@ TopQuarkAnalysis/Examples                        V06-07-13      V06-07-13
 TopQuarkAnalysis/TopEventProducers               V06-09-12      V06-09-12      
 TopQuarkAnalysis/TopEventSelection               V06-07-15      V06-07-14      
 TopQuarkAnalysis/TopHitFit                       V00-00-06      V00-00-05      
-TopQuarkAnalysis/TopJetCombination               V06-08-05      V06-08-05      
+TopQuarkAnalysis/TopJetCombination               V06-08-06      V06-08-05      
 TopQuarkAnalysis/TopKinFitter                    V06-07-23      V06-07-23      
 TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-10      
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-04      
