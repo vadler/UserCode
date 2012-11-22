@@ -135,7 +135,8 @@ TF2 TransferFunction::Function( int norm ) const
       TString parStr( "[" + boost::lexical_cast< std::string >( j ) + "]" );
       TString parStrNew( "{" + boost::lexical_cast< std::string >( pars.size() ) + "}" ); // FIXME: Just stupid manipulation.
       depStr.ReplaceAll( parStr, parStrNew );
-      depStr.ReplaceAll( "x", "y" ); // FIXME: This assumes no other 'x' than from the variable (e.g. no "exp")
+      depStr.ReplaceAll( "x", "y" );
+      depStr.ReplaceAll( "eyp", "exp" ); // Fixing unwanted replacements
       pars.push_back( Parameters2D().at( j ).at( i ) );
     }
     depStr.Prepend( "(" );
@@ -249,6 +250,25 @@ double TransferFunction::Eval( double dependencyValue, double value, int norm ) 
   return fitFunc.Eval( value );
 }
 
+double TransferFunction::Sigma( double dependencyValue ) const
+{
+  // FIXME: This is too simple. Add checks!
+  TFormula depFunc( dependencyFunction_ );
+  for ( unsigned j = 0; j < NParDependency(); ++j ) {
+    depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 2, j ) ) );
+  }
+  const double par2( depFunc.Eval( dependencyValue ) );
+  for ( unsigned j = 0; j < NParDependency(); ++j ) {
+    depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 3, j ) ) );
+  }
+  const double par3( depFunc.Eval( dependencyValue ) );
+  for ( unsigned j = 0; j < NParDependency(); ++j ) {
+    depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 5, j ) ) );
+  }
+  const double par5( depFunc.Eval( dependencyValue ) );
+  return par2 + par3 * par5;
+}
+
 // Communication
 
 std::string TransferFunction::Print( bool useNan ) const
@@ -313,6 +333,8 @@ std::string TransferFunction::PrintDependency( unsigned i, bool useNan ) const
     }
     TString depStr( depFunc.GetExpFormula( "p" ) );
     depStr.ReplaceAll( "x", Dependency() ); // FIXME: This assumes no other 'x' than from the variable (e.g. no "exp")
+    TString failStr( "e" + Dependency() + "p" );
+    depStr.ReplaceAll( failStr, "x" ); // Fixing unwanted replacements
     if ( useNan ) depStr.ReplaceAll( boost::lexical_cast< std::string >( transferFunctionInitConst ).c_str(), "NAN" );
     return std::string( depStr.Data() );
 }

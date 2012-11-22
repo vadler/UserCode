@@ -246,6 +246,14 @@ namespace my {
       /// the fit and dependency variables.
       double Eval( double dependencyValue, double value, int norm = 0 ) const;
 
+      /// Get the  numerical value of the 1D fit function for given values of
+      /// the fit variable.
+      double Sigma() const { return Parameter( 2 ) + Parameter( 3 ) * Parameter( 5 ); };
+
+      /// Get the  numerical value of the 2D fit function for given values of
+      /// the fit and dependency variables.
+      double Sigma( double dependencyValue ) const;
+
       /// Communication
 
       /// Returns a formatted string for human readability with all important
