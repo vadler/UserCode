@@ -1,9 +1,10 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
-cmsswVersion = 'CMSSW_5_3_4_cand1'
-globalTag    = 'GR_R_53_V12'
+cmsswVersion = 'CMSSW_5_3_6'
+globalTag    = 'GR_R_53_V15'
 condition    = 'com10_7E33v2'
+version      = 2
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
@@ -12,7 +13,7 @@ process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                   , relVal        = 'SingleMu'
                                                   , dataTier      = 'RECO'
                                                   , globalTag     = '%s_RelVal_mu2011B'%( globalTag )
-                                                  , maxVersions   = 1
+                                                  , maxVersions   = version
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
