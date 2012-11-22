@@ -1,15 +1,19 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+
+cmsswVersion = 'CMSSW_5_3_6'
+globalTag    = 'GR_R_53_V15'
+condition    = 'com10_7E33v2'
+version      = 2
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-cmsswVersion = 'CMSSW_5_3_0'
-globalTag    = 'GR_R_53_V1'
-process.GlobalTag.globaltag = '%s::All'%( globalTag )
 process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                     cmsswVersion  = cmsswVersion
                                                   , relVal        = 'SingleMu'
                                                   , dataTier      = 'RECO'
-                                                  , globalTag     = '%s_RelVal_wMu2011B'%( globalTag )
-                                                  , maxVersions   = 1
+                                                  , globalTag     = '%s_RelVal_mu2011B'%( globalTag )
+                                                  , maxVersions   = version
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
@@ -26,13 +30,6 @@ process.out.outputCommands += [
 
 from PhysicsTools.PatAlgos.tools.coreTools import runOnData
 runOnData( process )
-process.patJetCorrFactors.levels = [ 'L1Offset'
-                                   , 'L2Relative'
-                                   , 'L3Absolute'
-                                   , 'L2L3Residual'
-                                   , 'L5Flavor'
-                                   , 'L7Parton'
-                                   ]
 process.patJetCorrFactors.useRho = cms.bool( False )
 
 # from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
