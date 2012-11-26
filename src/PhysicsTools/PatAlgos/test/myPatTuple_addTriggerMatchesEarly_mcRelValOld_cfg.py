@@ -1,16 +1,18 @@
 ## import skeleton process
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-cmsswVersion = 'CMSSW_5_3_0'
-globalTag    = 'START53_V4'
+cmsswVersion = 'CMSSW_5_3_6'
+globalTag    = 'START53_V14'
+version      = 2
 process.GlobalTag.globaltag = '%s::All'%( globalTag )
 process.source.fileNames    = pickRelValInputFiles( #formerVersion = True
                                                     cmsswVersion  = cmsswVersion
                                                   , relVal        = 'RelValProdTTbar'
                                                   , dataTier      = 'AODSIM'
                                                   , globalTag     = globalTag
-                                                  , maxVersions   = 1
+                                                  , maxVersions   = version
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.maxEvents.input     = 10

@@ -1,17 +1,13 @@
 import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
+
+condition = 'com10_7E33v2'
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-condition                   = 'com10'
-globalTag                   = autoCond[ condition ][ : -5 ]
-process.GlobalTag.globaltag = autoCond[ condition ]
-process.GlobalTag.toGet.append( cms.PSet( tag     = cms.string( 'L1GtTriggerMenu_L1Menu_Collisions2012_v0_mc' )
-                                        , record  = cms.string( 'L1GtTriggerMenuRcd' )
-                                        , connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_L1T' )
-                                        )
-                              )
 process.source.fileNames    = pickRelValInputFiles( relVal      = 'SingleMu'
                                                   , dataTier    = 'RECO'
-                                                  , globalTag   = '%s_RelVal_mu2011B'%( globalTag )
+                                                  , globalTag   = '%s_RelVal_mu2012A'%( process.GlobalTag.globaltag.value()[ : -5 ] )
                                                   )
 process.source.skipBadFiles = cms.untracked.bool( True )
 process.options.wantSummary = False
@@ -28,13 +24,6 @@ process.out.outputCommands += [
 
 from PhysicsTools.PatAlgos.tools.coreTools import runOnData
 runOnData( process )
-process.patJetCorrFactors.levels = [ 'L1Offset'
-                                   , 'L2Relative'
-                                   , 'L3Absolute'
-                                   , 'L2L3Residual'
-                                   , 'L5Flavor'
-                                   , 'L7Parton'
-                                   ]
 process.patJetCorrFactors.useRho = cms.bool( False )
 
 # from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning

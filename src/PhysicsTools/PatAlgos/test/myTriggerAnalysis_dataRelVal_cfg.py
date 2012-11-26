@@ -3,16 +3,10 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process( "HLTPROV" )
 
 # Conditions
-condition = 'com10'
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-from Configuration.AlCa.autoCond import autoCond
-globalTag                   = autoCond[ condition ][ : -5 ]
-process.GlobalTag.globaltag = autoCond[ condition ]
-process.GlobalTag.toGet.append( cms.PSet( tag     = cms.string( 'L1GtTriggerMenu_L1Menu_Collisions2012_v0_mc' )
-                                        , record  = cms.string( 'L1GtTriggerMenuRcd' )
-                                        , connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_31X_L1T' )
-                                        )
-                              )
+condition = 'com10_7E33v2'
+process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 
 # Source
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
@@ -22,7 +16,7 @@ process.source = cms.Source("PoolSource",
                         , relVal        = 'SingleMu'
                         , dataTier      = 'RECO'
                         , condition     = condition
-                        , globalTag     = '%s_RelVal_mu2011B'%( globalTag )
+                        , globalTag     = '%s_RelVal_mu2012A'%( process.GlobalTag.globaltag.value()[ : -5 ] )
                         , maxVersions   = None
                         , skipFiles     = None
                         , numberOfFiles = None
@@ -38,34 +32,20 @@ process.maxEvents = cms.untracked.PSet(
 
 # Trigger analyzers
 process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
-process.hltEventAnalyzerAOD.triggerName    = cms.string( '@' )
-process.hltEventAnalyzerReAOD = process.hltEventAnalyzerAOD.clone( processName    = cms.string( 'reHLT' )
-                                                                 , triggerResults = cms.InputTag( 'TriggerResults', '', 'reHLT' )
-                                                                 , triggerEvent   = cms.InputTag( 'hltTriggerSummaryAOD', '', 'reHLT' )
-                                                                 )
+process.hltEventAnalyzerAOD.triggerName = cms.string( '@' )
 process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
-process.triggerSummaryAnalyzerAOD.inputTag = cms.InputTag( 'hltTriggerSummaryAOD', '', 'reHLT' )
-process.triggerSummaryAnalyzerReAOD = process.triggerSummaryAnalyzerAOD.clone( inputTag = cms.InputTag( 'hltTriggerSummaryAOD', '', 'reHLT' )
-                                                                             )
 process.load( "L1Trigger.GlobalTriggerAnalyzer.l1GtAnalyzer_cfi" )
 process.l1GtAnalyzer.AlgorithmName = "L1_SingleMu7"
 process.l1GtAnalyzer.ConditionName = "SingleMu_0x0B"
 process.load( "L1Trigger.GlobalTriggerAnalyzer.l1GtTrigReport_cfi" )
 # process.l1GtTrigReport.PrintVerbosity = 101
 
-process.pL1 = cms.Path(
+process.p = cms.Path(
   process.l1GtAnalyzer
++ process.hltEventAnalyzerAOD
 + process.l1GtTrigReport
-)
-
-process.pHlt = cms.Path(
-  process.hltEventAnalyzerAOD
+#   process.l1GtTrigReport
 + process.triggerSummaryAnalyzerAOD
-)
-
-process.pReHlt = cms.Path(
-  process.hltEventAnalyzerReAOD
-+ process.triggerSummaryAnalyzerReAOD
 )
 
 # Message logger
