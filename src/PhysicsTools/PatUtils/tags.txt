@@ -7,7 +7,7 @@ CondFormats/EgammaObjects                        V00-04-01      V00-04-00
 DataFormats/PatCandidates                        V06-05-11      V06-05-02-02   
 EGamma/EGammaAnalysisTools                       V00-00-28                     
 EgammaAnalysis/ElectronTools                     FB_4Oct2012-2                 
-PhysicsTools/PatAlgos                            V08-10-26      V08-09-11-88   
+PhysicsTools/PatAlgos                            V08-10-27      V08-09-11-88   
 PhysicsTools/PatExamples                         NoTag          V00-05-25      
 PhysicsTools/PatUtils                            V03-09-26      V03-09-22      
 RecoEgamma/EgammaTools                           V09-00-01      V08-11-22      
