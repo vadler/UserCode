@@ -5,9 +5,6 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 cmsswVersion = 'CMSSW_6_1_0_pre5'
 globalTag    = 'START61_V4'
 
-# only for transaition from 610p2 to 610p3:
-process.GlobalTag.globaltag = '%s::All'%( globalTag )
-
 ## Options
 process.options.wantSummary      = False
 process.options.allowUnscheduled = cms.untracked.bool( False )
