@@ -28,7 +28,7 @@ cmsRun ${LOCAL_TEST_DIR}/patTuple_addVertexInfo_cfg.py || die 'Failure using pat
 
 cmsRun ${LOCAL_TEST_DIR}/patTuple_fastsim_cfg.py || die 'Failure using patTuple_fastsim_cfg.py' $?
 
-# cmsRun ${LOCAL_TEST_DIR}/patTuple_topSdelection_cfg.py || die 'Failure using patTuple_topSelection_cfg.py' $?
+# cmsRun ${LOCAL_TEST_DIR}/patTuple_topSelection_cfg.py || die 'Failure using patTuple_topSelection_cfg.py' $?
 
 # cmsRun ${LOCAL_TEST_DIR}/patTuple_userData_cfg.py || die 'Failure using patTuple_userData_cfg.py' $?
 
@@ -39,4 +39,4 @@ cmsRun ${LOCAL_TEST_DIR}/patTuple_fastsim_cfg.py || die 'Failure using patTuple_
 # cmsRun ${LOCAL_TEST_DIR}/patTuple_onlyMuons_cfg.py || die 'Failure using patTuple_onlyMuons_cfg.py' $?
 # cmsRun ${LOCAL_TEST_DIR}/patTuple_onlyPhotons_cfg.py || die 'Failure using patTuple_onlyPhotons_cfg.py' $?
 # cmsRun ${LOCAL_TEST_DIR}/patTuple_onlyTaus_cfg.py || die 'Failure using patTuple_onlyTaus_cfg.py' $?
-# cmsRun ${LOCAL_TEST_DIR}/patTuple_factorisedTaginfo_cfg.py || die 'Failure using patTuple_factorisedTaginfo_cfg.py' $?
+
