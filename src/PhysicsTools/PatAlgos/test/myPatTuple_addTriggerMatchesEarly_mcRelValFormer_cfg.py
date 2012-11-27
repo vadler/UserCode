@@ -31,6 +31,7 @@ process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
 ## Processing
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
+  process.particleFlowPtrs * # transition 610pre5 to 610pre6 only
   process.patCandidates
 )
 
@@ -42,7 +43,7 @@ process.patPhotonTriggerMatchHLTPhoton26Photon18                       = somePat
 process.patElectronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL = somePatElectronTriggerMatchHLTEle17CaloIdTCaloIsoVLTrkIdVLTrkIsoVL.clone( src = 'patElectrons' )
 process.patTauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1          = somePatTauTriggerMatchHLTDoubleMediumIsoPFTau30Trk1eta2p1.clone( src = 'patTaus' )
 process.patJetTriggerMatchHLTPFJet40                                   = somePatJetTriggerMatchHLTPFJet40.clone( src = 'patJets' )
-process.patMetTriggerMatchHLTMET120                                       = somePatMetTriggerMatchHLTMET120.clone()
+process.patMetTriggerMatchHLTMET120                                    = somePatMetTriggerMatchHLTMET120.clone()
 process.patMuonTriggerMatchHLTMu8DiJet30                               = somePatMuonTriggerMatchHLTMu8DiJet30.clone( src = 'patMuons' )
 process.patJetTriggerMatchHLTMu8DiJet30                                = somePatJetTriggerMatchHLTMu8DiJet30.clone( src = 'patJets' )
 from PhysicsTools.PatAlgos.tools.trigTools import switchOnTriggerMatchEmbedding
