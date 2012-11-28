@@ -7,8 +7,7 @@ CondFormats/EgammaObjects                        V00-04-01      V00-04-00
 DataFormats/PatCandidates                        V06-05-12      V06-05-02-02   
 EGamma/EGammaAnalysisTools                       V00-00-28                     
 EgammaAnalysis/ElectronTools                     FB_4Oct2012-2                 
-PhysicsTools/PatAlgos                            V08-10-29      V08-09-11-88   
-PhysicsTools/PatExamples                         NoTag          V00-05-25      
+PhysicsTools/PatAlgos                            V08-10-30      V08-09-11-88   
 PhysicsTools/PatUtils                            V03-09-26      V03-09-22      
 RecoEgamma/EgammaTools                           V09-00-01      V08-11-22      
 RecoTauTag/Configuration                         V01-04-03-02   V01-03-04-00   
@@ -23,4 +22,4 @@ TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-10
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-04      
 TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-13      
 ---------------------------------------
-total packages: 20 (20 displayed)
+total packages: 19 (19 displayed)
