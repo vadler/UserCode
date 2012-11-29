@@ -1,12 +1,13 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process( "HLTPROV" )
-
 # Steering
 cmsswVersion = 'CMSSW_6_1_0_pre6'
-globalTag    = 'START61_V5'
+globalTag    = 'GR_R_61_V3'
+condition    = 'com10_7E33v3'
 
-## Messaging
+process = cms.Process( "HLTPROV" )
+
+# Messaging
 process.load( "FWCore.MessageService.MessageLogger_cfi" )
 process.MessageLogger.debugModules.append( 'l1GtAnalyzer' ) # FIXME: this does not work yet
 process.MessageLogger.categories.append( 'L1GtAnalyzer' )
@@ -17,21 +18,20 @@ process.MessageLogger.cerr.L1GtAnalyzer   = cms.untracked.PSet( limit = cms.untr
 process.MessageLogger.cerr.L1GtTrigReport = cms.untracked.PSet( limit = cms.untracked.int32( -1 ) )
 
 # Conditions
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = '%s::All'%( globalTag )
+process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:%s'%( condition ) )
 
 ## Input
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-
-    pickRelValInputFiles( #formerVersion = True
-                          cmsswVersion  = cmsswVersion
-                        , relVal        = 'RelValProdTTbar'
-                        , dataTier      = 'AODSIM'
-                        , condition     = None
-                        , globalTag     = globalTag
-                        , maxVersions   = 1
+    pickRelValInputFiles( cmsswVersion  = cmsswVersion
+                        , relVal        = 'SingleMu'
+                        , dataTier      = 'RECO'
+                        , condition     = condition
+                        , globalTag     = '%s_RelVal_mu2012A'%( globalTag )
+                        , maxVersions   = None
                         , skipFiles     = None
                         , numberOfFiles = None
                         , debug         = True
@@ -45,17 +45,29 @@ process.maxEvents = cms.untracked.PSet(
 
 ## Processing
 process.load( "HLTrigger.HLTcore.hltEventAnalyzerAOD_cfi" )
-process.hltEventAnalyzerAOD.triggerName = cms.string( '@' )
+process.hltEventAnalyzerAOD.triggerName    = cms.string( '@' )
+process.hltEventAnalyzerReAOD = process.hltEventAnalyzerAOD.clone( processName    = cms.string( 'reHLT' )
+                                                                 , triggerResults = cms.InputTag( 'TriggerResults', '', 'reHLT' )
+                                                                 , triggerEvent   = cms.InputTag( 'hltTriggerSummaryAOD', '', 'reHLT' )
+                                                                 )
 process.load( "HLTrigger.HLTcore.triggerSummaryAnalyzerAOD_cfi" )
+process.triggerSummaryAnalyzerAOD.inputTag = cms.InputTag( 'hltTriggerSummaryAOD', '', 'HLT' )
+process.triggerSummaryAnalyzerReAOD = process.triggerSummaryAnalyzerAOD.clone( inputTag = cms.InputTag( 'hltTriggerSummaryAOD', '', 'reHLT' )
+                                                                             )
 process.load( "L1Trigger.GlobalTriggerAnalyzer.l1GtAnalyzer_cfi" )
 process.l1GtAnalyzer.AlgorithmName = "L1_SingleMu7"
 process.l1GtAnalyzer.ConditionName = "SingleMu_0x0B"
 process.load( "L1Trigger.GlobalTriggerAnalyzer.l1GtTrigReport_cfi" )
 # process.l1GtTrigReport.PrintVerbosity = 101
-process.p = cms.Path(
+process.pL1 = cms.Path(
   process.l1GtAnalyzer
-+ process.hltEventAnalyzerAOD
 + process.l1GtTrigReport
-#   process.l1GtTrigReport
+)
+process.pHlt = cms.Path(
+  process.hltEventAnalyzerAOD
 + process.triggerSummaryAnalyzerAOD
+)
+process.pReHlt = cms.Path(
+  process.hltEventAnalyzerReAOD
++ process.triggerSummaryAnalyzerReAOD
 )

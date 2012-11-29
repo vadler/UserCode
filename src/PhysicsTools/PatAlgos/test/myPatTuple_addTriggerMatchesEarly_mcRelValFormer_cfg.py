@@ -2,8 +2,8 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 # Steering
-cmsswVersion = 'CMSSW_6_1_0_pre5'
-globalTag    = 'START61_V4'
+cmsswVersion = 'CMSSW_6_1_0_pre6'
+globalTag    = 'START61_V5'
 
 ## Options
 process.options.wantSummary      = False
@@ -31,7 +31,6 @@ process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
 ## Processing
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 process.p = cms.Path(
-  process.particleFlowPtrs * # transition 610pre5 to 610pre6 only
   process.patCandidates
 )
 
