@@ -5,8 +5,8 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_3_6-PATTutorial
 DataFormats/PatCandidates                        V06-05-06-03   V06-05-06-01   
 FWCore/GuiBrowsers                               V00-00-70      V00-00-66      
 PatExercise10c/PatL1PhysAlgo                     NoCVS                         
-PhysicsTools/PatAlgos                            V08-09-47      V08-09-37      
-PhysicsTools/PatExamples                         NoTag          V00-05-25      
+PhysicsTools/PatAlgos                            V08-09-48      V08-09-37      
+PhysicsTools/PatExamples                         tutorialJuly2012_exercise10 V00-05-25      
 RecoLuminosity/LumiDB                            V04-01-09      V04-01-05      
 ---------------------------------------
 total packages: 6 (6 displayed)
