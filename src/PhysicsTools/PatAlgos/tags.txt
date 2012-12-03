@@ -5,7 +5,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_3_7
 AnalysisDataFormats/TopObjects                   V06-08-09      V06-08-07      
 DataFormats/PatCandidates                        V06-05-06-03   V06-05-06-01   
 EGamma/EGammaAnalysisTools                       V00-00-13                     
-FWCore/GuiBrowsers                               V00-00-67      V00-00-66      
+FWCore/GuiBrowsers                               V00-00-70      V00-00-66      
 PhysicsTools/PatAlgos                            V08-09-48      V08-09-37      
 RecoMET/METAnalyzers                             V00-00-08                     
 RecoParticleFlow/PFProducer                      V15-02-06      V15-02-05-01   
