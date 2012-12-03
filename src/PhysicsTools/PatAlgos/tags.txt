@@ -10,8 +10,8 @@ FWCore/GuiBrowsers                               V00-00-70      V00-00-66
 PhysicsTools/PatAlgos                            V08-10-31      V08-09-11-88   
 PhysicsTools/PatUtils                            V03-09-26      V03-09-22      
 RecoEgamma/EgammaTools                           V09-00-01      V08-11-22      
-RecoTauTag/Configuration                         V01-04-07-01   V01-03-04-00   
-RecoTauTag/RecoTau                               V01-04-19-01   V01-04-12-05   
+RecoTauTag/Configuration                         V01-04-08      V01-03-04-00   
+RecoTauTag/RecoTau                               V01-04-20      V01-04-12-05   
 TopQuarkAnalysis/Examples                        V06-07-13      V06-07-13      
 TopQuarkAnalysis/TopEventProducers               V06-09-12      V06-09-12      
 TopQuarkAnalysis/TopEventSelection               V06-07-15      V06-07-15      
