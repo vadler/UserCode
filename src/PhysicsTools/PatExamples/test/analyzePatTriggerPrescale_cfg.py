@@ -19,11 +19,3 @@ process.maxEvents = cms.untracked.PSet(
 process.TFileService = cms.Service( "TFileService",
     fileName = cms.string( 'analyzePatTriggerPrescale.root' )
 )
-
-process.triggerAnalysisPrescale = cms.EDAnalyzer( "PatTriggerAnalyzerPrescale",
-    pathName = cms.string( "HLT_HT450_v5" )
-)
-
-process.p = cms.Path(
-    process.triggerAnalysisPrescale
-)
