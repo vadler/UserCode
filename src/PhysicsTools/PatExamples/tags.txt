@@ -6,7 +6,7 @@ DataFormats/PatCandidates                        V06-05-06-03   V06-05-06-01
 FWCore/GuiBrowsers                               V00-00-70      V00-00-66      
 PatExercise10c/PatL1PhysAlgo                     NoCVS                         
 PhysicsTools/PatAlgos                            V08-09-48      V08-09-37      
-PhysicsTools/PatExamples                         tutorialDec2012_exercise11 V00-05-25      
+PhysicsTools/PatExamples                         tutorialDec2012_solution11 V00-05-25      
 RecoLuminosity/LumiDB                            V04-01-09      V04-01-05      
 ---------------------------------------
 total packages: 6 (6 displayed)
