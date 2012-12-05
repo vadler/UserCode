@@ -35,8 +35,6 @@ class PatTriggerAnalyzer : public edm::EDAnalyzer {
   edm::InputTag triggerEvent_;
   /// input for muons
   edm::InputTag muons_;
-  /// input for trigger match objects
-  std::string   muonMatch_;
   /// binning for turn-on curve
   unsigned nBins_;
   double   binWidth_;
@@ -58,7 +56,6 @@ class PatTriggerAnalyzer : public edm::EDAnalyzer {
 #include "TMath.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 
 
 using namespace pat;
@@ -71,8 +68,6 @@ PatTriggerAnalyzer::PatTriggerAnalyzer( const edm::ParameterSet & iConfig ) :
   triggerEvent_( iConfig.getParameter< edm::InputTag >( "triggerEvent" ) ),
   // muon input collection
   muons_( iConfig.getParameter< edm::InputTag >( "muons" ) ),
-  // muon match objects
-  muonMatch_( iConfig.getParameter< std::string >( "muonMatch" ) ),
   // binning for turn-on curve
   nBins_( iConfig.getParameter< unsigned >( "nBins" ) ),
   binWidth_( iConfig.getParameter< double >( "binWidth" ) ),
@@ -134,23 +129,12 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
   edm::Handle< MuonCollection > muons;
   iEvent.getByLabel( muons_, muons );
 
-  // PAT trigger helper for trigger matching information
-  const helper::TriggerMatchHelper matchHelper;
-
   /*
     kinematics comparison
   */
 
   // loop over muon references (PAT muons have been used in the matcher in task 3)
   for( size_t iMuon = 0; iMuon < muons->size(); ++iMuon ) {
-    // we need all these ingedients to recieve matched trigger objects from the matchHelper
-    const TriggerObjectRef trigRef( matchHelper.triggerMatchObject( muons, iMuon, muonMatch_, iEvent, *triggerEvent ) );
-    // finally we can fill the histograms
-    if ( trigRef.isAvailable() && trigRef.isNonnull() ) { // check references (necessary!)
-      histos2D_[ "ptTrigCand" ]->Fill( muons->at( iMuon ).pt(), trigRef->pt() );
-      histos2D_[ "etaTrigCand" ]->Fill( muons->at( iMuon ).eta(), trigRef->eta() );
-      histos2D_[ "phiTrigCand" ]->Fill( muons->at( iMuon ).phi(), trigRef->phi() );
-    }
   }
 
   /*
@@ -167,16 +151,6 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
   const TriggerObjectRefVector trigRefs( triggerEvent->objects( trigger::TriggerMuon ) );
   // loop over selected trigger objects
   for ( TriggerObjectRefVector::const_iterator iTrig = trigRefs.begin(); iTrig != trigRefs.end(); ++iTrig ) {
-    // get all matched candidates for the trigger object
-    const reco::CandidateBaseRefVector candRefs( matchHelper.triggerMatchCandidates( ( *iTrig ), muonMatch_, iEvent, *triggerEvent ) );
-    if ( candRefs.empty() ) continue;
-    // fill the histogram...
-    // (only for the first match, since we resolved ambiguities in the matching configuration,
-    // so that we have one at maximum per trigger object)
-    reco::CandidateBaseRef muonRef( candRefs.at( 0 ) );
-    if ( muonRef.isAvailable() && muonRef.isNonnull() ) {
-      histos1D_[ "turnOn" ]->Fill( muonRef->pt() );
-    }
   }
 
   /*
@@ -187,14 +161,6 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
   // a look to DataFormats/HLTReco/interface/TriggerTypeDefs.h to
   // know more about the available trrigger object IDs
   for ( unsigned id = minID_; id <= maxID_; ++id ) {
-    // vector of all objects for a given object id
-    const TriggerObjectRefVector objRefs( triggerEvent->objects( id ) );
-    // buffer the number of objects
-    sumN_[ id ] += objRefs.size();
-    // iterate the objects and buffer the pt of the objects
-    for ( TriggerObjectRefVector::const_iterator iRef = objRefs.begin(); iRef != objRefs.end(); ++iRef ) {
-      sumPt_[ id ] += ( *iRef )->pt();
-    }
   }
 }
 
@@ -205,16 +171,12 @@ void PatTriggerAnalyzer::endJob()
   */
 
   // normalise bins for turn-on based with counter
-  histos1D_[ "turnOn" ]->Divide( histos1D_[ "countCand" ] );
 
   /*
     mean pt
   */
 
   // normalize the entries for the mean pt plot
-  for(unsigned id=minID_; id<=maxID_; ++id){
-    if( sumN_[ id ] != 0 ) histos1D_[ "ptMean" ]->Fill( id, sumPt_[ id ] / sumN_[ id ] );
-  }
 }
 
 
