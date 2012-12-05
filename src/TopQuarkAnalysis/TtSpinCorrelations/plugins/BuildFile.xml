@@ -1,7 +1,0 @@
-<library name="TopQuarkAnalysisTtSpinCorrelations_plugins" file="*.cc">
-  <use name="FWCore/Framework"/>
-  <use name="FWCore/ParameterSet"/>
-  <use name="CommonTools/UtilAlgos"/>
-  <use name="AnalysisDataFormats/TopObjects"/>
-  <use name="root"/>
-</library>
