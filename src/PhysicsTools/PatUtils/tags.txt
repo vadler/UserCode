@@ -12,6 +12,7 @@ PhysicsTools/PatUtils                            V03-09-26      V03-09-22
 RecoEgamma/EgammaTools                           V09-00-01      V08-11-22      
 RecoTauTag/Configuration                         V01-04-08      V01-03-04-00   
 RecoTauTag/RecoTau                               V01-04-20-03   V01-04-12-05   
+TopQuarkAnalysis/Configuration                   V07-00-04      V07-00-02      
 TopQuarkAnalysis/Examples                        V06-07-13      V06-07-13      
 TopQuarkAnalysis/TopEventProducers               V06-09-13      V06-09-12      
 TopQuarkAnalysis/TopEventSelection               V06-07-16      V06-07-15      
@@ -22,4 +23,4 @@ TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-10
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-04      
 TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-13      
 ---------------------------------------
-total packages: 19 (19 displayed)
+total packages: 20 (20 displayed)
