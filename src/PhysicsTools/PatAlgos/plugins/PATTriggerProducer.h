@@ -51,7 +51,7 @@ namespace pat {
 
     private:
 
-      virtual void beginRun( edm::Run & iRun, const edm::EventSetup & iSetup );
+      virtual void beginRun( edm::Run const & iRun, const edm::EventSetup & iSetup );
       virtual void produce( edm::Event & iEvent, const edm::EventSetup & iSetup );
       
       HLTConfigProvider hltConfig_;

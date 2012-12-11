@@ -5,10 +5,6 @@
 
 #include "PhysicsTools/PatAlgos/plugins/PATTriggerProducer.h"
 
-#include <algorithm>
-
-#include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
-
 
 using namespace pat;
 
@@ -34,14 +30,11 @@ PATTriggerProducer::~PATTriggerProducer()
 {
 }
 
-void PATTriggerProducer::beginRun( edm::Run & iRun, const edm::EventSetup & iSetup )
+void PATTriggerProducer::beginRun( const edm::Run & iRun, const edm::EventSetup & iSetup )
 {
   if ( ! hltConfig_.init( nameProcess_ ) ) {
     edm::LogError( "errorHltConfigExtraction" ) << "HLT config extraction error with process name " << nameProcess_;
-  }                          
-  hltConfig_.dump( "ProcessPSet" ); // DEBUG
-  hltConfig_.dump( "TableName" );   // DEBUG
-  hltConfig_.dump( "Modules" );     // DEBUG
+  }
 }
 
 void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSetup )
@@ -58,74 +51,64 @@ void PATTriggerProducer::produce( edm::Event& iEvent, const edm::EventSetup& iSe
     edm::LogError( "errorTriggerEventValid" ) << "TriggerEvent product with InputTag " << tagTriggerEvent_.encode() << " not in event";
     return;
   }
-  const unsigned int sizePaths( hltConfig_.size() );
-  const unsigned int sizeFilters( handleTriggerEvent->sizeFilters() );
-  const unsigned int sizeObjects( handleTriggerEvent->sizeObjects() );
-  const unsigned int sizeCollections( handleTriggerEvent->sizeCollections() );
+  unsigned int sizePaths( hltConfig_.size() );
+  unsigned int sizeFilters( handleTriggerEvent->sizeFilters() );
+  unsigned int sizeObjects( handleTriggerEvent->sizeObjects() );
 
   // produce trigger event
   std::string nameTable( hltConfig_.tableName() );
-  std::auto_ptr< TriggerEvent > triggerEvent( new TriggerEvent( nameTable, handleTriggerResults->wasrun(), handleTriggerResults->accept(), handleTriggerResults->error() ) );
+  TriggerEvent * ptrTriggerEvent( new TriggerEvent( nameTable, handleTriggerResults->wasrun(), handleTriggerResults->accept(), handleTriggerResults->error() ) ) ;
 
   // produce trigger paths
-  std::auto_ptr< TriggerPathCollection > triggerPaths( new TriggerPathCollection() );
-  triggerPaths->reserve( sizePaths );
-//   std::vector< std::vector< std::string > > tableTriggerModulesInPaths; // transient table of modules in each path; maybe needed later (?)
-//   tableTriggerModulesInPaths.reserve( sizePaths );
+  TriggerPathCollection * ptrTriggerPaths( new TriggerPathCollection() );
+  ptrTriggerPaths->reserve( sizePaths );
+  std::vector< std::vector< std::string > > tableTriggerModulesInPaths; // transient table of modules in each path; maybe needed later (?)
+  tableTriggerModulesInPaths.reserve( sizePaths );
   for ( unsigned int i = 0; i < sizePaths; ++i ) {
-    std::string namePath( hltConfig_.triggerName( i ) );
+    std::string  namePath( hltConfig_.triggerName( i ) );
     unsigned int indexPath( hltConfig_.triggerIndex( namePath ) );
     TriggerPath triggerPath( namePath, 1, handleTriggerResults->wasrun( indexPath ), handleTriggerResults->accept( indexPath ), handleTriggerResults->error( indexPath ) );
-    triggerPaths->push_back( triggerPath );
-//     tableTriggerModulesInPaths.push_back( hltConfig_.moduleLabels( i ) );
+    ptrTriggerPaths->push_back( triggerPath );
+    tableTriggerModulesInPaths.push_back( hltConfig_.moduleLabels( i ) );
   }
   
   // produce trigger filters
   // from TriggerEvent, which contains only the "last active filter" (doesn't help for x-channels)
-  std::auto_ptr< TriggerFilterCollection > triggerFilters( new TriggerFilterCollection() );
-  triggerFilters->reserve( sizeFilters );
+  TriggerFilterCollection * ptrTriggerFilters( new TriggerFilterCollection() );
+  ptrTriggerFilters->reserve( sizeFilters );
   for ( unsigned int i = 0; i < sizeFilters; ++i ) {
      std::string filterLabel( handleTriggerEvent->filterTag( i ).label() );
      std::string filterType( hltConfig_.moduleType( filterLabel ) );
      TriggerFilter triggerFilter( filterLabel, filterType );
-     triggerFilter.setWasRun( true ); // applies automatically only for "last active filter" from TriggerEvent
+     triggerFilter.setWasRun( true );
 //      triggerFilter.setAccept(  ); // to be figured out
-     triggerFilters->push_back( triggerFilter );
+     ptrTriggerFilters->push_back( triggerFilter );
   }
   
   // produce trigger objects
-  std::auto_ptr< TriggerObjectCollection > triggerObjects( new TriggerObjectCollection() );
-  triggerObjects->reserve( sizeObjects );
-  const trigger::Keys & collectionKeys( handleTriggerEvent->collectionKeys() );
-  for ( unsigned int i = 0, j = 0; i < sizeObjects && j < sizeCollections; ++i ) {
-    while ( i >= collectionKeys.at( j ) ) {
-      ++j;
-    }
+  TriggerObjectCollection * ptrTriggerObjects( new TriggerObjectCollection() );
+  ptrTriggerObjects->reserve( sizeObjects );
+  for ( unsigned int i = 0; i < sizeObjects; ++i ) {
     TriggerObject triggerObject( handleTriggerEvent->getObjects().at( i ) );
-    std::string collectionTag( handleTriggerEvent->collectionTag( j ).encode() );
-    triggerObject.setCollection( collectionTag );
-    triggerObjects->push_back( triggerObject );
+    ptrTriggerObjects->push_back( triggerObject );
   }
   
   // connect trigger objects to filters
-  for ( unsigned int i = 0; i < triggerFilters->size(); ++i ) {
-    const trigger::Vids & vids = handleTriggerEvent->filterIds( i );   
-    const trigger::Keys & keys = handleTriggerEvent->filterKeys( i );
-    for ( unsigned int j = 0; j < std::max( vids.size(), keys.size() ); ++j ) {
-      if ( triggerObjects->at( keys[ j ] ).getType() != 0 && triggerObjects->at( keys[ j ] ).getType() != vids[ j ] ) {
-        edm::LogWarning( "warningDiffVid" ) << "TriggerObject " << keys[ j ] << " has differing types " << triggerObjects->at( keys[ j ] ).getType() << " and " << vids[ j ];
-      }
-      triggerObjects->at( keys[ j ] ).setType( vids[ j ] );
-    }   
-  }
   
   // connect trigger filters to paths
   
-  // put products into the event
+  std::auto_ptr< TriggerObjectCollection > triggerObjects( ptrTriggerObjects );
   iEvent.put( triggerObjects );
+  delete ptrTriggerObjects;
+  std::auto_ptr< TriggerFilterCollection > triggerFilters( ptrTriggerFilters );
   iEvent.put( triggerFilters );
+  delete ptrTriggerFilters;
+  std::auto_ptr< TriggerPathCollection > triggerPaths( ptrTriggerPaths );
   iEvent.put( triggerPaths );
+  delete ptrTriggerPaths;
+  std::auto_ptr< TriggerEvent > triggerEvent( ptrTriggerEvent );
   iEvent.put( triggerEvent );
+  delete ptrTriggerEvent;
 }
 
 
