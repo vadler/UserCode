@@ -1,24 +1,26 @@
-Test Release based on: CMSSW_5_2_8
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_8
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_2_8
+Test Release based on: CMSSW_5_3_7
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_3_7
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_3_7
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-CommonTools/ParticleFlow                         V00-03-16      V00-03-08      
-CommonTools/RecoUtils                            V00-00-12      V00-00-03      
-DataFormats/PatCandidates                        V06-05-06-03   V06-05-00      
+AnalysisDataFormats/TopObjects                   V06-08-09      V06-08-07      
+DataFormats/PatCandidates                        V06-05-06-03   V06-05-06-01   
+DataFormats/StdDictionaries                      V00-02-14      V00-02-13      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
-JetMETCorrections/Type1MET                       V04-06-09      V04-06-05      
-PhysicsTools/PatAlgos                            V08-09-44-00   V08-09-04-02   
-PhysicsTools/PatUtils                            V03-09-26      V03-09-18-03   
-RecoBTag/SecondaryVertex                         V01-08-00      V01-06-02      
+FWCore/GuiBrowsers                               V00-00-70      V00-00-66      
+PhysicsTools/PatAlgos                            V08-09-50      V08-09-37      
 RecoMET/METAnalyzers                             V00-00-08                     
-RecoMET/METFilters                               V00-00-07                     
-RecoParticleFlow/PFProducer                      V15-01-11      V15-01-06-01   
-RecoVertex/AdaptiveVertexFinder                  V02-02-00      V02-00-04-02   
-TopQuarkAnalysis/Configuration                   V07-00-02      V06-02-00      
-TopQuarkAnalysis/TopEventProducers               V06-09-09      V06-09-08      
-TopQuarkAnalysis/TopJetCombination               V06-08-06      V06-08-03      
+RecoParticleFlow/PFProducer                      V15-02-06      V15-02-05-01   
+RecoTauTag/Configuration                         V01-04-08      V01-03-04      
+RecoTauTag/RecoTau                               V01-04-20      V01-04-12-00   
+TopQuarkAnalysis/Configuration                   V07-00-04      V06-02-05      
+TopQuarkAnalysis/Examples                        V06-07-13      V06-07-12      
+TopQuarkAnalysis/TopEventProducers               V06-09-11      V06-09-08-01   
+TopQuarkAnalysis/TopEventSelection               V06-07-15      V06-07-15      
+TopQuarkAnalysis/TopHitFit                       V00-00-07      V00-00-06      
+TopQuarkAnalysis/TopJetCombination               V06-08-06      V06-08-04      
+TopQuarkAnalysis/TopKinFitter                    V06-07-23      V06-07-20      
 TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09      
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-03      
-TopQuarkAnalysis/TopTools                        V06-07-11-01   V06-07-11      
+TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-12      
 ---------------------------------------
-total packages: 18 (18 displayed)
+total packages: 20 (20 displayed)
