@@ -2,8 +2,8 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-cmsswVersion = 'CMSSW_5_3_4_cand1'
-globalTag    = 'GR_R_53_V12'
+cmsswVersion = 'CMSSW_5_3_6'
+globalTag    = 'GR_R_53_V15'
 condition    = 'com10_7E33v2'
 
 process = cms.Process("PAT")
@@ -33,7 +33,7 @@ process.source = cms.Source(
                                                          , relVal        = 'SingleMu'
                                                          , dataTier      = 'RECO'
                                                          , globalTag     = '%s_RelVal_mu2011B'%( globalTag )
-                                                         , maxVersions   = 1
+                                                         , maxVersions   = 2
                                                          )
                                    )
 , skipBadFiles = cms.untracked.bool( True )
