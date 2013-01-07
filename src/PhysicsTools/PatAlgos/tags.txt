@@ -1,12 +1,12 @@
-Test Release based on: CMSSW_6_1_0_pre8
-Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc472/cms/cmssw/CMSSW_6_1_0_pre8
-Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_1_0_pre8
+Test Release based on: CMSSW_6_1_0
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc472/cms/cmssw/CMSSW_6_1_0
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_1_0
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-08-09      V06-08-09      
 DataFormats/PatCandidates                        V06-05-12      V06-05-12      
-PhysicsTools/PatAlgos                            V08-10-34      V08-10-33      
+PhysicsTools/PatAlgos                            V08-10-34      V08-10-34      
 PhysicsTools/PatUtils                            V03-09-26      V03-09-26      
-TopQuarkAnalysis/Configuration                   V07-00-04      V07-00-02      
+TopQuarkAnalysis/Configuration                   V07-00-04      V07-00-04      
 TopQuarkAnalysis/Examples                        V06-07-13      V06-07-13      
 TopQuarkAnalysis/TopEventProducers               V06-09-13      V06-09-13      
 TopQuarkAnalysis/TopEventSelection               V06-07-16      V06-07-16      
