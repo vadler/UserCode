@@ -3,7 +3,7 @@ Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw-patch/CMSSW_5_3_7_
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_3_7_patch4
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-08-09      V06-08-07      
-DataFormats/PatCandidates                        V06-05-06-03   V06-05-06-01   
+DataFormats/PatCandidates                        V06-05-06-05   V06-05-06-01   
 DataFormats/StdDictionaries                      V00-02-14      V00-02-13      
 EGamma/EGammaAnalysisTools                       V00-00-13                     
 FWCore/GuiBrowsers                               V00-00-70      V00-00-67      
