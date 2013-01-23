@@ -33,15 +33,15 @@
 
 
 // Initialise parameters for fit function
-void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction = false, bool scale = true );
+void setParametersFit( std::string objCat, TF1 * fit, TH1D * histo, std::string fitFuncId, bool scale );
 // Check correct assignment of signal and background to the fit function parameters
-bool checkParametersFit( TF1 * fit, bool useBkgFunction = false );
+bool checkParametersFit( std::string objCat, TF1 * fit, std::string fitFuncId );
 // Interchange signal and background parameters of fit function
 void mixParametersFit( my::TransferFunction & transfer, TF1 * fit );
 // Interchange signal and background parameters of fit function in histogram filling
 void fillMixedParametersFit( int bin, std::vector< TH1D * > & histoVec, TFitResultPtr & fitResultPtr );
 // Initialise parametrs for dependency function
-void setParametersDependency( TF1 * dep, TH1D * histo, bool pos = false );
+void setParametersDependency( std::string objCat, TF1 * dep, TH1D * histo, std::string fitFuncId, std::string depFuncId, unsigned par );
 
 
 int main( int argc, char * argv[] )
@@ -103,12 +103,11 @@ int main( int argc, char * argv[] )
   const bool doFit_( transfer_.getParameter< bool >( "doFit" ) );
   const bool scale_( transfer_.getParameter< bool >( "scale" ) );
   double fitMaxPt_( transfer_.getParameter< double >( "fitMaxPt" ) );
-  const std::string fitFunction_( transfer_.getParameter< std::string >( "fitFunction" ) );
+  const std::string fitFuncId_( transfer_.getParameter< std::string >( "fitFunction" ) );
   const int norm_( transfer_.getParameter< int >( "norm" ) );
-  const bool useBkg_( transfer_.getParameter< bool >( "useBkg" ) );
   std::string fitOptions_( transfer_.getParameter< std::string >( "fitOptions" ) );
   const double fitRange_( std::min( transfer_.getParameter< double >( "fitRange" ), widthFactor_ ) );
-  const std::string dependencyFunction_( transfer_.getParameter< std::string >( "dependencyFunction" ) );
+  const std::string depFuncId_( transfer_.getParameter< std::string >( "dependencyFunction" ) );
   const bool writeFiles_( transfer_.getParameter< bool >( "writeFiles" ) );
   const std::string pathOut_( transfer_.getParameter< std::string >( "pathOut" ) );
 
@@ -119,6 +118,29 @@ int main( int argc, char * argv[] )
     for ( unsigned uCat = 0; uCat < objCats_.size() - 1; ++uCat ) std::cout << "'" << objCats_.at( uCat ) << "', ";
     std::cout << "'" << objCats_.back() << "'" << std::endl;
   }
+
+  // Set fit functions
+  std::map< std::string, std::string > fitFunctions_;
+  fitFunctions_[ "sGauss" ] = "[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))";                                            // single Gaussian
+  fitFunctions_[ "dGauss" ] = "[0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi))"; // double Gaussian
+  if ( fitFunctions_.find( fitFuncId_ ) == fitFunctions_.end() ) {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "    fit function identifier '" << fitFuncId_ << "' unknown" << std::endl;
+    returnStatus_ += 0x3;
+    return returnStatus_;
+  }
+  const std::string fitFunction_( fitFunctions_[ fitFuncId_ ] );
+  // Set dependency functions
+  std::map< std::string, std::string > dependencyFunctions_;
+  dependencyFunctions_[ "linear" ]  = "[0]+[1]*x";
+  dependencyFunctions_[ "squared" ] = "[0]+[1]*x+[2]*x**2";
+  if ( dependencyFunctions_.find( depFuncId_ ) == dependencyFunctions_.end() ) {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
+    returnStatus_ += 0x4;
+    return returnStatus_;
+  }
+  const std::string dependencyFunction_( dependencyFunctions_[ depFuncId_ ] );
 
   // Set constants
   std::string evtSel_( "analyzeHitFit" );
@@ -134,7 +156,7 @@ int main( int argc, char * argv[] )
   const std::string titlePt( refGen_ ? titlePtT + "^{GEN} (GeV)" : titlePtT + " (GeV)" );
   const std::string baseTitleEta( useSymm_ ? "|#eta|" : "#eta" );
   const std::string titleEta( refGen_ ? baseTitleEta + "^{GEN}" : baseTitleEta + "^{RECO}" );
-  const std::string titleTrans( refGen_ ? "#Delta" + titlePtT + " (GeV)" : "#Delta" + titlePtT + " (GeV)" );
+  const std::string titleTrans( "#Delta" + titlePtT + " (GeV)" );
   const std::string titleTransMean( "#mu of " + titleTrans );
   const std::string titleTransNorm( "c of " + titleTrans );
   const std::string titleTransSigma( "#sigma of " + titleTrans );
@@ -994,11 +1016,11 @@ int main( int argc, char * argv[] )
           const std::string nameTransRebinFit( nameTransRebin + "_fit" );
           if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRebinFit << std::endl;
           TF1 * fitTransRebin( new TF1( nameTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange_ ) ) );
-          setParametersFit( fitTransRebin, histTransRebin, useBkg_, scale_ );
+          setParametersFit( objCat, fitTransRebin, histTransRebin, fitFuncId_, scale_ );
           TFitResultPtr fitTransRebinResultPtr( histTransRebin->Fit( fitTransRebin, fitOptions_.c_str() ) );
           if ( fitTransRebinResultPtr >= 0 ) {
             if ( fitTransRebinResultPtr->Status() == 0 && fitTransRebinResultPtr->Ndf() != 0. ) {
-              if ( checkParametersFit( fitTransRebin, useBkg_ ) ) {
+              if ( checkParametersFit( objCat, fitTransRebin, fitFuncId_ ) ) {
                 mixParametersFit( transferPt, fitTransRebin );
               }
               else {
@@ -1035,11 +1057,11 @@ int main( int argc, char * argv[] )
           const std::string nameTransRestrRebinFit( nameTransRestrRebin + "_fit" );
           if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRestrRebinFit << std::endl;
           TF1 * fitTransRestrRebin( new TF1( nameTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange_ ) ) );
-          setParametersFit( fitTransRestrRebin, histTransRestrRebin, useBkg_, scale_ );
+          setParametersFit( objCat, fitTransRestrRebin, histTransRestrRebin, fitFuncId_, scale_ );
           TFitResultPtr fitTransRestrRebinResultPtr( histTransRestrRebin->Fit( fitTransRestrRebin, fitOptions_.c_str() ) );
           if ( fitTransRestrRebinResultPtr >= 0 ) {
             if ( fitTransRestrRebinResultPtr->Status() == 0 && fitTransRestrRebinResultPtr->Ndf() != 0. ) {
-              if ( checkParametersFit( fitTransRestrRebin, useBkg_ ) ) {
+              if ( checkParametersFit( objCat, fitTransRestrRebin, fitFuncId_ ) ) {
                 mixParametersFit( transferPtRestr, fitTransRestrRebin );
               }
               else {
@@ -1105,11 +1127,11 @@ int main( int argc, char * argv[] )
             const std::string namePtTransRebinFit( namePtTransRebin + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << namePtTransRebinFit << std::endl;
             TF1 * fitPtTransRebin( new TF1( namePtTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange_ ) ) );
-            setParametersFit( fitPtTransRebin, histPtTransRebin, useBkg_, scale_ );
+            setParametersFit( objCat, fitPtTransRebin, histPtTransRebin, fitFuncId_, scale_ );
             TFitResultPtr fitPtTransRebinResultPtr( histPtTransRebin->Fit( fitPtTransRebin, fitOptions_.c_str() ) );
             if ( fitPtTransRebinResultPtr >= 0 ) {
               if ( fitPtTransRebinResultPtr->Status() == 0 && fitPtTransRebinResultPtr->Ndf() != 0. ) {
-                if ( checkParametersFit( fitPtTransRebin, useBkg_ ) ) {
+                if ( checkParametersFit( objCat, fitPtTransRebin, fitFuncId_ ) ) {
                   fillMixedParametersFit( uPt + 1, histVecTransRebinPtFitMap, fitPtTransRebinResultPtr );
                 }
                 else {
@@ -1145,11 +1167,11 @@ int main( int argc, char * argv[] )
             const std::string namePtTransRestrRebinFit( namePtTransRestrRebin + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << namePtTransRestrRebinFit << std::endl;
             TF1 * fitPtTransRestrRebin( new TF1( namePtTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange_ ) ) );
-            setParametersFit( fitPtTransRestrRebin, histPtTransRestrRebin, useBkg_, scale_ );
+            setParametersFit( objCat, fitPtTransRestrRebin, histPtTransRestrRebin, fitFuncId_, scale_ );
             TFitResultPtr fitPtTransRestrRebinResultPtr( histPtTransRestrRebin->Fit( fitPtTransRestrRebin, fitOptions_.c_str() ) );
             if ( fitPtTransRestrRebinResultPtr >= 0 ) {
               if ( fitPtTransRestrRebinResultPtr->Status() == 0 && fitPtTransRestrRebinResultPtr->Ndf() != 0. ) {
-                if ( checkParametersFit( fitPtTransRestrRebin, useBkg_ ) ) {
+                if ( checkParametersFit( objCat, fitPtTransRestrRebin, fitFuncId_ ) ) {
                   fillMixedParametersFit( uPt + 1, histVecTransRestrRebinPtFitMap, fitPtTransRestrRebinResultPtr );
                 }
                 else {
@@ -1197,7 +1219,7 @@ int main( int argc, char * argv[] )
             const std::string nameTransRebinPtFitMapFit( nameTransRebinPtFitMap + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRebinPtFitMapFit << std::endl;
             TF1 * fitTransRebinPtFitMap( new TF1( nameTransRebinPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
-            setParametersDependency( fitTransRebinPtFitMap, histVecTransRebinPtFitMap.at( uPar ), uPar % 3 == 0 );
+            setParametersDependency( objCat, fitTransRebinPtFitMap, histVecTransRebinPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
             TFitResultPtr fitTransRebinPtFitMapResultPtr( histVecTransRebinPtFitMap.at( uPar )->Fit( fitTransRebinPtFitMap, fitOptions_.c_str() ) );
             if ( fitTransRebinPtFitMapResultPtr >= 0 ) {
               if ( fitTransRebinPtFitMapResultPtr->Status() == 0 && fitTransRebinPtFitMapResultPtr->Ndf() != 0. ) {
@@ -1226,7 +1248,7 @@ int main( int argc, char * argv[] )
           const std::string nameTransRestrRebinPtFitMapFit( nameTransRestrRebinPtFitMap + "_fit" );
           if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRestrRebinPtFitMapFit << std::endl;
           TF1 * fitTransRestrRebinPtFitMap( new TF1( nameTransRestrRebinPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
-          setParametersDependency( fitTransRestrRebinPtFitMap, histVecTransRestrRebinPtFitMap.at( uPar ), uPar % 3 == 0 );
+          setParametersDependency( objCat, fitTransRestrRebinPtFitMap, histVecTransRestrRebinPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
           TFitResultPtr fitTransRestrRebinPtFitMapResultPtr( histVecTransRestrRebinPtFitMap.at( uPar )->Fit( fitTransRestrRebinPtFitMap, fitOptions_.c_str() ) );
           if ( fitTransRestrRebinPtFitMapResultPtr >= 0 ) {
             if ( fitTransRestrRebinPtFitMapResultPtr->Status() == 0 && fitTransRestrRebinPtFitMapResultPtr->Ndf() != 0. ) {
@@ -1372,11 +1394,11 @@ int main( int argc, char * argv[] )
               const std::string nameEtaTransRebinFit( nameEtaTransRebin + "_fit" );
               if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaTransRebinFit << std::endl;
               TF1 * fitEtaTransRebin( new TF1( nameEtaTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaTransRebin->GetXaxis()->GetXmin(), histEtaTransRebin->GetMean() - histEtaTransRebin->GetRMS() * fitRange_ ), std::min( histEtaTransRebin->GetXaxis()->GetXmax(), histEtaTransRebin->GetMean() + histEtaTransRebin->GetRMS() * fitRange_ ) ) );
-              setParametersFit( fitEtaTransRebin, histEtaTransRebin, useBkg_, scale_ );
+              setParametersFit( objCat, fitEtaTransRebin, histEtaTransRebin, fitFuncId_, scale_ );
               TFitResultPtr fitEtaTransRebinResultPtr( histEtaTransRebin->Fit( fitEtaTransRebin, fitOptions_.c_str() ) );
               if ( fitEtaTransRebinResultPtr >= 0 ) {
                 if ( fitEtaTransRebinResultPtr->Status() == 0 && fitEtaTransRebinResultPtr->Ndf() != 0. ) {
-                  if ( checkParametersFit( fitEtaTransRebin, useBkg_ ) ) {
+                  if ( checkParametersFit( objCat, fitEtaTransRebin, fitFuncId_ ) ) {
                     mixParametersFit( transferVecEtaPt.at( uEta ), fitEtaTransRebin );
                     fillMixedParametersFit( uEta + 1, histVecTransRebinEtaFitMap, fitEtaTransRebinResultPtr );
                   }
@@ -1419,11 +1441,11 @@ int main( int argc, char * argv[] )
             const std::string nameEtaTransRestrRebinFit( nameEtaTransRestrRebin + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaTransRestrRebinFit << std::endl;
             TF1 * fitEtaTransRestrRebin( new TF1( nameEtaTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaTransRestrRebin->GetXaxis()->GetXmin(), histEtaTransRestrRebin->GetMean() - histEtaTransRestrRebin->GetRMS() * fitRange_ ), std::min( histEtaTransRestrRebin->GetXaxis()->GetXmax(), histEtaTransRestrRebin->GetMean() + histEtaTransRestrRebin->GetRMS() * fitRange_ ) ) );
-            setParametersFit( fitEtaTransRestrRebin, histEtaTransRestrRebin, useBkg_, scale_ );
+            setParametersFit( objCat, fitEtaTransRestrRebin, histEtaTransRestrRebin, fitFuncId_, scale_ );
             TFitResultPtr fitEtaTransRestrRebinResultPtr( histEtaTransRestrRebin->Fit( fitEtaTransRestrRebin, fitOptions_.c_str() ) );
             if ( fitEtaTransRestrRebinResultPtr >= 0 ) {
               if ( fitEtaTransRestrRebinResultPtr->Status() == 0 && fitEtaTransRestrRebinResultPtr->Ndf() != 0. ) {
-                if ( checkParametersFit( fitEtaTransRestrRebin, useBkg_ ) ) {
+                if ( checkParametersFit( objCat, fitEtaTransRestrRebin, fitFuncId_ ) ) {
                   mixParametersFit( transferVecEtaPtRestr.at( uEta ), fitEtaTransRestrRebin );
                   fillMixedParametersFit( uEta + 1, histVecTransRestrRebinEtaFitMap, fitEtaTransRestrRebinResultPtr );
                 }
@@ -1499,11 +1521,11 @@ int main( int argc, char * argv[] )
                   const std::string nameEtaPtTransRebinFit( nameEtaPtTransRebin + "_fit" );
                   if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaPtTransRebinFit << std::endl;
                   TF1 * fitEtaPtTransRebin( new TF1( nameEtaPtTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtTransRebin->GetXaxis()->GetXmin(), histEtaPtTransRebin->GetMean() - histEtaPtTransRebin->GetRMS() * fitRange_ ), std::min( histEtaPtTransRebin->GetXaxis()->GetXmax(), histEtaPtTransRebin->GetMean() + histEtaPtTransRebin->GetRMS() * fitRange_ ) ) );
-                  setParametersFit( fitEtaPtTransRebin, histEtaPtTransRebin, useBkg_, scale_ );
+                  setParametersFit( objCat, fitEtaPtTransRebin, histEtaPtTransRebin, fitFuncId_, scale_ );
                   TFitResultPtr fitEtaPtTransRebinResultPtr( histEtaPtTransRebin->Fit( fitEtaPtTransRebin, fitOptions_.c_str() ) );
                   if ( fitEtaPtTransRebinResultPtr >= 0 ) {
                     if ( fitEtaPtTransRebinResultPtr->Status() == 0 && fitEtaPtTransRebinResultPtr->Ndf() != 0. ) {
-                      if ( checkParametersFit( fitEtaPtTransRebin, useBkg_ ) ) {
+                      if ( checkParametersFit( objCat, fitEtaPtTransRebin, fitFuncId_ ) ) {
                         fillMixedParametersFit( uPt + 1, histVecTransRebinEtaPtFitMap, fitEtaPtTransRebinResultPtr );
                       }
                       else {
@@ -1543,11 +1565,11 @@ int main( int argc, char * argv[] )
                 const std::string nameEtaPtTransRestrRebinFit( nameEtaPtTransRestrRebin + "_fit" );
                 if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaPtTransRestrRebinFit << std::endl;
                 TF1 * fitEtaPtTransRestrRebin( new TF1( nameEtaPtTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtTransRestrRebin->GetXaxis()->GetXmin(), histEtaPtTransRestrRebin->GetMean() - histEtaPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histEtaPtTransRestrRebin->GetXaxis()->GetXmax(), histEtaPtTransRestrRebin->GetMean() + histEtaPtTransRestrRebin->GetRMS() * fitRange_ ) ) );
-                setParametersFit( fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin, useBkg_, scale_ );
+                setParametersFit( objCat, fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin, fitFuncId_, scale_ );
                 TFitResultPtr fitEtaPtTransRestrRebinResultPtr( histEtaPtTransRestrRebin->Fit( fitEtaPtTransRestrRebin, fitOptions_.c_str() ) );
                 if ( fitEtaPtTransRestrRebinResultPtr >= 0 ) {
                   if ( fitEtaPtTransRestrRebinResultPtr->Status() == 0 && fitEtaPtTransRestrRebinResultPtr->Ndf() != 0. ) {
-                    if ( checkParametersFit( fitEtaPtTransRestrRebin, useBkg_ ) ) {
+                    if ( checkParametersFit( objCat, fitEtaPtTransRestrRebin, fitFuncId_ ) ) {
                       fillMixedParametersFit( uPt + 1, histVecTransRestrRebinEtaPtFitMap, fitEtaPtTransRestrRebinResultPtr );
                     }
                     else {
@@ -1607,7 +1629,7 @@ int main( int argc, char * argv[] )
                 const std::string nameTransRebinEtaPtFitMapFit( nameTransRebinEtaPtFitMap + "_fit" );
                 if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRebinEtaPtFitMapFit << std::endl;
                 TF1 * fitTransRebinEtaPtFitMap( new TF1( nameTransRebinEtaPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
-                setParametersDependency( fitTransRebinEtaPtFitMap, histVecTransRebinEtaPtFitMap.at( uPar ), uPar % 3 == 0 );
+                setParametersDependency( objCat, fitTransRebinEtaPtFitMap, histVecTransRebinEtaPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
                 TFitResultPtr fitTransRebinEtaPtFitMapResultPtr( histVecTransRebinEtaPtFitMap.at( uPar )->Fit( fitTransRebinEtaPtFitMap, fitOptions_.c_str() ) );
                 if ( fitTransRebinEtaPtFitMapResultPtr >= 0 ) {
                   if ( fitTransRebinEtaPtFitMapResultPtr->Status() == 0 && fitTransRebinEtaPtFitMapResultPtr->Ndf() != 0. ) {
@@ -1638,7 +1660,7 @@ int main( int argc, char * argv[] )
               const std::string nameTransRestrRebinEtaPtFitMapFit( nameTransRestrRebinEtaPtFitMap + "_fit" );
               if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRestrRebinEtaPtFitMapFit << std::endl;
               TF1 * fitTransRestrRebinEtaPtFitMap( new TF1( nameTransRestrRebinEtaPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
-              setParametersDependency( fitTransRestrRebinEtaPtFitMap, histVecTransRestrRebinEtaPtFitMap.at( uPar ), uPar % 3 == 0 );
+              setParametersDependency( objCat, fitTransRestrRebinEtaPtFitMap, histVecTransRestrRebinEtaPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
               TFitResultPtr fitTransRestrRebinEtaPtFitMapResultPtr( histVecTransRestrRebinEtaPtFitMap.at( uPar )->Fit( fitTransRestrRebinEtaPtFitMap, fitOptions_.c_str() ) );
               if ( fitTransRestrRebinEtaPtFitMapResultPtr >= 0 ) {
                 if ( fitTransRestrRebinEtaPtFitMapResultPtr->Status() == 0 && fitTransRestrRebinEtaPtFitMapResultPtr->Ndf() != 0. ) {
@@ -1794,57 +1816,103 @@ int main( int argc, char * argv[] )
 
 
 // Initialise parameters for fit function
-void setParametersFit( TF1 * fit, TH1D * histo, bool useBkgFunction, bool scale )
+void setParametersFit( std::string objCat, TF1 * fit, TH1D * histo, std::string fitFuncId, bool scale )
 {
   //. This function assumes fit functions of the forms
   // - [0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi)) (single Gaissian) or
-  // - [0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
+  // - [0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
 
   // Starting points
-  Double_t c( scale ? 1. : histo->GetSumOfWeights() );         // Constant
-  Double_t m( histo->GetMean() );                              // Mean
-  Double_t p( histo->GetBinCenter( histo->GetMaximumBin() ) ); // Peak
-  Double_t s( histo->GetRMS() );                               // RMS
+  const Double_t c( scale ? 1. : histo->GetSumOfWeights() );         // Constant
+  const Double_t m( histo->GetMean() );                              // Mean
+  const Double_t p( histo->GetBinCenter( histo->GetMaximumBin() ) ); // Peak
+  const Double_t s( histo->GetRMS() );                               // RMS
   Double_t fitMin, fitMax;
-  fit->GetRange( fitMin, fitMax );                             // function's fit limits
-  // Gaussian part
-  // Constant
-  fit->SetParameter( 0, c );
-  fit->SetParLimits( 0, 0., 10. * c * s ); // 10. stands for 2pi
-  fit->SetParName( 0, "Constant c" );
-  // Mean
-  fit->SetParameter( 1, p ); // No double peak structure in this case
-//   fit->SetParLimits( 1, -1. * s, 1. * s );
-  fit->SetParLimits( 1, fitMin, fitMax );
-  fit->SetParName( 1, "Gaussian #mu" );
-  // Sigma
-  fit->SetParameter( 2, s );
-//   fit->SetParLimits( 2, 0., 2. * s );
-  fit->SetParLimits( 2, 0., fitMax - fitMin );
-  fit->SetParName( 2, "Gaussian #sigma" );
-  // Additional part
-  if ( useBkgFunction ) {
-    fit->SetParameter( 3, 0.25 );
-    fit->SetParLimits( 3, 0., 100. );
-    fit->SetParName( 3, "bkg c" );
-    fit->SetParameter( 4, m + ( m - p ) ); // Shift into opposite direction compared to main Gaussian
-    fit->SetParLimits( 4, fitMin, fitMax );
-    fit->SetParName( 4, "bkg #mu" );
-    fit->SetParameter( 5, ( fitMax - fitMin ) / 4. ); // Starting from sigma covering half of the fit range
-    fit->SetParLimits( 5, 0., fitMax - fitMin );
-    fit->SetParName( 5, "bkg #sigma" );
+  fit->GetRange( fitMin, fitMax );                                   // function's fit limits
+
+  // Single Gaussian case
+  if ( fitFuncId == "sGauss" ) {
+    fit->SetParameter( 0, c );
+    fit->SetParName( 0, "c" );
+    fit->SetParameter( 1, p );
+    fit->SetParName( 1, "#mu" );
+    fit->SetParameter( 2, sqrt( s - m ) );
+    fit->SetParName( 2, "#sigma" );
   }
+
+  // Double Gaussian case
+  if ( fitFuncId == "dGauss" ) {
+    fit->SetParName( 0, "Signal c" );
+    fit->SetParName( 1, "Signal #mu" );
+    fit->SetParName( 2, "Signal #sigma" );
+    fit->SetParName( 3, "Bkg c" );
+    fit->SetParName( 4, "Bkg #mu" );
+    fit->SetParName( 5, "Bkg #sigma" );
+    if ( objCat == "UdscJet" ) {
+      fit->SetParameter( 0, 10. * c );
+      fit->SetParameter( 1, p );
+      fit->SetParLimits( 1, fitMin, fitMax );
+      fit->SetParameter( 2, sqrt( s - m ) );
+      fit->SetParLimits( 2, 0., 2. * s );
+      fit->SetParameter( 3, 0.25 );
+      fit->SetParLimits( 3, 0., 100. );
+      fit->SetParameter( 4, 2 * m - p );
+      fit->SetParLimits( 4, fitMin, fitMax );
+      fit->SetParameter( 5, ( fitMax - fitMin ) / 4. );
+      fit->SetParLimits( 5, 0., fitMax - fitMin );
+    }
+    else if ( objCat == "BJet" ) {
+      fit->SetParameter( 0, 10. * c );
+      fit->SetParameter( 1, p );
+      fit->SetParLimits( 1, fitMin, fitMax );
+      fit->SetParameter( 2, sqrt( s - m ) );
+      fit->SetParameter( 3, 0.25 );
+      fit->SetParLimits( 3, 0., 100. );
+      fit->SetParameter( 4, 2 * m - p );
+      fit->SetParLimits( 4, fitMin, fitMax );
+      fit->SetParameter( 5, ( fitMax - fitMin ) / 4. );
+      fit->SetParLimits( 5, 0., fitMax - fitMin );
+    }
+    else if ( objCat == "Elec" ) {
+      fit->SetParameter( 0, 10. * c );
+//       fit->SetParLimits( 0, 0., 10. * c * ( s - m ) );
+      fit->SetParameter( 1, p );
+      fit->SetParameter( 2, sqrt( s - m ) );
+//       fit->SetParLimits( 2, 0., fitMax - fitMin );
+      fit->SetParameter( 3, 0.25 );
+      fit->SetParLimits( 3, 0., 100. );
+      fit->SetParameter( 4, 2 * m - p );
+      fit->SetParLimits( 4, fitMin, fitMax );
+      fit->SetParameter( 5, ( fitMax - fitMin ) / 4. );
+      fit->SetParLimits( 5, 0., fitMax - fitMin );
+    }
+    else if ( objCat == "Mu" ) {
+      fit->SetParameter( 0, 10. * c );
+//       fit->SetParLimits( 0, 0., 10. * c * ( s - m ) );
+      fit->SetParameter( 1, p );
+      fit->SetParameter( 2, sqrt( s - m ) );
+//       fit->SetParLimits( 2, 0., fitMax - fitMin );
+      fit->SetParameter( 3, 0.25 );
+      fit->SetParLimits( 3, 0., 100. );
+      fit->SetParameter( 4, 2 * m - p );
+      fit->SetParLimits( 4, fitMin, fitMax );
+      fit->SetParameter( 5, ( fitMax - fitMin ) / 4. );
+      fit->SetParLimits( 5, 0., fitMax - fitMin );
+    }
+  }
+
 }
 
 
 // Check correct assignment of signal and background to the fit function parameters
-bool checkParametersFit( TF1 * fit, bool useBkgFunction )
+bool checkParametersFit( std::string objCat, TF1 * fit, std::string fitFuncId )
 {
-  // This function assumes fit functions of the form
-  // - [0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
+  //. This function assumes fit functions of the forms
+  // - [0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi)) (single Gaissian) or
+  // - [0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
 
   // Check, if background is described at all in function
-  if ( ! useBkgFunction || fit->GetNpar() < 6 ) return false;
+  if ( fitFuncId == "sGauss" ) return false;
   // Signal distributions are narrower
   if ( fit->GetParameter( 2 ) < fit->GetParameter( 5 ) ) return false;
   // Signal distributions (are expected to) contribute a larger fraction to the distribution
@@ -1855,7 +1923,7 @@ bool checkParametersFit( TF1 * fit, bool useBkgFunction )
   std::cout << std::endl
             << " --> INFO:" << std::endl
             << "    function " << fit->GetName() << " mixed parameters." << std::endl;
-  return true;
+  return true; // incorrect assignment assumed!
 }
 
 
@@ -1895,25 +1963,120 @@ void fillMixedParametersFit( int bin, std::vector< TH1D * > & histoVec, TFitResu
 
 
 // Initialise parametrs for dependency function
-void setParametersDependency( TF1 * dep, TH1D * histo, bool pos )
+void setParametersDependency( std::string objCat, TF1 * dep, TH1D * histo, std::string fitFuncId, std::string depFuncId, unsigned par )
 {
+  //. This function assumes fit functions of the forms
+  // - [0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi)) (single Gaissian) or
+  // - [0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
   //. This function assumes dependency functions of the form
-  // - [0]+[1]*x (line)
+  // - [0]+[1]*x (linear)
+  // - [0]+[1]*x+[2]*x**2 (squared)
 
   // Starting points
-  // Bins are away from unstable low/high momentum regions
   Double_t x1( histo->GetBinCenter( 5 ) );
   Double_t y1( histo->GetBinContent( 5 ) );
   Double_t x2( histo->GetBinCenter( histo->GetNbinsX() - 2 ) );
   Double_t y2( histo->GetBinContent( histo->GetNbinsX() - 2 ) );
-  // Linear part
   // Constant
-  if ( pos && ( x2 * y1 - x1 * y2 ) / ( x2 - x1 ) < 0. ) dep->SetParameter( 0, 0.25 );
-  else                                                   dep->SetParameter( 0, ( x2 * y1 - x1 * y2 ) / ( x2 - x1 ) );
+  dep->SetParameter( 0, ( x2 * y1 - x1 * y2 ) / ( x2 - x1 ) );
   dep->SetParName( 0, "Constant a" );
   // Slope
-  if ( pos && ( y2 - y1 ) / ( x2 - x1 ) < 0. ) dep->SetParameter( 1, 0.25 );
-  else                                         dep->SetParameter( 1, ( y2 - y1 ) / ( x2 - x1 ) );
+  dep->SetParameter( 1, ( y2 - y1 ) / ( x2 - x1 ) );
   dep->SetParName( 1, "Slope b" );
-  if ( pos ) dep->SetParLimits( 1, 0., 100. ); // to avoid negative transfer functions
+  // Curvature
+  if ( depFuncId == "squared" ) {
+    dep->SetParameter( 2, 0. );
+    dep->SetParName( 2, "Curvature c" );
+  }
+
+  if ( depFuncId == "linear" ) {
+    if ( objCat == "UdscJet" ) {
+    }
+    else if ( objCat == "BJet" ) {
+    }
+    else if ( objCat == "Elec" ) {
+      // Constant
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 0 || par % 3 == 2 ) {
+          if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
+          dep->SetParLimits( 0, 0., 100. );
+        }
+      }
+      // Slope
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 0 || par % 3 == 2 ) {
+          if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
+          dep->SetParLimits( 1, 0., 100. );
+        }
+      }
+    }
+    else if ( objCat == "Mu" ) {
+      // Constant
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 0 || par % 3 == 2 ) {
+          if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
+          dep->SetParLimits( 0, 0., 100. );
+        }
+      }
+      // Slope
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 0 || par % 3 == 2 ) {
+          if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
+          dep->SetParLimits( 1, 0., 100. );
+        }
+      }
+    }
+  }
+
+  else if ( depFuncId == "squared" ) {
+    if ( objCat == "UdscJet" ) {
+    }
+    else if ( objCat == "BJet" ) {
+    }
+    else if ( objCat == "Elec" ) {
+      // Constant
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 0 || par % 3 == 2 ) {
+          if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
+          dep->SetParLimits( 0, 0., 100. );
+        }
+      }
+      // Slope
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 0 || par % 3 == 2 ) {
+          if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
+          dep->SetParLimits( 1, 0., 100. );
+        }
+      }
+      // Curvature
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 1 ) {
+//           dep->FixParameter( 2, 0. );
+        }
+      }
+    }
+    else if ( objCat == "Mu" ) {
+      // Constant
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 0 || par % 3 == 2 ) {
+          if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
+          dep->SetParLimits( 0, 0., 100. );
+        }
+      }
+      // Slope
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 0 || par % 3 == 2 ) {
+          if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
+          dep->SetParLimits( 1, 0., 100. );
+        }
+      }
+      // Curvature
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 1 ) {
+//           dep->FixParameter( 2, 0. );
+        }
+      }
+    }
+  }
+
 }

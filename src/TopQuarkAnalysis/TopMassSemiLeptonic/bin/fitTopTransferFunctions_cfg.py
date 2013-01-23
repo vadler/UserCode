@@ -35,26 +35,27 @@ scale          = True
 fitMaxPt       = 999999.
 #fitMaxPt       = 200.
 fitNonRestr    = False
-fitEtaBins     = True
+fitEtaBins     = False
 #minPt    = 0.
 #minPt    = 20.
-minPt    = 50.
+minPt    = 27.
+#minPt    = 40.
+#minPt    = 50.
+#minPt    = 60.
 #maxDR    = 999999.
 maxDR    = 0.1
 #maxDR    = 0.2
 
 # Transfer functions
-# Fit function: a Gaussian is always required for the first three function parameters
-useBkg   = False
-#fitFunction = '[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))' # single Gaussian
-fitFunction = '[0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi))' # double Gaussian
-norm           = 0
+# Fit function
+fitFunction = 'sGauss' # 'sGauss', 'dGauss'
+norm        = 0 # index of parameter holding the normalisation of the fit functikon
 fitOptions  = 'IBRS+'
 fitRange    = 1. # for Gaussian fits (in units of orig. RMS)
 #fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
-if len( fitFunction.split( ' + ' ) ) > 1: # a background function is defined
+if fitFunction == 'dGauss': # a background function is defined
   fitRange = widthFactor # for combined fits (in units of orig. RMS)
-  useBkg   = True
+dependencyFunction = 'squared' # 'linear', 'squared'
 
 # I/O
 name = ''
@@ -106,10 +107,10 @@ process = cms.PSet()
 process.verbose = cms.uint32( 1 )
 if runTest:
   process.verbose = 3
-process.objectCategories = cms.vstring( 'UdscJet'
-#process.objectCategories = cms.vstring( 'BJet'
-#process.objectCategories = cms.vstring( 'Mu'
-#process.objectCategories = cms.vstring( 'Elec'
+#process.objectCategories = cms.vstring( 'UdscJet' # dGauss+linear
+#process.objectCategories = cms.vstring( 'BJet'    # dGauss+linear
+process.objectCategories = cms.vstring( 'Mu'      # sGauss+squared
+#process.objectCategories = cms.vstring( 'Elec'    # sGauss+squared
                                       )
 process.overwrite = cms.bool( overwrite )
 process.usePileUp = cms.bool( usePileUp )
@@ -153,10 +154,9 @@ process.transfer = cms.PSet(
 , fitMaxPt    = cms.double( fitMaxPt )
 , fitFunction = cms.string( fitFunction )
 , norm        = cms.int32( norm )
-, useBkg      = cms.bool( useBkg )
 , fitOptions  = cms.string( fitOptions )
 , fitRange    = cms.double( fitRange )
-, dependencyFunction = cms.string( '[0]+[1]*x' )
+, dependencyFunction = cms.string( dependencyFunction )
 , writeFiles  = cms.bool( True )
 , pathOut     = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
