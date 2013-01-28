@@ -21,7 +21,7 @@ process.maxEvents = cms.untracked.PSet(
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load( "Configuration.StandardSequences.Services_cff" )
-process.load( "Configuration.StandardSequences.Geometry_cff" )
+process.load( "Configuration.Geometry.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 from Configuration.AlCa.autoCond import autoCond
 process.GlobalTag.globaltag = cms.string( autoCond[ 'com10' ] )
