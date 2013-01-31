@@ -3,7 +3,6 @@ import FWCore.ParameterSet.Config as cms
 process = cms.PSet(
     verbose = cms.uint32(1),
     objectCategories = cms.vstring('UdscJet'),
-    overwrite = cms.bool(True),
     usePileUp = cms.bool(False),
     useAlt = cms.bool(True),
     useNonT = cms.bool(True),
@@ -15,7 +14,7 @@ process = cms.PSet(
         sample = cms.string('Fall11_R4_1_L3_unambiguousOnly'),
         pathPlots = cms.string('/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/plots/fitTopTransferFunctions/fitTopTransferFunctions_fromSummer11_Fall11_R4_1_L3_unambiguousOnly_Ref_'),
         outputFile = cms.string('file:/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/fitTopTransferFunctions_fromSummer11_Fall11_R4_1_L3_unambiguousOnly.root'),
-        overwrite = cms.bool(False),
+        overwrite = cms.bool(True),
         inputFile = cms.string('file:/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/fitTopHitFit_fromSummer11_Fall11_R4_1_L3_unambiguousOnly.root')
     ),
     histos = cms.PSet(

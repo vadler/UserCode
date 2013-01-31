@@ -3,7 +3,6 @@ import FWCore.ParameterSet.Config as cms
 process = cms.PSet(
     verbose = cms.uint32(1),
     objectCategories = cms.vstring('Elec'),
-    overwrite = cms.bool(True),
     usePileUp = cms.bool(False),
     useAlt = cms.bool(True),
     useNonT = cms.bool(True),

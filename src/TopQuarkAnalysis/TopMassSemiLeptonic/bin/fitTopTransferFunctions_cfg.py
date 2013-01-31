@@ -112,7 +112,6 @@ if runTest:
 process.objectCategories = cms.vstring( 'Mu'      # sGauss+squared
 #process.objectCategories = cms.vstring( 'Elec'    # sGauss+squared
                                       )
-process.overwrite = cms.bool( overwrite )
 process.usePileUp = cms.bool( usePileUp )
 process.useAlt    = cms.bool( useAlt )
 process.useNonT   = cms.bool( useNonT )
