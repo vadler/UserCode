@@ -1,4 +1,6 @@
-cms.PSet(
+import os
+import FWCore.ParameterSet.Config as cms
+process = cms.PSet(
     verbose = cms.uint32(1),
     objectCategories = cms.vstring('Elec'),
     overwrite = cms.bool(True),
