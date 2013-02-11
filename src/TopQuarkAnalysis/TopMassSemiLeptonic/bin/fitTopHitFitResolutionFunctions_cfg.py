@@ -10,6 +10,10 @@ rfioInput = True
 # Origin of existing resolution functions
 # era    = 'Spring10'
 era    = 'Summer11'
+# Input sample
+sample = 'Fall11_R4_1_L3_unambiguousOnly'
+#sample = 'Fall11_R4_1_L3_totalMinDist'
+#sample = 'Fall11_R4_L3_unambiguousOnly'
 
 # Settings
 overwrite = True # to throw away earlier versions of histograms, trees and functions
@@ -19,8 +23,6 @@ useAlt    = False
 useSymm   = True
 refGen    = False
 refSel    = True
-if runTest:
-  refSel = False
 
 pileUp = 'PileUpWeightTrue' # 'PileUpWeightTrue' or 'PileUpWeightObserved'
 
@@ -33,10 +35,14 @@ fitOptionsSigma = 'MERS'
 fitRange        = 2. # for Gaussian fits (in units of orig. RMS)
 
 # I/O
-inputFile = 'fitTopHitFit_from%s.root'%( era )
-sample    = 'Fall11_R4_1'
-if not runTest and rfioInput:
-  inputFile = inputFile.replace( '.root', '_%s.root'%( sample ) )
+name = ''
+if useAlt:
+  name += 'Alt'
+if refGen:
+  name += 'Gen'
+if useSymm:
+  name += 'Symm'
+inputFile = 'fitTopHitFit_from%s_%s.root'%( era, sample )
 if usePileUp:
   inputFile = inputFile.replace( '.root', '_PileUp.root' )
 if runTest:
@@ -44,18 +50,23 @@ if runTest:
 if not rfioInput:
   inputFile = inputFile.replace( 'root', 'local.root' )
 logFile = inputFile.replace( 'root', 'log' )
-if not runTest:
-  if useAlt:
-    logFile = logFile.replace( '.', '_Alt.', 1 )
-  if useSymm:
-    logFile = logFile.replace( '.', '_Symm.', 1 )
-  if refGen:
-    logFile = logFile.replace( '.', '_Gen.', 1 )
-  if refSel:
-    logFile = logFile.replace( '.', '_Ref.', 1 )
+if refSel:
+  logFile = logFile.replace( '.', '_Ref.', 1 )
+logFile = logFile.replace( '.', '_' + name + '.', 1 )
 inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
-logFile   = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
+outputFile = inputFile.replace( 'fitTopHitFit', 'fitTopHitFitResolutionFunctions' )
 logFile   = logFile.replace( 'fitTopHitFit', 'fitTopHitFitResolutionFunctions' )
+cfgFile   = logFile.replace( '.', '_cfg.', 1 )
+cfgFile   = cfgFile.replace( '.log', '.py' )
+logFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
+cfgFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), cfgFile )
+pathPlots = '%s/output/plots/fitTopHitFitResolutionFunctions/fitTopHitFitResolutionFunctions_from%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample )
+if refSel:
+  pathPlots += 'Ref_'
+if runTest:
+  #pathPlots = ''
+  pathPlots = pathPlots.replace( 'fitTopHitFitResolutionFunctions', 'fitTopHitFitResolutionFunctionsTest', 2 )
+  pathPlots = pathPlots.replace( 'fitTopHitFitResolutionFunctionsTest', 'fitTopHitFitResolutionFunctions', 1 )
 
 
 # Processing
@@ -83,6 +94,7 @@ process.pileUp    = cms.string( pileUp )
 process.io = cms.PSet(
   inputFile      = cms.string( inputFile )
 , sample         = cms.string( sample )
+, pathPlots      = cms.string( pathPlots )
 , resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era ) )
 )
 
@@ -175,16 +187,37 @@ process.fit = cms.PSet(
 , pathOut      = cms.string( '%s/src/TopQuarkAnalysis/TopHitFit/data/resolution_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the resolution functions
 )
 
-if runTest or not rfioInput:
+#if runTest or not rfioInput:
+if not rfioInput:
   process.fit.writeFiles = False
 
 
 # Messaging
 
+f = open( cfgFile, 'w' )
+print >> f, process.dumpPython()
+f.close()
+print
+print 'Config file:'
+print '------------'
+print cfgFile
 print
 print 'Input file:'
 print '------------'
 print inputFile
+print
+if process.fit.writeFiles:
+  pathOut = process.fit.pathOut.value() + '/gentResolution_' + sample + '_*' + name + '*.txt'
+  if refSel:
+    pathOut = pathOut.replace( sample, sample + '_Ref', 1)
+  print 'Output destination:'
+  print '------------------'
+  print pathOut
+if pathPlots != '':
+  print
+  print 'Plots destination:'
+  print '------------------'
+  print pathPlots + '*' + name + '*.png'
 print
 print 'Log file destination:'
 print '---------------------'

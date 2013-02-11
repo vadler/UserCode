@@ -19,6 +19,7 @@
 #include <TF2.h>
 #include <TFitResult.h>
 #include <TMath.h>
+#include <TCanvas.h>
 
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -65,6 +66,8 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & io_( process_.getParameter< edm::ParameterSet >( "io" ) );
   const std::string inFile_( io_.getParameter< std::string >( "inputFile" ) );
   const std::string sample_( io_.getParameter< std::string >( "sample" ) );
+  const std::string pathPlots_( io_.getParameter< std::string >( "pathPlots" ) );
+  const bool plot_( ! pathPlots_.empty() );
   const std::string resolutionFile_( io_.getParameter< std::string >( "resolutionFile" ) );
   // Configuration for histogram binning
   const edm::ParameterSet & histos_( process_.getParameter< edm::ParameterSet >( "histos" ) );
@@ -248,6 +251,9 @@ int main( int argc, char * argv[] )
   TDirectory * dirSel_ = dynamic_cast< TDirectory* >( fileIn_->Get( evtSel_.c_str() ) );
   TH1D::SetDefaultSumw2();
   TH2D::SetDefaultSumw2();
+
+  TCanvas c1( "c1" );
+  c1.cd();
 
   // Read pile-up data
   std::vector< Double_t > pileUpWeights_;
@@ -564,6 +570,15 @@ int main( int argc, char * argv[] )
               }
             } // loop: uEntry < ptEtaBin.at( uPt ).size()
 
+            if ( plot_ ) {
+              histEtaPtDelta->Draw();
+              c1.Print( std::string( pathPlots_ + histEtaPtDelta->GetName() + ".png" ).c_str() );
+              if ( ! inverse && kinProp == "Pt" ) {
+                histEtaPtDeltaRel->Draw();
+                c1.Print( std::string( pathPlots_ + histEtaPtDeltaRel->GetName() + ".png" ).c_str() );
+              }
+            }
+
             histDelta->Add( histEtaPtDelta );
             histVecPtDelta.at( uPt )->Add( histEtaPtDelta );
             histEtaDelta->Add( histEtaPtDelta );
@@ -620,6 +635,15 @@ int main( int argc, char * argv[] )
 
           } // loop: uPt < nPtBins_
 
+          if ( plot_ ) {
+            histEtaDelta->Draw();
+            c1.Print( std::string( pathPlots_ + histEtaDelta->GetName() + ".png" ).c_str() );
+            if ( ! inverse && kinProp == "Pt" ) {
+              histEtaDeltaRel->Draw();
+              c1.Print( std::string( pathPlots_ + histEtaDeltaRel->GetName() + ".png" ).c_str() );
+            }
+          }
+
           const std::string nameEtaDeltaRebin( nameEtaDelta + "Rebin" );
 //           const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
           const Int_t deltaBinsRebin( deltaBins );
@@ -667,7 +691,21 @@ int main( int argc, char * argv[] )
             } // loop: uEntry < ptEtaBin.at( uPt ).size()
           } // loop: uPt < nPtBins_
 
+          if ( plot_ ) {
+            histEtaDeltaRebin->Draw();
+            c1.Print( std::string( pathPlots_ + histEtaDeltaRebin->GetName() + ".png" ).c_str() );
+          }
+
         } // loop: keyEta
+
+        if ( plot_ ) {
+          histDelta->Draw();
+          c1.Print( std::string( pathPlots_ + histDelta->GetName() + ".png" ).c_str() );
+          if ( ! inverse && kinProp == "Pt" ) {
+            histDeltaRel->Draw();
+            c1.Print( std::string( pathPlots_ + histDeltaRel->GetName() + ".png" ).c_str() );
+          }
+        }
 
         dirFit_->cd();
 
@@ -702,6 +740,16 @@ int main( int argc, char * argv[] )
         std::vector< TH1D * > histVecPtDeltaRebin;
         std::vector< TH1D * > histVecPtDeltaRelRebin;
         for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+
+          if ( plot_ ) {
+            histVecPtDelta.at( uPt )->Draw();
+            c1.Print( std::string( pathPlots_ + histVecPtDelta.at( uPt )->GetName() + ".png" ).c_str() );
+            if ( ! inverse && kinProp == "Pt" ) {
+              histVecPtDeltaRel.at( uPt )->Draw();
+              c1.Print( std::string( pathPlots_ + histVecPtDeltaRel.at( uPt )->GetName() + ".png" ).c_str() );
+            }
+          }
+
           const std::string binPt( boost::lexical_cast< std::string >( uPt ) );
           const std::string namePt( name + "_Pt" + binPt );
 
@@ -796,6 +844,15 @@ int main( int argc, char * argv[] )
           } // loop: uEntry < sizeEta_.at( uEta )
 
         } // loop: keyEta
+
+        if ( plot_ ) {
+          histDeltaRebin->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaRebin->GetName() + ".png" ).c_str() );
+          for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+            histVecPtDeltaRebin.at( uPt )->Draw();
+            c1.Print( std::string( pathPlots_ + histVecPtDeltaRebin.at( uPt )->GetName() + ".png" ).c_str() );
+          }
+        }
 
       } // loop: keyFit
 
@@ -1041,6 +1098,12 @@ int main( int argc, char * argv[] )
                 std::cout << "    '" << nameEtaPtDeltaRebin << std::endl;
               }
             }
+
+            if ( plot_ ) {
+              histEtaPtDeltaRebin->Draw();
+              c1.Print( std::string( pathPlots_ + histEtaPtDeltaRebin->GetName() + ".png" ).c_str() );
+            }
+
           } // loop: uPt < nPtBins_
 
           const std::string nameEtaSigmaFit( nameSigmaEta + "_fit" );
@@ -1059,17 +1122,34 @@ int main( int argc, char * argv[] )
                 fitEtaSigmaRelFit->SetParameters( params );
                 if ( overwrite_ ) fitEtaSigmaRelFit->Write( 0, TObject::kOverwrite );
                 else              fitEtaSigmaRelFit->Write();
+
+                if ( plot_ ) {
+                  fitEtaSigmaRelFit->Draw();
+                  c1.Print( std::string( pathPlots_ + fitEtaSigmaRelFit->GetName() + ".png" ).c_str() );
+                }
+
                 if ( inverse ) {
                   const std::string nameEtaSigmaFitInv( nameEtaSigmaFit + "Inv" );
                   TF1 * fitEtaSigmaInvFit( new TF1( nameEtaSigmaFitInv.c_str(), resFuncInvInv_.c_str(), histSigmaEta->GetXaxis()->GetXmin(), histSigmaEta->GetXaxis()->GetXmax() ) );
                   fitEtaSigmaInvFit->SetParameters( params );
                   if ( overwrite_ ) fitEtaSigmaInvFit->Write( 0, TObject::kOverwrite );
                   else              fitEtaSigmaInvFit->Write();
+
+                  if ( plot_ ) {
+                    fitEtaSigmaInvFit->Draw();
+                    c1.Print( std::string( pathPlots_ + fitEtaSigmaInvFit->GetName() + ".png" ).c_str() );
+                  }
+
                   const std::string nameEtaSigmaFitInvRel( nameEtaSigmaFitInv + "Rel" );
                   TF1 * fitEtaSigmaInvRelFit( new TF1( nameEtaSigmaFitInvRel.c_str(), resFuncInvInvRel_.c_str(), histSigmaEta->GetXaxis()->GetXmin(), histSigmaEta->GetXaxis()->GetXmax() ) );
                   fitEtaSigmaInvRelFit->SetParameters( params );
                   if ( overwrite_ ) fitEtaSigmaInvRelFit->Write( 0, TObject::kOverwrite );
                   else              fitEtaSigmaInvRelFit->Write();
+
+                  if ( plot_ ) {
+                    fitEtaSigmaInvRelFit->Draw();
+                    c1.Print( std::string( pathPlots_ + fitEtaSigmaInvRelFit->GetName() + ".png" ).c_str() );
+                  }
                 }
               }
               if ( writeFiles_ ) {
@@ -1120,7 +1200,53 @@ int main( int argc, char * argv[] )
             }
           }
 
+          if ( plot_ ) {
+            histDeltaFitChi2->Draw();
+            c1.Print( std::string( pathPlots_ + histDeltaFitChi2->GetName() + ".png" ).c_str() );
+            histDeltaPtFitProb->Draw();
+            c1.Print( std::string( pathPlots_ + histDeltaPtFitProb->GetName() + ".png" ).c_str() );
+            histSigmaEta->Draw();
+            c1.Print( std::string( pathPlots_ + histSigmaEta->GetName() + ".png" ).c_str() );
+          }
+
         } // loop: keyEta
+
+        if ( plot_ ) {
+          histDeltaEtaPtFitChi2Map->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaEtaPtFitChi2Map->GetName() + ".png" ).c_str() );
+          histDeltaEtaPtFitSigmaMap->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaEtaPtFitSigmaMap->GetName() + ".png" ).c_str() );
+          histDeltaEtaPtFitProbMap->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaEtaPtFitProbMap->GetName() + ".png" ).c_str() );
+          histDeltaEtaPtFitSigma->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaEtaPtFitSigma->GetName() + ".png" ).c_str() );
+          histDeltaEtaPtFitProb->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaEtaPtFitProb->GetName() + ".png" ).c_str() );
+          histDeltaEtaPtFitMissingMap->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaEtaPtFitMissingMap->GetName() + ".png" ).c_str() );
+          histDeltaEtaPtFitBadProbMap->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaEtaPtFitBadProbMap->GetName() + ".png" ).c_str() );
+          histDeltaEtaPtFitBadNdfMap->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaEtaPtFitBadNdfMap->GetName() + ".png" ).c_str() );
+          histDeltaEtaPtFitBadProb->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaEtaPtFitBadProb->GetName() + ".png" ).c_str() );
+          histDeltaEtaPtFitBadNdf->Draw();
+          c1.Print( std::string( pathPlots_ + histDeltaEtaPtFitBadNdf->GetName() + ".png" ).c_str() );
+          histSigmaEtaFitChi2Map->Draw();
+          c1.Print( std::string( pathPlots_ + histSigmaEtaFitChi2Map->GetName() + ".png" ).c_str() );
+          histSigmaEtaFitProbMap->Draw();
+          c1.Print( std::string( pathPlots_ + histSigmaEtaFitProbMap->GetName() + ".png" ).c_str() );
+          histSigmaEtaFitProb->Draw();
+          c1.Print( std::string( pathPlots_ + histSigmaEtaFitProb->GetName() + ".png" ).c_str() );
+          histSigmaEtaFitMissingMap->Draw();
+          c1.Print( std::string( pathPlots_ + histSigmaEtaFitMissingMap->GetName() + ".png" ).c_str() );
+          histSigmaEtaFitBadProbMap->Draw();
+          c1.Print( std::string( pathPlots_ + histSigmaEtaFitBadProbMap->GetName() + ".png" ).c_str() );
+          histSigmaEtaFitBadNdfMap->Draw();
+          c1.Print( std::string( pathPlots_ + histSigmaEtaFitBadNdfMap->GetName() + ".png" ).c_str() );
+          histSigmaEtaFitBadNdf->Draw();
+          c1.Print( std::string( pathPlots_ + histSigmaEtaFitBadNdf->GetName() + ".png" ).c_str() );
+        }
 
       } // loop: keyFit
 
