@@ -1259,11 +1259,12 @@ int main( int argc, char * argv[] )
 
       // File name
       std::string nameOut( pathOutResolution_ + "/gentResolution_" + sample_ + "_" + objCat );
-      if ( usePileUp_ ) nameOut.append( "_PileUp" );
-      if ( useAlt_ )    nameOut.append( "_Alt" );
-      if ( useSymm_ )   nameOut.append( "_Symm" );
-      if ( refGen_ )    nameOut.append( "_Gen" );
-      if ( refSel_)     nameOut.append( "_Ref" );
+      if ( usePileUp_ )                     nameOut.append( "_PileUp" );
+      if ( refSel_)                         nameOut.append( "_Ref" );
+      if ( useAlt_ || refGen_ || useSymm_ ) nameOut.append( "_" );
+      if ( useAlt_ )                        nameOut.append( "Alt" );
+      if ( refGen_ )                        nameOut.append( "Gen" );
+      if ( useSymm_ )                       nameOut.append( "Symm" );
       nameOut.append( ".txt" );
 
       ofstream fileOut;
