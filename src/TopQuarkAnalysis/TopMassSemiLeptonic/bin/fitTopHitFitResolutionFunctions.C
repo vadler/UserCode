@@ -155,7 +155,7 @@ int main( int argc, char * argv[] )
 
     for ( unsigned uCat = 0; uCat < objCats_.size(); ++uCat ) {
       const std::string objCat( objCats_.at( uCat ) );
-      TDirectory * dirCat_( dynamic_cast< TDirectory* >( resolutionFile->Get( objCat.c_str() ) ) );
+      TDirectory * dirCat_( ( TDirectory* )( resolutionFile->Get( objCat.c_str() ) ) );
       if ( ! dirCat_ ) {
         std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                   << "    object category '" << objCat << "' does not exist in resolution file" << std::endl;
@@ -168,7 +168,7 @@ int main( int argc, char * argv[] )
       while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
         if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
         const std::string kinProp( keyProp->GetName() );
-        TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
+        TDirectory * dirProp_( ( TDirectory* )( dirCat_->Get( kinProp.c_str() ) ) );
 
         TList * listProp( dirProp_->GetListOfKeys() );
         if ( verbose_ > 3 ) listProp->Print();
@@ -177,7 +177,7 @@ int main( int argc, char * argv[] )
         while ( TKey * keyEta = ( TKey* )nextInListProp() ) {
           if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
           const std::string binEta( keyEta->GetName() );
-          TDirectory * dirEta_( dynamic_cast< TDirectory* >( dirProp_->Get( binEta.c_str() ) ) );
+          TDirectory * dirEta_( ( TDirectory* )( dirProp_->Get( binEta.c_str() ) ) );
 
           const std::string name( "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
           const std::string nameInv( "fitExist_" + objCat + "_Inv_" + kinProp + "_" + binEta );
@@ -189,8 +189,8 @@ int main( int argc, char * argv[] )
           TF1 * fitSigmaInv( 0 );
           while ( TKey * keyFunc = ( TKey* )nextInListEta() ) {
             if ( std::string( keyFunc->GetClassName() ) != nameFuncClass ) continue;
-            fitSigma    = dynamic_cast< TF1* >( dirEta_->Get( name.c_str() ) );
-            fitSigmaInv = dynamic_cast< TF1* >( dirEta_->Get( nameInv.c_str() ) );
+            fitSigma    = ( TF1* )( dirEta_->Get( name.c_str() ) );
+            fitSigmaInv = ( TF1* )( dirEta_->Get( nameInv.c_str() ) );
           }
           if ( ( fitSigma && fitSigmaInv ) || ( ! fitSigma && ! fitSigmaInv ) ) {
             std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
@@ -248,7 +248,7 @@ int main( int argc, char * argv[] )
     returnStatus_ += 0x10;
     return returnStatus_;
   }
-  TDirectory * dirSel_ = dynamic_cast< TDirectory* >( fileIn_->Get( evtSel_.c_str() ) );
+  TDirectory * dirSel_ = ( TDirectory* )( fileIn_->Get( evtSel_.c_str() ) );
   TH1D::SetDefaultSumw2();
   TH2D::SetDefaultSumw2();
 
@@ -274,7 +274,7 @@ int main( int argc, char * argv[] )
   // Loop over configured object categories
   for ( unsigned uCat = 0; uCat < objCats_.size(); ++uCat ) {
     const std::string objCat( objCats_.at( uCat ) );
-    TDirectory * dirCat_( dynamic_cast< TDirectory* >( dirSel_->Get( objCat.c_str() ) ) );
+    TDirectory * dirCat_( ( TDirectory* )( dirSel_->Get( objCat.c_str() ) ) );
     if ( ! dirCat_ ) {
       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                 << "    object category '" << objCat << "' does not exist in input file" << std::endl;
@@ -285,7 +285,7 @@ int main( int argc, char * argv[] )
 
     // Eta binning
     std::vector< double > etaBins_;
-    TH1D * histBinsEta( dynamic_cast< TH1D* >( dirCat_->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
+    TH1D * histBinsEta( ( TH1D* )( dirCat_->Get( std::string( objCat + "_binsEta" ).c_str() ) ) );
     const bool objMetLike( histBinsEta->GetNbinsX() == 1 );
     if ( objMetLike ) {
       etaBins_.push_back( histBinsEta->GetBinLowEdge( 1 ) );
@@ -302,7 +302,7 @@ int main( int argc, char * argv[] )
 
     // Pt binning
     std::vector< double > ptBins_;
-    TH1D * histBinsPt( dynamic_cast< TH1D* >( dirCat_->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
+    TH1D * histBinsPt( ( TH1D* )( dirCat_->Get( std::string( objCat + "_binsPt" ).c_str() ) ) );
     for ( int uPt = 0; uPt < histBinsPt->GetNbinsX(); ++uPt ) {
       ptBins_.push_back( histBinsPt->GetBinLowEdge( uPt + 1 ) );
     }
@@ -373,7 +373,7 @@ int main( int argc, char * argv[] )
     while ( TKey * keyProp = ( TKey* )nextInListCat() ) {
       if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
       const std::string kinProp( keyProp->GetName() );
-      TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
+      TDirectory * dirProp_( ( TDirectory* )( dirCat_->Get( kinProp.c_str() ) ) );
 
       // Histogram binning
       const unsigned propBins_( histos_.getParameter< unsigned >( std::string( objCat + kinProp + "Bins" ) ) );
@@ -406,7 +406,7 @@ int main( int argc, char * argv[] )
         if ( useAlt_  == ( subFit.find( "Alt" )  == std::string::npos ) ) continue;
         if ( useSymm_ == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
         if ( refGen_  == ( subFit.find( "Gen" )  == std::string::npos ) ) continue;
-        TDirectory * dirFit_( dynamic_cast< TDirectory* >( dirProp_->Get( subFit.c_str() ) ) );
+        TDirectory * dirFit_( ( TDirectory* )( dirProp_->Get( subFit.c_str() ) ) );
         dirFit_->cd();
 
         const std::string name( objCat + "_" + kinProp + "_" + subFit );
@@ -414,16 +414,31 @@ int main( int argc, char * argv[] )
         // Inversion flags
         const bool inverse( subFit.find( "Inv" ) != std::string::npos );
         if ( onlyExisting_ ) {
-          if ( nominalInv_.at( uCat ).at( uProp ) != inverse ) {
-            if ( verbose_ > 2 ) {
-              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                        << "    skipping unnominal directory '"; gDirectory->pwd();
+          if ( kinProp == "Pt" || ! objMetLike ) {
+            if ( nominalInv_.at( uCat ).at( uProp ) != inverse ) {
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                          << "    skipping unnominal directory '"; gDirectory->pwd();
+              }
+              continue;
             }
-            continue;
+            else if ( verbose_ > 3 ) {
+              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                        << "    entering nominal directory '"; gDirectory->pwd();
+            }
           }
-          else if ( verbose_ > 3 ) {
-            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                      << "    entering nominal directory '"; gDirectory->pwd();
+          else {
+            if ( inverse ) {
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                          << "    skipping unnominal directory '"; gDirectory->pwd();
+              }
+              continue;
+            }
+            else if ( verbose_ > 3 ) {
+              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                        << "    entering nominal directory '"; gDirectory->pwd();
+            }
           }
         }
 
@@ -899,7 +914,7 @@ int main( int argc, char * argv[] )
         break;
       }
       const std::string kinProp( keyProp->GetName() );
-      TDirectory * dirProp_( dynamic_cast< TDirectory* >( dirCat_->Get( kinProp.c_str() ) ) );
+      TDirectory * dirProp_( ( TDirectory* )( dirCat_->Get( kinProp.c_str() ) ) );
 
       // Histogram binning
       const double propMax_( histos_.getParameter< double >( std::string( objCat + kinProp + "Max" ) ) );
@@ -919,22 +934,37 @@ int main( int argc, char * argv[] )
         if ( useAlt_  == ( subFit.find( "Alt" )  == std::string::npos ) ) continue;
         if ( useSymm_ == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
         if ( refGen_  == ( subFit.find( "Gen" )  == std::string::npos ) ) continue;
-        TDirectory * dirFit_( dynamic_cast< TDirectory* >( dirProp_->Get( subFit.c_str() ) ) );
+        TDirectory * dirFit_( ( TDirectory* )( dirProp_->Get( subFit.c_str() ) ) );
         dirFit_->cd();
 
         // Inversion flags
         const bool inverse( subFit.find( "Inv" ) != std::string::npos );
         if ( onlyExisting_ ) {
-          if ( nominalInv_.at( uCat ).at( uProp ) != inverse ) {
-            if ( verbose_ > 2 ) {
-              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                        << "    skipping unnominal directory '"; gDirectory->pwd();
+          if ( kinProp == "Pt" || ! objMetLike ) {
+            if ( nominalInv_.at( uCat ).at( uProp ) != inverse ) {
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                          << "    skipping unnominal directory '"; gDirectory->pwd();
+              }
+              continue;
             }
-            continue;
+            else if ( verbose_ > 3 ) {
+              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                        << "    entering nominal directory '"; gDirectory->pwd();
+            }
           }
-          else if ( verbose_ > 3 ) {
-            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                      << "    entering nominal directory '"; gDirectory->pwd();
+          else {
+            if ( inverse ) {
+              if ( verbose_ > 2 ) {
+                std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                          << "    skipping unnominal directory '"; gDirectory->pwd();
+              }
+              continue;
+            }
+            else if ( verbose_ > 3 ) {
+              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                        << "    entering nominal directory '"; gDirectory->pwd();
+            }
           }
         }
 
@@ -1066,7 +1096,7 @@ int main( int argc, char * argv[] )
 
             const std::string nameEtaPtDelta( nameEtaPt + "_Delta" );
             const std::string nameEtaPtDeltaRebin( nameEtaPtDelta + "Rebin" );
-            TH1D * histEtaPtDeltaRebin( dynamic_cast< TH1D* >( gDirectory->Get( nameEtaPtDeltaRebin.c_str() ) ) );
+            TH1D * histEtaPtDeltaRebin( ( TH1D* )( gDirectory->Get( nameEtaPtDeltaRebin.c_str() ) ) );
 
             const std::string nameEtaPtDeltaFit( nameEtaPtDelta + "_fit" );
             const std::string nameEtaPtDeltaRebinFit( nameEtaPtDeltaRebin + "_fit" );
