@@ -7,46 +7,32 @@ import FWCore.ParameterSet.Config as cms
 
 ### Steering
 
-runOnMC       = True
-runOnRelVal   = True # If 'False', define input files in l. 218ff.
-maxEvents     = -1
-gc            = True
-createNTuples = True
-if lxplusTest:
-  gc            = False
-  createNTuples = False
-  maxEvents     = 100
-  if not runOnMC:
-    maxEvents = 1000
-else:
-  runOnRelVal = False # If 'False', define input files in l. 218ff.
+gc = False
+
+runOnMC     = True
+runOnRelVal = True # If 'False', define input files in l. 187ff.
 
 runMatch  = True
 runMVA    = True
 runCiC    = True
 runEwk    = True
 addGenEvt = True
+createNTuples        = True
 writePdfWeights      = False    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
+writeWDecay          = False	# this should only be set True for *broken* W datasets
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
-filterDecayChannels        = False
-addMuonChannel             = True
-addElectronChannel         = True
-addTauChannel              = False
-restrictTauChannelMuon     = False
-restrictTauChannelElectron = False
+
+maxEvents = 1000
 
 hltProcess       = 'HLT'
 triggerSelection = ''
 
 jetAlgo   = 'AK5'
 jecLevels = []
-#jecLevels.append( 'L1FastJet' )
-#jecLevels.append( 'L2Relative' )
-#jecLevels.append( 'L3Absolute' )
+#jecLevels = [ 'L1FastJet', 'L2Relative', 'L3Absolute' ]
 #if not runOnMC:
   #jecLevels.append( 'L2L3Residual' )
-typeIMetCorrections = True
 
 # vertex collection to use
 # 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
@@ -59,47 +45,42 @@ pfJetCollection = 'pfJets'
 # muon top projection object selection
 pfMuonSelect = 'pt > 5.' # PF2PAT: 'pt > 5.'
 # muon isolation cone
-usePfMuonIsoConeR03 = False
+usePfMuonIsoConeR03 = True
 # muon top projection isolation
-pfMuonIso = 0.2 # PF2PAT: 0.15
-pfMuonIsoUseDeltaBeta = True
+pfMuonIso = 0.5 # PF2PAT: 0.15
 postfixNonIsoMu = 'NonIsoMu'
 # muon object selection
-#muonSelect = 'isPFMuon && (isGlobalMuon || isTrackerMuon) && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
+#muonSelect = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5' # RefSel (min. for veto)
 muonSelect = ''
 # muon event selection
-muonCut = 'isPFMuon && (isGlobalMuon || isTrackerMuon) && pt > 10. && abs(eta) < 2.5'
+#muonCut = 'isGlobalMuon && pt > 5. && abs(eta) < 3.0'
+#muonCut = 'isGlobalMuon && pt > 5. && abs(eta) < 2.5 && globalTrack().hitPattern().numberOfValidMuonHits() > 0 && numberOfMatches() > 1 && innerTrack().numberOfValidHits()> 10 && innerTrack().hitPattern().numberOfValidPixelHits()>0'
+muonCut = 'isGlobalMuon && pt > 10. && abs(eta) < 2.5 && globalTrack().hitPattern().numberOfValidMuonHits()> 0 && numberOfMatchedStations() > 1 && innerTrack().hitPattern().numberOfValidPixelHits()>0 && track().hitPattern().trackerLayersWithMeasurement() > 8'
 muonsMin = 0
 
-
 # electron top projection object selection
-pfElectronSelect = 'pt > 10. && gsfTrackRef.isNonnull' # PF2PAT: 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
+pfElectronSelect = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2' # PF2PAT: 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
 # electron isolation cone
 usePfElectronIsoConeR03 = True
 # electron top projection isolation
-pfElectronIso = 0.2 # PF2PAT: 0.2
-pfElectronIsoUseDeltaBeta = False
+pfElectronIso = 0.5 # PF2PAT: 0.2
 postfixNonIsoE = 'NonIsoE'
 # electron object selection
-#electronSelect = 'pt > 20. && abs(eta) < 2.5 && electronID("mvaTrigV0") > 0.' # RefSel (min. for veto)
+#electronSelect = 'et > 15. && abs(eta) < 2.5' # RefSel (min. for veto)
 electronSelect = ''
 # electron event selection
-electronCut  = 'et > 10. && abs(eta) < 2.5'
+electronCut  = 'et > 5. && abs(eta) < 3.0'
 electronsMin = 0
 
 # x-leptons event selection
-leptonsMin = 0
-if lxplusTest:
-  leptonsMin = 1
+leptonsMin = 1
 
 # jet object selection
-#jetSelect = 'pt > 20. && abs(eta) < 2.5' # RefSel
-jetSelect = 'pt > 15. && abs(eta) < 2.6'
+#jetSelect = 'pt > 30. && abs(eta) < 2.4' # RefSel
+jetSelect = ''
 # jet event selection
-jetCut  = 'pt > 15. && abs(eta) < 2.6'
-jetsMin = 0
-if lxplusTest:
-  jetsMin = 3
+jetCut  = 'pt > 15. && abs(eta) < 3.0'
+jetsMin = 3
 
 # Flat NTuple production
 processing_mode = 0
@@ -128,38 +109,33 @@ process = cms.Process( 'PF2PAT' )
 
 ### Conditions
 
-process.load( "Configuration.Geometry.GeometryIdeal_cff" )
+process.load( "Configuration.StandardSequences.Geometry_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START53_V11::All'
+  process.GlobalTag.globaltag = 'START52_V7::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_53_V13::All'
+  process.GlobalTag.globaltag = 'GR_R_52_V7::All'
 
 if gc:
 	runOnMC   = eval('@MC@')
-	#pfJetCollection = '@PFJETS@'
-	#usePfMuonIsoConeR03 = eval('@MUTPCONE03@')
-	#pfMuonIso = eval('@MUTPISO@')
-	#muonsMin = eval('@MINNMU@')
-	#usePfElectronIsoConeR03 = eval('@ETPCONE03@')
-	#pfElectronsIso = eval('@ETPISO@')
-	#electronsMin = eval('@MINNE@')
-	#leptonsMin = eval('@MINNLEP@')
-	#jetsMin = eval('@MINNJETS@')
+	pfJetCollection = '@PFJETS@'
+	usePfMuonIsoConeR03 = eval('@MUTPCONE03@') # FIXME in input file
+	pfMuonIso = eval('@MUTPISO@')
+	muonsMin = eval('@MINNMU@')
+	usePfElectronIsoConeR03 = eval('@ETPCONE03@')
+	pfElectronsIso = eval('@ETPISO@') # FIXME in input file
+	electronsMin = eval('@MINNE@')
+	leptonsMin = eval('@MINNLEP@')
+	jetsMin = eval('@MINNJETS@')
         writeNonIsoMuons   = eval('@WRITENONISOMU@')
-       	writeNonIsoElectrons   = eval('@WRITENONISOE@')
-	if '@WRITENONISOMU@'.lower() == 'false':
-        	writeNonIsoMuons   = False
-	else:
-		writeNonIsoMuons = True
-
-	if '@WRITENONISOE@'.lower() == 'false':
-        	writeNonIsoElectrons   = False
-	else:
-		writeNonIsoElectrons = True
-
+        writeNonIsoElectrons   = eval('@WRITENONISOE@')
 	process.GlobalTag.globaltag = '@GLOBALTAG@'
+	# if not set in gc config, take default value
+	if '@WRITEWDECAY@'.lower() == 'true' or '@WRITEWDECAY@'.lower() == 'false':
+		writeWDecay = eval('@WRITEWDECAY@')
+	else:
+		writeWDecay = False
 	# if not set in gc config, take default value
 	if '@PDFWEIGHTS@'.lower() == 'true' or '@PDFWEIGHTS@'.lower() == 'false':
 		writePdfWeights = eval('@PDFWEIGHTS@')
@@ -169,7 +145,6 @@ if gc:
 runMatch        = runMatch        and runOnMC
 addGenEvt       = addGenEvt       and runOnMC
 writePdfWeights = writePdfWeights and runOnMC
-filterDecayChannels = filterDecayChannels and runOnMC
 
 # muon propagator requirements
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
@@ -201,44 +176,107 @@ from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 inputFiles = cms.untracked.vstring()
 if runOnRelVal:
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
-                                     , dataTier     = 'AODSIM'
-                                     , relVal       = 'RelValProdTTbar'
-                                     , globalTag    = 'START53_V10'
-                                     , maxVersions  = 1
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_3'
+                                     , globalTag     = 'START52_V5'
+                                     , maxVersions   = 1
                                      )
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
-                                     , dataTier     = 'RECO'
-                                     , relVal       = 'SingleMu'
-                                     , globalTag    = 'GR_R_53_V12_RelVal_mu2012B'
-                                     #, relVal       = 'SingleElectron'
-                                     #, globalTag    = 'GR_R_53_V12_RelVal_electron2012B'
-                                     , maxVersions  = 1
+    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_2'
+                                     , dataTier      = 'RECO'
+                                     #, relVal        = 'SingleMu'
+                                     #, globalTag     = 'GR_R_52_V4_RelVal_mu2011B'
+                                     , relVal        = 'Electron'
+                                     , globalTag     = 'GR_R_52_V4_RelVal_electron2011B'
                                      )
-    hltProcess = 'reHLT'
 else:
   if runOnMC:
-    if lxplusTest:
-      inputFiles = [ '/store/user/vadler/cms/AT/CMSSW_5_2_5/output/TTbar_Summer12_AODskim.root'
-                   ]
-    else:
-      inputFiles = [ 'file:////user/bklein/TTbar_2012_synchronisation_ex.root'
-                   ]
+    inputFiles = [ 'file:/afs/cern.ch/work/v/vadler/public/data/CMSSW_5_2_X/TTbar_Summer12_AODskim.root'
+                 ]
   else:
     if lxplusTest:
-      process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange( '201197:1-201197:23'
-                                                                         )
-    inputFiles = [ '/store/data/Run2012C/MuHad/AOD/PromptReco-v2/000/201/197/94C63DB6-D2EB-E111-AE27-003048D375AA.root'
-                 ]
-    #inputFiles = [ '/store/data/Run2012C/ElectronHad/AOD/PromptReco-v2/000/201/197/2C1E6199-D2EB-E111-B2C6-0025B3203898.root'
+      process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange( '191226:81-191226:831'
+                                                                       )
+    #inputFiles = [ '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/EEFA1B9F-E687-E111-9C6D-BCAEC5364C62.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/EC6F55F7-E187-E111-9C56-0030486780EC.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/D6979235-D787-E111-8E2F-001D09F2527B.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/CA288C4D-D287-E111-98F5-0025901D5DB2.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/BAEDD978-CC87-E111-98FC-BCAEC53296F4.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/9A94FDB6-DE87-E111-B1E7-BCAEC518FF80.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/98C29851-D287-E111-AB01-5404A6388699.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/98234FE6-DF87-E111-8EE9-E0CB4E4408E7.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/7C5F35B9-DE87-E111-B35B-5404A63886EE.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/70EEB83A-D987-E111-8EFE-0025B3203898.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/38E568D8-E087-E111-ACE0-BCAEC518FF50.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/32A98280-E387-E111-AA76-001D09F2AD84.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/2CAE5610-D687-E111-B6E6-BCAEC53296FB.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/28B730D4-D387-E111-AFD7-E0CB4E4408E3.root'
+                 #, '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/14610E71-DC87-E111-A90B-BCAEC518FF40.root'
                  #]
+    inputFiles = [ '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/00108D1C-D687-E111-82B2-0025B32035A2.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/006AFE51-1188-E111-82EF-0025901D5DB2.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/0447FC15-EC87-E111-A95E-5404A640A642.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/0A967BF6-E187-E111-A2EA-0025901D5C86.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/0E90C037-2188-E111-BFB6-E0CB4E4408E3.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/12B4994A-FE87-E111-83DB-BCAEC5329719.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/16B230F1-0488-E111-9142-001D09F2525D.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/18B6EA8D-F387-E111-A213-001D09F23174.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/1C20CE6D-F987-E111-8ECD-003048D2C01A.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/24D88259-E987-E111-946A-BCAEC532971D.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/280DAE54-1B88-E111-AAA3-5404A63886AD.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/2A426EF3-1188-E111-9327-003048D2BED6.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/2AC2FE9E-D887-E111-90C3-5404A640A642.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/2CAC9E55-0E88-E111-A02E-5404A63886B1.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/2E8F99CB-D687-E111-8CF5-0025901D5DEE.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/36FFC961-1A88-E111-AC71-BCAEC518FF8F.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/388C9916-0288-E111-B663-003048D3750A.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/3A0E872A-0488-E111-BDE0-5404A6388697.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/4226FFD6-1488-E111-9FD4-003048D3C944.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/48386758-DC87-E111-8E71-5404A63886C5.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/48C05D29-F687-E111-8863-5404A638869B.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/48E74A6B-0988-E111-95E0-0025901D6268.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/4AACECC4-FB87-E111-8883-0025901D5D78.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/520B6F5E-F187-E111-A542-5404A63886EB.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/5A8335E9-FC87-E111-8EF6-001D09F2841C.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/6202C6F1-0488-E111-8171-001D09F242EF.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/643DD0B7-DE87-E111-AED4-BCAEC5364C42.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/667B9E8D-0E88-E111-A5D7-E0CB4E55367F.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/6C6F2A98-E287-E111-AE3D-003048D2BEA8.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/6EBEBF80-F087-E111-B30E-001D09F2B30B.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/70A118B5-F687-E111-981A-BCAEC518FF8F.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/74A9F0B7-F687-E111-9777-5404A63886EC.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/76C208CD-D687-E111-A2E9-0025901D5D80.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/76D2E6D6-1F88-E111-99F2-BCAEC518FF74.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/800B01F6-DF87-E111-B534-5404A638869E.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/803DEF58-E987-E111-A713-BCAEC5329727.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/805873F5-DF87-E111-88DC-5404A63886E6.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/80F4ACC7-FB87-E111-98BC-5404A63886B1.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/84D3D066-2388-E111-9E91-003048673374.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/888FF28F-0E88-E111-A30E-5404A63886AE.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/906E7DD5-1F88-E111-A83F-5404A63886B6.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/9C00A214-DD87-E111-B2A2-003048678110.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/9C8BF419-2288-E111-A0D0-5404A638869B.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/A0398ECA-EE87-E111-A307-BCAEC5364C93.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/B0B95579-FC87-E111-9DC0-BCAEC5329720.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/B684518D-F387-E111-970A-001D09F24353.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/BE7642AB-DB87-E111-97FD-003048D2BEAA.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/C2E50A8A-FD87-E111-8DA6-002481E0DEC6.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/C4AD7DB0-F487-E111-9B07-003048D37580.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/C85D70BB-1088-E111-964B-003048D2BD66.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/D236CBE5-D087-E111-B2C6-0025B32035BC.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/D4D35E6B-F587-E111-8A6D-001D09F2AF96.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/D86C210D-D687-E111-88A5-5404A63886CF.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/DC05C25A-DC87-E111-BD6B-BCAEC518FF8F.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/DC33C194-0B88-E111-8695-485B3962633D.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/DE16B3F3-0788-E111-9C66-003048D2C174.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/E4F91F12-0288-E111-8607-001D09F29146.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/F4EA272C-DA87-E111-A621-5404A63886CE.root'
+                 , '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/FC964A25-F687-E111-9B6C-5404A63886EE.root'
+                 ]
 #inputFiles = ['file:////user/walsh/tmp/20110812_Wjets_AODforsync.root']
 #inputFiles = ['file:////user/mccartin/TTbarFall11.root']
 #inputFiles = ['file:////user/bklein/WjetsScaleUpAOD.root']
 #inputFiles = ['file:////user/bklein/AOD_v6_Mu_latest_trigger_menu.root']
 #inputFiles = ['file:///user/ksbeerna/RECO2012DataTEST.root']
-#inputFiles = ['file:///user/bklein/TTbar_2012_synchronisation_ex.root']
 process.source.fileNames = cms.untracked.vstring( inputFiles )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( maxEvents )
@@ -261,26 +299,14 @@ if not createNTuples:
     process.out
     )
 
+
 ### Cleaning
 
+# HBHE noise filter
 process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
 process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
 process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
 process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
-
-process.load( "RecoMET.METAnalyzers.CSCHaloFilter_cfi" )
-
-process.load( "RecoMET.METFilters.hcalLaserEventFilter_cfi" )
-process.hcalLaserEventFilter.vetoByRunEventNumber = cms.untracked.bool( False )
-process.hcalLaserEventFilter.vetoByHBHEOccupancy = cms.untracked.bool( True )
-
-process.load( "RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi" )
-process.EcalDeadCellTriggerPrimitiveFilter.tpDigiCollection = cms.InputTag( 'ecalTPSkimNA' )
-
-process.load( "RecoMET.METFilters.eeBadScFilter_cfi" )
-
-process.load( "RecoMET.METFilters.trackingFailureFilter_cfi" )
-process.trackingFailureFilter.VertexSource = cms.InputTag( 'goodOfflinePrimaryVertices' )
 
 # Scraping filter
 process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
@@ -309,55 +335,41 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
 , filter       = cms.bool( False )
 , src          = cms.InputTag( 'offlinePrimaryVertices' )
 )
+process.goodOfflinePrimaryVertexFilter = cms.EDFilter(
+  "PrimaryVertexFilter"
+, pvSelection
+, pvSrc = cms.InputTag( 'goodOfflinePrimaryVertices' )
+, NPV   = cms.int32( 1 )
+)
 process.vertexSelection = cms.Sequence(
   process.goodOfflinePrimaryVertices
+* process.goodOfflinePrimaryVertexFilter
 )
 
-if not runOnMC:
-  process.goodOfflinePrimaryVertexFilter = cms.EDFilter(
-    "PrimaryVertexFilter"
-  , pvSelection
-  , pvSrc = cms.InputTag( 'goodOfflinePrimaryVertices' )
-  , NPV   = cms.int32( 1 )
-  )
-  process.vertexSelection *= process.goodOfflinePrimaryVertexFilter
-
 process.eventCleaning = cms.Sequence()
-if triggerSelection != '':
-  process.eventCleaning *= process.triggerResultsFilter
-if not runOnMC:
-  process.eventCleaning += process.scrapingFilter
-process.eventCleaning += process.HBHENoiseFilter
-process.eventCleaning += process.CSCTightHaloFilter
-process.eventCleaning += process.hcalLaserEventFilter
-process.eventCleaning += process.EcalDeadCellTriggerPrimitiveFilter
-process.eventCleaning += process.eeBadScFilter
-process.eventCleaning += ( process.vertexSelection * process.trackingFailureFilter )
 
-if writePdfWeights:
-  process.pdfWeights = cms.EDProducer(
-    "PdfWeightProducer"
-  , PdfInfoTag  = cms.untracked.InputTag( 'generator' )
-  , PdfSetNames = cms.untracked.vstring( 'cteq66.LHgrid' )
-  )
+if not runOnMC:
+  process.eventCleaning += process.HBHENoiseFilter
+  process.eventCleaning += process.scrapingFilter
+
+if triggerSelection != '':
+  process.eventCleaning += process.triggerResultsFilter
+process.eventCleaning += process.vertexSelection
 
 ### PAT
 
 process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
 
 # Misc
-if len( jecLevels ) is 0:
-  typeIMetCorrections = False
 from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
 usePF2PAT( process
-         , runOnMC             = runOnMC
-         , jetAlgo             = jetAlgo
-         , jetCorrections      = ( jetAlgo + 'PFchs'
-                                 , jecLevels
-                                 )
-         , typeIMetCorrections = typeIMetCorrections
-         , pvCollection        = cms.InputTag( pvCollection )
-         , outputModules       = outputModules
+         , runOnMC        = runOnMC
+         , jetAlgo        = jetAlgo
+         , jetCorrections = ( jetAlgo + 'PFchs'
+                            , jecLevels
+                            )
+         , pvCollection   = cms.InputTag( pvCollection )
+         , outputModules  = outputModules
          )
 from PhysicsTools.PatAlgos.tools.helpers import removeIfInSequence
 removeIfInSequence( process, 'patPFParticles', 'patPF2PATSequence', '' )
@@ -372,8 +384,7 @@ removeSpecificPATObjects( process
 process.cleanPatCandidateSummary.candidates.remove( cms.InputTag( 'cleanPatPhotons' ) )
 process.cleanPatCandidateSummary.candidates.remove( cms.InputTag( 'cleanPatTaus' ) )
 if not pfJetCollection == 'pfNoTau':
-  if not typeIMetCorrections:
-    removeIfInSequence( process, 'pfNoJet', 'patPF2PATSequence', '' )
+  removeIfInSequence( process, 'pfNoJet', 'patPF2PATSequence', '' )
   removeIfInSequence( process, 'pfTauPFJets08Region', 'patPF2PATSequence', '' )
   removeIfInSequence( process, 'pfTauPileUpVertices', 'patPF2PATSequence', '' )
   removeIfInSequence( process, 'pfTauTagInfoProducer', 'patPF2PATSequence', '' )
@@ -425,6 +436,7 @@ removeIfInSequence( process, 'hpsPFTauDiscriminationByMediumMuonRejection', 'pat
 removeIfInSequence( process, 'hpsPFTauDiscriminationByTightMuonRejection', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'patTaus', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'selectedPatTaus', 'patPF2PATSequence', '' )
+removeIfInSequence( process, 'patTaus', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'countPatTaus', 'patPF2PATSequence', '' )
 process.patPF2PATSequence.replace( process.selectedPatCandidateSummary
                                  , process.selectedPatCandidateSummary * ( process.cleanPatMuons
@@ -441,9 +453,7 @@ if not runOnMC:
   runOnData( process
            , names = [ 'PFAll' ]
            )
-if runMatch:
-  process.patJets.addGenJetMatch = True
-else:
+if not runMatch:
   process.patMuons.addGenMatch = False
   removeIfInSequence( process, 'muonMatch', 'patPF2PATSequence', '' )
   process.patElectrons.addGenMatch = False
@@ -455,25 +465,28 @@ else:
   process.patJets.getJetMCFlavour    = False
   process.patJets.JetPartonMapSource = cms.InputTag( '' )
   removeIfInSequence( process, 'patJetFlavourId', 'patPF2PATSequence', '' )
-  process.patJets.addGenJetMatch = False
-  process.patJets.genJetMatch    = cms.InputTag( '' )
-  removeIfInSequence( process, 'patJetGenJetMatch', 'patPF2PATSequence', '' )
-  removeIfInSequence( process, 'ak5GenJetsNoNu', 'patPF2PATSequence', '' )
-  removeIfInSequence( process, 'genParticlesForJetsNoNu', 'patPF2PATSequence', '' )
+
+process.patJets.jetSource = cms.InputTag(pfJetCollection)#Added S
+process.jetTracksAssociatorAtVertex.jets = cms.InputTag(pfJetCollection)
+process.patJetCorrFactors.src = cms.InputTag(pfJetCollection)
+process.patJetGenJetMatch.src = cms.InputTag(pfJetCollection)
+process.patJetPartonAssociation.jets = cms.InputTag(pfJetCollection)
+process.patJetPartonMatch.src = cms.InputTag(pfJetCollection)
+process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag("pfJets")
+process.pfMET.jets = cms.InputTag("pfJets")
+process.softMuonTagInfosAOD.jets = cms.InputTag(pfJetCollection)#end add
+
+if runMatch:
+	process.patJets.addGenJetMatch = True
+else:
+        process.patJets.addGenJetMatch = False
+
+#process.patJets.genJetMatch    = cms.InputTag( '' )
+#removeIfInSequence( process, 'patJetGenJetMatch', 'patPF2PATSequence', '' )
+#removeIfInSequence( process, 'ak5GenJetsNoNu', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'ak7GenJetsNoNu', 'patPF2PATSequence', '' )
 removeIfInSequence( process, 'iterativeCone5GenJetsNoNu', 'patPF2PATSequence', '' )
-
-process.patJets.jetSource = cms.InputTag( pfJetCollection )
-process.jetTracksAssociatorAtVertex.jets = cms.InputTag( pfJetCollection )
-process.patJetCorrFactors.src = cms.InputTag( pfJetCollection )
-process.patJetGenJetMatch.src = cms.InputTag( pfJetCollection )
-process.patJetPartonAssociation.jets = cms.InputTag( pfJetCollection )
-process.patJetPartonMatch.src = cms.InputTag( pfJetCollection )
-process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag( pfJetCollection )
-process.pfMET.jets = cms.InputTag( pfJetCollection )
-process.softMuonTagInfosAOD.jets = cms.InputTag( pfJetCollection )
-process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
-
+#removeIfInSequence( process, 'genParticlesForJetsNoNu', 'patPF2PATSequence', '' )
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
 process.patJetCorrFactors.levels  = jecLevels
@@ -498,11 +511,10 @@ if not createNTuples:
     process.out.outputCommands += [ 'keep recoGenParticles_*_*_*'
                                   ]
   if addGenEvt:
-    process.out.outputCommands += [ 'keep *_decaySubset_*_*'
-                                  , 'keep *_initSubset_*_*'
+    process.out.outputCommands += [ 'keep *_genParticles_*_*'
                                   , 'keep *_genEvt_*_*'
                                   ]
-  process.out.outputCommands += [ 'keep double_kt6PFJets_*_*' ]
+  process.out.outputCommands += [ 'keep double_kt6PFJets_*_' + process.name_() ]
 
 # Muons
 process.pfSelectedMuons.cut = pfMuonSelect
@@ -513,18 +525,10 @@ if usePfMuonIsoConeR03:
   process.pfIsolatedMuons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03' )
                                                                     , cms.InputTag( 'muPFIsoValueGamma03' )
                                                                     )
-  process.pfMuons.isolationValueMapsCharged  = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03' )
-                                                            )
-  process.pfMuons.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03' )
-  process.pfMuons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03' )
-                                                            , cms.InputTag( 'muPFIsoValueGamma03' )
-                                                            )
-process.pfIsolatedMuons.isolationCut          = pfMuonIso
-process.pfIsolatedMuons.doDeltaBetaCorrection = pfMuonIsoUseDeltaBeta
+process.pfIsolatedMuons.isolationCut = pfMuonIso
 process.patMuons.embedTrack = True
 if usePfMuonIsoConeR03:
   process.patMuons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'muPFIsoValueNeutral03' )
-  process.patMuons.isolationValues.pfChargedAll       = cms.InputTag( 'muPFIsoValueChargedAll03' )
   process.patMuons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03' )
   process.patMuons.isolationValues.pfPhotons          = cms.InputTag( 'muPFIsoValueGamma03' )
   process.patMuons.isolationValues.pfChargedHadrons   = cms.InputTag( 'muPFIsoValueCharged03' )
@@ -543,18 +547,10 @@ if usePfElectronIsoConeR03:
   process.pfIsolatedElectrons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
                                                                         , cms.InputTag( 'elPFIsoValueGamma03PFId' )
                                                                         )
-  process.pfElectrons.isolationValueMapsCharged  = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03PFId' )
-                                                                )
-  process.pfElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03PFId' )
-  process.pfElectrons.isolationValueMapsNeutral  = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
-                                                                , cms.InputTag( 'elPFIsoValueGamma03PFId' )
-                                                                )
-process.pfIsolatedElectrons.isolationCut          = pfElectronIso
-process.pfIsolatedElectrons.doDeltaBetaCorrection = pfElectronIsoUseDeltaBeta
+process.pfIsolatedElectrons.isolationCut = pfElectronIso
 process.patElectrons.embedTrack = True
 if usePfElectronIsoConeR03:
   process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03PFId' )
-  process.patElectrons.isolationValues.pfChargedAll       = cms.InputTag( 'elPFIsoValueChargedAll03PFId' )
   process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFId' )
   process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03PFId' )
   process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03PFId' )
@@ -623,14 +619,11 @@ process.countPatLeptons.minNumber = leptonsMin
 if len( jecLevels ) is 0:
   process.patJets.addJetCorrFactors = False
   print 'WARNING: No JECs are stored or applied!'
-  print '         TypeI MET corrections have been switched off in PF2PAT.'
-  print '         Following settings are adjusted for on-the-fly usage of L1FastJet (CHS):'
-  print '         - pfPileUp.checkClosestZVertex = False'
-  print '         - pfJets.doAreaFastjet = True'
-  process.pfPileUp.checkClosestZVertex = False
-  process.pfJets.doAreaFastjet = True
 elif 'L1FastJet' in jecLevels:
   process.pfPileUp.checkClosestZVertex = False
+  process.pfJets.doAreaFastjet = True
+  process.pfJets.doRhoFastjet  = False
+process.patJets.embedCaloTowers   = False
 process.patJets.embedPFCandidates = False
 process.selectedPatJets.cut = jetSelect
 process.cleanPatJets.src           = cms.InputTag( 'patJets' )
@@ -650,53 +643,17 @@ if writeNonIsoMuons:
 if writeNonIsoElectrons:
   cloneProcessingSnippet(process,process.patPF2PATSequence,postfixNonIsoE)
   getattr(process,'pfNoElectron'+postfixNonIsoE).topCollection = "pfSelectedElectrons" + postfixNonIsoE
-  #if runOnMC:
-    #getattr(process,'electronMatch'+postfixNonIsoE).src = "pfElectrons" + postfixNonIsoE
   getattr(process,'patElectrons'+postfixNonIsoE).pfElectronSource = "pfSelectedElectrons" + postfixNonIsoE
   #getattr(process,'pfIsolatedElectrons'+postfixNonIsoE).isolationCut = 999999.
 
 ### TQAF
-
 if addGenEvt:
   process.load( "TopQuarkAnalysis.TopEventProducers.sequences.ttGenEvent_cff" )
-if filterDecayChannels:
-  process.load( "TopQuarkAnalysis.TopSkimming.ttDecayChannelFilters_cff" )
-  if addGenEvt:
-    process.ttSemiLeptonicFilter.src = 'genEvt'
-  if not addMuonChannel:
-    process.ttSemiLeptonicFilter.allowedTopDecays.decayBranchA.muon = False
-  if not addElectronChannel:
-    process.ttSemiLeptonicFilter.allowedTopDecays.decayBranchA.electron = False
-  if addTauChannel:
-    process.ttSemiLeptonicFilter.allowedTopDecays.decayBranchA.tau = True
-    if restrictTauChannelMuon:
-      process.ttSemiLeptonicFilter.allowedTopDecays.restrictTauDecays.muon = cms.bool( True )
-    if restrictTauChannelElectron:
-      process.ttSemiLeptonicFilter.allowedTopDecays.restrictTauDecays.electron = cms.bool( True )
-
-### Additipnal reconstruction
-
-# For lepton isolation with rho corrections
-from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
-process.kt6PFJetsForIsolation = kt6PFJets.clone( Rho_EtaMax   = 2.5
-                                               , Ghost_EtaMax = 2.5
-                                               )
-if not createNTuples:
-  process.out.outputCommands += [ 'keep double_kt6PFJetsForIsolation_*_*'
-                                ]
 
 ### Path
-
 process.p = cms.Path( process.eventCleaning
+                    * process.patPF2PATSequence
                     )
-
-if addGenEvt:
-  process.p *= process.makeGenEvt
-if filterDecayChannels:
-  process.p *= process.ttSemiLeptonicFilter
-
-process.p *= process.kt6PFJetsForIsolation
-process.p *= process.patPF2PATSequence
 
 if writeNonIsoMuons:
   process.p *= process.patPF2PATSequenceNonIsoMu
@@ -707,9 +664,13 @@ if addGenEvt:
   process.p *= process.makeGenEvt
 
 if writePdfWeights:
+  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+        PdfInfoTag = cms.untracked.InputTag("generator"),
+        PdfSetNames = cms.untracked.vstring("cteq66.LHgrid")
+	)
   process.p *= process.pdfWeights
 
-if createNTuples:
+if createNTuples and not lxplusTest:
   process.produceNTuples = cms.EDAnalyzer('FlatNTuples',
 	tauTag      = cms.untracked.InputTag("selectedPatTaus"),
 	photonTag   = cms.untracked.InputTag("selectedPatPhotons"),
@@ -788,8 +749,6 @@ if createNTuples:
 					, "eidHyperTight2MC_no_iso"
 					, "eidHyperTight3MC_no_iso"
 					, "eidHyperTight4MC_no_iso"
-					#, "mvaTrigV0"
-					#, "mvaNonTrigV0"
 					),
 	TriggerList      = cms.vstring("HLT_Ele[2-9]\\\d+(?:(?!(No|Anti)BPTX|Tau|MT|MHT|Deta|SC17).)*","HLT_(Iso)?Mu([1-9]\\\d|9)_(?:(?!(Photon|Deta|MT|Ele|HT|MET|Track|Tk|Vertex|NoBPTX|AntiBPTX|Jpsi|Single|Tau|MR|R0)).)*","HLT_(Central)?(Tri|Quad)Jet(?:(?!(No|Anti)BPTX|BTag|Tau|MT|MHT|MET|NoJetID).)*"),
 	VetoObjectTriggers = cms.vstring("HLT_.*MET.*"),
@@ -832,15 +791,15 @@ if createNTuples:
 	WriteMET	= cms.bool(True),
 	WriteTriggerPrescales	= cms.bool(True),
 	WritePDFEventWeights = cms.bool(writePdfWeights),
-	WriteWDecayInformation = cms.bool(False),
+	WriteWDecayInformation = cms.bool(writeWDecay),
 	PDFWeights = cms.VInputTag("pdfWeights:cteq66"),
 	Writed0wrtPV	= cms.bool(True),		# write d0 wrt PV
         WriteLooseMuons = cms.bool(writeNonIsoMuons),
         WriteLooseElectrons = cms.bool(writeNonIsoElectrons),
-	WriteGenParticles = cms.bool(runOnMC),		# write selected MC particles
-	SelectedGenParticles = cms.vint32(5),	# pdgIds of MC particles to write
-	SelectedGenParticlesMinPt = cms.double(0.),	# min pt of MC particles to write
-	SelectedGenParticlesMaxEta = cms.double(0.1),	# max eta of MC particles to write
+	WriteGenParticles = cms.bool(False),		# write selected MC particles
+	SelectedGenParticles = cms.vint32(11,13),	# pdgIds of MC particles to write
+	SelectedGenParticlesMinPt = cms.double(1),	# min pt of MC particles to write
+	SelectedGenParticlesMaxEta = cms.double(3.0),	# max eta of MC particles to write
 	outfile		= cms.string("NTuple.root")
   )
   process.p *= process.produceNTuples

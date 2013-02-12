@@ -2,17 +2,16 @@
 Environment:
 ============
 
-cmsrel CMSSW_5_3_5
-cd CMSSW_5_3_5/src
+cmsrel CMSSW_5_2_4
+cd CMSSW_5_2_4/src
+setenv SCRAM_ARCH slc5_amd64_gcc462
 cmsenv
-cvs co -r V07-01-04    TopQuarkAnalysis/TopSkimming
-cvs co -r V06-07-13    TopQuarkAnalysis/TopTools
-cvs co -r V00-00-08    RecoMET/METAnalyzers
-cvs co -r V15-02-06    RecoParticleFlow/PFProducer
-cvs co -r V00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
-cd EGamma/EGammaAnalysisTools/data
-cat download.url | xargs wget
-cd -
+cvs co -r V06-05-01    DataFormats/PatCandidates
+cvs co -r V08-09-02    PhysicsTools/PatAlgos
+cvs co -r V03-09-18-03 PhysicsTools/PatUtils
+cvs co -r V00-03-08    CommonTools/ParticleFlow
+cvs co -r V15-01-06    RecoParticleFlow/PFProducer
+cvs co -r V00-00-05 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
 scram b -j 9
 
 Steering:
@@ -41,9 +40,6 @@ parameters are availabel in all configuration files:
 - writeNonIsoMuons, writeNonIsoElectrons:
                     add another work flow, which ignores the isolation of the lepton also in
                     the jet clustering
-- filterDecayChannels              : select events based on their semi-leptonic decay channel
-- add{Muon,Electron,Tau}Channel    : switch on leptons to keep; putting all to 'False' will select the hadronic channel
-- restrictTauChannel{Muon,Electron}: switches for leptonic decay channels of the tau to keep; putting all to 'False' will keep all tau channels
 - maxEvents       : self-explaining
 - hltProcess      : process name of the HLT, needed to be adapted for re-DIGI MC
 - triggerSelection: defines logical expression for HLT selection;
@@ -61,8 +57,6 @@ parameters are availabel in all configuration files:
                                        isolation; "off" uses the radius 0.4 instead
 - pf{Muon, Electron}Iso              : cut value for combined isolation of objects to be
                                        kept in PF top projection procedure
-- pf{Muon, Electron}IsoUseDeltaBeta  : to switch on/off the use of Delta beta corrections
-                                       for the computation of the isolation sum compared to 'pf{Muon, Electron}Iso'
 - {muon, electron, jet}Select        : selection string cut for objects to be stored in the
                                        output
 - {muon, electron, jet}Cut           : selection string cut for objects used in the event
@@ -113,10 +107,17 @@ The following settings might be objects to optimisation:
 Note, that the actually applied JEC depends on the JECs stored (details in PAT
 documentation).
 
+MET:
+----
+
+Note that all METs in these configurations are uncorrected, since PF.
+CaloMET (corrections available) is removed.
+
 MC:
 ---
 
 If no MC match is performed, the GenParticles are kept in the event content.
+This should also be sufficient to reconstruct the TtGenEvent in the TQAF.
 
 Tests:
 ======

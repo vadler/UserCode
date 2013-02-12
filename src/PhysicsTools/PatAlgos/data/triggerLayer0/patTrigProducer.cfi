@@ -1,0 +1,111 @@
+/// Examples for configurations of the trigger primitive producers.
+/// A list of valid filter names is found in: 
+/// https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideGlobalHLT
+/// 
+/// BEWARE: Use the list of the CMSSW version the data has been  p r o d u c e d  with,
+///         not of that you are running with!
+/// BEWARE: The InputTags to be used in this configuration start with  l o w e r  case letters
+///         compared to the HLT paths given in the TWiki!
+///         E.g., use
+///         InputTag filterName = hlt1Photon
+///         to access "HLT1Photon" from the TWiki.
+
+# modules to produce pat::TriggerPrimitiveCollections,
+# grouped by POG (corresponding to trigger config files)
+
+# Egamma triggers
+
+module patHLT1Photon = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt1Photon
+}
+
+module patHLT1PhotonRelaxed = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt1PhotonRelaxed
+}
+
+module patHLT2Photon = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt2Photon
+}
+
+module patHLT2PhotonRelaxed = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt2PhotonRelaxed
+}
+
+module patHLT1Electron = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt1Electron
+}
+
+module patHLT1ElectronRelaxed = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt1ElectronRelaxed
+}
+
+module patHLT2Electron = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt2Electron
+}
+
+module patHLT2ElectronRelaxed = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt2ElectronRelaxed
+}
+
+# Muon triggers
+
+module patHLT1MuonIso = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt1MuonIso
+}
+
+module patHLT1MuonNonIso = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt1MuonNonIso
+}
+
+module patHLT2MuonNonIso = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt2MuonNonIso
+}
+
+# BTau triggers
+
+module patHLT1Tau = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt1Tau
+}
+
+module patHLT2TauPixel = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt2TauPixel
+}
+
+# JetMET triggers
+
+module patHLT2Jet = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt2Jet
+}
+
+module patHLT3Jet = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt3Jet
+}
+
+module patHLT4Jet = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt4Jet
+}
+
+module patHLT1MET65 = PATTrigProducer {
+    InputTag triggerEvent = hltTriggerSummaryAOD::HLT
+    InputTag filterName   = hlt1MET65
+}
+
+# Xchannel triggers
+
+# Special triggers
