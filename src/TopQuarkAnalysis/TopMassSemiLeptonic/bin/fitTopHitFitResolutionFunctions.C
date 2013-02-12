@@ -413,6 +413,19 @@ int main( int argc, char * argv[] )
 
         // Inversion flags
         const bool inverse( subFit.find( "Inv" ) != std::string::npos );
+        if ( onlyExisting_ ) {
+          if ( nominalInv_.at( uCat ).at( uProp ) != inverse ) {
+            if ( verbose_ > 2 ) {
+              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                        << "    skipping unnominal directory '"; gDirectory->pwd();
+            }
+            continue;
+          }
+          else if ( verbose_ > 3 ) {
+            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                      << "    entering nominal directory '"; gDirectory->pwd();
+          }
+        }
 
         std::string titleDelta( titlesDelta.at( uProp ) );
         std::string titleDeltaRel( titlesDeltaRel.at( uProp ) );
