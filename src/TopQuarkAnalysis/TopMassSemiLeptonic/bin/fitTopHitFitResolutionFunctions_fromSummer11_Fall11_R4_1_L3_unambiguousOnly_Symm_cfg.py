@@ -17,7 +17,7 @@ process = cms.PSet(
     io = cms.PSet(
         sample = cms.string('Fall11_R4_1_L3_unambiguousOnly'),
         resolutionFile = cms.string('file:/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/existingHitFitResolutionFunctions_Summer11.root'),
-        pathPlots = cms.string('/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/plots/fitTopHitFitResolutionFunctions/fitTopHitFitResolutionFunctions_fromSummer11_Fall11_R4_1_L3_unambiguousOnly_Ref_'),
+        pathPlots = cms.string('/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/plots/fitTopHitFitResolutionFunctions/fitTopHitFitResolutionFunctions_fromSummer11_Fall11_R4_1_L3_unambiguousOnly_'),
         inputFile = cms.string('file:/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/fitTopHitFit_fromSummer11_Fall11_R4_1_L3_unambiguousOnly.root')
     ),
     histos = cms.PSet(
