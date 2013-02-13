@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 
 # Steering
 
-runTest   = False
+runTest   = True
 rfioInput = True
 
 # Origin of existing resolution functions
@@ -187,8 +187,8 @@ process.fit = cms.PSet(
 , pathOut      = cms.string( '%s/src/TopQuarkAnalysis/TopHitFit/data/resolution_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the resolution functions
 )
 
-#if runTest or not rfioInput:
-if not rfioInput:
+if runTest or not rfioInput:
+#if not rfioInput:
   process.fit.writeFiles = False
 
 

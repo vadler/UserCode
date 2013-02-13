@@ -484,13 +484,11 @@ int main( int argc, char * argv[] )
           histPtDelta->SetXTitle( titleDelta.c_str() );
           histPtDelta->SetYTitle( titleEvents.c_str() );
           histVecPtDelta.push_back( histPtDelta );
-          if ( ! inverse && kinProp == "Pt" ) {
-            const std::string namePtDeltaRel( namePtDelta + "Rel" );
-            TH1D * histPtDeltaRel( new TH1D( namePtDeltaRel.c_str(), titlePtDelta.c_str(), deltaBins, -1., 1. ) );
-            histPtDeltaRel->SetXTitle( titleDeltaRel.c_str() );
-            histPtDeltaRel->SetYTitle( titleEvents.c_str() );
-            histVecPtDeltaRel.push_back( histPtDeltaRel );
-          }
+          const std::string namePtDeltaRel( namePtDelta + "Rel" );
+          TH1D * histPtDeltaRel( new TH1D( namePtDeltaRel.c_str(), titlePtDelta.c_str(), deltaBins, -1., 1. ) );
+          histPtDeltaRel->SetXTitle( titleDeltaRel.c_str() );
+          histPtDeltaRel->SetYTitle( titleEvents.c_str() );
+          histVecPtDeltaRel.push_back( histPtDeltaRel );
         }
 
         // Loop over eta bins
@@ -635,7 +633,7 @@ int main( int argc, char * argv[] )
             const Int_t deltaBinsRebinRel( deltaBins );
             const Double_t meanEtaPtDeltaRel( histEtaPtDeltaRel->GetMean() );
             const Double_t widthEtaPtDeltaRel( std::fabs( histEtaPtDeltaRel->GetRMS() ) );
-            if ( widthEtaPtDeltaRel == 0. && verbose_ > 2 ) {
+            if ( widthEtaPtDeltaRel == 0. && ( ( verbose_ > 2 && ! inverse && kinProp == "Pt" ) || verbose_ > 3 ) ) {
               std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                         << "    no histogram \"width\" in '" << nameEtaPtDeltaRel << "'" << std::endl;
             }
@@ -660,6 +658,15 @@ int main( int argc, char * argv[] )
                 }
               }
             } // loop: uEntry < ptEtaBin.at( uPt ).size()
+
+            if ( plot_ ) {
+              histEtaPtDeltaRebin->Draw();                                                              // FIXME: just for testing
+              c1.Print( std::string( pathPlots_ + histEtaPtDeltaRebin->GetName() + ".png" ).c_str() );  // FIXME: just for testing
+              if ( ! inverse && kinProp == "Pt" ) {
+                histEtaPtDeltaRelRebin->Draw();
+                c1.Print( std::string( pathPlots_ + histEtaPtDeltaRelRebin->GetName() + ".png" ).c_str() );
+              }
+            }
 
           } // loop: uPt < nPtBins_
 
@@ -691,7 +698,7 @@ int main( int argc, char * argv[] )
           const Int_t deltaBinsRebinRel( deltaBins );
           const Double_t meanEtaDeltaRel( histEtaDeltaRel->GetMean() );
           const Double_t widthEtaDeltaRel( std::fabs( histEtaDeltaRel->GetRMS() ) );
-          if ( widthEtaDeltaRel == 0. && verbose_ > 2 ) {
+          if ( widthEtaDeltaRel == 0. && ( ( verbose_ > 2 && ! inverse && kinProp == "Pt" ) || verbose_ > 3 ) ) {
             std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                       << "    no histogram \"width\" in '" << nameEtaDeltaRel << "'" << std::endl;
           }
@@ -756,7 +763,7 @@ int main( int argc, char * argv[] )
         const Int_t deltaBinsRebinRel( deltaBins );
         const Double_t meanDeltaRel( histDeltaRel->GetMean() );
         const Double_t widthDeltaRel( std::fabs( histDeltaRel->GetRMS() ) );
-        if ( widthDeltaRel == 0. && verbose_ > 2 ) {
+        if ( widthDeltaRel == 0. && ( ( verbose_ > 2 && ! inverse && kinProp == "Pt" ) || verbose_ > 3 ) ) {
           std::cout << argv[ 0 ] << " --> INFO:" << std::endl
                     << "    no histogram \"width\" in '" << nameDeltaRel << "'" << std::endl;
         }
@@ -798,22 +805,20 @@ int main( int argc, char * argv[] )
           histPtDeltaRebin->SetYTitle( titleEvents.c_str() );
           histVecPtDeltaRebin.push_back( histPtDeltaRebin );
 
-          if ( ! inverse && kinProp == "Pt" ) {
-            const std::string namePtDeltaRel( namePtDelta + "Rel" );
-            const std::string namePtDeltaRelRebin( namePtDeltaRel + "Rebin" );
-//             const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
-            const Double_t meanPtDeltaRel( histVecPtDeltaRel.at( uPt )->GetMean() );
-            const Double_t widthPtDeltaRel( std::fabs( histVecPtDeltaRel.at( uPt )->GetRMS() ) );
-            if ( widthPtDeltaRel == 0. && verbose_ > 2 ) {
-              std::cout << argv[ 0 ] << " --> INFO:" << std::endl
-                        << "    no histogram \"width\" in '" << namePtDeltaRel << "'" << std::endl;
-            }
-            const Double_t rangePtDeltaRelRebin( widthPtDeltaRel == 0. ? widthFactor_ * std::fabs( histVecPtDeltaRel.at( uPt )->GetXaxis()->GetXmax() ) : widthFactor_ * widthPtDeltaRel ); // FIXME: tune, incl. under- and overflow, remove hard-coding
-            TH1D * histPtDeltaRelRebin( new TH1D( namePtDeltaRelRebin.c_str(), titlePtDelta.c_str(), deltaBinsRebinRel, -rangePtDeltaRelRebin + meanPtDeltaRel, rangePtDeltaRelRebin + meanPtDeltaRel ) );
-            histPtDeltaRelRebin->SetXTitle( titleDeltaRel.c_str() );
-            histPtDeltaRelRebin->SetYTitle( titleEvents.c_str() );
-            histVecPtDeltaRelRebin.push_back( histPtDeltaRelRebin );
+          const std::string namePtDeltaRel( namePtDelta + "Rel" );
+          const std::string namePtDeltaRelRebin( namePtDeltaRel + "Rebin" );
+//           const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
+          const Double_t meanPtDeltaRel( histVecPtDeltaRel.at( uPt )->GetMean() );
+          const Double_t widthPtDeltaRel( std::fabs( histVecPtDeltaRel.at( uPt )->GetRMS() ) );
+          if ( widthPtDeltaRel == 0. && ( ( verbose_ > 2 && ! inverse && kinProp == "Pt" ) || verbose_ > 3 ) ) {
+            std::cout << argv[ 0 ] << " --> INFO:" << std::endl
+                      << "    no histogram \"width\" in '" << namePtDeltaRel << "'" << std::endl;
           }
+          const Double_t rangePtDeltaRelRebin( widthPtDeltaRel == 0. ? widthFactor_ * std::fabs( histVecPtDeltaRel.at( uPt )->GetXaxis()->GetXmax() ) : widthFactor_ * widthPtDeltaRel ); // FIXME: tune, incl. under- and overflow, remove hard-coding
+          TH1D * histPtDeltaRelRebin( new TH1D( namePtDeltaRelRebin.c_str(), titlePtDelta.c_str(), deltaBinsRebinRel, -rangePtDeltaRelRebin + meanPtDeltaRel, rangePtDeltaRelRebin + meanPtDeltaRel ) );
+          histPtDeltaRelRebin->SetXTitle( titleDeltaRel.c_str() );
+          histPtDeltaRelRebin->SetYTitle( titleEvents.c_str() );
+          histVecPtDeltaRelRebin.push_back( histPtDeltaRelRebin );
 
         } // loop: uPt < nPtBins_
 
@@ -879,6 +884,14 @@ int main( int argc, char * argv[] )
           for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
             histVecPtDeltaRebin.at( uPt )->Draw();
             c1.Print( std::string( pathPlots_ + histVecPtDeltaRebin.at( uPt )->GetName() + ".png" ).c_str() );
+          }
+          if ( ! inverse && kinProp == "Pt" ) {
+            histDeltaRelRebin->Draw();
+            c1.Print( std::string( pathPlots_ + histDeltaRelRebin->GetName() + ".png" ).c_str() );
+            for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
+              histVecPtDeltaRelRebin.at( uPt )->Draw();
+              c1.Print( std::string( pathPlots_ + histVecPtDeltaRelRebin.at( uPt )->GetName() + ".png" ).c_str() );
+            }
           }
         }
 
@@ -1142,10 +1155,10 @@ int main( int argc, char * argv[] )
               }
             }
 
-            if ( plot_ ) {
-              histEtaPtDeltaRebin->Draw();
-              c1.Print( std::string( pathPlots_ + histEtaPtDeltaRebin->GetName() + ".png" ).c_str() );
-            }
+//             if ( plot_ ) {
+//               histEtaPtDeltaRebin->Draw();
+//               c1.Print( std::string( pathPlots_ + histEtaPtDeltaRebin->GetName() + ".png" ).c_str() );
+//             }
 
           } // loop: uPt < nPtBins_
 
@@ -1209,11 +1222,9 @@ int main( int argc, char * argv[] )
             else {
               if ( fitEtaSigmaFitResultPtr->Prob() == 0. ) {
                 histSigmaEtaFitBadProbMap->SetBinContent( uEta + 1, -1. );
-//                 histSigmaNtupBadProb->AddBinContent( 0 );
               }
               else {
                 histSigmaEtaFitBadProbMap->SetBinContent( uEta + 1, fitEtaSigmaFitResultPtr->Prob() );
-//                 histSigmaNtupBadProb->Fill( fitEtaSigmaFitResultPtr->Prob() );
               }
               histSigmaEtaFitBadNdfMap->SetBinContent( uEta + 1, fitEtaSigmaFitResultPtr->Ndf() );
               histSigmaEtaFitBadNdf->Fill( fitEtaSigmaFitResultPtr->Ndf() );
