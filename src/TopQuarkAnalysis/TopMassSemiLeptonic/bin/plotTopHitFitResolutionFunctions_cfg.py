@@ -7,9 +7,12 @@ import FWCore.ParameterSet.Config as cms
 runTest = True
 
 # Origin of existing resolution functions
-# era = 'Spring10'
+# era    = 'Spring10'
 era    = 'Summer11'
-sample = 'Fall11_R4_1'
+# Input sample
+sample = 'Fall11_R4_1_L3_unambiguousOnly'
+#sample = 'Fall11_R4_1_L3_totalMinDist'
+#sample = 'Fall11_R4_L3_unambiguousOnly'
 
 # Settings
 overwrite = True # to throw away earlier versions of histograms, trees and functions
@@ -19,31 +22,39 @@ useAlt    = False
 useSymm   = True
 refGen    = False
 refSel    = True
-if runTest:
-  refSel = False
 
 accuEvery = 5
 
 # I/O
+name = ''
+if useAlt:
+  name += 'Alt'
+if refGen:
+  name += 'Gen'
+if useSymm:
+  name += 'Symm'
 inputFile = 'fitTopHitFit_from%s_%s.root'%( era, sample )
 if usePileUp:
   inputFile = inputFile.replace( '.root', '_PileUp.root' )
+if runTest:
+  inputFile = inputFile.replace( 'root', 'test.root' )
 logFile = inputFile.replace( 'root', 'log' )
-if not runTest:
-  if useAlt:
-    logFile = logFile.replace( '.', '_Alt.', 1 )
-  if useSymm:
-    logFile = logFile.replace( '.', '_Symm.', 1 )
-  if refGen:
-    logFile = logFile.replace( '.', '_Gen.', 1 )
-  if refSel:
-    logFile = logFile.replace( '.', '_Ref.', 1 )
-inputFile  = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
-logFile    = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
-logFile    = logFile.replace( 'fitTopHitFit', 'plotTopHitFitResolutionFunctions' )
-outputFile = logFile.replace( 'log', 'root' )
-logFile    = logFile.replace( 'file:', '' )
-plotPath  = '%s/output/plots'%( os.getenv( "CMSSW_BASE" ) )
+if refSel:
+  logFile = logFile.replace( '.', '_Ref.', 1 )
+logFile = logFile.replace( '.', '_' + name + '.', 1 )
+inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
+outputFile = inputFile.replace( 'fitTopHitFit', 'plotTopHitFitResolutionFunctions' )
+logFile   = logFile.replace( 'fitTopHitFit', 'plotTopHitFitResolutionFunctions' )
+cfgFile   = logFile.replace( '.', '_cfg.', 1 )
+cfgFile   = cfgFile.replace( '.log', '.py' )
+logFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
+cfgFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), cfgFile )
+pathPlots = '%s/output/plots/fitTopHitFitResolutionFunctions/plotTopHitFitResolutionFunctions_from%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample )
+if refSel:
+  pathPlots += 'Ref_'
+if runTest:
+  pathPlots = ''
+  #pathPlots = pathPlots.replace( 'plotTopHitFitResolutionFunctions', 'plotTopHitFitResolutionFunctionsTest' )
 
 
 # Processing
@@ -53,10 +64,10 @@ process.verbose = cms.bool( False )
 if runTest:
   process.verbose = True
 process.objectCategories = cms.vstring( 'Mu'
+                                      , 'UdscJet'
                                       )
 if not runTest:
   process.objectCategories.append( 'Elec' )
-  process.objectCategories.append( 'UdscJet' )
   process.objectCategories.append( 'BJet' )
   process.objectCategories.append( 'MET' )
 process.overwrite = cms.bool( overwrite )
@@ -70,34 +81,35 @@ process.io = cms.PSet(
   inputFiles     = cms.vstring( inputFile )
 , sample         = cms.string( sample )
 , outputFile     = cms.string( outputFile )
-, plotPath       = cms.string( plotPath )
+, pathPlots      = cms.string( pathPlots )
 , resolutionFile = cms.string( 'file:%s/output/existingHitFitResolutionFunctions_%s.root'%( os.getenv( "CMSSW_BASE" ), era ) )
 )
 
 process.plot = cms.PSet(
-  onlyExisting = cms.bool( True ) # True includes the possibility of writing resolution function text files.
-, writeFiles   = cms.bool( True ) # True takes effect only, if "onlyExisting" is True, too.
+  onlyExisting = cms.bool( True )
 , accuEvery    = cms.uint32( accuEvery )
 )
 
 
 # Messaging
 
+f = open( cfgFile, 'w' )
+print >> f, process.dumpPython()
+f.close()
 print
-print 'Input files:'
+print 'Config file:'
 print '------------'
-for inputFile in process.io.inputFiles:
-  print inputFile
-if overwrite:
-  print
-  print 'WARNING: existing resolution function plots will be overwritten!'
-else:
-  print
-  print 'INFO: existing resolution function plots will be kept.'
+print cfgFile
 print
-print 'ROOT output file destination:'
-print '---------------------'
-print outputFile
+print 'Input file:'
+print '------------'
+print inputFile
+print
+if pathPlots != '':
+  print
+  print 'Plots destination:'
+  print '------------------'
+  print pathPlots + '*' + name + '*.png'
 print
 print 'Log file destination:'
 print '---------------------'

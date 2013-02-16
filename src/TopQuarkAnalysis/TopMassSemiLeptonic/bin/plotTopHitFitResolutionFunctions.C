@@ -79,12 +79,11 @@ int main(  int argc, char * argv[] )
   const std::vector< std::string > inFiles_( io_.getParameter< std::vector< std::string > >( "inputFiles" ) );
   const std::string sample_( io_.getParameter< std::string >( "sample" ) );
   const std::string outFile_( io_.getParameter< std::string >( "outputFile" ) );
-  const std::string plotPath_( io_.getParameter< std::string >( "plotPath" ) );
+  const std::string pathPlots_( io_.getParameter< std::string >( "pathPlots" ) );
   const std::string resolutionFile_( io_.getParameter< std::string >( "resolutionFile" ) );
   // Configuration for plotting resolution functions
   const edm::ParameterSet & plot_( process_.getParameter< edm::ParameterSet >( "plot" ) );
   const bool onlyExisting_( plot_.getParameter< bool >( "onlyExisting" ) );
-  const bool writeFiles_( plot_.getParameter< bool >( "writeFiles" ) && onlyExisting_ );
   const unsigned accuEvery_( plot_.getParameter< unsigned >( "accuEvery" ) );
 
   std::vector< std::vector< bool > > nominalInv_( objCats_.size() );
@@ -315,7 +314,7 @@ int main(  int argc, char * argv[] )
           const std::string nameEtaSigma( nameEta + "_Sigma" );
           const std::string nameEtaSigmaFit( nameEtaSigma + "_fit" );
           const std::string nameEtaExist( inverse ? "fitExist_" + objCat + "_Inv_" + kinProp + "_" + binEta  : "fitExist_" + objCat + "_" + kinProp + "_" + binEta );
-          const std::string nameEtaSigmaPrint( plotPath_ + "/" + evtSel_ + "_" + nameEtaSigma + ".png" );
+          const std::string nameEtaSigmaPrint( pathPlots_ +  evtSel_ + "_" + nameEtaSigma + ".png" );
           const std::string strEta( useSymm_ ? " #leq |#eta| < " :  " #leq #eta < ");
           const std::string titleLegendEta( titleLegend + ", " + boost::lexical_cast< std::string >( etaBins.at( uEta ) ) + strEta + boost::lexical_cast< std::string >( etaBins.at( uEta + 1 ) ) );
 
@@ -400,7 +399,7 @@ int main(  int argc, char * argv[] )
             const std::string nameEtaPtDeltaRebin( nameEtaPtDelta + "Rebin" );
             const std::string nameEtaPtDeltaFit( nameEtaPtDelta + "_fit" );
             const std::string nameEtaPtDeltaRebinFit( nameEtaPtDeltaRebin + "_fit" );
-            const std::string nameEtaPtDeltaPrint( plotPath_ + "/" + evtSel_ + "_" + nameEtaPtDelta + ".png" );
+            const std::string nameEtaPtDeltaPrint( pathPlots_ + evtSel_ + "_" + nameEtaPtDelta + ".png" );
             const std::string titleLegendEtaPt( titleLegendEta + ", " + boost::lexical_cast< std::string >( ptBins.at( uPt ) ) + " GeV #leq p_{t} < " + boost::lexical_cast< std::string >( ptBins.at( uPt + 1 ) ) + " GeV" );
 
             canv->cd();
@@ -437,7 +436,7 @@ int main(  int argc, char * argv[] )
         } // loop: keyEta
 
         canv->cd();
-        const std::string nameSigmasPrint( plotPath_ + "/" + evtSel_ + "_" + name + "_Sigmas.png" );
+        const std::string nameSigmasPrint( pathPlots_ + evtSel_ + "_" + name + "_Sigmas.png" );
         TLegend * legSigma( new TLegend( 0.33, 0.67, 0.67, 0.9, titleLegend.c_str() ) );
         legSigma->SetTextSize( 0.03 );
         legSigma->SetFillColor( kWhite );
@@ -496,7 +495,7 @@ int main(  int argc, char * argv[] )
         canv->cd();
         canv->SetLogz();
         const std::string nameDeltaEtaPtFitSigmaMap( name + "_DeltaEtaPt_FitSigmaMap" );
-        const std::string nameDeltaEtaPtFitSigmaMapPrint( plotPath_ + "/" + evtSel_ + "_" + nameDeltaEtaPtFitSigmaMap + ".png" );
+        const std::string nameDeltaEtaPtFitSigmaMapPrint( pathPlots_ + evtSel_ + "_" + nameDeltaEtaPtFitSigmaMap + ".png" );
         TH2D * histDeltaEtaPtFitSigmaMap( ( TH2D* )( dirFit_->Get( nameDeltaEtaPtFitSigmaMap.c_str() ) ) );
         histDeltaEtaPtFitSigmaMap->GetXaxis()->SetTitleOffset( 1.5 );
         histDeltaEtaPtFitSigmaMap->GetYaxis()->SetTitleOffset( 1.5 );

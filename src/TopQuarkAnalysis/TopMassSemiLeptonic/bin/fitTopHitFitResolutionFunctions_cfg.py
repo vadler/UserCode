@@ -64,9 +64,9 @@ pathPlots = '%s/output/plots/fitTopHitFitResolutionFunctions/fitTopHitFitResolut
 if refSel:
   pathPlots += 'Ref_'
 if runTest:
-  #pathPlots = ''
-  pathPlots = pathPlots.replace( 'fitTopHitFitResolutionFunctions', 'fitTopHitFitResolutionFunctionsTest', 2 )
-  pathPlots = pathPlots.replace( 'fitTopHitFitResolutionFunctionsTest', 'fitTopHitFitResolutionFunctions', 1 )
+  pathPlots = ''
+  #pathPlots = pathPlots.replace( 'fitTopHitFitResolutionFunctions', 'fitTopHitFitResolutionFunctionsTest', 2 )
+  #pathPlots = pathPlots.replace( 'fitTopHitFitResolutionFunctionsTest', 'fitTopHitFitResolutionFunctions', 1 )
 
 
 # Processing
