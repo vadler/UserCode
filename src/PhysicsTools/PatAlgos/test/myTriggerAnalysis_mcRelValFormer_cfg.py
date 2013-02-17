@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process( "HLTPROV" )
 
 # Steering
-cmsswVersion = 'CMSSW_6_1_0_pre8'
+cmsswVersion = 'CMSSW_6_1_0'
 globalTag    = 'START61_V8'
 
 ## Messaging
