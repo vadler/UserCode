@@ -173,7 +173,7 @@ int main( int argc, char * argv[] )
               << "    using      input  file '" << inFile_  << "'" << std::endl
               << "    writing to output file '" << outFile_ << "'" << std::endl;
 
-  TFile * fileIn_( TFile::Open( inFile_.c_str(), "UPDATE" ) );
+  TFile * fileIn_( TFile::Open( inFile_.c_str(), "READ" ) );
   if ( ! fileIn_ ) {
     std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
               << "    input file '" << inFile_ << "' missing" << std::endl;
@@ -202,11 +202,9 @@ int main( int argc, char * argv[] )
 
   // Open output file
 
-  bool newOut( false );
   TFile * fileOut_( TFile::Open( outFile_.c_str(), "UPDATE" ) );
   if ( ! fileOut_ ) {
     fileOut_ = TFile::Open( outFile_.c_str(), "NEW" );
-    newOut = true;
   }
   if ( ! fileOut_ ) {
     std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
@@ -217,8 +215,9 @@ int main( int argc, char * argv[] )
   TDirectory * dirOutSel_( ( TDirectory* )( fileOut_->Get( evtSel_.c_str() ) ) );
   if ( ! dirOutSel_ ) {
     fileOut_->cd();
-    dirOutSel_ = new TDirectory( evtSel_.c_str(), "" );
+    dirOutSel_ = new TDirectoryFile( evtSel_.c_str(), std::string( refSel_ ? "Reference selection" : "Basic selection" ).c_str() );
   }
+  if ( verbose_ > 1 ) gDirectory->pwd();
 
   TCanvas c1( "c1" );
   c1.cd();
@@ -242,8 +241,9 @@ int main( int argc, char * argv[] )
     TDirectory * dirOutCat_( ( TDirectory* )( dirOutSel_->Get( objCat.c_str() ) ) );
     if ( ! dirOutCat_ ) {
       dirOutSel_->cd();
-      dirOutCat_ = new TDirectory( objCat.c_str(), "" );
+      dirOutCat_ = new TDirectoryFile( objCat.c_str(), std::string( objCat + " objects" ).c_str() );
     }
+    if ( verbose_ > 1 ) gDirectory->pwd();
 
     // Get binning per object category
 
@@ -339,8 +339,9 @@ int main( int argc, char * argv[] )
     TDirectory * dirOutPt_( ( TDirectory* )( dirOutCat_->Get( "Pt" ) ) );
     if ( ! dirOutPt_ ) {
       dirOutCat_->cd();
-      dirOutPt_ = new TDirectory( "Pt", "" );
+      dirOutPt_ = new TDirectoryFile( "Pt", "Momentum variable" );
     }
+    if ( verbose_ > 1 ) gDirectory->pwd();
 
     // Loop over fit versions
     TList * listProp( dirPt_->GetListOfKeys() );
@@ -361,7 +362,13 @@ int main( int argc, char * argv[] )
         returnStatus_ += 0x10000;
         continue;
       }
-      dirFit_->cd();
+      TDirectory * dirOutFit_( ( TDirectory* )( dirOutPt_->Get( subFit.c_str() ) ) );
+      if ( ! dirOutFit_ ) {
+        dirOutPt_->cd();
+        dirOutFit_ = new TDirectoryFile( subFit.c_str(), "Particular fit" );
+      }
+      dirOutFit_->cd();
+      if ( verbose_ > 1 ) gDirectory->pwd();
 
       std::string name( objCat + "_" + baseTitlePt + "_" + subFit );
 
@@ -437,8 +444,15 @@ int main( int argc, char * argv[] )
         ++sizeEtaBins;
         const std::string binEta( keyEta->GetName() );
         const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
-        TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
-        dirEta_->cd();
+//         TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
+//         dirEta_->cd();
+//         if ( verbose_ > 1 ) gDirectory->pwd();
+        TDirectory * dirOutEta_( ( TDirectory* )( dirOutFit_->Get( binEta.c_str() ) ) );
+        if ( ! dirOutEta_ ) {
+          dirOutFit_->cd();
+          dirOutEta_ = new TDirectoryFile( binEta.c_str(), "Eta bin" );
+        }
+        dirOutEta_->cd();
         if ( verbose_ > 1 ) gDirectory->pwd();
 
         const std::string nameEta( name + "_" + binEta );
@@ -665,7 +679,7 @@ int main( int argc, char * argv[] )
             if ( fitNonRestr_ ) {
               histEtaTransRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               const std::string nameEtaPtTransRebin( nameEtaPtTrans + "Rebin" );
-              TH1D * histEtaPtTransRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRebin.c_str() ) ) );
+              TH1D * histEtaPtTransRebin( ( TH1D* )( dirOutEta_->Get( nameEtaPtTransRebin.c_str() ) ) );
               if ( histEtaPtTransRebin != 0 && ! ( scale_ && histEtaPtTransRebin->GetSumOfWeights() == 0. ) ) {
                 const Double_t weight( scale_ ? weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRebin->GetSumOfWeights() : weightEtaBin.at( uPt ).at( uEntry ) );
                 histEtaTransRebinMapPt->Fill( ptRef, value, weight );
@@ -674,7 +688,7 @@ int main( int argc, char * argv[] )
             if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
               histEtaTransRestrRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               const std::string nameEtaPtTransRestrRebin( nameEtaPtTrans + "RestrRebin" );
-              TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
+              TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirOutEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
               if ( histEtaPtTransRestrRebin != 0 && ! ( scale_ && histEtaPtTransRestrRebin->GetSumOfWeights() == 0. ) ) {
                 const Double_t weight( scale_ ? weightEtaBin.at( uPt ).at( uEntry ) / histEtaPtTransRestrRebin->GetSumOfWeights() : weightEtaBin.at( uPt ).at( uEntry ) );
                 histEtaTransRestrRebinMapPt->Fill( ptRef, value, weight );
@@ -717,7 +731,7 @@ int main( int argc, char * argv[] )
         }
       }
 
-      dirFit_->cd();
+      dirOutFit_->cd();
 
       if ( sizeEtaBins != nEtaBins_ ) {
         std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
@@ -859,7 +873,7 @@ int main( int argc, char * argv[] )
         if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
         const std::string binEta( keyEta->GetName() );
         const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
-        TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
+        TDirectory * dirOutEta_( ( TDirectory* )( dirOutFit_->Get( binEta.c_str() ) ) );
         const std::string nameEta( name + "_" + binEta );
 
         for ( unsigned uEntry = 0; uEntry < sizeEta_.at( uEta ); ++uEntry ) {
@@ -875,7 +889,7 @@ int main( int argc, char * argv[] )
           if ( fitNonRestr_ ) {
             const std::string nameEtaTrans( nameEta + "_Trans" );
             const std::string nameEtaTransRebin( nameEtaTrans + "Rebin" );
-            TH1D * histEtaTransRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRebin.c_str() ) ) );
+            TH1D * histEtaTransRebin( ( TH1D* )( dirOutEta_->Get( nameEtaTransRebin.c_str() ) ) );
             if ( histEtaTransRebin != 0 && ! ( scale_ && histEtaTransRebin->GetSumOfWeights() == 0. ) ) {
               const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histEtaTransRebin->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
               histTransRebinMapEta->Fill( etaRef, value, weight );
@@ -884,7 +898,7 @@ int main( int argc, char * argv[] )
           if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
             const std::string nameEtaTransRestr( nameEta + "_TransRestr" );
             const std::string nameEtaTransRestrRebin( nameEtaTransRestr + "Rebin" );
-            TH1D * histEtaTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRestrRebin.c_str() ) ) );
+            TH1D * histEtaTransRestrRebin( ( TH1D* )( dirOutEta_->Get( nameEtaTransRestrRebin.c_str() ) ) );
             if ( histEtaTransRestrRebin != 0 && ! ( scale_ && histEtaTransRestrRebin->GetSumOfWeights() == 0. ) ) {
               const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histEtaTransRestrRebin->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
               histTransRestrRebinMapEta->Fill( etaRef, value, weight );
@@ -901,7 +915,7 @@ int main( int argc, char * argv[] )
                   histTransRebinMapPt->Fill( ptRef, value, weight );
                 }
                 const std::string nameEtaPtTransRebin( nameEtaPtTrans + "Rebin" );
-                TH1D * histEtaPtTransRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRebin.c_str() ) ) );
+                TH1D * histEtaPtTransRebin( ( TH1D* )( dirOutEta_->Get( nameEtaPtTransRebin.c_str() ) ) );
                 if ( histEtaPtTransRebin != 0 && ! ( scale_ && histEtaPtTransRebin->GetSumOfWeights() == 0. ) ) {
                   const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histEtaPtTransRebin->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
                   histVecPtTransRebinMapEta.at( uPt )->Fill( etaRef, value, weight );
@@ -913,7 +927,7 @@ int main( int argc, char * argv[] )
                   histTransRestrRebinMapPt->Fill( ptRef, value, weight );
                 }
                 const std::string nameEtaPtTransRestrRebin( nameEtaPtTrans + "RestrRebin" );
-                TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
+                TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirOutEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
                 if ( histEtaPtTransRestrRebin != 0 && ! ( scale_ && histEtaPtTransRestrRebin->GetSumOfWeights() == 0. ) ) {
                   const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histEtaPtTransRestrRebin->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
                   histVecPtTransRestrRebinMapEta.at( uPt )->Fill( etaRef, value, weight );
@@ -984,13 +998,14 @@ int main( int argc, char * argv[] )
         if ( useAlt_  == ( subFit.find( "Alt" )  == std::string::npos ) ) continue;
         if ( useSymm_ == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
         if ( refGen_  == ( subFit.find( "Gen" )  == std::string::npos ) ) continue;
-        TDirectory * dirFit_( ( TDirectory* )( dirPt_->Get( subFit.c_str() ) ) );
         TDirectory * dirOutFit_( ( TDirectory* )( dirOutPt_->Get( subFit.c_str() ) ) );
         if ( ! dirOutFit_ ) {
-          dirOutPt_->cd();
-          dirOutFit_ = new TDirectory( subFit.c_str(), "" );
+          std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                    << "    fit '" << subFit << "' does not exist in output file" << std::endl;
+          returnStatus_ += 0x100000;
+          continue;
         }
-        dirFit_->cd();
+        dirOutFit_->cd();
 
         std::string name( objCat + "_" + baseTitlePt + "_" + subFit );
 
@@ -1011,7 +1026,7 @@ int main( int argc, char * argv[] )
 
         const std::string nameTrans( name + "_Trans" );
         const std::string nameTransRebin( nameTrans + "Rebin" );
-        TH1D * histTransRebin( ( TH1D* )( dirFit_->Get( nameTransRebin.c_str() ) ) );
+        TH1D * histTransRebin( ( TH1D* )( dirOutFit_->Get( nameTransRebin.c_str() ) ) );
         if ( fitNonRestr_ && histTransRebin != 0 ) {
           const std::string nameTransRebinFit( nameTransRebin + "_fit" );
           if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRebinFit << std::endl;
@@ -1032,7 +1047,7 @@ int main( int argc, char * argv[] )
             else {
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    failing fit in directory '"; dirFit_->pwd();
+                          << "    failing fit in directory '"; dirOutFit_->pwd();
                 std::cout << "    '" << nameTransRebin << "' status " << fitTransRebinResultPtr->Status() << std::endl;
               }
             }
@@ -1040,7 +1055,7 @@ int main( int argc, char * argv[] )
           else {
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "    missing fit in directory '"; dirFit_->pwd();
+                        << "    missing fit in directory '"; dirOutFit_->pwd();
               std::cout << "    '" << nameTransRebin << std::endl;
             }
           }
@@ -1052,7 +1067,7 @@ int main( int argc, char * argv[] )
 
         const std::string nameTransRestr( nameTrans + "Restr" );
         const std::string nameTransRestrRebin( nameTransRestr + "Rebin" );
-        TH1D * histTransRestrRebin( ( TH1D* )( dirFit_->Get( nameTransRestrRebin.c_str() ) ) );
+        TH1D * histTransRestrRebin( ( TH1D* )( dirOutFit_->Get( nameTransRestrRebin.c_str() ) ) );
         if ( histTransRestrRebin != 0 ) {
           const std::string nameTransRestrRebinFit( nameTransRestrRebin + "_fit" );
           if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRestrRebinFit << std::endl;
@@ -1073,7 +1088,7 @@ int main( int argc, char * argv[] )
             else {
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    failing fit in directory '"; dirFit_->pwd();
+                          << "    failing fit in directory '"; dirOutFit_->pwd();
                 std::cout << "    '" << nameTransRestrRebin << "' status " << fitTransRestrRebinResultPtr->Status() << std::endl;
               }
             }
@@ -1081,7 +1096,7 @@ int main( int argc, char * argv[] )
           else {
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "    missing fit in directory '"; dirFit_->pwd();
+                        << "    missing fit in directory '"; dirOutFit_->pwd();
               std::cout << "    '" << nameTransRestrRebin << std::endl;
             }
           }
@@ -1122,7 +1137,7 @@ int main( int argc, char * argv[] )
           const std::string namePt( name + "_" + baseTitlePt + binPt );
 
           const std::string namePtTransRebin( namePt + "_TransRebin" );
-          TH1D * histPtTransRebin( ( TH1D* )( dirFit_->Get( namePtTransRebin.c_str() ) ) );
+          TH1D * histPtTransRebin( ( TH1D* )( dirOutFit_->Get( namePtTransRebin.c_str() ) ) );
           if ( fitNonRestr_ && histPtTransRebin != 0 ) {
             const std::string namePtTransRebinFit( namePtTransRebin + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << namePtTransRebinFit << std::endl;
@@ -1146,7 +1161,7 @@ int main( int argc, char * argv[] )
               else {
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "    failing fit in directory '"; dirFit_->pwd();
+                            << "    failing fit in directory '"; dirOutFit_->pwd();
                   std::cout << "    '" << namePtTransRebin << "' status " << fitPtTransRebinResultPtr->Status() << std::endl;
                 }
               }
@@ -1154,7 +1169,7 @@ int main( int argc, char * argv[] )
             else {
               if ( verbose_ > 1 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    missing fit in directory '"; dirFit_->pwd();
+                          << "    missing fit in directory '"; dirOutFit_->pwd();
                 std::cout << "    '" << namePtTransRebin << std::endl;
               }
             }
@@ -1162,7 +1177,7 @@ int main( int argc, char * argv[] )
 
           const std::string namePtTransRestr( namePt + "_TransRestr" );
           const std::string namePtTransRestrRebin( namePtTransRestr + "Rebin" );
-          TH1D * histPtTransRestrRebin( ( TH1D* )( dirFit_->Get( namePtTransRestrRebin.c_str() ) ) );
+          TH1D * histPtTransRestrRebin( ( TH1D* )( dirOutFit_->Get( namePtTransRestrRebin.c_str() ) ) );
           if ( histPtTransRestrRebin != 0 ) {
             const std::string namePtTransRestrRebinFit( namePtTransRestrRebin + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << namePtTransRestrRebinFit << std::endl;
@@ -1186,7 +1201,7 @@ int main( int argc, char * argv[] )
               else {
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "    failing fit in directory '"; dirFit_->pwd();
+                            << "    failing fit in directory '"; dirOutFit_->pwd();
                   std::cout << "    '" << namePtTransRestrRebin << "' status " << fitPtTransRestrRebinResultPtr->Status() << std::endl;
                 }
               }
@@ -1194,7 +1209,7 @@ int main( int argc, char * argv[] )
             else {
               if ( verbose_ > 1 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    missing fit in directory '"; dirFit_->pwd();
+                          << "    missing fit in directory '"; dirOutFit_->pwd();
                 std::cout << "    '" << namePtTransRestrRebin << std::endl;
               }
             }
@@ -1230,7 +1245,7 @@ int main( int argc, char * argv[] )
               else {
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "    failing fit in directory '"; dirFit_->pwd();
+                            << "    failing fit in directory '"; dirOutFit_->pwd();
                   std::cout << "    '" << nameTransRebinPtFitMap << "' status " << fitTransRebinPtFitMapResultPtr->Status() << std::endl;
                 }
               }
@@ -1238,7 +1253,7 @@ int main( int argc, char * argv[] )
             else {
               if ( verbose_ > 1 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    missing fit in directory '"; dirFit_->pwd();
+                          << "    missing fit in directory '"; dirOutFit_->pwd();
                 std::cout << "    '" << nameTransRebinPtFitMap << std::endl;
               }
             }
@@ -1259,7 +1274,7 @@ int main( int argc, char * argv[] )
             else {
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    failing fit in directory '"; dirFit_->pwd();
+                          << "    failing fit in directory '"; dirOutFit_->pwd();
                 std::cout << "    '" << nameTransRestrRebinPtFitMap << "' status " << fitTransRestrRebinPtFitMapResultPtr->Status() << std::endl;
               }
             }
@@ -1267,13 +1282,13 @@ int main( int argc, char * argv[] )
           else {
             if ( verbose_ > 1 ) {
               std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                        << "    missing fit in directory '"; dirFit_->pwd();
+                        << "    missing fit in directory '"; dirOutFit_->pwd();
               std::cout << "    '" << nameTransRestrRebinPtFitMap << std::endl;
             }
           }
         } // loop: uPar < nPar
 
-        dirFit_->cd();
+        dirOutFit_->cd();
         const std::string nameTransferFunctionPt( name + "_TransferFunction" );
         if ( fitNonRestr_ ) {
           TF2 * transferFunctionPt( new TF2( ( ( TF2& )( *( transferPt.Function( norm_ ).Clone( nameTransferFunctionPt.c_str() ) ) ) ) ) );
@@ -1370,26 +1385,27 @@ int main( int argc, char * argv[] )
           }
         }
 
-        TList * listFit( dirFit_->GetListOfKeys() );
+        TList * listFit( dirOutFit_->GetListOfKeys() );
         TIter nextInListFit( listFit );
         while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
           if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
           const std::string binEta( keyEta->GetName() );
           const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
-          TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
           TDirectory * dirOutEta_( ( TDirectory* )( dirOutFit_->Get( binEta.c_str() ) ) );
           if ( ! dirOutEta_ ) {
-            dirOutFit_->cd();
-            dirOutEta_ = new TDirectory( binEta.c_str(), "" );
+            std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                      << "    fit '" << binEta << "' does not exist in output file" << std::endl;
+            returnStatus_ += 0x200000;
+            continue;
           }
-          dirEta_->cd();
+          dirOutEta_->cd();
 
           const std::string nameEta( name + "_" + binEta );
 
           const std::string nameEtaTrans( nameEta + "_Trans" );
           const std::string nameEtaTransRebin( nameEtaTrans + "Rebin" );
           if ( fitNonRestr_ ) {
-            TH1D * histEtaTransRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRebin.c_str() ) ) );
+            TH1D * histEtaTransRebin( ( TH1D* )( dirOutEta_->Get( nameEtaTransRebin.c_str() ) ) );
             if ( histEtaTransRebin != 0 ) {
               const std::string nameEtaTransRebinFit( nameEtaTransRebin + "_fit" );
               if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaTransRebinFit << std::endl;
@@ -1415,7 +1431,7 @@ int main( int argc, char * argv[] )
                 else {
                   if ( verbose_ > 2 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                              << "    failing fit in directory '"; dirEta_->pwd();
+                              << "    failing fit in directory '"; dirOutEta_->pwd();
                     std::cout << "    '" << nameEtaTransRebin << "' status " << fitEtaTransRebinResultPtr->Status() << std::endl;
                   }
                 }
@@ -1423,7 +1439,7 @@ int main( int argc, char * argv[] )
               else {
                 if ( verbose_ > 1 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "    missing fit in directory '"; dirEta_->pwd();
+                            << "    missing fit in directory '"; dirOutEta_->pwd();
                   std::cout << "    '" << nameEtaTransRebin << std::endl;
                 }
               }
@@ -1436,7 +1452,7 @@ int main( int argc, char * argv[] )
 
           const std::string nameEtaTransRestr( nameEta + "_TransRestr" );
           const std::string nameEtaTransRestrRebin( nameEtaTransRestr + "Rebin" );
-          TH1D * histEtaTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaTransRestrRebin.c_str() ) ) );
+          TH1D * histEtaTransRestrRebin( ( TH1D* )( dirOutEta_->Get( nameEtaTransRestrRebin.c_str() ) ) );
           if ( histEtaTransRestrRebin != 0 ) {
             const std::string nameEtaTransRestrRebinFit( nameEtaTransRestrRebin + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaTransRestrRebinFit << std::endl;
@@ -1462,7 +1478,7 @@ int main( int argc, char * argv[] )
               else {
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "    failing fit in directory '"; dirEta_->pwd();
+                            << "    failing fit in directory '"; dirOutEta_->pwd();
                   std::cout << "    '" << nameEtaTransRestrRebin << "' status " << fitEtaTransRestrRebinResultPtr->Status() << std::endl;
                 }
               }
@@ -1470,7 +1486,7 @@ int main( int argc, char * argv[] )
             else {
               if ( verbose_ > 1 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                          << "    missing fit in directory '"; dirEta_->pwd();
+                          << "    missing fit in directory '"; dirOutEta_->pwd();
                 std::cout << "    '" << nameEtaTransRestrRebin << std::endl;
               }
             }
@@ -1516,7 +1532,7 @@ int main( int argc, char * argv[] )
 
               if ( fitNonRestr_ ) {
                 const std::string nameEtaPtTransRebin( nameEtaPtTrans + "Rebin" );
-                TH1D * histEtaPtTransRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRebin.c_str() ) ) );
+                TH1D * histEtaPtTransRebin( ( TH1D* )( dirOutEta_->Get( nameEtaPtTransRebin.c_str() ) ) );
                 if ( histEtaPtTransRebin != 0 ) {
                   const std::string nameEtaPtTransRebinFit( nameEtaPtTransRebin + "_fit" );
                   if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaPtTransRebinFit << std::endl;
@@ -1540,7 +1556,7 @@ int main( int argc, char * argv[] )
                     else {
                       if ( verbose_ > 2 ) {
                         std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                                  << "    failing fit in directory '"; dirEta_->pwd();
+                                  << "    failing fit in directory '"; dirOutEta_->pwd();
                         std::cout << "    '" << nameEtaPtTransRebin << "' status " << fitEtaPtTransRebinResultPtr->Status() << std::endl;
                       }
                     }
@@ -1548,7 +1564,7 @@ int main( int argc, char * argv[] )
                   else {
                     if ( verbose_ > 1 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                                << "    missing fit in directory '"; dirEta_->pwd();
+                                << "    missing fit in directory '"; dirOutEta_->pwd();
                       std::cout << "    '" << nameEtaPtTransRebin << std::endl;
                     }
                   }
@@ -1560,7 +1576,7 @@ int main( int argc, char * argv[] )
               }
 
               const std::string nameEtaPtTransRestrRebin( nameEtaPtTrans + "RestrRebin" );
-              TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
+              TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirOutEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
               if ( histEtaPtTransRestrRebin != 0 ) {
                 const std::string nameEtaPtTransRestrRebinFit( nameEtaPtTransRestrRebin + "_fit" );
                 if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaPtTransRestrRebinFit << std::endl;
@@ -1584,7 +1600,7 @@ int main( int argc, char * argv[] )
                   else {
                     if ( verbose_ > 2 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                                << "    failing fit in directory '"; dirEta_->pwd();
+                                << "    failing fit in directory '"; dirOutEta_->pwd();
                       std::cout << "    '" << nameEtaPtTransRestrRebin << "' status " << fitEtaPtTransRestrRebinResultPtr->Status() << std::endl;
                     }
                   }
@@ -1592,7 +1608,7 @@ int main( int argc, char * argv[] )
                 else {
                   if ( verbose_ > 1 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                              << "    missing fit in directory '"; dirEta_->pwd();
+                              << "    missing fit in directory '"; dirOutEta_->pwd();
                     std::cout << "    '" << nameEtaPtTransRestrRebin << std::endl;
                   }
                 }
@@ -1642,7 +1658,7 @@ int main( int argc, char * argv[] )
                   else {
                     if ( verbose_ > 2 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                                << "    failing fit in directory '"; dirEta_->pwd();
+                                << "    failing fit in directory '"; dirOutEta_->pwd();
                       std::cout << "    '" << nameTransRebinEtaPtFitMap << "' status " << fitTransRebinEtaPtFitMapResultPtr->Status() << std::endl;
                     }
                   }
@@ -1650,7 +1666,7 @@ int main( int argc, char * argv[] )
                 else {
                   if ( verbose_ > 1 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                              << "    missing fit in directory '"; dirEta_->pwd();
+                              << "    missing fit in directory '"; dirOutEta_->pwd();
                     std::cout << "    '" << nameTransRebinEtaPtFitMap << std::endl;
                   }
                 }
@@ -1673,7 +1689,7 @@ int main( int argc, char * argv[] )
                 else {
                   if ( verbose_ > 2 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                              << "    failing fit in directory '"; dirEta_->pwd();
+                              << "    failing fit in directory '"; dirOutEta_->pwd();
                     std::cout << "    '" << nameTransRestrRebinEtaPtFitMap << "' status " << fitTransRestrRebinEtaPtFitMapResultPtr->Status() << std::endl;
                   }
                 }
@@ -1681,7 +1697,7 @@ int main( int argc, char * argv[] )
               else {
                 if ( verbose_ > 1 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
-                            << "    missing fit in directory '"; dirEta_->pwd();
+                            << "    missing fit in directory '"; dirOutEta_->pwd();
                   std::cout << "    '" << nameTransRestrRebinEtaPtFitMap << std::endl;
                 }
               }
@@ -1689,7 +1705,7 @@ int main( int argc, char * argv[] )
 
           }
 
-          dirEta_->cd();
+          dirOutEta_->cd();
           const std::string nameEtaTransferFunctionPt( nameEta + "_TransferFunction" );
           if ( fitNonRestr_ ) {
             TF2 * transferFunctionEtaPt( new TF2( ( ( TF2& )( *( transferVecEtaPt.at( uEta ).Function( norm_ ).Clone( nameEtaTransferFunctionPt.c_str() ) ) ) ) ) );
@@ -1795,13 +1811,12 @@ int main( int argc, char * argv[] )
 
 
   // Write and close ROOT files
+  Int_t writeOut_( 0 );
   if ( overwrite_ ) {
-    fileIn_->Write( 0, TObject::kOverwrite );
-    fileOut_->Write( 0, TObject::kOverwrite );
+    writeOut_ = fileOut_->Write( 0, TObject::kOverwrite );
   }
   else {
-    fileIn_->Write();
-    fileOut_->Write();
+    writeOut_ = fileOut_->Write();
   }
   fileIn_->Close();
   fileOut_->Close();
@@ -1809,7 +1824,8 @@ int main( int argc, char * argv[] )
   if ( verbose_ > 0 )
     std::cout << std::endl
               << argv[ 0 ] << " --> INFO:" << std::endl
-              << "    return status " << returnStatus_ << std::endl;
+              << "    return status   " << returnStatus_ << std::endl
+              << "    " << writeOut_ << " bytes written to output file" << std::endl;
   return returnStatus_;
 
 }

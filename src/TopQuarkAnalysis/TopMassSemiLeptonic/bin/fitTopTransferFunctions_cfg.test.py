@@ -20,7 +20,7 @@ objects.append( 'UdscJet' ) # default: dGauss+linear
 #objects.append( 'Elec' )    # default: sGauss+squared
 
 # Settings
-overwrite  = True # to throw away earlier versions of histograms, trees and functions
+overwrite  = False # to throw away earlier versions of histograms, trees and functions
 plot       = False
 writeFiles = False
 # Exclusive switches:
@@ -56,14 +56,14 @@ maxDR    = 0.1
 
 # Transfer functions
 # Fit function
-fitFunction = 'dGauss' # 'sGauss', 'dGauss'
+fitFunction        = 'dGauss' # 'sGauss', 'dGauss'
+dependencyFunction = 'linear' # 'linear', 'squared'
 norm        = 0 # index of parameter holding the normalisation of the fit functikon
 fitOptions  = 'IBRS+'
 fitRange    = 1. # for Gaussian fits (in units of orig. RMS)
 #fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
 if fitFunction == 'dGauss': # a background function is defined
   fitRange = widthFactor # for combined fits (in units of orig. RMS)
-dependencyFunction = 'squared' # 'linear', 'squared'
 
 # I/O
 name = ''
@@ -73,10 +73,13 @@ if refGen:
   name += 'Gen'
 if useSymm:
   name += 'Symm'
-inputFile = 'fitTopHitFit_from%s_%s.test.root'%( era, sample )
+inputFile = 'analyzeHitFit_from%s_%s.root'%( era, sample )
+logFile = inputFile.replace( 'analyzeHitFit', 'fitTopTransferFunctions' )
+outputFile = logFile
+logFile = logFile.replace( 'root', 'test.log' )
 if usePileUp:
-  inputFile = inputFile.replace( '.test.root', '_PileUp.test.root' )
-logFile = inputFile.replace( 'root', 'log' )
+  outputFile = outputFile.replace( '.test.root', '_PileUp.test.root' )
+  logFile    = logFile.replace( '.test.log', '_PileUp.test.log' )
 if refSel:
   logFile = logFile.replace( '.', '_Ref.', 1 )
 if useNonT:
@@ -91,13 +94,11 @@ else:
     logFile = logFile.replace( '.', '_Pt_.', 1 )
 logFile = logFile.replace( '_.', '_' + name + '.', 1 )
 logFile = logFile.replace( '_.', '.', 1 )
-inputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
-outputFile = inputFile.replace( 'fitTopHitFit', 'fitTopTransferFunctions' )
-logFile   = logFile.replace( 'fitTopHitFit', 'fitTopTransferFunctions' )
-cfgFile   = logFile.replace( '.', '_cfg.', 1 )
-cfgFile   = cfgFile.replace( '.log', '.py' )
-logFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
-cfgFile   = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), cfgFile )
+cfgFile    = logFile.replace( '.test.log', '_cfg.test.py' )
+inputFile  = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
+outputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), outputFile )
+logFile    = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
+cfgFile    = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), cfgFile )
 pathPlots = ''
 if plot:
   pathPlots = '%s/output/plots/fitTopTransferFunctions/fitTopTransferFunctionsTest_from%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample )

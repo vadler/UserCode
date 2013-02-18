@@ -15,7 +15,7 @@ process = cms.PSet(
         pathPlots = cms.string('/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/plots/fitTopTransferFunctions/fitTopTransferFunctions_fromSummer11_Fall11_R4_1_L3_unambiguousOnly_Ref_'),
         outputFile = cms.string('file:/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/fitTopTransferFunctions_fromSummer11_Fall11_R4_1_L3_unambiguousOnly.root'),
         overwrite = cms.bool(True),
-        inputFile = cms.string('file:/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/fitTopHitFit_fromSummer11_Fall11_R4_1_L3_unambiguousOnly.root')
+        inputFile = cms.string('file:/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/output/analyzeHitFit_fromSummer11_Fall11_R4_1_L3_unambiguousOnly.root')
     ),
     histos = cms.PSet(
         DeltaPtMax = cms.double(50.0),
@@ -32,7 +32,6 @@ process = cms.PSet(
         scale = cms.bool(True),
         fitRange = cms.double(5.0),
         dependencyFunction = cms.string('linear'),
-        writeFiles = cms.bool(True),
         fitOptions = cms.string('IBRS+'),
         fitFunction = cms.string('dGauss'),
         fitMaxPt = cms.double(999999.0),
