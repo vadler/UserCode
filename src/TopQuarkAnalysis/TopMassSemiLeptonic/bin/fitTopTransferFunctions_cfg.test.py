@@ -8,9 +8,9 @@ import FWCore.ParameterSet.Config as cms
 # era    = 'Spring10'
 era    = 'Summer11'
 # Input sample
-#sample = 'Fall11_R4_1_L3_unambiguousOnly'
+sample = 'Fall11_R4_1_L3_unambiguousOnly'
 #sample = 'Fall11_R4_1_L3_totalMinDist'
-sample = 'Fall11_R4_L3_unambiguousOnly'
+#sample = 'Fall11_R4_L3_unambiguousOnly'
 
 # Objects
 objects = []
@@ -20,7 +20,7 @@ objects.append( 'UdscJet' ) # default: dGauss+linear
 #objects.append( 'Elec' )    # default: sGauss+squared
 
 # Settings
-overwrite  = False # to throw away earlier versions of histograms, trees and functions
+overwrite  = True # to throw away earlier versions of histograms, trees and functions
 plot       = False
 writeFiles = False
 # Exclusive switches:
@@ -47,8 +47,8 @@ fitEtaBins     = False
 #minPt    = 0.
 #minPt    = 20.
 #minPt    = 27.
-minPt    = 40.
-#minPt    = 50.
+#minPt    = 40.
+minPt    = 50.
 #minPt    = 60.
 #maxDR    = 999999.
 maxDR    = 0.1
@@ -73,9 +73,9 @@ if refGen:
   name += 'Gen'
 if useSymm:
   name += 'Symm'
-inputFile = 'fitTopHitFit_from%s_%s.root'%( era, sample )
+inputFile = 'fitTopHitFit_from%s_%s.test.root'%( era, sample )
 if usePileUp:
-  inputFile = inputFile.replace( '.root', '_PileUp.root' )
+  inputFile = inputFile.replace( '.test.root', '_PileUp.test.root' )
 logFile = inputFile.replace( 'root', 'log' )
 if refSel:
   logFile = logFile.replace( '.', '_Ref.', 1 )
@@ -111,7 +111,7 @@ if writeFiles:
 # Processing
 
 process = cms.PSet()
-process.verbose = cms.uint32( 1 )
+process.verbose = cms.uint32( 3 )
 process.objectCategories = cms.vstring( objects )
 process.usePileUp = cms.bool( usePileUp )
 process.useAlt    = cms.bool( useAlt )

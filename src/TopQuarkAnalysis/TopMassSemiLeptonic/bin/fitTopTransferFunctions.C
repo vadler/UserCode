@@ -108,8 +108,8 @@ int main( int argc, char * argv[] )
   std::string fitOptions_( transfer_.getParameter< std::string >( "fitOptions" ) );
   const double fitRange_( std::min( transfer_.getParameter< double >( "fitRange" ), widthFactor_ ) );
   const std::string depFuncId_( transfer_.getParameter< std::string >( "dependencyFunction" ) );
-  const bool writeFiles_( transfer_.getParameter< bool >( "writeFiles" ) );
   const std::string pathOut_( transfer_.getParameter< std::string >( "pathOut" ) );
+  const bool writeFiles_( ! pathOut_.empty() );
 
   if ( verbose_ > 0 ) {
     std::cout << std::endl
@@ -187,8 +187,6 @@ int main( int argc, char * argv[] )
     returnStatus_ += 0x20;
     return returnStatus_;
   }
-  TH1D::SetDefaultSumw2();
-  TH2D::SetDefaultSumw2();
 
   // Read pile-up data
   std::vector< Double_t > pileUpWeights_;
@@ -224,6 +222,8 @@ int main( int argc, char * argv[] )
 
   TCanvas c1( "c1" );
   c1.cd();
+  TH1D::SetDefaultSumw2();
+  TH2D::SetDefaultSumw2();
 
   // Loops through directory structure
 
