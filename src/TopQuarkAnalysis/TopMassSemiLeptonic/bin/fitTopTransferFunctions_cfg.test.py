@@ -8,9 +8,9 @@ import FWCore.ParameterSet.Config as cms
 # era    = 'Spring10'
 era    = 'Summer11'
 # Input sample
-sample = 'Fall11_R4_1_L3_unambiguousOnly'
+#sample = 'Fall11_R4_1_L3_unambiguousOnly'
 #sample = 'Fall11_R4_1_L3_totalMinDist'
-#sample = 'Fall11_R4_L3_unambiguousOnly'
+sample = 'Fall11_R4_L3_unambiguousOnly'
 
 # Objects
 objects = []
@@ -75,8 +75,8 @@ if useSymm:
   name += 'Symm'
 inputFile = 'analyzeHitFit_from%s_%s.root'%( era, sample )
 logFile = inputFile.replace( 'analyzeHitFit', 'fitTopTransferFunctions' )
-outputFile = logFile
-logFile = logFile.replace( 'root', 'test.log' )
+logFile = logFile.replace( '.root', '.test.log' )
+outputFile = logFile.replace( 'test.log', 'test.root' )
 if usePileUp:
   outputFile = outputFile.replace( '.test.root', '_PileUp.test.root' )
   logFile    = logFile.replace( '.test.log', '_PileUp.test.log' )
