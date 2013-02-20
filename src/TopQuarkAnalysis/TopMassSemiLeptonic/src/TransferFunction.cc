@@ -43,13 +43,13 @@ TransferFunction::TransferFunction( const std::string & fitFunction, const std::
 
 void TransferFunction::SetFitFunction( const std::string & fitFunction, bool clear )
 {
-  fitFunction_ = TFormula( "fitFunction", fitFunction.c_str() );
+  fitFunction_ = TF1( "fitFunction", fitFunction.c_str() );
   clear ? ClearParameters() : ResizeParameters();
 }
 
 void TransferFunction::SetDependencyFunction( const std::string & dependencyFunction, bool clear )
 {
-  dependencyFunction_ = TFormula( "dependencyFunction", dependencyFunction.c_str() );
+  dependencyFunction_ = TF1( "dependencyFunction", dependencyFunction.c_str() );
   clear ? ClearParameters() : ResizeParameters();
 }
 
@@ -163,7 +163,7 @@ TF1 TransferFunction::Function( double dependencyValue, int norm ) const
   std::vector< double > pars;
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) continue;
-    TFormula depFunc( dependencyFunction_ );
+    TF1 depFunc( dependencyFunction_ );
     for ( unsigned j = 0; j < NParDependency(); ++j ) {
       depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
@@ -205,13 +205,13 @@ std::string TransferFunction::Formula( int norm ) const
 
 std::string TransferFunction::Formula( double dependencyValue, int norm ) const
 {
-  TFormula fitFunc( fitFunction_ );
+  TF1 fitFunc( fitFunction_ );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
       continue;
     }
-    TFormula depFunc( dependencyFunction_ );
+    TF1 depFunc( dependencyFunction_ );
     for ( unsigned j = 0; j < NParDependency(); ++j ) {
       depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
@@ -222,7 +222,7 @@ std::string TransferFunction::Formula( double dependencyValue, int norm ) const
 
 double TransferFunction::Eval( double value, int norm ) const
 {
-  TFormula fitFunc( fitFunction_ );
+  TF1 fitFunc( fitFunction_ );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
@@ -235,13 +235,13 @@ double TransferFunction::Eval( double value, int norm ) const
 
 double TransferFunction::Eval( double dependencyValue, double value, int norm ) const
 {
-  TFormula fitFunc( fitFunction_ );
+  TF1 fitFunc( fitFunction_ );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
       continue;
     }
-    TFormula depFunc( dependencyFunction_ );
+    TF1 depFunc( dependencyFunction_ );
     for ( unsigned j = 0; j < NParDependency(); ++j ) {
       depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
@@ -253,7 +253,7 @@ double TransferFunction::Eval( double dependencyValue, double value, int norm ) 
 // double TransferFunction::Sigma( double dependencyValue ) const
 // {
 //   // FIXME: This is too simple. Add checks!
-//   TFormula depFunc( dependencyFunction_ );
+//   TF1 depFunc( dependencyFunction_ );
 //   for ( unsigned j = 0; j < NParDependency(); ++j ) {
 //     depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 2, j ) ) );
 //   }
@@ -327,7 +327,7 @@ std::string TransferFunction::PrintFit2D( bool useNan ) const
 
 std::string TransferFunction::PrintDependency( unsigned i, bool useNan ) const
 {
-    TFormula depFunc( dependencyFunction_ );
+    TF1 depFunc( dependencyFunction_ );
     for ( unsigned j = 0; j < NParDependency(); ++j ) {
       depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }

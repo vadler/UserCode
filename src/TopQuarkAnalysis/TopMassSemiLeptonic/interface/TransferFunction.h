@@ -46,12 +46,12 @@ namespace my {
 
       /// Fit function
       /// Function to be fit to the momentum difference distributions.
-      TFormula fitFunction_;
+      TF1 fitFunction_;
 
       /// Dependency function
       /// Function to be fit distributions of fit parameters for the fit
       /// function over a dependency variable.
-      TFormula dependencyFunction_;
+      TF1 dependencyFunction_;
 
       /// Name of the dependency variable (e.g. "E_parton", "eta").
       std::string dependency_;
