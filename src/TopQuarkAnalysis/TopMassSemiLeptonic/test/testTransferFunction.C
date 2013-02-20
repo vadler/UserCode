@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 
+#include "CommonTools/MyTools/interface/RootFunctions.h"
 #include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/TransferFunction.h"
 
 
@@ -28,6 +29,7 @@ int main( int argc, char * argv[] )
   assert( testFuncGauss1.NParDependency() == 2 );
   assert( testFuncGauss1.Eval( 0., 0. )   == testFuncGauss1.Eval( 0. ) );
   assert( testFuncGauss1.Eval( 0., 1. )   != testFuncGauss1.Eval( 0. ) );
+  assert( testFuncGauss1.Eval( 0., 1. )   == 1. );
 
   my::TransferFunction testFuncGauss2( testFuncGauss1 );
   assert(   testFuncGauss2.SetParameters( 0, pars ) );
@@ -38,8 +40,8 @@ int main( int argc, char * argv[] )
   assert( testFuncGauss2.Eval( 0., 0. )   == testFuncGauss1.Eval( 0., 0. ) );
   assert( testFuncGauss2.Eval( 0., 1. )   == testFuncGauss1.Eval( 0., 1. ) );
 
-  TF1 * gauss3( new TF1( "gauss2", "gaus" ) );
-  TF1 * line3( new TF1( "line2", "[0]+[1]*x" ) );
+  TF1 * gauss3( new TF1( "gauss3", "gaus" ) );
+  TF1 * line3( new TF1( "line3", "[0]+[1]*x" ) );
   my::TransferFunction testFuncGauss3( gauss3, line3 );
   assert(   testFuncGauss3.SetParameters( 0, pars ) );
   assert(   testFuncGauss3.SetParameters( 1, pars ) );
@@ -58,8 +60,25 @@ int main( int argc, char * argv[] )
   assert( testFuncGauss4.Eval( 0., 0. )   == testFuncGauss1.Eval( 0., 0. ) );
   assert( testFuncGauss4.Eval( 0., 1. )   == testFuncGauss1.Eval( 0., 1. ) );
 
+  my::SingleGaussian * myGauss = new my::SingleGaussian();
+  TF1 * gauss5( new TF1( "gauss5", myGauss, 0., 1., my::SingleGaussian::NPar(), "my::SingleGaussian" ) );
+  my::Line * myLine = new my::Line();
+  TF1 * line5( new TF1( "line5", myLine, 0., 1., my::Line::NPar(), "my::Line" ) );
+  my::TransferFunction testFuncGauss5( gauss5, line5 );
+  assert(   testFuncGauss5.SetParameters( 0, pars ) );
+  assert(   testFuncGauss5.SetParameters( 1, pars ) );
+  assert( ! testFuncGauss5.SetParameters( 2, pars ) );
+  assert( testFuncGauss5.NParFit()        == testFuncGauss1.NParFit() );
+  assert( testFuncGauss5.NParDependency() == testFuncGauss1.NParDependency() );
+  assert( testFuncGauss5.Eval( 0., 0. )   != testFuncGauss1.Eval( 0., 0. ) );
+  assert( testFuncGauss5.Eval( 0., 1. )   != testFuncGauss1.Eval( 0., 1. ) );
+  assert( testFuncGauss5.Eval( 0., 0. ) / testFuncGauss5.Eval( 0., 1. ) == testFuncGauss1.Eval( 0., 0. ) / testFuncGauss1.Eval( 0., 1. ) );
+  assert( testFuncGauss5.Formula().empty() );
+
   delete gauss3;
   delete line3;
+
+  std::cout << std::endl << argv[ 0 ] << " --> SUCCESS!" << std::endl << std::endl;
 
   return returnStatus_;
 
