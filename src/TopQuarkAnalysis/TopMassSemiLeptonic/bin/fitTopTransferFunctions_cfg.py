@@ -46,10 +46,10 @@ fitNonRestr    = False
 fitEtaBins     = True
 #minPt    = 0.
 #minPt    = 20.
-#minPt    = 27.
-#minPt    = 40.
-minPt    = 50.
-#minPt    = 60.
+#minPt    = 27. # Mu
+#minPt    = 40. # Elec
+minPt    = 50. # UdscJet
+#minPt    = 60. # BJet
 #maxDR    = 999999.
 maxDR    = 0.1
 #maxDR    = 0.2
@@ -57,7 +57,7 @@ maxDR    = 0.1
 # Transfer functions
 # Fit function
 fitFunction        = 'dGauss' # 'sGauss', 'dGauss'
-dependencyFunction = 'linear' # 'linear', 'squared'
+dependencyFunction = 'linear' # 'linear', 'squared', 'resolution'
 norm        = 0 # index of parameter holding the normalisation of the fit functikon
 fitOptions  = 'IBRS+'
 fitRange    = 1. # for Gaussian fits (in units of orig. RMS)

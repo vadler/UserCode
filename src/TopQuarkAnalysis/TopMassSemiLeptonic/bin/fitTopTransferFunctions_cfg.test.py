@@ -22,7 +22,7 @@ objects.append( 'UdscJet' ) # default: dGauss+linear
 # Settings
 overwrite  = False # to throw away earlier versions of histograms, trees and functions
 plot       = False
-writeFiles = False
+writeFiles = True
 # Exclusive switches:
 usePileUp = False
 useAlt    = True # E instead of p
@@ -46,23 +46,23 @@ fitNonRestr    = False
 fitEtaBins     = False
 #minPt    = 0.
 #minPt    = 20.
-#minPt    = 27.
-#minPt    = 40.
-minPt    = 50.
-#minPt    = 60.
+#minPt    = 27. # Mu
+#minPt    = 40. # Elec
+minPt    = 50. # UdscJet
+#minPt    = 60. # BJet
 #maxDR    = 999999.
 maxDR    = 0.1
 #maxDR    = 0.2
 
 # Transfer functions
 # Fit function
-fitFunction        = 'dGauss' # 'sGauss', 'dGauss'
-dependencyFunction = 'linear' # 'linear', 'squared'
+fitFunction        = 'dGauss' # 'sGauss', 'dGauss', 'CB'
+dependencyFunction = 'linear' # 'linear', 'squared', 'resolution'
 norm        = 0 # index of parameter holding the normalisation of the fit functikon
 fitOptions  = 'IBRS+'
 fitRange    = 1. # for Gaussian fits (in units of orig. RMS)
 #fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
-if fitFunction == 'dGauss': # a background function is defined
+if fitFunction != 'sGauss': # a background function is defined
   fitRange = widthFactor # for combined fits (in units of orig. RMS)
 
 # I/O
