@@ -4,7 +4,7 @@
 # $Id$
 #
 
-## CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.py
+## CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF_cfg.py
 #
 #  This script submits batch jobs to the CAF in order to process the full
 #  granularity SiStrip offline DQM.
@@ -26,7 +26,7 @@ import time
 OCT_rwx_r_r = 0744
 # strings
 STR_default              = 'DEFAULT'
-STR_nameInputFilesJobCff = 'inputFiles_cff'
+STR_nameInputFilesJobCff = 'inputFiles.cff'
 STR_nameCmsswPackage     = 'DQM/SiStripMonitorClient'
 STR_textUsage            = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMOfflineCAF.py
  
@@ -79,7 +79,7 @@ STR_textUsage            = """ CMSSW/DQM/SiStripMonitorClient/scripts/submitDQMO
                     /Cosmics/Commissioning08-CRUZET4_v1/RAW
                     /Cosmics/Commissioning08-MW33_v1/RECO
                     /Cosmics/Commissioning08-MW33_v1/RAW
-                    
+         
      -o, --outpath PATH
          path to copy job output *.root files to;
          currently (almost) no check performed;
@@ -318,7 +318,7 @@ if os.path.exists(str_nameRun):
       os.rmdir(os.path.join(str_root, name))
   os.rmdir(str_nameRun)
 os.mkdir(str_nameRun)
-str_pathRunIncludeDir = str_pathCmsswBasePackage + '/python/' + str_nameRun
+str_pathRunIncludeDir = str_pathCmsswBasePackage + '/data/' + str_nameRun
 if os.path.exists(str_pathRunIncludeDir):
   for str_root, str_dirs, str_files in os.walk(str_pathRunIncludeDir, topdown = False):
     for name in str_files:
@@ -333,7 +333,7 @@ str_nameInputFilesFile = str_nameRun + '/' + str_nameRun + '.txt'
 
 int_nInputFiles    = 0
 file_inputFilesCff = file(str_nameInputFilesFile, 'w')
-str_dbsParams    = urllib.urlencode({'dbsInst': 'cms_dbs_prod_global', 'blockName': '*', 'dataset': str_dataset, 'userMode': 'user', 'run': str_runNumber, 'what': 'py'})
+str_dbsParams    = urllib.urlencode({'dbsInst': 'cms_dbs_prod_global', 'blockName': '*', 'dataset': str_dataset, 'userMode': 'user', 'run': str_runNumber, 'what': 'cff'})
 lstr_dbsOutput   = urllib.urlopen("https://cmsweb.cern.ch/dbs_discovery/getLFN_txt", str_dbsParams)
 str_pathDbsStore = DICT_datasets[str_dataset]
 for str_iLine in lstr_dbsOutput.readlines():
@@ -368,7 +368,7 @@ file_mergeScript.write('#!/bin/tcsh\n')
 file_mergeScript.write('cd ' + str_pathCmsswBaseSrc + '\n')
 file_mergeScript.write('cmsenv\n')
 file_mergeScript.write('setenv STAGE_SVCCLASS cmscaf\n')
-file_mergeScript.write('hadd -f ' + str_pathMerge + '/DQM_SiStrip_' + str_nameRun + '_CAF-' + str_nameCmsswRel +'-standAlone.root \\\n') # FIXME: make configurable
+file_mergeScript.write('hadd -f ' + str_pathMerge + '/DQM_SiStrip_' + str_nameRun + '_CAF-' + str_nameCmsswRel +'-standAlone.root \\\n') # --> configurable
 for int_iJob in range(int_nJobs):
   int_nDigits = 1
   if int_iJob >= 10:
@@ -381,41 +381,38 @@ for int_iJob in range(int_nJobs):
   str_nameJobDir = str_nameRun + "/" + str_nameJob
   os.mkdir(str_nameJobDir)
   os.chdir(str_nameJobDir)     
-  str_nameJobIncludeDir = STR_nameCmsswPackage + '/python/' + str_nameJobDir
+  str_nameJobIncludeDir = STR_nameCmsswPackage + '/data/' + str_nameJobDir
   str_pathJobIncludeDir = str_pathRunIncludeDir + '/' + str_nameJob
-  str_includeDirPy      = str_nameJobIncludeDir.replace('/','.')
-  str_includeDirPy      = str_includeDirPy.replace('.python.','.')
   str_outputDir         = '/tmp/' + os.getenv('USER') + '/' + str_nameJobDir
   # create main configuration file
   str_sedCommand = 'sed '
   if bool_filtersOn:
-    str_sedCommand += '-e \"s#HLT_FILTER#    process.hltFilter *#g\" '
+    str_sedCommand += '-e \"s#HLT_FILTER#    hltFilter,#g\" '
   else:
-    str_sedCommand += '-e \"s#HLT_FILTER#\#     process.hltFilter *#g\" '
+    str_sedCommand += '-e \"s#HLT_FILTER#//     hltFilter,#g\" '
   if str_datatier == 'RECO':
-    str_sedCommand += '-e \"s#RECO_FROM_RAW#\#     process.SiStripDQMRecoFromRaw *#g\" -e \"s#DQM_FROM_RAW#\#     process.SiStripDQMSourceGlobalRunCAF_fromRAW *#g\" '
+    str_sedCommand += '-e \"s#RECO_FROM_RAW#//     SiStripDQMRecoFromRaw,#g\" -e \"s#DQM_FROM_RAW#//     SiStripDQMSourceGlobalRunCAF_fromRAW,#g\" '
   else:
-    str_sedCommand += '-e \"s#RECO_FROM_RAW#    process.SiStripDQMRecoFromRaw *#g\" -e \"s#DQM_FROM_RAW#    process.SiStripDQMSourceGlobalRunCAF_fromRAW *#g\" '
-  str_sedCommand += '-e \"s#INCLUDE_DIRECTORY#' + str_includeDirPy + '#g\" '
-  str_sedCommand += '-e \"s#INPUT_FILES#' + str_includeDirPy + '.' + STR_nameInputFilesJobCff + '#g\" '
-  str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripDQMOfflineGlobalRunCAF_template_cfg.py > SiStripDQMOfflineGlobalRunCAF_cfg.py'
+    str_sedCommand += '-e \"s#RECO_FROM_RAW#    SiStripDQMRecoFromRaw,#g\" -e \"s#DQM_FROM_RAW#    SiStripDQMSourceGlobalRunCAF_fromRAW,#g\" '
+  str_sedCommand += '-e \"s#INCLUDE_DIRECTORY#' + str_nameJobIncludeDir + '#g\" '
+  str_sedCommand += '-e \"s#INPUT_FILES#' + str_nameJobIncludeDir + '/' + STR_nameInputFilesJobCff + '#g\" '
+  str_sedCommand += str_pathCmsswBasePackage + '/test/SiStripDQMOfflineGlobalRunCAF_template.cfg > SiStripDQMOfflineGlobalRunCAF.cfg'
   os.system(str_sedCommand)
   # prepare job include dir
   os.mkdir(str_pathJobIncludeDir)
   # create included input files list
-  str_pathInputFilesJobCff = str_pathJobIncludeDir + '/' + STR_nameInputFilesJobCff + '.py'
+  str_pathInputFilesJobCff = str_pathJobIncludeDir + '/' + STR_nameInputFilesJobCff
   file_inputFilesJobCff = file(str_pathInputFilesJobCff, 'w')
-  file_inputFilesJobCff.write('import FWCore.ParameterSet.Config as cms\n\nsource = cms.Source ("PoolSource",\n    fileNames = cms.untracked.vstring (\n')
+  file_inputFilesJobCff.write('  source = PoolSource {\n    untracked vstring fileNames = {\n')
   for n_iActualLine in range(int_nLinesRead, min(int_nLinesRead+nInputFilesJob, int_nInputFiles)):
     # protections vs. those annoying DBS output format changes come here:
-#     str_linesInput = lstr_linesInput[n_iActualLine]
-    str_linesInput = lstr_linesInput[n_iActualLine].replace(') );',',')
+    str_linesInput = lstr_linesInput[n_iActualLine]
     str_actualLine = str_linesInput
     if (n_iActualLine+1)%nInputFilesJob == 0 or int_nLinesRead == int_nInputFiles-1:
       str_actualLine = string.split(str_linesInput, ',')[0] + '\n'
     file_inputFilesJobCff.write(str_actualLine)
     int_nLinesRead += 1
-  file_inputFilesJobCff.write('    )\n)\n')
+  file_inputFilesJobCff.write('    }\n  }\n')
   file_inputFilesJobCff.close()
   # extend merge script
   str_lineMergeScript = str_pathOut + '/DQM_SiStrip_' + str_nameJob + '.root'
@@ -428,7 +425,7 @@ for int_iJob in range(int_nJobs):
   # create included configuration file
   str_sedCommand = 'sed '
   str_sedCommand += '-e \"s#OUTPUT_DIRECTORY#' + str_outputDir + '#g\" '
-  str_sedCommand += str_pathCmsswBasePackage + '/python/SiStripDQMOfflineGlobalRunCAF_template_cff.py > ' + str_pathJobIncludeDir + '/SiStripDQMOfflineGlobalRunCAF_cff.py'
+  str_sedCommand += str_pathCmsswBasePackage + '/data/SiStripDQMOfflineGlobalRunCAF_template.cff > ' + str_pathJobIncludeDir + '/SiStripDQMOfflineGlobalRunCAF.cff'
   os.system(str_sedCommand)
   # create job script
   str_sedCommand = 'sed '
@@ -436,6 +433,7 @@ for int_iJob in range(int_nJobs):
   str_sedCommand += '-e \"s#RUN_NAME#' + str_nameRun + '#g\" '
   str_sedCommand += '-e \"s#JOB_NAME#' + str_nameJob + '#g\" '
   str_sedCommand += '-e \"s#CURRENT_DIR#' + str_pathCurrentDir + '#g\" '
+  str_sedCommand += '-e \"s#_cfg.py#.cfg#g\" '
   if bool_useCastor:
     str_sedCommand += '-e \"s#COPY#rfcp#g\" '
   else:
@@ -451,12 +449,6 @@ for int_iJob in range(int_nJobs):
     print
     break
 file_mergeScript.close()
-
-# compile
-
-os.chdir(str_pathCmsswBasePackage)
-os.system('scramv1 b python')
-os.chdir(str_pathCurrentDir)
 
 # submit jobs
 

@@ -3,7 +3,7 @@
 // Package:    TriggerUtils
 // Class:      GenericTriggerEventFlagTest
 //
-// $Id: GenericTriggerEventFlagTest.cc,v 1.1 2012/01/19 17:18:35 vadler Exp $
+// $Id:$
 //
 /**
   \class    GenericTriggerEventFlagTest
@@ -12,7 +12,7 @@
    This unit test ...
 
   \author   Volker Adler
-  \version  $Id: GenericTriggerEventFlagTest.cc,v 1.1 2012/01/19 17:18:35 vadler Exp $
+  \version  $Id:$
 */
 
 
@@ -23,8 +23,6 @@
 
 class GenericTriggerEventFlagTest : public edm::EDFilter {
 
-    GenericTriggerEventFlag * genericTriggerEventFlag_;
-
   public:
 
     explicit GenericTriggerEventFlagTest( const edm::ParameterSet & iConfig );
@@ -34,6 +32,8 @@ class GenericTriggerEventFlagTest : public edm::EDFilter {
 
     virtual bool beginRun( edm::Run & iRun, const edm::EventSetup & iSetup );
     virtual bool filter( edm::Event & iEvent, const edm::EventSetup & iSetup );
+
+    GenericTriggerEventFlag * genericTriggerEventFlag_;
 
 };
 
