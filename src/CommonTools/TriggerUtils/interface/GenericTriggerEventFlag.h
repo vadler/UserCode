@@ -7,7 +7,7 @@
 // Package:    CommonTools/TriggerUtils
 // Class:      GenericTriggerEventFlag
 //
-// $Id: GenericTriggerEventFlag.h,v 1.6 2012/01/20 18:18:11 vadler Exp $
+// $Id: GenericTriggerEventFlag.h,v 1.2 2010/06/23 22:55:51 vadler Exp $
 //
 /**
   \class    GenericTriggerEventFlag GenericTriggerEventFlag.h "CommonTools/TriggerUtils/interface/GenericTriggerEventFlag.h"
@@ -16,7 +16,7 @@
    [...]
 
   \author   Volker Adler
-  \version  $Id: GenericTriggerEventFlag.h,v 1.6 2012/01/20 18:18:11 vadler Exp $
+  \version  $Id: GenericTriggerEventFlag.h,v 1.2 2010/06/23 22:55:51 vadler Exp $
 */
 
 
@@ -57,13 +57,11 @@ class GenericTriggerEventFlag {
     bool                       andOrL1_;
     bool                       l1BeforeMask_;
     std::string                l1DBKey_;
-    std::vector< std::string > l1LogicalExpressionsCache_;
     std::vector< std::string > l1LogicalExpressions_;
     bool                       errorReplyL1_;
     bool                       andOrHlt_;
     edm::InputTag              hltInputTag_;
     std::string                hltDBKey_;
-    std::vector< std::string > hltLogicalExpressionsCache_;
     std::vector< std::string > hltLogicalExpressions_;
     bool                       errorReplyHlt_;
     // Switches
@@ -74,7 +72,6 @@ class GenericTriggerEventFlag {
     bool onHlt_;
     // Member constants
     const std::string configError_;
-    const std::string emptyKeyError_;
 
   public:
 
@@ -109,18 +106,8 @@ class GenericTriggerEventFlag {
     bool acceptHltLogicalExpression( const edm::Handle< edm::TriggerResults > & hltTriggerResults, std::string hltLogicalExpression ) const;
 
     // Algos
-    std::string expandLogicalExpression( const std::vector< std::string > & target, const std::string & expr, bool useAnd = false ) const;
-    bool negate( std::string & word ) const;
-
-  public:
-
-    // Methods for expert analysis
-
-    std::string gtDBKey()  { return gtDBKey_ ; } // can be empty
-    std::string l1DBKey()  { return l1DBKey_ ; } // can be empty
-    std::string hltDBKey() { return hltDBKey_; } // can be empty
-
     std::vector< std::string > expressionsFromDB( const std::string & key, const edm::EventSetup & setup );
+    bool negate( std::string & word ) const;
 
 };
 

@@ -1,56 +1,39 @@
 //
-// $Id: GenericTriggerEventFlag.cc,v 1.12 2012/04/22 14:21:29 vadler Exp $
+// $Id: GenericTriggerEventFlag.cc,v 1.3 2010/07/16 12:35:58 vadler Exp $
 //
 
 
 #include "CommonTools/TriggerUtils/interface/GenericTriggerEventFlag.h"
 
-#include "FWCore/Framework/interface/ESHandle.h"
-#include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
-#include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerEvmReadoutRecord.h"
 #include "CondFormats/HLTObjects/interface/AlCaRecoTriggerBits.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GtLogicParser.h"
+#include "FWCore/Framework/interface/ESHandle.h"
 
 #include <vector>
 
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-
-
-// Constants' definitions
-static const bool useL1EventSetup( true );
-static const bool useL1GtTriggerMenuLite( false );
+#include <iostream> // DEBUG
 
 
 /// To be called from the ED module's c'tor
 GenericTriggerEventFlag::GenericTriggerEventFlag( const edm::ParameterSet & config )
   : watchDB_( 0 )
-  , hltConfigInit_( false )
-  , andOr_( false )
   , dbLabel_( "" )
   , verbose_( 0 )
-  , andOrDcs_( false )
-  , errorReplyDcs_( false )
-  , andOrGt_( false )
   , gtInputTag_( "" )
   , gtEvmInputTag_( "" )
   , gtDBKey_( "" )
-  , errorReplyGt_( false )
-  , andOrL1_( false )
   , l1BeforeMask_( true )
   , l1DBKey_( "" )
-  , errorReplyL1_( false )
-  , andOrHlt_( false )
   , hltDBKey_( "" )
-  , errorReplyHlt_( false )
   , on_( true )
   , onDcs_( true )
   , onGt_( true )
   , onL1_( true )
   , onHlt_( true )
   , configError_( "CONFIG_ERROR" )
-  , emptyKeyError_( "EMPTY_KEY_ERROR" )
 {
 
   // General switch(es)
@@ -85,24 +68,24 @@ GenericTriggerEventFlag::GenericTriggerEventFlag( const edm::ParameterSet & conf
       onGt_ = false;
     }
     if ( config.exists( "andOrL1" ) ) {
-      andOrL1_                   = config.getParameter< bool >( "andOrL1" );
-      l1LogicalExpressionsCache_ = config.getParameter< std::vector< std::string > >( "l1Algorithms" );
-      errorReplyL1_              = config.getParameter< bool >( "errorReplyL1" );
+      andOrL1_              = config.getParameter< bool >( "andOrL1" );
+      l1LogicalExpressions_ = config.getParameter< std::vector< std::string > >( "l1Algorithms" );
+      errorReplyL1_         = config.getParameter< bool >( "errorReplyL1" );
       if ( config.exists( "l1DBKey" ) )      l1DBKey_      = config.getParameter< std::string >( "l1DBKey" );
       if ( config.exists( "l1BeforeMask" ) ) l1BeforeMask_ = config.getParameter< bool >( "l1BeforeMask" );
     } else {
       onL1_ = false;
     }
     if ( config.exists( "andOrHlt" ) ) {
-      andOrHlt_                   = config.getParameter< bool >( "andOrHlt" );
-      hltInputTag_                = config.getParameter< edm::InputTag >( "hltInputTag" );
-      hltLogicalExpressionsCache_ = config.getParameter< std::vector< std::string > >( "hltPaths" );
-      errorReplyHlt_              = config.getParameter< bool >( "errorReplyHlt" );
+      andOrHlt_              = config.getParameter< bool >( "andOrHlt" );
+      hltInputTag_           = config.getParameter< edm::InputTag >( "hltInputTag" );
+      hltLogicalExpressions_ = config.getParameter< std::vector< std::string > >( "hltPaths" );
+      errorReplyHlt_         = config.getParameter< bool >( "errorReplyHlt" );
       if ( config.exists( "hltDBKey" ) ) hltDBKey_ = config.getParameter< std::string >( "hltDBKey" );
     } else {
       onHlt_ = false;
     }
-    if ( ! onDcs_ && ! onGt_ && ! onL1_ && ! onHlt_ ) on_ = false;
+    if ( ! onDcs_ && ! onGt_ && ! onL1_ && ! onHlt_ ) on_      = false;
     else {
       if ( config.exists( "dbLabel" ) ) dbLabel_ = config.getParameter< std::string >( "dbLabel" );
       watchDB_ = new edm::ESWatcher< AlCaRecoTriggerBitsRcd >;
@@ -121,28 +104,39 @@ GenericTriggerEventFlag::~GenericTriggerEventFlag()
 }
 
 
-/// To be called from beginRun() methods
+/// To be called from beginedm::Run() methods
 void GenericTriggerEventFlag::initRun( const edm::Run & run, const edm::EventSetup & setup )
 {
 
   if ( watchDB_->check( setup ) ) {
+    std::cout << "  GenericTriggerEventFlag::initRun(): GT DB tag : " << gtDBKey_.data() << std::endl; // DEBUG
     if ( onGt_ && gtDBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( gtDBKey_, setup ) );
       if ( exprs.empty() || exprs.at( 0 ) != configError_ ) gtLogicalExpressions_ = exprs;
+      std::cout << "  GenericTriggerEventFlag::initRun(): GT size   : " << gtLogicalExpressions_.size() << std::endl; // DEBUG
+      for ( size_t iE( 0 ); iE < gtLogicalExpressions_.size(); ++iE ) { // DEBUG
+        std::cout << "                                      " << gtLogicalExpressions_.at( iE ) << std::endl; // DEBUG
+      } // DEBUG
     }
+    std::cout << "  GenericTriggerEventFlag::initRun(): L1 DB tag : " << l1DBKey_.data() << std::endl; // DEBUG
     if ( onL1_ && l1DBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( l1DBKey_, setup ) );
-      if ( exprs.empty() || exprs.at( 0 ) != configError_ ) l1LogicalExpressionsCache_ = exprs;
+      if ( exprs.empty() || exprs.at( 0 ) != configError_ ) l1LogicalExpressions_ = exprs;
+      std::cout << "  GenericTriggerEventFlag::initRun(): L1 size   : " << l1LogicalExpressions_.size() << std::endl; // DEBUG
+      for ( size_t iE( 0 ); iE < l1LogicalExpressions_.size(); ++iE ) { // DEBUG
+        std::cout << "                                      " << l1LogicalExpressions_.at( iE ) << std::endl; // DEBUG
+      } // DEBUG
     }
+    std::cout << "  GenericTriggerEventFlag::initRun(): HLT DB tag: " << hltDBKey_.data() << std::endl; // DEBUG
     if ( onHlt_ && hltDBKey_.size() > 0 ) {
       const std::vector< std::string > exprs( expressionsFromDB( hltDBKey_, setup ) );
-      if ( exprs.empty() || exprs.at( 0 ) != configError_ ) hltLogicalExpressionsCache_ = exprs;
+      if ( exprs.empty() || exprs.at( 0 ) != configError_ ) hltLogicalExpressions_ = exprs;
+      std::cout << "  GenericTriggerEventFlag::initRun(): HLT size  : " << hltLogicalExpressions_.size() << std::endl; // DEBUG
+      for ( size_t iE( 0 ); iE < hltLogicalExpressions_.size(); ++iE ) { // DEBUG
+        std::cout << "                                      " << hltLogicalExpressions_.at( iE ) << std::endl; // DEBUG
+      } // DEBUG
     }
   }
-
-  // Re-initialise starting valuse before wild-card expansion
-  l1LogicalExpressions_  = l1LogicalExpressionsCache_;
-  hltLogicalExpressions_ = hltLogicalExpressionsCache_;
 
   hltConfigInit_ = false;
   if ( onHlt_ ) {
@@ -155,54 +149,7 @@ void GenericTriggerEventFlag::initRun( const edm::Run & run, const edm::EventSet
       } else if ( hltConfig_.size() <= 0 ) {
         if ( verbose_ > 0 ) edm::LogError( "GenericTriggerEventFlag" ) << "HLT config size error";
       } else hltConfigInit_ = true;
-    }
-  }
-
-  // Expand version wild-cards in HLT logical expressions
-  // L1
-  if ( onL1_ ) {
-    // build vector of algo names
-    l1Gt_.getL1GtRunCache( run, setup, true, false );
-    edm::ESHandle< L1GtTriggerMenu > handleL1GtTriggerMenu;
-    setup.get< L1GtTriggerMenuRcd >().get( handleL1GtTriggerMenu );
-//     L1GtTriggerMenu l1GtTriggerMenu( *handleL1GtTriggerMenu );
-    std::vector< std::string > algoNames;
-//     const AlgorithmMap l1GtPhys( l1GtTriggerMenu.gtAlgorithmMap() );
-    const AlgorithmMap l1GtPhys( handleL1GtTriggerMenu->gtAlgorithmMap() );
-    for ( CItAlgo iAlgo = l1GtPhys.begin(); iAlgo != l1GtPhys.end(); ++iAlgo ) {
-      algoNames.push_back( iAlgo->second.algoName() );
-    }
-//     const AlgorithmMap l1GtTech( l1GtTriggerMenu.gtTechnicalTriggerMap() );
-    const AlgorithmMap l1GtTech( handleL1GtTriggerMenu->gtTechnicalTriggerMap() );
-    for ( CItAlgo iAlgo = l1GtTech.begin(); iAlgo != l1GtTech.end(); ++iAlgo ) {
-      algoNames.push_back( iAlgo->second.algoName() );
-    }
-    for ( unsigned iExpr = 0; iExpr < l1LogicalExpressions_.size(); ++iExpr ) {
-      std::string l1LogicalExpression( l1LogicalExpressions_.at( iExpr ) );
-      L1GtLogicParser l1AlgoLogicParser( l1LogicalExpression );
-      // Loop over algorithms
-      for ( size_t iAlgo = 0; iAlgo < l1AlgoLogicParser.operandTokenVector().size(); ++iAlgo ) {
-        const std::string l1AlgoName( l1AlgoLogicParser.operandTokenVector().at( iAlgo ).tokenName );
-        if ( l1AlgoName.find( '*' ) != std::string::npos ) {
-          l1LogicalExpression.replace( l1LogicalExpression.find( l1AlgoName ), l1AlgoName.size(), expandLogicalExpression( algoNames, l1AlgoName ) );
-        }
-      }
-      l1LogicalExpressions_[ iExpr ] = l1LogicalExpression;
-    }
-  }
-  // HLT
-  if ( hltConfigInit_ ) {
-    for ( unsigned iExpr = 0; iExpr < hltLogicalExpressions_.size(); ++iExpr ) {
-      std::string hltLogicalExpression( hltLogicalExpressions_.at( iExpr ) );
-      L1GtLogicParser hltAlgoLogicParser( hltLogicalExpression );
-      // Loop over paths
-      for ( size_t iPath = 0; iPath < hltAlgoLogicParser.operandTokenVector().size(); ++iPath ) {
-        const std::string hltPathName( hltAlgoLogicParser.operandTokenVector().at( iPath ).tokenName );
-        if ( hltPathName.find( '*' ) != std::string::npos ) {
-          hltLogicalExpression.replace( hltLogicalExpression.find( hltPathName ), hltPathName.size(), expandLogicalExpression( hltConfig_.triggerNames(), hltPathName ) );
-        }
-      }
-      hltLogicalExpressions_[ iExpr ] = hltLogicalExpression;
+      if ( hltChanged ) std::cout << "  GenericTriggerEventFlag::initRun(): HLT changed"<< std::endl; // DEBUG
     }
   }
 
@@ -291,6 +238,7 @@ bool GenericTriggerEventFlag::acceptDcsPartition( const edm::Handle< DcsStatusCo
   }
 
   // Determine decision
+  std::cout << "  GenericTriggerEventFlag: partition " << dcsPartition << " -> " << dcsStatus->at( 0 ).ready( dcsPartition ) << std::endl; // DEBUG
   return dcsStatus->at( 0 ).ready( dcsPartition );
 
 }
@@ -385,11 +333,15 @@ bool GenericTriggerEventFlag::acceptGtLogicalExpression( const edm::Event & even
     } else {
       if ( verbose_ > 1 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "GT status bit \"" << gtStatusBit << "\" is not defined ==> decision: " << errorReplyGt_;
     }
+    std::cout << "  GenericTriggerEventFlag: status bit \"" << gtStatusBit << "\" -> " << decision << std::endl; // DEBUG
     gtAlgoLogicParser.operandTokenVector().at( iStatusBit ).tokenResult = decision;
   }
 
   // Determine decision
   const bool gtDecision( gtAlgoLogicParser.expressionResult() );
+  std::cout << "  GenericTriggerEventFlag: GT status logical expression "; // DEBUG
+  if ( negExpr ) std::cout << "~\"" << gtLogicalExpression << "\" -> " << ( ! gtDecision ) << std::endl; // DEBUG
+  else           std::cout <<  "\"" << gtLogicalExpression << "\" -> " <<     gtDecision   << std::endl; // DEBUG
   return negExpr ? ( ! gtDecision ) : gtDecision;
 
 }
@@ -403,7 +355,7 @@ bool GenericTriggerEventFlag::acceptL1( const edm::Event & event, const edm::Eve
   if ( ! onL1_ || l1LogicalExpressions_.empty() ) return ( ! andOr_ ); // logically neutral, depending on base logical connective
 
   // Getting the L1 event setup
-  l1Gt_.getL1GtRunCache( event, setup, useL1EventSetup, useL1GtTriggerMenuLite ); // FIXME This can possibly go to initRun()
+  l1Gt_.retrieveL1EventSetup( setup ); // FIXME This can possibly go to initRun()
 
   // Determine decision of L1 logical expression combination and return
   if ( andOrL1_ ) { // OR combination
@@ -442,8 +394,14 @@ bool GenericTriggerEventFlag::acceptL1LogicalExpression( const edm::Event & even
   // Loop over algorithms
   for ( size_t iAlgorithm = 0; iAlgorithm < l1AlgoLogicParser.operandTokenVector().size(); ++iAlgorithm ) {
     const std::string l1AlgoName( l1AlgoLogicParser.operandTokenVector().at( iAlgorithm ).tokenName );
+    std::cout << "  GenericTriggerEventFlag: algo name " << l1AlgoName << std::endl; // DEBUG
     int error( -1 );
     const bool decision( l1BeforeMask_ ? l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) : l1Gt_.decisionAfterMask( event, l1AlgoName, error ) );
+    const std::string choice( l1BeforeMask_ ? "before mask" : "after mask" ); // DEBUG
+    std::cout << "  GenericTriggerEventFlag: " << choice << std::endl; // DEBUG
+    if ( l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) != l1Gt_.decisionAfterMask( event, l1AlgoName, error ) ) { // DEBUG
+      std::cout << "  GenericTriggerEventFlag: before/after " << l1Gt_.decisionBeforeMask( event, l1AlgoName, error ) << "/" << l1Gt_.decisionAfterMask( event, l1AlgoName, error ) << " differ" << std::endl; // DEBUG
+    } // DEBUG
     // Error checks
     if ( error != 0 ) {
       if ( verbose_ > 1 ) {
@@ -454,11 +412,15 @@ bool GenericTriggerEventFlag::acceptL1LogicalExpression( const edm::Event & even
       continue;
     }
     // Manipulate algo decision as stored in the parser
+    std::cout << "  GenericTriggerEventFlag: decision " << decision << std::endl; // DEBUG
     l1AlgoLogicParser.operandTokenVector().at( iAlgorithm ).tokenResult = decision;
   }
 
   // Return decision
   const bool l1Decision( l1AlgoLogicParser.expressionResult() );
+  std::cout << "  GenericTriggerEventFlag: L1 logical expression "; // DEBUG
+  if ( negExpr ) std::cout << "~\"" << l1LogicalExpression << "\" -> " << ( ! l1Decision ) << std::endl; // DEBUG
+  else           std::cout <<  "\"" << l1LogicalExpression << "\" -> " <<     l1Decision   << std::endl; // DEBUG
   return negExpr ? ( ! l1Decision ) : l1Decision;
 
 }
@@ -540,48 +502,34 @@ bool GenericTriggerEventFlag::acceptHltLogicalExpression( const edm::Handle< edm
     }
     // Manipulate algo decision as stored in the parser
     const bool decision( hltTriggerResults->accept( indexPath ) );
+    std::cout << "  GenericTriggerEventFlag: path name " << hltPathName << " -> " << decision << std::endl; // DEBUG
     hltAlgoLogicParser.operandTokenVector().at( iPath ).tokenResult = decision;
   }
 
   // Determine decision
   const bool hltDecision( hltAlgoLogicParser.expressionResult() );
+  std::cout << "  GenericTriggerEventFlag: HLT logical expression "; // DEBUG
+  if ( negExpr ) std::cout << "~\"" << hltLogicalExpression << "\" -> " << ( ! hltDecision ) << std::endl; // DEBUG
+  else           std::cout <<  "\"" << hltLogicalExpression << "\" -> " <<     hltDecision   << std::endl; // DEBUG
   return negExpr ? ( ! hltDecision ) : hltDecision;
 
 }
 
 
 
-/// Expand wild-carded logical expressions, giving version postfixes priority
-std::string GenericTriggerEventFlag::expandLogicalExpression( const std::vector< std::string > & targets, const std::string & expr, bool useAnd ) const
+/// Reads and returns logical expressions from DB
+std::vector< std::string > GenericTriggerEventFlag::expressionsFromDB( const std::string & key, const edm::EventSetup & setup )
 {
 
-  // Find matching entries in the menu
-  std::vector< std::string > matched;
-  const std::string versionWildcard( "_v*" );
-  if ( expr.substr( expr.size() - versionWildcard.size() ) == versionWildcard ) {
-    const std::string exprBase( expr.substr( 0, expr.size() - versionWildcard.size() ) );
-    matched = hltConfig_.restoreVersion( targets, exprBase );
-  } else {
-    matched = hltConfig_.matched( targets, expr );
+  edm::ESHandle< AlCaRecoTriggerBits > logicalExpressions;
+  setup.get< AlCaRecoTriggerBitsRcd >().get( dbLabel_, logicalExpressions );
+  const std::map< std::string, std::string > & expressionMap = logicalExpressions->m_alcarecoToTrig;
+  std::map< std::string, std::string >::const_iterator listIter = expressionMap.find( key );
+  if ( listIter == expressionMap.end() ) {
+    if ( verbose_ > 0 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "No logical expressions found under key " << key << " in 'AlCaRecoTriggerBitsRcd'";
+    return std::vector< std::string >( 1, configError_ );
   }
-
-  // Return input, if no match is found
-  if ( matched.empty() ) {
-    if ( verbose_ > 1 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "Logical expression: \"" << expr << "\" could not be resolved";
-    return expr;
-  }
-
-  // Compose logical expression
-  std::string expanded( "(" );
-  for ( unsigned iVers = 0; iVers < matched.size(); ++iVers ) {
-    if ( iVers > 0 ) expanded.append( useAnd ? " AND " : " OR " );
-    expanded.append( matched.at( iVers ) );
-  }
-  expanded.append( ")" );
-  if ( verbose_ > 1 ) edm::LogInfo( "GenericTriggerEventFlag" ) << "Logical expression: \"" << expr     << "\"\n"
-                                                                << "   --> expanded to  \"" << expanded << "\"";
-
-  return expanded;
+  return logicalExpressions->decompose( listIter->second );
 
 }
 
@@ -597,32 +545,5 @@ bool GenericTriggerEventFlag::negate( std::string & word ) const
     word.erase( 0, 1 );
   }
   return negate;
-
-}
-
-
-
-/// Reads and returns logical expressions from DB
-std::vector< std::string > GenericTriggerEventFlag::expressionsFromDB( const std::string & key, const edm::EventSetup & setup )
-{
-
-  if ( key.size() == 0 ) return std::vector< std::string >( 1, emptyKeyError_ );
-  edm::ESHandle< AlCaRecoTriggerBits > logicalExpressions;
-  std::vector< edm::eventsetup::DataKey > labels;
-  setup.get< AlCaRecoTriggerBitsRcd >().fillRegisteredDataKeys( labels );
-  std::vector< edm::eventsetup::DataKey >::const_iterator iKey = labels.begin();
-  while ( iKey != labels.end() && iKey->name().value() != dbLabel_ ) ++iKey;
-  if ( iKey == labels.end() ) {
-    if ( verbose_ > 0 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "Label " << dbLabel_ << " not found in DB for 'AlCaRecoTriggerBitsRcd'";
-    return std::vector< std::string >( 1, configError_ );
-  }
-  setup.get< AlCaRecoTriggerBitsRcd >().get( dbLabel_, logicalExpressions );
-  const std::map< std::string, std::string > & expressionMap = logicalExpressions->m_alcarecoToTrig;
-  std::map< std::string, std::string >::const_iterator listIter = expressionMap.find( key );
-  if ( listIter == expressionMap.end() ) {
-    if ( verbose_ > 0 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "No logical expressions found under key " << key << " in 'AlCaRecoTriggerBitsRcd'";
-    return std::vector< std::string >( 1, configError_ );
-  }
-  return logicalExpressions->decompose( listIter->second );
 
 }
