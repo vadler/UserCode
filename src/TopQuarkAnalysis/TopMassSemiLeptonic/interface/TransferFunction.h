@@ -84,9 +84,13 @@ namespace my {
       TransferFunction( const TransferFunction & transfer );
 
       /// Constructor from strings
-      /// Functions are entered in the format for filling a TFormula (s. data
-      /// members).
+      /// Functions are entered in the format for filling a TFormula
       TransferFunction( const std::string & fitFunction, const std::string & dependencyFunction = "0", const std::string & dependency = "x" );
+
+      /// Constructor from TF1s
+      /// TFormula members of the TF1s are possibly empty (e.g. TF1 from
+      /// functor).
+      TransferFunction( TF1 * fitFunction, TF1 * dependencyFunction, const std::string & dependency = "x" );
 
       /// Destructor
       virtual ~TransferFunction() {};
@@ -105,6 +109,14 @@ namespace my {
       /// values are not overwritten.
       void SetFitFunction( const std::string & fitFunction, bool clear = true );
 
+      /// Set the fit function.
+      /// TFormula members of the TF1s are possibly empty (e.g. TF1 from
+      /// functor).
+      /// The corresponding parameter vectors are resized according to the
+      /// number of function parameters. If 'clear' is 'false', the existing
+      /// values are not overwritten.
+      void SetFitFunction( TF1 * fitFunction, bool clear = true );
+
       /// Set the dependency function.
       /// The function is entered in the format for filling a TFormula (s. data
       /// members).
@@ -112,6 +124,14 @@ namespace my {
       /// to the number of function parameters. If 'clear' is 'false', the
       /// existing values are not overwritten.
       void SetDependencyFunction( const std::string & dependencyFunction, bool clear = true );
+
+      /// Set the dependency function.
+      /// TFormula members of the TF1s are possibly empty (e.g. TF1 from
+      /// functor).
+      /// The corresponding vector of parameter vectors are resized according
+      /// to the number of function parameters. If 'clear' is 'false', the
+      /// existing values are not overwritten.
+      void SetDependencyFunction( TF1 * dependencyFunction, bool clear = true );
 
       /// Set the name of the dependency variable (e.g. "E_parton", "eta").
       void SetDependency( const std::string & dependency ) { dependency_ = dependency; };

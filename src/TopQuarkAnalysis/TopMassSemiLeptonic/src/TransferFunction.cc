@@ -36,6 +36,18 @@ TransferFunction::TransferFunction( const std::string & fitFunction, const std::
   ClearParameters();
 }
 
+// Constructor from TF1s
+TransferFunction::TransferFunction( TF1 * fitFunction, TF1 * dependencyFunction, const std::string & dependency )
+: fitFunction_( *fitFunction )
+, dependencyFunction_( *dependencyFunction )
+, dependency_( dependency )
+, comment_()
+{
+  ClearParameters();
+  fitFunction_.SetName( "fitFunction" );
+  dependencyFunction_.SetName( "dependencyFunction" );
+}
+
 
 // Methods
 
@@ -47,9 +59,23 @@ void TransferFunction::SetFitFunction( const std::string & fitFunction, bool cle
   clear ? ClearParameters() : ResizeParameters();
 }
 
+void TransferFunction::SetFitFunction( TF1 * fitFunction, bool clear )
+{
+  fitFunction_ = TF1( *fitFunction );
+  fitFunction_.SetName( "fitFunction" );
+  clear ? ClearParameters() : ResizeParameters();
+}
+
 void TransferFunction::SetDependencyFunction( const std::string & dependencyFunction, bool clear )
 {
   dependencyFunction_ = TF1( "dependencyFunction", dependencyFunction.c_str() );
+  clear ? ClearParameters() : ResizeParameters();
+}
+
+void TransferFunction::SetDependencyFunction( TF1 * dependencyFunction, bool clear )
+{
+  dependencyFunction_ = TF1( *dependencyFunction );
+  dependencyFunction_.SetName( "dependencyFunction" );
   clear ? ClearParameters() : ResizeParameters();
 }
 
