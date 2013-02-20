@@ -67,7 +67,7 @@ namespace my {
       std::vector< double > pars1D_;
 
       /// Parameter vectors for 2D
-      /// It holds the results of the fit of thhe dependency function for each
+      /// It holds the results of the fit of the dependency function for each
       /// parameter of the fit function.
       std::vector< std::vector< double > > pars2D_;
 
@@ -246,13 +246,11 @@ namespace my {
       /// the fit and dependency variables.
       double Eval( double dependencyValue, double value, int norm = 0 ) const;
 
-      /// Get the  numerical value of the 1D fit function for given values of
-      /// the fit variable.
-      double Sigma() const { return Parameter( 2 ) + Parameter( 3 ) * Parameter( 5 ); };
+      ///
+//       double Sigma() const { return Parameter( 2 ) + Parameter( 3 ) * Parameter( 5 ); };
 
-      /// Get the  numerical value of the 2D fit function for given values of
-      /// the fit and dependency variables.
-      double Sigma( double dependencyValue ) const;
+      ///
+//       double Sigma( double dependencyValue ) const;
 
       /// Communication
 

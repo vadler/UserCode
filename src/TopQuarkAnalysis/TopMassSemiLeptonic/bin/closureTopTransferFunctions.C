@@ -90,9 +90,9 @@ int main( int argc, char * argv[] )
   // Configuration for transfer functions; need to be identical to those used for the determination
   const edm::ParameterSet & transfer_( process_.getParameter< edm::ParameterSet >( "transfer" ) );
   double fitMaxPt_( transfer_.getParameter< double >( "fitMaxPt" ) );
-  const std::string fitFunction_( transfer_.getParameter< std::string >( "fitFunction" ) );
+  const std::string fitFuncId_( transfer_.getParameter< std::string >( "fitFunction" ) );
   const int norm_( transfer_.getParameter< int >( "norm" ) );
-  const std::string dependencyFunction_( transfer_.getParameter< std::string >( "dependencyFunction" ) );
+  const std::string depFuncId_( transfer_.getParameter< std::string >( "dependencyFunction" ) );
   const double minPt_( transfer_.getParameter< double >( "minPt" ) );
   const double maxDR_( transfer_.getParameter< double >( "maxDR" ) );
   // Configuration for pull distributions
@@ -109,6 +109,29 @@ int main( int argc, char * argv[] )
     std::cout << "'" << objCats_.back() << "'" << std::endl;
   }
 
+  // Set fit functions
+  std::map< std::string, std::string > fitFunctions_;
+  fitFunctions_[ "sGauss" ] = "[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))";                                            // single Gaussian
+  fitFunctions_[ "dGauss" ] = "[0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi))"; // double Gaussian
+  if ( fitFunctions_.find( fitFuncId_ ) == fitFunctions_.end() ) {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "    fit function identifier '" << fitFuncId_ << "' unknown" << std::endl;
+    returnStatus_ += 0x3;
+    return returnStatus_;
+  }
+  const std::string fitFunction_( fitFunctions_[ fitFuncId_ ] );
+  // Set dependency functions
+  std::map< std::string, std::string > dependencyFunctions_;
+  dependencyFunctions_[ "linear" ]  = "[0]+[1]*x";
+  dependencyFunctions_[ "squared" ] = "[0]+[1]*x+[2]*x**2";
+  if ( dependencyFunctions_.find( depFuncId_ ) == dependencyFunctions_.end() ) {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
+    returnStatus_ += 0x4;
+    return returnStatus_;
+  }
+  const std::string dependencyFunction_( dependencyFunctions_[ depFuncId_ ] );
+
   // Set constants
   std::string evtSel_( "analyzeHitFit" );
   if ( refSel_ ) evtSel_.append( "Reference" );
@@ -124,7 +147,7 @@ int main( int argc, char * argv[] )
   std::string titlePtNonRef( refGen_ ? titlePtT : titlePtT + "^{GEN}" );
   const std::string baseTitleEta( useSymm_ ? "|#eta|" : "#eta" );
   const std::string titleEta( refGen_ ? baseTitleEta + "^{GEN}" : baseTitleEta + "^{RECO}" );
-  const std::string titleTransPull( "#frac{#Delta" + titlePtRef + "_{smeared} - " + titlePtNonRef + "}{#sigma}" );
+  const std::string titleTransPull( "#frac{" + titlePtRef + "_{smeared} - " + titlePtNonRef + "}{#sigma}" );
   const std::string titleTransPullMean( "#mu of " + titleTransPull );
   const std::string titleTransPullSigma( "#sigma of " + titleTransPull );
   titlePtRef    += " (GeV)";
@@ -718,56 +741,56 @@ int main( int argc, char * argv[] )
             const Double_t etaGenSymm( useSymm_ ? std::fabs( etaGenEtaBin.at( uPt ).at( uEntry ) ) : etaGenEtaBin.at( uPt ).at( uEntry ) );
             const Double_t etaSymm( useSymm_ ? std::fabs( etaEtaBin.at( uPt ).at( uEntry ) ) : etaEtaBin.at( uPt ).at( uEntry ) );
             const Double_t etaRef( refGen_ ? etaGenSymm : etaSymm );
-            if ( fitNonRestr_ ) {
-              if ( fitEtaBins_ ) {
-                smear = transferEta.Function( ptRef ).GetRandom();
-                sigma = transferEta.Sigma( ptRef );
-                histEtaPtTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaTransPullPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-                histTransPullEtaPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              }
-                smear = fitEtaTransRebin->GetRandom();
-                sigma = transferEta.Sigma();
-                histEtaTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaTransPullMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-                histTransPullEta->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//             if ( fitNonRestr_ ) {
+//               if ( fitEtaBins_ ) {
+//                 smear = transferEta.Function( ptRef ).GetRandom();
+//                 sigma = transferEta.Sigma( ptRef );
+//                 histEtaPtTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//                 histEtaTransPullPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//                 histTransPullEtaPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
 //               }
-              smear = transfer.Function( ptRef ).GetRandom();
-              sigma = transfer.Sigma( ptRef );
-              histVecPtTransPull.at( uPt )->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histVecPtTransPullMapEta.at( uPt )->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histTransPullPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              smear = fitTransRebin->GetRandom();
-              sigma = transferRestr.Sigma();
-              histTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histTransPullMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histTransPullMapEta->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-            }
-            if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
-              if ( fitEtaBins_ ) {
-                smear = transferEtaRestr.Function( ptRef ).GetRandom();
-                sigma = transferEtaRestr.Sigma( ptRef );
-                histEtaPtTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaTransPullRestrPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-                histTransPullRestrEtaPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              }
-                smear = fitEtaTransRestrRebin->GetRandom();
-                sigma = transferEtaRestr.Sigma();
-                histEtaTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-                histEtaTransPullRestrMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-                histTransPullRestrEta->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//                 smear = fitEtaTransRebin->GetRandom();
+//                 sigma = transferEta.Sigma();
+//                 histEtaTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//                 histEtaTransPullMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//                 histTransPullEta->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+// //               }
+//               smear = transfer.Function( ptRef ).GetRandom();
+//               sigma = transfer.Sigma( ptRef );
+//               histVecPtTransPull.at( uPt )->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               histVecPtTransPullMapEta.at( uPt )->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               histTransPullPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               smear = fitTransRebin->GetRandom();
+//               sigma = transferRestr.Sigma();
+//               histTransPull->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               histTransPullMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               histTransPullMapEta->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//             }
+//             if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
+//               if ( fitEtaBins_ ) {
+//                 smear = transferEtaRestr.Function( ptRef ).GetRandom();
+//                 sigma = transferEtaRestr.Sigma( ptRef );
+//                 histEtaPtTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//                 histEtaTransPullRestrPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//                 histTransPullRestrEtaPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
 //               }
-              smear = transferRestr.Function( ptRef ).GetRandom();
-              sigma = transferRestr.Sigma( ptRef );
-              histVecPtTransPullRestr.at( uPt )->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histVecPtTransPullRestrMapEta.at( uPt )->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ));
-              histTransPullRestrPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              smear = fitTransRestrRebin->GetRandom();
-              sigma = transferRestr.Sigma();
-              histTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histTransPullRestrMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-              histTransPullRestrMapEta->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
-            }
+//                 smear = fitEtaTransRestrRebin->GetRandom();
+//                 sigma = transferEtaRestr.Sigma();
+//                 histEtaTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//                 histEtaTransPullRestrMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//                 histTransPullRestrEta->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+// //               }
+//               smear = transferRestr.Function( ptRef ).GetRandom();
+//               sigma = transferRestr.Sigma( ptRef );
+//               histVecPtTransPullRestr.at( uPt )->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               histVecPtTransPullRestrMapEta.at( uPt )->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ));
+//               histTransPullRestrPt->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               smear = fitTransRestrRebin->GetRandom();
+//               sigma = transferRestr.Sigma();
+//               histTransPullRestr->Fill( ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               histTransPullRestrMapPt->Fill( ptRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//               histTransPullRestrMapEta->Fill( etaRef, ( ptRef - ptNonRef - smear ) / sigma, weightEtaBin.at( uPt ).at( uEntry ) );
+//             }
           } // loop: uEntry < ptEtaBin.at( uPt ).size()
 
         } // loop: uPt < nPtBins_

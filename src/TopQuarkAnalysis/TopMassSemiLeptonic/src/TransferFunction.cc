@@ -250,24 +250,24 @@ double TransferFunction::Eval( double dependencyValue, double value, int norm ) 
   return fitFunc.Eval( value );
 }
 
-double TransferFunction::Sigma( double dependencyValue ) const
-{
-  // FIXME: This is too simple. Add checks!
-  TFormula depFunc( dependencyFunction_ );
-  for ( unsigned j = 0; j < NParDependency(); ++j ) {
-    depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 2, j ) ) );
-  }
-  const double par2( depFunc.Eval( dependencyValue ) );
-  for ( unsigned j = 0; j < NParDependency(); ++j ) {
-    depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 3, j ) ) );
-  }
-  const double par3( depFunc.Eval( dependencyValue ) );
-  for ( unsigned j = 0; j < NParDependency(); ++j ) {
-    depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 5, j ) ) );
-  }
-  const double par5( depFunc.Eval( dependencyValue ) );
-  return par2 + par3 * par5;
-}
+// double TransferFunction::Sigma( double dependencyValue ) const
+// {
+//   // FIXME: This is too simple. Add checks!
+//   TFormula depFunc( dependencyFunction_ );
+//   for ( unsigned j = 0; j < NParDependency(); ++j ) {
+//     depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 2, j ) ) );
+//   }
+//   const double par2( depFunc.Eval( dependencyValue ) );
+//   for ( unsigned j = 0; j < NParDependency(); ++j ) {
+//     depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 3, j ) ) );
+//   }
+//   const double par3( depFunc.Eval( dependencyValue ) );
+//   for ( unsigned j = 0; j < NParDependency(); ++j ) {
+//     depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 5, j ) ) );
+//   }
+//   const double par5( depFunc.Eval( dependencyValue ) );
+//   return par2 + par3 * par5;
+// }
 
 // Communication
 
