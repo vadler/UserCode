@@ -29,9 +29,12 @@
 #include "DataFormats/Math/interface/deltaR.h"
 
 #include "CommonTools/MyTools/interface/RootTools.h"
+#include "CommonTools/MyTools/interface/RootFunctions.h"
 #include "TopQuarkAnalysis/TopMassSemiLeptonic/interface/TransferFunction.h"
 
 
+template< typename FitFuncType, typename DepFuncType >
+int run( int argc, char * argv[] );
 // Initialise parameters for fit function
 void setParametersFit( std::string objCat, TF1 * fit, TH1D * histo, std::string fitFuncId, bool scale );
 // Check correct assignment of signal and background to the fit function parameters
@@ -67,6 +70,62 @@ int main( int argc, char * argv[] )
     returnStatus_ += 0x2;
     return returnStatus_;
   }
+
+  // Get the configurations
+  const edm::ParameterSet & process_( edm::readPSetsFrom( argv[ 1 ] )->getParameter< edm::ParameterSet >( "process" ) );
+  const edm::ParameterSet & transfer_( process_.getParameter< edm::ParameterSet >( "transfer" ) );
+  const std::string fitFuncId_( transfer_.getParameter< std::string >( "fitFunction" ) );
+  const std::string depFuncId_( transfer_.getParameter< std::string >( "dependencyFunction" ) );
+
+  if ( fitFuncId_ == "sGauss" ) {
+    if ( depFuncId_ == "linear" )          returnStatus_ += run< my::SingleGaussian, my::Line >( argc, argv );
+    else if ( depFuncId_ == "squared" )    returnStatus_ += run< my::SingleGaussian, my::Parabola >( argc, argv );
+    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::SingleGaussian, my::Resolution >( argc, argv );
+    else {
+      std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
+      returnStatus_ += 0x4;
+      return returnStatus_;
+    }
+  }
+  else if ( fitFuncId_ == "dGauss" ){
+    if ( depFuncId_ == "linear" )          returnStatus_ += run< my::DoubleGaussian, my::Line >( argc, argv );
+    else if ( depFuncId_ == "squared" )    returnStatus_ += run< my::DoubleGaussian, my::Parabola >( argc, argv );
+    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::DoubleGaussian, my::Resolution >( argc, argv );
+    else {
+      std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
+      returnStatus_ += 0x4;
+      return returnStatus_;
+    }
+  }
+  else if ( fitFuncId_ == "CB" ) {
+    if ( depFuncId_ == "linear" )          returnStatus_ += run< my::LowCrystalBall, my::Line >( argc, argv );
+    else if ( depFuncId_ == "squared" )    returnStatus_ += run< my::LowCrystalBall, my::Parabola >( argc, argv );
+    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::LowCrystalBall, my::Resolution >( argc, argv );
+    else {
+      std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
+      returnStatus_ += 0x4;
+      return returnStatus_;
+    }
+  }
+  else {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "    fit function identifier '" << fitFuncId_ << "' unknown" << std::endl;
+    returnStatus_ += 0x3;
+    return returnStatus_;
+  }
+
+  return returnStatus_;
+
+}
+
+template< typename FitFuncType, typename DepFuncType >
+int run( int argc, char * argv[] )
+{
+
+  int returnStatus_( 0 );
 
   // Get the configurations
   const edm::ParameterSet & process_( edm::readPSetsFrom( argv[ 1 ] )->getParameter< edm::ParameterSet >( "process" ) );
@@ -118,30 +177,6 @@ int main( int argc, char * argv[] )
     for ( unsigned uCat = 0; uCat < objCats_.size() - 1; ++uCat ) std::cout << "'" << objCats_.at( uCat ) << "', ";
     std::cout << "'" << objCats_.back() << "'" << std::endl;
   }
-
-  // Set fit functions
-  std::map< std::string, std::string > fitFunctions_;
-  fitFunctions_[ "sGauss" ] = "[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))";                                            // single Gaussian
-  fitFunctions_[ "dGauss" ] = "[0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi))"; // double Gaussian
-  if ( fitFunctions_.find( fitFuncId_ ) == fitFunctions_.end() ) {
-    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-              << "    fit function identifier '" << fitFuncId_ << "' unknown" << std::endl;
-    returnStatus_ += 0x3;
-    return returnStatus_;
-  }
-  const std::string fitFunction_( fitFunctions_[ fitFuncId_ ] );
-  // Set dependency functions
-  std::map< std::string, std::string > dependencyFunctions_;
-  dependencyFunctions_[ "linear" ]     = "[0]+[1]*x";
-  dependencyFunctions_[ "squared" ]    = "[0]+[1]*x+[2]*x**2";
-  dependencyFunctions_[ "resolution" ] = "sqrt([0]**2+[1]**2*x+[2]**2*x**2)";
-  if ( dependencyFunctions_.find( depFuncId_ ) == dependencyFunctions_.end() ) {
-    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
-              << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
-    returnStatus_ += 0x4;
-    return returnStatus_;
-  }
-  const std::string dependencyFunction_( dependencyFunctions_[ depFuncId_ ] );
 
   // Set constants
   std::string evtSel_( "analyzeHitFit" );
@@ -1015,7 +1050,11 @@ int main( int argc, char * argv[] )
         // Transfer function parameters
         const std::string part( refGen_ ? "_parton" : "_reco" );
         std::stringstream comment( std::ios_base::out );
-        my::TransferFunction transferPt( fitFunction_, dependencyFunction_, std::string( titlePtT + part ) );
+        FitFuncType * fitFunc( new FitFuncType() );
+        TF1 * fitFunction( new TF1( "fitFunction", fitFunc, 0., 1., FitFuncType::NPar() ) );
+        DepFuncType * depFunc( new DepFuncType() );
+        TF1 * dependencyFunction( new TF1( "dependencyFunction", depFunc, 0., 1., DepFuncType::NPar() ) );
+        my::TransferFunction transferPt( fitFunction, dependencyFunction, std::string( titlePtT + part ) );
         comment << baseTitlePt << part << " <= " << fitMaxPt_;
         transferPt.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPt( nEtaBins_, transferPt );
@@ -1033,7 +1072,7 @@ int main( int argc, char * argv[] )
         if ( fitNonRestr_ && histTransRebin != 0 ) {
           const std::string nameTransRebinFit( nameTransRebin + "_fit" );
           if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRebinFit << std::endl;
-          TF1 * fitTransRebin( new TF1( nameTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange_ ) ) );
+          TF1 * fitTransRebin( new TF1( nameTransRebinFit.c_str(), fitFunction, std::max( histTransRebin->GetXaxis()->GetXmin(), histTransRebin->GetMean() - histTransRebin->GetRMS() * fitRange_ ), std::min( histTransRebin->GetXaxis()->GetXmax(), histTransRebin->GetMean() + histTransRebin->GetRMS() * fitRange_ ), FitFuncType::NPar() ) );
           setParametersFit( objCat, fitTransRebin, histTransRebin, fitFuncId_, scale_ );
           TFitResultPtr fitTransRebinResultPtr( histTransRebin->Fit( fitTransRebin, fitOptions_.c_str() ) );
           if ( fitTransRebinResultPtr >= 0 ) {
@@ -1074,7 +1113,7 @@ int main( int argc, char * argv[] )
         if ( histTransRestrRebin != 0 ) {
           const std::string nameTransRestrRebinFit( nameTransRestrRebin + "_fit" );
           if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRestrRebinFit << std::endl;
-          TF1 * fitTransRestrRebin( new TF1( nameTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange_ ) ) );
+          TF1 * fitTransRestrRebin( new TF1( nameTransRestrRebinFit.c_str(), fitFunction, std::max( histTransRestrRebin->GetXaxis()->GetXmin(), histTransRestrRebin->GetMean() - histTransRestrRebin->GetRMS() * fitRange_ ), std::min( histTransRestrRebin->GetXaxis()->GetXmax(), histTransRestrRebin->GetMean() + histTransRestrRebin->GetRMS() * fitRange_ ), FitFuncType::NPar() ) );
           setParametersFit( objCat, fitTransRestrRebin, histTransRestrRebin, fitFuncId_, scale_ );
           TFitResultPtr fitTransRestrRebinResultPtr( histTransRestrRebin->Fit( fitTransRestrRebin, fitOptions_.c_str() ) );
           if ( fitTransRestrRebinResultPtr >= 0 ) {
@@ -1144,7 +1183,7 @@ int main( int argc, char * argv[] )
           if ( fitNonRestr_ && histPtTransRebin != 0 ) {
             const std::string namePtTransRebinFit( namePtTransRebin + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << namePtTransRebinFit << std::endl;
-            TF1 * fitPtTransRebin( new TF1( namePtTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange_ ) ) );
+            TF1 * fitPtTransRebin( new TF1( namePtTransRebinFit.c_str(), fitFunction, std::max( histPtTransRebin->GetXaxis()->GetXmin(), histPtTransRebin->GetMean() - histPtTransRebin->GetRMS() * fitRange_ ), std::min( histPtTransRebin->GetXaxis()->GetXmax(), histPtTransRebin->GetMean() + histPtTransRebin->GetRMS() * fitRange_ ), FitFuncType::NPar() ) );
             setParametersFit( objCat, fitPtTransRebin, histPtTransRebin, fitFuncId_, scale_ );
             TFitResultPtr fitPtTransRebinResultPtr( histPtTransRebin->Fit( fitPtTransRebin, fitOptions_.c_str() ) );
             if ( fitPtTransRebinResultPtr >= 0 ) {
@@ -1184,7 +1223,7 @@ int main( int argc, char * argv[] )
           if ( histPtTransRestrRebin != 0 ) {
             const std::string namePtTransRestrRebinFit( namePtTransRestrRebin + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << namePtTransRestrRebinFit << std::endl;
-            TF1 * fitPtTransRestrRebin( new TF1( namePtTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange_ ) ) );
+            TF1 * fitPtTransRestrRebin( new TF1( namePtTransRestrRebinFit.c_str(), fitFunction, std::max( histPtTransRestrRebin->GetXaxis()->GetXmin(), histPtTransRestrRebin->GetMean() - histPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histPtTransRestrRebin->GetXaxis()->GetXmax(), histPtTransRestrRebin->GetMean() + histPtTransRestrRebin->GetRMS() * fitRange_ ), FitFuncType::NPar() ) );
             setParametersFit( objCat, fitPtTransRestrRebin, histPtTransRestrRebin, fitFuncId_, scale_ );
             TFitResultPtr fitPtTransRestrRebinResultPtr( histPtTransRestrRebin->Fit( fitPtTransRestrRebin, fitOptions_.c_str() ) );
             if ( fitPtTransRestrRebinResultPtr >= 0 ) {
@@ -1236,7 +1275,7 @@ int main( int argc, char * argv[] )
             const std::string nameTransRebinPtFitMap( name + "_TransRebin" + baseTitlePt + "_FitMap_Par" + parFit );
             const std::string nameTransRebinPtFitMapFit( nameTransRebinPtFitMap + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRebinPtFitMapFit << std::endl;
-            TF1 * fitTransRebinPtFitMap( new TF1( nameTransRebinPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
+            TF1 * fitTransRebinPtFitMap( new TF1( nameTransRebinPtFitMapFit.c_str(), dependencyFunction, ptBins_.front(), fitMaxPt_, DepFuncType::NPar() ) );
             setParametersDependency( objCat, fitTransRebinPtFitMap, histVecTransRebinPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
             TFitResultPtr fitTransRebinPtFitMapResultPtr( histVecTransRebinPtFitMap.at( uPar )->Fit( fitTransRebinPtFitMap, fitOptions_.c_str() ) );
             if ( fitTransRebinPtFitMapResultPtr >= 0 ) {
@@ -1265,7 +1304,7 @@ int main( int argc, char * argv[] )
           const std::string nameTransRestrRebinPtFitMap( name + "_TransRestrRebin" + baseTitlePt + "_FitMap_Par" + parFit );
           const std::string nameTransRestrRebinPtFitMapFit( nameTransRestrRebinPtFitMap + "_fit" );
           if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRestrRebinPtFitMapFit << std::endl;
-          TF1 * fitTransRestrRebinPtFitMap( new TF1( nameTransRestrRebinPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
+          TF1 * fitTransRestrRebinPtFitMap( new TF1( nameTransRestrRebinPtFitMapFit.c_str(), dependencyFunction, ptBins_.front(), fitMaxPt_, DepFuncType::NPar() ) );
           setParametersDependency( objCat, fitTransRestrRebinPtFitMap, histVecTransRestrRebinPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
           TFitResultPtr fitTransRestrRebinPtFitMapResultPtr( histVecTransRestrRebinPtFitMap.at( uPar )->Fit( fitTransRestrRebinPtFitMap, fitOptions_.c_str() ) );
           if ( fitTransRestrRebinPtFitMapResultPtr >= 0 ) {
@@ -1412,7 +1451,7 @@ int main( int argc, char * argv[] )
             if ( histEtaTransRebin != 0 ) {
               const std::string nameEtaTransRebinFit( nameEtaTransRebin + "_fit" );
               if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaTransRebinFit << std::endl;
-              TF1 * fitEtaTransRebin( new TF1( nameEtaTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaTransRebin->GetXaxis()->GetXmin(), histEtaTransRebin->GetMean() - histEtaTransRebin->GetRMS() * fitRange_ ), std::min( histEtaTransRebin->GetXaxis()->GetXmax(), histEtaTransRebin->GetMean() + histEtaTransRebin->GetRMS() * fitRange_ ) ) );
+              TF1 * fitEtaTransRebin( new TF1( nameEtaTransRebinFit.c_str(), fitFunction, std::max( histEtaTransRebin->GetXaxis()->GetXmin(), histEtaTransRebin->GetMean() - histEtaTransRebin->GetRMS() * fitRange_ ), std::min( histEtaTransRebin->GetXaxis()->GetXmax(), histEtaTransRebin->GetMean() + histEtaTransRebin->GetRMS() * fitRange_ ), FitFuncType::NPar() ) );
               setParametersFit( objCat, fitEtaTransRebin, histEtaTransRebin, fitFuncId_, scale_ );
               TFitResultPtr fitEtaTransRebinResultPtr( histEtaTransRebin->Fit( fitEtaTransRebin, fitOptions_.c_str() ) );
               if ( fitEtaTransRebinResultPtr >= 0 ) {
@@ -1459,7 +1498,7 @@ int main( int argc, char * argv[] )
           if ( histEtaTransRestrRebin != 0 ) {
             const std::string nameEtaTransRestrRebinFit( nameEtaTransRestrRebin + "_fit" );
             if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaTransRestrRebinFit << std::endl;
-            TF1 * fitEtaTransRestrRebin( new TF1( nameEtaTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaTransRestrRebin->GetXaxis()->GetXmin(), histEtaTransRestrRebin->GetMean() - histEtaTransRestrRebin->GetRMS() * fitRange_ ), std::min( histEtaTransRestrRebin->GetXaxis()->GetXmax(), histEtaTransRestrRebin->GetMean() + histEtaTransRestrRebin->GetRMS() * fitRange_ ) ) );
+            TF1 * fitEtaTransRestrRebin( new TF1( nameEtaTransRestrRebinFit.c_str(), fitFunction, std::max( histEtaTransRestrRebin->GetXaxis()->GetXmin(), histEtaTransRestrRebin->GetMean() - histEtaTransRestrRebin->GetRMS() * fitRange_ ), std::min( histEtaTransRestrRebin->GetXaxis()->GetXmax(), histEtaTransRestrRebin->GetMean() + histEtaTransRestrRebin->GetRMS() * fitRange_ ), FitFuncType::NPar() ) );
             setParametersFit( objCat, fitEtaTransRestrRebin, histEtaTransRestrRebin, fitFuncId_, scale_ );
             TFitResultPtr fitEtaTransRestrRebinResultPtr( histEtaTransRestrRebin->Fit( fitEtaTransRestrRebin, fitOptions_.c_str() ) );
             if ( fitEtaTransRestrRebinResultPtr >= 0 ) {
@@ -1539,7 +1578,7 @@ int main( int argc, char * argv[] )
                 if ( histEtaPtTransRebin != 0 ) {
                   const std::string nameEtaPtTransRebinFit( nameEtaPtTransRebin + "_fit" );
                   if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaPtTransRebinFit << std::endl;
-                  TF1 * fitEtaPtTransRebin( new TF1( nameEtaPtTransRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtTransRebin->GetXaxis()->GetXmin(), histEtaPtTransRebin->GetMean() - histEtaPtTransRebin->GetRMS() * fitRange_ ), std::min( histEtaPtTransRebin->GetXaxis()->GetXmax(), histEtaPtTransRebin->GetMean() + histEtaPtTransRebin->GetRMS() * fitRange_ ) ) );
+                  TF1 * fitEtaPtTransRebin( new TF1( nameEtaPtTransRebinFit.c_str(), fitFunction, std::max( histEtaPtTransRebin->GetXaxis()->GetXmin(), histEtaPtTransRebin->GetMean() - histEtaPtTransRebin->GetRMS() * fitRange_ ), std::min( histEtaPtTransRebin->GetXaxis()->GetXmax(), histEtaPtTransRebin->GetMean() + histEtaPtTransRebin->GetRMS() * fitRange_ ), FitFuncType::NPar() ) );
                   setParametersFit( objCat, fitEtaPtTransRebin, histEtaPtTransRebin, fitFuncId_, scale_ );
                   TFitResultPtr fitEtaPtTransRebinResultPtr( histEtaPtTransRebin->Fit( fitEtaPtTransRebin, fitOptions_.c_str() ) );
                   if ( fitEtaPtTransRebinResultPtr >= 0 ) {
@@ -1583,7 +1622,7 @@ int main( int argc, char * argv[] )
               if ( histEtaPtTransRestrRebin != 0 ) {
                 const std::string nameEtaPtTransRestrRebinFit( nameEtaPtTransRestrRebin + "_fit" );
                 if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameEtaPtTransRestrRebinFit << std::endl;
-                TF1 * fitEtaPtTransRestrRebin( new TF1( nameEtaPtTransRestrRebinFit.c_str(), fitFunction_.c_str(), std::max( histEtaPtTransRestrRebin->GetXaxis()->GetXmin(), histEtaPtTransRestrRebin->GetMean() - histEtaPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histEtaPtTransRestrRebin->GetXaxis()->GetXmax(), histEtaPtTransRestrRebin->GetMean() + histEtaPtTransRestrRebin->GetRMS() * fitRange_ ) ) );
+                TF1 * fitEtaPtTransRestrRebin( new TF1( nameEtaPtTransRestrRebinFit.c_str(), fitFunction, std::max( histEtaPtTransRestrRebin->GetXaxis()->GetXmin(), histEtaPtTransRestrRebin->GetMean() - histEtaPtTransRestrRebin->GetRMS() * fitRange_ ), std::min( histEtaPtTransRestrRebin->GetXaxis()->GetXmax(), histEtaPtTransRestrRebin->GetMean() + histEtaPtTransRestrRebin->GetRMS() * fitRange_ ), FitFuncType::NPar() ) );
                 setParametersFit( objCat, fitEtaPtTransRestrRebin, histEtaPtTransRestrRebin, fitFuncId_, scale_ );
                 TFitResultPtr fitEtaPtTransRestrRebinResultPtr( histEtaPtTransRestrRebin->Fit( fitEtaPtTransRestrRebin, fitOptions_.c_str() ) );
                 if ( fitEtaPtTransRestrRebinResultPtr >= 0 ) {
@@ -1647,7 +1686,7 @@ int main( int argc, char * argv[] )
                 const std::string nameTransRebinEtaPtFitMap( nameEta + "_TransRebin" + baseTitlePt + "_FitMap_Par" + parFit );
                 const std::string nameTransRebinEtaPtFitMapFit( nameTransRebinEtaPtFitMap + "_fit" );
                 if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRebinEtaPtFitMapFit << std::endl;
-                TF1 * fitTransRebinEtaPtFitMap( new TF1( nameTransRebinEtaPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
+                TF1 * fitTransRebinEtaPtFitMap( new TF1( nameTransRebinEtaPtFitMapFit.c_str(), dependencyFunction, ptBins_.front(), fitMaxPt_, DepFuncType::NPar() ) );
                 setParametersDependency( objCat, fitTransRebinEtaPtFitMap, histVecTransRebinEtaPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
                 TFitResultPtr fitTransRebinEtaPtFitMapResultPtr( histVecTransRebinEtaPtFitMap.at( uPar )->Fit( fitTransRebinEtaPtFitMap, fitOptions_.c_str() ) );
                 if ( fitTransRebinEtaPtFitMapResultPtr >= 0 ) {
@@ -1678,7 +1717,7 @@ int main( int argc, char * argv[] )
               const std::string nameTransRestrRebinEtaPtFitMap( nameEta + "_TransRestrRebin" + baseTitlePt + "_FitMap_Par" + parFit );
               const std::string nameTransRestrRebinEtaPtFitMapFit( nameTransRestrRebinEtaPtFitMap + "_fit" );
               if ( verbose_ > 2 ) std::cout << argv[ 0 ] << " --> FIT: " << nameTransRestrRebinEtaPtFitMapFit << std::endl;
-              TF1 * fitTransRestrRebinEtaPtFitMap( new TF1( nameTransRestrRebinEtaPtFitMapFit.c_str(), dependencyFunction_.c_str(), ptBins_.front(), fitMaxPt_ ) );
+              TF1 * fitTransRestrRebinEtaPtFitMap( new TF1( nameTransRestrRebinEtaPtFitMapFit.c_str(), dependencyFunction, ptBins_.front(), fitMaxPt_, DepFuncType::NPar() ) );
               setParametersDependency( objCat, fitTransRestrRebinEtaPtFitMap, histVecTransRestrRebinEtaPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
               TFitResultPtr fitTransRestrRebinEtaPtFitMapResultPtr( histVecTransRestrRebinEtaPtFitMap.at( uPar )->Fit( fitTransRestrRebinEtaPtFitMap, fitOptions_.c_str() ) );
               if ( fitTransRestrRebinEtaPtFitMapResultPtr >= 0 ) {
@@ -2112,17 +2151,17 @@ void setParametersDependency( std::string objCat, TF1 * dep, TH1D * histo, std::
     else if ( objCat == "BJet" ) {
     }
     else if ( objCat == "Elec" ) {
+      // Noise
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 0 || par % 3 == 2 ) {
+        }
+      }
+      // Resolution
+      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+        if ( par % 3 == 0 || par % 3 == 2 ) {
+        }
+      }
       // Constant
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-        }
-      }
-      // Slope
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-        }
-      }
-      // Curvature
       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
         if ( par % 3 == 1 ) {
 //           dep->FixParameter( 2, 0. );

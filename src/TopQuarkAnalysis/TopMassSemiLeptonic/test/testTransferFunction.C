@@ -60,9 +60,9 @@ int main( int argc, char * argv[] )
   assert( testFuncGauss4.Eval( 0., 0. )   == testFuncGauss1.Eval( 0., 0. ) );
   assert( testFuncGauss4.Eval( 0., 1. )   == testFuncGauss1.Eval( 0., 1. ) );
 
-  my::SingleGaussian * myGauss = new my::SingleGaussian();
+  my::SingleGaussian * myGauss( new my::SingleGaussian() );
   TF1 * gauss5( new TF1( "gauss5", myGauss, 0., 1., my::SingleGaussian::NPar() ) );
-  my::Line * myLine = new my::Line();
+  my::Line * myLine( new my::Line() );
   TF1 * line5( new TF1( "line5", myLine, 0., 1., my::Line::NPar() ) );
   my::TransferFunction testFuncGauss5( gauss5, line5 );
   assert(   testFuncGauss5.SetParameters( 0, pars ) );

@@ -16,8 +16,8 @@ using namespace my;
 
 // Constructor from TransferFunction (copy c'tor)
 TransferFunction::TransferFunction( const TransferFunction & transfer )
-: fitFunction_( "fitFunction", transfer.FitFunction().c_str() )
-, dependencyFunction_( "dependencyFunction", transfer.DependencyFunction().c_str() )
+: fitFunction_( transfer.GetFitFunction() )
+, dependencyFunction_( transfer.GetDependencyFunction() )
 , dependency_( transfer.Dependency() )
 , comment_( transfer.Comment() )
 {
@@ -130,8 +130,8 @@ void TransferFunction::ClearParameters()
 
 void TransferFunction::ResizeParameters()
 {
-  pars1D_.resize( fitFunction_.GetNpar() );
-  pars2D_.resize( dependencyFunction_.GetNpar(), std::vector< double >( fitFunction_.GetNpar() ) );
+  pars1D_.resize( GetFitFunction().GetNpar() );
+  pars2D_.resize( GetDependencyFunction().GetNpar(), std::vector< double >( GetFitFunction().GetNpar() ) );
 }
 
 // Getters
@@ -189,7 +189,7 @@ TF1 TransferFunction::Function( double dependencyValue, int norm ) const
   std::vector< double > pars;
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) continue;
-    TF1 depFunc( dependencyFunction_ );
+    TF1 depFunc( GetDependencyFunction() );
     for ( unsigned j = 0; j < NParDependency(); ++j ) {
       depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
@@ -231,13 +231,13 @@ std::string TransferFunction::Formula( int norm ) const
 
 std::string TransferFunction::Formula( double dependencyValue, int norm ) const
 {
-  TF1 fitFunc( fitFunction_ );
+  TF1 fitFunc( GetFitFunction() );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
       continue;
     }
-    TF1 depFunc( dependencyFunction_ );
+    TF1 depFunc( GetDependencyFunction() );
     for ( unsigned j = 0; j < NParDependency(); ++j ) {
       depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
@@ -248,7 +248,7 @@ std::string TransferFunction::Formula( double dependencyValue, int norm ) const
 
 double TransferFunction::Eval( double value, int norm ) const
 {
-  TF1 fitFunc( fitFunction_ );
+  TF1 fitFunc( GetFitFunction() );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
@@ -261,13 +261,13 @@ double TransferFunction::Eval( double value, int norm ) const
 
 double TransferFunction::Eval( double dependencyValue, double value, int norm ) const
 {
-  TF1 fitFunc( fitFunction_ );
+  TF1 fitFunc( GetFitFunction() );
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
       continue;
     }
-    TF1 depFunc( dependencyFunction_ );
+    TF1 depFunc( GetDependencyFunction() );
     for ( unsigned j = 0; j < NParDependency(); ++j ) {
       depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
     }
@@ -279,7 +279,7 @@ double TransferFunction::Eval( double dependencyValue, double value, int norm ) 
 // double TransferFunction::Sigma( double dependencyValue ) const
 // {
 //   // FIXME: This is too simple. Add checks!
-//   TF1 depFunc( dependencyFunction_ );
+//   TF1 depFunc( GetDependencyFunction() );
 //   for ( unsigned j = 0; j < NParDependency(); ++j ) {
 //     depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( 2, j ) ) );
 //   }
@@ -299,10 +299,15 @@ double TransferFunction::Eval( double dependencyValue, double value, int norm ) 
 
 std::string TransferFunction::Print( bool useNan ) const
 {
+  const bool noFitFunc( FitFunction().empty() );
+  const bool noDepFunc( DependencyFunction().empty() );
+
   std::stringstream print( std::ios_base::out );
   print << std::endl;
-  print << "FitFunction       : \t" << FitFunction() << std::endl;
-  print << "DependencyFunction: \t" << DependencyFunction() << " \ton " << Dependency() << std::endl;
+  if ( noFitFunc ) print << "FitFunction       : \tnot available, constructed from C++ class." << std::endl;
+  else             print << "FitFunction       : \t" << FitFunction() << std::endl;
+  if ( noDepFunc ) print << "DependencyFunction: \tnot available, constructed from C++ class; \ton " << Dependency() << std::endl;
+  else             print << "DependencyFunction: \t" << DependencyFunction() << " \ton " << Dependency() << std::endl;
   print << "Comment           : \t" << Comment() << std::endl << std::endl;
 
   print << "Parameters 1D:" << std::endl;
@@ -312,14 +317,14 @@ std::string TransferFunction::Print( bool useNan ) const
     else print << Parameter( i );
     print << std::endl;
   }
-  print << "[all]: \t" << PrintFit1D( useNan ) << std::endl;
+  if ( ! noFitFunc ) print << "[all]: \t" << PrintFit1D( useNan ) << std::endl;
   print << std::endl;
 
   print << "Parameters 2D (DependencyFunction):" << std::endl;
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     print << "[" << i << "]: \t"  << PrintDependency( i, useNan ) << std::endl;
   }
-  print << "[all]: \t" << PrintFit2D( useNan ) << std::endl;
+  if ( ! noFitFunc ) print << "[all]: \t" << PrintFit2D( useNan ) << std::endl;
 
   return print.str();
 }
@@ -353,16 +358,30 @@ std::string TransferFunction::PrintFit2D( bool useNan ) const
 
 std::string TransferFunction::PrintDependency( unsigned i, bool useNan ) const
 {
-    TF1 depFunc( dependencyFunction_ );
+  TF1 depFunc( GetDependencyFunction() );
+  for ( unsigned j = 0; j < NParDependency(); ++j ) {
+    depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
+  }
+
+  if ( DependencyFunction().empty() ) {
+    std::stringstream print( std::ios_base::out );
     for ( unsigned j = 0; j < NParDependency(); ++j ) {
-      depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
+      if ( j > 0 ) print << " \t";
+      if ( useNan && Parameter( i, j ) == transferFunctionInitConst )
+        print << "NAN";
+      else
+        print << Parameter( i, j );
     }
+    return print.str();
+  }
+  else {
     TString depStr( depFunc.GetExpFormula( "p" ) );
     depStr.ReplaceAll( "x", Dependency() ); // FIXME: This assumes no other 'x' than from the variable (e.g. no "exp")
     TString failStr( "e" + Dependency() + "p" );
     depStr.ReplaceAll( failStr, "x" ); // Fixing unwanted replacements
     if ( useNan ) depStr.ReplaceAll( boost::lexical_cast< std::string >( transferFunctionInitConst ).c_str(), "NAN" );
     return std::string( depStr.Data() );
+  }
 }
 
 TransferFunction TransferFunction::Read( const std::string & stream )

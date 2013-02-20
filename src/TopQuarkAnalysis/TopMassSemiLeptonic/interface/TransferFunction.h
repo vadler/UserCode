@@ -184,12 +184,18 @@ namespace my {
       /// Getters
 
       /// Get the fit function.
+      TF1 GetFitFunction() const { return fitFunction_; };
+
+      /// Get the fit function.
       /// The function is returned in the format for filling a TFormula (s.
       /// data members).
       std::string FitFunction() const { return std::string( fitFunction_.GetTitle() ); };
 
       /// Get the number of parameters in the fit function.
       unsigned NParFit() const { return pars1D_.size(); };
+
+      /// Get the dependency function.
+      TF1 GetDependencyFunction() const { return dependencyFunction_; };
 
       /// Get the dependency function.
       /// The function is returned in the format for filling a TFormula (s.
