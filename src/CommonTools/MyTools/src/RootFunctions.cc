@@ -30,7 +30,7 @@ Double_t my::Parabola::operator()( Double_t * x, Double_t * par )
 }
 
 
-Double_t my::Resolution::operator()( Double_t * x, Double_t * par )
+Double_t my::ResolutionLike::operator()( Double_t * x, Double_t * par )
 {
 
   Double_t value( -1.);

@@ -7,12 +7,28 @@
 
 namespace my {
 
+  /// Base functions
+
+  /// Generic function base class
+  class Function {
+    public:
+      virtual Double_t operator()( Double_t * x, Double_t * par ) = 0;
+  };
+
+  /// Generic resolution function base class
+  class Resolution : public Function {
+    public:
+      virtual Double_t Sigma( Double_t * par ) = 0;
+  };
+
+  /// Function implementations
+
   /// Line with the following parameters:
   /// - [0]: y-intercept
   /// - [1]: gradient
-  class Line {
+  class Line : public Function {
     public:
-      Double_t operator()( Double_t * x, Double_t * par );
+      virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 2; };
   };
 
@@ -20,9 +36,9 @@ namespace my {
   /// - [0]: y-intercept
   /// - [1]: gradient
   /// - [2]: curvature
-  class Parabola {
+  class Parabola : public Function {
     public:
-      Double_t operator()( Double_t * x, Double_t * par );
+      virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 3; };
   };
 
@@ -31,9 +47,9 @@ namespace my {
   /// - [1]: resolution
   /// - [2]: constant
   /// Returns -1. in case of error
-  class Resolution {
+  class ResolutionLike : public Function {
     public:
-      Double_t operator()( Double_t * x, Double_t * par );
+      virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 3; };
   };
 
@@ -42,11 +58,11 @@ namespace my {
   /// - [1]: Gaussian mean
   /// - [2]: Gaussian sigma
   /// Returns -1. in case of error
-  class SingleGaussian {
+  class SingleGaussian : public Resolution {
     public:
-      Double_t operator()( Double_t * x, Double_t * par );
+      virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 3; };
-      Double_t Sigma( Double_t * par );
+      virtual Double_t Sigma( Double_t * par );
   };
 
   /// Normalised double Gaussian with the following parameters:
@@ -57,11 +73,11 @@ namespace my {
   /// - [4]: second Gaussian mean
   /// - [5]: second Gaussian sigma
   /// Returns -1. in case of error
-  class DoubleGaussian {
+  class DoubleGaussian : public Resolution {
     public:
-      Double_t operator()( Double_t * x, Double_t * par );
+      virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 6; };
-      Double_t Sigma( Double_t * par );
+      virtual Double_t Sigma( Double_t * par );
   };
 
   /// Normalised low sided Crystal Ball function with the following parameters:
@@ -71,11 +87,11 @@ namespace my {
   /// - [3]: transition position
   /// - [4]: power law parameter
   /// Returns -1. in case of error
-  class LowCrystalBall {
+  class LowCrystalBall : public Resolution {
     public:
-      Double_t operator()( Double_t * x, Double_t * par );
+      virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 5; };
-      Double_t Sigma( Double_t * par );
+      virtual Double_t Sigma( Double_t * par );
   };
 
   /// Normalised double sided Crystal Ball function with the following parameters:
@@ -87,11 +103,11 @@ namespace my {
   /// - [5]: transition position second power law
   /// - [6]: second power law parameter
   /// Returns -1. in case of error
-  class DoubleCrystalBall {
+  class DoubleCrystalBall : public Resolution {
     public:
-      Double_t operator()( Double_t * x, Double_t * par );
+      virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 7; };
-      Double_t Sigma( Double_t * par );
+      virtual Double_t Sigma( Double_t * par );
   };
 
 }
