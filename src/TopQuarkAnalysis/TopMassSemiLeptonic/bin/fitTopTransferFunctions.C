@@ -80,7 +80,7 @@ int main( int argc, char * argv[] )
   if ( fitFuncId_ == "sGauss" ) {
     if ( depFuncId_ == "linear" )          returnStatus_ += run< my::SingleGaussian, my::Line >( argc, argv );
     else if ( depFuncId_ == "squared" )    returnStatus_ += run< my::SingleGaussian, my::Parabola >( argc, argv );
-    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::SingleGaussian, my::Resolution >( argc, argv );
+    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::SingleGaussian, my::ResolutionLike >( argc, argv );
     else {
       std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
                 << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
@@ -91,7 +91,7 @@ int main( int argc, char * argv[] )
   else if ( fitFuncId_ == "dGauss" ){
     if ( depFuncId_ == "linear" )          returnStatus_ += run< my::DoubleGaussian, my::Line >( argc, argv );
     else if ( depFuncId_ == "squared" )    returnStatus_ += run< my::DoubleGaussian, my::Parabola >( argc, argv );
-    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::DoubleGaussian, my::Resolution >( argc, argv );
+    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::DoubleGaussian, my::ResolutionLike >( argc, argv );
     else {
       std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
                 << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
@@ -102,7 +102,7 @@ int main( int argc, char * argv[] )
   else if ( fitFuncId_ == "CB" ) {
     if ( depFuncId_ == "linear" )          returnStatus_ += run< my::LowCrystalBall, my::Line >( argc, argv );
     else if ( depFuncId_ == "squared" )    returnStatus_ += run< my::LowCrystalBall, my::Parabola >( argc, argv );
-    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::LowCrystalBall, my::Resolution >( argc, argv );
+    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::LowCrystalBall, my::ResolutionLike >( argc, argv );
     else {
       std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
                 << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
@@ -1090,7 +1090,9 @@ int run( int argc, char * argv[] )
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                           << "    failing fit in directory '"; dirOutFit_->pwd();
-                std::cout << "    '" << nameTransRebin << "' status " << fitTransRebinResultPtr->Status() << std::endl;
+                if ( fitTransRebinResultPtr->Status() != 0 ) std::cout << "    '" << nameTransRebin << "' status " << fitTransRebinResultPtr->Status() << std::endl;
+                if ( fitTransRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << nameTransRebin << "' prob   " << fitTransRebinResultPtr->Prob()   << std::endl;
+                if ( fitTransRebinResultPtr->Ndf() == 0. )   std::cout << "    '" << nameTransRebin << "' ndf    " << fitTransRebinResultPtr->Ndf()    << std::endl;
               }
             }
           }
@@ -1131,7 +1133,9 @@ int run( int argc, char * argv[] )
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                           << "    failing fit in directory '"; dirOutFit_->pwd();
-                std::cout << "    '" << nameTransRestrRebin << "' status " << fitTransRestrRebinResultPtr->Status() << std::endl;
+                if ( fitTransRestrRebinResultPtr->Status() != 0 ) std::cout << "    '" << nameTransRestrRebin << "' status " << fitTransRestrRebinResultPtr->Status() << std::endl;
+                if ( fitTransRestrRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << nameTransRestrRebin << "' prob   " << fitTransRestrRebinResultPtr->Prob()   << std::endl;
+                if ( fitTransRestrRebinResultPtr->Ndf() == 0. )   std::cout << "    '" << nameTransRestrRebin << "' ndf    " << fitTransRestrRebinResultPtr->Ndf()    << std::endl;
               }
             }
           }
@@ -1204,7 +1208,9 @@ int run( int argc, char * argv[] )
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    failing fit in directory '"; dirOutFit_->pwd();
-                  std::cout << "    '" << namePtTransRebin << "' status " << fitPtTransRebinResultPtr->Status() << std::endl;
+                  if ( fitPtTransRebinResultPtr->Status() != 0 ) std::cout << "    '" << namePtTransRebin << "' status " << fitPtTransRebinResultPtr->Status() << std::endl;
+                  if ( fitPtTransRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << namePtTransRebin << "' prob   " << fitPtTransRebinResultPtr->Prob()   << std::endl;
+                  if ( fitPtTransRebinResultPtr->Ndf() == 0. )   std::cout << "    '" << namePtTransRebin << "' ndf    " << fitPtTransRebinResultPtr->Ndf()    << std::endl;
                 }
               }
             }
@@ -1244,7 +1250,9 @@ int run( int argc, char * argv[] )
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    failing fit in directory '"; dirOutFit_->pwd();
-                  std::cout << "    '" << namePtTransRestrRebin << "' status " << fitPtTransRestrRebinResultPtr->Status() << std::endl;
+                  if ( fitPtTransRestrRebinResultPtr->Status() != 0 ) std::cout << "    '" << namePtTransRestrRebin << "' status " << fitPtTransRestrRebinResultPtr->Status() << std::endl;
+                  if ( fitPtTransRestrRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << namePtTransRestrRebin << "' prob   " << fitPtTransRestrRebinResultPtr->Prob()   << std::endl;
+                  if ( fitPtTransRestrRebinResultPtr->Ndf() == 0. )   std::cout << "    '" << namePtTransRestrRebin << "' ndf    " << fitPtTransRestrRebinResultPtr->Ndf()    << std::endl;
                 }
               }
             }
@@ -1279,7 +1287,7 @@ int run( int argc, char * argv[] )
             setParametersDependency( objCat, fitTransRebinPtFitMap, histVecTransRebinPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
             TFitResultPtr fitTransRebinPtFitMapResultPtr( histVecTransRebinPtFitMap.at( uPar )->Fit( fitTransRebinPtFitMap, fitOptions_.c_str() ) );
             if ( fitTransRebinPtFitMapResultPtr >= 0 ) {
-              if ( fitTransRebinPtFitMapResultPtr->Status() == 0 && fitTransRebinPtFitMapResultPtr->Prob() > 0. && fitTransRebinPtFitMapResultPtr->Ndf() != 0. ) {
+              if ( fitTransRebinPtFitMapResultPtr->Status() == 0 && fitTransRebinPtFitMapResultPtr->Ndf() != 0. ) {
                 for ( unsigned uDep = 0; uDep < nDep; ++uDep ) {
                   transferPt.SetParameter( uPar, uDep, fitTransRebinPtFitMap->GetParameter( uDep ) );
                 }
@@ -1288,7 +1296,8 @@ int run( int argc, char * argv[] )
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    failing fit in directory '"; dirOutFit_->pwd();
-                  std::cout << "    '" << nameTransRebinPtFitMap << "' status " << fitTransRebinPtFitMapResultPtr->Status() << std::endl;
+                  if ( fitTransRebinPtFitMapResultPtr->Status() != 0 ) std::cout << "    '" << nameTransRebinPtFitMap << "' status " << fitTransRebinPtFitMapResultPtr->Status() << std::endl;
+                  if ( fitTransRebinPtFitMapResultPtr->Ndf() == 0. )   std::cout << "    '" << nameTransRebinPtFitMap << "' ndf    " << fitTransRebinPtFitMapResultPtr->Ndf()    << std::endl;
                 }
               }
             }
@@ -1308,7 +1317,7 @@ int run( int argc, char * argv[] )
           setParametersDependency( objCat, fitTransRestrRebinPtFitMap, histVecTransRestrRebinPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
           TFitResultPtr fitTransRestrRebinPtFitMapResultPtr( histVecTransRestrRebinPtFitMap.at( uPar )->Fit( fitTransRestrRebinPtFitMap, fitOptions_.c_str() ) );
           if ( fitTransRestrRebinPtFitMapResultPtr >= 0 ) {
-            if ( fitTransRestrRebinPtFitMapResultPtr->Status() == 0 && fitTransRestrRebinPtFitMapResultPtr->Prob() > 0. && fitTransRestrRebinPtFitMapResultPtr->Ndf() != 0. ) {
+            if ( fitTransRestrRebinPtFitMapResultPtr->Status() == 0 && fitTransRestrRebinPtFitMapResultPtr->Ndf() != 0. ) {
               for ( unsigned uDep = 0; uDep < nDep; ++uDep ) {
                 transferPtRestr.SetParameter( uPar, uDep, fitTransRestrRebinPtFitMap->GetParameter( uDep ) );
               }
@@ -1317,7 +1326,8 @@ int run( int argc, char * argv[] )
               if ( verbose_ > 2 ) {
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                           << "    failing fit in directory '"; dirOutFit_->pwd();
-                std::cout << "    '" << nameTransRestrRebinPtFitMap << "' status " << fitTransRestrRebinPtFitMapResultPtr->Status() << std::endl;
+                if ( fitTransRestrRebinPtFitMapResultPtr->Status() != 0 ) std::cout << "    '" << nameTransRestrRebinPtFitMap << "' status " << fitTransRestrRebinPtFitMapResultPtr->Status() << std::endl;
+                if ( fitTransRestrRebinPtFitMapResultPtr->Ndf() == 0. )   std::cout << "    '" << nameTransRestrRebinPtFitMap << "' ndf    " << fitTransRestrRebinPtFitMapResultPtr->Ndf()    << std::endl;
               }
             }
           }
@@ -1474,7 +1484,9 @@ int run( int argc, char * argv[] )
                   if ( verbose_ > 2 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    failing fit in directory '"; dirOutEta_->pwd();
-                    std::cout << "    '" << nameEtaTransRebin << "' status " << fitEtaTransRebinResultPtr->Status() << std::endl;
+                    if ( fitEtaTransRebinResultPtr->Status() != 0 ) std::cout << "    '" << nameEtaTransRebin << "' status " << fitEtaTransRebinResultPtr->Status() << std::endl;
+                    if ( fitEtaTransRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << nameEtaTransRebin << "' prob   " << fitEtaTransRebinResultPtr->Prob()   << std::endl;
+                    if ( fitEtaTransRebinResultPtr->Ndf() == 0. )   std::cout << "    '" << nameEtaTransRebin << "' ndf    " << fitEtaTransRebinResultPtr->Ndf()    << std::endl;
                   }
                 }
               }
@@ -1521,7 +1533,9 @@ int run( int argc, char * argv[] )
                 if ( verbose_ > 2 ) {
                   std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                             << "    failing fit in directory '"; dirOutEta_->pwd();
-                  std::cout << "    '" << nameEtaTransRestrRebin << "' status " << fitEtaTransRestrRebinResultPtr->Status() << std::endl;
+                  if ( fitEtaTransRestrRebinResultPtr->Status() != 0 ) std::cout << "    '" << nameEtaTransRestrRebin << "' status " << fitEtaTransRestrRebinResultPtr->Status() << std::endl;
+                  if ( fitEtaTransRestrRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << nameEtaTransRestrRebin << "' prob   " << fitEtaTransRestrRebinResultPtr->Prob()   << std::endl;
+                  if ( fitEtaTransRestrRebinResultPtr->Ndf() == 0. )   std::cout << "    '" << nameEtaTransRestrRebin << "' ndf    " << fitEtaTransRestrRebinResultPtr->Ndf()    << std::endl;
                 }
               }
             }
@@ -1599,7 +1613,9 @@ int run( int argc, char * argv[] )
                       if ( verbose_ > 2 ) {
                         std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                                   << "    failing fit in directory '"; dirOutEta_->pwd();
-                        std::cout << "    '" << nameEtaPtTransRebin << "' status " << fitEtaPtTransRebinResultPtr->Status() << std::endl;
+                        if ( fitEtaPtTransRebinResultPtr->Status() != 0 ) std::cout << "    '" << nameEtaPtTransRebin << "' status " << fitEtaPtTransRebinResultPtr->Status() << std::endl;
+                        if ( fitEtaPtTransRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << nameEtaPtTransRebin << "' prob   " << fitEtaPtTransRebinResultPtr->Prob()   << std::endl;
+                        if ( fitEtaPtTransRebinResultPtr->Ndf() == 0. )   std::cout << "    '" << nameEtaPtTransRebin << "' ndf    " << fitEtaPtTransRebinResultPtr->Ndf()    << std::endl;
                       }
                     }
                   }
@@ -1643,7 +1659,9 @@ int run( int argc, char * argv[] )
                     if ( verbose_ > 2 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                                 << "    failing fit in directory '"; dirOutEta_->pwd();
-                      std::cout << "    '" << nameEtaPtTransRestrRebin << "' status " << fitEtaPtTransRestrRebinResultPtr->Status() << std::endl;
+                      if ( fitEtaPtTransRestrRebinResultPtr->Status() != 0 ) std::cout << "    '" << nameEtaPtTransRestrRebin << "' status " << fitEtaPtTransRestrRebinResultPtr->Status() << std::endl;
+                      if ( fitEtaPtTransRestrRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << nameEtaPtTransRestrRebin << "' prob   " << fitEtaPtTransRestrRebinResultPtr->Prob()   << std::endl;
+                      if ( fitEtaPtTransRestrRebinResultPtr->Ndf() == 0. )   std::cout << "    '" << nameEtaPtTransRestrRebin << "' ndf    " << fitEtaPtTransRestrRebinResultPtr->Ndf()    << std::endl;
                     }
                   }
                 }
@@ -1690,7 +1708,7 @@ int run( int argc, char * argv[] )
                 setParametersDependency( objCat, fitTransRebinEtaPtFitMap, histVecTransRebinEtaPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
                 TFitResultPtr fitTransRebinEtaPtFitMapResultPtr( histVecTransRebinEtaPtFitMap.at( uPar )->Fit( fitTransRebinEtaPtFitMap, fitOptions_.c_str() ) );
                 if ( fitTransRebinEtaPtFitMapResultPtr >= 0 ) {
-                  if ( fitTransRebinEtaPtFitMapResultPtr->Status() == 0 && fitTransRebinEtaPtFitMapResultPtr->Prob() > 0. && fitTransRebinEtaPtFitMapResultPtr->Ndf() != 0. ) {
+                  if ( fitTransRebinEtaPtFitMapResultPtr->Status() == 0 && fitTransRebinEtaPtFitMapResultPtr->Ndf() != 0. ) {
                     for ( unsigned uDep = 0; uDep < nDep; ++uDep ) {
                       transferVecEtaPt.at( uEta ).SetParameter( uPar, uDep, fitTransRebinEtaPtFitMapResultPtr->Parameter( uDep ) );
                       histVecVecTransRebinEtaParMap.at( uDep ).at( uPar )->SetBinContent( uEta + 1, fitTransRebinEtaPtFitMapResultPtr->Parameter( uDep ) );
@@ -1701,7 +1719,8 @@ int run( int argc, char * argv[] )
                     if ( verbose_ > 2 ) {
                       std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                                 << "    failing fit in directory '"; dirOutEta_->pwd();
-                      std::cout << "    '" << nameTransRebinEtaPtFitMap << "' status " << fitTransRebinEtaPtFitMapResultPtr->Status() << std::endl;
+                      if ( fitTransRebinEtaPtFitMapResultPtr->Status() != 0 ) std::cout << "    '" << nameTransRebinEtaPtFitMap << "' status " << fitTransRebinEtaPtFitMapResultPtr->Status() << std::endl;
+                      if ( fitTransRebinEtaPtFitMapResultPtr->Ndf() == 0. )   std::cout << "    '" << nameTransRebinEtaPtFitMap << "' ndf    " << fitTransRebinEtaPtFitMapResultPtr->Ndf()    << std::endl;
                     }
                   }
                 }
@@ -1721,7 +1740,7 @@ int run( int argc, char * argv[] )
               setParametersDependency( objCat, fitTransRestrRebinEtaPtFitMap, histVecTransRestrRebinEtaPtFitMap.at( uPar ), fitFuncId_, depFuncId_, uPar );
               TFitResultPtr fitTransRestrRebinEtaPtFitMapResultPtr( histVecTransRestrRebinEtaPtFitMap.at( uPar )->Fit( fitTransRestrRebinEtaPtFitMap, fitOptions_.c_str() ) );
               if ( fitTransRestrRebinEtaPtFitMapResultPtr >= 0 ) {
-                if ( fitTransRestrRebinEtaPtFitMapResultPtr->Status() == 0 && fitTransRestrRebinEtaPtFitMapResultPtr->Prob() > 0. && fitTransRestrRebinEtaPtFitMapResultPtr->Ndf() != 0. ) {
+                if ( fitTransRestrRebinEtaPtFitMapResultPtr->Status() == 0 && fitTransRestrRebinEtaPtFitMapResultPtr->Ndf() != 0. ) {
                   for ( unsigned uDep = 0; uDep < nDep; ++uDep ) {
                     transferVecEtaPtRestr.at( uEta ).SetParameter( uPar, uDep, fitTransRestrRebinEtaPtFitMapResultPtr->Parameter( uDep ) );
                     histVecVecTransRestrRebinEtaParMap.at( uDep ).at( uPar )->SetBinContent( uEta + 1, fitTransRestrRebinEtaPtFitMapResultPtr->Parameter( uDep ) );
@@ -1732,7 +1751,8 @@ int run( int argc, char * argv[] )
                   if ( verbose_ > 2 ) {
                     std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                               << "    failing fit in directory '"; dirOutEta_->pwd();
-                    std::cout << "    '" << nameTransRestrRebinEtaPtFitMap << "' status " << fitTransRestrRebinEtaPtFitMapResultPtr->Status() << std::endl;
+                    if ( fitTransRestrRebinEtaPtFitMapResultPtr->Status() != 0 ) std::cout << "    '" << nameTransRestrRebinEtaPtFitMap << "' status " << fitTransRestrRebinEtaPtFitMapResultPtr->Status() << std::endl;
+                    if ( fitTransRestrRebinEtaPtFitMapResultPtr->Ndf() == 0. )   std::cout << "    '" << nameTransRestrRebinEtaPtFitMap << "' ndf    " << fitTransRestrRebinEtaPtFitMapResultPtr->Ndf()    << std::endl;
                   }
                 }
               }
