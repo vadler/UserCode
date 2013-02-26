@@ -8,7 +8,9 @@ DataFormats/StdDictionaries                      V00-02-14      V00-02-13
 EGamma/EGammaAnalysisTools                       V00-00-13                     
 FWCore/GuiBrowsers                               V00-00-70      V00-00-67      
 PhysicsTools/PatAlgos                            V08-09-52      V08-09-37-01   
+PhysicsTools/PatUtils                            V03-09-28      V03-09-26      
 RecoMET/METAnalyzers                             V00-00-08                     
+RecoMET/METProducers                             V03-03-12-02   V03-03-12      
 RecoParticleFlow/PFProducer                      V15-02-06      V15-02-05-01   
 TopQuarkAnalysis/Configuration                   V07-00-04      V07-00-04      
 TopQuarkAnalysis/Examples                        V06-07-13      V06-07-12      
@@ -21,4 +23,4 @@ TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-03      
 TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-12      
 ---------------------------------------
-total packages: 18 (18 displayed)
+total packages: 20 (20 displayed)
