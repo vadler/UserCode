@@ -2,19 +2,6 @@ import FWCore.ParameterSet.Config as cms
 
 # SiStrip DQM Source
 
-# Hardware Monitoring
-from DQM.SiStripMonitorHardware.buffer_hack_cfi import *
-HardwareMonitor.rootFile           = ''
-HardwareMonitor.buildAllHistograms = False
-
-# Condition DB Monitoring
-from DQM.SiStripMonitorSummary.SiStripMonitorCondData_cfi import *
-
-# DQMEventInfo
-DqmEventInfoSiStrip = cms.EDFilter( "DQMEventInfo",
-    subSystemFolder = cms.untracked.string( 'SiStrip' )
-)
-
 # SiStripMonitoDigi
 import DQM.SiStripMonitorDigi.SiStripMonitorDigi_cfi
 SiStripMonitorDigiCAF                    = DQM.SiStripMonitorDigi.SiStripMonitorDigi_cfi.SiStripMonitorDigi.clone()
@@ -27,25 +14,27 @@ SiStripMonitorClusterCAF.OutputMEsInRootFile = False
 SiStripMonitorClusterCAF.SelectAllDetectors  = True
 SiStripMonitorClusterCAF.StripQualityLabel   = ''
 
+# SiStripMonitorQuality
+import DQM.SiStripMonitorPedestals.SiStripMonitorQuality_cfi
+QualityMonCAF = DQM.SiStripMonitorPedestals.SiStripMonitorQuality_cfi.QualityMon.clone()
+QualityMonCAF.StripQualityLabel = ''
+
 # SiStripMonitorTrack
 # clone for cosmic track finder
 import DQM.SiStripMonitorTrack.SiStripMonitorTrack_cfi
 SiStripMonitorTrackCAF_cosmicTk = DQM.SiStripMonitorTrack.SiStripMonitorTrack_cfi.SiStripMonitorTrack.clone()
 SiStripMonitorTrackCAF_cosmicTk.TrackProducer = 'cosmictrackfinderP5Refitter'
 SiStripMonitorTrackCAF_cosmicTk.FolderName    = 'SiStrip/Tracks'
-SiStripMonitorTrackCAF_cosmicTk.Mod_On        = True
 # clone for CTF track finder
 import DQM.SiStripMonitorTrack.SiStripMonitorTrack_cfi
 SiStripMonitorTrackCAF_ckf = DQM.SiStripMonitorTrack.SiStripMonitorTrack_cfi.SiStripMonitorTrack.clone()
 SiStripMonitorTrackCAF_ckf.TrackProducer = 'ctfWithMaterialTracksP5Refitter'
 SiStripMonitorTrackCAF_ckf.FolderName    = 'SiStrip/Tracks'
-SiStripMonitorTrackCAF_ckf.Mod_On        = True
 # clone for RS track finder
 import DQM.SiStripMonitorTrack.SiStripMonitorTrack_cfi
 SiStripMonitorTrackCAF_rs = DQM.SiStripMonitorTrack.SiStripMonitorTrack_cfi.SiStripMonitorTrack.clone()
 SiStripMonitorTrackCAF_rs.TrackProducer = 'rsWithMaterialTracksP5Refitter'
 SiStripMonitorTrackCAF_rs.FolderName    = 'SiStrip/Tracks'
-SiStripMonitorTrackCAF_rs.Mod_On        = True
 
 # TrackerMonitorTrack
 # clone for cosmic track finder
@@ -88,8 +77,7 @@ TrackMonCAF_rs.AlgoName      = 'RSTk'
 TrackMonCAF_rs.FolderName    = 'SiStrip/Tracks'
 
 # Scheduling
-SiStripDQMSourceGlobalRunCAF_fromRAW  = cms.Sequence( HardwareMonitor )
-SiStripDQMSourceGlobalRunCAF_common   = cms.Sequence( CondDataMonitoring + DqmEventInfoSiStrip + SiStripMonitorDigiCAF + SiStripMonitorClusterCAF )
+SiStripDQMSourceGlobalRunCAF_common   = cms.Sequence( SiStripMonitorDigiCAF + SiStripMonitorClusterCAF + QualityMonCAF )
 SiStripDQMSourceGlobalRunCAF_cosmikTk = cms.Sequence( SiStripMonitorTrackCAF_cosmicTk + MonitorTrackResidualsCAF_cosmicTk + TrackMonCAF_cosmicTk )
 SiStripDQMSourceGlobalRunCAF_ckf      = cms.Sequence( SiStripMonitorTrackCAF_ckf      + MonitorTrackResidualsCAF_ckf      + TrackMonCAF_ckf )
 SiStripDQMSourceGlobalRunCAF_rs       = cms.Sequence( SiStripMonitorTrackCAF_rs       + MonitorTrackResidualsCAF_rs       + TrackMonCAF_rs )

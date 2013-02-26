@@ -1,0 +1,27 @@
+  ### DQM SERVICES
+  
+  ## DQM Store
+  include "DQMServices/Core/data/DQM.cfg"
+  replace DQM.collectorHost = ""
+ 
+  ##  DQM File Saving and Environment
+  include "DQMServices/Components/data/DQMEnvironment.cfi"
+  replace dqmSaver.convention   = "Online"
+  replace dqmSaver.dirName      = "OUTPUT_DIRECTORY"  
+  replace dqmSaver.producer     = "DQM"
+  replace dqmSaver.saveByRun    =  1
+  replace dqmSaver.saveAtJobEnd = true
+  replace dqmEnv.subSystemFolder = "SiStrip"
+  
+  ## Quality Tester
+  module qTester = QualityTester {
+    untracked FileInPath qtList = "DQM/SiStripMonitorClient/data/sistrip_qualitytest_config.xml"
+    untracked bool getQualityTestsFromFile = true
+    untracked int32 prescaleFactor = 1
+  }
+
+  ### DQM MODULES
+  
+  include "DQM/SiStripMonitorClient/data/SiStripDQMRecoConfigOfflineGlobalRunCAF.cfi"  
+  include "DQM/SiStripMonitorClient/data/SiStripDQMSourceConfigOfflineGlobalRunCAF.cfi"  
+  include "DQM/SiStripMonitorClient/data/SiStripDQMClientConfigOfflineGlobalRunCAF.cfi"  

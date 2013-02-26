@@ -12,7 +12,6 @@ era    = 'Summer11'
 # Input sample
 sample = 'Fall11_R4_1_L3_unambiguousOnly'
 #sample = 'Fall11_R4_1_L3_totalMinDist'
-#sample = 'Fall11_R4_L3_unambiguousOnly'
 
 # Settings
 overwrite = False # to throw away earlier versions of histograms, trees and functions
@@ -36,12 +35,12 @@ scale          = True
 fitMaxPt       = 999999.
 #fitMaxPt       = 200.
 fitNonRestr    = False
-fitEtaBins     = True
+fitEtaBins     = False
 #minPt    = 0.
 #minPt    = 20.
-#minPt    = 27.
+minPt    = 27.
 #minPt    = 40.
-minPt    = 50.
+#minPt    = 50.
 #minPt    = 60.
 #maxDR    = 999999.
 maxDR    = 0.1
@@ -49,14 +48,14 @@ maxDR    = 0.1
 
 # Transfer functions
 # Fit function
-fitFunction = 'dGauss' # 'sGauss', 'dGauss'
+fitFunction = 'sGauss' # 'sGauss', 'dGauss'
 norm        = 0 # index of parameter holding the normalisation of the fit functikon
 fitOptions  = 'IBRS+'
 fitRange    = 1. # for Gaussian fits (in units of orig. RMS)
 #fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
 if fitFunction == 'dGauss': # a background function is defined
   fitRange = widthFactor # for combined fits (in units of orig. RMS)
-dependencyFunction = 'linear' # 'linear', 'squared'
+dependencyFunction = 'squared' # 'linear', 'squared'
 
 # I/O
 name = ''
@@ -97,9 +96,9 @@ pathPlots = '%s/output/plots/fitTopTransferFunctions/fitTopTransferFunctions_fro
 if refSel:
   pathPlots += 'Ref_'
 if runTest:
-  #pathPlots = ''
-  pathPlots = pathPlots.replace( 'fitTopTransferFunctions', 'fitTopTransferFunctionsTest', 2 )
-  pathPlots = pathPlots.replace( 'fitTopTransferFunctionsTest', 'fitTopTransferFunctions', 1 )
+  pathPlots = ''
+  #pathPlots = pathPlots.replace( 'fitTopTransferFunctions', 'fitTopTransferFunctionsTest', 2 )
+  #pathPlots = pathPlots.replace( 'fitTopTransferFunctionsTest', 'fitTopTransferFunctions', 1 )
 
 
 # Processing
@@ -108,9 +107,9 @@ process = cms.PSet()
 process.verbose = cms.uint32( 1 )
 if runTest:
   process.verbose = 3
-process.objectCategories = cms.vstring( 'UdscJet' # dGauss+linear
+#process.objectCategories = cms.vstring( 'UdscJet' # dGauss+linear
 #process.objectCategories = cms.vstring( 'BJet'    # dGauss+linear
-#process.objectCategories = cms.vstring( 'Mu'      # sGauss+squared
+process.objectCategories = cms.vstring( 'Mu'      # sGauss+squared
 #process.objectCategories = cms.vstring( 'Elec'    # sGauss+squared
                                       )
 process.usePileUp = cms.bool( usePileUp )
@@ -144,8 +143,8 @@ process.fit = cms.PSet(
 , minPt  = cms.double( minPt )
 , maxDR  = cms.double( maxDR )
 )
-if runTest:
-  process.fit.fitNonRestr = False
+#if runTest:
+  #process.fit.fitNonRestr = False
   #process.fit.fitEtaBins  = False
 
 process.transfer = cms.PSet(
@@ -160,8 +159,8 @@ process.transfer = cms.PSet(
 , writeFiles  = cms.bool( True )
 , pathOut     = cms.string( '%s/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer_from%s'%( os.getenv( "CMSSW_BASE" ), era ) ) # path to write the transfer functions
 )
-if runTest:
-  process.transfer.writeFiles = False
+#if runTest:
+  #process.transfer.writeFiles = False
 
 
 # Messaging
@@ -181,14 +180,6 @@ print
 print 'Output file:'
 print '-----------'
 print outputFile
-print
-if process.transfer.writeFiles:
-  pathOut = process.transfer.pathOut.value() + '/gentTransferFunction_' + sample + '_*' + name + '*.txt'
-  if refSel:
-    pathOut = pathOut.replace( sample, sample + '_Ref', 1)
-  print 'Output destination:'
-  print '------------------'
-  print pathOut
 if pathPlots != '':
   print
   print 'Plots destination:'
