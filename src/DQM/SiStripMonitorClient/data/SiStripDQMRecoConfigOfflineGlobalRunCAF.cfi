@@ -1,0 +1,30 @@
+  ## SiStrip DQM Reco
+  
+  include "Configuration/StandardSequences/data/ReconstructionCosmics.cff"
+  replace CTF_P5_MeasurementTracker.pixelClusterProducer = ""
+  replace RS_P5_MeasurementTracker.pixelClusterProducer  = ""
+  include "Configuration/StandardSequences/data/RawToDigi_Data.cff"
+  
+  # refitting needed due to missing trajectories in RECO
+  include "RecoTracker/TrackProducer/data/RefitterWithMaterial.cfi"
+  replace RKFittingSmoother.ComponentName = "FittingSmootherRK"
+  module cosmictrackfinderP5Refitter = TrackRefitter from "RecoTracker/TrackProducer/data/RefitterWithMaterial.cfi"
+  replace cosmictrackfinderP5Refitter.src               = cosmictrackfinderP5
+  replace cosmictrackfinderP5Refitter.TrajectoryInEvent = true
+  module ctfWithMaterialTracksP5Refitter = TrackRefitter from "RecoTracker/TrackProducer/data/RefitterWithMaterial.cfi"
+  replace ctfWithMaterialTracksP5Refitter.src               = ctfWithMaterialTracksP5
+  replace ctfWithMaterialTracksP5Refitter.TrajectoryInEvent = true
+  module rsWithMaterialTracksP5Refitter = TrackRefitter from "RecoTracker/TrackProducer/data/RefitterWithMaterial.cfi"
+  replace rsWithMaterialTracksP5Refitter.src               = rsWithMaterialTracksP5
+  replace rsWithMaterialTracksP5Refitter.TrajectoryInEvent = true
+   
+  ## Scheduling
+  
+  sequence SiStripDQMRecoGlobalRunCAF = {
+//     siStripDigis & // needed input not available in RECO
+    cosmictrackfinderP5Refitter &
+    ctfWithMaterialTracksP5Refitter &
+    rsWithMaterialTracksP5Refitter
+  }
+ 
+  

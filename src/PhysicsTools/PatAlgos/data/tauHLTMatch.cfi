@@ -1,0 +1,27 @@
+///
+/// Example for a configuration of the HLT match for muons
+/// (cuts are NOT tuned, using old values from TQAF MC match for e/mu, january 2008)
+///
+
+module tauHLTMatchHLT1Tau = PATHLTMatcher {
+   InputTag src               = allLayer0Taus
+   InputTag matched           = HLT1Tau
+   double maxDeltaR           = 0.5
+   double maxDPtRel           = 0.5
+   bool resolveAmbiguities    = true
+   bool resolveByMatchQuality = false
+}
+
+module tauHLTMatchHLT2TauPixel = PATHLTMatcher {
+   InputTag src               = allLayer0Taus
+   InputTag matched           = HLT2TauPixel
+   double maxDeltaR           = 0.5
+   double maxDPtRel           = 0.5
+   bool resolveAmbiguities    = true
+   bool resolveByMatchQuality = false
+}
+
+sequence tauHLTMatch = {
+    tauHLTMatchHLT1Tau,
+    tauHLTMatchHLT2TauPixel
+}
