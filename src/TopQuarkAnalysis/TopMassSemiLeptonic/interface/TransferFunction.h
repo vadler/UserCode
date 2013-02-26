@@ -48,10 +48,20 @@ namespace my {
       /// Function to be fit to the momentum difference distributions.
       TF1 fitFunction_;
 
+      /// Fit function string
+      /// Holds string representing the fit function if constructed from C++
+      /// class.
+      std::string fitFunctionString_;
+
       /// Dependency function
       /// Function to be fit distributions of fit parameters for the fit
       /// function over a dependency variable.
       TF1 dependencyFunction_;
+
+      /// Dependency function string
+      /// Holds string representing the dependency function if constructed from
+      /// C++ class.
+      std::string dependencyFunctionString_;
 
       /// Name of the dependency variable (e.g. "E_parton", "eta").
       std::string dependency_;
@@ -107,7 +117,7 @@ namespace my {
       /// The corresponding parameter vectors are resized according to the
       /// number of function parameters. If 'clear' is 'false', the existing
       /// values are not overwritten.
-      void SetFitFunction( const std::string & fitFunction, bool clear = true );
+      void SetFitFunction( const std::string & fitFunctionString, bool clear = true );
 
       /// Set the fit function.
       /// TFormula members of the TF1s are possibly empty (e.g. TF1 from
@@ -117,13 +127,17 @@ namespace my {
       /// values are not overwritten.
       void SetFitFunction( TF1 * fitFunction, bool clear = true );
 
+      /// Set the fit function string.
+      /// This has only effect, if the original function's title is empty.
+      void SetFitFunctionString( const std::string & fitFunctionString );
+
       /// Set the dependency function.
       /// The function is entered in the format for filling a TFormula (s. data
       /// members).
       /// The corresponding vector of parameter vectors are resized according
       /// to the number of function parameters. If 'clear' is 'false', the
       /// existing values are not overwritten.
-      void SetDependencyFunction( const std::string & dependencyFunction, bool clear = true );
+      void SetDependencyFunction( const std::string & dependencyFunctionString, bool clear = true );
 
       /// Set the dependency function.
       /// TFormula members of the TF1s are possibly empty (e.g. TF1 from
@@ -132,6 +146,10 @@ namespace my {
       /// to the number of function parameters. If 'clear' is 'false', the
       /// existing values are not overwritten.
       void SetDependencyFunction( TF1 * dependencyFunction, bool clear = true );
+
+      /// Set the dependency function string.
+      /// This has only effect, if the original function's title is empty.
+      void SetDependencyFunctionString( const std::string & dependencyFunctionString );
 
       /// Set the name of the dependency variable (e.g. "E_parton", "eta").
       void SetDependency( const std::string & dependency ) { dependency_ = dependency; };
@@ -191,6 +209,9 @@ namespace my {
       /// data members).
       std::string FitFunction() const { return std::string( fitFunction_.GetTitle() ); };
 
+      /// Get the dependency function string.
+      std::string FitFunctionString() const { return fitFunctionString_; };
+
       /// Get the number of parameters in the fit function.
       unsigned NParFit() const { return pars1D_.size(); };
 
@@ -201,6 +222,9 @@ namespace my {
       /// The function is returned in the format for filling a TFormula (s.
       /// data members).
       std::string DependencyFunction() const { return std::string( dependencyFunction_.GetTitle() ); };
+
+      /// Get the dependency function string.
+      std::string DependencyFunctionString() const { return dependencyFunctionString_; };
 
       /// Get the number of parameters in the dependency function.
       unsigned NParDependency() const { return pars2D_.size(); };

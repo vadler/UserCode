@@ -2,6 +2,8 @@
 #define CommonTools_MyTools_RootFunctions_h
 
 
+#include <string>
+
 #include "TROOT.h"
 
 
@@ -30,6 +32,7 @@ namespace my {
     public:
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 2; };
+      inline static std::string String() { return std::string( "[0]+[1]*x" ); };
   };
 
   /// Parabola with the following parameters:
@@ -40,6 +43,7 @@ namespace my {
     public:
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 3; };
+      inline static std::string String() { return std::string( "[0]+[1]*x+[2]*x**2" ); };
   };
 
   /// Resolution function for x>=0. with the following parameters:
@@ -51,6 +55,7 @@ namespace my {
     public:
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 3; };
+      inline static std::string String() { return std::string( "sqrt([0]**2+[1]**2*x+[2]**2*x**2)" ); };
   };
 
   /// Normalised single Gaussian with the following parameters:
@@ -62,6 +67,7 @@ namespace my {
     public:
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 3; };
+      inline static std::string String() { return std::string( "[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))" ); };
       virtual Double_t Sigma( Double_t * par );
   };
 
@@ -77,6 +83,7 @@ namespace my {
     public:
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 6; };
+      inline static std::string String() { return std::string( "[0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi))" ); };
       virtual Double_t Sigma( Double_t * par );
   };
 
@@ -91,6 +98,7 @@ namespace my {
     public:
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 5; };
+      inline static std::string String() { return std::string( "one-sided Crystal Ball" ); };
       virtual Double_t Sigma( Double_t * par );
   };
 
@@ -107,6 +115,7 @@ namespace my {
     public:
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 7; };
+      inline static std::string String() { return std::string( "double-sided Crystal Ball" ); };
       virtual Double_t Sigma( Double_t * par );
   };
 

@@ -1055,6 +1055,8 @@ int run( int argc, char * argv[] )
         DepFuncType * depFunc( new DepFuncType() );
         TF1 * dependencyFunction( new TF1( "dependencyFunction", depFunc, 0., 1., DepFuncType::NPar() ) );
         my::TransferFunction transferPt( fitFunction, dependencyFunction, std::string( titlePtT + part ) );
+        transferPt.SetFitFunctionString( FitFuncType::String() );
+        transferPt.SetDependencyFunctionString( DepFuncType::String() );
         comment << baseTitlePt << part << " <= " << fitMaxPt_;
         transferPt.SetComment( comment.str() );
         my::TransferFunctionCollection transferVecEtaPt( nEtaBins_, transferPt );

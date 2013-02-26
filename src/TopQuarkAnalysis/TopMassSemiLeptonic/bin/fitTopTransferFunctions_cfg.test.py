@@ -15,7 +15,7 @@ sample = 'Fall11_R4_L3_unambiguousOnly'
 # Objects
 objects = []
 objects.append( 'UdscJet' ) # default: dGauss+linear
-#objects.append( 'BJet' )    # default: dGauss+linear
+objects.append( 'BJet' )    # default: dGauss+linear
 #objects.append( 'Mu' )      # default: sGauss+squared
 #objects.append( 'Elec' )    # default: sGauss+squared
 
@@ -44,11 +44,11 @@ fitMaxPt       = 999999.
 #fitMaxPt       = 200.
 fitNonRestr    = False
 fitEtaBins     = False
-#minPt    = 0.
+minPt    = 0.
 #minPt    = 20.
 #minPt    = 27. # Mu
 #minPt    = 40. # Elec
-minPt    = 50. # UdscJet
+#minPt    = 50. # UdscJet
 #minPt    = 60. # BJet
 #maxDR    = 999999.
 maxDR    = 0.1

@@ -17,7 +17,9 @@ using namespace my;
 // Constructor from TransferFunction (copy c'tor)
 TransferFunction::TransferFunction( const TransferFunction & transfer )
 : fitFunction_( transfer.GetFitFunction() )
+, fitFunctionString_( transfer.FitFunctionString() )
 , dependencyFunction_( transfer.GetDependencyFunction() )
+, dependencyFunctionString_( transfer.DependencyFunctionString() )
 , dependency_( transfer.Dependency() )
 , comment_( transfer.Comment() )
 {
@@ -29,7 +31,9 @@ TransferFunction::TransferFunction( const TransferFunction & transfer )
 // Constructor from strings
 TransferFunction::TransferFunction( const std::string & fitFunction, const std::string & dependencyFunction, const std::string & dependency )
 : fitFunction_( "fitFunction", fitFunction.c_str() )
+, fitFunctionString_( fitFunction )
 , dependencyFunction_( "dependencyFunction", dependencyFunction.c_str() )
+, dependencyFunctionString_( dependencyFunction )
 , dependency_( dependency )
 , comment_()
 {
@@ -39,7 +43,9 @@ TransferFunction::TransferFunction( const std::string & fitFunction, const std::
 // Constructor from TF1s
 TransferFunction::TransferFunction( TF1 * fitFunction, TF1 * dependencyFunction, const std::string & dependency )
 : fitFunction_( *fitFunction )
+, fitFunctionString_( "" )
 , dependencyFunction_( *dependencyFunction )
+, dependencyFunctionString_( "" )
 , dependency_( dependency )
 , comment_()
 {
@@ -53,9 +59,10 @@ TransferFunction::TransferFunction( TF1 * fitFunction, TF1 * dependencyFunction,
 
 // Setters
 
-void TransferFunction::SetFitFunction( const std::string & fitFunction, bool clear )
+void TransferFunction::SetFitFunction( const std::string & fitFunctionString, bool clear )
 {
-  fitFunction_ = TF1( "fitFunction", fitFunction.c_str() );
+  fitFunction_       = TF1( "fitFunction", fitFunctionString.c_str() );
+  fitFunctionString_ = fitFunctionString;
   clear ? ClearParameters() : ResizeParameters();
 }
 
@@ -63,12 +70,19 @@ void TransferFunction::SetFitFunction( TF1 * fitFunction, bool clear )
 {
   fitFunction_ = TF1( *fitFunction );
   fitFunction_.SetName( "fitFunction" );
+  fitFunctionString_ = fitFunction->GetTitle();
   clear ? ClearParameters() : ResizeParameters();
 }
 
-void TransferFunction::SetDependencyFunction( const std::string & dependencyFunction, bool clear )
+void TransferFunction::SetFitFunctionString( const std::string & fitFunctionString )
 {
-  dependencyFunction_ = TF1( "dependencyFunction", dependencyFunction.c_str() );
+  if ( FitFunction().empty() ) fitFunctionString_ = fitFunctionString;
+}
+
+void TransferFunction::SetDependencyFunction( const std::string & dependencyFunctionString, bool clear )
+{
+  dependencyFunction_       = TF1( "dependencyFunction", dependencyFunctionString.c_str() );
+  dependencyFunctionString_ = dependencyFunctionString;
   clear ? ClearParameters() : ResizeParameters();
 }
 
@@ -76,7 +90,13 @@ void TransferFunction::SetDependencyFunction( TF1 * dependencyFunction, bool cle
 {
   dependencyFunction_ = TF1( *dependencyFunction );
   dependencyFunction_.SetName( "dependencyFunction" );
+  dependencyFunctionString_ = dependencyFunction->GetTitle();
   clear ? ClearParameters() : ResizeParameters();
+}
+
+void TransferFunction::SetDependencyFunctionString( const std::string & dependencyFunctionString )
+{
+  if ( DependencyFunction().empty() ) dependencyFunctionString_ = dependencyFunctionString;
 }
 
 bool TransferFunction::SetParameter( unsigned i, double par )
@@ -185,7 +205,13 @@ TF2 TransferFunction::Function( int norm ) const
 
 TF1 TransferFunction::Function( double dependencyValue, int norm ) const
 {
-  TString fitStr( FitFunction() );
+  TString fitStr;
+  if ( FitFunction().empty() && ! FitFunctionString().empty() ) {
+    fitStr = TString( FitFunctionString() );
+  }
+  else {
+    fitStr = TString( FitFunction() );
+  }
   std::vector< double > pars;
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) continue;
@@ -213,7 +239,13 @@ TF1 TransferFunction::Function( double dependencyValue, int norm ) const
 
 std::string TransferFunction::Formula( int norm ) const
 {
-  TString fitStr( FitFunction() );
+  TString fitStr;
+  if ( FitFunction().empty() && ! FitFunctionString().empty() ) {
+    fitStr = TString( FitFunctionString() );
+  }
+  else {
+    fitStr = TString( FitFunction() );
+  }
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
     if ( ( int )i == norm ) {
@@ -231,7 +263,13 @@ std::string TransferFunction::Formula( int norm ) const
 
 std::string TransferFunction::Formula( double dependencyValue, int norm ) const
 {
-  TF1 fitFunc( GetFitFunction() );
+  TF1 fitFunc;
+  if ( FitFunction().empty() && ! FitFunctionString().empty() ) {
+    fitFunc = TF1( "fitFunc", FitFunctionString().c_str() );
+  }
+  else {
+    fitFunc = TF1( GetFitFunction() );
+  }
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
@@ -248,7 +286,13 @@ std::string TransferFunction::Formula( double dependencyValue, int norm ) const
 
 double TransferFunction::Eval( double value, int norm ) const
 {
-  TF1 fitFunc( GetFitFunction() );
+  TF1 fitFunc;
+  if ( FitFunction().empty() && ! FitFunctionString().empty() ) {
+    fitFunc = TF1( "fitFunc", FitFunctionString().c_str() );
+  }
+  else {
+    fitFunc = TF1( GetFitFunction() );
+  }
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
@@ -261,7 +305,13 @@ double TransferFunction::Eval( double value, int norm ) const
 
 double TransferFunction::Eval( double dependencyValue, double value, int norm ) const
 {
-  TF1 fitFunc( GetFitFunction() );
+  TF1 fitFunc;
+  if ( FitFunction().empty() && ! FitFunctionString().empty() ) {
+    fitFunc = TF1( "fitFunc", FitFunctionString().c_str() );
+  }
+  else {
+    fitFunc = TF1( GetFitFunction() );
+  }
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) {
       fitFunc.SetParameter( ( Int_t )i, 1. );
@@ -299,15 +349,12 @@ double TransferFunction::Eval( double dependencyValue, double value, int norm ) 
 
 std::string TransferFunction::Print( bool useNan ) const
 {
-  const bool noFitFunc( FitFunction().empty() );
-  const bool noDepFunc( DependencyFunction().empty() );
-
   std::stringstream print( std::ios_base::out );
   print << std::endl;
-  if ( noFitFunc ) print << "FitFunction       : \tnot available, constructed from C++ class." << std::endl;
-  else             print << "FitFunction       : \t" << FitFunction() << std::endl;
-  if ( noDepFunc ) print << "DependencyFunction: \tnot available, constructed from C++ class; \ton " << Dependency() << std::endl;
-  else             print << "DependencyFunction: \t" << DependencyFunction() << " \ton " << Dependency() << std::endl;
+  if ( FitFunction().empty() ) print << "FitFunction       : \t" << FitFunctionString() << "\t(constructed from C++ class)" << std::endl;
+  else                         print << "FitFunction       : \t" << FitFunction() << std::endl;
+  if ( DependencyFunction().empty() ) print << "DependencyFunction: \t" << DependencyFunctionString() << "\t(constructed from C++ class) \ton " << Dependency() << std::endl;
+  else                                print << "DependencyFunction: \t" << DependencyFunction() << " \ton " << Dependency() << std::endl;
   print << "Comment           : \t" << Comment() << std::endl << std::endl;
 
   print << "Parameters 1D:" << std::endl;
@@ -317,53 +364,83 @@ std::string TransferFunction::Print( bool useNan ) const
     else print << Parameter( i );
     print << std::endl;
   }
-  if ( ! noFitFunc ) print << "[all]: \t" << PrintFit1D( useNan ) << std::endl;
+  print << "[all]: \t" << PrintFit1D( useNan ) << std::endl;
   print << std::endl;
 
   print << "Parameters 2D (DependencyFunction):" << std::endl;
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     print << "[" << i << "]: \t"  << PrintDependency( i, useNan ) << std::endl;
   }
-  if ( ! noFitFunc ) print << "[all]: \t" << PrintFit2D( useNan ) << std::endl;
+  print << "[all]: \t" << PrintFit2D( useNan ) << std::endl;
 
   return print.str();
 }
 
 std::string TransferFunction::PrintFit1D( bool useNan ) const
 {
-  TString fitStr( FitFunction() );
-  for ( unsigned i = 0; i < NParFit(); ++i ) {
-    TString valStr( boost::lexical_cast< std::string >( Parameter( i ) ) );
-    if ( useNan ) valStr.ReplaceAll( boost::lexical_cast< std::string >( transferFunctionInitConst ).c_str(), "NAN" );
-    valStr.Prepend( "(" );
-    valStr.Append( ")" );
-    TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
-    fitStr.ReplaceAll( parStr, valStr );
+  TString fitStr;
+  if ( FitFunction().empty() && ! FitFunctionString().empty() ) {
+    fitStr = TString( FitFunctionString() );
+  }
+  else {
+    fitStr = TString( FitFunction() );
+  }
+  if ( fitStr.Length() > 0 ) {
+    for ( unsigned i = 0; i < NParFit(); ++i ) {
+      TString valStr( boost::lexical_cast< std::string >( Parameter( i ) ) );
+      if ( useNan ) valStr.ReplaceAll( boost::lexical_cast< std::string >( transferFunctionInitConst ).c_str(), "NAN" );
+      valStr.Prepend( "(" );
+      valStr.Append( ")" );
+      TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
+      fitStr.ReplaceAll( parStr, valStr );
+    }
   }
   return std::string( fitStr.Data() );
 }
 
 std::string TransferFunction::PrintFit2D( bool useNan ) const
 {
-  TString fitStr( FitFunction() );
-  for ( unsigned i = 0; i < NParFit(); ++i ) {
-    TString depParStr( PrintDependency( i, useNan ) );
-    depParStr.Prepend( "(" );
-    depParStr.Append( ")" );
-    TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
-    fitStr.ReplaceAll( parStr, depParStr );
+  TString fitStr;
+  if ( FitFunction().empty() && ! FitFunctionString().empty() ) {
+    fitStr = TString( FitFunctionString() );
+  }
+  else {
+    fitStr = TString( FitFunction() );
+  }
+  if ( fitStr.Length() > 0 ) {
+    for ( unsigned i = 0; i < NParFit(); ++i ) {
+      TString depParStr( PrintDependency( i, useNan ) );
+      depParStr.Prepend( "(" );
+      depParStr.Append( ")" );
+      TString parStr( "[" + boost::lexical_cast< std::string >( i ) + "]" );
+      fitStr.ReplaceAll( parStr, depParStr );
+    }
   }
   return std::string( fitStr.Data() );
 }
 
 std::string TransferFunction::PrintDependency( unsigned i, bool useNan ) const
 {
-  TF1 depFunc( GetDependencyFunction() );
+  TF1 depFunc;
+  if ( DependencyFunction().empty() && ! DependencyFunctionString().empty() ) {
+    depFunc = TF1( "depFunc", DependencyFunctionString().c_str() );
+  }
+  else {
+    depFunc = TF1( GetDependencyFunction() );
+  }
   for ( unsigned j = 0; j < NParDependency(); ++j ) {
     depFunc.SetParameter( ( Int_t )j, ( Double_t )( Parameter( i, j ) ) );
   }
 
-  if ( DependencyFunction().empty() ) {
+  if ( ! DependencyFunction().empty() || ! DependencyFunctionString().empty() ) {
+    TString depStr( depFunc.GetExpFormula( "p" ) );
+    depStr.ReplaceAll( "x", Dependency() );
+    TString failStr( "e" + Dependency() + "p" );
+    depStr.ReplaceAll( failStr, "x" ); // Fixing unwanted replacements
+    if ( useNan ) depStr.ReplaceAll( boost::lexical_cast< std::string >( transferFunctionInitConst ).c_str(), "NAN" );
+    return std::string( depStr.Data() );
+  }
+  else {
     std::stringstream print( std::ios_base::out );
     for ( unsigned j = 0; j < NParDependency(); ++j ) {
       if ( j > 0 ) print << " \t";
@@ -373,14 +450,6 @@ std::string TransferFunction::PrintDependency( unsigned i, bool useNan ) const
         print << Parameter( i, j );
     }
     return print.str();
-  }
-  else {
-    TString depStr( depFunc.GetExpFormula( "p" ) );
-    depStr.ReplaceAll( "x", Dependency() ); // FIXME: This assumes no other 'x' than from the variable (e.g. no "exp")
-    TString failStr( "e" + Dependency() + "p" );
-    depStr.ReplaceAll( failStr, "x" ); // Fixing unwanted replacements
-    if ( useNan ) depStr.ReplaceAll( boost::lexical_cast< std::string >( transferFunctionInitConst ).c_str(), "NAN" );
-    return std::string( depStr.Data() );
   }
 }
 
