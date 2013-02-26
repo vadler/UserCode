@@ -172,11 +172,25 @@ std::vector< double > TransferFunction::Parameters( unsigned j ) const
 
 TF2 TransferFunction::Function( int norm ) const
 {
-  TString fitStr( FitFunction() );
+  TString fitStr;
+  if ( FitFunction().empty() && ! FitFunctionString().empty() ) {
+    fitStr = TString( FitFunctionString() );
+  }
+  else {
+    fitStr = TString( FitFunction() );
+  }
+  if ( fitStr.Length() == 0 ) return TF2();
   std::vector< double > pars;
   for ( unsigned i = 0; i < NParFit(); ++i ) {
     if ( ( int )i == norm ) continue;
-    TString depStr( DependencyFunction() );
+    TString depStr;
+    if ( DependencyFunction().empty() && ! DependencyFunctionString().empty() ) {
+      depStr = TString( DependencyFunctionString() );
+    }
+    else {
+      depStr = TString( DependencyFunction() );
+    }
+    if ( depStr.Length() == 0 ) continue;
     for ( unsigned j = 0; j < NParDependency(); ++j ) {
       TString parStr( "[" + boost::lexical_cast< std::string >( j ) + "]" );
       TString parStrNew( "{" + boost::lexical_cast< std::string >( pars.size() ) + "}" ); // FIXME: Just stupid manipulation.
