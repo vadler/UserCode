@@ -1078,7 +1078,8 @@ int run( int argc, char * argv[] )
           setParametersFit( objCat, fitTransRebin, histTransRebin, fitFuncId_, scale_ );
           TFitResultPtr fitTransRebinResultPtr( histTransRebin->Fit( fitTransRebin, fitOptions_.c_str() ) );
           if ( fitTransRebinResultPtr >= 0 ) {
-            if ( fitTransRebinResultPtr->Status() == 0 && fitTransRebinResultPtr->Prob() > 0. && fitTransRebinResultPtr->Ndf() != 0. ) {
+//             if ( fitTransRebinResultPtr->Status() == 0 && fitTransRebinResultPtr->Prob() > 0. && fitTransRebinResultPtr->Ndf() != 0. ) {
+            if ( fitTransRebinResultPtr->Status() == 0 && fitTransRebinResultPtr->Ndf() != 0. ) { // FIXME: Large number of entries seems to decrease prob.
               if ( checkParametersFit( objCat, fitTransRebin, fitFuncId_ ) ) {
                 mixParametersFit( transferPt, fitTransRebin );
               }
@@ -1093,7 +1094,7 @@ int run( int argc, char * argv[] )
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                           << "    failing fit in directory '"; dirOutFit_->pwd();
                 if ( fitTransRebinResultPtr->Status() != 0 ) std::cout << "    '" << nameTransRebin << "' status " << fitTransRebinResultPtr->Status() << std::endl;
-                if ( fitTransRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << nameTransRebin << "' prob   " << fitTransRebinResultPtr->Prob()   << std::endl;
+//                 if ( fitTransRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << nameTransRebin << "' prob   " << fitTransRebinResultPtr->Prob()   << std::endl;
                 if ( fitTransRebinResultPtr->Ndf() == 0. )   std::cout << "    '" << nameTransRebin << "' ndf    " << fitTransRebinResultPtr->Ndf()    << std::endl;
               }
             }
@@ -1121,7 +1122,8 @@ int run( int argc, char * argv[] )
           setParametersFit( objCat, fitTransRestrRebin, histTransRestrRebin, fitFuncId_, scale_ );
           TFitResultPtr fitTransRestrRebinResultPtr( histTransRestrRebin->Fit( fitTransRestrRebin, fitOptions_.c_str() ) );
           if ( fitTransRestrRebinResultPtr >= 0 ) {
-            if ( fitTransRestrRebinResultPtr->Status() == 0 && fitTransRestrRebinResultPtr->Prob() > 0. && fitTransRestrRebinResultPtr->Ndf() != 0. ) {
+//             if ( fitTransRestrRebinResultPtr->Status() == 0 && fitTransRestrRebinResultPtr->Prob() > 0. && fitTransRestrRebinResultPtr->Ndf() != 0. ) {
+            if ( fitTransRestrRebinResultPtr->Status() == 0 && fitTransRestrRebinResultPtr->Ndf() != 0. ) { // FIXME: Large number of entries seems to decrease prob.
               if ( checkParametersFit( objCat, fitTransRestrRebin, fitFuncId_ ) ) {
                 mixParametersFit( transferPtRestr, fitTransRestrRebin );
               }
@@ -1136,7 +1138,7 @@ int run( int argc, char * argv[] )
                 std::cout << argv[ 0 ] << " --> WARNING:" << std::endl
                           << "    failing fit in directory '"; dirOutFit_->pwd();
                 if ( fitTransRestrRebinResultPtr->Status() != 0 ) std::cout << "    '" << nameTransRestrRebin << "' status " << fitTransRestrRebinResultPtr->Status() << std::endl;
-                if ( fitTransRestrRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << nameTransRestrRebin << "' prob   " << fitTransRestrRebinResultPtr->Prob()   << std::endl;
+//                 if ( fitTransRestrRebinResultPtr->Prob() <= 0. )  std::cout << "    '" << nameTransRestrRebin << "' prob   " << fitTransRestrRebinResultPtr->Prob()   << std::endl;
                 if ( fitTransRestrRebinResultPtr->Ndf() == 0. )   std::cout << "    '" << nameTransRestrRebin << "' ndf    " << fitTransRestrRebinResultPtr->Ndf()    << std::endl;
               }
             }
@@ -1992,7 +1994,7 @@ bool checkParametersFit( std::string objCat, TF1 * fit, std::string fitFuncId )
   // - [0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
 
   // Check, if background is described at all in function
-  if ( fitFuncId == "sGauss" ) return false;
+  if ( fitFuncId != "dGauss" ) return false;
 //   if ( fit->GetParameter( 2 ) < fit->GetParameter( 5 ) || std::fabs( fit->GetParameter( 3 ) ) < 1. ) return false; // test 1,5; default
 //   if ( std::fabs( fit->GetParameter( 3 ) ) * std::fabs( fit->GetParameter( 5 ) ) < std::fabs( fit->GetParameter( 2 ) ) ) return false; // test 2,6
 //   if ( std::fabs( fit->GetParameter( 3 ) ) < 1. && std::fabs( fit->GetParameter( 3 ) ) * std::fabs( fit->GetParameter( 5 ) ) < std::fabs( fit->GetParameter( 2 ) ) ) return false; // test 3,7
@@ -2011,6 +2013,7 @@ void mixParametersFit( my::TransferFunction & transfer, TF1 * fit )
   //. This function assumes fit functions of the form
   // - [0]*(exp(-0.5*((x-[1])/[2])**2) + [3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
 
+  transfer.SetParameter( 0, fit->GetParameter( 0 ) );
   transfer.SetParameter( 1, fit->GetParameter( 4 ) );
   transfer.SetParameter( 2, fit->GetParameter( 5 ) );
   transfer.SetParameter( 3, 1. / fit->GetParameter( 3 ) );
