@@ -22,7 +22,7 @@ objects.append( 'BJet' )    # default: dGauss+linear
 # Settings
 overwrite  = False # to throw away earlier versions of histograms, trees and functions
 plot       = False
-writeFiles = True
+writeFiles = False
 # Exclusive switches:
 usePileUp = False
 useAlt    = True # E instead of p
