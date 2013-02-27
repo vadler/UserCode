@@ -2,10 +2,11 @@ import os
 import FWCore.ParameterSet.Config as cms
 process = cms.PSet(
     verbose = cms.uint32(1),
-    objectCategories = cms.vstring('Elec'),
+    objectCategories = cms.vstring('Mu',
+        'Elec'),
     usePileUp = cms.bool(False),
-    useAlt = cms.bool(False),
-    useNonT = cms.bool(False),
+    useAlt = cms.bool(True),
+    useNonT = cms.bool(True),
     useSymm = cms.bool(True),
     refGen = cms.bool(True),
     refSel = cms.bool(True),
@@ -25,7 +26,7 @@ process = cms.PSet(
     fit = cms.PSet(
         maxDR = cms.double(0.1),
         fitNonRestr = cms.bool(False),
-        minPt = cms.double(40.0),
+        minPt = cms.double(0.0),
         fitEtaBins = cms.bool(False)
     ),
     transfer = cms.PSet(

@@ -2,10 +2,11 @@ import os
 import FWCore.ParameterSet.Config as cms
 process = cms.PSet(
     verbose = cms.uint32(1),
-    objectCategories = cms.vstring('Mu'),
+    objectCategories = cms.vstring('UdscJet',
+        'BJet'),
     usePileUp = cms.bool(False),
-    useAlt = cms.bool(False),
-    useNonT = cms.bool(False),
+    useAlt = cms.bool(True),
+    useNonT = cms.bool(True),
     useSymm = cms.bool(True),
     refGen = cms.bool(True),
     refSel = cms.bool(True),
@@ -25,15 +26,15 @@ process = cms.PSet(
     fit = cms.PSet(
         maxDR = cms.double(0.1),
         fitNonRestr = cms.bool(False),
-        minPt = cms.double(27.0),
+        minPt = cms.double(0.0),
         fitEtaBins = cms.bool(False)
     ),
     transfer = cms.PSet(
         scale = cms.bool(True),
-        fitRange = cms.double(1.0),
-        dependencyFunction = cms.string('squared'),
+        fitRange = cms.double(5.0),
+        dependencyFunction = cms.string('linear'),
         fitOptions = cms.string('IBRS+'),
-        fitFunction = cms.string('sGauss'),
+        fitFunction = cms.string('dGauss'),
         fitMaxPt = cms.double(999999.0),
         pathOut = cms.string('/afs/cern.ch/user/v/vadler/cms/Top/CMSSW_4_4_4/src/TopQuarkAnalysis/TopMassSemiLeptonic/data/transfer_fromSummer11'),
         doFit = cms.bool(True),
