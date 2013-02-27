@@ -1,5 +1,5 @@
 //
-// $Id: GenericTriggerEventFlag.cc,v 1.13 2012/04/22 15:09:29 vadler Exp $
+// $Id: GenericTriggerEventFlag.cc,v 1.11 2012/01/20 18:18:11 vadler Exp $
 //
 
 
@@ -347,19 +347,27 @@ bool GenericTriggerEventFlag::acceptGtLogicalExpression( const edm::Event & even
       edm::Handle< L1GlobalTriggerReadoutRecord > gtReadoutRecord;
       event.getByLabel( gtInputTag_, gtReadoutRecord );
       if ( ! gtReadoutRecord.isValid() ) {
-        if ( verbose_ > 1 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "L1GlobalTriggerReadoutRecord product with InputTag \"" << gtInputTag_.encode() << "\" not in event ==> decision: " << errorReplyGt_;
-        gtAlgoLogicParser.operandTokenVector().at( iStatusBit ).tokenResult = errorReplyDcs_;
-        continue;
+        if ( verbose_ > 1 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "L1GlobalTriggerReadoutRecord product with InputTag \"" << gtInputTag_.encode() << "\" not in event";
+        event.getByType( gtReadoutRecord );
+        if ( ! gtReadoutRecord.isValid() ) {
+          if ( verbose_ > 1 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "L1GlobalTriggerReadoutRecord product not in event at all ==> decision: " << errorReplyGt_;
+          gtAlgoLogicParser.operandTokenVector().at( iStatusBit ).tokenResult = errorReplyDcs_;
+          continue;
+        }
       }
       decision = ( gtReadoutRecord->gtFdlWord().physicsDeclared() == 1 );
     } else if ( gtStatusBit == "Stable" || gtStatusBit == "StableBeam" || gtStatusBit == "Adjust" || gtStatusBit == "Sqeeze" || gtStatusBit == "Flat" || gtStatusBit == "FlatTop" ||
-                gtStatusBit == "7TeV" || gtStatusBit == "8TeV" || gtStatusBit == "2360GeV" || gtStatusBit == "900GeV" ) {
+                gtStatusBit == "7TeV" || gtStatusBit == "900GeV" ) {
       edm::Handle< L1GlobalTriggerEvmReadoutRecord > gtEvmReadoutRecord;
       event.getByLabel( gtEvmInputTag_, gtEvmReadoutRecord );
       if ( ! gtEvmReadoutRecord.isValid() ) {
-        if ( verbose_ > 1 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "L1GlobalTriggerEvmReadoutRecord product with InputTag \"" << gtEvmInputTag_.encode() << "\" not in event ==> decision: " << errorReplyGt_;
-        gtAlgoLogicParser.operandTokenVector().at( iStatusBit ).tokenResult = errorReplyDcs_;
-        continue;
+        if ( verbose_ > 1 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "L1GlobalTriggerEvmReadoutRecord product with InputTag \"" << gtEvmInputTag_.encode() << "\" not in event";
+        event.getByType( gtEvmReadoutRecord );
+        if ( ! gtEvmReadoutRecord.isValid() ) {
+          if ( verbose_ > 1 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "L1GlobalTriggerEvmReadoutRecord product not in event at all ==> decision: " << errorReplyGt_;
+          gtAlgoLogicParser.operandTokenVector().at( iStatusBit ).tokenResult = errorReplyDcs_;
+          continue;
+        }
       }
       if ( gtStatusBit == "Stable" || gtStatusBit == "StableBeam" ) {
         decision = ( gtEvmReadoutRecord->gtfeWord().beamMode() == 11 );
@@ -371,10 +379,6 @@ bool GenericTriggerEventFlag::acceptGtLogicalExpression( const edm::Event & even
         decision = ( 8 <= gtEvmReadoutRecord->gtfeWord().beamMode() && gtEvmReadoutRecord->gtfeWord().beamMode() <= 11 );
       } else if ( gtStatusBit == "7TeV" ) {
         decision = ( gtEvmReadoutRecord->gtfeWord().beamMomentum() == 3500 );
-      } else if ( gtStatusBit == "8TeV" ) {
-        decision = ( gtEvmReadoutRecord->gtfeWord().beamMomentum() == 4000 );
-      } else if ( gtStatusBit == "2360GeV" ) {
-        decision = ( gtEvmReadoutRecord->gtfeWord().beamMomentum() == 1180 );
       } else if ( gtStatusBit == "900GeV" ) {
         decision = ( gtEvmReadoutRecord->gtfeWord().beamMomentum() == 450 );
       }
@@ -604,14 +608,6 @@ std::vector< std::string > GenericTriggerEventFlag::expressionsFromDB( const std
 
   if ( key.size() == 0 ) return std::vector< std::string >( 1, emptyKeyError_ );
   edm::ESHandle< AlCaRecoTriggerBits > logicalExpressions;
-  std::vector< edm::eventsetup::DataKey > labels;
-  setup.get< AlCaRecoTriggerBitsRcd >().fillRegisteredDataKeys( labels );
-  std::vector< edm::eventsetup::DataKey >::const_iterator iKey = labels.begin();
-  while ( iKey != labels.end() && iKey->name().value() != dbLabel_ ) ++iKey;
-  if ( iKey == labels.end() ) {
-    if ( verbose_ > 0 ) edm::LogWarning( "GenericTriggerEventFlag" ) << "Label " << dbLabel_ << " not found in DB for 'AlCaRecoTriggerBitsRcd'";
-    return std::vector< std::string >( 1, configError_ );
-  }
   setup.get< AlCaRecoTriggerBitsRcd >().get( dbLabel_, logicalExpressions );
   const std::map< std::string, std::string > & expressionMap = logicalExpressions->m_alcarecoToTrig;
   std::map< std::string, std::string >::const_iterator listIter = expressionMap.find( key );
