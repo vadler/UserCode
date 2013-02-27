@@ -365,9 +365,9 @@ std::string TransferFunction::Print( bool useNan ) const
 {
   std::stringstream print( std::ios_base::out );
   print << std::endl;
-  if ( FitFunction().empty() ) print << "FitFunction       : \t" << FitFunctionString().empty() ? "[undetermined]" : FitFunctionString() << "\t(constructed from C++ class)" << std::endl;
+  if ( FitFunction().empty() ) print << "FitFunction       : \t" << ( FitFunctionString().empty() ? "[undetermined]" : FitFunctionString() ) << "\t(constructed from C++ class)" << std::endl;
   else                         print << "FitFunction       : \t" << FitFunction() << std::endl;
-  if ( DependencyFunction().empty() ) print << "DependencyFunction: \t" << DependencyFunctionString() << "\t(constructed from C++ class) \ton " << Dependency() << std::endl;
+  if ( DependencyFunction().empty() ) print << "DependencyFunction: \t" << ( DependencyFunctionString().empty() ? "[undetermined]" : DependencyFunctionString() ) << "\t(constructed from C++ class) \ton " << Dependency() << std::endl;
   else                                print << "DependencyFunction: \t" << DependencyFunction() << " \ton " << Dependency() << std::endl;
   print << "Comment           : \t" << Comment() << std::endl << std::endl;
 
