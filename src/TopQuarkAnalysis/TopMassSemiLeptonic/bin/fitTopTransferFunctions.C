@@ -1983,6 +1983,23 @@ void setParametersFit( std::string objCat, TF1 * fit, TH1D * histo, std::string 
     }
   }
 
+  // Crystal Ball case
+  if ( fitFuncId == "CB" ) {
+    fit->SetParameter( 0, c );
+//     fit->SetParLimits( 0, 0., 100. ); //
+    fit->SetParName( 0, "c" );
+    fit->SetParameter( 1, p );
+    fit->SetParName( 1, "#mu" );
+    fit->SetParameter( 2, sqrt( s - m ) );
+//     fit->SetParLimits( 2, 0., 100. ); //
+    fit->SetParName( 2, "#sigma" );
+    fit->SetParameter( 3, 1. );
+//     fit->SetParLimits( 3, 0., 100. ); // 3
+    fit->SetParName( 3, "#alpha" );
+    fit->SetParameter( 4, 2. );
+    fit->SetParName( 4, "n" );
+  }
+
 }
 
 
