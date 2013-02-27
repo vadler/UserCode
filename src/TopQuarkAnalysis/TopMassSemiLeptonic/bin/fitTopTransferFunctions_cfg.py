@@ -62,7 +62,7 @@ norm        = 0 # index of parameter holding the normalisation of the fit functi
 fitOptions  = 'IBRS+'
 fitRange    = 1. # for Gaussian fits (in units of orig. RMS)
 #fitRange    = 2. # for Gaussian fits (in units of orig. RMS)
-if fitFunction == 'dGauss': # a background function is defined
+if fitFunction != 'sGauss': # a background function is defined
   fitRange = widthFactor # for combined fits (in units of orig. RMS)
 
 # I/O
