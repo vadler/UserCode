@@ -1,0 +1,48 @@
+  #-------------------------------------------------
+  # DQM Services
+  #-------------------------------------------------
+
+  # core
+  include "DQMServices/Core/data/DQM.cfg"
+  
+  # ME2EDM conversion
+  include "DQMServices/Components/data/MEtoEDMConverter.cfi"
+
+  #-------------------------------------------------
+  # SiStrip DQM Source and Client
+  #-------------------------------------------------
+  
+  # source
+  include "DQM/SiStripMonitorClient/data/SiStripSourceConfigTier0.cff"
+  
+  #-------------------------------------------------
+  # Scheduling
+  #-------------------------------------------------
+  
+  sequence SiStripDQMTest_cosmicTk = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
+    SiStripDQMTier0_cosmicTk,
+    # from "DQMServices/Components/data/MEtoEDMConverter.cfi"
+    MEtoEDMConverter 
+  }
+  
+  sequence SiStripDQMTest_ckf = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
+    SiStripDQMTier0_ckf,
+    # from "DQMServices/Components/data/MEtoEDMConverter.cfi"
+    MEtoEDMConverter 
+  }
+  
+  sequence SiStripDQMTest_rs = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
+    SiStripDQMTier0_rs,
+    # from "DQMServices/Components/data/MEtoEDMConverter.cfi"
+    MEtoEDMConverter 
+  }
+  
+  sequence SiStripDQMTest = {
+    # from "DQM/SiStripMonitorClient/scripts/SiStripSourceConfigTier0.cff"
+    SiStripDQMTier0,
+    # from "DQMServices/Components/data/MEtoEDMConverter.cfi"
+    MEtoEDMConverter 
+  }
