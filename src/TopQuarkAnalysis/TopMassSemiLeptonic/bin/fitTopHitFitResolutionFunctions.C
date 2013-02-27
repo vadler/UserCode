@@ -55,7 +55,6 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & process_( edm::readPSetsFrom( argv[ 1 ] )->getParameter< edm::ParameterSet >( "process" ) );
   const unsigned verbose_( process_.getParameter< unsigned >( "verbose" ) );
   const std::vector< std::string > objCats_( process_.getParameter< std::vector< std::string > >( "objectCategories" ) );   // object categories
-  const bool overwrite_(  process_.getParameter< bool >( "overwrite" ));
   const bool usePileUp_( process_.getParameter< bool >( "usePileUp" ) );
   const bool useAlt_( process_.getParameter< bool >( "useAlt" ) );
   const bool useSymm_( process_.getParameter< bool >( "useSymm" ) );
@@ -65,6 +64,8 @@ int main( int argc, char * argv[] )
   // Configuration for in- & output
   const edm::ParameterSet & io_( process_.getParameter< edm::ParameterSet >( "io" ) );
   const std::string inFile_( io_.getParameter< std::string >( "inputFile" ) );
+  const std::string outFile_( io_.getParameter< std::string >( "outputFile" ) );
+  const bool overwrite_(  io_.getParameter< bool >( "overwrite" ));
   const std::string sample_( io_.getParameter< std::string >( "sample" ) );
   const std::string pathPlots_( io_.getParameter< std::string >( "pathPlots" ) );
   const bool plot_( ! pathPlots_.empty() );
@@ -73,20 +74,24 @@ int main( int argc, char * argv[] )
   const edm::ParameterSet & histos_( process_.getParameter< edm::ParameterSet >( "histos" ) );
   const double widthFactor_( histos_.getParameter< double >( "widthFactor" ) );
   // Configuration for fitting resolution functions
-  const edm::ParameterSet & fit_( process_.getParameter< edm::ParameterSet >( "fit" ) );
-  const std::string fitFunction_( fit_.getParameter< std::string >( "fitFunction" ) );
-  std::string fitOptions_( fit_.getParameter< std::string >( "fitOptions" ) );
-  std::string fitOptionsSigma_( fit_.getParameter< std::string >( "fitOptionsSigma" ) );
-  const double fitRange_( std::min( fit_.getParameter< double >( "fitRange" ), widthFactor_ ) );
-  const std::string resFunc_( fit_.getParameter< std::string >( "resolutionFunction" ) );
-  const std::string resFuncInv_( fit_.getParameter< std::string >( "resolutionFunctionInverse" ) );
-  const std::string resFuncRel_( fit_.getParameter< std::string >( "resolutionFunctionRel" ) );
-  const std::string resFuncInvRel_( fit_.getParameter< std::string >( "resolutionFunctionInverseRel" ) );
-  const std::string resFuncInvInv_( fit_.getParameter< std::string >( "resolutionFunctionInverseInv" ) );
-  const std::string resFuncInvInvRel_( fit_.getParameter< std::string >( "resolutionFunctionInverseInvRel" ) );
-  const bool onlyExisting_( fit_.getParameter< bool >( "onlyExisting" ) );
-  const bool writeFiles_( fit_.getParameter< bool >( "writeFiles" ) && onlyExisting_ );
-  const std::string pathOutResolution_( fit_.getParameter< std::string >( "pathOut" ) );
+  const edm::ParameterSet & resolution_( process_.getParameter< edm::ParameterSet >( "resolution" ) );
+  const bool doFit_( resolution_.getParameter< bool >( "doFit" ) );
+  const bool scale_( resolution_.getParameter< bool >( "scale" ) );
+  double fitMaxPt_( resolution_.getParameter< double >( "fitMaxPt" ) );
+  const std::string fitFunction_( resolution_.getParameter< std::string >( "fitFunction" ) );
+  const int norm_( resolution_.getParameter< int >( "norm" ) );
+  std::string fitOptions_( resolution_.getParameter< std::string >( "fitOptions" ) );
+  std::string fitOptionsSigma_( resolution_.getParameter< std::string >( "fitOptionsSigma" ) );
+  const double fitRange_( std::min( resolution_.getParameter< double >( "fitRange" ), widthFactor_ ) );
+  const std::string resFunc_( resolution_.getParameter< std::string >( "resolutionFunction" ) );
+  const std::string resFuncInv_( resolution_.getParameter< std::string >( "resolutionFunctionInverse" ) );
+  const std::string resFuncRel_( resolution_.getParameter< std::string >( "resolutionFunctionRel" ) );
+  const std::string resFuncInvRel_( resolution_.getParameter< std::string >( "resolutionFunctionInverseRel" ) );
+  const std::string resFuncInvInv_( resolution_.getParameter< std::string >( "resolutionFunctionInverseInv" ) );
+  const std::string resFuncInvInvRel_( resolution_.getParameter< std::string >( "resolutionFunctionInverseInvRel" ) );
+  const bool onlyExisting_( resolution_.getParameter< bool >( "onlyExisting" ) );
+  const std::string pathOut_( resolution_.getParameter< std::string >( "pathOut" ) );
+  const bool writeFiles_( ! pathOut_.empty() );
 
   std::vector< std::vector< bool > > nominalInv_( objCats_.size() );
 
@@ -1312,7 +1317,7 @@ int main( int argc, char * argv[] )
     if ( writeFiles_ ) {
 
       // File name
-      std::string nameOut( pathOutResolution_ + "/gentResolution_" + sample_ + "_" + objCat );
+      std::string nameOut( pathOut_ + "/gentResolution_" + sample_ + "_" + objCat );
       if ( usePileUp_ )                     nameOut.append( "_PileUp" );
       if ( refSel_)                         nameOut.append( "_Ref" );
       if ( useAlt_ || refGen_ || useSymm_ ) nameOut.append( "_" );

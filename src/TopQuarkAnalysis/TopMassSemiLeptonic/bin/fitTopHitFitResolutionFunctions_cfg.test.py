@@ -15,14 +15,14 @@ sample = 'Fall11_R4_1_L3_unambiguousOnly'
 # Objects
 objects = []
 objects.append( 'UdscJet' )
-objects.append( 'BJet' )
-objects.append( 'Mu' )
-objects.append( 'Elec' )
+#objects.append( 'BJet' )
+#objects.append( 'Mu' )
+#objects.append( 'Elec' )
 
 # Settings
-overwrite  = True # to throw away earlier versions of histograms, trees and functions
-plot       = True
-writeFiles = True
+overwrite  = False # to throw away earlier versions of histograms, trees and functions
+plot       = False
+writeFiles = False
 # Exclusive switches:
 usePileUp = False
 useAlt    = False
@@ -71,13 +71,14 @@ if useSymm:
   name += 'Symm'
 #inputFile = 'analyzeHitFit_from%s_%s.root'%( era, sample )
 #logFile    = inputFile.replace( 'analyzeHitFit', 'fitTopResolutionFunctions' )
-inputFile = 'fitTopHitFit_from%s_%s.root'%( era, sample )
+#logFile    = logFile.replace( '.root', '.test.log' )
+inputFile = 'fitTopHitFit_from%s_%s.test.root'%( era, sample )
 logFile    = inputFile.replace( 'fitTopHitFit', 'fitTopResolutionFunctions' )
-outputFile = logFile
-logFile    = logFile.replace( '.root', '.log' )
+logFile    = logFile.replace( '.test.root', '.test.log' )
+outputFile = logFile.replace( '.test.log', '.test.root' )
 if usePileUp:
-  outputFile = outputFile.replace( '.root', '_PileUp.root' )
-  logFile    = logFile.replace( '.log', '_PileUp.log' )
+  outputFile = outputFile.replace( '.test.root', '_PileUp.test.root' )
+  logFile    = logFile.replace( '.test.log', '_PileUp.test.log' )
 if refSel:
   logFile = logFile.replace( '.', '_Ref.', 1 )
 if useNonT:
@@ -92,14 +93,14 @@ else:
     logFile = logFile.replace( '.', '_Pt_.', 1 )
 logFile = logFile.replace( '_.', '_' + name + '.', 1 )
 logFile = logFile.replace( '_.', '.', 1 )
-cfgFile    = logFile.replace( '.log', '_cfg.py' )
+cfgFile    = logFile.replace( '.test.log', '_cfg.test.py' )
 inputFile  = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), inputFile )
 outputFile = 'file:%s/output/%s'%( os.getenv( "CMSSW_BASE" ), outputFile )
 logFile    = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
 cfgFile    = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), cfgFile )
 pathPlots = ''
 if plot:
-  pathPlots = '%s/output/plots/fitTopResolutionFunctions/fitTopResolutionFunctions_from%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample )
+  pathPlots = '%s/output/plots/fitTopResolutionFunctions/fitTopResolutionFunctionsTest_from%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample )
   if refSel:
     pathPlots += 'Ref_'
 pathOut = ''
