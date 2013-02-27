@@ -90,15 +90,15 @@ int main( int argc, char * argv[] )
   assert( testFuncGauss5.Eval( 0., 0. ) / testFuncGauss5.Eval( 0., 1. ) == testFuncGauss1.Eval( 0., 0. ) / testFuncGauss1.Eval( 0., 1. ) );
   assert( testFuncGauss5.Formula().empty() );
 
-  my::LowCrystalBall * myCrystalBall( new my::LowCrystalBall() );
-  TF1 * crystal6( new TF1( "crystal6", myCrystalBall, 0., 1., my::LowCrystalBall::NPar() ) );
+  my::LowerCrystalBall * myCrystalBall( new my::LowerCrystalBall() );
+  TF1 * crystal6( new TF1( "crystal6", myCrystalBall, 0., 1., my::LowerCrystalBall::NPar() ) );
   TF1 * line6( new TF1( "line6", myLine, 0., 1., my::Line::NPar() ) );
   my::TransferFunction testFuncCrystal6( crystal6, line6 );
   assert(   testFuncCrystal6.SetParameters( 0, pars_5 ) );
   assert( ! testFuncCrystal6.SetParameters( 0, pars_7 ) );
   assert(   testFuncCrystal6.SetParameters( 1, pars_5 ) );
   assert( ! testFuncCrystal6.SetParameters( 2, pars_5 ) );
-  assert( ( Int_t )testFuncCrystal6.NParFit() == my::LowCrystalBall::NPar() );
+  assert( ( Int_t )testFuncCrystal6.NParFit() == my::LowerCrystalBall::NPar() );
   assert( testFuncCrystal6.NParDependency()   == testFuncGauss5.NParDependency() );
 
   delete myGauss;

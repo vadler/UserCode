@@ -98,11 +98,26 @@ namespace my {
   /// - [3]: transition position
   /// - [4]: power law parameter
   /// Returns -1. in case of error
-  class LowCrystalBall : public Resolution {
+  class LowerCrystalBall : public Resolution {
     public:
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 5; };
-      inline static std::string String() { return std::string( "one-sided Crystal Ball" ); };
+      inline static std::string String() { return std::string( "" ); };
+      virtual Double_t Sigma( Double_t * par ) { return par[ 2 ]; };
+  };
+
+  /// Normalised high sided Crystal Ball function with the following parameters:
+  /// - [0]: normation factor
+  /// - [1]: Gaussian mean
+  /// - [2]: Gaussian sigma
+  /// - [3]: transition position
+  /// - [4]: power law parameter
+  /// Returns -1. in case of error
+  class UpperCrystalBall : public Resolution {
+    public:
+      virtual Double_t operator()( Double_t * x, Double_t * par );
+      inline static Int_t NPar() { return 5; };
+      inline static std::string String() { return std::string( "" ); };
       virtual Double_t Sigma( Double_t * par ) { return par[ 2 ]; };
   };
 
@@ -119,7 +134,7 @@ namespace my {
     public:
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 7; };
-      inline static std::string String() { return std::string( "double-sided Crystal Ball" ); };
+      inline static std::string String() { return std::string( "" ); };
       virtual Double_t Sigma( Double_t * par ) { return par[ 2 ]; };
   };
 

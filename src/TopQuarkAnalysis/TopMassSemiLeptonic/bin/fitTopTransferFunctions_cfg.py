@@ -56,7 +56,7 @@ maxDR    = 0.1
 
 # Transfer functions
 # Fit function
-fitFunction        = 'dGauss' # 'sGauss', 'dGauss'
+fitFunction        = 'dGauss' # 'sGauss', 'dGauss', 'lCB', 'uCB'
 dependencyFunction = 'linear' # 'linear', 'squared', 'resolution'
 norm        = 0 # index of parameter holding the normalisation of the fit functikon
 fitOptions  = 'IBRS+'

@@ -99,10 +99,21 @@ int main( int argc, char * argv[] )
       return returnStatus_;
     }
   }
-  else if ( fitFuncId_ == "CB" ) {
-    if ( depFuncId_ == "linear" )          returnStatus_ += run< my::LowCrystalBall, my::Line >( argc, argv );
-    else if ( depFuncId_ == "squared" )    returnStatus_ += run< my::LowCrystalBall, my::Parabola >( argc, argv );
-    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::LowCrystalBall, my::ResolutionLike >( argc, argv );
+  else if ( fitFuncId_ == "lCB" ) {
+    if ( depFuncId_ == "linear" )          returnStatus_ += run< my::LowerCrystalBall, my::Line >( argc, argv );
+    else if ( depFuncId_ == "squared" )    returnStatus_ += run< my::LowerCrystalBall, my::Parabola >( argc, argv );
+    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::LowerCrystalBall, my::ResolutionLike >( argc, argv );
+    else {
+      std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
+      returnStatus_ += 0x4;
+      return returnStatus_;
+    }
+  }
+  else if ( fitFuncId_ == "uCB" ) {
+    if ( depFuncId_ == "linear" )          returnStatus_ += run< my::UpperCrystalBall, my::Line >( argc, argv );
+    else if ( depFuncId_ == "squared" )    returnStatus_ += run< my::UpperCrystalBall, my::Parabola >( argc, argv );
+    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::UpperCrystalBall, my::ResolutionLike >( argc, argv );
     else {
       std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
                 << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
@@ -1984,20 +1995,21 @@ void setParametersFit( std::string objCat, TF1 * fit, TH1D * histo, std::string 
   }
 
   // Crystal Ball case
-  if ( fitFuncId == "CB" ) {
+  if ( fitFuncId == "lCB" || fitFuncId == "uCB" ) {
     fit->SetParameter( 0, c );
-//     fit->SetParLimits( 0, 0., 100. ); //
+    fit->SetParLimits( 0, 0., 100. ); //
     fit->SetParName( 0, "c" );
     fit->SetParameter( 1, p );
     fit->SetParName( 1, "#mu" );
     fit->SetParameter( 2, sqrt( s - m ) );
-//     fit->SetParLimits( 2, 0., 100. ); //
+    fit->SetParLimits( 2, 0., 100. ); // 6, 7, 8, 9, 10
     fit->SetParName( 2, "#sigma" );
     fit->SetParameter( 3, 1. );
-//     fit->SetParLimits( 3, 0., 100. ); // 3
+    fit->SetParLimits( 3, 0., 100. ); // 3, 9, 10
     fit->SetParName( 3, "#alpha" );
     fit->SetParameter( 4, 2. );
     fit->SetParName( 4, "n" );
+//   fit->SetParLimits( 4, 1., 100. ); //
   }
 
 }
