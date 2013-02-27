@@ -1,0 +1,493 @@
+### patLayer0 ###
+
+
+## cleaners ##
+
+# caloJetCleaner #
+// replace allLayer0Jets.jetSource = iterativeCone5CaloJets
+// replace allLayer0Jets.removeOverlaps.jets.collection = allLayer0Electrons
+// replace allLayer0Jets.removeOverlaps.jets.deltaR     = 0.3
+// replace allLayer0Jets.removeOverlaps.jets.cut        = "pt > 10"
+// replace allLayer0Jets.removeOverlaps.jets.flags      = { "Isolation/Tracker" }
+// replace allLayer0Jets.selection.type = "none"
+// replace allLayer0Jets.markItems    = true
+// replace allLayer0Jets.saveRejected = "Bad"
+// replace allLayer0Jets.saveAll      = ""
+// replace allLayer0Jets.bitsToIgnore = {  }
+// replace allLayer0Jets.wantSummary  = true
+
+# caloMETCleaner #
+// replace allLayer0METs.metSource    = corMetType1Icone5
+// replace allLayer0METs.markItems    = true
+// replace allLayer0METs.saveRejected = ""
+// replace allLayer0METs.saveAll      = ""
+// replace allLayer0METs.bitsToIgnore = {  }
+// replace allLayer0METs.wantSummary  = true
+
+# electronCleaner #
+// replace allLayer0Electrons.electronSource   = pixelMatchGsfElectrons
+// replace allLayer0Electrons.removeDuplicates = true
+// replace allLayer0Electrons.selection.type = "none"
+// replace allLayer0Electrons.isolation.tracker.src = patAODElectronIsolations:egammaElectronTkIsolation
+// replace allLayer0Electrons.isolation.tracker.cut = 3.0
+// replace allLayer0Electrons.isolation.ecal.src = patAODElectronIsolations:egammaEcalIsolation
+// replace allLayer0Electrons.isolation.ecal.cut = 9999.0
+// replace allLayer0Electrons.isolation.hcal.src = patAODElectronIsolations:egammaTowerIsolation
+// replace allLayer0Electrons.isolation.hcal.cut = 9999.0
+// replace allLayer0Electrons.markItems    = true
+// replace allLayer0Electrons.saveRejected = ""
+// replace allLayer0Electrons.saveAll      = ""
+// replace allLayer0Electrons.bitsToIgnore = { "Isolation/All" }
+// replace allLayer0Electrons.wantSummary = true
+
+# muonCleaner #
+// replace allLayer0Muons.muonSource = muons
+// replace allLayer0Muons.selection.type = "muonPOG"
+// replace allLayer0Muons.selection.flag = "TMLastStationLoose"
+// replace allLayer0Muons.isolation.tracker.src    = patAODMuonIsolations:muGlobalIsoDepositCtfTk 
+// replace allLayer0Muons.isolation.tracker.deltaR = 0.3 
+// replace allLayer0Muons.isolation.tracker.cut    = 2.0
+// replace allLayer0Muons.isolation.ecal.src    = patAODMuonIsolations:muGlobalIsoDepositCalByAssociatorTowersecal
+// replace allLayer0Muons.isolation.ecal.deltaR = 0.3 
+// replace allLayer0Muons.isolation.ecal.cut    = 2.0
+// replace allLayer0Muons.isolation.hcal.src    = patAODMuonIsolations:muGlobalIsoDepositCalByAssociatorTowershcal
+// replace allLayer0Muons.isolation.hcal.deltaR = 0.3 
+// replace allLayer0Muons.isolation.hcal.cut    = 2.0
+// replace allLayer0Muons.isolation.user = { 
+//                                           {
+//                                             InputTag src    = patAODMuonIsolations:muGlobalIsoDepositCalByAssociatorTowersho 
+//                                             double   deltaR = 0.3 
+//                                             double   cut    = 2.0
+//                                           },
+//                                           {
+//                                             InputTag src    = patAODMuonIsolations:muGlobalIsoDepositJets
+//                                             double   deltaR = 0.5 
+//                                             double   cut    = 2.0
+//                                           }
+//                                         }
+// replace allLayer0Muons.markItems    = true
+// replace allLayer0Muons.saveRejected = ""
+// replace allLayer0Muons.saveAll      = ""
+// replace allLayer0Muons.bitsToIgnore = { "Isolation/All" }
+// replace allLayer0Muons.wantSummary  = true
+
+# pfTauCleaner #
+// replace allLayer0Taus.tauSource              = pfRecoTauProducer 
+// replace allLayer0Taus.tauDiscriminatorSource = pfRecoTauDiscriminationByIsolation 
+// replace allLayer0Taus.removeOverlaps         = {  } 
+// replace allLayer0Taus.markItems              = true 
+// replace allLayer0Taus.saveRejected           = "" 
+// replace allLayer0Taus.saveAll                = "" 
+// replace allLayer0Taus.bitsToIgnore           = {  } 
+// replace allLayer0Taus.wantSummary            = true 
+
+# photonCleaner #
+// replace allLayer0Photons.photonSource     = photons
+// replace allLayer0Photons.removeDuplicates = "bySeed"
+// replace allLayer0Photons.removeElectrons  = "bySeed"
+// replace allLayer0Photons.electrons        = allLayer0Electrons
+// replace allLayer0Photons.isolation.tracker.src             = patAODPhotonIsolations:egammaPhotonTkDeposits
+// replace allLayer0Photons.isolation.tracker.deltaR          = 0.3
+// replace allLayer0Photons.isolation.tracker.vetos           = { "Threshold(1.5)" }
+// replace allLayer0Photons.isolation.tracker.skipDefaultVeto = true
+// replace allLayer0Photons.isolation.tracker.cut             = 5.0
+// replace allLayer0Photons.isolation.ecal.src    = patAODPhotonIsolations:egammaPhotonTowersDeposits
+// replace allLayer0Photons.isolation.ecal.deltaR = 0.3 
+// replace allLayer0Photons.isolation.ecal.cut    = 3.0
+// replace allLayer0Photons.isolation.hcal.src    = patAODPhotonIsolations:egammaPhotonEcalDeposits
+// replace allLayer0Photons.isolation.hcal.deltaR = 0.3 
+// replace allLayer0Photons.isolation.hcal.cut    = 5.0
+// replace allLayer0Photons.markItems    = true
+// replace allLayer0Photons.saveRejected = ""
+// replace allLayer0Photons.saveAll      = ""
+// replace allLayer0Photons.bitsToIgnore = { "Isolation/All" }
+
+## corrections ##
+
+# jetCorrFactors #
+// replace jetCorrFactors.jetSource           = iterativeCone5CaloJets
+// replace jetCorrFactors.defaultJetCorrector = "MCJetCorrectorIcone5"
+// replace jetCorrFactors.udsJetCorrector     = "L5FlavorJetCorrectorUds"
+// replace jetCorrFactors.gluonJetCorrector   = "L5FlavorJetCorrectorGluon"
+// replace jetCorrFactors.cJetCorrector       = "L5FlavorJetCorrectorC"
+// replace jetCorrFactors.bJetCorrector       = "L5FlavorJetCorrectorB"
+
+## MC matching ##
+
+# electronMatch #
+// replace electronMatch.src                   = allLayer0Electrons
+// replace electronMatch.matched               = genParticles
+// replace electronMatch.maxDeltaR             = 0.5
+// replace electronMatch.maxDPtRel             = 0.5
+// replace electronMatch.resolveAmbiguities    = true
+// replace electronMatch.resolveByMatchQuality = false
+// replace electronMatch.checkCharge           = true
+// replace electronMatch.mcPdgId               = { 11 }
+// replace electronMatch.mcStatus              = { 1 }
+
+# tauMatch #
+// replace tauMatch.src                   = allLayer0Taus
+// replace tauMatch.matched               = genParticles
+// replace tauMatch.maxDeltaR             = 5
+// replace tauMatch.maxDPtRel             = 99
+// replace tauMatch.resolveAmbiguities    = true
+// replace tauMatch.resolveByMatchQuality = false
+// replace tauMatch.checkCharge           = true
+// replace tauMatch.mcPdgId               = { 15 }
+// replace tauMatch.mcStatus              = { 2 }
+
+# photonMatch #
+// replace photonMatch.src                   = allLayer0Photons
+// replace photonMatch.matched               = genParticles
+// replace photonMatch.maxDeltaR             = 0.2
+// replace photonMatch.maxDPtRel             = 1.0
+// replace photonMatch.resolveAmbiguities    = true
+// replace photonMatch.resolveByMatchQuality = false
+// replace photonMatch.checkCharge           = true
+// replace photonMatch.mcPdgId               = { 22 }
+// replace photonMatch.mcStatus              = { 1 }
+
+# muonMatch #
+// replace muonMatch.src                   = allLayer0Muons
+// replace muonMatch.matched               = genParticles
+// replace muonMatch.maxDeltaR             = 0.5
+// replace muonMatch.maxDPtRel             = 0.5
+// replace muonMatch.resolveAmbiguities    = true
+// replace muonMatch.resolveByMatchQuality = false
+// replace muonMatch.checkCharge           = true
+// replace muonMatch.mcPdgId               = { 13 }
+// replace muonMatch.mcStatus              = { 1 }
+
+# jetPartonMatch #
+// replace jetPartonMatch.src                   = allLayer0Jets
+// replace jetPartonMatch.matched               = genParticles
+// replace jetPartonMatch.maxDeltaR             = 0.4
+// replace jetPartonMatch.maxDPtRel             = 3.0
+// replace jetPartonMatch.resolveAmbiguities    = true
+// replace jetPartonMatch.resolveByMatchQuality = false
+// replace jetPartonMatch.checkCharge           = false
+// replace jetPartonMatch.mcPdgId               = { 1, 2, 3, 4, 5, 21 }
+// replace jetPartonMatch.mcStatus              = { 3 }
+
+# jetGenJetMatch #
+// replace jetGenJetMatch.src                   = allLayer0Jets
+// replace jetGenJetMatch.matched               = iterativeCone5GenJetsPt10
+// replace jetGenJetMatch.maxDeltaR             = 0.4
+// replace jetGenJetMatch.maxDPtRel             = 3.0
+// replace jetGenJetMatch.resolveAmbiguities    = true
+// replace jetGenJetMatch.resolveByMatchQuality = false
+// replace jetGenJetMatch.checkCharge           = false
+// replace jetGenJetMatch.mcPdgId               = {  }
+// replace jetGenJetMatch.mcStatus              = {  }
+
+## trigger matching ##
+
+# muonHLTProducer #
+// replace HLT1MuonIso.triggerResults  = TriggerResults::HLT
+// replace HLT1MuonIso.triggerName     = "HLT1MuonIso"
+// replace HLT1MuonIso.filterName      = SingleMuIsoL3IsoFiltered::HLT
+// replace HLT1MuonIso.reportVerbose   = false
+# muonHLTMatch #
+// replace muonHLTMatchHLT1MuonNonIso.src               = allLayer0Muons
+// replace muonHLTMatchHLT1MuonNonIso.matched           = HLT1MuonNonIso
+// replace muonHLTMatchHLT1MuonNonIso.maxDeltaR           = 0.5
+// replace muonHLTMatchHLT1MuonNonIso.maxDPtRel           = 0.5
+// replace muonHLTMatchHLT1MuonNonIso.resolveAmbiguities    = true
+// replace muonHLTMatchHLT1MuonNonIso.resolveByMatchQuality = false
+
+# jetHLTProducer
+// replace HLT1Jet.triggerResults  = TriggerResults::HLT
+// replace HLT1Jet.triggerName     = "HLT1Jet"
+// replace HLT1Jet.filterName      = hlt1jet200::HLT
+// replace HLT1Jet.reportVerbose   = false
+// replace HLT2Jet.triggerResults  = TriggerResults::HLT
+// replace HLT2Jet.triggerName     = "HLT2Jet"
+// replace HLT2Jet.filterName      = hlt2jet150::HLT
+// replace HLT2Jet.reportVerbose   = false
+// replace HLT3Jet.triggerResults  = TriggerResults::HLT
+// replace HLT3Jet.triggerName     = "HLT3Jet"
+// replace HLT3Jet.filterName      = hlt3jet85::HLT
+// replace HLT3Jet.reportVerbose   = false
+// replace HLT4Jet.triggerResults  = TriggerResults::HLT
+// replace HLT4Jet.triggerName     = "HLT4Jet"
+// replace HLT4Jet.filterName      = hlt4jet60::HLT
+// replace HLT4Jet.reportVerbose   = false
+# jetHLTMatch #
+// replace jetHLTMatchHLT1Jet.src                   = allLayer0Jets
+// replace jetHLTMatchHLT1Jet.matched               = HLT1Jet
+// replace jetHLTMatchHLT1Jet.maxDeltaR             = 0.4
+// replace jetHLTMatchHLT1Jet.maxDPtRel             = 3.0
+// replace jetHLTMatchHLT1Jet.resolveAmbiguities    = true
+// replace jetHLTMatchHLT1Jet.resolveByMatchQuality = false
+// replace jetHLTMatchHLT2Jet.src                   = allLayer0Jets
+// replace jetHLTMatchHLT2Jet.matched               = HLT2Jet
+// replace jetHLTMatchHLT2Jet.maxDeltaR             = 0.4
+// replace jetHLTMatchHLT2Jet.maxDPtRel             = 3.0
+// replace jetHLTMatchHLT2Jet.resolveAmbiguities    = true
+// replace jetHLTMatchHLT2Jet.resolveByMatchQuality = false
+// replace jetHLTMatchHLT3Jet.src                   = allLayer0Jets
+// replace jetHLTMatchHLT3Jet.matched               = HLT3Jet
+// replace jetHLTMatchHLT3Jet.maxDeltaR             = 0.4
+// replace jetHLTMatchHLT3Jet.maxDPtRel             = 3.0
+// replace jetHLTMatchHLT3Jet.resolveAmbiguities    = true
+// replace jetHLTMatchHLT3Jet.resolveByMatchQuality = false
+// replace jetHLTMatchHLT4Jet.src                   = allLayer0Jets
+// replace jetHLTMatchHLT4Jet.matched               = HLT4Jet
+// replace jetHLTMatchHLT4Jet.maxDeltaR             = 0.4
+// replace jetHLTMatchHLT4Jet.maxDPtRel             = 3.0
+// replace jetHLTMatchHLT4Jet.resolveAmbiguities    = true
+// replace jetHLTMatchHLT4Jet.resolveByMatchQuality = false
+
+
+### patLayer1 ###
+
+## electrons ##
+
+# electronProducer #
+// replace allLayer1Electrons.electronSource   = allLayer0Electrons
+// replace allLayer1Electrons.addGenMatch      = true
+// replace allLayer1Electrons.genParticleMatch = electronMatch
+replace allLayer1Electrons.addTrigMatch     = false
+replace allLayer1Electrons.trigPrimMatch    = {  }
+// replace allLayer1Electrons.addResolutions   = true
+// replace allLayer1Electrons.useNNResolutions = false
+// replace allLayer1Electrons.electronResoFile = "PhysicsTools/PatUtils/data/Resolutions_electron.root"
+// replace allLayer1Electrons.isolation.tracker.src = layer0ElectronIsolations:egammaElectronTkIsolation
+// replace allLayer1Electrons.isolation.ecal.src = layer0ElectronIsolations:egammaEcalIsolation
+// replace allLayer1Electrons.isolation.hcal.src = layer0ElectronIsolations:egammaTowerIsolation
+// replace allLayer1Electrons.isolation.user = {
+//                                               { InputTag src = layer0ElectronIsolations:egammaElectronTkNumIsolation },
+//                                               { InputTag src = layer0ElectronIsolations:egammaEcalRelIsolation },
+//                                               { InputTag src = layer0ElectronIsolations:egammaHOETower }
+//                                             }
+// replace allLayer1Electrons.isoDeposits             = {  }
+// replace allLayer1Electrons.addElectronID           = true
+// replace allLayer1Electrons.electronIDSource        = electronId
+// replace allLayer1Electrons.addElectronIDRobust     = true
+// replace allLayer1Electrons.electronIDRobustSource  = electronIdRobust
+
+# electronSelector #
+// replace selectedLayer1Electrons.src = allLayer1Electrons
+// replace selectedLayer1Electrons.cut = "pt > 10. & abs(eta) < 2.4"
+
+# electronCountFilter #
+// replace minLayer1Electrons.src       = selectedLayer1Electrons
+// replace minLayer1Electrons.minNumber = 0
+// replace maxLayer1Electrons.src       = selectedLayer1Electrons
+// replace maxLayer1Electrons.maxNumber = 999999
+
+## muons ##
+
+# muonProducer #
+// replace allLayer1Muons.muonSource        = allLayer0Muons
+// replace allLayer1Muons.addGenMatch       = true
+// replace allLayer1Muons.genParticleMatch  = muonMatch
+// replace allLayer1Muons.addTrigMatch      = true
+replace allLayer1Muons.trigPrimMatch     = { muonHLTMatchHLT1MuonNonIso }
+// replace allLayer1Muons.addResolutions    = true
+// replace allLayer1Muons.useNNResolutions  = false
+// replace allLayer1Muons.muonResoFile      = "PhysicsTools/PatUtils/data/Resolutions_muon.root"
+// replace allLayer1Muons.isolation.tracker.src    = layer0MuonIsolations:muGlobalIsoDepositCtfTk
+// replace allLayer1Muons.isolation.tracker.deltaR = 0.3
+// replace allLayer1Muons.isolation.ecal.src    = layer0MuonIsolations:muGlobalIsoDepositCalByAssociatorTowersecal
+// replace allLayer1Muons.isolation.ecal.deltaR = 0.3
+// replace allLayer1Muons.isolation.hcal.src    = layer0MuonIsolations:muGlobalIsoDepositCalByAssociatorTowershcal
+// replace allLayer1Muons.isolation.hcal.deltaR = 0.3
+// replace allLayer1Muons.isolation.user = {
+//                                           { InputTag src    = layer0MuonIsolations:muGlobalIsoDepositCalByAssociatorTowersho
+//                                             double   deltaR = 0.3
+//                                           },
+//                                           { InputTag src    = layer0MuonIsolations:muGlobalIsoDepositJets
+//                                             double   deltaR = 0.3
+//                                           }
+//                                         }
+// replace allLayer1Muons.isoDeposits.tracker = layer0MuonIsolations:muGlobalIsoDepositCtfTk
+// replace allLayer1Muons.isoDeposits.ecal    = layer0MuonIsolations:muGlobalIsoDepositCalByAssociatorTowersecal
+// replace allLayer1Muons.isoDeposits.hcal    = layer0MuonIsolations:muGlobalIsoDepositCalByAssociatorTowershcal
+// replace allLayer1Muons.isoDeposits.user    = {
+//                                                layer0MuonIsolations:muGlobalIsoDepositCalByAssociatorTowersho,
+//                                                layer0MuonIsolations:muGlobalIsoDepositJets
+//                                              }
+// replace allLayer1Muons.addMuonID = true
+
+# muonSelector #
+// replace selectedLayer1Muons.src = allLayer1Muons
+// replace selectedLayer1Muons.cut = "pt > 10. & abs(eta) < 2.4"
+
+# muonCountFilter #
+// replace minLayer1Muons.src       = selectedLayer1Muons
+replace minLayer1Muons.minNumber = 1
+// replace maxLayer1Muons.src       = selectedLayer1Muons
+// replace maxLayer1Muons.maxNumber = 999999
+
+## taus ##
+
+# tauProducer #
+// replace allLayer1Taus.tauSource        = allLayer0Taus
+// replace allLayer1Taus.addGenMatch      = true
+// replace allLayer1Taus.genParticleMatch = tauMatch  
+replace allLayer1Taus.addTrigMatch     = false
+replace allLayer1Taus.trigPrimMatch    = {  }
+// replace allLayer1Taus.addResolutions   = true
+// replace allLayer1Taus.useNNResolutions = true
+// replace allLayer1Taus.tauResoFile      = "PhysicsTools/PatUtils/data/Resolutions_tau.root"
+// replace allLayer1Taus.isolation        = {  } 
+// replace allLayer1Taus.isoDeposits      = {  } 
+
+# tauSelector #
+// replace selectedLayer1Taus.src = allLayer1Taus
+// replace selectedLayer1Taus.cut = "pt > 15. & abs(eta) < 2.4 & emEnergyFraction<0.9 & eOverP>0.5"
+
+# tauCountFilter #
+// replace minLayer1Taus.src       = selectedLayer1Taus
+// replace minLayer1Taus.minNumber = 0
+// replace maxLayer1Taus.src       = selectedLayer1Taus
+// replace maxLayer1Taus.maxNumber = 999999
+
+## photons ##
+
+# photonProducer #
+// replace allLayer1Photons.photonSource      = allLayer0Photons 
+// replace allLayer1Photons.embedSuperCluster = false
+replace allLayer1Photons.addTrigMatch      = false
+replace allLayer1Photons.trigPrimMatch     = {  }
+// replace allLayer1Photons.isolation.tracker.src       = layer0PhotonIsolations:egammaPhotonTkDeposits
+// replace allLayer1Photons.isolation.tracker.deltaR    = 0.3
+// replace allLayer1Photons.isolation.tracker.threshold = 1.5
+// replace allLayer1Photons.isolation.hcal.src    = layer0PhotonIsolations:egammaPhotonTowersDeposits
+// replace allLayer1Photons.isolation.hcal.deltaR = 0.3
+// replace allLayer1Photons.isolation.ecal.src    = layer0PhotonIsolations:egammaPhotonEcalDeposits
+// replace allLayer1Photons.isolation.ecal.deltaR = 0.3
+// replace allLayer1Photons.isoDeposits.tracker =  layer0PhotonIsolations:egammaPhotonTkDeposits
+// replace allLayer1Photons.isoDeposits.ecal    =  layer0PhotonIsolations:egammaPhotonEcalDeposits
+// replace allLayer1Photons.isoDeposits.hcal    =  layer0PhotonIsolations:egammaPhotonTowersDeposits
+
+# photonSelector #
+// replace selectedLayer1Photons.src = allLayer1Photons
+// replace selectedLayer1Photons.cut = "pt > 10. & abs(eta) < 2.4"
+
+# photonCountFilter #
+// replace minLayer1Photons.src       = selectedLayer1Photons
+// replace minLayer1Photons.minNumber = 0
+// replace maxLayer1Photons.src       = selectedLayer1Photons
+// replace maxLayer1Photons.maxNumber = 999999
+
+## jets ##
+
+# jetProducer #
+// replace allLayer1Jets.jetSource               = allLayer0Jets
+// replace allLayer1Jets.embedCaloTowers         = true
+// replace allLayer1Jets.getJetMCFlavour         = true
+// replace allLayer1Jets.JetPartonMapSource      = jetPartonAssociation
+// replace allLayer1Jets.addGenPartonMatch       = true
+// replace allLayer1Jets.genPartonMatch          = jetPartonMatch
+// replace allLayer1Jets.addGenJetMatch          = true
+// replace allLayer1Jets.genJetMatch             = jetGenJetMatch
+// replace allLayer1Jets.addPartonJetMatch       = false
+// replace allLayer1Jets.partonJetSource         = nonsenseName
+// replace allLayer1Jets.addTrigMatch            = true
+// replace allLayer1Jets.trigPrimMatch           = {
+//                                                   jetHLTMatchHLT1Jet,
+//                                                   jetHLTMatchHLT2Jet,
+//                                                   jetHLTMatchHLT3Jet,
+//                                                   jetHLTMatchHLT4Jet
+//                                                 }
+// replace allLayer1Jets.jetCorrFactorsSource    = jetCorrFactors
+// replace allLayer1Jets.addResolutions          = true
+// replace allLayer1Jets.useNNResolutions        = false
+// replace allLayer1Jets.caliJetResoFile         = "PhysicsTools/PatUtils/data/Resolutions_lJets_MCJetCorJetIcone5.root"
+// replace allLayer1Jets.caliBJetResoFile        = "PhysicsTools/PatUtils/data/Resolutions_bJets_MCJetCorJetIcone5.root"
+// replace allLayer1Jets.addBTagInfo             = true
+// replace allLayer1Jets.tagModuleLabelPostfix   = "Layer0"
+// replace allLayer1Jets.addDiscriminators       = true
+// replace allLayer1Jets.addJetTagRefs           = true
+// replace allLayer1Jets.tagModuleLabelsToKeep = {
+//                                                 "combinedSVJetTags",
+//                                                 "combinedSVMVAJetTags",
+//                                                 "impactParameterMVAJetTags",
+//                                                 "jetProbabilityJetTags",
+//                                                 "softElectronJetTags",
+//                                                 "softMuonJetTags",
+//                                                 "softMuonNoIPJetTags",
+//                                                 "trackCountingHighEffJetTags",
+//                                                 "trackCountingHighPurJetTags"
+//                                               }
+// replace allLayer1Jets.addAssociatedTracks     = true 
+// replace allLayer1Jets.trackAssociation.tracksSource = ctfWithMaterialTracks
+// replace allLayer1Jets.trackAssociation.deltaR       = 0.5
+// replace allLayer1Jets.trackAssociation.minHits      = 8
+// replace allLayer1Jets.trackAssociation.maxNormChi2  = 5.0
+// replace allLayer1Jets.addJetCharge = true
+// replace allLayer1Jets.jetCharge.exp = 1.0
+// replace allLayer1Jets.jetCharge.var = "Pt"
+
+# jetSelector #
+// replace selectedLayer1Jets.src = allLayer1Jets
+// replace selectedLayer1Jets.cut = "et > 15. & abs(eta) < 2.4 & nConstituents > 0"
+
+# jetCountFilter #
+// replace minLayer1Jets.src       = selectedLayer1Jets
+replace minLayer1Jets.minNumber = 4
+// replace maxLayer1Jets.src       = selectedLayer1Jets
+// replace maxLayer1Jets.maxNumber = 999999
+
+## MET ##
+
+# metProducer #
+// replace allLayer1METs.metSource        = allLayer0METs
+// replace allLayer1METs.addGenMET        = true
+// replace allLayer1METs.genMETSource     = genMet
+replace allLayer1METs.addTrigMatch     = false
+replace allLayer1METs.trigPrimMatch    = {  }
+// replace allLayer1METs.addResolutions   = true
+// replace allLayer1METs.useNNResolutions = false
+// replace allLayer1METs.metResoFile      = "PhysicsTools/PatUtils/data/Resolutions_met.root"
+
+# metSelector #
+// replace selectedLayer1METs.src = allLayer1METs
+// replace selectedLayer1METs.cut = "et > 0."
+
+## leptons ##
+
+# leptonCountFilter #
+// replace countLayer1Leptons.electronSource = selectedLayer1Electrons
+// replace countLayer1Leptons.muonSource     = selectedLayer1Muons
+// replace countLayer1Leptons.tauSource      = selectedLayer1Taus
+// replace countLayer1Leptons.countElectrons = true
+// replace countLayer1Leptons.countMuons     = true
+// replace countLayer1Leptons.countTaus      = false
+// replace countLayer1Leptons.minNumber      = 0
+// replace countLayer1Leptons.maxNumber      = 999999
+
+## eventSolution ##
+
+# ttSemi #
+// replace solutions.electronSource      = selectedLayer1Electrons
+// replace solutions.muonSource          = selectedLayer1Muons
+// replace solutions.metSource           = selectedLayer1METs
+// replace solutions.jetSource           = selectedLayer1Jets
+// replace solutions.leptonFlavour       = "muon"
+// replace solutions.jetCorrectionScheme = 0
+// replace solutions.nrCombJets          = 4
+// replace solutions.matchToGenEvt       = true
+// replace solutions.matchingAlgorithm   = 0
+// replace solutions.useMaximalDistance  = true
+// replace solutions.useDeltaR           = true 
+// replace solutions.maximalDistance     = 0.3
+// replace solutions.doKinFit            = true
+// replace solutions.maxNrIter           = 200
+// replace solutions.maxDeltaS           = 5e-5
+// replace solutions.maxF                = 1e-4
+// replace solutions.jetParametrisation  = 0
+// replace solutions.lepParametrisation  = 0
+// replace solutions.metParametrisation  = 0
+// replace solutions.constraints         = { 1 }
+// replace solutions.addLRSignalSel      = true
+// replace solutions.lrSignalSelObs      = { -1 }
+// replace solutions.lrSignalSelFile     = "TopQuarkAnalysis/TopEventSelection/data/TtSemiLRSignalSelSelObsAndPurity.root"
+// replace solutions.addLRJetComb        = true
+// replace solutions.lrJetCombObs        = { -1 }
+// replace solutions.lrJetCombFile       = "TopQuarkAnalysis/TopJetCombination/data/TtSemiLRJetCombSelObsAndPurity.root"
+
+
+                                                 

@@ -7,79 +7,75 @@ process.MessageLogger = cms.Service( "MessageLogger",
         'cout'
     ),
     cout = cms.untracked.PSet(
-#         threshold = cms.untracked.string( 'ERROR' )
         threshold = cms.untracked.string( 'WARNING' )
     )
 )
-process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck",
-    ignoreTotal = cms.untracked.int32( 0 )
-)
 
 # Magnetic Field
-process.load( "Configuration.StandardSequences.MagneticField_xMAG_FIELDx_cff" )
+# process.load( "Configuration.GlobalRuns.ForceZeroTeslaField_cff" )
+process.localUniform = cms.ESProducer( "UniformMagneticFieldESProducer",
+    ZFieldInTesla = cms.double( 0.0 )
+)
+process.prefer( "UniformMagneticFieldESProducer" )
 
 # Geometry
 process.load( "Configuration.StandardSequences.Geometry_cff" )
 
 # Calibration 
-process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
-process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_COND_21X_GLOBALTAG'
-process.GlobalTag.globaltag = 'xGLOBAL_TAGx'
-process.es_prefer_GlobalTag = cms.ESPrefer(
-    'PoolDBESSource',
-    'GlobalTag'
+import CalibTracker.Configuration.Common.PoolDBESSource_cfi
+process.siStripCond = CalibTracker.Configuration.Common.PoolDBESSource_cfi.poolDBESSource.clone()
+process.siStripCond.toGet = cms.VPSet(
+    cms.PSet( record = cms.string( 'SiStripPedestalsRcd') , tag = cms.string( 'SiStripPedestals_TKCC_21X_v3_hlt' )      ), 
+    cms.PSet( record = cms.string( 'SiStripNoisesRcd')    , tag = cms.string( 'SiStripNoise_TKCC_21X_v3_hlt' )          ),
+    cms.PSet( record = cms.string( 'SiStripBadFiberRcd')  , tag = cms.string( 'SiStripBadChannel_TKCC_21X_v2_offline' ) ),
+    cms.PSet( record = cms.string( 'SiStripBadChannelRcd'), tag = cms.string( 'SiStripBadChannel_TKCC_21X_v3_hlt' )     ),
+    cms.PSet( record = cms.string( 'SiStripFedCablingRcd'), tag = cms.string( 'SiStripFedCabling_TKCC_21X_v3_hlt' )     )
 )
+# uncomment for Oracle access at CERN
+process.siStripCond.connect                         = 'oracle://cms_orcoff_prod/CMS_COND_21X_STRIP'
+process.siStripCond.DBParameters.authenticationPath = '/afs/cern.ch/cms/DB/conddb'
+
+process.sistripconn = cms.ESProducer( "SiStripConnectivity" )
+
+process.load("CalibTracker.SiStripESProducers.SiStripQualityESProducer_cfi")
+process.siStripQualityESProducer.ListOfRecordToMerge = cms.VPSet(
+    cms.PSet( record = cms.string( 'SiStripDetCablingRcd' ), tag = cms.string( '' ) ),
+    cms.PSet( record = cms.string( 'SiStripBadChannelRcd' ), tag = cms.string( '' ) )
+)
+
+# Fake Conditions
+process.load( "CalibTracker.Configuration.SiStripGain.SiStripGain_Fake_cff" )
+process.siStripGainFakeESSource.appendToDataLabel=cms.string('')
+process.load( "CalibTracker.Configuration.SiStripLorentzAngle.SiStripLorentzAngle_Fake_cff" )
+process.load( "CalibTracker.Configuration.SiPixelLorentzAngle.SiPixelLorentzAngle_Fake_cff" )
+process.load( "CalibTracker.Configuration.TrackerAlignment.TrackerAlignment_Fake_cff" )
 
 # SiStrip DQM
-process.load( "DQM.SiStripMonitorClient.SiStripDQMOfflineGlobalRunCAF_cff" )
-
-# Input
-process.load( "xINCLUDE_DIRECTORYx.inputFiles_cff" )
-process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( -1 )
-)
+process.load( "INCLUDE_DIRECTORY.SiStripDQMOfflineGlobalRunCAF_cff" )
 
 # HLT Filter
 process.hltFilter = cms.EDFilter( "HLTHighLevel",
-    HLTPaths           = cms.vstring(
-        'HLT_WhatEverFunnyFilter',
-        'HLT_TrackerCosmics',
-        'HLT_TrackerCosmics_CoTF',
-        'HLT_TrackerCosmics_RS'  ,
-        'HLT_TrackerCosmics_CTF'
+    HLTPaths          = cms.vstring(
+        'CandHLTTrackerCosmicsCoTF',
+        'CandHLTTrackerCosmicsRS'  ,
+        'CandHLTTrackerCosmicsCTF'
     ),
-    eventSetupPathsKey = cms.string( '' ),
-    andOr              = cms.bool( True ),
-    throw              = cms.bool( False ),
-    # use this according to https://hypernews.cern.ch/HyperNews/CMS/get/global-runs/537.html
-    # TO BE TEMPLATYFIED!
-    TriggerResultsTag  = cms.InputTag( 'TriggerResults', '', 'HLT' )
-#     TriggerResultsTag  = cms.InputTag( 'TriggerResults', '', 'FU' )    
+    andOr             = cms.bool( True ),
+    TriggerResultsTag = cms.InputTag( "TriggerResults", "", "FU" )
 )
 
 # Scheduling
 process.p = cms.Path(
-xHLT_FILTERxprocess.hltFilter                            *
-xRECO_FROM_RAWxprocess.SiStripDQMRecoFromRaw                *
-xDQM_FROM_RAWxprocess.SiStripDQMSourceGlobalRunCAF_fromRAW *
+RECO_FROM_RAW
+HLT_FILTER
     process.SiStripDQMRecoGlobalRunCAF           *
-#     process.SiStripDQMSourceGlobalRunCAF_reduced *
-    process.SiStripMonitorClusterCAF             *
-    process.MEtoEDMConverter
+    process.SiStripDQMSourceGlobalRunCAF_reduced *
+    process.SiStripDQMClientGlobalRunCAF         *
+    process.qTester * process.dqmSaver
 )
 
-# Output
-process.out = cms.OutputModule( "PoolOutputModule",
-    fileName       = cms.untracked.string( 'xOUTPUT_DIRECTORYx/SiStripDQMOfflineGlobalRunCAF-xRUN_NAMEx.root' ),
-    SelectEvents   = cms.untracked.PSet(
-        SelectEvents = cms.vstring( 'p' )
-    ),
-    outputCommands = cms.untracked.vstring(
-        'drop *',
-        'keep *_MEtoEDMConverter_*_SiStripDQMOfflineGlobalRunCAF'
-    )
-)
-
-process.outpath = cms.EndPath(
-    process.out
+# Input
+process.load( "INPUT_FILES" )
+process.maxEvents = cms.untracked.PSet(
+    input = cms.untracked.int32( -1 )
 )
