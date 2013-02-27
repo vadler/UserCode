@@ -65,13 +65,6 @@ Double_t my::SingleGaussian::operator()( Double_t * x, Double_t * par )
 
 }
 
-Double_t my::SingleGaussian::Sigma( Double_t * par )
-{
-
-  return par[ 2 ];
-
-}
-
 
 Double_t my::DoubleGaussian::operator()( Double_t * x, Double_t * par )
 {
@@ -90,13 +83,6 @@ Double_t my::DoubleGaussian::operator()( Double_t * x, Double_t * par )
   }
 
   return value;
-
-}
-
-Double_t my::DoubleGaussian::Sigma( Double_t * par )
-{
-
-  return par[ 2 ] + par[ 3 ] * par[ 5 ];
 
 }
 
@@ -127,13 +113,6 @@ Double_t my::LowCrystalBall::operator()( Double_t * x, Double_t * par )
 
 }
 
-Double_t my::LowCrystalBall::Sigma( Double_t * par )
-{
-
-  return par[ 2 ];
-
-}
-
 
 Double_t my::DoubleCrystalBall::operator()( Double_t * x, Double_t * par )
 {
@@ -141,12 +120,5 @@ Double_t my::DoubleCrystalBall::operator()( Double_t * x, Double_t * par )
   Double_t value( -1. );
 
   return value;
-
-}
-
-Double_t my::DoubleCrystalBall::Sigma( Double_t * par )
-{
-
-  return par[ 2 ];
 
 }

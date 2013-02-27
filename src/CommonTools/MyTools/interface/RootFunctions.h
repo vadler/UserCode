@@ -7,9 +7,9 @@
 #include "TROOT.h"
 
 
-namespace my {
+/// Base functions
 
-  /// Base functions
+namespace my {
 
   /// Generic function base class
   class Function {
@@ -23,7 +23,11 @@ namespace my {
       virtual Double_t Sigma( Double_t * par ) = 0;
   };
 
-  /// Function implementations
+}
+
+/// Function implementations
+
+namespace my {
 
   /// Line with the following parameters:
   /// - [0]: y-intercept
@@ -68,7 +72,7 @@ namespace my {
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 3; };
       inline static std::string String() { return std::string( "[0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi))" ); };
-      virtual Double_t Sigma( Double_t * par );
+      virtual Double_t Sigma( Double_t * par ) { return par[ 2 ]; };
   };
 
   /// Normalised double Gaussian with the following parameters:
@@ -84,7 +88,7 @@ namespace my {
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 6; };
       inline static std::string String() { return std::string( "[0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi))" ); };
-      virtual Double_t Sigma( Double_t * par );
+      virtual Double_t Sigma( Double_t * par ) { return par[ 2 ] + par[ 3 ] * par[ 5 ]; };
   };
 
   /// Normalised low sided Crystal Ball function with the following parameters:
@@ -99,7 +103,7 @@ namespace my {
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 5; };
       inline static std::string String() { return std::string( "one-sided Crystal Ball" ); };
-      virtual Double_t Sigma( Double_t * par );
+      virtual Double_t Sigma( Double_t * par ) { return par[ 2 ]; };
   };
 
   /// Normalised double sided Crystal Ball function with the following parameters:
@@ -116,7 +120,7 @@ namespace my {
       virtual Double_t operator()( Double_t * x, Double_t * par );
       inline static Int_t NPar() { return 7; };
       inline static std::string String() { return std::string( "double-sided Crystal Ball" ); };
-      virtual Double_t Sigma( Double_t * par );
+      virtual Double_t Sigma( Double_t * par ) { return par[ 2 ]; };
   };
 
 }
