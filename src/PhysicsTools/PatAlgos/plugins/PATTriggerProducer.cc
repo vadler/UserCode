@@ -1,5 +1,5 @@
 //
-// $Id: PATTriggerProducer.cc,v 1.37 2012/09/11 22:45:29 vadler Exp $
+// $Id: PATTriggerProducer.cc,v 1.39 2013/02/27 23:26:56 wmtan Exp $
 //
 
 
@@ -165,7 +165,7 @@ PATTriggerProducer::PATTriggerProducer( const ParameterSet & iConfig ) :
 }
 
 
-void PATTriggerProducer::beginRun( Run & iRun, const EventSetup & iSetup )
+void PATTriggerProducer::beginRun(const Run & iRun, const EventSetup & iSetup )
 {
 
   // Initialize
@@ -247,7 +247,7 @@ void PATTriggerProducer::beginRun( Run & iRun, const EventSetup & iSetup )
 }
 
 
-void PATTriggerProducer::beginLuminosityBlock( LuminosityBlock & iLuminosityBlock, const EventSetup & iSetup )
+void PATTriggerProducer::beginLuminosityBlock(const LuminosityBlock & iLuminosityBlock, const EventSetup & iSetup )
 {
 
   // Terminate, if auto process name determination failed
