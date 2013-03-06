@@ -3,10 +3,11 @@ Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc472/cms/cmssw/CMSSW_6_2_0_pre3
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_2_0_pre3
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        V06-05-13      V06-05-13      
-PhysicsTools/PatAlgos                            V08-10-34      V08-10-34      
+PhysicsTools/PatAlgos                            V08-10-34-02   V08-10-34      
 PhysicsTools/PatUtils                            V03-09-29      V03-09-26-01   
 RecoMET/METProducers                             V03-03-21-01   V03-03-21      
 TopQuarkAnalysis/TopEventProducers               V06-09-13      V06-09-13      
+TopQuarkAnalysis/TopEventSelection               V06-07-16      V06-07-16      
 TopQuarkAnalysis/TopJetCombination               V06-08-06      V06-08-05      
 ---------------------------------------
-total packages: 6 (6 displayed)
+total packages: 7 (7 displayed)

@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 
 filesRelValProdTTbarAODSIM = cms.untracked.vstring(
-    pickRelValInputFiles( cmsswVersion  = 'CMSSW_6_2_0_pre2'
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_6_1_1'
                         , relVal        = 'RelValProdTTbar'
                         , globalTag     = 'START61_V11'
                         , dataTier      = 'AODSIM'
@@ -11,7 +11,7 @@ filesRelValProdTTbarAODSIM = cms.untracked.vstring(
                         )
     )
 filesRelValProdTTbarGENSIMRECO = cms.untracked.vstring(
-    pickRelValInputFiles( cmsswVersion  = 'CMSSW_6_2_0_pre2'
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_6_1_1'
                         , relVal        = 'RelValProdTTbar'
                         , globalTag     = 'START61_V11'
                         , dataTier      = 'GEN-SIM-RECO'
@@ -20,7 +20,7 @@ filesRelValProdTTbarGENSIMRECO = cms.untracked.vstring(
                         )
     )
 filesRelValTTbarPileUpGENSIMRECO = cms.untracked.vstring(
-    pickRelValInputFiles( cmsswVersion  = 'CMSSW_6_2_0_pre2'
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_6_1_1'
                         , relVal        = 'RelValTTbar'
                         , globalTag     = 'PU_START61_V11'
                         , dataTier      = 'GEN-SIM-RECO'
@@ -29,10 +29,10 @@ filesRelValTTbarPileUpGENSIMRECO = cms.untracked.vstring(
                         )
     )
 filesSingleMuRECO = cms.untracked.vstring(
-    pickRelValInputFiles( cmsswVersion  = 'CMSSW_6_2_0_pre2'
+    pickRelValInputFiles( cmsswVersion  = 'CMSSW_6_1_1'
                         , relVal        = 'SingleMu'
                         , dataTier      = 'RECO'
-                        , globalTag     = 'GR_R_61_V6_RelVal_mu2012D'
+                        , globalTag     = 'GR_R_61_V6_RelVal_mu2012C'
                         , maxVersions   = 1
                         , numberOfFiles = 1
                         )
