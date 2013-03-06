@@ -1,9 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-cmsswVersion = 'CMSSW_6_1_0'
+cmsswVersion = 'CMSSW_6_2_0_pre2'
 globalTag    = 'GR_R_61_V6'
-condition    = 'com10_5E33v4'
+condition    = 'com10_7E33v3'
 
 process = cms.Process( "HLTPROV" )
 
@@ -30,7 +30,7 @@ process.source = cms.Source("PoolSource",
                         , relVal        = 'SingleMu'
                         , dataTier      = 'RECO'
                         , condition     = condition
-                        , globalTag     = '%s_RelVal_mu2012A'%( globalTag )
+                        , globalTag     = '%s_RelVal_mu2012C'%( globalTag )
                         , maxVersions   = None
                         , skipFiles     = None
                         , numberOfFiles = None

@@ -2,7 +2,7 @@ import os
 import FWCore.ParameterSet.Config as cms
 
 # Steering
-cmsswVersion = 'CMSSW_6_1_0'
+cmsswVersion = 'CMSSW_6_2_0_pre2'
 globalTag    = 'GR_R_61_V6'
 condition    = 'com10_7E33v3'
 
@@ -32,7 +32,7 @@ process.source = cms.Source(
 , fileNames = cms.untracked.vstring( pickRelValInputFiles( cmsswVersion  = cmsswVersion
                                                          , relVal        = 'SingleMu'
                                                          , dataTier      = 'RECO'
-                                                         , globalTag     = '%s_RelVal_mu2012A'%( globalTag )
+                                                         , globalTag     = '%s_RelVal_mu2012C'%( globalTag )
                                                          , maxVersions   = 1
                                                          )
                                    )

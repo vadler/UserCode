@@ -2,8 +2,8 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 # Steering
-cmsswVersion = 'CMSSW_6_1_0'
-globalTag    = 'START61_V8'
+cmsswVersion = 'CMSSW_6_2_0_pre2'
+globalTag    = 'START61_V11'
 
 ## Options
 process.options.wantSummary      = False
