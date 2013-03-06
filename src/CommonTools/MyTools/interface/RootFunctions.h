@@ -25,7 +25,7 @@ namespace my {
 
 }
 
-/// Function implementations
+/// Dependency implementations
 
 namespace my {
 
@@ -62,8 +62,14 @@ namespace my {
       inline static std::string String() { return std::string( "sqrt([0]**2+[1]**2*x+[2]**2*x**2)" ); };
   };
 
+}
+
+/// Resolution implementations
+
+namespace my {
+
   /// Normalised single Gaussian with the following parameters:
-  /// - [0]: normation factor
+  /// - [0]: normalisation factor
   /// - [1]: Gaussian mean
   /// - [2]: Gaussian sigma
   /// Returns -1. in case of error
@@ -76,10 +82,10 @@ namespace my {
   };
 
   /// Normalised double Gaussian with the following parameters:
-  /// - [0]: normation factor
+  /// - [0]: normalisation factor
   /// - [1]: first Gaussian mean
   /// - [2]: first Gaussian sigma
-  /// - [3]: additional normation factor for second Gaussian
+  /// - [3]: additional normalisation factor for second Gaussian
   /// - [4]: second Gaussian mean
   /// - [5]: second Gaussian sigma
   /// Returns -1. in case of error
@@ -92,7 +98,7 @@ namespace my {
   };
 
   /// Normalised low sided Crystal Ball function with the following parameters:
-  /// - [0]: normation factor
+  /// - [0]: normalisation factor
   /// - [1]: Gaussian mean
   /// - [2]: Gaussian sigma
   /// - [3]: transition position
@@ -107,7 +113,7 @@ namespace my {
   };
 
   /// Normalised high sided Crystal Ball function with the following parameters:
-  /// - [0]: normation factor
+  /// - [0]: normalisation factor
   /// - [1]: Gaussian mean
   /// - [2]: Gaussian sigma
   /// - [3]: transition position
@@ -122,7 +128,7 @@ namespace my {
   };
 
   /// Normalised double sided Crystal Ball function with the following parameters:
-  /// - [0]: normation factor
+  /// - [0]: normalisation factor
   /// - [1]: Gaussian mean
   /// - [2]: Gaussian sigma
   /// - [3]: transition position first power law

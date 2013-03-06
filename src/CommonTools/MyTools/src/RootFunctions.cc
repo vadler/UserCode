@@ -126,12 +126,12 @@ Double_t my::UpperCrystalBall::operator()( Double_t * x, Double_t * par )
   Double_t B( par[ 4 ] / TMath::Abs( par[ 3 ] ) - TMath::Abs( par[ 3 ] ) );
   Double_t C( ( par[ 4 ] / TMath::Abs( par[ 3 ] ) ) * ( 1. / ( par[ 4 ] - 1. ) ) * TMath::Exp( -( TMath::Power( TMath::Abs( par[ 3 ] ), 2. ) / 2. ) ) );
   Double_t D( TMath::Sqrt( TMath::PiOver2() ) * ( 1. + TMath::Erf( TMath::Abs( par[ 3 ] ) / TMath::Sqrt( TMath::Pi() ) ) ) );
-  Double_t E( ( M - x[ 0 ] ) / S );
+  Double_t E( ( x[ 0 ] - M ) / S );
   Double_t N( par[ 0 ] / ( par[ 2 ] * ( C + D ) ) );
 
   if ( N >= 0. && S > 0. ) {
-    if ( E <= -par[ 3 ] ) {
-      value = N * A * TMath::Power( ( B - E ), -par[ 4 ] );
+    if ( E >= par[ 3 ] ) {
+      value = N * A * TMath::Power( ( B + E ), -par[ 4 ] );
     }
     else {
       value = N * TMath::Exp( -0.5 * TMath::Power( E, 2. ) );
