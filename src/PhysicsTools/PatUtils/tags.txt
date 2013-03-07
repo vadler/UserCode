@@ -3,7 +3,7 @@ Base Release in: /afs/cern.ch/cms/sw/ReleaseCandidates/slc5_amd64_gcc472/wed/6.2
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_2_X_2013-03-06-1400
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/PatCandidates                        V06-05-13      V06-05-13      
-PhysicsTools/PatAlgos                            V08-11-00      V08-10-35      
+PhysicsTools/PatAlgos                            V08-11-01      V08-10-35      
 PhysicsTools/PatUtils                            V03-09-29      V03-09-26-01   
 RecoMET/METProducers                             V03-03-23      V03-03-22      
 TopQuarkAnalysis/TopEventProducers               V06-09-13      V06-09-13      
