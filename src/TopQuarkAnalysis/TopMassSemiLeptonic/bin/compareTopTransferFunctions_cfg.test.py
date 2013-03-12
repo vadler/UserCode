@@ -17,7 +17,6 @@ objects.append( 'BJet' )    # default: dGauss+linear
 # Settings
 overwrite  = True # to throw away earlier versions of histograms, trees and functions
 plot       = True
-writeFiles = False
 # Exclusive switches:
 useAlt    = True # E instead of p
 useNonT   = True
@@ -26,8 +25,11 @@ refGen    = True
 refSel    = True
 
 # Fitting
-fitNonRestr    = False
-fitEtaBins     = False
+fitNonRestr = False
+fitEtaBins  = False
+useNorm     = False  # use normalisation parameter, when combining fit parameters
+norm        = 0     # index of parameter holding the normalisation of the fit functikon
+weightR2    = True # to account for differing numbers of parameters
 
 # I/O
 logFile = inputFile.replace( 'fitTopTransferFunctions', 'compareTopTransferFunctions' )
@@ -69,21 +71,24 @@ cfgFile    = logFile.replace( '.test.log', '_cfg.test.py' )
 process = cms.PSet()
 process.verbose = cms.uint32( 3 )
 process.objectCategories = cms.vstring( objects )
-process.useAlt    = cms.bool( useAlt )
-process.useNonT   = cms.bool( useNonT )
-process.useSymm   = cms.bool( useSymm )
-process.refGen    = cms.bool( refGen )
-process.refSel    = cms.bool( refSel )
+process.useAlt  = cms.bool( useAlt )
+process.useNonT = cms.bool( useNonT )
+process.useSymm = cms.bool( useSymm )
+process.refGen  = cms.bool( refGen )
+process.refSel  = cms.bool( refSel )
 
 process.io = cms.PSet(
-  inputFile  = cms.string( inputFile )
-, overwrite  = cms.bool( overwrite )
-, pathPlots  = cms.string( pathPlots )
+  inputFile = cms.string( inputFile )
+, overwrite = cms.bool( overwrite )
+, pathPlots = cms.string( pathPlots )
 )
 
 process.fit = cms.PSet(
-  fitNonRestr  = cms.bool( fitNonRestr )
-, fitEtaBins   = cms.bool( fitEtaBins )
+  fitNonRestr = cms.bool( fitNonRestr )
+, fitEtaBins  = cms.bool( fitEtaBins )
+, useNorm     = cms.bool( useNorm )
+, norm        = cms.int32( norm )
+, weightR2    = cms.bool( weightR2 )
 )
 
 
