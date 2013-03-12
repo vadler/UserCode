@@ -4,7 +4,7 @@ from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 filesRelValProdTTbarAODSIM = cms.untracked.vstring(
     pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_3_6'
                         , relVal        = 'RelValProdTTbar'
-                        , globalTag     = 'START52_V14'
+                        , globalTag     = 'START53_V14'
                         , dataTier      = 'AODSIM'
                         , maxVersions   = 2
                         , numberOfFiles = 1
@@ -13,7 +13,7 @@ filesRelValProdTTbarAODSIM = cms.untracked.vstring(
 filesRelValProdTTbarGENSIMRECO = cms.untracked.vstring(
     pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_3_6'
                         , relVal        = 'RelValProdTTbar'
-                        , globalTag     = 'START52_V14'
+                        , globalTag     = 'START53_V14'
                         , dataTier      = 'GEN-SIM-RECO'
                         , maxVersions   = 2
                         , numberOfFiles = 1
