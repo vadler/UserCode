@@ -9,10 +9,10 @@ PhysicsTools/PatUtils                            V03-09-28      V03-09-26
 RecoMET/METProducers                             V03-03-17-00-01 V03-03-17      
 TopQuarkAnalysis/Configuration                   V07-00-04      V07-00-04      
 TopQuarkAnalysis/Examples                        V06-07-13      V06-07-13      
-TopQuarkAnalysis/TopEventProducers               V06-09-13      V06-09-13      
+TopQuarkAnalysis/TopEventProducers               V06-09-14      V06-09-13      
 TopQuarkAnalysis/TopEventSelection               V06-07-16      V06-07-16      
 TopQuarkAnalysis/TopHitFit                       V00-00-07      V00-00-07      
-TopQuarkAnalysis/TopJetCombination               V06-08-06      V06-08-05      
+TopQuarkAnalysis/TopJetCombination               V06-08-07      V06-08-05      
 TopQuarkAnalysis/TopKinFitter                    V06-07-23      V06-07-23      
 TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-10      
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-04      
