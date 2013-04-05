@@ -5,8 +5,8 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_2_0_pre4
 DataFormats/PatCandidates                        V06-05-13      V06-05-13      
 PhysicsTools/PatAlgos                            V08-11-02      V08-11-02      
 PhysicsTools/PatUtils                            V03-09-29      V03-09-29      
-TopQuarkAnalysis/TopEventProducers               V06-09-13      V06-09-13      
+TopQuarkAnalysis/TopEventProducers               V06-09-14      V06-09-13      
 TopQuarkAnalysis/TopEventSelection               V06-07-16      V06-07-16      
-TopQuarkAnalysis/TopJetCombination               V06-08-06      V06-08-05      
+TopQuarkAnalysis/TopJetCombination               V06-08-07      V06-08-05      
 ---------------------------------------
 total packages: 6 (6 displayed)
