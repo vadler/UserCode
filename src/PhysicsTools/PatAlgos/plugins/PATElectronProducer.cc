@@ -1,5 +1,5 @@
 //
-// $Id: PATElectronProducer.cc,v 1.60.2.7 2012/10/04 20:36:09 tjkim Exp $
+// $Id: PATElectronProducer.cc,v 1.60.2.8 2013/04/01 18:05:40 tjkim Exp $
 //
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
 
@@ -55,7 +55,12 @@ PATElectronProducer::PATElectronProducer(const edm::ParameterSet & iConfig) :
   embedGsfElectronCore_ = iConfig.getParameter<bool>( "embedGsfElectronCore" );
   embedGsfTrack_ = iConfig.getParameter<bool>( "embedGsfTrack" );
   embedSuperCluster_ = iConfig.getParameter<bool>         ( "embedSuperCluster"    );
+  embedPflowSuperCluster_ = iConfig.getParameter<bool>    ( "embedPflowSuperCluster"    );
   embedSeedCluster_ = iConfig.getParameter<bool>( "embedSeedCluster" );
+  embedBasicClusters_ = iConfig.getParameter<bool>( "embedBasicClusters" );
+  embedPreshowerClusters_ = iConfig.getParameter<bool>( "embedPreshowerClusters" );
+  embedPflowBasicClusters_ = iConfig.getParameter<bool>( "embedPflowBasicClusters" );
+  embedPflowPreshowerClusters_ = iConfig.getParameter<bool>( "embedPflowPreshowerClusters" );
   embedTrack_ = iConfig.getParameter<bool>( "embedTrack" );
   embedRecHits_ = iConfig.getParameter<bool>( "embedRecHits" );
   // pflow configurables
@@ -684,7 +689,12 @@ void PATElectronProducer::fillElectron(Electron& anElectron,
   if (embedGsfElectronCore_) anElectron.embedGsfElectronCore();
   if (embedGsfTrack_) anElectron.embedGsfTrack();
   if (embedSuperCluster_) anElectron.embedSuperCluster();
+  if (embedPflowSuperCluster_) anElectron.embedPflowSuperCluster();
   if (embedSeedCluster_) anElectron.embedSeedCluster();
+  if (embedBasicClusters_) anElectron.embedBasicClusters();
+  if (embedPreshowerClusters_) anElectron.embedPreshowerClusters();
+  if (embedPflowBasicClusters_ ) anElectron.embedPflowBasicClusters();
+  if (embedPflowPreshowerClusters_ ) anElectron.embedPflowPreshowerClusters();
   if (embedTrack_) anElectron.embedTrack();
 
   // store the match to the generated final state muons
@@ -764,7 +774,12 @@ void PATElectronProducer::fillElectron2( Electron& anElectron,
   if (embedGsfElectronCore_) anElectron.embedGsfElectronCore();
   if (embedGsfTrack_) anElectron.embedGsfTrack();
   if (embedSuperCluster_) anElectron.embedSuperCluster();
+  if (embedPflowSuperCluster_ ) anElectron.embedPflowSuperCluster();
   if (embedSeedCluster_) anElectron.embedSeedCluster();
+  if (embedBasicClusters_) anElectron.embedBasicClusters();
+  if (embedPreshowerClusters_) anElectron.embedPreshowerClusters();
+  if (embedPflowBasicClusters_ ) anElectron.embedPflowBasicClusters();
+  if (embedPflowPreshowerClusters_ ) anElectron.embedPflowPreshowerClusters();
   if (embedTrack_) anElectron.embedTrack();
 
   // store the match to the generated final state muons
@@ -838,7 +853,12 @@ void PATElectronProducer::fillDescriptions(edm::ConfigurationDescriptions & desc
   iDesc.add<bool>("embedGsfElectronCore", true)->setComment("embed external gsf electron core");
   iDesc.add<bool>("embedGsfTrack", true)->setComment("embed external gsf track");
   iDesc.add<bool>("embedSuperCluster", true)->setComment("embed external super cluster");
+  iDesc.add<bool>("embedPflowSuperCluster", true)->setComment("embed external super cluster");
   iDesc.add<bool>("embedSeedCluster", true)->setComment("embed external seed cluster");
+  iDesc.add<bool>("embedBasicClusters", true)->setComment("embed external basic clusters");
+  iDesc.add<bool>("embedPreshowerClusters", true)->setComment("embed external preshower clusters");
+  iDesc.add<bool>("embedPflowBasicClusters", true)->setComment("embed external pflow basic clusters");
+  iDesc.add<bool>("embedPflowPreshowerClusters", true)->setComment("embed external pflow preshower clusters");
   iDesc.add<bool>("embedTrack", false)->setComment("embed external track");
   iDesc.add<bool>("embedRecHits", true)->setComment("embed external RecHits");
 
