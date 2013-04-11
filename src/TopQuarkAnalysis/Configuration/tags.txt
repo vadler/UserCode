@@ -3,7 +3,8 @@ Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_3_9
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_3_9
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 AnalysisDataFormats/TopObjects                   V06-08-09      V06-08-07      
-DataFormats/PatCandidates                        V06-05-06-08   V06-05-06-01   
+DataFormats/CaloRecHit                           V02-05-11      V02-05-10      
+DataFormats/PatCandidates                        V06-05-06-09   V06-05-06-01   
 DataFormats/StdDictionaries                      V00-02-14      V00-02-13-01   
 EGamma/EGammaAnalysisTools                       V00-00-13                     
 FWCore/GuiBrowsers                               V00-00-70      V00-00-67      
@@ -23,4 +24,4 @@ TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-03      
 TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-12      
 ---------------------------------------
-total packages: 20 (20 displayed)
+total packages: 21 (21 displayed)
