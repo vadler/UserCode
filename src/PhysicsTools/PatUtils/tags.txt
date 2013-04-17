@@ -2,7 +2,7 @@ Test Release based on: CMSSW_6_2_0_pre5
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc472/cms/cmssw/CMSSW_6_2_0_pre5
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_2_0_pre5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
-DataFormats/CaloRecHit                           V02-05-12      V02-05-10      
+DataFormats/CaloRecHit                           V02-05-13      V02-05-10      
 DataFormats/PatCandidates                        V06-06-02      V06-05-13      
 PhysicsTools/PatAlgos                            V08-11-04      V08-11-02      
 PhysicsTools/PatUtils                            V03-09-30      V03-09-29      
