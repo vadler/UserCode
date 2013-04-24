@@ -2,12 +2,15 @@ Test Release based on: CMSSW_6_2_0_pre5
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc472/cms/cmssw/CMSSW_6_2_0_pre5
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_2_0_pre5
 -------- Package --------                        --- Tag ---    --- RelTag --- 
+CommonTools/ParticleFlow                         V01-01-19      V01-01-17      
 DataFormats/CaloRecHit                           V02-05-13      V02-05-10      
 DataFormats/PatCandidates                        V06-06-02      V06-05-13      
-PhysicsTools/PatAlgos                            V08-11-05      V08-11-02      
+PhysicsTools/PatAlgos                            V08-11-06      V08-11-02      
 PhysicsTools/PatUtils                            V03-09-30      V03-09-29      
+RecoTauTag/Configuration                         V02-00-00      V01-04-08-01   
+RecoTauTag/RecoTau                               V01-06-01      V01-04-20-03   
 TopQuarkAnalysis/TopEventProducers               V06-09-14      V06-09-13      
 TopQuarkAnalysis/TopEventSelection               V06-07-16      V06-07-16      
 TopQuarkAnalysis/TopJetCombination               V06-08-07      V06-08-05      
 ---------------------------------------
-total packages: 7 (7 displayed)
+total packages: 10 (10 displayed)
