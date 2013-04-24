@@ -8,7 +8,7 @@ DataFormats/PatCandidates                        V06-05-06-10   V06-05-06-01
 DataFormats/StdDictionaries                      V00-02-14      V00-02-13-01   
 EGamma/EGammaAnalysisTools                       V00-00-13                     
 FWCore/GuiBrowsers                               V00-00-70      V00-00-67      
-PhysicsTools/PatAlgos                            V08-09-56      V08-09-37-01   
+PhysicsTools/PatAlgos                            V08-09-57      V08-09-37-01   
 PhysicsTools/PatUtils                            V03-09-28      V03-09-26      
 RecoMET/METAnalyzers                             V00-00-08                     
 RecoMET/METProducers                             V03-03-12-02   V03-03-12      
