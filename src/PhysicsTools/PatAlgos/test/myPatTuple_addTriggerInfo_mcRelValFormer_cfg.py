@@ -6,19 +6,17 @@ cmsswVersion = 'CMSSW_6_2_0_pre4'
 globalTag    = 'PRE_ST61_V1'
 
 ## Options
-process.options.wantSummary      = True
+process.options.wantSummary      = False
 process.options.allowUnscheduled = cms.untracked.bool( True )
 
 ## Input
-#from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
-#process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = cmsswVersion
-                                                  #, relVal        = 'RelValProdTTbar'
-                                                  #, dataTier      = 'AODSIM'
-                                                  #, globalTag     = globalTag
-                                                  #, maxVersions   = 1
-                                                  #)
-process.source.fileNames = cms.untracked.vstring( '/store/relval/CMSSW_6_2_0_pre4/RelValProdTTbar/AODSIM/PRE_ST61_V1-v1/00000/E2A9A526-FB90-E211-AA90-003048F1748A.root' )
-process.maxEvents.input = 100
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
+process.source.fileNames    = pickRelValInputFiles( cmsswVersion  = cmsswVersion
+                                                  , relVal        = 'RelValProdTTbar'
+                                                  , dataTier      = 'AODSIM'
+                                                  , globalTag     = globalTag
+                                                  , maxVersions   = 1
+                                                  )
 process.source.skipBadFiles = cms.untracked.bool( True )
 
 # Messaging
@@ -26,8 +24,8 @@ if process.maxEvents.input.value() <= 1:
     process.Tracer = cms.Service( "Tracer" )
 
 ## Output
-process.out.fileName = '%s/output/myPatTupleUnscheduled_addTriggerInfo_mcRelValFormer.root'%( os.getenv( "CMSSW_BASE" ) )
-process.out.outputCommands = cms.untracked.vstring('drop *' )
+process.out.fileName = '%s/output/myPatTuple_addTriggerInfo_mcRelValFormer.root'%( os.getenv( "CMSSW_BASE" ) )
+process.out.outputCommands = cms.untracked.vstring( 'drop *' )
 process.out.outputCommands.append( 'keep edmTriggerResults_TriggerResults_*_*' )
 process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
 
