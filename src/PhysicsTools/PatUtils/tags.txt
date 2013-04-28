@@ -5,7 +5,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_2_0_pre5
 CommonTools/ParticleFlow                         V01-01-19      V01-01-17      
 DataFormats/CaloRecHit                           V02-05-13      V02-05-10      
 DataFormats/PatCandidates                        V06-06-02      V06-05-13      
-PhysicsTools/PatAlgos                            V08-11-06      V08-11-02      
+PhysicsTools/PatAlgos                            V08-11-07      V08-11-02      
 PhysicsTools/PatUtils                            V03-09-30      V03-09-29      
 RecoTauTag/Configuration                         V02-00-00      V01-04-08-01   
 RecoTauTag/RecoTau                               V01-06-01      V01-04-20-03   
