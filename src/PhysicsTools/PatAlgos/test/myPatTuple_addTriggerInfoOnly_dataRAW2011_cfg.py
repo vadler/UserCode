@@ -9,12 +9,8 @@ process = cms.Process( "PAT" )
 ## Options
 process.options = cms.untracked.PSet(
   wantSummary      = cms.untracked.bool( False )
-, allowUnscheduled = cms.untracked.bool( False )
+, allowUnscheduled = cms.untracked.bool( True )
 )
-
-## Messaging
-process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
-#process.Tracer = cms.Service( "Tracer" )
 
 ## Conditions
 process.load( "Configuration.StandardSequences.Services_cff" )
@@ -35,18 +31,23 @@ process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 100 )
 )
 
+## Messaging
+process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
+if process.maxEvents.input.value() <= 1:
+    process.Tracer = cms.Service( "Tracer" )
+
 ## Output
 from L1Trigger.Configuration.L1Trigger_EventContent_cff import L1TriggerAOD
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, SelectEvents = cms.untracked.PSet(
-    SelectEvents = cms.vstring(
-      'p'
-    )
-  )
+#, SelectEvents = cms.untracked.PSet(
+    #SelectEvents = cms.vstring(
+      #'p'
+    #)
+  #)
 , fileName       = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfoOnly_dataRAW2011.root'%( os.getenv( "CMSSW_BASE" ) ) )
 , outputCommands = cms.untracked.vstring(
-    *L1TriggerAOD.outputCommands
+    #*L1TriggerAOD.outputCommands
   )
 )
 process.out.outputCommands.append( 'keep edmTriggerResults_TriggerResults_*_*' )
@@ -58,17 +59,10 @@ process.outpath = cms.EndPath(
 ## RAW to DIGI and RECO pre-requisites
 process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )
 process.load( "L1Trigger.Configuration.L1Reco_cff" )
-process.p = cms.Path(
-  process.gctDigis
-* process.gtDigis
-* process.gtEvmDigis
-* process.scalersRawToDigi
-* process.L1Reco
-)
 
 ## PAT trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOnTrigger( process, sequence = 'p', hltProcess = '*' )
+switchOnTrigger( process, hltProcess = '*' )
 process.patTrigger.addL1Algos     = cms.bool( True )
 process.patTrigger.l1ExtraMu      = cms.InputTag( 'l1extraParticles', ''            )
 process.patTrigger.l1ExtraNoIsoEG = cms.InputTag( 'l1extraParticles', 'NonIsolated' )
@@ -85,5 +79,5 @@ process.patTrigger.exludeCollections = cms.vstring(
 )
 # process.patTriggerEvent.condGtTag = cms.InputTag( 'conditionsInEdm' ) # This does not work due to the lumi and run products
 process.patTriggerEvent.l1GtTag   = cms.InputTag( 'gtDigis' )
-switchOnTrigger( process, sequence = 'p', hltProcess = '*' ) # to update event content
-switchOnTriggerStandAlone( process, sequence = 'p', hltProcess = '*' )
+switchOnTrigger( process, hltProcess = '*' ) # to update event content
+switchOnTriggerStandAlone( process, hltProcess = '*' )

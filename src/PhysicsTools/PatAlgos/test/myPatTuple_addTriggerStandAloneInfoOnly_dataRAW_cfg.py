@@ -9,12 +9,8 @@ process = cms.Process( "PAT" )
 ## Options
 process.options = cms.untracked.PSet(
   wantSummary      = cms.untracked.bool( False )
-, allowUnscheduled = cms.untracked.bool( False )
+, allowUnscheduled = cms.untracked.bool( True )
 )
-
-## Messaging
-process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
-#process.Tracer = cms.Service( "Tracer" )
 
 ## Conditions
 process.load( "Configuration.StandardSequences.Services_cff" )
@@ -35,6 +31,11 @@ process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 1000 )
 )
 
+## Messaging
+process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
+if process.maxEvents.input.value() <= 1:
+    process.Tracer = cms.Service( "Tracer" )
+
 ## Output
 process.out = cms.OutputModule(
   "PoolOutputModule"
@@ -44,10 +45,12 @@ process.out = cms.OutputModule(
     )
   )
 , fileName       = cms.untracked.string( '%s/output/myPatTuple_addTriggerStandAloneInfoOnly_dataRAW.root'%( os.getenv( "CMSSW_BASE" ) ) )
-, outputCommands = cms.untracked.vstring()
+, outputCommands = cms.untracked.vstring(
+    'drop *'
+  , 'keep edmTriggerResults_TriggerResults_*_*'
+  , 'keep *_hltTriggerSummaryAOD_*_*'
+  )
 )
-process.out.outputCommands.append( 'keep edmTriggerResults_TriggerResults_*_*' )
-process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
 process.outpath = cms.EndPath(
   process.out
 )
@@ -59,5 +62,5 @@ process.p = cms.Path(
 )
 
 ## PAT trigger
-from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOnTriggerStandAlone( process, sequence = 'p', hltProcess = '*' )
+from PhysicsTools.PatAlgos.tools.trigTools import switchOnTriggerStandAlone
+switchOnTriggerStandAlone( process, hltProcess = '*' )

@@ -11,12 +11,8 @@ process = cms.Process("PAT")
 ## Options
 process.options = cms.untracked.PSet(
   wantSummary      = cms.untracked.bool( False )
-, allowUnscheduled = cms.untracked.bool( False )
+, allowUnscheduled = cms.untracked.bool( True )
 )
-
-## Messaging
-process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
-#process.Tracer = cms.Service( "Tracer" )
 
 ## Conditions
 process.load( "Configuration.Geometry.GeometryIdeal_cff" )
@@ -32,7 +28,7 @@ process.source = cms.Source(
 , fileNames = cms.untracked.vstring( pickRelValInputFiles( cmsswVersion  = cmsswVersion
                                                          , relVal        = 'SingleMu'
                                                          , dataTier      = 'RECO'
-                                                         , globalTag     = '%s_RelVal_mu2012A'%( globalTag )
+                                                         , globalTag     = '%s_RelVal_mu2012C'%( globalTag )
                                                          , maxVersions   = 1
                                                          )
                                    )
@@ -42,8 +38,12 @@ process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( 100 )
 )
 
+## Messaging
+process.load( "FWCore.MessageLogger.MessageLogger_cfi" )
+if process.maxEvents.input.value() <= 1:
+    process.Tracer = cms.Service( "Tracer" )
+
 ## Output
-from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
 process.out = cms.OutputModule(
   "PoolOutputModule"
 , SelectEvents = cms.untracked.PSet(
@@ -53,20 +53,23 @@ process.out = cms.OutputModule(
   )
 , fileName = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfo_dataRelValFormer.root'%( os.getenv( "CMSSW_BASE" ) ) )
 , outputCommands = cms.untracked.vstring(
-    *patEventContentNoCleaning
+    'drop *'
+  , 'keep edmTriggerResults_TriggerResults_*_*'
+  , 'keep *_hltTriggerSummaryAOD_*_*'
   )
 )
-process.out.outputCommands.append( 'keep edmTriggerResults_TriggerResults_*_*' )
-process.out.outputCommands.append( 'keep *_hltTriggerSummaryAOD_*_*' )
 process.outpath = cms.EndPath(
   process.out
 )
 
 ## Processing
-process.load( "PhysicsTools.PatAlgos.patSequences_cff" )
-process.p = cms.Path(
-  process.patDefaultSequence
-)
+
+## Processing
+process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
+process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
+#process.p = cms.Path(
+  #process.selectedPatCandidateSummary
+#)
 
 from PhysicsTools.PatAlgos.tools.myTools import runOnData
 runOnData( process )
@@ -75,35 +78,26 @@ process.out.outputCommands += [ 'drop recoGenJets_*_*_*' ]
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-from PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff import *
-process.hallo                     = patTrigger.clone()
-process.hallo.saveL1Refs          = cms.bool( True )
-process.hallo.addL1Algos          = cms.bool( True )
-process.hallo.addPathModuleLabels = cms.bool( True )
-process.tschuess           = patTriggerEvent.clone()
-process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
-process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
-process.moin = somePatMuonTriggerMatchPDSingleMu.clone()
-process.tach = somePatMetTriggerMatchHLTMu17.clone()
+#switchOnTrigger( process, path = 'p' )
 switchOnTrigger( process )
 switchOnTriggerMatching( process )
 switchOnTriggerStandAlone( process )
 switchOnTriggerMatchingStandAlone( process )
-#switchOnTriggerMatchEmbedding( process )
+switchOnTriggerMatchEmbedding( process )
+from PhysicsTools.PatAlgos.triggerLayer1.triggerMatcherExamples_cfi import *
+process.moin = somePatMuonTriggerMatchPDSingleMu.clone()
+process.tach = somePatMetTriggerMatchHLTMu17.clone()
+switchOnTrigger( process, triggerProducer = 'hallo', triggerEventProducer = 'tschuess', hltProcess = '*' )
+process.hallo.addL1Algos          = cms.bool( True )
+process.hallo.l1ExtraMu           = cms.InputTag( 'l1extraParticles' )
+process.hallo.saveL1Refs          = cms.bool( True )
+process.hallo.addPathModuleLabels = cms.bool( True )
+process.tschuess.condGtTag = cms.InputTag( 'conditionsInEdm' )
+process.tschuess.l1GtTag   = cms.InputTag( 'gtDigis' )
 switchOnTrigger( process, triggerProducer = 'hallo', triggerEventProducer = 'tschuess', hltProcess = '*' )
 switchOnTriggerMatching( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo', triggerEventProducer = 'tschuess', hltProcess = '*' )
 switchOnTriggerStandAlone( process, triggerProducer = 'hallo', hltProcess = '*' )
 switchOnTriggerMatchingStandAlone( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo', hltProcess = '*' )
 switchOnTriggerMatchEmbedding( process, triggerMatchers = [ 'moin', 'tach' ], triggerProducer = 'hallo', hltProcess = '*' )
-# print
-# print 'Path p'
-# print '--> %s'%( process.p )
-print
-print 'Sequence patDefaultSequenceTrigger'
-print '--> %s'%( process.patDefaultSequenceTrigger )
-print
-print 'Sequence patDefaultSequenceTriggerEvent'
-print '--> %s'%( process.patDefaultSequenceTriggerEvent )
-print
 print 'PoolOutputModule out.outputCommands'
 print '--> %s'%( process.out.outputCommands )
