@@ -10,7 +10,7 @@ process = cms.Process("PAT")
 
 ## Options
 process.options = cms.untracked.PSet(
-  wantSummary      = cms.untracked.bool( False )
+  wantSummary      = cms.untracked.bool( True )
 , allowUnscheduled = cms.untracked.bool( True )
 )
 
@@ -46,11 +46,6 @@ if process.maxEvents.input.value() <= 1:
 ## Output
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, SelectEvents = cms.untracked.PSet(
-    SelectEvents = cms.vstring(
-      'p'
-    )
-  )
 , fileName = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfo_dataRelValFormer.root'%( os.getenv( "CMSSW_BASE" ) ) )
 , outputCommands = cms.untracked.vstring(
     'drop *'
@@ -67,9 +62,6 @@ process.outpath = cms.EndPath(
 ## Processing
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
 process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
-#process.p = cms.Path(
-  #process.selectedPatCandidateSummary
-#)
 
 from PhysicsTools.PatAlgos.tools.myTools import runOnData
 runOnData( process )
@@ -78,7 +70,6 @@ process.out.outputCommands += [ 'drop recoGenJets_*_*_*' ]
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-#switchOnTrigger( process, path = 'p' )
 switchOnTrigger( process )
 switchOnTriggerMatching( process )
 switchOnTriggerStandAlone( process )
