@@ -8,7 +8,7 @@ process = cms.Process("PAT")
 
 ## Options
 process.options = cms.untracked.PSet(
-  wantSummary      = cms.untracked.bool( False )
+  wantSummary      = cms.untracked.bool( True )
 , allowUnscheduled = cms.untracked.bool( True )
 )
 
@@ -42,12 +42,7 @@ if process.maxEvents.input.value() <= 1:
 ## Output
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, SelectEvents = cms.untracked.PSet(
-    SelectEvents = cms.vstring(
-      'p'
-    )
-  )
-, fileName = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) ) )
+, fileName       = cms.untracked.string( '%s/output/myPatTuple_addTriggerInfo_dataRelVal.root'%( os.getenv( "CMSSW_BASE" ) ) )
 , outputCommands = cms.untracked.vstring(
     'drop *'
   , 'keep edmTriggerResults_TriggerResults_*_*'
@@ -61,9 +56,6 @@ process.outpath = cms.EndPath(
 ## Processing
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
 process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
-#process.p = cms.Path(
-  #process.selectedPatCandidateSummary
-#)
 
 from PhysicsTools.PatAlgos.tools.myTools import runOnData
 runOnData( process )

@@ -42,7 +42,7 @@ class RunOnData(ConfigToolBase):
 
         print '******************* RunOnData *******************'
         removeMCMatching(process, names=names, postfix=postfix, outputModules=outputModules)
-        for mod in getattr(process,'patDefaultSequence'+postfix).moduleNames():
+        for mod in process.producerNames().split():
             if mod.startswith('patJetCorrFactors'):
                 prefix = getattr(process, mod).payload.pythonValue().replace("'","")
                 if 'L3Absolute' in getattr(process,mod).levels:
@@ -111,10 +111,6 @@ class RemoveMCMatching(ConfigToolBase):
             if( names[obj] == 'Taus'      or names[obj] == 'All' ):
                 print "removing MC dependencies for taus"
                 _removeMCMatchingForPATObject(process, 'tauMatch', 'patTaus', postfix)
-                ## remove mc extra modules for taus
-                for mod in ['tauGenJets','tauGenJetsSelectorAllHadrons','tauGenJetMatch']:
-                    if hasattr(process,mod+postfix):
-                        getattr(process,'patDefaultSequence'+postfix).remove(getattr(process,mod+postfix))
                 ## remove mc extra configs for taus
                 tauProducer = getattr(process,'patTaus'+postfix)
                 tauProducer.addGenJetMatch   = False
@@ -122,17 +118,11 @@ class RemoveMCMatching(ConfigToolBase):
                 tauProducer.genJetMatch      = ''
             if( names[obj] == 'Jets'      or names[obj] == 'All' ):
                 print "removing MC dependencies for jets"
-                ## there may be multiple jet collection, therefore all jet collections
-                ## in patDefaultSequence+postfix are threated here
                 jetPostfixes = []
-                for mod in getattr(process,'patDefaultSequence'+postfix).moduleNames():
+                for mod in process.producerNames().split():
                     if mod.startswith('patJets'):
                         jetPostfixes.append(getattr(process, mod).label_().replace("patJets",""))
                 for pfix in jetPostfixes:
-                    ## remove mc extra modules for jets
-                    for mod in ['patJetPartonMatch','patJetGenJetMatch','patJetFlavourId','patJetPartons','patJetPartonAssociation','patJetFlavourAssociation']:
-                        if hasattr(process,mod+pfix):
-                            getattr(process,'patDefaultSequence'+postfix).remove(getattr(process,mod+pfix))
                     ## remove mc extra configs for jets
                     jetProducer = getattr(process, jetCollectionString()+pfix)
                     jetProducer.addGenPartonMatch   = False
@@ -158,15 +148,7 @@ class RemoveMCMatching(ConfigToolBase):
 removeMCMatching=RemoveMCMatching()
 
 def _removeMCMatchingForPATObject(process, matcherName, producerName, postfix=""):
-    ## remove mcMatcher from the default sequence
     objectMatcher = getattr(process, matcherName+postfix)
-    if (producerName=='pfPatMuons'or producerName=='pfPatTaus'):
-        #no idea what this should do: there is no other occurance of 'PFPATafterPAT' in CMSSW other than here...
-        getattr(process,"PFPATafterPAT"+postfix).remove(objectMatcher)
-    if (producerName=='patMuons'or producerName=='patTaus'or
-        producerName=='patPhotons' or producerName=='patElectrons'):
-        getattr(process,"patDefaultSequence"+postfix).remove(objectMatcher)
-    ## straighten photonProducer
     objectProducer = getattr(process, producerName+postfix)
     objectProducer.addGenMatch      = False
     objectProducer.embedGenMatch    = False
