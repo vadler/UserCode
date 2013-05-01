@@ -2,7 +2,3 @@
  <use name="root">
  <flags LDFLAGS="-lXMLIO">
 </bin>
-<bin file="analyzeRunCertification.C">
- <use name="root">
- <use name="DQM/SiStripCommon">
-</bin>
