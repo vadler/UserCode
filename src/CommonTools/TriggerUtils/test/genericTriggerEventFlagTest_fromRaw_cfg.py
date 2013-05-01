@@ -10,18 +10,18 @@ process.MessageLogger.cerr.GenericTriggerEventFlag = cms.untracked.PSet( limit =
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool( True ) )
 
 # Conditions
+from Configuration.AlCa.autoCond import autoCond
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag( process.GlobalTag, 'auto:com10' )
+process.GlobalTag.globaltag = 'GR_R_50_V6::All'
 
 ## Source
 process.source = cms.Source( "PoolSource"
-#, fileNames  = cms.untracked.vstring( '/store/relval/CMSSW_6_1_0_pre3-GR_R_60_V7_RelVal_mu2012A/SingleMu/RAW/v1/00000/00FD61D0-990C-E211-A7BC-002618943809.root'
-, fileNames  = cms.untracked.vstring( '/store/relval/CMSSW_6_1_0_pre3-GR_R_60_V7_RelVal_mu2012B/SingleMu/RAW/v1/00000/0E41BD63-950C-E211-B701-00261894390E.root'
+, fileNames  = cms.untracked.vstring( '/store/data/Run2011A/SingleMu/RAW/v1/000/165/121/060FB2F7-C07F-E011-B8AD-001D09F23944.root'
+                                    , '/store/data/Run2011B/SingleMu/RAW/v1/000/177/719/02BA0913-DFEC-E011-A8F1-E0CB4E55367F.root'
                                     )
-#, skipEvents = cms.untracked.uint32( 0 )
+, skipEvents = cms.untracked.uint32( 21200 )
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 10 ) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 100 ) )
 
 ## Reco
 process.load( "Configuration.StandardSequences.RawToDigi_Data_cff" )
@@ -35,20 +35,6 @@ process.s = cms.Sequence(
 )
 
 # Test modules
-# GT
-process.genericTriggerEventFlagGTPass = cms.EDFilter( "GenericTriggerEventFlagTest"
-, andOr          = cms.bool( False )
-, verbosityLevel = cms.uint32( 2 )
-, andOrGt        = cms.bool( False )
-, gtInputTag     = cms.InputTag( 'gtDigis' )
-, gtEvmInputTag  = cms.InputTag( 'gtEvmDigis' )
-, gtStatusBits   = cms.vstring( 'PhysDecl'
-                              )
-, errorReplyGt   = cms.bool( False )
-)
-process.genericTriggerEventFlagGTFail     = process.genericTriggerEventFlagGTPass.clone( gtStatusBits = [ '900GeV' ] )
-process.genericTriggerEventFlagGTTest     = process.genericTriggerEventFlagGTPass.clone( gtStatusBits = [ '8TeV' ] )
-process.genericTriggerEventFlagGTTestFail = process.genericTriggerEventFlagGTPass.clone( gtInputTag   = 'whateverDigis' )
 # L1
 process.genericTriggerEventFlagL1Pass = cms.EDFilter( "GenericTriggerEventFlagTest"
 , andOr          = cms.bool( False )
@@ -67,7 +53,7 @@ process.genericTriggerEventFlagHLTPass = cms.EDFilter( "GenericTriggerEventFlagT
 , verbosityLevel = cms.uint32( 2 )
 , andOrHlt      = cms.bool( False )
 , hltInputTag   = cms.InputTag( 'TriggerResults::HLT' )
-, hltPaths      = cms.vstring( 'HLT_IsoMu24_eta2p1_v13' # only in 2012B
+, hltPaths      = cms.vstring( 'HLT_IsoMu24_eta2p1_v3' # only in 2011B
                              )
 , errorReplyHlt = cms.bool( False )
 )
@@ -77,23 +63,6 @@ process.genericTriggerEventFlagHLTTestLoose = process.genericTriggerEventFlagHLT
 process.genericTriggerEventFlagHLTTestFail  = process.genericTriggerEventFlagHLTPass.clone( hltPaths = [ 'HLT_IsoMu2*_v*' ] )        # does not fail, in fact :-)
 
 # Paths
-# GT
-process.pGTPass = cms.Path(
-  process.s
-* process.genericTriggerEventFlagGTPass
-)
-process.pGTFail = cms.Path(
-  process.s
-* process.genericTriggerEventFlagGTFail
-)
-process.pGTTest = cms.Path(
-  process.s
-* process.genericTriggerEventFlagGTTest
-)
-process.pGTTestFail = cms.Path(
-  process.s
-* process.genericTriggerEventFlagGTTestFail
-)
 # L1
 process.pL1Pass = cms.Path(
   process.s
