@@ -121,6 +121,17 @@ int main( int argc, char * argv[] )
       return returnStatus_;
     }
   }
+  else if ( fitFuncId_ == "dCB" ) {
+    if ( depFuncId_ == "linear" )          returnStatus_ += run< my::DoubleCrystalBall, my::Line >( argc, argv );
+    else if ( depFuncId_ == "squared" )    returnStatus_ += run< my::DoubleCrystalBall, my::Parabola >( argc, argv );
+    else if ( depFuncId_ == "resolution" ) returnStatus_ += run< my::DoubleCrystalBall, my::ResolutionLike >( argc, argv );
+    else {
+      std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                << "    dependency function identifier '" << depFuncId_ << "' unknown" << std::endl;
+      returnStatus_ += 0x4;
+      return returnStatus_;
+    }
+  }
   else {
     std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
               << "    fit function identifier '" << fitFuncId_ << "' unknown" << std::endl;
@@ -1994,7 +2005,7 @@ void setParametersFit( std::string objCat, TF1 * fit, TH1D * histo, std::string 
     }
   }
 
-  // Crystal Ball case
+  // Crystal Ball cases
   if ( fitFuncId == "lCB" || fitFuncId == "uCB" ) {
     fit->SetParameter( 0, c );
     fit->SetParLimits( 0, 0., 100. ); //
@@ -2010,6 +2021,28 @@ void setParametersFit( std::string objCat, TF1 * fit, TH1D * histo, std::string 
     fit->SetParameter( 4, 2. );
     fit->SetParName( 4, "n" );
 //   fit->SetParLimits( 4, 1., 100. ); //
+  }
+  else if ( fitFuncId == "dCB" ) {
+    fit->SetParameter( 0, c );
+    fit->SetParLimits( 0, 0., 100. ); //
+    fit->SetParName( 0, "c" );
+    fit->SetParameter( 1, p );
+    fit->SetParName( 1, "#mu" );
+    fit->SetParameter( 2, sqrt( s - m ) );
+    fit->SetParLimits( 2, 0., 100. );
+    fit->SetParName( 2, "#sigma" );
+    fit->SetParameter( 3, 1. );
+    fit->SetParLimits( 3, 0., 100. );
+    fit->SetParName( 3, "#alpha_{l}" );
+    fit->SetParameter( 4, 2. );
+    fit->SetParName( 4, "n_{l}" );
+//   fit->SetParLimits( 4, 1., 100. );
+    fit->SetParameter( 5, 1. );
+    fit->SetParLimits( 5, 0., 100. );
+    fit->SetParName( 5, "#alpha_{u}" );
+    fit->SetParameter( 6, 2. );
+    fit->SetParName( 6, "n_{u}" );
+//   fit->SetParLimits( 6, 1., 100. );
   }
 
 }
@@ -2075,13 +2108,6 @@ void fillMixedParametersFit( int bin, std::vector< TH1D * > & histoVec, TFitResu
 // Initialise parametrs for dependency function
 void setParametersDependency( std::string objCat, TF1 * dep, TH1D * histo, std::string fitFuncId, std::string depFuncId, unsigned par )
 {
-  //. This function assumes fit functions of the forms
-  // - [0]*exp(-0.5*((x-[1])/[2])**2)/([2]*sqrt(2*pi)) (single Gaissian) or
-  // - [0]*(exp(-0.5*((x-[1])/[2])**2)+[3]*exp(-0.5*((x-[4])/[5])**2))/(([2]+[3]*[5])*sqrt(2*pi)) (double Gaussian)
-  //. This function assumes dependency functions of the form
-  // - [0]+[1]*x (linear)
-  // - [0]+[1]*x+[2]*x**2 (squared)
-
   // Starting points
   Double_t x1( histo->GetBinCenter( 5 ) );
   Double_t y1( histo->GetBinContent( 5 ) );
@@ -2094,13 +2120,13 @@ void setParametersDependency( std::string objCat, TF1 * dep, TH1D * histo, std::
     // Slope
     dep->SetParameter( 1, ( y2 - y1 ) / ( x2 - x1 ) );
     dep->SetParName( 1, "Slope b" );
-  }
     // Curvature
-  if ( depFuncId == "squared" ) {
-    dep->SetParameter( 2, 0. );
-    dep->SetParName( 2, "Curvature c" );
+    if ( depFuncId == "squared" ) {
+      dep->SetParameter( 2, 0. );
+      dep->SetParName( 2, "Curvature c" );
+    }
   }
-  if ( depFuncId == "resolution" ) {
+  else if ( depFuncId == "resolution" ) {
     dep->SetParameter( 0, 0. );
     dep->SetParName( 0, "Noise N" );
     dep->SetParameter( 1, 0. );
@@ -2108,6 +2134,205 @@ void setParametersDependency( std::string objCat, TF1 * dep, TH1D * histo, std::
     dep->SetParameter( 2, 0. );
     dep->SetParName( 2, "Constant C" );
   }
+
+  // Fit function dependencies
+
+   // par = 0: overall normalisation
+
+  // Single Gaussian
+  if ( fitFuncId == "sGauss" ) {
+    // par = 1: mean
+    // par = 2: sigma > 0.
+    if ( depFuncId == "linear" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+    else if ( depFuncId == "squared" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+    else if ( depFuncId == "resolution" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+  }
+
+  // Double Gaussian
+  else if ( fitFuncId == "dGauss" ) {
+    // par = 1: "signal" mean
+    // par = 2: "signal" sigma > 0.
+    // par = 3: fraction > 0.
+    // par = 4: "background" mean
+    // par = 5: "background" sigma > 0.
+    if ( depFuncId == "linear" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+    else if ( depFuncId == "squared" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+    else if ( depFuncId == "resolution" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+  }
+
+  // Low-sided Crystal Ball
+  else if ( fitFuncId == "lCB" ) {
+    // par = 1: mean
+    // par = 2: sigma > 0.
+    // par = 3: alpha > 0.
+    // par = 4: exponent > 0.
+    if ( depFuncId == "linear" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+    else if ( depFuncId == "squared" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+    else if ( depFuncId == "resolution" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+  }
+
+  // High-sided Crystal Ball
+  else if ( fitFuncId == "uCB" ) {
+    // par = 1: mean
+    // par = 2: sigma > 0.
+    // par = 3: alpha > 0.
+    // par = 4: exponent > 0.
+    if ( depFuncId == "linear" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+    else if ( depFuncId == "squared" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+    else if ( depFuncId == "resolution" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+  }
+
+  // Double-sided Crystal Ball
+  else if ( fitFuncId == "dCB" ) {
+    // par = 1: mean
+    // par = 2: sigma > 0.
+    // par = 3: alpha low > 0.
+    // par = 4: exponent low > 0.
+    // par = 5: alpha up > 0.
+    // par = 6: exponent up > 0.
+    if ( depFuncId == "linear" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+    else if ( depFuncId == "squared" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+    else if ( depFuncId == "resolution" ) {
+      if ( objCat == "UdscJet" ) {
+      }
+      else if ( objCat == "BJet" ) {
+      }
+      else if ( objCat == "Elec" ) {
+      }
+      else if ( objCat == "Mu" ) {
+      }
+    }
+  }
+
+  return;
+
+  //////////// OLD ////////////
 
   if ( depFuncId == "linear" ) {
     if ( objCat == "UdscJet" ) {

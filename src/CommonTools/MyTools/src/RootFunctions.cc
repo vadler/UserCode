@@ -148,6 +148,30 @@ Double_t my::DoubleCrystalBall::operator()( Double_t * x, Double_t * par )
 
   Double_t value( -1. );
 
+  Double_t M( par[ 1 ] );
+  Double_t S( par[ 2 ] );
+  Double_t A1( TMath::Power( par[ 4 ] / TMath::Abs( par[ 3 ] ), par[ 4 ] ) * TMath::Exp( -( TMath::Power( TMath::Abs( par[ 3 ] ), 2. ) / 2. ) ) );
+  Double_t B1( par[ 4 ] / TMath::Abs( par[ 3 ] ) - TMath::Abs( par[ 3 ] ) );
+  Double_t C1( ( par[ 4 ] / TMath::Abs( par[ 3 ] ) ) * ( 1. / ( par[ 4 ] - 1. ) ) * TMath::Exp( -( TMath::Power( TMath::Abs( par[ 3 ] ), 2. ) / 2. ) ) );
+  Double_t A2( TMath::Power( par[ 6 ] / TMath::Abs( par[ 5 ] ), par[ 6 ] ) * TMath::Exp( -( TMath::Power( TMath::Abs( par[ 5 ] ), 2. ) / 2. ) ) );
+  Double_t B2( par[ 6 ] / TMath::Abs( par[ 5 ] ) - TMath::Abs( par[ 5 ] ) );
+  Double_t C2( ( par[ 6 ] / TMath::Abs( par[ 5 ] ) ) * ( 1. / ( par[ 6 ] - 1. ) ) * TMath::Exp( -( TMath::Power( TMath::Abs( par[ 5 ] ), 2. ) / 2. ) ) );
+  Double_t D( TMath::Sqrt( TMath::PiOver2() ) * ( TMath::Erf( TMath::Abs( par[ 3 ] ) / TMath::Sqrt( TMath::Pi() ) ) + TMath::Erf( TMath::Abs( par[ 5 ] ) / TMath::Sqrt( TMath::Pi() ) ) ) );
+  Double_t E( ( x[ 0 ] - M ) / S );
+  Double_t N( par[ 0 ] / ( par[ 2 ] * ( C1 + C2 + D ) ) ); // FIXME: Is this the norm?
+
+  if ( N >= 0. && S > 0. ) {
+    if ( E <= -par[ 3 ] ) {
+      value = N * A1 * TMath::Power( ( B1 - E ), -par[ 4 ] );
+    }
+    else if ( E >= par[ 5 ] ) {
+      value = N * A2 * TMath::Power( ( B2 + E ), -par[ 6 ] );
+    }
+    else {
+      value = N * TMath::Exp( -0.5 * TMath::Power( E, 2. ) );
+    }
+  }
+
   return value;
 
 }

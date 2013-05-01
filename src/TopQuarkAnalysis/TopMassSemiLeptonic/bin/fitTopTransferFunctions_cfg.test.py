@@ -16,8 +16,8 @@ sample = 'Fall11_R4_L3_unambiguousOnly'
 objects = []
 objects.append( 'UdscJet' ) # default: dGauss+linear
 objects.append( 'BJet' )    # default: dGauss+linear
-#objects.append( 'Mu' )      # default: sGauss+squared
-#objects.append( 'Elec' )    # default: sGauss+squared
+objects.append( 'Mu' )      # default: sGauss+squared
+objects.append( 'Elec' )    # default: sGauss+squared
 
 # Settings
 overwrite  = False # to throw away earlier versions of histograms, trees and functions
@@ -45,18 +45,17 @@ fitMaxPt       = 999999.
 fitNonRestr    = False
 fitEtaBins     = False
 minPt    = 0.
-#minPt    = 20.
 #minPt    = 27. # Mu
 #minPt    = 40. # Elec
 #minPt    = 50. # UdscJet
 #minPt    = 60. # BJet
 #maxDR    = 999999.
-maxDR    = 0.1
 #maxDR    = 0.2
+maxDR    = 0.1
 
 # Transfer functions
 # Fit function
-fitFunction        = 'dGauss' # 'sGauss', 'dGauss', 'lCB', 'uCB'
+fitFunction        = 'sGauss' # 'sGauss', 'dGauss', 'lCB', 'uCB', 'dCB'
 dependencyFunction = 'linear' # 'linear', 'squared', 'resolution'
 norm        = 0 # index of parameter holding the normalisation of the fit functikon
 fitOptions  = 'IBRS+'

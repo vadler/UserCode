@@ -101,7 +101,7 @@ namespace my {
   /// - [0]: normalisation factor
   /// - [1]: Gaussian mean
   /// - [2]: Gaussian sigma
-  /// - [3]: transition position
+  /// - [3]: transition position; >= 0.
   /// - [4]: power law parameter
   /// Returns -1. in case of error
   class LowerCrystalBall : public Resolution {
@@ -116,7 +116,7 @@ namespace my {
   /// - [0]: normalisation factor
   /// - [1]: Gaussian mean
   /// - [2]: Gaussian sigma
-  /// - [3]: transition position
+  /// - [3]: transition position; >= 0.
   /// - [4]: power law parameter
   /// Returns -1. in case of error
   class UpperCrystalBall : public Resolution {
@@ -131,9 +131,9 @@ namespace my {
   /// - [0]: normalisation factor
   /// - [1]: Gaussian mean
   /// - [2]: Gaussian sigma
-  /// - [3]: transition position first power law
+  /// - [3]: transition position first power law; >= 0.
   /// - [4]: first power law parameter
-  /// - [5]: transition position second power law
+  /// - [5]: transition position second power law; >= 0.
   /// - [6]: second power law parameter
   /// Returns -1. in case of error
   class DoubleCrystalBall : public Resolution {
