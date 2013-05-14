@@ -64,7 +64,6 @@ process.out.outputCommands += [ 'drop recoGenJets_*_*_*' ]
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
-#switchOnTrigger( process, path = 'p' )
 switchOnTrigger( process )
 switchOnTriggerMatching( process )
 switchOnTriggerStandAlone( process )
