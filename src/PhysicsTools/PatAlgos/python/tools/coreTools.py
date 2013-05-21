@@ -136,6 +136,7 @@ class RemoveMCMatching(ConfigToolBase):
                 for outMod in outputModules:
                     if hasattr(process,outMod):
                         getattr(process,outMod).outputCommands.append("drop *_selectedPatJets*_genJets_*")
+                        getattr(process,outMod).outputCommands.append("drop recoGenJets_*_*_*")
                     else:
                         raise KeyError, "process has no OutModule named", outMod
 

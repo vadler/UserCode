@@ -63,10 +63,9 @@ process.outpath = cms.EndPath(
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
 process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 
-from PhysicsTools.PatAlgos.tools.myTools import runOnData
+from PhysicsTools.PatAlgos.tools.coreTools import runOnData
 runOnData( process )
 process.patJetCorrFactors.useRho = cms.bool( False )
-process.out.outputCommands += [ 'drop recoGenJets_*_*_*' ]
 
 # Trigger
 from PhysicsTools.PatAlgos.tools.trigTools import *
