@@ -2,18 +2,39 @@
 Environment:
 ============
 
-cmsrel CMSSW_5_3_5
-cd CMSSW_5_3_5/src
+cmsrel CMSSW_5_3_10_patch1
+cd CMSSW_5_3_10_patch1/src
 cmsenv
-cvs co -r V07-01-04    TopQuarkAnalysis/TopSkimming
-cvs co -r V06-07-13    TopQuarkAnalysis/TopTools
-cvs co -r V00-00-08    RecoMET/METAnalyzers
-cvs co -r V15-02-06    RecoParticleFlow/PFProducer
-cvs co -r V00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
+cvs co -r V03-03-11-01    DataFormats/METReco
+cvs co -r V06-05-06-10    DataFormats/PatCandidates
+cvs co -r V00-02-15       DataFormats/StdDictionaries
+cvs co -r V00-00-70       FWCore/GuiBrowsers
+cvs co -r V04-06-09-02    JetMETCorrections/Type1MET
+cvs co -r V08-09-59       PhysicsTools/PatAlgos
+cvs co -r V03-09-28       PhysicsTools/PatUtils
+cvs co -r V00-00-08       RecoMET/METAnalyzers
+cvs co -r V00-00-13-01    RecoMET/METFilters
+cvs co -r V03-03-12-02    RecoMET/METProducers
+cvs co -r V15-02-06       RecoParticleFlow/PFProducer
+cvs co -r V00-00-30-01 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
 cd EGamma/EGammaAnalysisTools/data
 cat download.url | xargs wget
 cd -
 scram b -j 9
+
+If the steering parameters "addGenEvt" and/or "filterDecayChannels" are set to 'true',
+also the following packages should be checked out:
+
+cvs co -r V06-08-09       AnalysisDataFormats/TopObjects
+cvs co -r V06-09-11       TopQuarkAnalysis/TopEventProducers
+cvs co -r V06-07-15       TopQuarkAnalysis/TopEventSelection
+cvs co -r V00-00-07       TopQuarkAnalysis/TopHitFit
+cvs co -r V06-08-06       TopQuarkAnalysis/TopJetCombination
+cvs co -r V06-07-23       TopQuarkAnalysis/TopKinFitter
+cvs co -r V06-07-10       TopQuarkAnalysis/TopObjectResolutions
+cvs co -r V07-01-04       TopQuarkAnalysis/TopSkimming
+cvs co -r V06-07-13       TopQuarkAnalysis/TopTools
+
 
 Steering:
 =========
@@ -110,7 +131,7 @@ JEC:
 The following settings might be objects to optimisation:
 - JEC levels  : which to apply, which to store
 
-Note, that the actually applied JEC depends on the JECs stored (details in PAT
+Note, that the actually applied JEC and MET correction depend on the JECs stored (details in PAT
 documentation).
 
 MC:

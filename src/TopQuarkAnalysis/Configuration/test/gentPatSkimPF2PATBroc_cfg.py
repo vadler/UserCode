@@ -8,7 +8,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 runOnMC       = True
-runOnRelVal   = True # If 'False', define input files in l. 218ff.
+runOnRelVal   = True # If 'False', define input files in l. 223ff.
 maxEvents     = -1
 gc            = True
 createNTuples = True
@@ -19,14 +19,14 @@ if lxplusTest:
   if not runOnMC:
     maxEvents = 1000
 else:
-  runOnRelVal = False # If 'False', define input files in l. 218ff.
+  runOnRelVal = False # If 'False', define input files in l. 223ff.
 
 runMatch  = True
 runMVA    = True
-runCiC    = True
-runEwk    = True
-addGenEvt = True
-writePdfWeights      = False    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
+runCiC    = False
+runEwk    = False
+addGenEvt = False
+writePdfWeights      = True    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
 filterDecayChannels        = False
@@ -49,8 +49,8 @@ jecLevels = []
 typeIMetCorrections = True
 
 # vertex collection to use
-# 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
-pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
+# 'offlinePrimaryVertices' or ( 'goodOfflinePrimaryVertices' or 'goodVertices' ) (done anyway for MET filters)
+pvCollection = 'goodVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
 
 # jet collection to use
 # 'pfJets' or 'pfNoTau'
@@ -132,9 +132,9 @@ process.load( "Configuration.Geometry.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START53_V11::All'
+  process.GlobalTag.globaltag = 'START53_V21::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_53_V13::All'
+  process.GlobalTag.globaltag = 'FT_53_V21_AN3::All'
 
 if gc:
 	runOnMC   = eval('@MC@')
@@ -166,9 +166,9 @@ if gc:
 	else:
 		writePdfWeights = False
 
-runMatch        = runMatch        and runOnMC
-addGenEvt       = addGenEvt       and runOnMC
-writePdfWeights = writePdfWeights and runOnMC
+runMatch            = runMatch            and runOnMC
+addGenEvt           = addGenEvt           and runOnMC
+writePdfWeights     = writePdfWeights     and runOnMC and not lxplusTest
 filterDecayChannels = filterDecayChannels and runOnMC
 
 # muon propagator requirements
@@ -180,7 +180,9 @@ process.load("RecoMuon.DetLayers.muonDetLayerGeometry_cfi")
 ### Logging
 
 process.load( "FWCore.MessageService.MessageLogger_cfi" )
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
+if lxplusTest:
+  process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
@@ -197,26 +199,27 @@ process.source = cms.Source( "PoolSource"
 , skipBadFiles = cms.untracked.bool( True )
 )
 
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 inputFiles = cms.untracked.vstring()
 if runOnRelVal:
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
-                                     , dataTier     = 'AODSIM'
-                                     , relVal       = 'RelValProdTTbar'
-                                     , globalTag    = 'START53_V10'
-                                     , maxVersions  = 1
-                                     )
+    from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValProdTTbarAODSIM
+    inputFiles = filesRelValProdTTbarAODSIM
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion = 'CMSSW_5_3_4_cand1'
-                                     , dataTier     = 'RECO'
-                                     , relVal       = 'SingleMu'
-                                     , globalTag    = 'GR_R_53_V12_RelVal_mu2012B'
-                                     #, relVal       = 'SingleElectron'
-                                     #, globalTag    = 'GR_R_53_V12_RelVal_electron2012B'
-                                     , maxVersions  = 1
-                                     )
-    hltProcess = 'reHLT'
+    inputFiles = [
+       '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/FE49EA68-7975-E211-B190-00259059642A.root',
+       '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/FCFDF118-7975-E211-8BBC-00261894395A.root',
+       '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/FC859A16-7875-E211-A52F-0026189438C4.root',
+       '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/F882C139-7B75-E211-9583-0025905964C4.root',
+       '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/F819E38B-7A75-E211-AD37-002590593878.root'
+       ]
+       #'/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_electron2012D_Reference/SingleElectron/RECO/v1/00001/FEA8DFEB-2975-E211-8991-003048FF3C9A.root',
+       #'/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_electron2012D_Reference/SingleElectron/RECO/v1/00001/FE3A4355-2A75-E211-B4CD-0025902CB620.root',
+       #'/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_electron2012D_Reference/SingleElectron/RECO/v1/00001/FCFD8DE0-2975-E211-9C3A-003048CF99DE.root',
+       #'/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_electron2012D_Reference/SingleElectron/RECO/v1/00001/FC336D49-2975-E211-8972-C86000151BB0.root',
+       #'/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_electron2012D_Reference/SingleElectron/RECO/v1/00001/FA8D3A7D-AC75-E211-A5EB-001D09F2465A.root'
+       #]
+
+    #hltProcess = 'reHLT'
 else:
   if runOnMC:
     if lxplusTest:
@@ -233,12 +236,6 @@ else:
                  ]
     #inputFiles = [ '/store/data/Run2012C/ElectronHad/AOD/PromptReco-v2/000/201/197/2C1E6199-D2EB-E111-B2C6-0025B3203898.root'
                  #]
-#inputFiles = ['file:////user/walsh/tmp/20110812_Wjets_AODforsync.root']
-#inputFiles = ['file:////user/mccartin/TTbarFall11.root']
-#inputFiles = ['file:////user/bklein/WjetsScaleUpAOD.root']
-#inputFiles = ['file:////user/bklein/AOD_v6_Mu_latest_trigger_menu.root']
-#inputFiles = ['file:///user/ksbeerna/RECO2012DataTEST.root']
-#inputFiles = ['file:///user/bklein/TTbar_2012_synchronisation_ex.root']
 process.source.fileNames = cms.untracked.vstring( inputFiles )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( maxEvents )
@@ -263,24 +260,7 @@ if not createNTuples:
 
 ### Cleaning
 
-process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
-process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
-process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
-process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
-
-process.load( "RecoMET.METAnalyzers.CSCHaloFilter_cfi" )
-
-process.load( "RecoMET.METFilters.hcalLaserEventFilter_cfi" )
-process.hcalLaserEventFilter.vetoByRunEventNumber = cms.untracked.bool( False )
-process.hcalLaserEventFilter.vetoByHBHEOccupancy = cms.untracked.bool( True )
-
-process.load( "RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi" )
-process.EcalDeadCellTriggerPrimitiveFilter.tpDigiCollection = cms.InputTag( 'ecalTPSkimNA' )
-
-process.load( "RecoMET.METFilters.eeBadScFilter_cfi" )
-
-process.load( "RecoMET.METFilters.trackingFailureFilter_cfi" )
-process.trackingFailureFilter.VertexSource = cms.InputTag( 'goodOfflinePrimaryVertices' )
+process.load("RecoMET.METFilters.metFilters_cff")
 
 # Scraping filter
 process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
@@ -310,14 +290,14 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
 , src          = cms.InputTag( 'offlinePrimaryVertices' )
 )
 process.vertexSelection = cms.Sequence(
-  process.goodOfflinePrimaryVertices
+  getattr( process, pvCollection )
 )
 
 if not runOnMC:
   process.goodOfflinePrimaryVertexFilter = cms.EDFilter(
     "PrimaryVertexFilter"
   , pvSelection
-  , pvSrc = cms.InputTag( 'goodOfflinePrimaryVertices' )
+  , pvSrc = cms.InputTag( pvCollection )
   , NPV   = cms.int32( 1 )
   )
   process.vertexSelection *= process.goodOfflinePrimaryVertexFilter
@@ -327,12 +307,8 @@ if triggerSelection != '':
   process.eventCleaning *= process.triggerResultsFilter
 if not runOnMC:
   process.eventCleaning += process.scrapingFilter
-process.eventCleaning += process.HBHENoiseFilter
-process.eventCleaning += process.CSCTightHaloFilter
-process.eventCleaning += process.hcalLaserEventFilter
-process.eventCleaning += process.EcalDeadCellTriggerPrimitiveFilter
-process.eventCleaning += process.eeBadScFilter
-process.eventCleaning += ( process.vertexSelection * process.trackingFailureFilter )
+process.eventCleaning += process.vertexSelection
+process.eventCleaning += process.metFilters
 
 if writePdfWeights:
   process.pdfWeights = cms.EDProducer(
