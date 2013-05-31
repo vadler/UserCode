@@ -2,9 +2,15 @@ Test Release based on: CMSSW_6_2_0_pre6_patch1
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc472/cms/cmssw-patch/CMSSW_6_2_0_pre6_patch1
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_2_0_pre6_patch1
 -------- Package --------                        --- Tag ---    --- RelTag --- 
+CommonTools/ParticleFlow                         V01-01-20      V01-01-19      
 DataFormats/PatCandidates                        V06-06-02      V06-06-02      
 PhysicsTools/PatAlgos                            V08-11-09      V08-11-07      
 PhysicsTools/PatUtils                            V03-09-30      V03-09-30      
 TopQuarkAnalysis/TopEventProducers               V06-09-14      V06-09-14      
+TopQuarkAnalysis/TopEventSelection               V06-07-18      V06-07-16      
+TopQuarkAnalysis/TopHitFit                       V00-00-08      V00-00-07      
+TopQuarkAnalysis/TopJetCombination               V06-08-09      V06-08-07      
+TopQuarkAnalysis/TopKinFitter                    V06-07-24      V06-07-23      
+TopQuarkAnalysis/TopTools                        V06-07-14      V06-07-13      
 ---------------------------------------
-total packages: 4 (4 displayed)
+total packages: 10 (10 displayed)
