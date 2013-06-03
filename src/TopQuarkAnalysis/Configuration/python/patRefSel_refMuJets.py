@@ -1,5 +1,7 @@
 #
-# This file contains the Top PAG reference selection for mu + jets analysis.
+# This file contains the Top PAG reference selection for mu + jets analysis
+# the documentation can be found in
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopLeptonPlusJetsRefSel_mu
 #
 
 ### Muon configuration
@@ -8,81 +10,57 @@
 muonsUsePV     = False # use beam spot rather than PV, which is necessary for 'dB' cut
 muonEmbedTrack = True  # embedded track needed for muon ID cuts
 
-### Jet configuration
-
-# Jet algorithm
-jetAlgo = 'AK5'
-
-# JEC sets
-jecSetBase = jetAlgo
-
-
 ### ------------------------- Reference selection -------------------------- ###
-
-
-# PF2PAT settings
-from TopQuarkAnalysis.Configuration.patRefSel_PF2PAT import *
 
 ### Trigger selection
 
 # HLT selection
-triggerSelectionDataRelVals = 'HLT_IsoMu17_eta2p1_TriCentralPFJet30_v*' # 2012A RelVals
-triggerSelectionData        = 'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20_v*'
-triggerSelectionMC          = 'HLT_*' # not recommended
+triggerSelection = 'HLT_Mu15 OR HLT_Mu15_v*'
 
 ### Muon selection
 
-# Minimal selection for all muons, also basis for signal and veto muons
-muonCut  =     'isPFMuon'                                                                      # general reconstruction property
-muonCut += ' && (isGlobalMuon || isTrackerMuon)'                                               # general reconstruction property
-muonCut += ' && pt > 10.'                                                                      # transverse momentum
-muonCut += ' && abs(eta) < 2.5'                                                                # pseudo-rapisity range
-muonCut += ' && (chargedHadronIso+neutralHadronIso+photonIso-0.5*puChargedHadronIso)/pt < 0.2' # relative isolation w/ Delta beta corrections (factor 0.5)
+# Minimal selection for veto muons
+muonCut  =     'isGlobalMuon'                # general reconstruction property
+muonCut += ' && pt > 10.'                    # transverse momentum
+muonCut += ' && abs(eta) < 2.5'              # pseudo-rapisity range
+muonCut += ' && (trackIso+caloIso)/pt < 0.2' # relative isolation
 
 # Signal muon selection on top of 'muonCut'
-signalMuonCut  =     'isPFMuon'                                                                       # general reconstruction property
-signalMuonCut += ' && isGlobalMuon'                                                                   # general reconstruction property
-signalMuonCut += ' && pt > 26.'                                                                       # transverse momentum
-signalMuonCut += ' && abs(eta) < 2.1'                                                                 # pseudo-rapisity range
-signalMuonCut += ' && globalTrack.normalizedChi2 < 10.'                                               # muon ID: 'isGlobalMuonPromptTight'
-signalMuonCut += ' && track.hitPattern.trackerLayersWithMeasurement > 5'                              # muon ID: 'isGlobalMuonPromptTight'
-signalMuonCut += ' && globalTrack.hitPattern.numberOfValidMuonHits > 0'                               # muon ID: 'isGlobalMuonPromptTight'
-signalMuonCut += ' && abs(dB) < 0.2'                                                                  # 2-dim impact parameter with respect to beam spot (s. "PAT muon configuration" above)
-signalMuonCut += ' && innerTrack.hitPattern.numberOfValidPixelHits > 0'                               # tracker reconstruction
-signalMuonCut += ' && numberOfMatchedStations > 1'                                                    # muon chamber reconstruction
-signalMuonCut += ' && (chargedHadronIso+neutralHadronIso+photonIso-0.5*puChargedHadronIso)/pt < 0.12' # relative isolation w/ Delta beta corrections (factor 0.5)
+looseMuonCut  =     'isTrackerMuon'                                         # general reconstruction property
+looseMuonCut += ' && pt > 20.'                                              # transverse momentum
+looseMuonCut += ' && abs(eta) < 2.1'                                        # pseudo-rapisity range
+looseMuonCut += ' && (trackIso+caloIso)/pt < 0.1'                           # relative isolation
+looseMuonCut += ' && globalTrack.normalizedChi2 < 10.'                      # muon ID: 'isGlobalMuonPromptTight'
+looseMuonCut += ' && globalTrack.hitPattern.numberOfValidMuonHits > 0'      # muon ID: 'isGlobalMuonPromptTight'
+looseMuonCut += ' && abs(dB) < 0.02'                                        # 2-dim impact parameter with respect to beam spot (s. "PAT muon configuration" above)
+looseMuonCut += ' && innerTrack.numberOfValidHits > 10'                     # tracker reconstruction
+looseMuonCut += ' && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1' # tracker reconstruction
+looseMuonCut += ' && numberOfMatches > 1'                                   # muon chamber reconstruction
+#looseMuonCut += ' && ()'                                                    # DeltaZ between muon vertex and PV < 1.
+muonJetsDR = 0.3                                                            # minimal DeltaR of signal muons from any signal jet
 
-muonVertexMaxDZ = 0.5 # DeltaZ between muon vertex and PV
+# Tightened signal muon selection on top of 'looseMuonCut'
+tightMuonCut  = '(trackIso+caloIso)/pt < 0.05' # relative isolation
 
 ### Jet selection
 
 # Signal jet selection
-jetCut  =     'abs(eta) < 2.5'                                        # pseudo-rapisity range
-jetCut += ' && numberOfDaughters > 1'                                 # PF jet ID:
-jetCut += ' && neutralHadronEnergyFraction < 0.99'                    # PF jet ID:
-jetCut += ' && neutralEmEnergyFraction < 0.99'                        # PF jet ID:
-jetCut += ' && (chargedEmEnergyFraction < 0.99 || abs(eta) >= 2.4)'   # PF jet ID:
-jetCut += ' && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4)' # PF jet ID:
-jetCut += ' && (chargedMultiplicity > 0 || abs(eta) >= 2.4)'          # PF jet ID:
-# varying jet pt thresholds
-veryLooseJetCut = 'pt > 20.' # transverse momentum (all jets)
-looseJetCut     = 'pt > 35.' # transverse momentum (3rd jet, optional)
-tightJetCut     = 'pt > 45.' # transverse momentum (leading jets)
+jetCut  =     'pt > 30.'
+jetCut += ' && abs(eta) < 2.4'          # transverse momentum# pseudo-rapisity range
+jetCut += ' && emEnergyFraction > 0.01' # jet ID: electro-magnetic energy fraction
+jetCut += ' && jetID.n90Hits > 1'       # jet ID: number of RecHits carying 90% of the total energy
+jetCut += ' && jetID.fHPD < 0.98'       # jet ID: fraction of energy in the hottest readout
 
 ### Electron selection
 
-# Minimal selection for all electrons, also basis for signal and veto muons
-electronCut  =     'pt > 20.'                                                                              # transverse energy
-electronCut += ' && abs(eta) < 2.5'                                                                        # pseudo-rapisity range
-electronCut += ' && electronID("mvaTrigV0") > 0.'                                                          # MVA electrons ID
-electronCut += ' && (chargedHadronIso+max(0.,neutralHadronIso)+photonIso-0.5*puChargedHadronIso)/et < 0.2' # relative isolation with Delta beta corrections
+# Veto electron selection
+electronCut  =     'et > 15.'                                                      # transverse momentum
+electronCut += ' && abs(eta) < 2.5'                                                # pseudo-rapisity range
+electronCut += ' && (dr03TkSumPt+dr03EcalRecHitSumEt+dr03HcalTowerSumEt)/et < 0.2' # relative isolation
 
 ### ------------------------------------------------------------------------ ###
-
 
 ### Trigger matching
 
 # Trigger object selection
-triggerObjectSelectionDataRelVals = 'type("TriggerMuon") && ( path("HLT_IsoMu17_eta2p1_TriCentralPFJet30_v*") )' # 2012A RelVals
-triggerObjectSelectionData        = 'type("TriggerMuon") && ( path("HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet30_30_20_v*") )'
-triggerObjectSelectionMC          = 'type("TriggerMuon") && ( path("HLT_*") )' # not recommended
+triggerObjectSelection = 'type("TriggerMuon") && ( path("HLT_Mu15") || path("HLT_Mu15_v*") )' # run >= 147196

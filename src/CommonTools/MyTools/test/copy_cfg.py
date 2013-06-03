@@ -33,9 +33,7 @@ process.options = cms.untracked.PSet(
 
 inputFiles = []
 if lxplusTest:
-  inputFiles = [ '/store/relval/CMSSW_4_4_2_patch10/RelValProdTTbar/AODSIM/START44_V7_special_120119-v1/0084/1AFC5FFF-3143-E111-9E01-001BFCDBD1BC.root'
-               , '/store/relval/CMSSW_4_4_2_patch10/RelValProdTTbar/AODSIM/START44_V7_special_120119-v1/0088/0ECC7FA5-7A43-E111-9B36-002618943861.root'
-               ]
+  inputFiles = []
 
 
 process.source = cms.Source(
@@ -51,7 +49,8 @@ process.maxEvents = cms.untracked.PSet(
 
 process.out = cms.OutputModule(
   "PoolOutputModule"
-, fileName = cms.untracked.string( 'copy.root' )
+, fileName = cms.untracked.string( 'TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola__Summer12_DR53X-PU_S10_START53_V7C-v1__AODSIM.root' )
+#, fileName = cms.untracked.string( 'TT_8TeV-mcatnlo__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM.root' )
 , outputCommands = cms.untracked.vstring( 'keep *'
                                         )
 )

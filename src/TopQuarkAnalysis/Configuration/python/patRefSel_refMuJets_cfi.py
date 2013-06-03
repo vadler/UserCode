@@ -1,69 +1,55 @@
 import FWCore.ParameterSet.Config as cms
 
 from PhysicsTools.PatAlgos.patSequences_cff import *
-from TopQuarkAnalysis.Configuration.patRefSel_common_cfi import *
 
 ### Muons
 
-intermediatePatMuons = selectedPatMuons.clone(
-  src = cms.InputTag( 'selectedPatMuons' )
-, cut = '' # signalMuonCut
+loosePatMuons = cleanPatMuons.clone(
+  preselection  = '' # looseMuonCut
+, checkOverlaps = cms.PSet(
+    jets = cms.PSet(
+      src                 = cms.InputTag( 'goodPatJets' )
+    , algorithm           = cms.string( 'byDeltaR' )
+    , preselection        = cms.string( '' )
+    , deltaR              = cms.double( 0. ) # muonJetsDR
+    , checkRecoComponents = cms.bool( False )
+    , pairCut             = cms.string( '' )
+    , requireNoOverlaps   = cms.bool( True)
+    )
+  )
 )
-goodPatMuons = cms.EDProducer(
-  "MuonSelectorVertex"
-, muonSource   = cms.InputTag( 'intermediatePatMuons' )
-, vertexSource = cms.InputTag( 'offlinePrimaryVertices' )
-, maxDZ        = cms.double( 999. ) # muonVertexMaxDZ
-)
+step3b = countPatMuons.clone( src = cms.InputTag( 'loosePatMuons' )
+                            , minNumber = 1
+                            , maxNumber = 1
+                            )
 
-step1 = cms.EDFilter(
-  "PATCandViewCountFilter"
-, src = cms.InputTag( 'goodPatMuons' )
-, minNumber = cms.uint32( 1 )
-, maxNumber = cms.uint32( 1 )
+tightPatMuons = cleanPatMuons.clone(
+  src           = cms.InputTag( 'loosePatMuons' )
+, preselection  = '' # tightMuonCut
+, checkOverlaps = cms.PSet()
 )
+step3a = countPatMuons.clone( src = cms.InputTag( 'tightPatMuons' )
+                            , minNumber = 1
+                            , maxNumber = 1
+                            )
 
-step2 = countPatMuons.clone(
-  maxNumber = 1 # includes the signal muon
-)
+step4 =countPatMuons.clone( maxNumber = 1 ) # includes the signal muon
 
 ### Jets
 
-veryLoosePatJets = selectedPatJets.clone(
-  src = 'selectedPatJets'
-, cut = '' # veryLooseJetCut
-)
-loosePatJets = selectedPatJets.clone(
-  src = 'veryLoosePatJets'
-, cut = '' # looseJetCut
-)
-tightPatJets = selectedPatJets.clone(
-  src = 'loosePatJets'
-, cut = '' # tightJetCut
+goodPatJets = cleanPatJets.clone(
+  preselection  = '' # jetCut
+, checkOverlaps = cms.PSet()
 )
 
-step4a = cms.EDFilter(
-  "PATCandViewCountFilter"
-, src = cms.InputTag( 'tightPatJets' )
-, minNumber = cms.uint32( 1 )
-, maxNumber = cms.uint32( 999999 )
-)
-step4b = step4a.clone(
-  minNumber = 2
-)
-step4cTight = step4a.clone(
-  minNumber = 3
-)
-step4cLoose = step4a.clone(
-  src       = 'loosePatJets'
-, minNumber = 3
-)
-step5  = step4a.clone(
-  src       = 'veryLoosePatJets'
-, minNumber = 4
-)
+step6a = countPatJets.clone( src = cms.InputTag( 'goodPatJets' )
+                                               , minNumber = 1
+                                               )
+step6b = step6a.clone( minNumber = 2 )
+step6c = step6b.clone( minNumber = 3 )
+step7  = step6c.clone( minNumber = 4 )
 
 ### Electrons
 
-step3 = countPatElectrons.clone( maxNumber = 0 )
+step5 = countPatElectrons.clone( maxNumber = 0 )
 

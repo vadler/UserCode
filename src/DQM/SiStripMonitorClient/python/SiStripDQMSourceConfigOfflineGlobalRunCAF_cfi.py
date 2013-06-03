@@ -2,19 +2,6 @@ import FWCore.ParameterSet.Config as cms
 
 # SiStrip DQM Source
 
-# Hardware Monitoring
-from DQM.SiStripMonitorHardware.buffer_hack_cfi import *
-HardwareMonitor.rootFile           = ''
-HardwareMonitor.buildAllHistograms = False
-
-# Condition DB Monitoring
-from DQM.SiStripMonitorSummary.SiStripMonitorCondData_cfi import *
-
-# DQMEventInfo
-DqmEventInfoSiStrip = cms.EDFilter( "DQMEventInfo",
-    subSystemFolder = cms.untracked.string( 'SiStrip' )
-)
-
 # SiStripMonitoDigi
 import DQM.SiStripMonitorDigi.SiStripMonitorDigi_cfi
 SiStripMonitorDigiCAF                    = DQM.SiStripMonitorDigi.SiStripMonitorDigi_cfi.SiStripMonitorDigi.clone()
@@ -26,6 +13,11 @@ SiStripMonitorClusterCAF = DQM.SiStripMonitorCluster.SiStripMonitorCluster_cfi.S
 SiStripMonitorClusterCAF.OutputMEsInRootFile = False
 SiStripMonitorClusterCAF.SelectAllDetectors  = True
 SiStripMonitorClusterCAF.StripQualityLabel   = ''
+
+# SiStripMonitorQuality
+import DQM.SiStripMonitorPedestals.SiStripMonitorQuality_cfi
+QualityMonCAF = DQM.SiStripMonitorPedestals.SiStripMonitorQuality_cfi.QualityMon.clone()
+QualityMonCAF.StripQualityLabel = ''
 
 # SiStripMonitorTrack
 # clone for cosmic track finder
@@ -88,8 +80,7 @@ TrackMonCAF_rs.AlgoName      = 'RSTk'
 TrackMonCAF_rs.FolderName    = 'SiStrip/Tracks'
 
 # Scheduling
-SiStripDQMSourceGlobalRunCAF_fromRAW  = cms.Sequence( HardwareMonitor )
-SiStripDQMSourceGlobalRunCAF_common   = cms.Sequence( CondDataMonitoring + DqmEventInfoSiStrip + SiStripMonitorDigiCAF + SiStripMonitorClusterCAF )
+SiStripDQMSourceGlobalRunCAF_common   = cms.Sequence( SiStripMonitorDigiCAF + SiStripMonitorClusterCAF + QualityMonCAF )
 SiStripDQMSourceGlobalRunCAF_cosmikTk = cms.Sequence( SiStripMonitorTrackCAF_cosmicTk + MonitorTrackResidualsCAF_cosmicTk + TrackMonCAF_cosmicTk )
 SiStripDQMSourceGlobalRunCAF_ckf      = cms.Sequence( SiStripMonitorTrackCAF_ckf      + MonitorTrackResidualsCAF_ckf      + TrackMonCAF_ckf )
 SiStripDQMSourceGlobalRunCAF_rs       = cms.Sequence( SiStripMonitorTrackCAF_rs       + MonitorTrackResidualsCAF_rs       + TrackMonCAF_rs )
