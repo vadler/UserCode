@@ -5,7 +5,7 @@ Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_3_10_patch2
 AnalysisDataFormats/TopObjects                   V06-08-07      V06-08-07      
 DataFormats/CaloRecHit                           V02-05-13      V02-05-10      
 DataFormats/METReco                              V03-03-11-01   V03-03-11      
-DataFormats/PatCandidates                        V06-05-06-10   V06-05-06-01   
+DataFormats/PatCandidates                        V06-05-06-11   V06-05-06-01   
 EGamma/EGammaAnalysisTools                       V00-00-30-01                  
 FWCore/GuiBrowsers                               V00-00-70      V00-00-67      
 JetMETCorrections/Type1MET                       V04-06-09-02   V04-06-09-01   
