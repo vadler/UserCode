@@ -6,7 +6,6 @@ AnalysisDataFormats/TopObjects                   V06-08-07      V06-08-07
 DataFormats/CaloRecHit                           V02-05-13      V02-05-10      
 DataFormats/METReco                              V03-03-11-01   V03-03-11      
 DataFormats/PatCandidates                        V06-05-06-10   V06-05-06-01   
-DataFormats/StdDictionaries                      V00-02-15      V00-02-13-01   
 EGamma/EGammaAnalysisTools                       V00-00-30-01                  
 FWCore/GuiBrowsers                               V00-00-70      V00-00-67      
 JetMETCorrections/Type1MET                       V04-06-09-02   V04-06-09-01   
@@ -27,4 +26,4 @@ TopQuarkAnalysis/TopObjectResolutions            V06-07-10      V06-07-09
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-03      
 TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-12      
 ---------------------------------------
-total packages: 24 (24 displayed)
+total packages: 23 (23 displayed)
