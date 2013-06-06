@@ -8,7 +8,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 runOnMC       = True
-runOnRelVal   = True # If 'False', define input files in l. 217ff.
+runOnRelVal   = True # If 'False', define input files in l. 223ff.
 maxEvents     = -1
 gc            = True
 createNTuples = True
@@ -19,14 +19,14 @@ if lxplusTest:
   if not runOnMC:
     maxEvents = 1000
 else:
-  runOnRelVal = False # If 'False', define input files in l. 217ff.
+  runOnRelVal = False # If 'False', define input files in l. 223ff.
 
 runMatch  = True
 runMVA    = True
-runCiC    = True
-runEwk    = True
-addGenEvt = True
-writePdfWeights      = False    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
+runCiC    = False
+runEwk    = False
+addGenEvt = False
+writePdfWeights      = True    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
 filterDecayChannels        = False
@@ -49,8 +49,8 @@ jecLevels = []
 typeIMetCorrections = True
 
 # vertex collection to use
-# 'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
-pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
+# 'offlinePrimaryVertices' or ( 'goodOfflinePrimaryVertices' or 'goodVertices' ) (done anyway for MET filters)
+pvCollection = 'goodVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
 
 # jet collection to use
 # 'pfJets' or 'pfNoTau'
@@ -128,13 +128,13 @@ process = cms.Process( 'PF2PAT' )
 
 ### Conditions
 
-process.load( "Configuration.StandardSequences.Geometry_cff" )
+process.load( "Configuration.Geometry.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 if runOnMC:
-  process.GlobalTag.globaltag = 'START52_V9D::All'
+  process.GlobalTag.globaltag = 'START53_V21::All'
 else:
-  process.GlobalTag.globaltag = 'GR_R_52_V7E::All'
+  process.GlobalTag.globaltag = 'FT_53_V21_AN3::All'
 
 if gc:
 	runOnMC   = eval('@MC@')
@@ -166,9 +166,9 @@ if gc:
 	else:
 		writePdfWeights = False
 
-runMatch        = runMatch        and runOnMC
-addGenEvt       = addGenEvt       and runOnMC
-writePdfWeights = writePdfWeights and runOnMC
+runMatch            = runMatch            and runOnMC
+addGenEvt           = addGenEvt           and runOnMC
+writePdfWeights     = writePdfWeights     and runOnMC and not lxplusTest
 filterDecayChannels = filterDecayChannels and runOnMC
 
 # muon propagator requirements
@@ -180,7 +180,9 @@ process.load("RecoMuon.DetLayers.muonDetLayerGeometry_cfi")
 ### Logging
 
 process.load( "FWCore.MessageService.MessageLogger_cfi" )
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
+if lxplusTest:
+  process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
@@ -197,23 +199,27 @@ process.source = cms.Source( "PoolSource"
 , skipBadFiles = cms.untracked.bool( True )
 )
 
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 inputFiles = cms.untracked.vstring()
 if runOnRelVal:
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_5_cand1'
-                                     , globalTag     = 'START52_V9'
-                                     , maxVersions   = 1
-                                     )
+    from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValProdTTbarAODSIM
+    inputFiles = filesRelValProdTTbarAODSIM
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_5_cand1'
-                                     , dataTier      = 'RECO'
-                                     , relVal        = 'SingleMu'
-                                     , globalTag     = 'GR_R_52_V7_RelVal_mu2011B'
-                                     #, relVal        = 'SingleElectron'
-                                     #, globalTag     = 'GR_R_52_V7_RelVal_electron2011B'
-                                     , maxVersions   = 1
-                                     )
+    inputFiles = [
+       '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/FE49EA68-7975-E211-B190-00259059642A.root',
+       '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/FCFDF118-7975-E211-8BBC-00261894395A.root',
+       '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/FC859A16-7875-E211-A52F-0026189438C4.root',
+       '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/F882C139-7B75-E211-9583-0025905964C4.root',
+       '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/F819E38B-7A75-E211-AD37-002590593878.root'
+       ]
+       #'/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_electron2012D_Reference/SingleElectron/RECO/v1/00001/FEA8DFEB-2975-E211-8991-003048FF3C9A.root',
+       #'/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_electron2012D_Reference/SingleElectron/RECO/v1/00001/FE3A4355-2A75-E211-B4CD-0025902CB620.root',
+       #'/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_electron2012D_Reference/SingleElectron/RECO/v1/00001/FCFD8DE0-2975-E211-9C3A-003048CF99DE.root',
+       #'/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_electron2012D_Reference/SingleElectron/RECO/v1/00001/FC336D49-2975-E211-8972-C86000151BB0.root',
+       #'/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_electron2012D_Reference/SingleElectron/RECO/v1/00001/FA8D3A7D-AC75-E211-A5EB-001D09F2465A.root'
+       #]
+
+    #hltProcess = 'reHLT'
 else:
   if runOnMC:
     if lxplusTest:
@@ -224,90 +230,12 @@ else:
                    ]
   else:
     if lxplusTest:
-      process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange( '191226:81-191226:831'
-                                                                       )
-    inputFiles = [ '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/EEFA1B9F-E687-E111-9C6D-BCAEC5364C62.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/EC6F55F7-E187-E111-9C56-0030486780EC.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/D6979235-D787-E111-8E2F-001D09F2527B.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/CA288C4D-D287-E111-98F5-0025901D5DB2.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/BAEDD978-CC87-E111-98FC-BCAEC53296F4.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/9A94FDB6-DE87-E111-B1E7-BCAEC518FF80.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/98C29851-D287-E111-AB01-5404A6388699.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/98234FE6-DF87-E111-8EE9-E0CB4E4408E7.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/7C5F35B9-DE87-E111-B35B-5404A63886EE.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/70EEB83A-D987-E111-8EFE-0025B3203898.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/38E568D8-E087-E111-ACE0-BCAEC518FF50.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/32A98280-E387-E111-AA76-001D09F2AD84.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/2CAE5610-D687-E111-B6E6-BCAEC53296FB.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/28B730D4-D387-E111-AFD7-E0CB4E4408E3.root'
-                 , '/store/data/Run2012A/MuHad/RECO/PromptReco-v1/000/191/226/14610E71-DC87-E111-A90B-BCAEC518FF40.root'
+      process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange( '201197:1-201197:23'
+                                                                         )
+    inputFiles = [ '/store/data/Run2012C/MuHad/AOD/PromptReco-v2/000/201/197/94C63DB6-D2EB-E111-AE27-003048D375AA.root'
                  ]
-    #inputFiles = [ '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/00108D1C-D687-E111-82B2-0025B32035A2.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/006AFE51-1188-E111-82EF-0025901D5DB2.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/0447FC15-EC87-E111-A95E-5404A640A642.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/0A967BF6-E187-E111-A2EA-0025901D5C86.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/0E90C037-2188-E111-BFB6-E0CB4E4408E3.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/12B4994A-FE87-E111-83DB-BCAEC5329719.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/16B230F1-0488-E111-9142-001D09F2525D.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/18B6EA8D-F387-E111-A213-001D09F23174.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/1C20CE6D-F987-E111-8ECD-003048D2C01A.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/24D88259-E987-E111-946A-BCAEC532971D.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/280DAE54-1B88-E111-AAA3-5404A63886AD.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/2A426EF3-1188-E111-9327-003048D2BED6.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/2AC2FE9E-D887-E111-90C3-5404A640A642.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/2CAC9E55-0E88-E111-A02E-5404A63886B1.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/2E8F99CB-D687-E111-8CF5-0025901D5DEE.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/36FFC961-1A88-E111-AC71-BCAEC518FF8F.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/388C9916-0288-E111-B663-003048D3750A.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/3A0E872A-0488-E111-BDE0-5404A6388697.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/4226FFD6-1488-E111-9FD4-003048D3C944.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/48386758-DC87-E111-8E71-5404A63886C5.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/48C05D29-F687-E111-8863-5404A638869B.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/48E74A6B-0988-E111-95E0-0025901D6268.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/4AACECC4-FB87-E111-8883-0025901D5D78.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/520B6F5E-F187-E111-A542-5404A63886EB.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/5A8335E9-FC87-E111-8EF6-001D09F2841C.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/6202C6F1-0488-E111-8171-001D09F242EF.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/643DD0B7-DE87-E111-AED4-BCAEC5364C42.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/667B9E8D-0E88-E111-A5D7-E0CB4E55367F.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/6C6F2A98-E287-E111-AE3D-003048D2BEA8.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/6EBEBF80-F087-E111-B30E-001D09F2B30B.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/70A118B5-F687-E111-981A-BCAEC518FF8F.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/74A9F0B7-F687-E111-9777-5404A63886EC.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/76C208CD-D687-E111-A2E9-0025901D5D80.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/76D2E6D6-1F88-E111-99F2-BCAEC518FF74.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/800B01F6-DF87-E111-B534-5404A638869E.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/803DEF58-E987-E111-A713-BCAEC5329727.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/805873F5-DF87-E111-88DC-5404A63886E6.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/80F4ACC7-FB87-E111-98BC-5404A63886B1.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/84D3D066-2388-E111-9E91-003048673374.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/888FF28F-0E88-E111-A30E-5404A63886AE.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/906E7DD5-1F88-E111-A83F-5404A63886B6.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/9C00A214-DD87-E111-B2A2-003048678110.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/9C8BF419-2288-E111-A0D0-5404A638869B.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/A0398ECA-EE87-E111-A307-BCAEC5364C93.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/B0B95579-FC87-E111-9DC0-BCAEC5329720.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/B684518D-F387-E111-970A-001D09F24353.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/BE7642AB-DB87-E111-97FD-003048D2BEAA.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/C2E50A8A-FD87-E111-8DA6-002481E0DEC6.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/C4AD7DB0-F487-E111-9B07-003048D37580.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/C85D70BB-1088-E111-964B-003048D2BD66.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/D236CBE5-D087-E111-B2C6-0025B32035BC.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/D4D35E6B-F587-E111-8A6D-001D09F2AF96.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/D86C210D-D687-E111-88A5-5404A63886CF.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/DC05C25A-DC87-E111-BD6B-BCAEC518FF8F.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/DC33C194-0B88-E111-8695-485B3962633D.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/DE16B3F3-0788-E111-9C66-003048D2C174.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/E4F91F12-0288-E111-8607-001D09F29146.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/F4EA272C-DA87-E111-A621-5404A63886CE.root'
-                 #, '/store/data/Run2012A/ElectronHad/RECO/PromptReco-v1/000/191/226/FC964A25-F687-E111-9B6C-5404A63886EE.root'
+    #inputFiles = [ '/store/data/Run2012C/ElectronHad/AOD/PromptReco-v2/000/201/197/2C1E6199-D2EB-E111-B2C6-0025B3203898.root'
                  #]
-#inputFiles = ['file:////user/walsh/tmp/20110812_Wjets_AODforsync.root']
-#inputFiles = ['file:////user/mccartin/TTbarFall11.root']
-#inputFiles = ['file:////user/bklein/WjetsScaleUpAOD.root']
-#inputFiles = ['file:////user/bklein/AOD_v6_Mu_latest_trigger_menu.root']
-#inputFiles = ['file:///user/ksbeerna/RECO2012DataTEST.root']
-#inputFiles = ['file:///user/bklein/TTbar_2012_synchronisation_ex.root']
 process.source.fileNames = cms.untracked.vstring( inputFiles )
 process.maxEvents = cms.untracked.PSet(
   input = cms.untracked.int32( maxEvents )
@@ -332,24 +260,7 @@ if not createNTuples:
 
 ### Cleaning
 
-process.load( "CommonTools.RecoAlgos.HBHENoiseFilter_cfi" )
-process.HBHENoiseFilter.minIsolatedNoiseSumE        = 999999.
-process.HBHENoiseFilter.minNumIsolatedNoiseChannels = 999999
-process.HBHENoiseFilter.minIsolatedNoiseSumEt       = 999999.
-
-process.load( "RecoMET.METAnalyzers.CSCHaloFilter_cfi" )
-
-process.load( "RecoMET.METFilters.hcalLaserEventFilter_cfi" )
-process.hcalLaserEventFilter.vetoByRunEventNumber = cms.untracked.bool( False )
-process.hcalLaserEventFilter.vetoByHBHEOccupancy = cms.untracked.bool( True )
-
-process.load( "RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi" )
-process.EcalDeadCellTriggerPrimitiveFilter.tpDigiCollection = cms.InputTag( 'ecalTPSkimNA' )
-
-process.load( "RecoMET.METFilters.eeBadScFilter_cfi" )
-
-process.load( "RecoMET.METFilters.trackingFailureFilter_cfi" )
-process.trackingFailureFilter.VertexSource = cms.InputTag( 'goodOfflinePrimaryVertices' )
+process.load("RecoMET.METFilters.metFilters_cff")
 
 # Scraping filter
 process.scrapingFilter = cms.EDFilter( "FilterOutScraping"
@@ -379,14 +290,14 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
 , src          = cms.InputTag( 'offlinePrimaryVertices' )
 )
 process.vertexSelection = cms.Sequence(
-  process.goodOfflinePrimaryVertices
+  getattr( process, pvCollection )
 )
 
 if not runOnMC:
   process.goodOfflinePrimaryVertexFilter = cms.EDFilter(
     "PrimaryVertexFilter"
   , pvSelection
-  , pvSrc = cms.InputTag( 'goodOfflinePrimaryVertices' )
+  , pvSrc = cms.InputTag( pvCollection )
   , NPV   = cms.int32( 1 )
   )
   process.vertexSelection *= process.goodOfflinePrimaryVertexFilter
@@ -396,12 +307,8 @@ if triggerSelection != '':
   process.eventCleaning *= process.triggerResultsFilter
 if not runOnMC:
   process.eventCleaning += process.scrapingFilter
-process.eventCleaning += process.HBHENoiseFilter
-process.eventCleaning += process.CSCTightHaloFilter
-process.eventCleaning += process.hcalLaserEventFilter
-process.eventCleaning += process.EcalDeadCellTriggerPrimitiveFilter
-process.eventCleaning += process.eeBadScFilter
-process.eventCleaning += ( process.vertexSelection * process.trackingFailureFilter )
+process.eventCleaning += process.vertexSelection
+process.eventCleaning += process.metFilters
 
 if writePdfWeights:
   process.pdfWeights = cms.EDProducer(
@@ -541,9 +448,7 @@ process.patJetPartonMatch.src = cms.InputTag( pfJetCollection )
 process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag( pfJetCollection )
 process.pfMET.jets = cms.InputTag( pfJetCollection )
 process.softMuonTagInfosAOD.jets = cms.InputTag( pfJetCollection )
-#process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
-if lxplusTest:
-  process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection ) # FIXME: temporary; due to difference in LXPLUS test setup and recommended stup from README
+process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
 
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
