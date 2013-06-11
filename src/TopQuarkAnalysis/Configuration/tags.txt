@@ -3,7 +3,7 @@ Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_3_11
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_5_3_11
 -------- Package --------                        --- Tag ---    --- RelTag --- 
 DataFormats/METReco                              V03-03-11-01   V03-03-11      
-DataFormats/PatCandidates                        V06-05-06-11   V06-05-06-11   
+DataFormats/PatCandidates                        V06-05-06-12   V06-05-06-11   
 EGamma/EGammaAnalysisTools                       V00-00-30-01                  
 JetMETCorrections/Type1MET                       V04-06-09-02   V04-06-09-01   
 PhysicsTools/PatAlgos                            V08-09-59      V08-09-59      
