@@ -5,12 +5,10 @@ import FWCore.ParameterSet.Config as cms
 # Steering
 
 # Origin of existing resolution functions
-# era    = 'Spring10'
 era    = 'Summer11'
 # Input sample
-sample = 'Fall11_R4_1_L3_unambiguousOnly'
-#sample = 'Fall11_R4_1_L3_totalMinDist'
-#sample = 'Fall11_R4_L3_unambiguousOnly'
+sample = 'Summer12_MadGraph_L3_unambiguousOnly'
+#sample = 'Summer12_MCatNLO_L3_unambiguousOnly'
 
 # Objects
 objects = []
@@ -20,6 +18,7 @@ objects.append( 'Mu' )
 objects.append( 'Elec' )
 
 # Settings
+verbose    = 1
 overwrite  = True # to throw away earlier versions of histograms, trees and functions
 plot       = True
 writeFiles = True
@@ -69,10 +68,8 @@ if refGen:
   name += 'Gen'
 if useSymm:
   name += 'Symm'
-#inputFile = 'analyzeHitFit_from%s_%s.root'%( era, sample )
-#logFile    = inputFile.replace( 'analyzeHitFit', 'fitTopResolutionFunctions' )
-inputFile = 'fitTopHitFit_from%s_%s.root'%( era, sample )
-logFile    = inputFile.replace( 'fitTopHitFit', 'fitTopResolutionFunctions' )
+inputFile = 'analyzeHitFit_from%s_%s.root'%( era, sample )
+logFile    = inputFile.replace( 'analyzeHitFit', 'fitTopHitFitResolutionFunctions' )
 outputFile = logFile
 logFile    = logFile.replace( '.root', '.log' )
 if usePileUp:
@@ -99,7 +96,7 @@ logFile    = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), logFile )
 cfgFile    = '%s/output/%s'%( os.getenv( "CMSSW_BASE" ), cfgFile )
 pathPlots = ''
 if plot:
-  pathPlots = '%s/output/plots/fitTopResolutionFunctions/fitTopResolutionFunctions_from%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample )
+  pathPlots = '%s/output/plots/fitTopHitFitResolutionFunctions/fitTopHitFitResolutionFunctions_from%s_%s_'%( os.getenv( "CMSSW_BASE" ), era, sample )
   if refSel:
     pathPlots += 'Ref_'
 pathOut = ''
@@ -110,7 +107,7 @@ if writeFiles:
 # Processing
 
 process = cms.PSet()
-process.verbose = cms.uint32( 3 )
+process.verbose = cms.uint32( verbose )
 process.objectCategories = cms.vstring( objects )
 process.usePileUp = cms.bool( usePileUp )
 process.useAlt    = cms.bool( useAlt )
@@ -240,7 +237,7 @@ print 'Output file:'
 print '-----------'
 print outputFile
 if writeFiles:
-  pathOut = process.fit.pathOut.value() + '/gentResolutionFunction_' + sample + '_*' + name + '*.txt'
+  pathOut = process.resolution.pathOut.value() + '/gentResolutionFunction_' + sample + '_*' + name + '*.txt'
   if refSel:
     pathOut = pathOut.replace( sample, sample + '_Ref', 1)
   print
