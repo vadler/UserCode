@@ -9,11 +9,12 @@ runTest   = False
 rfioInput = True
 
 # Origin of existing resolution functions
-# era    = 'Spring10'
 era    = 'Summer11'
-sample = 'Fall11_R4_1'
+sample = 'Summer12_MadGraph'
+#sample = 'Summer12_MCatNLO'
 
 # Correlation to input
+# FIXME: Update pile-up to 8TeV (but not used)
 pileUpFileMCTrue       = 'CommonTools/MyTools/data/pileUpFileMC_Fall11.root'
 pileUpFileMCObserved   = 'CommonTools/MyTools/data/pileUpFileMC_Fall11inTime.root'
 pileUpFileDataTrue     = 'CommonTools/MyTools/data/pileUpFileData_2011truePixel.root'
@@ -80,16 +81,16 @@ if runTest:
 
 ### Input
 
-inputFiles = [ 'file:%s/output/skimHitFit.local.root'%( os.getenv( "CMSSW_BASE" ) )
+inputFiles = [ 'file:%s/output/skimHitFit_%s.local.root'%( os.getenv( "CMSSW_BASE" ), sample )
              ]
 if rfioInput:
   from TopQuarkAnalysis.TopMassSemiLeptonic.input_hitFitPatSkimPF2PAT_cff import files
   if runTest:
-    inputFiles = files[ 'Fall11_R4_test' ]
+    inputFiles = files[ '%s_test'%( sample ) ]
   else:
     inputFiles = files[ sample ]
 elif runTest:
-  inputFiles = [ 'file:%s/output/skimHitFit.test.local.root'%( os.getenv( "CMSSW_BASE" ) )
+  inputFiles = [ 'file:%s/output/skimHitFit_%s.test.local.root'%( os.getenv( "CMSSW_BASE" ), sample )
                ]
 process.source = cms.Source(
   "PoolSource"
@@ -240,7 +241,7 @@ massSearchReplaceAnyInputTag( process.makeTtSemiLepEventReferenceElectrons
 process.ttSemiLepEventReferenceElectrons.hypotheses = [ 'ttSemiLepHypGenMatchReferenceElectrons'
                                                       ]
 
-from TopQuarkAnalysis.TopTools.ttSemiLepHypSelectionFilter_cfi import ttSemiLepHypSelectionFilter
+from TopQuarkAnalysis.TopMassSemiLeptonic.ttSemiLepHypSelectionFilter_cfi import ttSemiLepHypSelectionFilter
 muonCut     = 'isTrackerMuon && pt > 26. && abs(eta) < 2.1 && globalTrack.normalizedChi2 < 10. && globalTrack.hitPattern.numberOfValidMuonHits > 0 && abs(dB) < 0.02 && innerTrack.hitPattern.trackerLayersWithMeasurement > 8 && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1 && numberOfMatches > 1 && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.125'
 electronCut = 'et > 35. && abs(eta) < 2.5 && !(1.4442 < abs(superCluster.eta) && abs(superCluster.eta) < 1.5660) && abs(dB) < 0.02 && (electronID("eidHyperTight1MC") == 9. || electronID("eidHyperTight1MC") == 11. || electronID("eidHyperTight1MC") == 13. || electronID("eidHyperTight1MC") == 15.) && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.1 && passConversionVeto && gsfTrack.trackerExpectedHitsInner.numberOfLostHits == 0'
 jetCut      = 'pt > 30. && numberOfDaughters > 1 && chargedEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4) && (chargedMultiplicity > 0 || abs(eta) >= 2.4) && abs(eta) < 3.0 && abs(eta) < 2.5'
@@ -283,15 +284,17 @@ process.matcherSequenceBase = cms.Sequence(
 * process.makeTtSemiLepEventMCMatchElectrons
 )
 process.matcherSequence = cms.Sequence(
-  process.ttSemiLepHypSelectionFilterMuons
-* process.ttSemiLepHypSelectionFilterElectrons
-* process.makeTtSemiLepEventHitFitMuons
+  #process.ttSemiLepHypSelectionFilterMuons
+#* process.ttSemiLepHypSelectionFilterElectrons
+#* process.makeTtSemiLepEventHitFitMuons
+  process.makeTtSemiLepEventHitFitMuons
 * process.makeTtSemiLepEventHitFitElectrons
 )
 process.matcherSequenceReference = cms.Sequence(
-  process.ttSemiLepHypSelectionFilterMuonsReference
-* process.ttSemiLepHypSelectionFilterElectronsReference
-* process.makeTtSemiLepEventReferenceMuons
+  #process.ttSemiLepHypSelectionFilterMuonsReference
+#* process.ttSemiLepHypSelectionFilterElectronsReference
+#* process.makeTtSemiLepEventReferenceMuons
+  process.makeTtSemiLepEventReferenceMuons
 * process.makeTtSemiLepEventReferenceElectrons
 )
 
