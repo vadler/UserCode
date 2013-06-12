@@ -5,12 +5,10 @@ import FWCore.ParameterSet.Config as cms
 # Steering
 
 # Origin of existing resolution functions
-# era    = 'Spring10'
 era    = 'Summer11'
 # Input sample
-#sample = 'Fall11_R4_1_L3_unambiguousOnly'
-#sample = 'Fall11_R4_1_L3_totalMinDist'
-sample = 'Fall11_R4_L3_unambiguousOnly'
+sample = 'Summer12_MadGraph_L3_unambiguousOnly'
+#sample = 'Summer12_MCatNLO_L3_unambiguousOnly'
 
 # Objects
 objects = []
@@ -20,6 +18,7 @@ objects.append( 'BJet' )    # default: dGauss+linear
 #objects.append( 'Elec' )    # default: sGauss+squared
 
 # Settings
+verbose    = 1
 overwrite  = True # to throw away earlier versions of histograms, trees and functions
 plot       = True
 writeFiles = True
@@ -44,12 +43,13 @@ fitMaxPt       = 999999.
 #fitMaxPt       = 200.
 fitNonRestr    = False
 fitEtaBins     = False
+maxEta   = 999999.
+#maxEta   = 2.1
 minPt    = 0.
 #minPt    = 20.
-#minPt    = 27. # Mu
-#minPt    = 40. # Elec
-#minPt    = 50. # UdscJet
-#minPt    = 60. # BJet
+#minPt    = 26. # Mu
+#minPt    = 30. # Elec
+#minPt    = 30. # Jet
 #maxDR    = 999999.
 maxDR    = 0.1
 #maxDR    = 0.2
@@ -112,7 +112,7 @@ if writeFiles:
 # Processing
 
 process = cms.PSet()
-process.verbose = cms.uint32( 1 )
+process.verbose = cms.uint32( verbose )
 process.objectCategories = cms.vstring( objects )
 process.usePileUp = cms.bool( usePileUp )
 process.useAlt    = cms.bool( useAlt )
@@ -142,6 +142,7 @@ process.histos = cms.PSet(
 process.fit = cms.PSet(
   fitNonRestr  = cms.bool( fitNonRestr )
 , fitEtaBins   = cms.bool( fitEtaBins )
+, maxEta = cms.double( maxEta )
 , minPt  = cms.double( minPt )
 , maxDR  = cms.double( maxDR )
 )

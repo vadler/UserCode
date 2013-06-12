@@ -177,6 +177,7 @@ int run( int argc, char * argv[] )
   const edm::ParameterSet & fit_( process_.getParameter< edm::ParameterSet >( "fit" ) );
   const bool fitNonRestr_( fit_.getParameter< bool >( "fitNonRestr" ) );
   const bool fitEtaBins_( fit_.getParameter< bool >( "fitEtaBins" ) );
+  const double maxEta_( fit_.getParameter< double >( "maxEta" ) );
   const double minPt_( fit_.getParameter< double >( "minPt" ) );
   const double maxDR_( fit_.getParameter< double >( "maxDR" ) );
   // Configuration for fitting transfer functions
@@ -593,13 +594,14 @@ int run( int argc, char * argv[] )
           for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
             const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
             const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t etaRef( refGen_ ? etaGenEtaBin.at( uPt ).at( uEntry ) : etaEtaBin.at( uPt ).at( uEntry ) );
             if ( fitNonRestr_ ) {
               histEtaPtTrans->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               histVecPtTrans.at( uPt )->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               histEtaTrans->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               histTrans->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
             }
-            if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
+            if ( ptRef >= minPt_ && std::fabs( etaRef ) < maxEta_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
               histEtaPtTransRestr->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               histVecPtTransRestr.at( uPt )->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               histEtaTransRestr->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
@@ -625,7 +627,8 @@ int run( int argc, char * argv[] )
           if ( ! ( scale_ && histEtaPtTransRestr->GetSumOfWeights() == 0. ) ) {
             for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
               const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
-              if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
+              const Double_t etaRef( refGen_ ? etaGenEtaBin.at( uPt ).at( uEntry ) : etaEtaBin.at( uPt ).at( uEntry ) );
+              if ( ptRef >= minPt_ && std::fabs( etaRef ) && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
                 const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
                 const Double_t etaGenSymm( useSymm_ ? std::fabs( etaGenEtaBin.at( uPt ).at( uEntry ) ) : etaGenEtaBin.at( uPt ).at( uEntry ) );
                 const Double_t etaSymm( useSymm_ ? std::fabs( etaEtaBin.at( uPt ).at( uEntry ) ) : etaEtaBin.at( uPt ).at( uEntry ) );
@@ -673,10 +676,11 @@ int run( int argc, char * argv[] )
           for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
             const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
             const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t etaRef( refGen_ ? etaGenEtaBin.at( uPt ).at( uEntry ) : etaEtaBin.at( uPt ).at( uEntry ) );
             if ( fitNonRestr_ ) {
               histEtaPtTransRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
             }
-            if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
+            if ( ptRef >= minPt_ && std::fabs( etaRef ) < maxEta_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
               histEtaPtTransRestrRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
             }
           } // loop: uEntry < ptEtaBin.at( uPt ).size()
@@ -736,6 +740,7 @@ int run( int argc, char * argv[] )
           for ( unsigned uEntry = 0; uEntry < sizePt.at( uPt ); ++uEntry ) {
             const Double_t value( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) - ptEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) - ptGenEtaBin.at( uPt ).at( uEntry ) );
             const Double_t ptRef( refGen_ ? ptGenEtaBin.at( uPt ).at( uEntry ) : ptEtaBin.at( uPt ).at( uEntry ) );
+            const Double_t etaRef( refGen_ ? etaGenEtaBin.at( uPt ).at( uEntry ) : etaEtaBin.at( uPt ).at( uEntry ) );
             if ( fitNonRestr_ ) {
               histEtaTransRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               const std::string nameEtaPtTransRebin( nameEtaPtTrans + "Rebin" );
@@ -745,7 +750,7 @@ int run( int argc, char * argv[] )
                 histEtaTransRebinMapPt->Fill( ptRef, value, weight );
               }
             }
-            if ( ptRef >= minPt_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
+            if ( ptRef >= minPt_ && std::fabs( etaRef ) < maxEta_ && reco::deltaR( etaGenEtaBin.at( uPt ).at( uEntry ), phiGenEtaBin.at( uPt ).at( uEntry ), etaEtaBin.at( uPt ).at( uEntry ), phiEtaBin.at( uPt ).at( uEntry ) ) <= maxDR_ ) {
               histEtaTransRestrRebin->Fill( value, weightEtaBin.at( uPt ).at( uEntry ) );
               const std::string nameEtaPtTransRestrRebin( nameEtaPtTrans + "RestrRebin" );
               TH1D * histEtaPtTransRestrRebin( ( TH1D* )( dirOutEta_->Get( nameEtaPtTransRestrRebin.c_str() ) ) );
@@ -906,11 +911,14 @@ int run( int argc, char * argv[] )
           const Double_t ptGenVal( useNonT_ ? ptGenData_.at( uEta ).at( uEntry ) * std::cosh( etaGenData_.at( uEta ).at( uEntry ) ) : ptGenData_.at( uEta ).at( uEntry ) );
           const Double_t value( refGen_ ? ptGenVal - ptVal : ptVal - ptGenVal );
           const Double_t ptRef( refGen_ ? ptGenVal : ptVal );
+          const Double_t etaGenSymm( useSymm_ ? std::fabs( etaGenData_.at( uEta ).at( uEntry ) ) : etaGenData_.at( uEta ).at( uEntry ) );
+          const Double_t etaSymm( useSymm_ ? std::fabs( etaData_.at( uEta ).at( uEntry ) ) : etaData_.at( uEta ).at( uEntry ) );
+          const Double_t etaRef( refGen_ ? etaGenSymm : etaSymm );
 
           if ( fitNonRestr_ ) {
             histTransRebin->Fill( value, weightData_.at( uEta ).at( uEntry ) );
           }
-          if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
+          if ( ptRef >= minPt_ && std::fabs( etaRef ) < maxEta_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
             histTransRestrRebin->Fill( value, weightData_.at( uEta ).at( uEntry ) );
           }
           for ( unsigned uPt = 0; uPt < nPtBins_; ++uPt ) {
@@ -918,7 +926,7 @@ int run( int argc, char * argv[] )
               if ( fitNonRestr_ ) {
                 histVecPtTransRebin.at( uPt )->Fill( value, weightData_.at( uEta ).at( uEntry ) );
               }
-              if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
+              if ( ptRef >= minPt_ && std::fabs( etaRef ) < maxEta_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
                 histVecPtTransRestrRebin.at( uPt )->Fill( value, weightData_.at( uEta ).at( uEntry ) );
               }
               break;
@@ -955,7 +963,7 @@ int run( int argc, char * argv[] )
               histTransRebinMapEta->Fill( etaRef, value, weight );
             }
           }
-          if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
+          if ( ptRef >= minPt_ && std::fabs( etaRef ) && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
             const std::string nameEtaTransRestr( nameEta + "_TransRestr" );
             const std::string nameEtaTransRestrRebin( nameEtaTransRestr + "Rebin" );
             TH1D * histEtaTransRestrRebin( ( TH1D* )( dirOutEta_->Get( nameEtaTransRestrRebin.c_str() ) ) );
@@ -981,7 +989,7 @@ int run( int argc, char * argv[] )
                   histVecPtTransRebinMapEta.at( uPt )->Fill( etaRef, value, weight );
                 }
               }
-              if ( ptRef >= minPt_ && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
+              if ( ptRef >= minPt_ && std::fabs( etaRef ) && reco::deltaR( etaGenData_.at( uEta ).at( uEntry ), phiGenData_.at( uEta ).at( uEntry ), etaData_.at( uEta ).at( uEntry ), phiData_.at( uEta ).at( uEntry ) ) <= maxDR_ ) {
                 if ( histVecPtTransRestrRebin.at( uPt) != 0 && ! ( scale_ && histVecPtTransRestrRebin.at( uPt)->GetSumOfWeights() == 0. ) ) {
                   const Double_t weight( scale_ ? weightData_.at( uEta ).at( uEntry ) / histVecPtTransRestrRebin.at( uPt)->GetSumOfWeights() : weightData_.at( uEta ).at( uEntry ) );
                   histTransRestrRebinMapPt->Fill( ptRef, value, weight );
@@ -2006,7 +2014,11 @@ void setParametersFit( std::string objCat, TF1 * fit, TH1D * histo, std::string 
   }
 
   // Crystal Ball cases
-  if ( fitFuncId == "lCB" || fitFuncId == "uCB" ) {
+  if ( fitFuncId == "lCB" ) {
+    // par = 1: mean
+    // par = 2: sigma > 0.
+    // par = 3: alpha > 0.
+    // par = 4: exponent > 0.
     fit->SetParameter( 0, c );
     fit->SetParLimits( 0, 0., 100. ); //
     fit->SetParName( 0, "c" );
@@ -2017,12 +2029,38 @@ void setParametersFit( std::string objCat, TF1 * fit, TH1D * histo, std::string 
     fit->SetParName( 2, "#sigma" );
     fit->SetParameter( 3, 1. );
     fit->SetParLimits( 3, 0., 100. ); // 3, 9, 10
-    fit->SetParName( 3, "#alpha" );
-    fit->SetParameter( 4, 2. );
-    fit->SetParName( 4, "n" );
-//   fit->SetParLimits( 4, 1., 100. ); //
+    fit->SetParName( 3, "#alpha_{l}" );
+    fit->SetParameter( 4, 1. );
+    fit->SetParName( 4, "n_{l}" );
+//     fit->SetParLimits( 4, 1., 100. ); //
+  }
+  else if ( fitFuncId == "uCB" ) {
+    // par = 1: mean
+    // par = 2: sigma > 0.
+    // par = 3: alpha > 0.
+    // par = 4: exponent > 0.
+    fit->SetParameter( 0, c );
+    fit->SetParLimits( 0, 0., 100. ); //
+    fit->SetParName( 0, "c" );
+    fit->SetParameter( 1, p );
+    fit->SetParName( 1, "#mu" );
+    fit->SetParameter( 2, sqrt( s - m ) );
+    fit->SetParLimits( 2, 0., 100. ); // 6, 7, 8, 9, 10
+    fit->SetParName( 2, "#sigma" );
+    fit->SetParameter( 3, 1. );
+    fit->SetParLimits( 3, 0., 100. ); // 3, 9, 10
+    fit->SetParName( 3, "#alpha_{u}" );
+    fit->SetParameter( 4, 1. );
+    fit->SetParName( 4, "n_{u}" );
+//     fit->SetParLimits( 4, 1., 100. ); //
   }
   else if ( fitFuncId == "dCB" ) {
+    // par = 1: mean
+    // par = 2: sigma > 0.
+    // par = 3: alpha low > 0.
+    // par = 4: exponent low > 0.
+    // par = 5: alpha up > 0.
+    // par = 6: exponent up > 0.
     fit->SetParameter( 0, c );
     fit->SetParLimits( 0, 0., 100. ); //
     fit->SetParName( 0, "c" );
@@ -2034,15 +2072,15 @@ void setParametersFit( std::string objCat, TF1 * fit, TH1D * histo, std::string 
     fit->SetParameter( 3, 1. );
     fit->SetParLimits( 3, 0., 100. );
     fit->SetParName( 3, "#alpha_{l}" );
-    fit->SetParameter( 4, 2. );
+    fit->SetParameter( 4, 1. );
     fit->SetParName( 4, "n_{l}" );
-//   fit->SetParLimits( 4, 1., 100. );
+//     fit->SetParLimits( 4, 1., 100. );
     fit->SetParameter( 5, 1. );
     fit->SetParLimits( 5, 0., 100. );
     fit->SetParName( 5, "#alpha_{u}" );
-    fit->SetParameter( 6, 2. );
+    fit->SetParameter( 6, 1. );
     fit->SetParName( 6, "n_{u}" );
-//   fit->SetParLimits( 6, 1., 100. );
+//     fit->SetParLimits( 6, 1., 100. );
   }
 
 }
@@ -2135,336 +2173,336 @@ void setParametersDependency( std::string objCat, TF1 * dep, TH1D * histo, std::
     dep->SetParName( 2, "Constant C" );
   }
 
-  // Fit function dependencies
-
-   // par = 0: overall normalisation
-
-  // Single Gaussian
-  if ( fitFuncId == "sGauss" ) {
-    // par = 1: mean
-    // par = 2: sigma > 0.
-    if ( depFuncId == "linear" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-    else if ( depFuncId == "squared" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-    else if ( depFuncId == "resolution" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-  }
-
-  // Double Gaussian
-  else if ( fitFuncId == "dGauss" ) {
-    // par = 1: "signal" mean
-    // par = 2: "signal" sigma > 0.
-    // par = 3: fraction > 0.
-    // par = 4: "background" mean
-    // par = 5: "background" sigma > 0.
-    if ( depFuncId == "linear" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-    else if ( depFuncId == "squared" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-    else if ( depFuncId == "resolution" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-  }
-
-  // Low-sided Crystal Ball
-  else if ( fitFuncId == "lCB" ) {
-    // par = 1: mean
-    // par = 2: sigma > 0.
-    // par = 3: alpha > 0.
-    // par = 4: exponent > 0.
-    if ( depFuncId == "linear" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-    else if ( depFuncId == "squared" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-    else if ( depFuncId == "resolution" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-  }
-
-  // High-sided Crystal Ball
-  else if ( fitFuncId == "uCB" ) {
-    // par = 1: mean
-    // par = 2: sigma > 0.
-    // par = 3: alpha > 0.
-    // par = 4: exponent > 0.
-    if ( depFuncId == "linear" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-    else if ( depFuncId == "squared" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-    else if ( depFuncId == "resolution" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-  }
-
-  // Double-sided Crystal Ball
-  else if ( fitFuncId == "dCB" ) {
-    // par = 1: mean
-    // par = 2: sigma > 0.
-    // par = 3: alpha low > 0.
-    // par = 4: exponent low > 0.
-    // par = 5: alpha up > 0.
-    // par = 6: exponent up > 0.
-    if ( depFuncId == "linear" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-    else if ( depFuncId == "squared" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-    else if ( depFuncId == "resolution" ) {
-      if ( objCat == "UdscJet" ) {
-      }
-      else if ( objCat == "BJet" ) {
-      }
-      else if ( objCat == "Elec" ) {
-      }
-      else if ( objCat == "Mu" ) {
-      }
-    }
-  }
+//   // Fit function dependencies
+//
+//   // par = 0: overall normalisation
+//
+//   // Single Gaussian
+//   if ( fitFuncId == "sGauss" ) {
+//     // par = 1: mean
+//     // par = 2: sigma > 0.
+//     if ( depFuncId == "linear" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//     else if ( depFuncId == "squared" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//     else if ( depFuncId == "resolution" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//   }
+//
+//   // Double Gaussian
+//   else if ( fitFuncId == "dGauss" ) {
+//     // par = 1: "signal" mean
+//     // par = 2: "signal" sigma > 0.
+//     // par = 3: fraction > 0.
+//     // par = 4: "background" mean
+//     // par = 5: "background" sigma > 0.
+//     if ( depFuncId == "linear" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//     else if ( depFuncId == "squared" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//     else if ( depFuncId == "resolution" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//   }
+//
+//   // Low-sided Crystal Ball
+//   else if ( fitFuncId == "lCB" ) {
+//     // par = 1: mean
+//     // par = 2: sigma > 0.
+//     // par = 3: alpha > 0.
+//     // par = 4: exponent > 0.
+//     if ( depFuncId == "linear" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//     else if ( depFuncId == "squared" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//     else if ( depFuncId == "resolution" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//   }
+//
+//   // High-sided Crystal Ball
+//   else if ( fitFuncId == "uCB" ) {
+//     // par = 1: mean
+//     // par = 2: sigma > 0.
+//     // par = 3: alpha > 0.
+//     // par = 4: exponent > 0.
+//     if ( depFuncId == "linear" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//     else if ( depFuncId == "squared" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//     else if ( depFuncId == "resolution" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//   }
+//
+//   // Double-sided Crystal Ball
+//   else if ( fitFuncId == "dCB" ) {
+//     // par = 1: mean
+//     // par = 2: sigma > 0.
+//     // par = 3: alpha low > 0.
+//     // par = 4: exponent low > 0.
+//     // par = 5: alpha up > 0.
+//     // par = 6: exponent up > 0.
+//     if ( depFuncId == "linear" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//     else if ( depFuncId == "squared" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//     else if ( depFuncId == "resolution" ) {
+//       if ( objCat == "UdscJet" ) {
+//       }
+//       else if ( objCat == "BJet" ) {
+//       }
+//       else if ( objCat == "Elec" ) {
+//       }
+//       else if ( objCat == "Mu" ) {
+//       }
+//     }
+//   }
 
   return;
 
   //////////// OLD ////////////
 
-  if ( depFuncId == "linear" ) {
-    if ( objCat == "UdscJet" ) {
-    }
-    else if ( objCat == "BJet" ) {
-    }
-    else if ( objCat == "Elec" ) {
-      // Constant
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-          if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
-          dep->SetParLimits( 0, 0., 100. );
-        }
-      }
-      // Slope
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-          if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
-          dep->SetParLimits( 1, 0., 100. );
-        }
-      }
-    }
-    else if ( objCat == "Mu" ) {
-      // Constant
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-          if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
-          dep->SetParLimits( 0, 0., 100. );
-        }
-      }
-      // Slope
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-          if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
-          dep->SetParLimits( 1, 0., 100. );
-        }
-      }
-    }
-  }
-
-  else if ( depFuncId == "squared" ) {
-    if ( objCat == "UdscJet" ) {
-    }
-    else if ( objCat == "BJet" ) {
-    }
-    else if ( objCat == "Elec" ) {
-      // Constant
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-          if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
-          dep->SetParLimits( 0, 0., 100. );
-        }
-      }
-      // Slope
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-          if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
-          dep->SetParLimits( 1, 0., 100. );
-        }
-      }
-      // Curvature
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 1 ) {
-//           dep->FixParameter( 2, 0. );
-        }
-      }
-    }
-    else if ( objCat == "Mu" ) {
-      // Constant
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-          if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
-          dep->SetParLimits( 0, 0., 100. );
-        }
-      }
-      // Slope
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-          if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
-          dep->SetParLimits( 1, 0., 100. );
-        }
-      }
-      // Curvature
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 1 ) {
-//           dep->FixParameter( 2, 0. );
-        }
-      }
-    }
-  }
-
-  else if ( depFuncId == "resolution" ) {
-    if ( objCat == "UdscJet" ) {
-    }
-    else if ( objCat == "BJet" ) {
-    }
-    else if ( objCat == "Elec" ) {
-      // Noise
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-        }
-      }
-      // Resolution
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-        }
-      }
-      // Constant
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 1 ) {
-//           dep->FixParameter( 2, 0. );
-        }
-      }
-    }
-    else if ( objCat == "Mu" ) {
-      // Noise
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-        }
-      }
-      // Resolution
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 0 || par % 3 == 2 ) {
-        }
-      }
-      // Constant
-      if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
-        if ( par % 3 == 1 ) {
-//           dep->FixParameter( 2, 0. );
-        }
-      }
-    }
-  }
+//   if ( depFuncId == "linear" ) {
+//     if ( objCat == "UdscJet" ) {
+//     }
+//     else if ( objCat == "BJet" ) {
+//     }
+//     else if ( objCat == "Elec" ) {
+//       // Constant
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//           if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
+//           dep->SetParLimits( 0, 0., 100. );
+//         }
+//       }
+//       // Slope
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//           if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
+//           dep->SetParLimits( 1, 0., 100. );
+//         }
+//       }
+//     }
+//     else if ( objCat == "Mu" ) {
+//       // Constant
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//           if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
+//           dep->SetParLimits( 0, 0., 100. );
+//         }
+//       }
+//       // Slope
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//           if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
+//           dep->SetParLimits( 1, 0., 100. );
+//         }
+//       }
+//     }
+//   }
+//
+//   else if ( depFuncId == "squared" ) {
+//     if ( objCat == "UdscJet" ) {
+//     }
+//     else if ( objCat == "BJet" ) {
+//     }
+//     else if ( objCat == "Elec" ) {
+//       // Constant
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//           if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
+//           dep->SetParLimits( 0, 0., 100. );
+//         }
+//       }
+//       // Slope
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//           if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
+//           dep->SetParLimits( 1, 0., 100. );
+//         }
+//       }
+//       // Curvature
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 1 ) {
+// //           dep->FixParameter( 2, 0. );
+//         }
+//       }
+//     }
+//     else if ( objCat == "Mu" ) {
+//       // Constant
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//           if ( dep->GetParameter( 0 ) < 0. ) dep->SetParameter( 0, 0.1 );
+//           dep->SetParLimits( 0, 0., 100. );
+//         }
+//       }
+//       // Slope
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//           if ( dep->GetParameter( 1 ) < 0. ) dep->SetParameter( 1, 0.1 );
+//           dep->SetParLimits( 1, 0., 100. );
+//         }
+//       }
+//       // Curvature
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 1 ) {
+// //           dep->FixParameter( 2, 0. );
+//         }
+//       }
+//     }
+//   }
+//
+//   else if ( depFuncId == "resolution" ) {
+//     if ( objCat == "UdscJet" ) {
+//     }
+//     else if ( objCat == "BJet" ) {
+//     }
+//     else if ( objCat == "Elec" ) {
+//       // Noise
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//         }
+//       }
+//       // Resolution
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//         }
+//       }
+//       // Constant
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 1 ) {
+// //           dep->FixParameter( 2, 0. );
+//         }
+//       }
+//     }
+//     else if ( objCat == "Mu" ) {
+//       // Noise
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//         }
+//       }
+//       // Resolution
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 0 || par % 3 == 2 ) {
+//         }
+//       }
+//       // Constant
+//       if ( fitFuncId == "sGauss" || fitFuncId == "dGauss" ) {
+//         if ( par % 3 == 1 ) {
+// //           dep->FixParameter( 2, 0. );
+//         }
+//       }
+//     }
+//   }
 
 }

@@ -6,24 +6,19 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 # Misc
-runCrab    = False
+runCrab    = True
 runTest    = True
 reportTime = False
 
 # MC Input (only for 'runCrab' = True)
-#mc = 'Fall11_R3'
-mc = 'Fall11_R4'
-
-## RelVal Input
-#cmsswVersion = 'CMSSW_4_4_2_patch10' # does not work :-(
-#relVal       = 'RelValProdTTbar'
-#dataTier     = 'AODSIM'
-#globalTag    = 'START44_V7_special_120119'
+mc = 'Summer12_MadGraph'
+#mc = 'Summer12_MCatNLO'
 
 # Trigger
 hltProcess                = 'HLT'
-triggerSelectionMuons     = 'HLT_IsoMu24_v*'
-triggerSelectionElectrons = 'HLT_Ele25_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v*'
+triggerSelectionMuons     = 'HLT_IsoMu17_eta2p1_TriCentralPFNoPUJet50_40_30_v*'
+#triggerSelectionElectrons = 'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TriCentralPFNoPUJet50_40_30_v*' # tight
+triggerSelectionElectrons = 'HLT_Ele25_CaloIdVT_CaloIsoVL_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet50_40_30_v*' # loose
 
 # Vertices
 pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOfflinePrimaryVertices'
@@ -31,17 +26,17 @@ pvCollection = 'goodOfflinePrimaryVertices' #'offlinePrimaryVertices' or 'goodOf
 
 # Muons
 # switch for muon isolation cone, PF2PAT default: 0.4 (False)
-muonsIsoR03           = True # isolation cone of 0.3, if 'True'
+muonsIsoR03           = False # isolation cone of 0.3, if 'True'
 # muon top projection isolation selection, PF2PAT default: 0.15
 muonsSelectIsoPf      = 0.5
 # muon top projection object selection, PF2PAT default: 'pt > 5.'
 muonSelectPf          = 'pt > 5.'
 # muon object selection
 muonUsePV             = True
-muonSelectBase        = 'isGlobalMuon && pt > 10. && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.2 && abs(eta) < 3.0'
+muonSelectBase        = '(isGlobalMuon || isTrackerMuon) && pt > 10. && (chargedHadronIso+max(0.,neutralHadronIso+photonIso-0.5*puChargedHadronIso))/pt < 0.2 && abs(eta) < 3.0'
 muonSelectHitFit      = muonSelectBase + ' && abs(eta) < 2.4'
 muonSelect            = muonSelectBase + ' && abs(eta) < 2.5'
-muonSelectSignal      = 'isTrackerMuon && pt > 26. && abs(eta) < 2.1 && globalTrack.normalizedChi2 < 10. && globalTrack.hitPattern.numberOfValidMuonHits > 0 && abs(dB) < 0.02 && innerTrack.hitPattern.trackerLayersWithMeasurement > 8 && innerTrack.hitPattern.pixelLayersWithMeasurement >= 1 && numberOfMatches > 1 && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.125'
+muonSelectSignal      = 'isGlobalMuon && pt > 26. && abs(eta) < 2.1 && globalTrack.normalizedChi2 < 10. && track.hitPattern.trackerLayersWithMeasurement > 5 && globalTrack.hitPattern.numberOfValidMuonHits > 0 && abs(dB) < 0.2 && innerTrack.hitPattern.numberOfValidPixelHits > 0 && numberOfMatches > 1 && (chargedHadronIso+max(0.,neutralHadronIso+photonIso-0.5*puChargedHadronIso))/pt < 0.12'
 muonSelectSignalJetDR = 0.3
 # counters for muon channel
 selectedMuonsMin = 1
@@ -58,10 +53,10 @@ electronsSelectIsoPf = 0.5
 electronSelectPf     = 'pt > 5. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
 # electron object selection
 electronUsePV        = False
-electronSelectBase   = 'et > 15. && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.2 && abs(eta) < 3.0'
+electronSelectBase   = 'et > 20. && (chargedHadronIso+max(0.,neutralHadronIso+photonIso-1.*userIsolation("User1Iso")))/pt < 0.15 && abs(eta) < 3.0 && (1. >= electronID("mvaTrigV0") && electronID("mvaTrigV0") >= 0.)'
 electronSelectHitFit = electronSelectBase + ' && abs(eta) < 2.5 && passConversionVeto'
 electronSelect       = electronSelectBase + ' && abs(eta) < 2.5'
-electronSelectSignal = 'et > 35. && abs(eta) < 2.5 && !(1.4442 < abs(superCluster.eta) && abs(superCluster.eta) < 1.5660) && abs(dB) < 0.02 && (electronID("eidHyperTight1MC") == 9. || electronID("eidHyperTight1MC") == 11. || electronID("eidHyperTight1MC") == 13. || electronID("eidHyperTight1MC") == 15.) && (chargedHadronIso+neutralHadronIso+photonIso)/pt < 0.1 && passConversionVeto && gsfTrack.trackerExpectedHitsInner.numberOfLostHits == 0'
+electronSelectSignal = 'et > 30. && abs(eta) < 2.5 && !(1.4442 < abs(superCluster.eta) && abs(superCluster.eta) < 1.5660) && abs(dB) < 0.02 && electronID("mvaTrigV0") > 0.5 && (chargedHadronIso+max(0.,neutralHadronIso+photonIso-1.0*userIsolation("User1Iso")))/pt < 0.1 && passConversionVeto && gsfTrack.trackerExpectedHitsInner.numberOfHits <= 0'
 electronSelectSignalJetDR = 0.3
 # counters for electron channel
 selectedElectronsMin = 1
@@ -84,13 +79,17 @@ jecLevels = [ 'L1FastJet'
 # jet object selection
 jetSelectBase   = 'pt > 30. && numberOfDaughters > 1 && chargedEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && (chargedHadronEnergyFraction > 0. || abs(eta) >= 2.4) && (chargedMultiplicity > 0 || abs(eta) >= 2.4) && abs(eta) < 3.0'
 jetSelectHitFit = jetSelectBase + ' && abs(eta) < 2.5'
-jetSelect       = jetSelectBase + ' && abs(eta) < 2.4'
+jetSelect       = jetSelectBase + ' && abs(eta) < 2.5'
 jetSelectSignal = ''
 # counters
 selectedJetsMin = 4
 selectedJetsMax = 999999
 referenceJetsMin = 4
 referenceJetsMax = 999999
+
+# MET
+useType0Corr = True
+useTypeICorr = True
 
 
 ### Initialization
@@ -124,17 +123,14 @@ process.options = cms.untracked.PSet(
 
 ### Conditions
 
-process.load( "Configuration.StandardSequences.Geometry_cff" )
+process.load( "Configuration.Geometry.GeometryIdeal_cff" )
 process.load( "Configuration.StandardSequences.MagneticField_cff" )
 process.load( "Configuration.StandardSequences.FrontierConditions_GlobalTag_cff" )
 # from Configuration.AlCa.autoCond import autoCond
 # process.GlobalTag.globaltag = autoCond[ 'startup' ]
-process.GlobalTag.globaltag = 'START44_V13::All'
-if runCrab:
-  if mc == 'Fall11_R3':
-    process.GlobalTag.globaltag = 'START44_V5D::All'
-  elif mc == 'Fall11_R4':
-    process.GlobalTag.globaltag = 'START44_V9C::All'
+process.GlobalTag.globaltag = 'START53_V21::All'
+if mc == 'Summer12_MadGraph' or mc == 'Summer12_MCatNLO':
+  process.GlobalTag.globaltag = 'START53_V21::All'
 
 
 ### Input
@@ -153,15 +149,8 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 if not runCrab:
-  from TopQuarkAnalysis.TopMassSemiLeptonic.input_cff import *
-  if mc == 'Fall11_R3':
-    process.source.fileNames = files_Fall11_R3_test
-    process.GlobalTag.globaltag = 'START44_V5D::All'
-  elif mc == 'Fall11_R4':
-    process.source.fileNames = files_Fall11_R4_test
-    process.GlobalTag.globaltag = 'START44_V9C::All'
-  #triggerSelectionMuons     = 'HLT_IsoMu24_v*'
-  #triggerSelectionElectrons = 'HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v*'
+  from TopQuarkAnalysis.TopMassSemiLeptonic.input_cff import files
+  process.source.fileNames = files[ mc ]
 
 
 ### Output
@@ -186,10 +175,6 @@ logFile = outputFile.replace( 'root', 'log' )
 
 
 ### Trigger
-
-# Fix for Pythia bug in 2011 MC
-process.load("GeneratorInterface.GenFilters.TotalKinematicsFilter_cfi")
-process.totalKinematicsFilter.tolerance = 5. # from Martijn
 
 # Trigger
 if triggerSelectionMuons == '' or triggerSelectionMuons == '*':
@@ -220,8 +205,7 @@ process.goodOfflinePrimaryVertices = cms.EDFilter(
   )
 )
 
-process.eventCleaning = cms.Sequence( process.totalKinematicsFilter
-                                    + process.goodOfflinePrimaryVertices
+process.eventCleaning = cms.Sequence( process.goodOfflinePrimaryVertices
                                     )
 
 
@@ -243,7 +227,7 @@ usePF2PAT( process
          , jetCorrections      = ( '%sPFchs'%( jetAlgo )
                                  , jecLevels
                                  )
-         , typeIMetCorrections = True
+         , typeIMetCorrections = useTypeICorr
          , pvCollection        = cms.InputTag( pvCollection )
          )
 # still need to fix event content afterwards :-(
@@ -356,6 +340,8 @@ if muonsIsoR03:
                                                            , cms.InputTag( 'muPFIsoValueGamma03' )
                                                            )
   process.pfMuons.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03' )
+process.pfIsolatedMuons.doDeltaBetaCorrection = True
+process.pfIsolatedMuons.deltaBetaFactor       = -0.5
 process.pfIsolatedMuons.isolationCut = muonsSelectIsoPf
 process.patMuons.embedTrack = True
 process.patMuons.usePV      = muonUsePV
@@ -389,7 +375,19 @@ else:
 
 
 # Electrons
+process.load( 'EGamma.EGammaAnalysisTools.electronIsolatorFromEffectiveArea_cfi' )
+process.elPFIsoValueEA04 = process.elPFIsoValueEA03.clone( EffectiveAreaType = 'kEleGammaAndNeutralHadronIso04'
+)
+process.pfIdentifiedElectrons = cms.EDFilter(
+  "ElectronIDPFCandidateSelector"
+, recoGsfElectrons = cms.InputTag( 'gsfElectrons' )
+, electronIdMap    = cms.InputTag( 'mvaTrigV0' )
+, electronIdCut    = cms.double( 0.0 )
+, src              = cms.InputTag( 'pfElectronsFromVertex' )
+)
+process.pfSelectedElectrons.src = 'pfIdentifiedElectrons'
 process.pfSelectedElectrons.cut = electronSelectPf
+process.pfIsolatedElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValueEA04' ) # new Effective Area edm::ValueMap
 if electronsIsoR03:
   process.pfIsolatedElectrons.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03PFId' )
                                                                        )
@@ -402,40 +400,54 @@ if electronsIsoR03:
   process.pfElectrons.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFId' )
                                                                , cms.InputTag( 'elPFIsoValueGamma03PFId' )
                                                                )
-  process.pfElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03PFId' )
-process.pfIsolatedElectrons.isolationCut = electronsSelectIsoPf
+  process.pfElectrons.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValueEA03' ) # new Effective Area edm::ValueMap
+process.pfIsolatedElectrons.doDeltaBetaCorrection = True # EA now, in fact
+process.pfIsolatedElectrons.deltaBetaFactor       = -1.
+process.pfIsolatedElectrons.isolationCut          = electronsSelectIsoPf
 process.patElectrons.embedTrack = True
 process.patElectrons.usePV      = electronUsePV
-process.load( "RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_cfi" )
-process.eidCiCSequence = cms.Sequence(
-  process.eidVeryLooseMC
-+ process.eidLooseMC
-+ process.eidMediumMC
-+ process.eidTightMC
-+ process.eidSuperTightMC
-+ process.eidHyperTight1MC
-+ process.eidHyperTight2MC
-+ process.eidHyperTight3MC
-+ process.eidHyperTight4MC
-)
-process.patPF2PATSequence.replace( process.patElectrons
-                                 , process.eidCiCSequence * process.patElectrons
+#process.load( "RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_cfi" )
+#process.eidCiCSequence = cms.Sequence(
+  #process.eidVeryLooseMC
+#+ process.eidLooseMC
+#+ process.eidMediumMC
+#+ process.eidTightMC
+#+ process.eidSuperTightMC
+#+ process.eidHyperTight1MC
+#+ process.eidHyperTight2MC
+#+ process.eidHyperTight3MC
+#+ process.eidHyperTight4MC
+#)
+process.load('EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi')
+process.eidMVASequence = cms.Sequence( process.mvaTrigV0
+                                     + process.mvaNonTrigV0
+                                     )
+process.patPF2PATSequence.replace( process.pfSelectedElectrons
+                                 #, process.eidCiCSequence * process.patElectrons
+                                 , process.eidMVASequence + process.pfIdentifiedElectrons + process.pfSelectedElectrons + process.elPFIsoValueEA03 + process.elPFIsoValueEA04
                                  )
-process.patElectrons.electronIDSources.eidVeryLooseMC   = cms.InputTag( 'eidVeryLooseMC' )
-process.patElectrons.electronIDSources.eidLooseMC       = cms.InputTag( 'eidLooseMC' )
-process.patElectrons.electronIDSources.eidMediumMC      = cms.InputTag( 'eidMediumMC' )
-process.patElectrons.electronIDSources.eidTightMC       = cms.InputTag( 'eidTightMC' )
-process.patElectrons.electronIDSources.eidSuperTightMC  = cms.InputTag( 'eidSuperTightMC' )
-process.patElectrons.electronIDSources.eidHyperTight1MC = cms.InputTag( 'eidHyperTight1MC' )
-process.patElectrons.electronIDSources.eidHyperTight2MC = cms.InputTag( 'eidHyperTight2MC' )
-process.patElectrons.electronIDSources.eidHyperTight3MC = cms.InputTag( 'eidHyperTight3MC' )
-process.patElectrons.electronIDSources.eidHyperTight4MC = cms.InputTag( 'eidHyperTight4MC' )
+#process.patElectrons.electronIDSources.eidVeryLooseMC   = cms.InputTag( 'eidVeryLooseMC' )
+#process.patElectrons.electronIDSources.eidLooseMC       = cms.InputTag( 'eidLooseMC' )
+#process.patElectrons.electronIDSources.eidMediumMC      = cms.InputTag( 'eidMediumMC' )
+#process.patElectrons.electronIDSources.eidTightMC       = cms.InputTag( 'eidTightMC' )
+#process.patElectrons.electronIDSources.eidSuperTightMC  = cms.InputTag( 'eidSuperTightMC' )
+#process.patElectrons.electronIDSources.eidHyperTight1MC = cms.InputTag( 'eidHyperTight1MC' )
+#process.patElectrons.electronIDSources.eidHyperTight2MC = cms.InputTag( 'eidHyperTight2MC' )
+#process.patElectrons.electronIDSources.eidHyperTight3MC = cms.InputTag( 'eidHyperTight3MC' )
+#process.patElectrons.electronIDSources.eidHyperTight4MC = cms.InputTag( 'eidHyperTight4MC' )
+process.patElectrons.electronIDSources.mvaTrigV0    = cms.InputTag("mvaTrigV0")
+process.patElectrons.electronIDSources.mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0")
+process.patElectrons.isolationValues.user = cms.VInputTag( cms.InputTag( 'elPFIsoValueEA04' )
+                                                                       )
 if electronsIsoR03:
   process.patElectrons.isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03PFId' )
   process.patElectrons.isolationValues.pfChargedAll       = cms.InputTag( 'elPFIsoValueChargedAll03PFId' )
   process.patElectrons.isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03PFId' )
   process.patElectrons.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFId' )
   process.patElectrons.isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03PFId' )
+  process.patElectrons.isolationValues.user               = cms.VInputTag( cms.InputTag( 'elPFIsoValueEA03' )
+                                                                         )
+
 process.selectedPatElectronsMCMatch.cut     = electronSelectBase
 process.selectedPatElectrons.cut            = electronSelect
 process.selectedPatElectronsHitFit.cut      = electronSelectHitFit
@@ -474,6 +486,16 @@ process.patMETsUncorr = process.patMETs.clone( metSource = 'pfMET' )
 process.patPF2PATSequence.replace( process.patMETs
                                  , process.patMETs * process.patMETsUncorr
                                  )
+if useType0Corr:
+  process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
+  #process.selectedVerticesForPFMEtCorrType0.src           = cms.InputTag( pvCollection )
+  #process.particleFlowDisplacedVertex.mainVertexLabel     = cms.InputTag( pvCollection )
+  #process.trackToVertexAssociation.VertexCollection       = cms.InputTag( pvCollection )
+  #process.pfCandidateToVertexAssociation.VertexCollection = cms.InputTag( pvCollection )
+  process.producePatPFMETCorrections.replace( process.pfCandMETcorr
+                                            , process.type0PFMEtCorrection * process.patPFMETtype0Corr * process.pfCandMETcorr
+                                            )
+  process.patType1CorrectedPFMet.srcType1Corrections.append( cms.InputTag( 'patPFMETtype0Corr' ) )
 
 if not runTest:
   process.out.outputCommands.append( 'drop *_selectedPatJets_*_*' )
@@ -500,25 +522,15 @@ process.out.outputCommands.append( 'keep *_genEvt*_*_*' )
 process.out.outputCommands.append( 'keep *_initSubset*_*_*' )
 process.out.outputCommands.append( 'keep *_decaySubset*_*_*' )
 
-### Additipnal reconstruction
-
-# For lepton isolation with rho corrections
-from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
-process.kt6PFJetsForIso = kt6PFJets.clone( Rho_EtaMax = 2.5
-                                         )
-process.out.outputCommands.append( 'keep double_kt6PFJetsForIso_*_*' )
-
 
 ### Paths
 
 # Cleaning + PF2PAT
 process.pf2PatSequence = cms.Sequence( process.eventCleaning
-                                     * process.kt6PFJetsForIso
                                      * process.patPF2PATSequence
                                      * process.makeGenEvt
                                      )
 process.pf2PatPathMuons = cms.Path( process.triggerResultsFilterMuons
-                                  * process.kt6PFJetsForIso
                                   * process.pf2PatSequence
                                   * process.countSelectedPatMuons
                                   * process.countSelectedPatLeptons
@@ -526,7 +538,6 @@ process.pf2PatPathMuons = cms.Path( process.triggerResultsFilterMuons
                                   * process.patHitFitSequence
                                   )
 process.pf2PatPathElectrons = cms.Path( process.triggerResultsFilterElectrons
-                                      * process.kt6PFJetsForIso
                                       * process.pf2PatSequence
                                       * process.countSelectedPatElectrons
                                       * process.countSelectedPatLeptons
@@ -536,7 +547,6 @@ process.pf2PatPathElectrons = cms.Path( process.triggerResultsFilterElectrons
 
 # Reference selections
 process.referencePathMuons = cms.Path( process.triggerResultsFilterMuons
-                                     * process.kt6PFJetsForIso
                                      * process.pf2PatSequence
                                      * process.countSelectedPatMuons
                                      * process.countSelectedPatLeptons
@@ -545,7 +555,6 @@ process.referencePathMuons = cms.Path( process.triggerResultsFilterMuons
                                      * process.countReferencePatJets
                                      )
 process.referencePathElectrons = cms.Path( process.triggerResultsFilterElectrons
-                                         * process.kt6PFJetsForIso
                                          * process.pf2PatSequence
                                          * process.countSelectedPatElectrons
                                          * process.countSelectedPatLeptons
