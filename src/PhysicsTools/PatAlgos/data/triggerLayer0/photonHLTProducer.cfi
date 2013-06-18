@@ -1,0 +1,34 @@
+module HLT1Photon = PATHLTProducer {
+    InputTag triggerResults  = TriggerResults::HLT
+    string   triggerName     = "HLT1Photon"
+    InputTag filterName      = hltL1IsoSinglePhotonTrackIsolFilter::HLT
+    bool     reportVerbose   = false
+}
+
+module HLT1PhotonRelaxed = PATHLTProducer {
+    InputTag triggerResults  = TriggerResults::HLT
+    string   triggerName     = "HLT1PhotonRelaxed"
+    InputTag filterName      = hltL1NonIsoSinglePhotonTrackIsolFilter::HLT
+    bool     reportVerbose   = false
+}
+
+module HLT2Photon = PATHLTProducer {
+    InputTag triggerResults  = TriggerResults::HLT
+    string   triggerName     = "HLT2Photon"
+    InputTag filterName      = hltL1IsoDoublePhotonDoubleEtFilter::HLT
+    bool     reportVerbose   = false
+}
+
+module HLT2PhotonRelaxed = PATHLTProducer {
+    InputTag triggerResults  = TriggerResults::HLT
+    string   triggerName     = "HLT2PhotonRelaxed"
+    InputTag filterName      = hltL1NonIsoDoublePhotonDoubleEtFilter::HLT
+    bool     reportVerbose   = false
+}
+
+sequence photonHLTProducer = {
+    HLT1Photon,
+    HLT1PhotonRelaxed,
+    HLT2Photon,
+    HLT2PhotonRelaxed
+}

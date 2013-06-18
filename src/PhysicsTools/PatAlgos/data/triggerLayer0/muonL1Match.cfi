@@ -1,0 +1,17 @@
+///
+/// Example for a configuration of the L1 match for muons
+/// (cuts are NOT tuned, using old values from TQAF MC match, january 2008)
+///
+
+module muonL1MatchL1SingleMu3 = PATL1Matcher {
+   InputTag src               = allLayer0Muons
+   InputTag matched           = L1SingleMu3
+   double maxDeltaR           = 0.5
+   double maxDPtRel           = 0.5
+   bool resolveAmbiguities    = true
+   bool resolveByMatchQuality = false
+}
+
+sequence muonL1Match = {
+    muonL1MatchL1SingleMu3
+}

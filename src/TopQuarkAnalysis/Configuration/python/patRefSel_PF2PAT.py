@@ -1,12 +1,13 @@
 #
-# This file contains the PF2PAT settings for the Top PAG reference selections.
+# This file contains the PF2PAT settings for the
+# Top PAG reference selection for mu + jets analysis.
 #
 
 ### Vertex configuration (for leptons)
 
-pfVertices  = 'goodOfflinePrimaryVertices'
-pfD0Cut     = 0.2
-pfDzCut     = 0.5
+pfVertices = 'goodOfflinePrimaryVertices'
+pfD0Cut    = 0.2
+pfDzCut    = 0.5
 
 ### Muon configuration
 
@@ -14,8 +15,8 @@ pfDzCut     = 0.5
 pfMuonSelectionCut = 'pt > 5.'
 
 # Isolation
-pfMuonIsoConeR03 = False
-pfMuonCombIsoCut = 0.2
+pfMuonIsoConeR   = 0.3
+pfMuonCombIsoCut = 0.15
 
 ### Electron configuration
 
@@ -25,5 +26,5 @@ pfElectronSelectionCut += ' && gsfTrackRef.isNonnull'
 pfElectronSelectionCut += ' && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits < 2'
 
 # Isolation
-pfElectronIsoConeR03 = True
+pfElectronIsoConeR   = 0.3
 pfElectronCombIsoCut = 0.2
