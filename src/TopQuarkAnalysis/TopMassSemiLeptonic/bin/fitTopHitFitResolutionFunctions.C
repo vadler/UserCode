@@ -801,7 +801,7 @@ int main( int argc, char * argv[] )
           }
         }
 
-        dirFit_->cd();
+        dirOutFit_->cd();
 
         const std::string nameDeltaRebin( nameDelta + "Rebin" );
 //         const Int_t deltaBinsRebin( inverse ? propInvBins_ : propBins_ ); // FIXME: tune number of bins
