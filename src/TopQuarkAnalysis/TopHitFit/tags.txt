@@ -1,0 +1,18 @@
+Test Release based on: CMSSW_5_3_11
+Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_3_11
+Your Test release in: /afs/cern.ch/user/v/vadler/cms/Top/CMSSW_5_3_11
+-------- Package --------                        --- Tag ---    --- RelTag --- 
+CommonTools/MyTools                              NoCVS                         
+CommonTools/ParticleFlow                         V00-03-16      V00-03-16      
+DataFormats/METReco                              V03-03-11-01   V03-03-11      
+EGamma/EGammaAnalysisTools                       V00-00-31-EA02                
+JetMETCorrections/Type1MET                       V04-06-09-02   V04-06-09-01   
+RecoMET/METAlgorithms                            V03-04-03      V03-04-03      
+RecoMET/METAnalyzers                             V00-00-08                     
+RecoParticleFlow/PFProducer                      V15-02-06      V15-02-05-01   
+TopQuarkAnalysis/TopHitFit                       V00-00-07-01   V00-00-07-01   
+TopQuarkAnalysis/TopMassSemiLeptonic             NoCVS                         
+TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-03      
+TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-12      
+---------------------------------------
+total packages: 12 (12 displayed)
