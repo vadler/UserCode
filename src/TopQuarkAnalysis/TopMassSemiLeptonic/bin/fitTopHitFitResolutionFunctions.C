@@ -75,11 +75,7 @@ int main( int argc, char * argv[] )
   const double widthFactor_( histos_.getParameter< double >( "widthFactor" ) );
   // Configuration for fitting resolution functions
   const edm::ParameterSet & resolution_( process_.getParameter< edm::ParameterSet >( "resolution" ) );
-  const bool doFit_( resolution_.getParameter< bool >( "doFit" ) );
-  const bool scale_( resolution_.getParameter< bool >( "scale" ) );
-  double fitMaxPt_( resolution_.getParameter< double >( "fitMaxPt" ) );
   const std::string fitFunction_( resolution_.getParameter< std::string >( "fitFunction" ) );
-  const int norm_( resolution_.getParameter< int >( "norm" ) );
   std::string fitOptions_( resolution_.getParameter< std::string >( "fitOptions" ) );
   std::string fitOptionsSigma_( resolution_.getParameter< std::string >( "fitOptionsSigma" ) );
   const double fitRange_( std::min( resolution_.getParameter< double >( "fitRange" ), widthFactor_ ) );
@@ -244,9 +240,10 @@ int main( int argc, char * argv[] )
   if ( verbose_ > 0 )
     std::cout << std::endl
               << argv[ 0 ] << " --> INFO:" << std::endl
-              << "    using input file '" << inFile_ << "'" << std::endl;
+              << "    using      input  file '" << inFile_  << "'" << std::endl
+              << "    writing to output file '" << outFile_ << "'" << std::endl;
 
-  TFile * fileIn_( TFile::Open( inFile_.c_str(), "UPDATE" ) );
+  TFile * fileIn_( TFile::Open( inFile_.c_str(), "READ" ) );
   if ( ! fileIn_ ) {
     std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
               << "    input file '" << inFile_ << "' missing" << std::endl;
@@ -254,11 +251,6 @@ int main( int argc, char * argv[] )
     return returnStatus_;
   }
   TDirectory * dirSel_ = ( TDirectory* )( fileIn_->Get( evtSel_.c_str() ) );
-  TH1D::SetDefaultSumw2();
-  TH2D::SetDefaultSumw2();
-
-  TCanvas c1( "c1" );
-  c1.cd();
 
   // Read pile-up data
   std::vector< Double_t > pileUpWeights_;
@@ -271,6 +263,30 @@ int main( int argc, char * argv[] )
     if ( usePileUp_ ) pileUpWeights_.push_back( pileUpWeight );
     else              pileUpWeights_.push_back( 1. );
   }
+
+  // Open output file
+
+  TFile * fileOut_( TFile::Open( outFile_.c_str(), "UPDATE" ) );
+  if ( ! fileOut_ ) {
+    fileOut_ = TFile::Open( outFile_.c_str(), "NEW" );
+  }
+  if ( ! fileOut_ ) {
+    std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+              << "    output file '" << outFile_ << "' could not be opened" << std::endl;
+    returnStatus_ += 0x30;
+    return returnStatus_;
+  }
+  TDirectory * dirOutSel_( ( TDirectory* )( fileOut_->Get( evtSel_.c_str() ) ) );
+  if ( ! dirOutSel_ ) {
+    fileOut_->cd();
+    dirOutSel_ = new TDirectoryFile( evtSel_.c_str(), std::string( refSel_ ? "Reference selection" : "Basic selection" ).c_str() );
+  }
+  if ( verbose_ > 1 ) gDirectory->pwd();
+
+  TCanvas c1( "c1" );
+  c1.cd();
+  TH1D::SetDefaultSumw2();
+  TH2D::SetDefaultSumw2();
 
   // Loops through directory structure
 
@@ -285,6 +301,12 @@ int main( int argc, char * argv[] )
                 << "    object category '" << objCat << "' does not exist in input file" << std::endl;
       continue;
     }
+    TDirectory * dirOutCat_( ( TDirectory* )( dirOutSel_->Get( objCat.c_str() ) ) );
+    if ( ! dirOutCat_ ) {
+      dirOutSel_->cd();
+      dirOutCat_ = new TDirectoryFile( objCat.c_str(), std::string( objCat + " objects" ).c_str() );
+    }
+    if ( verbose_ > 1 ) gDirectory->pwd();
 
     // Get binning per object category
 
@@ -379,6 +401,18 @@ int main( int argc, char * argv[] )
       if ( std::string( keyProp->GetClassName() ) != nameDirClass ) continue;
       const std::string kinProp( keyProp->GetName() );
       TDirectory * dirProp_( ( TDirectory* )( dirCat_->Get( kinProp.c_str() ) ) );
+      if ( ! dirProp_ ) {
+        std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                  << "    kinematic property '" << kinProp << "' does not exist in input file" << std::endl;
+        returnStatus_ += 0x1000;
+        continue;
+      }
+      TDirectory * dirOutProp_( ( TDirectory* )( dirOutCat_->Get( kinProp.c_str() ) ) );
+      if ( ! dirOutProp_ ) {
+        dirOutCat_->cd();
+        dirOutProp_ = new TDirectoryFile( kinProp.c_str(), "" );
+      }
+      if ( verbose_ > 1 ) gDirectory->pwd();
 
       // Histogram binning
       const unsigned propBins_( histos_.getParameter< unsigned >( std::string( objCat + kinProp + "Bins" ) ) );
@@ -412,7 +446,19 @@ int main( int argc, char * argv[] )
         if ( useSymm_ == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
         if ( refGen_  == ( subFit.find( "Gen" )  == std::string::npos ) ) continue;
         TDirectory * dirFit_( ( TDirectory* )( dirProp_->Get( subFit.c_str() ) ) );
-        dirFit_->cd();
+        if ( ! dirFit_ ) {
+          std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                    << "    fit '" << subFit << "' does not exist in input file" << std::endl;
+          returnStatus_ += 0x10000;
+          continue;
+        }
+        TDirectory * dirOutFit_( ( TDirectory* )( dirOutProp_->Get( subFit.c_str() ) ) );
+        if ( ! dirOutFit_ ) {
+          dirOutProp_->cd();
+          dirOutFit_ = new TDirectoryFile( subFit.c_str(), "Particular fit" );
+        }
+        dirOutFit_->cd();
+        if ( verbose_ > 1 ) gDirectory->pwd();
 
         const std::string name( objCat + "_" + kinProp + "_" + subFit );
 
@@ -506,7 +552,15 @@ int main( int argc, char * argv[] )
           ++sizeEtaBins;
           const std::string binEta( keyEta->GetName() );
           const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
-          dirFit_->cd( binEta.c_str() );
+//           TDirectory * dirEta_( ( TDirectory* )( dirFit_->Get( binEta.c_str() ) ) );
+//           dirEta_->cd();
+//           if ( verbose_ > 1 ) gDirectory->pwd();
+          TDirectory * dirOutEta_( ( TDirectory* )( dirOutFit_->Get( binEta.c_str() ) ) );
+          if ( ! dirOutEta_ ) {
+            dirOutFit_->cd();
+            dirOutEta_ = new TDirectoryFile( binEta.c_str(), "Eta bin" );
+          }
+          dirOutEta_->cd();
           if ( verbose_ > 1 ) gDirectory->pwd();
 
           const std::string nameEta( name + "_" + binEta );
@@ -932,7 +986,14 @@ int main( int argc, char * argv[] )
         break;
       }
       const std::string kinProp( keyProp->GetName() );
-      TDirectory * dirProp_( ( TDirectory* )( dirCat_->Get( kinProp.c_str() ) ) );
+      TDirectory * dirOutProp_( ( TDirectory* )( dirOutCat_->Get( kinProp.c_str() ) ) );
+      if ( ! dirOutProp_ ) {
+        std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                  << "    kinematic property '" << kinProp << "' does not exist in output file" << std::endl;
+        returnStatus_ += 0x100000;
+        continue;
+      }
+      dirOutProp_->cd();
 
       // Histogram binning
       const double propMax_( histos_.getParameter< double >( std::string( objCat + kinProp + "Max" ) ) );
@@ -943,7 +1004,7 @@ int main( int argc, char * argv[] )
       Ns.push_back( std::vector< double >( nEtaBins_ ) );
 
       // Loop over fit versions
-      TList * listProp( dirProp_->GetListOfKeys() );
+      TList * listProp( dirOutProp_->GetListOfKeys() );
       TIter nextInListProp( listProp );
       while ( TKey * keyFit = ( TKey* )nextInListProp() ) {
         if ( std::string( keyFit->GetClassName() ) != nameDirClass ) continue;
@@ -952,8 +1013,14 @@ int main( int argc, char * argv[] )
         if ( useAlt_  == ( subFit.find( "Alt" )  == std::string::npos ) ) continue;
         if ( useSymm_ == ( subFit.find( "Symm" ) == std::string::npos ) ) continue;
         if ( refGen_  == ( subFit.find( "Gen" )  == std::string::npos ) ) continue;
-        TDirectory * dirFit_( ( TDirectory* )( dirProp_->Get( subFit.c_str() ) ) );
-        dirFit_->cd();
+        TDirectory * dirOutFit_( ( TDirectory* )( dirOutProp_->Get( subFit.c_str() ) ) );
+        if ( ! dirOutFit_ ) {
+          std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                    << "    fit '" << subFit << "' does not exist in output file" << std::endl;
+          returnStatus_ += 0x100000;
+          continue;
+        }
+        dirOutFit_->cd();
 
         // Inversion flags
         const bool inverse( subFit.find( "Inv" ) != std::string::npos );
@@ -1080,13 +1147,20 @@ int main( int argc, char * argv[] )
         histSigmaEtaFitBadNdf->SetXTitle( titleNdf.c_str() );
 
         // Loop over eta bins
-        TList * listFit( dirFit_->GetListOfKeys() );
+        TList * listFit( dirOutFit_->GetListOfKeys() );
         TIter nextInListFit( listFit );
         while ( TKey * keyEta = ( TKey* )nextInListFit() ) {
           if ( std::string( keyEta->GetClassName() ) != nameDirClass ) continue;
           const std::string binEta( keyEta->GetName() );
           const unsigned uEta( std::atoi( binEta.substr( 3 ).data() ) );
-          dirFit_->cd( binEta.c_str() );
+          TDirectory * dirOutEta_( ( TDirectory* )( dirOutFit_->Get( binEta.c_str() ) ) );
+          if ( ! dirOutEta_ ) {
+            std::cout << argv[ 0 ] << " --> ERROR:" << std::endl
+                      << "    fit '" << binEta << "' does not exist in output file" << std::endl;
+            returnStatus_ += 0x200000;
+            continue;
+          }
+          dirOutEta_->cd();
 
           const std::string nameEta( name + "_" + binEta );
           const std::string formula( inverse ? resFuncInv_ : resFunc_ );
@@ -1414,15 +1488,22 @@ int main( int argc, char * argv[] )
   }
 
 
-  // Write and close input file
-  if ( overwrite_ ) fileIn_->Write( 0, TObject::kOverwrite );
-  else              fileIn_->Write();
+  // Write and close ROOT files
+  Int_t writeOut_( 0 );
+  if ( overwrite_ ) {
+    writeOut_ = fileOut_->Write( 0, TObject::kOverwrite );
+  }
+  else {
+    writeOut_ = fileOut_->Write();
+  }
   fileIn_->Close();
+  fileOut_->Close();
 
   if ( verbose_ > 0 )
     std::cout << std::endl
               << argv[ 0 ] << " --> INFO:" << std::endl
-              << "    return status " << returnStatus_ << std::endl;
+              << "    return status   " << returnStatus_ << std::endl
+              << "    " << writeOut_ << " bytes written to output file" << std::endl;
   return returnStatus_;
 
 }
