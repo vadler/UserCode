@@ -1,16 +1,4 @@
 
-etadep_etamin0  = -2.40
-etadep_etamax0  = -2.30
-etadep_vecres0  = -NAN,NAN,NAN/-NAN,NAN,NAN/-NAN,NAN,NAN/et
-
-etadep_etamin1  = -2.30
-etadep_etamax1  = -2.20
-etadep_vecres1  = -NAN,NAN,NAN/-NAN,NAN,NAN/-NAN,NAN,NAN/et
-
-etadep_etamin2  = -2.20
-etadep_etamax2  = -2.10
-etadep_vecres2  = -NAN,NAN,NAN/-NAN,NAN,NAN/-NAN,NAN,NAN/et
-
 etadep_etamin3  = -2.10
 etadep_etamax3  = -2.00
 etadep_vecres3  = -0.01857341,0.00000864,0.00038889/-0.00000737,0.00042447,0.00025472/-0.00585435,0.00062100,0.00008810/et
@@ -178,15 +166,3 @@ etadep_vecres43 = -0.01926034,0.00000000,0.00036075/-0.00000293,0.00143024,0.000
 etadep_etamin44 = 2.00
 etadep_etamax44 = 2.10
 etadep_vecres44 = -0.01857341,0.00000864,0.00038889/-0.00000737,0.00042447,0.00025472/-0.00585435,0.00062100,0.00008810/et
-
-etadep_etamin45 = 2.10
-etadep_etamax45 = 2.20
-etadep_vecres45 = -NAN,NAN,NAN/-NAN,NAN,NAN/-NAN,NAN,NAN/et
-
-etadep_etamin46 = 2.20
-etadep_etamax46 = 2.30
-etadep_vecres46 = -NAN,NAN,NAN/-NAN,NAN,NAN/-NAN,NAN,NAN/et
-
-etadep_etamin47 = 2.30
-etadep_etamax47 = 2.40
-etadep_vecres47 = -NAN,NAN,NAN/-NAN,NAN,NAN/-NAN,NAN,NAN/et
