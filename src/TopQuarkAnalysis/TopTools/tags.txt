@@ -6,16 +6,11 @@ DataFormats/METReco                              V03-03-11-01   V03-03-11
 DataFormats/PatCandidates                        V06-05-06-12   V06-05-06-11   
 EGamma/EGammaAnalysisTools                       V00-00-30-01                  
 JetMETCorrections/Type1MET                       V04-06-09-02   V04-06-09-01   
-PhysicsTools/PatAlgos                            V08-09-60      V08-09-59      
+PhysicsTools/PatAlgos                            V08-09-61      V08-09-59      
 PhysicsTools/PatUtils                            V03-09-28      V03-09-28      
-RecoBTag/Configuration                           V00-07-05      V00-06-02      
-RecoBTag/ImpactParameter                         V01-04-09-01   V01-04-08      
-RecoBTag/SecondaryVertex                         V01-10-06      V01-08-01      
-RecoBTag/SoftLepton                              V05-09-11      V05-08-01      
-RecoBTau/JetTagComputer                          V02-03-02      V02-02-07      
 RecoMET/METAnalyzers                             V00-00-08                     
 TopQuarkAnalysis/Configuration                   V07-00-04      V07-00-04      
 TopQuarkAnalysis/TopSkimming                     V07-01-04      V07-01-03      
 TopQuarkAnalysis/TopTools                        V06-07-13      V06-07-12      
 ---------------------------------------
-total packages: 15 (15 displayed)
+total packages: 10 (10 displayed)
