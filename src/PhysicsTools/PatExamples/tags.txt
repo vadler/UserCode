@@ -5,5 +5,6 @@ Your Test release in: /afs/cern.ch/work/v/vadler/cms/Tutorial/CMSSW_5_3_11
 DataFormats/PatCandidates                        V06-05-06-12   V06-05-06-11   
 PhysicsTools/PatAlgos                            V08-09-59      V08-09-59      
 PhysicsTools/PatExamples                         V00-14-00      V00-05-30      
+RecoLuminosity/LumiDB                            V04-02-08      V04-02-01      
 ---------------------------------------
-total packages: 3 (3 displayed)
+total packages: 4 (4 displayed)
