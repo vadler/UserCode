@@ -8,7 +8,7 @@ cmsenv
 cvs co -r V03-03-11-01    DataFormats/METReco
 cvs co -r V06-05-06-12    DataFormats/PatCandidates
 cvs co -r V04-06-09-02    JetMETCorrections/Type1MET
-cvs co -r V08-09-61       PhysicsTools/PatAlgos
+cvs co -r V08-09-62       PhysicsTools/PatAlgos
 cvs co -r V03-09-28       PhysicsTools/PatUtils
 cvs co -r V00-00-08       RecoMET/METAnalyzers
 cvs co -r V00-00-30-01 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
