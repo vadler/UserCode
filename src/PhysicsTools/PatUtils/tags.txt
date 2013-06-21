@@ -2,10 +2,11 @@ Test Release based on: CMSSW_6_1_2
 Base Release in: /afs/cern.ch/cms/slc5_amd64_gcc472/cms/cmssw/CMSSW_6_1_2
 Your Test release in: /afs/cern.ch/user/v/vadler/cms/AT/CMSSW_6_1_2
 -------- Package --------                        --- Tag ---    --- RelTag --- 
+CommonTools/ParticleFlow                         V01-01-17-01   V01-01-17      
 DataFormats/CaloRecHit                           V02-05-12      V02-05-10      
 DataFormats/PatCandidates                        V06-05-17      V06-05-13      
-PhysicsTools/PatAlgos                            V08-10-34-05   V08-10-34-03   
+PhysicsTools/PatAlgos                            V08-10-34-06   V08-10-34-03   
 PhysicsTools/PatUtils                            V03-09-28      V03-09-26      
 RecoMET/METProducers                             V03-03-17-00-01 V03-03-17      
 ---------------------------------------
-total packages: 5 (5 displayed)
+total packages: 6 (6 displayed)
