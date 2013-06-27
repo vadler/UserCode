@@ -12,6 +12,19 @@ import FWCore.ParameterSet.Config as cms
 import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing ('standard')
 options.register('runOnMC', True, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, "decide if run on MC or data")
+# parsing command line arguments
+if( hasattr(sys, "argv") ):
+  #options.parseArguments()
+  if(len(sys.argv) > 1):
+    print "Parsing command line arguments:"
+  for args in sys.argv :
+    arg = args.split(',')
+    for val in arg:
+      val = val.split('=')
+      if(len(val)==2):
+        print "Setting *", val[0], "* to:", val[1]
+        setattr(options,val[0], val[1])
+
 
 process = cms.Process( 'PAT' )
 
@@ -26,6 +39,7 @@ process = cms.Process( 'PAT' )
 
 ### Data or MC?
 runOnMC = options.runOnMC
+print runOnMC
 
 ### Switch on/off selection steps
 
@@ -134,8 +148,8 @@ maxEvents = -1 # reduce for testing
 ### Conditions
 
 # GlobalTags
-globalTagData = 'GR_R_52_V7E::All' # incl. Summer12 JEC and new b-tag SF
-globalTagMC   = 'START52_V9D::All' # incl. Summer12 JEC and new b-tag SF
+globalTagData = 'FT_53_V21_AN3::All'
+globalTagMC   = 'START53_V21::All'
 
 ### Output
 
@@ -172,20 +186,16 @@ else:
 ###
 
 if useRelVals:
-  from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
   if runOnMC:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_5_cand1'
-                                     , relVal        = 'RelValTTbar'
-                                     , globalTag     = 'START52_V9'
-                                     , maxVersions   = 1
-                                     )
+    from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValProdTTbarAODSIM
+    inputFiles = filesRelValProdTTbarAODSIM
   else:
-    inputFiles = pickRelValInputFiles( cmsswVersion  = 'CMSSW_5_2_5_cand1'
-                                     , relVal        = 'SingleMu'
-                                     , dataTier      = 'RECO'
-                                     , globalTag     = 'GR_R_52_V7_RelVal_mu2011B'
-                                     , maxVersions   = 1
-                                     )
+    inputFiles = [ '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/FE49EA68-7975-E211-B190-00259059642A.root'
+                 , '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/FCFDF118-7975-E211-8BBC-00261894395A.root'
+                 , '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/FC859A16-7875-E211-A52F-0026189438C4.root'
+                 , '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/F882C139-7B75-E211-9583-0025905964C4.root'
+                 , '/store/relval/CMSSW_5_3_7_patch6-GR_R_53_V16_RelVal_mu2012D_Reference/SingleMu/RECO/v1/00004/F819E38B-7A75-E211-AD37-002590593878.root'
+                 ]
 process.load( "TopQuarkAnalysis.Configuration.patRefSel_inputModule_cfi" )
 process.source.fileNames = inputFiles
 process.maxEvents.input  = maxEvents
@@ -496,7 +506,7 @@ if addTriggerMatching:
 
 # MVA electron ID
 
-process.load( "EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi" )
+process.load( "EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi" )
 process.eidMVASequence = cms.Sequence(
   process.mvaTrigV0
 + process.mvaNonTrigV0
