@@ -8,7 +8,7 @@ import FWCore.ParameterSet.Config as cms
 ### Steering
 
 runOnMC       = True
-runOnRelVal   = True # If 'False', define input files in l. 223ff.
+runOnRelVal   = True # If 'False', define input files in l. 228ff.
 maxEvents     = -1
 gc            = True
 createNTuples = True
@@ -19,14 +19,14 @@ if lxplusTest:
   if not runOnMC:
     maxEvents = 1000
 else:
-  runOnRelVal = False # If 'False', define input files in l. 223ff.
+  runOnRelVal = False # If 'False', define input files in l. 228ff.
 
 runMatch  = True
 runMVA    = True
 runCiC    = False
 runEwk    = False
 addGenEvt = False
-writePdfWeights      = True    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
+writePdfWeights      = False    # corresponding actions to be updated, s. https://hypernews.cern.ch/HyperNews/CMS/get/top/1499.html ff.
 writeNonIsoMuons     = True
 writeNonIsoElectrons = True
 filterDecayChannels        = False
@@ -50,7 +50,7 @@ typeIMetCorrections = True
 
 # vertex collection to use
 # 'offlinePrimaryVertices' or ( 'goodOfflinePrimaryVertices' or 'goodVertices' ) (done anyway for MET filters)
-pvCollection = 'goodVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
+pvCollection = 'goodOfflinePrimaryVertices' # recommended: 'goodOfflinePrimaryVertices' (s. https://hypernews.cern.ch/HyperNews/CMS/get/top-selection/38/1/1/1/2/1/1/2/1/3/1.html)
 
 # jet collection to use
 # 'pfJets' or 'pfNoTau'
@@ -168,14 +168,14 @@ if gc:
 
 runMatch            = runMatch            and runOnMC
 addGenEvt           = addGenEvt           and runOnMC
-writePdfWeights     = writePdfWeights     and runOnMC and not lxplusTest
+writePdfWeights     = writePdfWeights     and runOnMC
 filterDecayChannels = filterDecayChannels and runOnMC
 
-# muon propagator requirements
-process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
-process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
-process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
-process.load("RecoMuon.DetLayers.muonDetLayerGeometry_cfi")
+## muon propagator requirements # FIXME: Is this needed any more?
+#process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
+#process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
+#process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
+#process.load("RecoMuon.DetLayers.muonDetLayerGeometry_cfi")
 
 ### Logging
 
@@ -186,9 +186,13 @@ if lxplusTest:
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool( True )
 )
-process.Timing = cms.Service( "Timing"
-, summaryOnly = cms.untracked.bool( True )
-)
+if lxplusTest:
+  process.Timing = cms.Service( "Timing"
+  , summaryOnly = cms.untracked.bool( True )
+  )
+  process.SimpleMemoryCheck = cms.Service( "SimpleMemoryCheck"
+  , ignoreTotal = cms.untracked.int32( 1 )
+  )
 
 ### Input
 
@@ -223,18 +227,29 @@ if runOnRelVal:
 else:
   if runOnMC:
     if lxplusTest:
-      inputFiles = [ '/store/user/vadler/cms/AT/CMSSW_5_2_5/output/TTbar_Summer12_AODskim.root'
+      inputFiles = [ '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola__Summer12_DR53X-PU_S10_START53_V7C-v1__AODSIM_1_1_8JH.root'
+                   , '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola__Summer12_DR53X-PU_S10_START53_V7C-v1__AODSIM_2_1_7TX.root'
+                   , '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola__Summer12_DR53X-PU_S10_START53_V7C-v1__AODSIM_3_1_qEJ.root'
+                   , '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola__Summer12_DR53X-PU_S10_START53_V7C-v1__AODSIM_4_1_LX5.root'
+                   , '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola__Summer12_DR53X-PU_S10_START53_V7C-v1__AODSIM_5_1_5vg.root'
                    ]
+      #inputFiles = [ '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TT_8TeV-mcatnlo__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM_1_1_e2E.root'
+                   #, '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TT_8TeV-mcatnlo__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM_2_1_8Ng.root'
+                   #, '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TT_8TeV-mcatnlo__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM_3_1_TyS.root'
+                   #, '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TT_8TeV-mcatnlo__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM_4_1_kI3.root'
+                   #, '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TT_8TeV-mcatnlo__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM_5_1_qxT.root'
+                   #, '/store/user/vadler/cms/Top/CMSSW_5_3_10_patch1/output/TT_8TeV-mcatnlo__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM_6_1_1yB.root'
+                   #]
     else:
       inputFiles = [ 'file:////user/bklein/TTbar_2012_synchronisation_ex.root'
                    ]
   else:
     if lxplusTest:
-      process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange( '201197:1-201197:23'
+      process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange( #'201197:1-201197:23'
                                                                          )
-    inputFiles = [ '/store/data/Run2012C/MuHad/AOD/PromptReco-v2/000/201/197/94C63DB6-D2EB-E111-AE27-003048D375AA.root'
+    inputFiles = [ #'/store/data/Run2012C/MuHad/AOD/PromptReco-v2/000/201/197/94C63DB6-D2EB-E111-AE27-003048D375AA.root'
                  ]
-    #inputFiles = [ '/store/data/Run2012C/ElectronHad/AOD/PromptReco-v2/000/201/197/2C1E6199-D2EB-E111-B2C6-0025B3203898.root'
+    #inputFiles = [ #'/store/data/Run2012C/ElectronHad/AOD/PromptReco-v2/000/201/197/2C1E6199-D2EB-E111-B2C6-0025B3203898.root'
                  #]
 process.source.fileNames = cms.untracked.vstring( inputFiles )
 process.maxEvents = cms.untracked.PSet(
@@ -315,6 +330,7 @@ if writePdfWeights:
     "PdfWeightProducer"
   , PdfInfoTag  = cms.untracked.InputTag( 'generator' )
   , PdfSetNames = cms.untracked.vstring( 'cteq66.LHgrid' )
+  #, PdfSetNames = cms.untracked.vstring( 'cteq66.LHgrid', 'CT10.LHgrid' )
   )
 
 ### PAT
@@ -447,8 +463,6 @@ process.patJetPartonAssociation.jets = cms.InputTag( pfJetCollection )
 process.patJetPartonMatch.src = cms.InputTag( pfJetCollection )
 process.pfJetTracksAssociatorAtVertex.jets = cms.InputTag( pfJetCollection )
 process.pfMET.jets = cms.InputTag( pfJetCollection )
-process.softMuonTagInfosAOD.jets = cms.InputTag( pfJetCollection )
-process.softElectronTagInfosAOD.jets = cms.InputTag( pfJetCollection )
 
 # The following need to be fixed _after_ the (potential) calls to 'removeSpecificPATObjects()' and 'runOnData()'
 process.patJetCorrFactors.payload = jetAlgo + 'PFchs'
@@ -462,7 +476,7 @@ if not createNTuples:
                                 , 'drop edmTriggerResults_*_*_*NONE*'
                                 , 'keep *_hltTriggerSummaryAOD_*_*'
                                 , 'keep *_offlineBeamSpot_*_*'
-                                , 'keep *_goodOfflinePrimaryVertices_*_*'
+                                , 'keep *_%s_*_*'%( pvCollection )
                                 # for conversion rejection
                                 , 'keep recoTracks_generalTracks_*_*'
                                 , 'keep recoGsfTracks_electronGsfTracks_*_*'
@@ -540,7 +554,7 @@ process.cleanPatElectrons.preselection  = electronCut
 process.cleanPatElectrons.checkOverlaps = cms.PSet()
 process.countPatElectrons.minNumber = electronsMin
 if runMVA:
-  process.load('EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi')
+  process.load('EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi')
   process.eidMVASequence = cms.Sequence( process.mvaTrigV0
                                        + process.mvaNonTrigV0
                                        )
@@ -650,17 +664,6 @@ if filterDecayChannels:
     if restrictTauChannelElectron:
       process.ttSemiLeptonicFilter.allowedTopDecays.restrictTauDecays.electron = cms.bool( True )
 
-### Additipnal reconstruction
-
-# For lepton isolation with rho corrections
-from RecoJets.Configuration.RecoPFJets_cff import kt6PFJets
-process.kt6PFJetsForIsolation = kt6PFJets.clone( Rho_EtaMax   = 2.5
-                                               , Ghost_EtaMax = 2.5
-                                               )
-if not createNTuples:
-  process.out.outputCommands += [ 'keep double_kt6PFJetsForIsolation_*_*'
-                                ]
-
 ### Path
 
 process.p = cms.Path( process.eventCleaning
@@ -671,7 +674,6 @@ if addGenEvt:
 if filterDecayChannels:
   process.p *= process.ttSemiLeptonicFilter
 
-process.p *= process.kt6PFJetsForIsolation
 process.p *= process.patPF2PATSequence
 
 if writeNonIsoMuons:

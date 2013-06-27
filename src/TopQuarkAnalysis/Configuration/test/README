@@ -11,8 +11,9 @@ cvs co -r V04-06-09-02    JetMETCorrections/Type1MET
 cvs co -r V08-09-62       PhysicsTools/PatAlgos
 cvs co -r V03-09-28       PhysicsTools/PatUtils
 cvs co -r V00-00-08       RecoMET/METAnalyzers
-cvs co -r V00-00-30-01 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
-cd EGamma/EGammaAnalysisTools/data
+cvs co -r V09-00-01       RecoEgamma/EgammaTools
+cvs co -r SE_PhotonIsoProducer_MovedIn EgammaAnalysis/ElectronTools
+cd EgammaAnalysis/ElectronTools/data/
 cat download.url | xargs wget
 cd -
 scram b -j 9

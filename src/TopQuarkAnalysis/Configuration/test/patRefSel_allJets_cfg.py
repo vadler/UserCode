@@ -127,7 +127,6 @@ inputFiles = []   # overwritten, if "useRelVals" is 'True'
 
 # maximum number of events
 maxEvents = -1 # reduce for testing
-maxEvents = 1000
 
 ### Conditions
 
@@ -471,7 +470,7 @@ if addTriggerMatching:
 
 # MVA electron ID
 
-process.load( "EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi" )
+process.load( "EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi" )
 process.eidMVASequence = cms.Sequence(
   process.mvaTrigV0
 + process.mvaNonTrigV0
